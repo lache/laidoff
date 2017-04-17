@@ -1451,7 +1451,7 @@ static void convert_touch_coord_to_ui_coord(LWCONTEXT *pLwc, float *x, float *y)
 void exec_attack_with_screen_point(LWCONTEXT* pLwc, float x, float y) {
 
 	for (int i = 0; i < MAX_ENEMY_SLOT; i++) {
-		if (pLwc->enemy[i].valid) {
+		if (pLwc->enemy[i].valid && pLwc->enemy[i].c.hp > 0) {
 			if (pLwc->enemy[i].left_top_ui_point[0] <= x
 				&& x <= pLwc->enemy[i].right_bottom_ui_point[0]
 				&& y <= pLwc->enemy[i].left_top_ui_point[1]

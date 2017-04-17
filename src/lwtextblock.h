@@ -25,4 +25,4 @@ typedef struct _LWTEXTBLOCK
 } LWTEXTBLOCK;
 
 
-#define DEFAULT_TEXT_BLOCK_WIDTH (2.0f)
+#define DEFAULT_TEXT_BLOCK_WIDTH (4.0f)

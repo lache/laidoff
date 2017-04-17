@@ -1,4 +1,4 @@
-#include "render_text_block.h"
+ï»¿#include "render_text_block.h"
 #include "lwcontext.h"
 #include "font.h"
 #include "unicode.h"
@@ -206,7 +206,7 @@ void render_text_block(const struct _LWCONTEXT *pLwc, const struct _LWTEXTBLOCK*
 			}
 			else {
 				glBindTexture(GL_TEXTURE_2D, pLwc->tex_font_atlas[bci->page]);
-				// TODO: ÆùÆ® ÅØ½ºÃ³ ÇØ»óµµ 1024x1024 ÇÏµåÄÚµù
+				// TODO: í°íŠ¸ í…ìŠ¤ì²˜ í•´ìƒë„ 1024x1024 í•˜ë“œì½”ë”©
 				set_texture_parameter_values(pLwc, bci->x, bci->y, bci->width, bci->height, 1024, 1024, 1);
 			}
 			
@@ -247,7 +247,7 @@ void render_text_block(const struct _LWCONTEXT *pLwc, const struct _LWTEXTBLOCK*
 			}
 			size_scaled_xadvance_accum += last_size_scaled_xadvance;
 
-			if (prop_font_size * xoffset * screen_aspect_ratio > text_block->text_block_width) {
+			if (size_scaled_xadvance_accum / pLwc->width * 2 * screen_aspect_ratio > text_block->text_block_width) {
 				size_scaled_xadvance_accum = 0;
 				line++;
 			}
