@@ -1,0 +1,8 @@
+build
+*.aps
+/.vs
+/win32/Debug
+/win32/MinSizeRel
+\#*\#
+/.vimrc
+

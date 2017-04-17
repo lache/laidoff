@@ -1,0 +1,13 @@
+#pragma once
+
+enum LW_SOUND
+{
+	LWS_TOUCH,
+	LWS_POINT,
+	LWS_HIT,
+	LWS_DIE,
+	LWS_SWOOSHING,
+	LWS_START,
+	LWS_COMPLETE,
+	LWS_BGM,
+};

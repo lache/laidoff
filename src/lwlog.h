@@ -1,0 +1,21 @@
+#pragma once
+
+#include "platform_detection.h"
+
+#if LW_PLATFORM_WIN32 || LW_PLATFORM_OSX || LW_PLATFORM_IOS || LW_PLATFORM_IOS_SIMULATOR || LW_PLATFORM_RPI
+#include <stdio.h>
+#define LOGV(...) //((void)printf(__VA_ARGS__))
+#define LOGD(...) (void)printf(__VA_ARGS__);(void)printf("\n")
+#define LOGI(...) (void)printf(__VA_ARGS__);(void)printf("\n")
+#define LOGW(...) (void)printf(__VA_ARGS__);(void)printf("\n")
+#define LOGE(...) (void)printf(__VA_ARGS__);(void)printf("\n")
+#define LOGA(...) (void)printf(__VA_ARGS__);(void)printf("\n")
+#elif LW_PLATFORM_ANDROID
+#include <android/log.h>
+#define LOGV(...) ((void)__android_log_print(ANDROID_LOG_VERBOSE, "native-activity", __VA_ARGS__))
+#define LOGD(...) ((void)__android_log_print(ANDROID_LOG_DEBUG, "native-activity", __VA_ARGS__))
+#define LOGI(...) ((void)__android_log_print(ANDROID_LOG_INFO, "native-activity", __VA_ARGS__))
+#define LOGW(...) ((void)__android_log_print(ANDROID_LOG_WARN, "native-activity", __VA_ARGS__))
+#define LOGE(...) ((void)__android_log_print(ANDROID_LOG_ERROR, "native-activity", __VA_ARGS__))
+#define LOGA(...) ((void)__android_log_print(ANDROID_LOG_ASSERT, "native-activity", __VA_ARGS__))
+#endif
