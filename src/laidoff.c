@@ -756,6 +756,8 @@ void init_font_fbo(LWCONTEXT* pLwc) {
 
 void init_lwc_runtime_data(LWCONTEXT *pLwc) {
 
+	init_font_fbo(pLwc);
+
 	reset_runtime_context(pLwc);
 
 	pLwc->highscore = request_get_highscore();
@@ -1418,8 +1420,6 @@ void lw_set_size(LWCONTEXT *pLwc, int w, int h) {
 	pLwc->height = h;
 
 	reset_dir_pad_position(pLwc);
-
-	init_font_fbo(pLwc);
 }
 
 void lw_set_window(LWCONTEXT *pLwc, struct GLFWwindow *window) {
