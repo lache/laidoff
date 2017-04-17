@@ -83,6 +83,7 @@ void lw_app_quit(const LWCONTEXT *pLwc);
 
 const static float default_uv_offset[2] = { 0, 0 };
 const static float default_uv_scale[2] = { 1, 1 };
+const static float default_flip_y_uv_scale[2] = { 1, -1 };
 
 #ifdef __cplusplus
 };

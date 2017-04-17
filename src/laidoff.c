@@ -688,6 +688,55 @@ void reset_runtime_context(LWCONTEXT* pLwc) {
 	pLwc->battle_state = LBS_SELECT_COMMAND;
 
 	pLwc->selected_command_slot = 0;
+
+	pLwc->font_fbo.dirty = 1;
+}
+
+void delete_font_fbo(LWCONTEXT* pLwc) {
+	if (pLwc->font_fbo.fbo) {
+		glDeleteFramebuffers(1, &pLwc->font_fbo.fbo);
+		pLwc->font_fbo.fbo = 0;
+	}
+
+	if (pLwc->font_fbo.depth_render_buffer) {
+		glDeleteRenderbuffers(1, &pLwc->font_fbo.depth_render_buffer);
+		pLwc->font_fbo.depth_render_buffer = 0;
+	}
+
+	if (pLwc->font_fbo.color_tex) {
+		glDeleteTextures(1, &pLwc->font_fbo.color_tex);
+		pLwc->font_fbo.color_tex = 0;
+	}
+}
+
+void init_font_fbo(LWCONTEXT* pLwc) {
+
+	// Delete GL resources before init
+
+	delete_font_fbo(pLwc);
+
+	// Start init
+
+	glGenFramebuffers(1, &pLwc->font_fbo.fbo);
+	glBindFramebuffer(GL_FRAMEBUFFER, pLwc->font_fbo.fbo);
+
+	glGenRenderbuffers(1, &pLwc->font_fbo.depth_render_buffer);
+	glBindRenderbuffer(GL_RENDERBUFFER, pLwc->font_fbo.depth_render_buffer);
+	glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT, pLwc->width, pLwc->height);
+	glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_COMPONENT, GL_RENDERBUFFER, pLwc->font_fbo.depth_render_buffer);
+
+	glGenTextures(1, &pLwc->font_fbo.color_tex);
+	glBindTexture(GL_TEXTURE_2D, pLwc->font_fbo.color_tex);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, pLwc->width, pLwc->height, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
+	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, pLwc->font_fbo.color_tex, 0);
+
+	GLenum status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
+	if (status != GL_FRAMEBUFFER_COMPLETE) {
+		LOGE("init_font_fbo: glCheckFramebufferStatus failed. return = %d", status);
+		delete_font_fbo(pLwc);
+	}
+
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
 void init_lwc_runtime_data(LWCONTEXT *pLwc) {
@@ -1128,6 +1177,11 @@ void lwc_update(LWCONTEXT *pLwc, double delta_time) {
 
 	update_battle_wall(pLwc);
 
+	if (pLwc->font_fbo.dirty) {
+		lwc_render_font_test_fbo(pLwc);
+		pLwc->font_fbo.dirty = 0;
+	}
+
 	((LWCONTEXT *)pLwc)->update_count++;
 }
 
@@ -1360,6 +1414,8 @@ void lw_set_size(LWCONTEXT *pLwc, int w, int h) {
 	pLwc->height = h;
 
 	reset_dir_pad_position(pLwc);
+
+	init_font_fbo(pLwc);
 }
 
 void lw_set_window(LWCONTEXT *pLwc, struct GLFWwindow *window) {

@@ -2,8 +2,11 @@
 #include "render_font_test.h"
 #include "lwcontext.h"
 #include "render_text_block.h"
+#include "render_solid.h"
 
-void lwc_render_font_test(const struct _LWCONTEXT* pLwc) {
+void lwc_render_font_test_fbo(const struct _LWCONTEXT* pLwc) {
+	glBindFramebuffer(GL_FRAMEBUFFER, pLwc->font_fbo.fbo);
+
 	glViewport(0, 0, pLwc->width, pLwc->height);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -119,4 +122,15 @@ void lwc_render_font_test(const struct _LWCONTEXT* pLwc) {
 	test_text_block.text_block_y = -0.25f;
 	test_text_block.align = LTBA_RIGHT_BOTTOM;
 	render_text_block(pLwc, &test_text_block);
+
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+}
+
+void lwc_render_font_test(const struct _LWCONTEXT* pLwc) {
+	glViewport(0, 0, pLwc->width, pLwc->height);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+	const float aspect_ratio = (float)pLwc->width / pLwc->height;
+
+	render_solid_box_ui_lvt_flip_y_uv(pLwc, 0, 0, 2 * aspect_ratio, 2/*flip_y*/, pLwc->font_fbo.color_tex, LVT_CENTER_CENTER_ANCHORED_SQUARE, 1);
 }

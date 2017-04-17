@@ -283,6 +283,13 @@ typedef struct
 
 typedef unsigned int UnicodeChar;
 
+typedef struct _LWFBO {
+	GLuint fbo;
+	GLuint depth_render_buffer;
+	GLuint color_tex;
+	int dirty;
+} LWFBO;
+
 typedef struct _LWCONTEXT
 {
     struct GLFWwindow* window;
@@ -419,6 +426,7 @@ typedef struct _LWCONTEXT
 
 	int font_texture_texture_mode;
 
+	LWFBO font_fbo;
 } LWCONTEXT;
 
 #pragma pack(push, 1)
