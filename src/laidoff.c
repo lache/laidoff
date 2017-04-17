@@ -727,6 +727,9 @@ void init_font_fbo(LWCONTEXT* pLwc) {
 
 	// Start init
 
+	pLwc->font_fbo.width = 1024;
+	pLwc->font_fbo.height = 1024;
+
 	glGenFramebuffers(1, &pLwc->font_fbo.fbo);
 	glBindFramebuffer(GL_FRAMEBUFFER, pLwc->font_fbo.fbo);
 
@@ -737,7 +740,7 @@ void init_font_fbo(LWCONTEXT* pLwc) {
 
 	glGenTextures(1, &pLwc->font_fbo.color_tex);
 	glBindTexture(GL_TEXTURE_2D, pLwc->font_fbo.color_tex);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, pLwc->width, pLwc->height, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, pLwc->font_fbo.width, pLwc->font_fbo.height, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
 	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, pLwc->font_fbo.color_tex, 0);
 
 	GLenum status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
