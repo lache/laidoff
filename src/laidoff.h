@@ -6,7 +6,7 @@
 #include "lwatlassprite.h"
 
 #ifdef __cplusplus
-extern "C" {
+extern "C" {;
 #endif
 
 typedef struct _LWCONTEXT LWCONTEXT;
@@ -15,7 +15,7 @@ typedef struct GLFWwindow GLFWwindow;
 LWCONTEXT* lw_init(void);
 void lw_deinit(LWCONTEXT* pLwc);
 void lwc_update(LWCONTEXT* pLwc, double delta_time);
-void lw_set_size(LWCONTEXT* pLwc, int w,int h);
+void lw_set_size(LWCONTEXT* pLwc, int w, int h);
 void lw_set_window(LWCONTEXT* pLwc, struct GLFWwindow* window);
 GLFWwindow* lw_get_window(const LWCONTEXT* pLwc);
 void lwc_render(const LWCONTEXT* pLwc);
@@ -56,6 +56,7 @@ void change_to_field(LWCONTEXT* pLwc);
 void change_to_dialog(LWCONTEXT* pLwc);
 void change_to_battle(LWCONTEXT* pLwc);
 void change_to_font_test(LWCONTEXT* pLwc);
+void change_to_admin(LWCONTEXT *pLwc);
 
 void toggle_font_texture_test_mode(LWCONTEXT* pLwc);
 
@@ -75,8 +76,7 @@ void bind_all_vertex_attrib_etc1_with_alpha(const LWCONTEXT *pLwc, int vbo_index
 void set_texture_parameter_values(const LWCONTEXT *pLwc, float x, float y, float w, float h,
 	float atlas_w, float atlas_h, int shader_index);
 int get_tex_index_by_hash_key(const LWCONTEXT* pLwc, const char* hash_key);
-void
-set_texture_parameter(const LWCONTEXT *pLwc, LWENUM _LW_ATLAS_ENUM lae, LWENUM _LW_ATLAS_SPRITE las);
+void set_texture_parameter(const LWCONTEXT *pLwc, LWENUM _LW_ATLAS_ENUM lae, LWENUM _LW_ATLAS_SPRITE las);
 
 int spawn_field_object(struct _LWCONTEXT* pLwc, float x, float y, float w, float h, enum _LW_VBO_TYPE lvt, unsigned int tex_id, float sx, float sy);
 void lw_app_quit(const LWCONTEXT *pLwc);

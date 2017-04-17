@@ -176,6 +176,8 @@ void lwc_render_dialog(const LWCONTEXT* pLwc)
 
 	render_dialog_balloon(pLwc);
 
+	const float aspect_ratio = (float)pLwc->width / pLwc->height;
+
 	LWTEXTBLOCK text_block;
 	text_block.align = LTBA_LEFT_TOP;
 	text_block.text = pLwc->dialog;
@@ -183,11 +185,11 @@ void lwc_render_dialog(const LWCONTEXT* pLwc)
 	text_block.begin_index = pLwc->dialog_start_index;
 	text_block.end_index = text_block.begin_index + pLwc->render_char < text_block.text_bytelen ? text_block.begin_index +
 		pLwc->render_char : text_block.text_bytelen;
-	text_block.text_block_x = -0.75f;
+	text_block.text_block_x = -0.75f * aspect_ratio;
 	text_block.text_block_y = -0.50f;
-	text_block.text_block_width = DEFAULT_TEXT_BLOCK_WIDTH;
-	text_block.text_block_line_height = DEFAULT_TEXT_BLOCK_LINE_HEIGHT;
-	text_block.size = DEFAULT_TEXT_BLOCK_SIZE;
+	text_block.text_block_width = 0.75f * 2;
+	text_block.text_block_line_height = DEFAULT_TEXT_BLOCK_LINE_HEIGHT_A;
+	text_block.size = DEFAULT_TEXT_BLOCK_SIZE_A;
 	SET_COLOR_RGBA_FLOAT(text_block.color_normal_glyph, 1, 1, 1, 1);
 	SET_COLOR_RGBA_FLOAT(text_block.color_normal_outline, 0, 0, 0, 1);
 	SET_COLOR_RGBA_FLOAT(text_block.color_emp_glyph, 1, 1, 0, 1);

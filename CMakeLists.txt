@@ -188,6 +188,7 @@ src/lwbattlecommand.h
 src/lwbattlecommandresult.h
 src/lwbattlecreature.h
 src/lwbitmapcontext.h
+src/lwbuttoncommand.h
 src/lwcontext.h
 src/lwdamagetext.h
 src/lwenemy.c
@@ -204,6 +205,8 @@ src/lwvbo.h
 src/lwvbotype.h
 src/lwtextblock.h
 src/platform_detection.h
+src/render_admin.c
+src/render_admin.h
 src/render_battle.c
 src/render_battle.h
 src/render_dialog.c

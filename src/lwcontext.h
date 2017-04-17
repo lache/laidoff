@@ -15,6 +15,7 @@
 #include "lwvbotype.h"
 #include "lwmacro.h"
 #include "lwatlasenum.h"
+#include "lwbuttoncommand.h"
 
 #define MAX_SHADER (3)
 #define MAX_BAR_SPAWN_COUNT (374) // ((int)(5 * 60 * 1.0/SCROLL_SPEED))
@@ -193,6 +194,7 @@ typedef enum
     LGS_FIELD,
     LGS_DIALOG,
 	LGS_FONT_TEST,
+	LGS_ADMIN,
 
     LGS_INVALID,
 } LW_GAME_SCENE;
@@ -427,6 +429,13 @@ typedef struct _LWCONTEXT
 	int font_texture_texture_mode;
 
 	LWFBO font_fbo;
+
+	LWBUTTONCOMMAND admin_button_command[6 * 5];
+
+	float last_mouse_press_x;
+	float last_mouse_press_y;
+	float last_mouse_move_x;
+	float last_mouse_move_y;
 } LWCONTEXT;
 
 #pragma pack(push, 1)

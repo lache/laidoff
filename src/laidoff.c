@@ -26,6 +26,7 @@
 #include "lwenemy.h"
 #include "battle.h"
 #include "render_font_test.h"
+#include "render_admin.h"
 
 #define LWEPSILON (1e-3)
 #define INCREASE_RENDER_SCORE (20)
@@ -217,16 +218,14 @@ static void on_title_enter(LWCONTEXT *pLwc) {
 void set_texture_parameter_values(const LWCONTEXT *pLwc, float x, float y, float w, float h,
 	float atlas_w, float atlas_h, int shader_index) {
 
-	const float offset[2] =
-	{
-			x / atlas_w,
-			y / atlas_h,
+	const float offset[2] = {
+		x / atlas_w,
+		y / atlas_h,
 	};
 
-	const float scale[2] =
-	{
-			w / atlas_w,
-			h / atlas_h,
+	const float scale[2] = {
+		w / atlas_w,
+		h / atlas_h,
 	};
 
 	glUniform2fv(pLwc->shader[shader_index].vuvoffset_location, 1, offset);
@@ -234,7 +233,7 @@ void set_texture_parameter_values(const LWCONTEXT *pLwc, float x, float y, float
 }
 
 void
-set_texture_parameter(const LWCONTEXT *pLwc, enum _LW_ATLAS_ENUM lae, enum _LW_ATLAS_SPRITE las) {
+set_texture_parameter(const LWCONTEXT *pLwc, LWENUM _LW_ATLAS_ENUM lae, LWENUM _LW_ATLAS_SPRITE las) {
 	set_texture_parameter_values(
 		pLwc,
 		(float)pLwc->sprite_data[las].x,
@@ -397,26 +396,26 @@ void init_gl_shaders(LWCONTEXT *pLwc) {
 	const char *etc1_frag_glsl = create_string_from_file(ASSETS_BASE_PATH
 		GLSL_DIR_NAME PATH_SEPARATOR "etc1-frag.glsl");
 
-    if (!default_vert_glsl) {
-        LOGE("init_gl_shaders: default-vert.glsl not loaded. Abort...");
-        return;
-    }
-    
-    if (!default_frag_glsl) {
-        LOGE("init_gl_shaders: default-frag.glsl not loaded. Abort...");
-        return;
-    }
-    
-    if (!font_frag_glsl) {
-        LOGE("init_gl_shaders: font-frag.glsl not loaded. Abort...");
-        return;
-    }
-    
-    if (!etc1_frag_glsl) {
-        LOGE("init_gl_shaders: etc1-frag.glsl not loaded. Abort...");
-        return;
-    }
-    
+	if (!default_vert_glsl) {
+		LOGE("init_gl_shaders: default-vert.glsl not loaded. Abort...");
+		return;
+	}
+
+	if (!default_frag_glsl) {
+		LOGE("init_gl_shaders: default-frag.glsl not loaded. Abort...");
+		return;
+	}
+
+	if (!font_frag_glsl) {
+		LOGE("init_gl_shaders: font-frag.glsl not loaded. Abort...");
+		return;
+	}
+
+	if (!etc1_frag_glsl) {
+		LOGE("init_gl_shaders: etc1-frag.glsl not loaded. Abort...");
+		return;
+	}
+
 	create_shader("Default Shader", &pLwc->shader[0], default_vert_glsl, default_frag_glsl);
 	create_shader("Font Shader", &pLwc->shader[1], default_vert_glsl, font_frag_glsl);
 	create_shader("ETC1 with Alpha Shader", &pLwc->shader[2], default_vert_glsl, etc1_frag_glsl);
@@ -528,8 +527,7 @@ static void init_vao(LWCONTEXT *pLwc, int shader_index) {
 	glGenVertexArrays(VERTEX_BUFFER_COUNT, pLwc->vao);
 	error_enum = glGetError();
 
-	for (int i = 0; i < VERTEX_BUFFER_COUNT; i++)
-	{
+	for (int i = 0; i < VERTEX_BUFFER_COUNT; i++) {
 		glBindVertexArray(pLwc->vao[i]);
 		error_enum = glGetError();
 		glBindBuffer(GL_ARRAY_BUFFER, pLwc->vertex_buffer[i].vertex_buffer);
@@ -582,8 +580,7 @@ static void reset_dir_pad_position(LWCONTEXT *pLwc) {
 	pLwc->dir_pad_y = dir_pad_center_y;
 }
 
-void set_creature_data(LWBATTLECREATURE* c, const char* name, int lv, int hp, int max_hp, int mp, int max_mp, int turn_token)
-{
+void set_creature_data(LWBATTLECREATURE* c, const char* name, int lv, int hp, int max_hp, int mp, int max_mp, int turn_token) {
 	c->valid = 1;
 	strcpy(c->name, name);
 	c->lv = lv;
@@ -690,6 +687,19 @@ void reset_runtime_context(LWCONTEXT* pLwc) {
 	pLwc->selected_command_slot = 0;
 
 	pLwc->font_fbo.dirty = 1;
+
+	pLwc->admin_button_command[0].name = LWU("필드");
+	pLwc->admin_button_command[0].command_handler = change_to_field;
+	pLwc->admin_button_command[1].name = LWU("대화");
+	pLwc->admin_button_command[1].command_handler = change_to_dialog;
+	pLwc->admin_button_command[2].name = LWU("전투");
+	pLwc->admin_button_command[2].command_handler = change_to_battle;
+	pLwc->admin_button_command[3].name = LWU("글꼴");
+	pLwc->admin_button_command[3].command_handler = change_to_font_test;
+	pLwc->admin_button_command[4].name = LWU("전투리셋");
+	pLwc->admin_button_command[4].command_handler = reset_runtime_context;
+	pLwc->admin_button_command[5].name = LWU("글꼴디버그");
+	pLwc->admin_button_command[5].command_handler = toggle_font_texture_test_mode;
 }
 
 void delete_font_fbo(LWCONTEXT* pLwc) {
@@ -737,6 +747,8 @@ void init_font_fbo(LWCONTEXT* pLwc) {
 	}
 
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+	pLwc->font_fbo.dirty = 1;
 }
 
 void init_lwc_runtime_data(LWCONTEXT *pLwc) {
@@ -751,12 +763,12 @@ void init_lwc_runtime_data(LWCONTEXT *pLwc) {
 	//const BMF_CHAR *bc = font_binary_search_char(pLwc->pFnt, 100);
 
 	pLwc->dialog = create_string_from_file(ASSETS_BASE_PATH "d" PATH_SEPARATOR "d1.txt");
-    if (pLwc->dialog) {
-        pLwc->dialog_bytelen = strlen(pLwc->dialog);
-    } else {
-        LOGE("dialog loading failed.");
-    }
-	
+	if (pLwc->dialog) {
+		pLwc->dialog_bytelen = strlen(pLwc->dialog);
+	} else {
+		LOGE("dialog loading failed.");
+	}
+
 
 	/*
 	pLwc->dialog_total_len = u8_toucs(pLwc->dialog, ARRAY_SIZE(pLwc->dialog),
@@ -915,15 +927,13 @@ void update_anim(LWCONTEXT *pLwc) {
 					anim->anim_finalized_proc_callback(pLwc);
 				}
 			}
-		}
-		else {
+		} else {
 			// not started
 			if (current_animdata_index == -1) {
 				anim->x = 0;
 				anim->y = 0;
 				anim->alpha = 0;
-			}
-			else {
+			} else {
 				const LWKEYFRAME *f1 = &anim->animdata[current_animdata_index];
 				const LWKEYFRAME *f2 = &anim->animdata[current_animdata_index + 1];
 
@@ -951,8 +961,7 @@ void render_anim(const LWCONTEXT *pLwc) {
 
 		if (anim->custom_render_proc_callback) {
 			anim->custom_render_proc_callback(pLwc, anim->x, anim->y, anim->alpha);
-		}
-		else {
+		} else {
 			set_texture_parameter(pLwc, LAE_C2_PNG, anim->las);
 			glUniformMatrix4fv(pLwc->shader[0].mvp_location, 1, GL_FALSE,
 				(const GLfloat *)anim->mvp);
@@ -987,15 +996,14 @@ int get_tex_index_by_hash_key(const LWCONTEXT *pLwc, const char *hash_key) {
 void lwc_render(const LWCONTEXT *pLwc) {
 	if (pLwc->game_scene == LGS_BATTLE) {
 		lwc_render_battle(pLwc);
-	}
-	else if (pLwc->game_scene == LGS_DIALOG) {
+	} else if (pLwc->game_scene == LGS_DIALOG) {
 		lwc_render_dialog(pLwc);
-	}
-	else if (pLwc->game_scene == LGS_FIELD) {
+	} else if (pLwc->game_scene == LGS_FIELD) {
 		lwc_render_field(pLwc);
-	}
-	else if (pLwc->game_scene == LGS_FONT_TEST) {
+	} else if (pLwc->game_scene == LGS_FONT_TEST) {
 		lwc_render_font_test(pLwc);
+	} else if (pLwc->game_scene == LGS_ADMIN) {
+		lwc_render_admin(pLwc);
 	}
 }
 
@@ -1003,8 +1011,7 @@ void get_dir_pad_center(float aspect_ratio, float *x, float *y) {
 	if (aspect_ratio > 1) {
 		*x = -1 * aspect_ratio + 0.5f;
 		*y = -0.5f;
-	}
-	else {
+	} else {
 		*x = -0.5f;
 		*y = -1 / aspect_ratio + 0.5f;
 	}
@@ -1060,8 +1067,7 @@ static float resolve_collision_one_fixed_axis(float fp, float fs, float mp, floa
 		(m_lo < f_lo && f_hi < m_hi)) {
 		if (fp < mp) {
 			displacement = f_hi - m_lo;
-		}
-		else {
+		} else {
 			displacement = -(m_hi - f_lo);
 		}
 	}
@@ -1079,8 +1085,7 @@ static void resolve_collision_one_fixed(const LWBOX2DCOLLIDER *fixed, LWBOX2DCOL
 		if (dy) {
 			if (fabs(dx) < fabs(dy)) {
 				movable->x += dx;
-			}
-			else {
+			} else {
 				movable->y += dy;
 			}
 		}
@@ -1147,8 +1152,7 @@ void lwc_update(LWCONTEXT *pLwc, double delta_time) {
 
 	if (ratio > 1) {
 		mat4x4_ortho(pLwc->proj, -ratio, ratio, -1.f, 1.f, 1.f, -1.f);
-	}
-	else {
+	} else {
 		mat4x4_ortho(pLwc->proj, -1.f, 1.f, -1 / ratio, 1 / ratio, 1.f, -1.f);
 	}
 
@@ -1209,10 +1213,10 @@ void bind_all_vertex_attrib_etc1_with_alpha(const LWCONTEXT *pLwc, int vbo_index
 static void load_pkm_texture(const char *tex_atlas_filename) {
 	size_t file_size = 0;
 	char *b = create_binary_from_file(tex_atlas_filename, &file_size);
-    if (!b) {
-        LOGE("load_pkm_texture: create_binary_from_file null, filename %s", tex_atlas_filename);
-        return;
-    }
+	if (!b) {
+		LOGE("load_pkm_texture: create_binary_from_file null, filename %s", tex_atlas_filename);
+		return;
+	}
 	LWPKM *pPkm = (LWPKM *)b;
 
 	GLenum error_enum;
@@ -1233,10 +1237,10 @@ static void load_pkm_texture(const char *tex_atlas_filename) {
 
 	release_image(&bitmap_context);
 #else
-    // calculate size of data with formula (extWidth / 4) * (extHeight / 4) * 8
-    u32 dataLength = ((extended_width >> 2) * (extended_height >> 2)) << 3;
+	// calculate size of data with formula (extWidth / 4) * (extHeight / 4) * 8
+	u32 dataLength = ((extended_width >> 2) * (extended_height >> 2)) << 3;
 
-    glCompressedTexImage2D(GL_TEXTURE_2D, 0, GL_ETC1_RGB8_OES, extended_width, extended_height, 0,
+	glCompressedTexImage2D(GL_TEXTURE_2D, 0, GL_ETC1_RGB8_OES, extended_width, extended_height, 0,
 		dataLength, b + sizeof(LWPKM));
 #endif
 
@@ -1269,16 +1273,14 @@ static void load_tex_files(LWCONTEXT *pLwc) {
 		// Hardware decoding of PKM
 		if (strcmp(tex_atlas_filename[i] + tex_atlas_filename_len - 4, ".pkm") == 0) {
 			load_pkm_texture(tex_atlas_filename[i]);
-		}
-		else
+		} else
 #endif
 			// Software/Hardware decoding of KTX
 			if (strcmp(tex_atlas_filename[i] + tex_atlas_filename_len - 4, ".ktx") == 0) {
 				if (load_ktx_texture(tex_atlas_filename[i]) < 0) {
 					LOGI("load_ktx_texture failure... %s", tex_atlas_filename[i]);
 				}
-			}
-			else {
+			} else {
 				// Software decoding of PNG or PKM
 
 				LWBITMAPCONTEXT bitmap_context;
@@ -1302,15 +1304,14 @@ static void load_tex_files(LWCONTEXT *pLwc) {
 					glGenerateMipmap(GL_TEXTURE_2D);
 					error_enum = glGetError();
 					LOGI("glGenerateMipmap result: %d", error_enum);
-				}
-				else {
+				} else {
 					LOGE("create_image: %s not loaded. Width=%d, height=%d", tex_atlas_filename[i],
 						bitmap_context.width, bitmap_context.height);
 				}
 			}
 
-			pLwc->tex_atlas_hash[i] = hash(
-				(const unsigned char *)&tex_atlas_filename[i][filename_index]);
+		pLwc->tex_atlas_hash[i] = hash(
+			(const unsigned char *)&tex_atlas_filename[i][filename_index]);
 	}
 }
 
@@ -1333,16 +1334,16 @@ void init_load_textures(LWCONTEXT *pLwc) {
 
 void load_test_font(LWCONTEXT *pLwc) {
 	glGenTextures(MAX_TEX_FONT_ATLAS, pLwc->tex_font_atlas);
-	
+
 	for (int i = 0; i < MAX_TEX_FONT_ATLAS; i++) {
 		glBindTexture(GL_TEXTURE_2D, pLwc->tex_font_atlas[i]);
 
 		size_t file_size = 0;
 		char *b = create_binary_from_file(tex_font_atlas_filename[i], &file_size);
-        if (!b) {
-            LOGE("load_test_font: create_binary_from_file null, filename %s", tex_font_atlas_filename[i]);
-            continue;
-        }
+		if (!b) {
+			LOGE("load_test_font: create_binary_from_file null, filename %s", tex_font_atlas_filename[i]);
+			continue;
+		}
 
 		LOGI("load_test_font %s...", tex_font_atlas_filename[i]);
 
@@ -1442,8 +1443,7 @@ void lw_trigger_ready(LWCONTEXT *pLwc) {
 static void convert_touch_coord_to_ui_coord(LWCONTEXT *pLwc, float *x, float *y) {
 	if (pLwc->height < pLwc->width) {
 		*x *= (float)pLwc->width / pLwc->height;
-	}
-	else {
+	} else {
 		*y *= (float)pLwc->height / pLwc->width;
 	}
 }
@@ -1466,9 +1466,16 @@ void exec_attack_with_screen_point(LWCONTEXT* pLwc, float x, float y) {
 }
 
 void lw_trigger_mouse_press(LWCONTEXT *pLwc, float x, float y) {
+	if (!pLwc) {
+		return;
+	}
+
 	convert_touch_coord_to_ui_coord(pLwc, &x, &y);
 
 	printf("mouse press ui coord x=%f, y=%f\n", x, y);
+
+	pLwc->last_mouse_press_x = x;
+	pLwc->last_mouse_press_y = y;
 
 	const float aspect_ratio = (float)pLwc->width / pLwc->height;
 
@@ -1487,8 +1494,7 @@ void lw_trigger_mouse_press(LWCONTEXT *pLwc, float x, float y) {
 
 		if (y > command_palette_pos) {
 			exec_attack_with_screen_point(pLwc, x, y);
-		}
-		else {
+		} else {
 			// command palette area
 			int command_slot = (int)((x + aspect_ratio) / (2.0f / 10 * aspect_ratio)) - 2;
 			if (command_slot >= 0 && command_slot < 6) {
@@ -1504,7 +1510,14 @@ void lw_trigger_mouse_press(LWCONTEXT *pLwc, float x, float y) {
 }
 
 void lw_trigger_mouse_move(LWCONTEXT *pLwc, float x, float y) {
+	if (!pLwc) {
+		return;
+	}
+
 	convert_touch_coord_to_ui_coord(pLwc, &x, &y);
+
+	pLwc->last_mouse_move_x = x;
+	pLwc->last_mouse_move_y = y;
 
 	const float aspect_ratio = (float)pLwc->width / pLwc->height;
 
@@ -1535,13 +1548,32 @@ void lw_trigger_mouse_move(LWCONTEXT *pLwc, float x, float y) {
 }
 
 void lw_trigger_mouse_release(LWCONTEXT *pLwc, float x, float y) {
+	if (!pLwc) {
+		return;
+	}
+
 	convert_touch_coord_to_ui_coord(pLwc, &x, &y);
 
-	printf("mouse release ui coord x=%f, y=%f\n", x, y);
+	printf("mouse release ui coord x=%f, y=%f (last move ui coord x=%f, y=%f)\n",
+		x, y, pLwc->last_mouse_press_x, pLwc->last_mouse_press_y);
+
+	const float aspect_ratio = (float)pLwc->width / pLwc->height;
+
+	if (pLwc->game_scene != LGS_ADMIN
+		&& x < -aspect_ratio + 0.25f
+		&& y > 1.0f - 0.25f) {
+
+		change_to_admin(pLwc);
+		return;
+	}
 
 	reset_dir_pad_position(pLwc);
 
 	pLwc->dir_pad_dragging = 0;
+
+	if (pLwc->game_scene == LGS_ADMIN) {
+		touch_admin(pLwc, pLwc->last_mouse_press_x, pLwc->last_mouse_press_y, x, y);
+	}
 }
 
 void lw_trigger_touch(LWCONTEXT *pLwc, float x, float y) {
@@ -1549,16 +1581,18 @@ void lw_trigger_touch(LWCONTEXT *pLwc, float x, float y) {
 		return;
 	}
 
+	convert_touch_coord_to_ui_coord(pLwc, &x, &y);
+
 	pLwc->dialog_move_next = 1;
 
 	if (pLwc->game_scene == LGS_FIELD) {
 
-	}
-	else if (pLwc->game_scene == LGS_DIALOG) {
+	} else if (pLwc->game_scene == LGS_DIALOG) {
 		//change_to_playing_state(pLwc);
-	}
-	else if (pLwc->game_scene == LGS_BATTLE) {
+	} else if (pLwc->game_scene == LGS_BATTLE) {
 		apply_touch_impulse(pLwc);
+	} else if (pLwc->game_scene == LGS_ADMIN) {
+		
 	}
 }
 
@@ -1614,8 +1648,7 @@ void lw_trigger_key_right(LWCONTEXT *pLwc) {
 				pLwc->selected_command_slot = new_selected_command_slot;
 			}
 		}
-	}
-	else if (pLwc->battle_state == LBS_SELECT_TARGET) {
+	} else if (pLwc->battle_state == LBS_SELECT_TARGET) {
 
 		if (pLwc->selected_enemy_slot != -1) {
 			int new_selected_enemy_slot = -1;
@@ -1655,8 +1688,7 @@ void lw_trigger_key_left(LWCONTEXT *pLwc) {
 				pLwc->selected_command_slot = new_selected_command_slot;
 			}
 		}
-	}
-	else if (pLwc->battle_state == LBS_SELECT_TARGET) {
+	} else if (pLwc->battle_state == LBS_SELECT_TARGET) {
 		if (pLwc->selected_enemy_slot != -1) {
 			int new_selected_enemy_slot = -1;
 			for (int i = pLwc->selected_enemy_slot - 1; i >= 0; i--) {
@@ -1691,8 +1723,7 @@ int exec_attack(LWCONTEXT *pLwc, int enemy_slot) {
 
 			ca->hp -= s->consume_hp;
 			ca->mp -= s->consume_mp;
-		}
-		else {
+		} else {
 			return -3;
 		}
 
@@ -1725,14 +1756,13 @@ int exec_attack(LWCONTEXT *pLwc, int enemy_slot) {
 		const float enemy_x = get_battle_enemy_x_center(enemy_slot);
 
 		char damage_str[128];
-		
+
 		if (cmd_result_a.type == LBCR_MISSED) {
 			snprintf(damage_str, ARRAY_SIZE(damage_str), "MISSED");
 
 			enemy->evasion_anim.t = enemy->evasion_anim.max_t = 0.25f;
 			enemy->evasion_anim.max_v = 0.15f;
-		}
-		else {
+		} else {
 			// 데미지는 음수이기 때문에 - 붙여서 양수로 바꿔줌
 			snprintf(damage_str, ARRAY_SIZE(damage_str), "%d", -cmd_result_b.delta_hp);
 
@@ -1750,8 +1780,7 @@ int exec_attack(LWCONTEXT *pLwc, int enemy_slot) {
 		pLwc->battle_cam_center_x = enemy_x;
 
 		return 0;
-	}
-	else {
+	} else {
 		return -4;
 	}
 }
@@ -1769,21 +1798,18 @@ void lw_trigger_key_enter(LWCONTEXT *pLwc) {
 				break;
 			}
 		}
-	}
-	else if (pLwc->battle_state == LBS_SELECT_TARGET) {
+	} else if (pLwc->battle_state == LBS_SELECT_TARGET) {
 
 		exec_attack(pLwc, pLwc->selected_enemy_slot);
 	}
 }
 
 #if LW_PLATFORM_WIN32 || LW_PLATFORM_OSX
-long lw_get_last_time_sec(LWCONTEXT* pLwc)
-{
+long lw_get_last_time_sec(LWCONTEXT* pLwc) {
 	return 0;
 }
 
-long lw_get_last_time_nsec(LWCONTEXT* pLwc)
-{
+long lw_get_last_time_nsec(LWCONTEXT* pLwc) {
 	return 0;
 }
 #else
@@ -1890,16 +1916,13 @@ int spawn_attack_trail(LWCONTEXT *pLwc, float x, float y, float z) {
 
 void update_next_player_turn_creature(LWCONTEXT* pLwc) {
 
-	if (pLwc->player_turn_creature_index >= 0)
-	{
+	if (pLwc->player_turn_creature_index >= 0) {
 		pLwc->player_creature[pLwc->player_turn_creature_index].selected = 0;
 		pLwc->player_creature[pLwc->player_turn_creature_index].turn_consumed = 1;
 		const int next_turn_token = pLwc->player_creature[pLwc->player_turn_creature_index].turn_token + 1;
 
-		for (int i = 0; i < MAX_BATTLE_CREATURE; i++)
-		{
-			if (pLwc->player_creature[i].turn_token == next_turn_token)
-			{
+		for (int i = 0; i < MAX_BATTLE_CREATURE; i++) {
+			if (pLwc->player_creature[i].turn_token == next_turn_token) {
 				pLwc->player_creature[i].selected = 1;
 				pLwc->player_turn_creature_index = i;
 				return;
@@ -1987,17 +2010,14 @@ void update_damage_text(LWCONTEXT *pLwc) {
 			const float max_size = 1.0f;
 			if (t < expand_time) {
 				pLwc->damage_text[i].text_block.size = max_size / expand_time * t;
-			}
-			else if (expand_time <= t && t < expand_time + retain_time) {
+			} else if (expand_time <= t && t < expand_time + retain_time) {
 				pLwc->damage_text[i].text_block.size = max_size;
-			}
-			else if (t < expand_time + retain_time + contract_time) {
+			} else if (t < expand_time + retain_time + contract_time) {
 				pLwc->damage_text[i].text_block.size = -(max_size / contract_time) * (t -
 					(expand_time +
 						retain_time +
 						contract_time));
-			}
-			else {
+			} else {
 				pLwc->damage_text[i].text_block.size = 0;
 			}
 
@@ -2022,6 +2042,10 @@ void change_to_battle(LWCONTEXT *pLwc) {
 
 void change_to_font_test(LWCONTEXT *pLwc) {
 	pLwc->game_scene = LGS_FONT_TEST;
+}
+
+void change_to_admin(LWCONTEXT *pLwc) {
+	pLwc->game_scene = LGS_ADMIN;
 }
 
 void toggle_font_texture_test_mode(LWCONTEXT *pLwc) {
