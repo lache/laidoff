@@ -1,5 +1,5 @@
 ﻿#include <math.h>
-
+#include <string.h>
 #include "render_admin.h"
 #include "lwcontext.h"
 #include "render_solid.h"
