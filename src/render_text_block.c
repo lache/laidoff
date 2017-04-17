@@ -180,7 +180,7 @@ void render_text_block(const struct _LWCONTEXT *pLwc, const struct _LWTEXTBLOCK*
 			}
 
 			const float x = align_offset_x + text_block->text_block_x + prop_font_size * xoffset * screen_aspect_ratio;
-			const float y = align_offset_y + text_block->text_block_y + prop_font_size * ((line * -text_block->text_block_line_height) + yoffset);
+			const float y = align_offset_y + text_block->text_block_y + prop_font_size * yoffset + (line * -text_block->text_block_line_height);
 
 			last_x = x;
 
@@ -247,7 +247,7 @@ void render_text_block(const struct _LWCONTEXT *pLwc, const struct _LWTEXTBLOCK*
 			}
 			size_scaled_xadvance_accum += last_size_scaled_xadvance;
 
-			if (size_scaled_xadvance_accum / pLwc->width * 2 * screen_aspect_ratio > text_block->text_block_width) {
+			if (prop_font_size * size_scaled_xadvance_accum / pLwc->width * 2 * screen_aspect_ratio > text_block->text_block_width) {
 				size_scaled_xadvance_accum = 0;
 				line++;
 			}

@@ -287,6 +287,8 @@ typedef unsigned int UnicodeChar;
 
 typedef struct _LWFBO {
 	GLuint fbo;
+	int width;
+	int height;
 	GLuint depth_render_buffer;
 	GLuint color_tex;
 	int dirty;

@@ -8,10 +8,10 @@ void lwc_render_font_test_fbo(const struct _LWCONTEXT* pLwc) {
 	glBindFramebuffer(GL_FRAMEBUFFER, pLwc->font_fbo.fbo);
 	glDisable(GL_DEPTH_TEST);
 
-	glViewport(0, 0, pLwc->width, pLwc->height);
+	glViewport(0, 0, pLwc->font_fbo.width, pLwc->font_fbo.height);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-	const float aspect_ratio = (float)pLwc->width / pLwc->height;
+	const float aspect_ratio = (float)pLwc->font_fbo.width / pLwc->font_fbo.height;
 
 	LWTEXTBLOCK test_text_block;
 	test_text_block.text_block_width = 999.0f;// 2.00f * aspect_ratio;
