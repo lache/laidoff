@@ -94,6 +94,7 @@ add_library(native-activity SHARED
             ../../../../../src/tex.c
             ../../../../../src/render_font_test.c
             ../../../../../src/render_solid.c
+            ../../../../../src/render_admin.c
             ${LUA_LIB}
             )
 

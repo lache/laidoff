@@ -247,7 +247,7 @@ void render_text_block(const struct _LWCONTEXT *pLwc, const struct _LWTEXTBLOCK*
 			}
 			size_scaled_xadvance_accum += last_size_scaled_xadvance;
 
-			if (xoffset > text_block->text_block_width) {
+			if (prop_font_size * xoffset * screen_aspect_ratio > text_block->text_block_width) {
 				size_scaled_xadvance_accum = 0;
 				line++;
 			}
