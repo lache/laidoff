@@ -99,6 +99,8 @@ int main(void)
 	//glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_COMPAT_PROFILE);
 #endif
 
+	//glfwWindowHint(GLFW_DEPTH_BITS, 16);
+
 	glfwWindowHint(GLFW_SAMPLES, 4); // supersampling
 
 #if LW_PLATFORM_RPI
