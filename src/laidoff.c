@@ -24,6 +24,7 @@
 #include "lwkeyframe.h"
 #include "input.h"
 #include "field.h"
+#include "lwpkm.h"
 
 #define LWEPSILON (1e-3)
 #define INCREASE_RENDER_SCORE (20)
