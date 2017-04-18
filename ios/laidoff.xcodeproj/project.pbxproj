@@ -15,6 +15,7 @@
 		567F39C51EA2A7500081EB67 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 567F39C41EA2A7500081EB67 /* UIKit.framework */; };
 		567F39C71EA2A7620081EB67 /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 567F39C61EA2A7620081EB67 /* CoreGraphics.framework */; };
 		567F39C91EA2AAD80081EB67 /* ImageIO.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 567F39C81EA2AAD80081EB67 /* ImageIO.framework */; };
+		56EDBA3E1EA5411000E5D811 /* render_admin.c in Sources */ = {isa = PBXBuildFile; fileRef = 56EDBA3C1EA5411000E5D811 /* render_admin.c */; };
 		6CA16CD81EA20B5600DB7AF0 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 6CA16CD71EA20B5600DB7AF0 /* main.m */; };
 		6CA16CDB1EA20B5600DB7AF0 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 6CA16CDA1EA20B5600DB7AF0 /* AppDelegate.m */; };
 		6CA16CDD1EA20B5600DB7AF0 /* Shader.fsh in Resources */ = {isa = PBXBuildFile; fileRef = 6CA16CDC1EA20B5600DB7AF0 /* Shader.fsh */; };
@@ -89,6 +90,8 @@
 		567F39C41EA2A7500081EB67 /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
 		567F39C61EA2A7620081EB67 /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = System/Library/Frameworks/CoreGraphics.framework; sourceTree = SDKROOT; };
 		567F39C81EA2AAD80081EB67 /* ImageIO.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = ImageIO.framework; path = System/Library/Frameworks/ImageIO.framework; sourceTree = SDKROOT; };
+		56EDBA3C1EA5411000E5D811 /* render_admin.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = render_admin.c; sourceTree = "<group>"; };
+		56EDBA3D1EA5411000E5D811 /* render_admin.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = render_admin.h; sourceTree = "<group>"; };
 		6CA16CD31EA20B5600DB7AF0 /* laidoff.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = laidoff.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		6CA16CD71EA20B5600DB7AF0 /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
 		6CA16CD91EA20B5600DB7AF0 /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
@@ -301,6 +304,8 @@
 		6CA16CF41EA20CA700DB7AF0 /* src */ = {
 			isa = PBXGroup;
 			children = (
+				56EDBA3C1EA5411000E5D811 /* render_admin.c */,
+				56EDBA3D1EA5411000E5D811 /* render_admin.h */,
 				6CA16CF51EA20CA700DB7AF0 /* battle.c */,
 				6CA16CF61EA20CA700DB7AF0 /* battle.h */,
 				6CA16CF71EA20CA700DB7AF0 /* battlelogic.c */,
@@ -541,6 +546,7 @@
 				6CA16D3C1EA20CA700DB7AF0 /* render_field.c in Sources */,
 				6CA16D361EA20CA700DB7AF0 /* laidoff.c in Sources */,
 				6CA16D9F1EA210BB00DB7AF0 /* lundump.c in Sources */,
+				56EDBA3E1EA5411000E5D811 /* render_admin.c in Sources */,
 				6CA16D971EA210BB00DB7AF0 /* lstate.c in Sources */,
 				6CA16D951EA210BB00DB7AF0 /* loslib.c in Sources */,
 				6CA16D841EA210BB00DB7AF0 /* lcode.c in Sources */,
