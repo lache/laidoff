@@ -76,7 +76,7 @@
 		6CA16DA01EA210BB00DB7AF0 /* lutf8lib.c in Sources */ = {isa = PBXBuildFile; fileRef = 6CA16D7B1EA210BB00DB7AF0 /* lutf8lib.c */; };
 		6CA16DA11EA210BB00DB7AF0 /* lvm.c in Sources */ = {isa = PBXBuildFile; fileRef = 6CA16D7C1EA210BB00DB7AF0 /* lvm.c */; };
 		6CA16DA21EA210BB00DB7AF0 /* lzio.c in Sources */ = {isa = PBXBuildFile; fileRef = 6CA16D7E1EA210BB00DB7AF0 /* lzio.c */; };
-		6CA16DA41EA2110E00DB7AF0 /* lwios.m in Sources */ = {isa = PBXBuildFile; fileRef = 6CA16DA31EA2110E00DB7AF0 /* lwios.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
+		6CA16DA41EA2110E00DB7AF0 /* lwios.m in Sources */ = {isa = PBXBuildFile; fileRef = 6CA16DA31EA2110E00DB7AF0 /* lwios.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
