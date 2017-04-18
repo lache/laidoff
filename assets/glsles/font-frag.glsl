@@ -1,6 +1,7 @@
 #define GLYPH_OUTLINE_MIX_THICKNESS 0.05
 
 precision mediump float;
+
 uniform sampler2D diffuse;
 uniform float alpha_multiplier;
 uniform vec3 overlay_color;

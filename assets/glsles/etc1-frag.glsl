@@ -1,4 +1,7 @@
+#version 100
+
 precision mediump float;
+
 uniform sampler2D diffuse;
 uniform sampler2D alpha_only;
 uniform float alpha_multiplier;
