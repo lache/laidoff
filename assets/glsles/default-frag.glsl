@@ -1,4 +1,7 @@
+#version 100
+
 precision mediump float;
+
 uniform sampler2D diffuse;
 uniform float alpha_multiplier;
 uniform vec3 overlay_color;

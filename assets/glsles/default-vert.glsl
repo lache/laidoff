@@ -1,6 +1,7 @@
 #version 100
 
-precision mediump float;
+// mediump causes z-fighting on iOS devices. highp required.
+precision highp float;
 
 uniform mat4 MVP;
 uniform vec2 vUvOffset;
