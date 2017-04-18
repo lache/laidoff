@@ -4,6 +4,7 @@
 #include "unicode.h"
 #include "render_solid.h"
 #include "lwlog.h"
+#include "laidoff.h"
 
 #define LW_COLOR_WHITE { 1, 1, 1, 1 }
 #define LW_COLOR_BLACK { 0, 0, 0, 1 }

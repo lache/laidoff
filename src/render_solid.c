@@ -1,5 +1,6 @@
 #include "lwcontext.h"
 #include "render_solid.h"
+#include "laidoff.h"
 
 void render_solid_box_ui_lvt_flip_y_uv(const LWCONTEXT* pLwc, float x, float y, float w, float h, GLuint tex_index, enum _LW_VBO_TYPE lvt, int flip_y_uv)
 {

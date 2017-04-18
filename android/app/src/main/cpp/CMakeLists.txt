@@ -95,6 +95,7 @@ add_library(native-activity SHARED
             ../../../../../src/render_font_test.c
             ../../../../../src/render_solid.c
             ../../../../../src/render_admin.c
+            ../../../../../src/lwtimepoint.c
             ${LUA_LIB}
             )
 

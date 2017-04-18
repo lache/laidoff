@@ -2,6 +2,7 @@
 #include "render_field.h"
 #include "lwlog.h"
 #include "lwmacro.h"
+#include "laidoff.h"
 
 static void render_field_object(const LWCONTEXT* pLwc, int vbo_index, GLuint tex_id, mat4x4 view, mat4x4 proj, float x, float y, float sx, float sy)
 {

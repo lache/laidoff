@@ -1,6 +1,7 @@
 #include <string.h>
 #include "dialog.h"
 #include "lwcontext.h"
+#include "laidoff.h"
 
 static int parse_dialog_command(const char* dialog_instruction, const char* dialog, size_t dialog_command_len, char* first_arg)
 {

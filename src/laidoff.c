@@ -1120,26 +1120,12 @@ static void update_battle_wall(LWCONTEXT* pLwc) {
 }
 
 void lwc_update(LWCONTEXT *pLwc, double delta_time) {
-#if LW_PLATFORM_WIN32 || LW_PLATFORM_OSX
-	const double cur_time = glfwGetTime();
-	pLwc->delta_time = cur_time - pLwc->last_time;
+
+	LWTIMEPOINT cur_time;
+	lwtimepoint_now(&cur_time);
+
+	pLwc->delta_time = lwtimepoint_diff(&cur_time, &pLwc->last_time);
 	pLwc->last_time = cur_time;
-#else
-	struct timespec now;
-	clock_gettime(CLOCK_MONOTONIC, &now);
-	//return now.tv_sec + (double)now.tv_nsec/1e9;
-
-	long nsec_diff = now.tv_nsec - pLwc->last_time.tv_nsec;
-	long sec_diff = now.tv_sec - pLwc->last_time.tv_sec;
-
-	if (nsec_diff < 0) {
-		nsec_diff += 1000000000LL;
-		sec_diff--;
-	}
-
-	pLwc->delta_time = delta_time; //(double)nsec_diff / 1e9 + sec_diff;
-	pLwc->last_time = now;
-#endif
 
 	// accumulate time since app startup
 	pLwc->app_time += pLwc->delta_time;
@@ -1400,13 +1386,7 @@ LWCONTEXT *lw_init(void) {
 
 	init_lwc_runtime_data(pLwc);
 
-#if LW_PLATFORM_WIN32 || LW_PLATFORM_OSX
-	pLwc->last_time = glfwGetTime();
-#else
-	struct timespec now;
-	clock_gettime(CLOCK_MONOTONIC, &now);
-	pLwc->last_time = now;
-#endif
+	lwtimepoint_now(&pLwc->last_time);
 
 	return pLwc;
 }
@@ -1807,23 +1787,13 @@ void lw_trigger_key_enter(LWCONTEXT *pLwc) {
 	}
 }
 
-#if LW_PLATFORM_WIN32 || LW_PLATFORM_OSX
-long lw_get_last_time_sec(LWCONTEXT* pLwc) {
-	return 0;
-}
-
-long lw_get_last_time_nsec(LWCONTEXT* pLwc) {
-	return 0;
-}
-#else
 long lw_get_last_time_sec(LWCONTEXT *pLwc) {
-	return pLwc->last_time.tv_sec;
+	return lwtimepoint_get_second_portion(&pLwc->last_time);
 }
 
 long lw_get_last_time_nsec(LWCONTEXT *pLwc) {
-	return pLwc->last_time.tv_nsec;
+	return lwtimepoint_get_nanosecond_portion(&pLwc->last_time);
 }
-#endif
 
 double lw_get_delta_time(LWCONTEXT *pLwc) {
 	return pLwc->delta_time;

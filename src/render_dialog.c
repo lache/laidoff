@@ -5,6 +5,7 @@
 #include "lwlog.h"
 #include "font.h"
 #include "render_text_block.h"
+#include "laidoff.h"
 
 static void render_portrait(const LWCONTEXT* pLwc)
 {

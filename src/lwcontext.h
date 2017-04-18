@@ -1,12 +1,8 @@
 #pragma once
 
-#include <time.h> // ios struct timespec
-
 #include "lwgl.h"
-#include "laidoff.h"
 #include "linmath.h"
 #include "sprite_data.h"
-#include "vertices.h"
 #include "lwdamagetext.h"
 #include "lwbattlecreature.h"
 #include "lwenemy.h"
@@ -16,6 +12,7 @@
 #include "lwmacro.h"
 #include "lwatlasenum.h"
 #include "lwbuttoncommand.h"
+#include "lwtimepoint.h"
 
 #define MAX_SHADER (3)
 #define MAX_BAR_SPAWN_COUNT (374) // ((int)(5 * 60 * 1.0/SCROLL_SPEED))
@@ -322,12 +319,7 @@ typedef struct _LWCONTEXT
     int rotate;
     mat4x4 mvp;
 
-#if LW_PLATFORM_WIN32 || LW_PLATFORM_OSX
-    double last_time;
-#else
-    struct timespec last_time;
-#endif
-
+	LWTIMEPOINT last_time;
     double delta_time;
 
     LWKIWI kiwi;

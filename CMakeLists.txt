@@ -204,6 +204,8 @@ src/lwskilleffect.h
 src/lwvbo.h
 src/lwvbotype.h
 src/lwtextblock.h
+src/lwtimepoint.c
+src/lwtimepoint.h
 src/platform_detection.h
 src/render_admin.c
 src/render_admin.h

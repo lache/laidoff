@@ -6,6 +6,7 @@
 #include "script.h"
 #include "file.h"
 #include "lwlog.h"
+#include "laidoff.h"
 
 int l_ink(lua_State *L)
 {
