@@ -23,7 +23,7 @@ char * create_string_from_file(const char * filename) {
     return strdup((char *)[str UTF8String]);
 }
 
-void release_string(const char * d) {
+void release_string(char * d) {
     free((void*)d);
 }
 
