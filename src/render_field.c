@@ -118,7 +118,7 @@ void lwc_render_field(const LWCONTEXT* pLwc)
 	const float screen_aspect_ratio = (float)pLwc->width / pLwc->height;
 
 	mat4x4 perspective;
-	mat4x4_perspective(perspective, (float)(LWDEG2RAD(49.134) / screen_aspect_ratio), screen_aspect_ratio, 0.1f, 1000.0f);
+	mat4x4_perspective(perspective, (float)(LWDEG2RAD(49.134) / screen_aspect_ratio), screen_aspect_ratio, 1.0f, 50.0f);
 
 	const float cam_dist = 20;
 	mat4x4 view;
