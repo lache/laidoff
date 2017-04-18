@@ -88,22 +88,13 @@ typedef struct _LWCONTEXT {
 
 	double app_time;
 
-	int completed;
-	int current_heart;
-	int max_heart;
-
 	int tex_atlas_index;
 	LWSPRITE* sprite_data;
 
-	int selected_command_slot;
-
-	int selected_enemy_slot;
-	LWENEMY enemy[MAX_ENEMY_SLOT];
-	LW_BATTLE_STATE battle_state;
-	LWANIM1D command_in_progress_anim;
-
+	
 	void* pFnt;
 
+	// Dialog Mode Components
 	char* dialog;
 	int dialog_bytelen;
 	int render_char;
@@ -115,6 +106,7 @@ typedef struct _LWCONTEXT {
 	int dialog_bg_tex_index;
 	int dialog_portrait_tex_index;
 
+	// Field Mode Components
 	int player_move_left;
 	int player_move_right;
 	int player_move_up;
@@ -130,20 +122,25 @@ typedef struct _LWCONTEXT {
 	float dir_pad_y;
 	int dir_pad_dragging;
 
+	// Battle Mode Components
+
 	LWTRAIL trail[MAX_TRAIL];
 	float battle_fov_deg;
 	float battle_fov_deg_0;
 	float battle_fov_mag_deg_0;
 	float battle_cam_center_x;
 
+	int selected_command_slot;
+	int selected_enemy_slot;
+	LW_BATTLE_STATE battle_state;
+	LWANIM1D command_in_progress_anim;
 	LWDAMAGETEXT damage_text[MAX_DAMAGE_TEXT];
-
-	LWBATTLECREATURE player_creature[MAX_BATTLE_CREATURE];
-
+	LWBATTLECREATURE player[MAX_BATTLE_CREATURE];
+	LWENEMY enemy[MAX_ENEMY_SLOT];
 	int player_turn_creature_index;
-
+	int enemy_turn_creature_index;
+	float enemy_turn_command_wait_time;
 	float battle_wall_tex_v;
-
 	mat4x4 battle_proj;
 	mat4x4 battle_view;
 
@@ -151,10 +148,12 @@ typedef struct _LWCONTEXT {
 
 	LWFBO font_fbo;
 
-	LWBUTTONCOMMAND admin_button_command[6 * 5];
-
 	float last_mouse_press_x;
 	float last_mouse_press_y;
 	float last_mouse_move_x;
 	float last_mouse_move_y;
+
+	// Admin
+
+	LWBUTTONCOMMAND admin_button_command[6 * 5];
 } LWCONTEXT;

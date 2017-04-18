@@ -62,7 +62,7 @@ void render_enemy_scope(const LWCONTEXT* pLwc, float ux, float uy, float width, 
 	int immu = 0;
 
 	if (pLwc->player_turn_creature_index >= 0) {
-		const LWBATTLECREATURE* pc = &pLwc->player_creature[pLwc->player_turn_creature_index];
+		const LWBATTLECREATURE* pc = &pLwc->player[pLwc->player_turn_creature_index];
 		if (pLwc->selected_command_slot >= 0 && pc->skill[pLwc->selected_command_slot]) {
 			const LWATTRIBVALUE skill_attrib = pc->skill[pLwc->selected_command_slot]->attrib;
 
@@ -703,7 +703,7 @@ static void render_command_banner(const LWCONTEXT* pLwc) {
 		SET_COLOR_RGBA_FLOAT(text_block.color_normal_outline, 1, 1, 1, 1);
 		SET_COLOR_RGBA_FLOAT(text_block.color_emp_glyph, 1, 1, 0, 1);
 		SET_COLOR_RGBA_FLOAT(text_block.color_emp_outline, 0, 0, 0, 1);
-		text_block.text = pLwc->player_creature[pLwc->player_turn_creature_index].skill[pLwc->selected_command_slot]->name;
+		text_block.text = pLwc->player[pLwc->player_turn_creature_index].skill[pLwc->selected_command_slot]->name;
 		text_block.text_bytelen = (int)strlen(text_block.text);
 		text_block.begin_index = 0;
 		text_block.end_index = text_block.text_bytelen;
@@ -731,7 +731,7 @@ static void render_command_palette(const LWCONTEXT* pLwc) {
 	
 	const int max_command_in_palette = 6;
 
-	const LWSKILL *const *const skill = pLwc->player_creature[pLwc->player_turn_creature_index].skill;
+	const LWSKILL *const *const skill = pLwc->player[pLwc->player_turn_creature_index].skill;
 
 	const int selected_command_slot = pLwc->selected_command_slot;
 
@@ -979,11 +979,11 @@ void lwc_render_battle(const LWCONTEXT* pLwc) {
 	}
 
 	// Player battle creature UI
-	for (int i = 0; i < ARRAY_SIZE(pLwc->player_creature); i++)
+	for (int i = 0; i < ARRAY_SIZE(pLwc->player); i++)
 	{
-		if (pLwc->player_creature[i].valid)
+		if (pLwc->player[i].valid)
 		{
-			render_player_creature_ui(pLwc, &pLwc->player_creature[i], i);
+			render_player_creature_ui(pLwc, &pLwc->player[i], i);
 		}
 	}
 

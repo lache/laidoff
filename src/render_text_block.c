@@ -302,3 +302,7 @@ void render_text_block(const struct _LWCONTEXT *pLwc, const struct _LWTEXTBLOCK*
 		);
 	}
 }
+
+void toggle_font_texture_test_mode(LWCONTEXT *pLwc) {
+	pLwc->font_texture_texture_mode = !pLwc->font_texture_texture_mode;
+}

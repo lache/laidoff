@@ -46,7 +46,7 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
 	}
 
 	if (key == GLFW_KEY_S && action == GLFW_PRESS) {
-		lw_trigger_spawn_bar(pLwc);
+		
 	}
 
 	if (key == GLFW_KEY_R && action == GLFW_PRESS) {
@@ -54,7 +54,7 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
 	}
 
 	if (key == GLFW_KEY_A && action == GLFW_PRESS) {
-		lw_trigger_anim(pLwc);
+		
 	}
 
 	if (key == GLFW_KEY_P && action == GLFW_PRESS) {

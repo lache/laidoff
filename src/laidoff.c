@@ -7,7 +7,6 @@
 #include "laidoff.h"
 #include "lwbitmapcontext.h"
 #include "constants.h"
-#include "kiwi_api.h"
 #include "file.h"
 #include "font.h"
 #include "lwcontext.h"
@@ -17,16 +16,14 @@
 #include "unicode.h"
 #include "dialog.h"
 #include "tex.h"
-#include "battlelogic.h"
-#include "lwbattlecommand.h"
-#include "lwbattlecommandresult.h"
 #include "lwmacro.h"
 #include "lwenemy.h"
 #include "battle.h"
 #include "render_font_test.h"
 #include "render_admin.h"
 #include "lwkeyframe.h"
-#include "lwpkm.h"
+#include "input.h"
+#include "field.h"
 
 #define LWEPSILON (1e-3)
 #define INCREASE_RENDER_SCORE (20)
@@ -42,8 +39,6 @@
 #define QUIT_WAIT_TIME (3)
 #define COMPLETION_SCORE (3000)
 #define SCROLL_SPEED (0.8f)
-
-#define MAX_COMMAND_SLOT (6)
 
 // Vertex attributes: Coordinates (3) + Normal (3) + UV (2) + S9 (2)
 // See Also: LWVERTEX
@@ -103,7 +98,6 @@ float get_battle_enemy_x_center(int enemy_slot_index);
 int exec_attack(LWCONTEXT *pLwc, int enemy_slot);
 int spawn_damage_text(LWCONTEXT *pLwc, float x, float y, float z, const char *text);
 void update_damage_text(LWCONTEXT *pLwc);
-void reset_runtime_context(LWCONTEXT* pLwc);
 
 typedef struct {
 	GLuint vb;
@@ -494,17 +488,6 @@ static void init_gl_context(LWCONTEXT *pLwc) {
 	mat4x4_identity(pLwc->mvp);
 }
 
-static void reset_dir_pad_position(LWCONTEXT *pLwc) {
-	const float aspect_ratio = (float)pLwc->width / pLwc->height;
-
-	float dir_pad_center_x = 0;
-	float dir_pad_center_y = 0;
-	get_dir_pad_center(aspect_ratio, &dir_pad_center_x, &dir_pad_center_y);
-
-	pLwc->dir_pad_x = dir_pad_center_x;
-	pLwc->dir_pad_y = dir_pad_center_y;
-}
-
 void set_creature_data(LWBATTLECREATURE* c, const char* name, int lv, int hp, int max_hp, int mp, int max_mp, int turn_token) {
 	c->valid = 1;
 	strcpy(c->name, name);
@@ -539,10 +522,10 @@ void reset_runtime_context(LWCONTEXT* pLwc) {
 	pLwc->enemy[3] = ENEMY_DATA_LIST[3];
 	pLwc->enemy[4] = ENEMY_DATA_LIST[4];
 
-	memset(pLwc->player_creature, 0, sizeof(pLwc->player_creature));
+	memset(pLwc->player, 0, sizeof(pLwc->player));
 
 	set_creature_data(
-		&pLwc->player_creature[0],
+		&pLwc->player[0],
 		u8"주인공",
 		1,
 		50,
@@ -551,16 +534,16 @@ void reset_runtime_context(LWCONTEXT* pLwc) {
 		30,
 		1
 	);
-	pLwc->player_creature[0].stat = ENEMY_DATA_LIST[0].c.stat;
-	pLwc->player_creature[0].skill[0] = &SKILL_DATA_LIST[0];
-	pLwc->player_creature[0].skill[1] = &SKILL_DATA_LIST[1];
-	pLwc->player_creature[0].skill[2] = &SKILL_DATA_LIST[2];
-	pLwc->player_creature[0].skill[3] = &SKILL_DATA_LIST[3];
-	pLwc->player_creature[0].skill[4] = &SKILL_DATA_LIST[4];
-	pLwc->player_creature[0].skill[5] = &SKILL_DATA_LIST[5];
+	pLwc->player[0].stat = ENEMY_DATA_LIST[0].c.stat;
+	pLwc->player[0].skill[0] = &SKILL_DATA_LIST[0];
+	pLwc->player[0].skill[1] = &SKILL_DATA_LIST[1];
+	pLwc->player[0].skill[2] = &SKILL_DATA_LIST[2];
+	pLwc->player[0].skill[3] = &SKILL_DATA_LIST[3];
+	pLwc->player[0].skill[4] = &SKILL_DATA_LIST[4];
+	pLwc->player[0].skill[5] = &SKILL_DATA_LIST[5];
 
-	set_creature_data(
-		&pLwc->player_creature[1],
+	/*set_creature_data(
+		&pLwc->player[1],
 		u8"극작가",
 		2,
 		25,
@@ -569,12 +552,12 @@ void reset_runtime_context(LWCONTEXT* pLwc) {
 		30,
 		2
 	);
-	pLwc->player_creature[1].stat = ENEMY_DATA_LIST[0].c.stat;
-	pLwc->player_creature[1].skill[0] = &SKILL_DATA_LIST[0];
-	pLwc->player_creature[1].skill[1] = &SKILL_DATA_LIST[2];
+	pLwc->player[1].stat = ENEMY_DATA_LIST[0].c.stat;
+	pLwc->player[1].skill[0] = &SKILL_DATA_LIST[0];
+	pLwc->player[1].skill[1] = &SKILL_DATA_LIST[2];
 
 	set_creature_data(
-		&pLwc->player_creature[2],
+		&pLwc->player[2],
 		u8"손톱깎이",
 		3,
 		46,
@@ -583,12 +566,12 @@ void reset_runtime_context(LWCONTEXT* pLwc) {
 		55,
 		3
 	);
-	pLwc->player_creature[2].stat = ENEMY_DATA_LIST[0].c.stat;
-	pLwc->player_creature[2].skill[0] = &SKILL_DATA_LIST[0];
-	pLwc->player_creature[2].skill[1] = &SKILL_DATA_LIST[3];
+	pLwc->player[2].stat = ENEMY_DATA_LIST[0].c.stat;
+	pLwc->player[2].skill[0] = &SKILL_DATA_LIST[0];
+	pLwc->player[2].skill[1] = &SKILL_DATA_LIST[3];
 
 	set_creature_data(
-		&pLwc->player_creature[3],
+		&pLwc->player[3],
 		u8"대문호",
 		8,
 		105,
@@ -597,15 +580,15 @@ void reset_runtime_context(LWCONTEXT* pLwc) {
 		20,
 		4
 	);
-	pLwc->player_creature[3].stat = ENEMY_DATA_LIST[0].c.stat;
-	pLwc->player_creature[3].skill[0] = &SKILL_DATA_LIST[0];
-	pLwc->player_creature[3].skill[1] = &SKILL_DATA_LIST[4];
+	pLwc->player[3].stat = ENEMY_DATA_LIST[0].c.stat;
+	pLwc->player[3].skill[0] = &SKILL_DATA_LIST[0];
+	pLwc->player[3].skill[1] = &SKILL_DATA_LIST[4];*/
 
 	for (int i = 0; i < MAX_BATTLE_CREATURE; i++) {
-		pLwc->player_creature[i].selected = 0;
+		pLwc->player[i].selected = 0;
 	}
 
-	pLwc->player_creature[0].selected = 1;
+	pLwc->player[0].selected = 1;
 
 	pLwc->player_turn_creature_index = 0;
 
@@ -861,108 +844,6 @@ void lwc_render(const LWCONTEXT *pLwc) {
 	}
 }
 
-void get_dir_pad_center(float aspect_ratio, float *x, float *y) {
-	if (aspect_ratio > 1) {
-		*x = -1 * aspect_ratio + 0.5f;
-		*y = -0.5f;
-	} else {
-		*x = -0.5f;
-		*y = -1 / aspect_ratio + 0.5f;
-	}
-}
-
-static int
-lw_get_normalized_dir_pad_input(const LWCONTEXT *pLwc, float *dx, float *dy, float *dlen) {
-	if (!pLwc->dir_pad_dragging) {
-		return 0;
-	}
-
-	const float aspect_ratio = (float)pLwc->width / pLwc->height;
-	float dir_pad_center_x = 0;
-	float dir_pad_center_y = 0;
-	get_dir_pad_center(aspect_ratio, &dir_pad_center_x, &dir_pad_center_y);
-
-	*dx = pLwc->dir_pad_x - dir_pad_center_x;
-	*dy = pLwc->dir_pad_y - dir_pad_center_y;
-
-	*dlen = sqrtf(*dx * *dx + *dy * *dy);
-
-	*dx /= *dlen;
-	*dy /= *dlen;
-
-	return 1;
-}
-
-static void move_player(LWCONTEXT *pLwc) {
-	const float move_speed = 5.0f;
-	const float move_speed_delta = (float)(pLwc->delta_time * move_speed);
-
-	// Using keyboard
-	pLwc->player_pos_x += (float)((pLwc->player_move_right - pLwc->player_move_left) *
-		move_speed_delta);
-	pLwc->player_pos_y += (float)((pLwc->player_move_up - pLwc->player_move_down) *
-		move_speed_delta);
-
-	// Using mouse
-	float dx, dy, dlen;
-	if (lw_get_normalized_dir_pad_input(pLwc, &dx, &dy, &dlen)) {
-		pLwc->player_pos_x += dx * move_speed_delta;
-		pLwc->player_pos_y += dy * move_speed_delta;
-	}
-}
-
-static float resolve_collision_one_fixed_axis(float fp, float fs, float mp, float ms) {
-	const float f_lo = fp - fs / 2;
-	const float f_hi = fp + fs / 2;
-	const float m_lo = mp - ms / 2;
-	const float m_hi = mp + ms / 2;
-	float displacement = 0;
-	if ((f_lo < m_lo && m_lo < f_hi) || (f_lo < m_hi && m_hi < f_hi) ||
-		(m_lo < f_lo && f_hi < m_hi)) {
-		if (fp < mp) {
-			displacement = f_hi - m_lo;
-		} else {
-			displacement = -(m_hi - f_lo);
-		}
-	}
-
-	return displacement;
-}
-
-static void resolve_collision_one_fixed(const LWBOX2DCOLLIDER *fixed, LWBOX2DCOLLIDER *movable) {
-	const float dx = resolve_collision_one_fixed_axis(fixed->x, fixed->w, movable->x, movable->w);
-
-	if (dx) {
-		const float dy = resolve_collision_one_fixed_axis(fixed->y, fixed->h, movable->y,
-			movable->h);
-
-		if (dy) {
-			if (fabs(dx) < fabs(dy)) {
-				movable->x += dx;
-			} else {
-				movable->y += dy;
-			}
-		}
-	}
-}
-
-static void resolve_player_collision(LWCONTEXT *pLwc) {
-	LWBOX2DCOLLIDER player_collider;
-	player_collider.x = pLwc->player_pos_x;
-	player_collider.y = pLwc->player_pos_y;
-	player_collider.w = 1.0f;
-	player_collider.h = 1.0f;
-
-	for (int i = 0; i < MAX_BOX_COLLIDER; i++) {
-		if (pLwc->box_collider[i].valid) {
-			resolve_collision_one_fixed(&pLwc->box_collider[i], &player_collider);
-		}
-	}
-
-	pLwc->player_pos_x = player_collider.x;
-	pLwc->player_pos_y = player_collider.y;
-}
-
 static void update_battle_wall(LWCONTEXT* pLwc) {
 	pLwc->battle_wall_tex_v += (float)(pLwc->delta_time / 34);
 	pLwc->battle_wall_tex_v = fmodf(pLwc->battle_wall_tex_v, 1.0f);
@@ -998,16 +879,8 @@ void lwc_update(LWCONTEXT *pLwc, double delta_time) {
 
 	update_battle(pLwc);
 
-#define ARRAY_ITERATE_VALID(v) \
-    for (int i = 0; i < ARRAY_SIZE((v)); i++) \
-    { \
-        if (v[i].valid)
-
-#define ARRAY_ITERATE_VALID_END() \
-    }
-
-	ARRAY_ITERATE_VALID(pLwc->enemy) {
-		update_enemy(pLwc, i, &pLwc->enemy[i]);
+	ARRAY_ITERATE_VALID(LWENEMY, pLwc->enemy) {
+		update_enemy(pLwc, i, e);
 	}
 	ARRAY_ITERATE_VALID_END();
 
@@ -1263,416 +1136,6 @@ int lw_get_game_scene(LWCONTEXT *pLwc) {
 	return pLwc->game_scene;
 }
 
-static void convert_touch_coord_to_ui_coord(LWCONTEXT *pLwc, float *x, float *y) {
-	if (pLwc->height < pLwc->width) {
-		*x *= (float)pLwc->width / pLwc->height;
-	} else {
-		*y *= (float)pLwc->height / pLwc->width;
-	}
-}
-
-void exec_attack_with_screen_point(LWCONTEXT* pLwc, float x, float y) {
-
-	for (int i = 0; i < MAX_ENEMY_SLOT; i++) {
-		if (pLwc->enemy[i].valid && pLwc->enemy[i].c.hp > 0) {
-			if (pLwc->enemy[i].left_top_ui_point[0] <= x
-				&& x <= pLwc->enemy[i].right_bottom_ui_point[0]
-				&& y <= pLwc->enemy[i].left_top_ui_point[1]
-				&& pLwc->enemy[i].right_bottom_ui_point[1] <= y) {
-
-				pLwc->battle_state = LBS_SELECT_TARGET;
-				pLwc->selected_enemy_slot = i;
-				exec_attack(pLwc, i);
-			}
-		}
-	}
-}
-
-void lw_trigger_mouse_press(LWCONTEXT *pLwc, float x, float y) {
-	if (!pLwc) {
-		return;
-	}
-
-	convert_touch_coord_to_ui_coord(pLwc, &x, &y);
-
-	printf("mouse press ui coord x=%f, y=%f\n", x, y);
-
-	pLwc->last_mouse_press_x = x;
-	pLwc->last_mouse_press_y = y;
-
-	const float aspect_ratio = (float)pLwc->width / pLwc->height;
-
-	float dir_pad_center_x = 0;
-	float dir_pad_center_y = 0;
-	get_dir_pad_center(aspect_ratio, &dir_pad_center_x, &dir_pad_center_y);
-
-	if (fabs(dir_pad_center_x - x) < 0.5f && fabs(dir_pad_center_y - y) < 0.5f) {
-		pLwc->dir_pad_x = x;
-		pLwc->dir_pad_y = y;
-		pLwc->dir_pad_dragging = 1;
-	}
-
-	if (pLwc->battle_state != LBS_COMMAND_IN_PROGRESS && pLwc->player_turn_creature_index >= 0) {
-		const float command_palette_pos = -0.5f;
-
-		if (y > command_palette_pos) {
-			exec_attack_with_screen_point(pLwc, x, y);
-		} else {
-			// command palette area
-			int command_slot = (int)((x + aspect_ratio) / (2.0f / 10 * aspect_ratio)) - 2;
-			if (command_slot >= 0 && command_slot < 6) {
-				const LWSKILL* skill = pLwc->player_creature[pLwc->player_turn_creature_index].skill[command_slot];
-				if (skill && skill->valid) {
-					pLwc->selected_command_slot = command_slot;
-				}
-			}
-
-			//printf("mouse press command slot %d\n", command_slot);
-		}
-	}
-}
-
-void lw_trigger_mouse_move(LWCONTEXT *pLwc, float x, float y) {
-	if (!pLwc) {
-		return;
-	}
-
-	convert_touch_coord_to_ui_coord(pLwc, &x, &y);
-
-	pLwc->last_mouse_move_x = x;
-	pLwc->last_mouse_move_y = y;
-
-	const float aspect_ratio = (float)pLwc->width / pLwc->height;
-
-	if (pLwc->dir_pad_dragging) {
-		float dir_pad_center_x = 0;
-		float dir_pad_center_y = 0;
-		get_dir_pad_center(aspect_ratio, &dir_pad_center_x, &dir_pad_center_y);
-
-		if (x < dir_pad_center_x - 0.5f) {
-			x = dir_pad_center_x - 0.5f;
-		}
-
-		if (x > dir_pad_center_x + 0.5f) {
-			x = dir_pad_center_x + 0.5f;
-		}
-
-		if (y < dir_pad_center_y - 0.5f) {
-			y = dir_pad_center_y - 0.5f;
-		}
-
-		if (y > dir_pad_center_y + 0.5f) {
-			y = dir_pad_center_y + 0.5f;
-		}
-
-		pLwc->dir_pad_x = x;
-		pLwc->dir_pad_y = y;
-	}
-}
-
-void lw_trigger_mouse_release(LWCONTEXT *pLwc, float x, float y) {
-	if (!pLwc) {
-		return;
-	}
-
-	convert_touch_coord_to_ui_coord(pLwc, &x, &y);
-
-	printf("mouse release ui coord x=%f, y=%f (last move ui coord x=%f, y=%f)\n",
-		x, y, pLwc->last_mouse_press_x, pLwc->last_mouse_press_y);
-
-	const float aspect_ratio = (float)pLwc->width / pLwc->height;
-
-	if (pLwc->game_scene != LGS_ADMIN
-		&& x < -aspect_ratio + 0.25f
-		&& y > 1.0f - 0.25f) {
-
-		change_to_admin(pLwc);
-		return;
-	}
-
-	reset_dir_pad_position(pLwc);
-
-	pLwc->dir_pad_dragging = 0;
-
-	if (pLwc->game_scene == LGS_ADMIN) {
-		touch_admin(pLwc, pLwc->last_mouse_press_x, pLwc->last_mouse_press_y, x, y);
-	}
-}
-
-void lw_trigger_touch(LWCONTEXT *pLwc, float x, float y) {
-	if (!pLwc) {
-		return;
-	}
-
-	convert_touch_coord_to_ui_coord(pLwc, &x, &y);
-
-	pLwc->dialog_move_next = 1;
-
-	if (pLwc->game_scene == LGS_FIELD) {
-
-	} else if (pLwc->game_scene == LGS_DIALOG) {
-		
-	} else if (pLwc->game_scene == LGS_BATTLE) {
-		
-	} else if (pLwc->game_scene == LGS_ADMIN) {
-		
-	}
-}
-
-void lw_trigger_spawn_bar(LWCONTEXT *pLwc) {
-	if (pLwc->game_scene == LGS_BATTLE) {
-		//spawn_bar(pLwc, 0);
-	}
-}
-
-void lw_trigger_reset(LWCONTEXT *pLwc) {
-	reset_runtime_context(pLwc);
-}
-
-void lw_trigger_boast(LWCONTEXT *pLwc) {
-	pLwc->game_scene = LGS_INVALID;
-}
-
-void lw_trigger_anim(LWCONTEXT *pLwc) {
-}
-
-void lw_trigger_play_sound(LWCONTEXT *pLwc) {
-	play_sound(LWS_TOUCH);
-}
-
-void lw_trigger_key_right(LWCONTEXT *pLwc) {
-
-	// battle
-
-	if (pLwc->battle_state == LBS_SELECT_COMMAND) {
-		if (pLwc->selected_command_slot != -1 && pLwc->player_turn_creature_index >= 0) {
-			int new_selected_command_slot = -1;
-			for (int i = pLwc->selected_command_slot + 1; i < MAX_COMMAND_SLOT; i++) {
-				const LWSKILL* s = pLwc->player_creature[pLwc->player_turn_creature_index].skill[i];
-				if (s && s->valid) {
-
-					new_selected_command_slot = i;
-					break;
-				}
-			}
-
-			if (new_selected_command_slot != -1) {
-				pLwc->selected_command_slot = new_selected_command_slot;
-			}
-		}
-	} else if (pLwc->battle_state == LBS_SELECT_TARGET) {
-
-		if (pLwc->selected_enemy_slot != -1) {
-			int new_selected_enemy_slot = -1;
-			for (int i = pLwc->selected_enemy_slot + 1; i < MAX_ENEMY_SLOT; i++) {
-				if (pLwc->enemy[i].valid
-					&& pLwc->enemy[i].c.hp > 0) {
-
-					new_selected_enemy_slot = i;
-					break;
-				}
-			}
-
-			if (new_selected_enemy_slot != -1) {
-				pLwc->selected_enemy_slot = new_selected_enemy_slot;
-			}
-		}
-	}
-}
-
-void lw_trigger_key_left(LWCONTEXT *pLwc) {
-
-	// battle
-
-	if (pLwc->battle_state == LBS_SELECT_COMMAND) {
-		if (pLwc->selected_command_slot != -1 && pLwc->player_turn_creature_index >= 0) {
-			int new_selected_command_slot = -1;
-			for (int i = pLwc->selected_command_slot - 1; i >= 0; i--) {
-				const LWSKILL* s = pLwc->player_creature[pLwc->player_turn_creature_index].skill[i];
-				if (s && s->valid) {
-
-					new_selected_command_slot = i;
-					break;
-				}
-			}
-
-			if (new_selected_command_slot != -1) {
-				pLwc->selected_command_slot = new_selected_command_slot;
-			}
-		}
-	} else if (pLwc->battle_state == LBS_SELECT_TARGET) {
-		if (pLwc->selected_enemy_slot != -1) {
-			int new_selected_enemy_slot = -1;
-			for (int i = pLwc->selected_enemy_slot - 1; i >= 0; i--) {
-				if (pLwc->enemy[i].valid
-					&& pLwc->enemy[i].c.hp > 0) {
-
-					new_selected_enemy_slot = i;
-					break;
-				}
-			}
-
-			if (new_selected_enemy_slot != -1) {
-				pLwc->selected_enemy_slot = new_selected_enemy_slot;
-			}
-		}
-	}
-}
-
-int exec_attack(LWCONTEXT *pLwc, int enemy_slot) {
-	if (pLwc->battle_state == LBS_SELECT_TARGET && pLwc->player_turn_creature_index >= 0) {
-
-		LWBATTLECREATURE *ca = &pLwc->player_creature[pLwc->player_turn_creature_index];
-		const LWSKILL *s = ca->skill[pLwc->selected_command_slot];
-		if (s && s->valid) {
-			if (s->consume_hp > ca->hp) {
-				return -1;
-			}
-
-			if (s->consume_mp > ca->mp) {
-				return -2;
-			}
-
-			ca->hp -= s->consume_hp;
-			ca->mp -= s->consume_mp;
-		} else {
-			return -3;
-		}
-
-		pLwc->battle_state = LBS_COMMAND_IN_PROGRESS;
-		pLwc->command_in_progress_anim.t = pLwc->command_in_progress_anim.max_t = 1;
-		pLwc->command_in_progress_anim.max_v = 1;
-
-
-		LWENEMY* enemy = &pLwc->enemy[enemy_slot];
-		LWBATTLECREATURE* cb = &enemy->c;
-
-		LWBATTLECOMMAND cmd;
-		cmd.skill = s;
-
-		LWBATTLECOMMANDRESULT cmd_result_a;
-		LWBATTLECOMMANDRESULT cmd_result_b;
-
-		calculate_battle_command_result(ca, cb, &cmd, &cmd_result_a, &cmd_result_b);
-
-		apply_battle_command_result(ca, &cmd_result_a);
-		apply_battle_command_result(cb, &cmd_result_b);
-
-		if (cb->hp <= 0) {
-			enemy->death_anim.v0[4] = 1; // Phase 0 (last): alpha remove max
-			enemy->death_anim.v1[0] = 1; enemy->death_anim.v1[3] = 1; // Phase 1 (middle): full red
-			enemy->death_anim.v2[3] = 1; // Phase 2 (start): full black
-			enemy->death_anim.anim_1d.t = enemy->death_anim.anim_1d.max_t = 0.45f;
-		}
-
-		const float enemy_x = get_battle_enemy_x_center(enemy_slot);
-
-		char damage_str[128];
-
-		if (cmd_result_a.type == LBCR_MISSED) {
-			snprintf(damage_str, ARRAY_SIZE(damage_str), "MISSED");
-
-			enemy->evasion_anim.t = enemy->evasion_anim.max_t = 0.25f;
-			enemy->evasion_anim.max_v = 0.15f;
-		} else {
-			// 데미지는 음수이기 때문에 - 붙여서 양수로 바꿔줌
-			snprintf(damage_str, ARRAY_SIZE(damage_str), "%d", -cmd_result_b.delta_hp);
-
-			enemy->shake_duration = 0.15f;
-			enemy->shake_magitude = 0.03f;
-		}
-
-		// TODO: MISSED 일 때 트레일을 그리지 않으면 전투가 도중에 멈추는 문제가 있어서 무조건 그려줌
-		spawn_attack_trail(pLwc, enemy_x, -0.1f, 0.5f);
-
-		spawn_damage_text(pLwc, 0, 0, 0, damage_str);
-
-		pLwc->battle_fov_deg = pLwc->battle_fov_mag_deg_0;
-
-		pLwc->battle_cam_center_x = enemy_x;
-
-		return 0;
-	} else {
-		return -4;
-	}
-}
-
-void lw_trigger_key_enter(LWCONTEXT *pLwc) {
-
-	// battle
-
-	if (pLwc->battle_state == LBS_SELECT_COMMAND && pLwc->player_turn_creature_index >= 0) {
-		pLwc->battle_state = LBS_SELECT_TARGET;
-
-		for (int i = 0; i < ARRAY_SIZE(pLwc->enemy); i++) {
-			if (pLwc->enemy[i].valid && pLwc->enemy[i].c.hp > 0) {
-				pLwc->selected_enemy_slot = i;
-				break;
-			}
-		}
-	} else if (pLwc->battle_state == LBS_SELECT_TARGET) {
-
-		exec_attack(pLwc, pLwc->selected_enemy_slot);
-	}
-}
-
-long lw_get_last_time_sec(LWCONTEXT *pLwc) {
-	return lwtimepoint_get_second_portion(&pLwc->last_time);
-}
-
-long lw_get_last_time_nsec(LWCONTEXT *pLwc) {
-	return lwtimepoint_get_nanosecond_portion(&pLwc->last_time);
-}
-
-double lw_get_delta_time(LWCONTEXT *pLwc) {
-	return pLwc->delta_time;
-}
-
-int lw_get_update_count(LWCONTEXT *pLwc) {
-	return pLwc->update_count;
-}
-
-int lw_get_render_count(LWCONTEXT *pLwc) {
-	return pLwc->render_count;
-}
-
-void lw_on_destroy(LWCONTEXT *pLwc) {
-	release_font(pLwc->pFnt);
-	release_string(pLwc->dialog);
-}
-
-void lw_press_key_left(LWCONTEXT *pLwc) {
-	pLwc->player_move_left = 1;
-}
-
-void lw_press_key_right(LWCONTEXT *pLwc) {
-	pLwc->player_move_right = 1;
-}
-
-void lw_press_key_up(LWCONTEXT *pLwc) {
-	pLwc->player_move_up = 1;
-}
-
-void lw_press_key_down(LWCONTEXT *pLwc) {
-	pLwc->player_move_down = 1;
-}
-
-void lw_release_key_left(LWCONTEXT *pLwc) {
-	pLwc->player_move_left = 0;
-}
-
-void lw_release_key_right(LWCONTEXT *pLwc) {
-	pLwc->player_move_right = 0;
-}
-
-void lw_release_key_up(LWCONTEXT *pLwc) {
-	pLwc->player_move_up = 0;
-}
-
-void lw_release_key_down(LWCONTEXT *pLwc) {
-	pLwc->player_move_down = 0;
-}
-
 int spawn_field_object(struct _LWCONTEXT *pLwc, float x, float y, float w, float h, enum _LW_VBO_TYPE lvt,
 	unsigned int tex_id, float sx, float sy) {
 	for (int i = 0; i < MAX_FIELD_OBJECT; i++) {
@@ -1698,138 +1161,6 @@ int spawn_field_object(struct _LWCONTEXT *pLwc, float x, float y, float w, float
 	return -1;
 }
 
-int spawn_attack_trail(LWCONTEXT *pLwc, float x, float y, float z) {
-	for (int i = 0; i < MAX_TRAIL; i++) {
-		if (!pLwc->trail[i].valid) {
-			pLwc->trail[i].x = x;
-			pLwc->trail[i].y = y;
-			pLwc->trail[i].z = z;
-			pLwc->trail[i].age = 0;
-			pLwc->trail[i].max_age = 1;
-			pLwc->trail[i].tex_coord_speed = 5;
-			pLwc->trail[i].tex_coord = -1;
-			pLwc->trail[i].valid = 1;
-			return i;
-		}
-	}
-
-	return -1;
-}
-
-void update_next_player_turn_creature(LWCONTEXT* pLwc) {
-
-	if (pLwc->player_turn_creature_index >= 0) {
-		pLwc->player_creature[pLwc->player_turn_creature_index].selected = 0;
-		pLwc->player_creature[pLwc->player_turn_creature_index].turn_consumed = 1;
-		const int next_turn_token = pLwc->player_creature[pLwc->player_turn_creature_index].turn_token + 1;
-
-		for (int i = 0; i < MAX_BATTLE_CREATURE; i++) {
-			if (pLwc->player_creature[i].turn_token == next_turn_token) {
-				pLwc->player_creature[i].selected = 1;
-				pLwc->player_turn_creature_index = i;
-				return;
-			}
-		}
-
-		pLwc->player_turn_creature_index = -1;
-	}
-}
-
-void update_attack_trail(LWCONTEXT *pLwc) {
-	for (int i = 0; i < MAX_TRAIL; i++) {
-		if (pLwc->trail[i].valid) {
-			pLwc->trail[i].age += (float)pLwc->delta_time;
-			pLwc->trail[i].tex_coord += (float)(pLwc->trail[i].tex_coord_speed * pLwc->delta_time);
-
-			if (pLwc->trail[i].age >= pLwc->trail[i].max_age) {
-				pLwc->trail[i].valid = 0;
-
-				pLwc->battle_fov_deg = pLwc->battle_fov_deg_0;
-				pLwc->battle_cam_center_x = 0;
-
-				update_next_player_turn_creature(pLwc);
-
-				pLwc->battle_state = LBS_SELECT_COMMAND;
-				pLwc->selected_command_slot = 0;
-			}
-		}
-	}
-}
-
-int spawn_damage_text(LWCONTEXT *pLwc, float x, float y, float z, const char *text) {
-	for (int i = 0; i < MAX_TRAIL; i++) {
-		if (!pLwc->damage_text[i].valid) {
-			LWDAMAGETEXT *dt = &pLwc->damage_text[i];
-
-			dt->x = x;
-			dt->y = y;
-			dt->z = z;
-			dt->age = 0;
-			dt->max_age = 1;
-
-			dt->valid = 1;
-			strncpy(dt->text, text, ARRAY_SIZE(dt->text));
-			dt->text[ARRAY_SIZE(dt->text) - 1] = '\0';
-
-			LWTEXTBLOCK *tb = &dt->text_block;
-
-			tb->text = dt->text;
-			tb->text_bytelen = (int)strlen(tb->text);
-			tb->begin_index = 0;
-			tb->end_index = tb->text_bytelen;
-
-			tb->text_block_x = x;
-			tb->text_block_y = y;
-			tb->text_block_width = 1;
-			tb->text_block_line_height = DEFAULT_TEXT_BLOCK_LINE_HEIGHT;
-			tb->size = DEFAULT_TEXT_BLOCK_SIZE;
-
-			SET_COLOR_RGBA_FLOAT(tb->color_normal_glyph, 1, 0.25f, 0.25f, 1);
-			SET_COLOR_RGBA_FLOAT(tb->color_normal_outline, 0.1f, 0.1f, 0.1f, 1);
-			SET_COLOR_RGBA_FLOAT(tb->color_emp_glyph, 1, 1, 0, 1);
-			SET_COLOR_RGBA_FLOAT(tb->color_emp_outline, 0, 0, 0, 1);
-
-			return i;
-		}
-	}
-
-	return -1;
-}
-
-void update_damage_text(LWCONTEXT *pLwc) {
-	for (int i = 0; i < MAX_TRAIL; i++) {
-		if (pLwc->damage_text[i].valid) {
-			pLwc->damage_text[i].age += (float)pLwc->delta_time;
-
-			//pLwc->damage_text[i].text_block.text_block_x += (float)(0.2 * cos(LWDEG2RAD(60)) * pLwc->delta_time);
-			pLwc->damage_text[i].text_block.text_block_y += (float)(0.2 * sin(LWDEG2RAD(60)) *
-				pLwc->delta_time);
-
-			const float t = pLwc->damage_text[i].age;
-			const float expand_time = 0.15f;
-			const float retain_time = 0.5f;
-			const float contract_time = 0.15f;
-			const float max_size = 1.0f;
-			if (t < expand_time) {
-				pLwc->damage_text[i].text_block.size = max_size / expand_time * t;
-			} else if (expand_time <= t && t < expand_time + retain_time) {
-				pLwc->damage_text[i].text_block.size = max_size;
-			} else if (t < expand_time + retain_time + contract_time) {
-				pLwc->damage_text[i].text_block.size = -(max_size / contract_time) * (t -
-					(expand_time +
-						retain_time +
-						contract_time));
-			} else {
-				pLwc->damage_text[i].text_block.size = 0;
-			}
-
-			if (pLwc->damage_text[i].age >= pLwc->damage_text[i].max_age) {
-				pLwc->damage_text[i].valid = 0;
-			}
-		}
-	}
-}
-
 void change_to_field(LWCONTEXT *pLwc) {
 	pLwc->game_scene = LGS_FIELD;
 }
@@ -1850,6 +1181,27 @@ void change_to_admin(LWCONTEXT *pLwc) {
 	pLwc->game_scene = LGS_ADMIN;
 }
 
-void toggle_font_texture_test_mode(LWCONTEXT *pLwc) {
-	pLwc->font_texture_texture_mode = !pLwc->font_texture_texture_mode;
+long lw_get_last_time_sec(LWCONTEXT *pLwc) {
+	return lwtimepoint_get_second_portion(&pLwc->last_time);
+}
+
+long lw_get_last_time_nsec(LWCONTEXT *pLwc) {
+	return lwtimepoint_get_nanosecond_portion(&pLwc->last_time);
+}
+
+double lw_get_delta_time(LWCONTEXT *pLwc) {
+	return pLwc->delta_time;
+}
+
+int lw_get_update_count(LWCONTEXT *pLwc) {
+	return pLwc->update_count;
+}
+
+int lw_get_render_count(LWCONTEXT *pLwc) {
+	return pLwc->render_count;
+}
+
+void lw_on_destroy(LWCONTEXT *pLwc) {
+	release_font(pLwc->pFnt);
+	release_string(pLwc->dialog);
 }

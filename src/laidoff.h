@@ -5,6 +5,8 @@
 #include "lwatlasenum.h"
 #include "lwatlassprite.h"
 
+#define MAX_COMMAND_SLOT (6)
+
 #ifdef __cplusplus
 extern "C" {;
 #endif
@@ -24,11 +26,8 @@ void lw_trigger_touch(LWCONTEXT* pLwc, float xpos, float ypos);
 void lw_trigger_mouse_press(LWCONTEXT* pLwc, float xpos, float ypos);
 void lw_trigger_mouse_release(LWCONTEXT* pLwc, float xpos, float ypos);
 void lw_trigger_mouse_move(LWCONTEXT *pLwc, float x, float y);
-void lw_trigger_spawn_bar(LWCONTEXT* pLwc);
 void lw_trigger_reset(LWCONTEXT* pLwc);
-void lw_trigger_anim(LWCONTEXT* pLwc);
 void lw_trigger_play_sound(LWCONTEXT* pLwc);
-void lw_trigger_boast(LWCONTEXT* pLwc);
 void lw_trigger_key_left(LWCONTEXT* pLwc);
 void lw_trigger_key_right(LWCONTEXT* pLwc);
 void lw_trigger_key_enter(LWCONTEXT* pLwc);
@@ -59,6 +58,7 @@ void change_to_font_test(LWCONTEXT* pLwc);
 void change_to_admin(LWCONTEXT *pLwc);
 
 void toggle_font_texture_test_mode(LWCONTEXT* pLwc);
+void reset_runtime_context(LWCONTEXT* pLwc);
 
 #ifndef __cplusplus
 enum _LW_ATLAS_ENUM;

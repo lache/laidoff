@@ -53,3 +53,13 @@
 #elif LW_PLATFORM_ANDROID || LW_PLATFORM_IOS || LW_PLATFORM_IOS_SIMULATOR
 #   define HRESULT int
 #endif
+
+#define ARRAY_ITERATE_VALID(t, v) \
+    for (int i = 0; i < ARRAY_SIZE((v)); i++) \
+    { \
+        if (v[i].valid) { \
+			t* e = &v[i];
+
+#define ARRAY_ITERATE_VALID_END() \
+		} \
+    }
