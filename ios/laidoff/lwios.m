@@ -94,8 +94,8 @@ unsigned char* CGImageRef_data(CGImageRef image, int* w, int* h) {
                        image);
     CGContextRelease(context);
     
-    *w = width;
-    *h = height;
+    *w = (int)width;
+    *h = (int)height;
     
     return data;
 }
@@ -103,13 +103,13 @@ unsigned char* CGImageRef_data(CGImageRef image, int* w, int* h) {
 const unsigned char* load_png_ios(const char* filename, LWBITMAPCONTEXT* pBitmapContext) {
     
     CGImageRef r = CGImageRef_load(filename);
-    const unsigned char* d = 0;
+    unsigned char* d = 0;
     if (r) {
         d = CGImageRef_data(r, &pBitmapContext->width, &pBitmapContext->height);
     }
     
     pBitmapContext->lock = 0;
-    pBitmapContext->data = d;
+    pBitmapContext->data = (char*)d;
     
     return d;
 }

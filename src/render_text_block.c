@@ -9,8 +9,8 @@
 #define LW_COLOR_BLACK { 0, 0, 0, 1 }
 #define LW_COLOR_YELLOW { 1, 1, 0, 1 }
 
-const static float normal_outline_thickness = 3;
-const static float emp_outline_thickness = 3;
+//const static float normal_outline_thickness = 3;
+//const static float emp_outline_thickness = 3;
 
 float get_proportional_font_size(int height, float font_size) {
 
@@ -199,7 +199,7 @@ void render_text_block(const struct _LWCONTEXT *pLwc, const struct _LWTEXTBLOCK*
 			glUniform1f(pLwc->shader[shader_index].overlay_color_ratio_location, 0);
 			set_tex_filter(GL_LINEAR_MIPMAP_LINEAR, GL_LINEAR);
 
-			if (0 && pLwc->font_texture_texture_mode) {
+			if (/* DISABLES CODE */ (0) && pLwc->font_texture_texture_mode) {
 				glBindTexture(GL_TEXTURE_2D, pLwc->tex_programmed[LPT_SOLID_WHITE_WITH_ALPHA]);
 				glUniform2fv(pLwc->shader[shader_index].vuvoffset_location, 1, default_uv_offset);
 				glUniform2fv(pLwc->shader[shader_index].vuvscale_location, 1, default_uv_scale);
@@ -230,7 +230,7 @@ void render_text_block(const struct _LWCONTEXT *pLwc, const struct _LWTEXTBLOCK*
 				glDrawArrays(GL_TRIANGLES, 0, pLwc->vertex_buffer[lvt].vertex_count);
 			}
 
-			const BMF_CHAR* bci_next = bc[i + 1];
+			//const BMF_CHAR* bci_next = bc[i + 1];
 
 			const float outline_xadvance = 0;// (float)(color_emp ? emp_outline_thickness : normal_outline_thickness) / 2;
 
@@ -256,15 +256,16 @@ void render_text_block(const struct _LWCONTEXT *pLwc, const struct _LWTEXTBLOCK*
 
 	glUniform1f(pLwc->shader[shader_index].overlay_color_ratio_location, 0);
 
-	// Render origin point indicator
+	// Render text block debug indicator
 	if (pLwc->font_texture_texture_mode) {
 		const float aspect_ratio = (float)pLwc->width / pLwc->height;
 		const float width_pixels = (float)(2 * aspect_ratio) / pLwc->width;
 		const float height_pixels = (float)(2) / pLwc->height;
 
-		const float w = 2 * width_pixels;
+		//const float w = 2 * width_pixels;
 		const float h = 2 * height_pixels;
 
+        // text total width debug indicator
 		render_solid_vb_ui(
 			pLwc,
 			text_block->text_block_x,
@@ -283,6 +284,7 @@ void render_text_block(const struct _LWCONTEXT *pLwc, const struct _LWTEXTBLOCK*
 		const float w2 = 2 * width_pixels;
 		const float h2 = 2 * height_pixels;
 
+        // text origin point debug indicator
 		render_solid_vb_ui(
 			pLwc,
 			text_block->text_block_x,
