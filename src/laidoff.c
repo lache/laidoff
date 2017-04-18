@@ -47,7 +47,7 @@
 
 // Vertex attributes: Coordinates (3) + Normal (3) + UV (2) + S9 (2)
 // See Also: LWVERTEX
-const static size_t stride_in_bytes = sizeof(float) * (3 + 3 + 2 + 2);
+const static GLsizei stride_in_bytes = (GLsizei)(sizeof(float) * (3 + 3 + 2 + 2));
 LwStaticAssert(sizeof(LWVERTEX) == sizeof(float) * (3 + 3 + 2 + 2), "LWVERTEX size error");
 
 
@@ -387,13 +387,13 @@ void init_gl_shaders(LWCONTEXT *pLwc) {
 #define GLSL_DIR_NAME "glsles"
 #endif
 
-	const char *default_vert_glsl = create_string_from_file(ASSETS_BASE_PATH
+	char *default_vert_glsl = create_string_from_file(ASSETS_BASE_PATH
 		GLSL_DIR_NAME PATH_SEPARATOR "default-vert.glsl");
-	const char *default_frag_glsl = create_string_from_file(ASSETS_BASE_PATH
+	char *default_frag_glsl = create_string_from_file(ASSETS_BASE_PATH
 		GLSL_DIR_NAME PATH_SEPARATOR "default-frag.glsl");
-	const char *font_frag_glsl = create_string_from_file(ASSETS_BASE_PATH
+	char *font_frag_glsl = create_string_from_file(ASSETS_BASE_PATH
 		GLSL_DIR_NAME PATH_SEPARATOR "font-frag.glsl");
-	const char *etc1_frag_glsl = create_string_from_file(ASSETS_BASE_PATH
+	char *etc1_frag_glsl = create_string_from_file(ASSETS_BASE_PATH
 		GLSL_DIR_NAME PATH_SEPARATOR "etc1-frag.glsl");
 
 	if (!default_vert_glsl) {
@@ -769,7 +769,7 @@ void init_lwc_runtime_data(LWCONTEXT *pLwc) {
 
 	pLwc->dialog = create_string_from_file(ASSETS_BASE_PATH "d" PATH_SEPARATOR "d1.txt");
 	if (pLwc->dialog) {
-		pLwc->dialog_bytelen = strlen(pLwc->dialog);
+		pLwc->dialog_bytelen = (int)strlen(pLwc->dialog);
 	} else {
 		LOGE("dialog loading failed.");
 	}
@@ -1263,11 +1263,11 @@ static void load_tex_files(LWCONTEXT *pLwc) {
 	for (int i = 0; i < MAX_TEX_ATLAS; i++) {
 		glBindTexture(GL_TEXTURE_2D, pLwc->tex_atlas[i]);
 
-		size_t tex_atlas_filename_len = strlen(tex_atlas_filename[i]);
+		size_t tex_atlas_filename_len = (int)strlen(tex_atlas_filename[i]);
 
 		GLenum error_enum;
 
-		int filename_index = tex_atlas_filename_len;
+		size_t filename_index = tex_atlas_filename_len;
 		while (tex_atlas_filename[i][filename_index - 1] != PATH_SEPARATOR[0]) {
 			filename_index--;
 		}
@@ -1975,7 +1975,7 @@ int spawn_damage_text(LWCONTEXT *pLwc, float x, float y, float z, const char *te
 			LWTEXTBLOCK *tb = &dt->text_block;
 
 			tb->text = dt->text;
-			tb->text_bytelen = strlen(tb->text);
+			tb->text_bytelen = (int)strlen(tb->text);
 			tb->begin_index = 0;
 			tb->end_index = tb->text_bytelen;
 

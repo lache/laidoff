@@ -384,7 +384,7 @@ typedef struct _LWCONTEXT
 
     void* pFnt;
 
-    const char* dialog;
+    char* dialog;
     //UnicodeChar dialog_wide[1024 * 10];
     int dialog_bytelen;
     int render_char;

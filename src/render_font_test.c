@@ -22,7 +22,7 @@ void lwc_render_font_test_fbo(const struct _LWCONTEXT* pLwc) {
 	SET_COLOR_RGBA_FLOAT(test_text_block.color_emp_glyph, 1, 1, 0, 1);
 	SET_COLOR_RGBA_FLOAT(test_text_block.color_emp_outline, 0, 0, 0, 1);
 	test_text_block.text = LWU("lqpM^_^123-45");
-	test_text_block.text_bytelen = strlen(test_text_block.text);
+	test_text_block.text_bytelen = (int)strlen(test_text_block.text);
 	test_text_block.begin_index = 0;
 	test_text_block.end_index = test_text_block.text_bytelen;
 
@@ -46,7 +46,7 @@ void lwc_render_font_test_fbo(const struct _LWCONTEXT* pLwc) {
 	// The second column (center aligned)
 
 	test_text_block.text = LWU("lqpM^__^Mpql");
-	test_text_block.text_bytelen = strlen(test_text_block.text);
+	test_text_block.text_bytelen = (int)strlen(test_text_block.text);
 	test_text_block.begin_index = 0;
 	test_text_block.end_index = test_text_block.text_bytelen;
 	test_text_block.text_block_x = 0;
@@ -55,7 +55,7 @@ void lwc_render_font_test_fbo(const struct _LWCONTEXT* pLwc) {
 	render_text_block(pLwc, &test_text_block);
 
 	test_text_block.text = LWU("가가가가가가가가가가가가가가가가가가가가");
-	test_text_block.text_bytelen = strlen(test_text_block.text);
+	test_text_block.text_bytelen = (int)strlen(test_text_block.text);
 	test_text_block.begin_index = 0;
 	test_text_block.end_index = test_text_block.text_bytelen;
 	test_text_block.text_block_x = 0;
@@ -64,7 +64,7 @@ void lwc_render_font_test_fbo(const struct _LWCONTEXT* pLwc) {
 	render_text_block(pLwc, &test_text_block);
 
 	test_text_block.text = LWU("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA");
-	test_text_block.text_bytelen = strlen(test_text_block.text);
+	test_text_block.text_bytelen = (int)strlen(test_text_block.text);
 	test_text_block.begin_index = 0;
 	test_text_block.end_index = test_text_block.text_bytelen;
 	test_text_block.text_block_x = 0;
@@ -74,7 +74,7 @@ void lwc_render_font_test_fbo(const struct _LWCONTEXT* pLwc) {
 
 	test_text_block.text = LWU("한글이 됩니다~~~");
 	//test_text_block.size = DEFAULT_TEXT_BLOCK_SIZE_A;
-	test_text_block.text_bytelen = strlen(test_text_block.text);
+	test_text_block.text_bytelen = (int)strlen(test_text_block.text);
 	test_text_block.begin_index = 0;
 	test_text_block.end_index = test_text_block.text_bytelen;
 	test_text_block.text_block_x = 0;
@@ -88,7 +88,7 @@ void lwc_render_font_test_fbo(const struct _LWCONTEXT* pLwc) {
 	render_text_block(pLwc, &test_text_block);
 
 	test_text_block.text = LWU("이제 진정하십시오...");
-	test_text_block.text_bytelen = strlen(test_text_block.text);
+	test_text_block.text_bytelen = (int)strlen(test_text_block.text);
 	test_text_block.begin_index = 0;
 	test_text_block.end_index = test_text_block.text_bytelen;
 	test_text_block.text_block_x = 0;
@@ -101,7 +101,7 @@ void lwc_render_font_test_fbo(const struct _LWCONTEXT* pLwc) {
 
 	test_text_block.text = LWU("lmqpMQ^__^ 123-45");
 	//test_text_block.size = DEFAULT_TEXT_BLOCK_SIZE_A;
-	test_text_block.text_bytelen = strlen(test_text_block.text);
+	test_text_block.text_bytelen = (int)strlen(test_text_block.text);
 	test_text_block.begin_index = 0;
 	test_text_block.end_index = test_text_block.text_bytelen;
 	test_text_block.text_block_x = 0.9f * aspect_ratio;
@@ -115,7 +115,7 @@ void lwc_render_font_test_fbo(const struct _LWCONTEXT* pLwc) {
 	render_text_block(pLwc, &test_text_block);
 
 	test_text_block.text = LWU("국민 여러분!");
-	test_text_block.text_bytelen = strlen(test_text_block.text);
+	test_text_block.text_bytelen = (int)strlen(test_text_block.text);
 	test_text_block.begin_index = 0;
 	test_text_block.end_index = test_text_block.text_bytelen;
 	test_text_block.text_block_x = 0.9f * aspect_ratio;

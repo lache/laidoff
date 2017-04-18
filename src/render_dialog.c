@@ -19,7 +19,7 @@ static void render_portrait(const LWCONTEXT* pLwc)
 	glUniformMatrix4fv(pLwc->shader[shader_index].mvp_location, 1, GL_FALSE, (const GLfloat*)pLwc->proj);
 
 	glBindBuffer(GL_ARRAY_BUFFER, pLwc->vertex_buffer[LVT_CENTER_CENTER_ANCHORED_SQUARE].vertex_buffer);
-	bind_all_vertex_attrib_etc1_with_alpha(pLwc, 0);
+	bind_all_vertex_attrib_etc1_with_alpha(pLwc, LVT_CENTER_CENTER_ANCHORED_SQUARE);
 	glUniform1f(pLwc->shader[shader_index].overlay_color_ratio_location, 0);
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, pLwc->tex_atlas[LAE_P_DOHEE]);
@@ -181,7 +181,7 @@ void lwc_render_dialog(const LWCONTEXT* pLwc)
 	LWTEXTBLOCK text_block;
 	text_block.align = LTBA_LEFT_TOP;
 	text_block.text = pLwc->dialog;
-	text_block.text_bytelen = strlen(text_block.text);
+	text_block.text_bytelen = (int)strlen(text_block.text);
 	text_block.begin_index = pLwc->dialog_start_index;
 	text_block.end_index = text_block.begin_index + pLwc->render_char < text_block.text_bytelen ? text_block.begin_index +
 		pLwc->render_char : text_block.text_bytelen;

@@ -4,11 +4,11 @@
 
 static int parse_dialog_command(const char* dialog_instruction, const char* dialog, size_t dialog_command_len, char* first_arg)
 {
-	const size_t dialog_instruction_len = strlen(dialog_instruction);
+	const size_t dialog_instruction_len = (int)strlen(dialog_instruction);
 
 	if (strncmp(dialog, dialog_instruction, dialog_instruction_len) == 0)
 	{
-		const int arg_len = dialog_command_len - (dialog_instruction_len + 1);
+		const int arg_len = (int)(dialog_command_len - (dialog_instruction_len + 1));
 		if (arg_len < 0)
 		{
 			return 0;
@@ -25,7 +25,7 @@ static int parse_dialog_command(const char* dialog_instruction, const char* dial
 			}
 			first_arg[first_arg_len] = '\0';
 
-			return first_arg_len;
+			return (int)first_arg_len;
 		}
 	}
 

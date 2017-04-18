@@ -15,13 +15,13 @@ char* create_string_from_file(const char* filename)
 	const size_t last_byte = fread(d, 1, f_size, f);
 	d[last_byte] = '\0';
 	fclose(f);
-	LOGI("create_string_from_file: %s (%d bytes) loaded to memory.", filename, last_byte);
+	LOGI("create_string_from_file: %s (%d bytes) loaded to memory.", filename, (int)last_byte);
 	return d;
 }
 
-void release_string(const char* d)
+void release_string(char* d)
 {
-	free((void*)d);
+	free(d);
 }
 
 char* create_binary_from_file(const char* filename, size_t* size)
@@ -41,6 +41,6 @@ char* create_binary_from_file(const char* filename, size_t* size)
 
 void release_binary(char* d)
 {
-	free((void*)d);
+	free(d);
 }
 

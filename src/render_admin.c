@@ -76,7 +76,7 @@ void lwc_render_admin(const struct _LWCONTEXT* pLwc) {
 			SET_COLOR_RGBA_FLOAT(text_block.color_emp_glyph, 1, 1, 0, 1);
 			SET_COLOR_RGBA_FLOAT(text_block.color_emp_outline, 0, 0, 0, 1);
 			text_block.text = pLwc->admin_button_command[i].name;
-			text_block.text_bytelen = strlen(text_block.text);
+			text_block.text_bytelen = (int)strlen(text_block.text);
 			text_block.begin_index = 0;
 			text_block.end_index = text_block.text_bytelen;
 			text_block.text_block_x = but_pos[0];

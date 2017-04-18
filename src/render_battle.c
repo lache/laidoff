@@ -504,7 +504,7 @@ void render_player_creature_ui(const LWCONTEXT* pLwc, const LWBATTLECREATURE* c,
 		char str[32];
 		sprintf(str, "Lv.%d", c->lv);
 		text_block.text = str;
-		text_block.text_bytelen = strlen(text_block.text);
+		text_block.text_bytelen = (int)strlen(text_block.text);
 		text_block.begin_index = 0;
 		text_block.end_index = text_block.text_bytelen;
 		text_block.text_block_x = left_top_x + block_x_margin;
@@ -516,7 +516,7 @@ void render_player_creature_ui(const LWCONTEXT* pLwc, const LWBATTLECREATURE* c,
 	// Name
 	{
 		text_block.text = c->name;
-		text_block.text_bytelen = strlen(text_block.text);
+		text_block.text_bytelen = (int)strlen(text_block.text);
 		text_block.begin_index = 0;
 		text_block.end_index = text_block.text_bytelen;
 		text_block.text_block_y -= text_block.text_block_line_height;
@@ -570,7 +570,7 @@ void render_player_creature_ui(const LWCONTEXT* pLwc, const LWBATTLECREATURE* c,
 		char str[32];
 		sprintf(str, "%d", c->turn_token);
 		turn_token_text_block.text = str;
-		turn_token_text_block.text_bytelen = strlen(str);
+		turn_token_text_block.text_bytelen = (int)strlen(str);
 		turn_token_text_block.begin_index = 0;
 		turn_token_text_block.end_index = turn_token_text_block.text_bytelen;
 		turn_token_text_block.text_block_width = DEFAULT_TEXT_BLOCK_WIDTH;
@@ -588,7 +588,7 @@ void render_player_creature_ui(const LWCONTEXT* pLwc, const LWBATTLECREATURE* c,
 		char str[32];
 		sprintf(str, "HP %d", c->hp);
 		text_block.text = str;
-		text_block.text_bytelen = strlen(text_block.text);
+		text_block.text_bytelen = (int)strlen(text_block.text);
 		text_block.begin_index = 0;
 		text_block.end_index = text_block.text_bytelen;
 		text_block.text_block_y -= text_block.text_block_line_height;
@@ -619,7 +619,7 @@ void render_player_creature_ui(const LWCONTEXT* pLwc, const LWBATTLECREATURE* c,
 		char str[32];
 		sprintf(str, "MP %d", c->mp);
 		text_block.text = str;
-		text_block.text_bytelen = strlen(text_block.text);
+		text_block.text_bytelen = (int)strlen(text_block.text);
 		text_block.begin_index = 0;
 		text_block.end_index = text_block.text_bytelen;
 		text_block.text_block_y -= text_block.text_block_line_height;
@@ -704,7 +704,7 @@ static void render_command_banner(const LWCONTEXT* pLwc) {
 		SET_COLOR_RGBA_FLOAT(text_block.color_emp_glyph, 1, 1, 0, 1);
 		SET_COLOR_RGBA_FLOAT(text_block.color_emp_outline, 0, 0, 0, 1);
 		text_block.text = pLwc->player_creature[pLwc->player_turn_creature_index].skill[pLwc->selected_command_slot]->name;
-		text_block.text_bytelen = strlen(text_block.text);
+		text_block.text_bytelen = (int)strlen(text_block.text);
 		text_block.begin_index = 0;
 		text_block.end_index = text_block.text_bytelen;
 		text_block.text_block_x = x;
@@ -765,7 +765,7 @@ static void render_command_palette(const LWCONTEXT* pLwc) {
 		desc_text_block.text_block_x = -screen_width / 2 + command_slot_width * (0 + command_slot_margin_count);
 		desc_text_block.text_block_y = -command_slot_height + command_desc_height;
 		desc_text_block.text = skill[selected_command_slot]->desc;
-		desc_text_block.text_bytelen = strlen(desc_text_block.text);
+		desc_text_block.text_bytelen = (int)strlen(desc_text_block.text);
 		desc_text_block.begin_index = 0;
 		desc_text_block.end_index = desc_text_block.text_bytelen;
 		render_text_block(pLwc, &desc_text_block);
@@ -809,7 +809,7 @@ static void render_command_palette(const LWCONTEXT* pLwc) {
 			
 			// Skill name
 			cmd_text_block.text = skill[i]->name;
-			cmd_text_block.text_bytelen = strlen(cmd_text_block.text);
+			cmd_text_block.text_bytelen = (int)strlen(cmd_text_block.text);
 			cmd_text_block.begin_index = 0;
 			cmd_text_block.end_index = cmd_text_block.text_bytelen;
 			cmd_text_block.size = DEFAULT_TEXT_BLOCK_SIZE_C;
@@ -822,7 +822,7 @@ static void render_command_palette(const LWCONTEXT* pLwc) {
 				char str[64];
 				sprintf(str, u8"MP %d", skill[i]->consume_mp);
 				cmd_text_block.text = str;
-				cmd_text_block.text_bytelen = strlen(cmd_text_block.text);
+				cmd_text_block.text_bytelen = (int)strlen(cmd_text_block.text);
 				cmd_text_block.begin_index = 0;
 				cmd_text_block.end_index = cmd_text_block.text_bytelen;
 				cmd_text_block.size = DEFAULT_TEXT_BLOCK_SIZE_E;
