@@ -1,0 +1,11 @@
+#pragma once
+
+typedef enum _LW_GAME_SCENE {
+	LGS_BATTLE,
+	LGS_FIELD,
+	LGS_DIALOG,
+	LGS_FONT_TEST,
+	LGS_ADMIN,
+
+	LGS_INVALID,
+} LW_GAME_SCENE;

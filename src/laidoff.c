@@ -1,7 +1,6 @@
 ﻿#include <stdlib.h>
 #include <stdio.h>
 #include <locale.h>
-#include <wchar.h>
 #include <string.h>
 
 #include "lwgl.h"
@@ -9,7 +8,6 @@
 #include "lwbitmapcontext.h"
 #include "constants.h"
 #include "kiwi_api.h"
-#include "tinyobj_loader_c.h"
 #include "file.h"
 #include "font.h"
 #include "lwcontext.h"
@@ -27,6 +25,8 @@
 #include "battle.h"
 #include "render_font_test.h"
 #include "render_admin.h"
+#include "lwkeyframe.h"
+#include "lwpkm.h"
 
 #define LWEPSILON (1e-3)
 #define INCREASE_RENDER_SCORE (20)
@@ -138,81 +138,6 @@ unsigned int swap_4_bytes(unsigned int num) {
 		((num << 8) & 0xff0000) | // move byte 1 to byte 2
 		((num >> 8) & 0xff00) | // move byte 2 to byte 1
 		((num << 24) & 0xff000000); // byte 0 to byte 3
-}
-
-static void apply_touch_impulse(LWCONTEXT *pLwc) {
-	if (!pLwc->kiwi.dead && !pLwc->completed) {
-		const double app_time_since_last = pLwc->app_time - pLwc->kiwi.last_apply_impulse_app_time;
-
-		if (app_time_since_last > APPLY_IMPULSE_COOLTIME) {
-			pLwc->kiwi.acc_y_touch = (float)(pLwc->kiwi.impulse_y_touch / pLwc->delta_time);
-
-			play_sound(LWS_TOUCH);
-
-			pLwc->kiwi.last_apply_impulse_app_time = pLwc->app_time;
-		}
-	}
-}
-
-static void change_to_ready_state(LWCONTEXT *pLwc) {
-	pLwc->next_game_scene = LGS_DIALOG;
-
-	pLwc->kiwi.x = KIWI_X_POS;
-	pLwc->kiwi.enable_title_anim = 1;
-	pLwc->ready_alpha = 1;
-	pLwc->ready_alpha_speed = 2.5f;
-	// pLwc->kiwi.y = 0; // controlled by title animation
-	pLwc->kiwi.angle = 0;
-	pLwc->kiwi.target_angle = 0;
-	pLwc->increase_render_score = 0;
-	pLwc->render_score = RENDER_SCORE_INITIAL;
-
-	stop_sound(LWS_BGM);
-	play_sound(LWS_START);
-}
-
-static void change_to_title_state(LWCONTEXT *pLwc) {
-	invalidate_all_touch_proc(pLwc);
-
-	pLwc->next_game_scene = LGS_FIELD;
-}
-
-static void play_gameover_anim(LWCONTEXT *pLwc, int test) {
-	pLwc->completion_target_score_waited_time = 0;
-	pLwc->target_score = pLwc->score;
-	pLwc->render_score = RENDER_SCORE_INITIAL;
-
-}
-
-static void on_title_enter(LWCONTEXT *pLwc) {
-	// Determine a tex atlas
-	pLwc->tex_atlas_index = 0;
-	pLwc->sprite_data = SPRITE_DATA[pLwc->tex_atlas_index];
-
-	pLwc->ground_scroll_speed = SCROLL_SPEED;
-
-	pLwc->cloud_scroll_speed = 0.4f;
-
-	pLwc->curtain_alpha_speed = 2.5f;
-
-	pLwc->score = 0;
-
-	pLwc->ready_alpha = 1;
-
-	pLwc->bar_dist = 1;
-
-	pLwc->bar_spawn_count = 0;
-	pLwc->max_bar_spawn_count = MAX_BAR_SPAWN_COUNT;
-	pLwc->completed = 0;
-	memset(pLwc->bar, 0, sizeof(pLwc->bar));
-	memset(pLwc->anim, 0, sizeof(pLwc->anim));
-	memset(pLwc->touch_proc, 0, sizeof(pLwc->touch_proc));
-
-	pLwc->current_heart =
-		request_get_today_playing_limit_count() - request_get_today_played_count();
-	pLwc->max_heart = request_get_today_playing_limit_count();
-
-	play_sound(LWS_BGM);
 }
 
 void set_texture_parameter_values(const LWCONTEXT *pLwc, float x, float y, float w, float h,
@@ -597,6 +522,8 @@ void set_creature_data(LWBATTLECREATURE* c, const char* name, int lv, int hp, in
 
 void reset_runtime_context(LWCONTEXT* pLwc) {
 
+	pLwc->sprite_data = SPRITE_DATA[0];
+
 	pLwc->game_scene = LGS_BATTLE;
 	pLwc->font_texture_texture_mode = 0;
 
@@ -760,8 +687,6 @@ void init_lwc_runtime_data(LWCONTEXT *pLwc) {
 
 	reset_runtime_context(pLwc);
 
-	pLwc->highscore = request_get_highscore();
-
 	//pLwc->pFnt = load_fnt(ASSETS_BASE_PATH "fnt" PATH_SEPARATOR "arita-semi-bold.fnt");
 	pLwc->pFnt = load_fnt(ASSETS_BASE_PATH "fnt" PATH_SEPARATOR "test6.fnt");
 
@@ -786,9 +711,6 @@ void init_lwc_runtime_data(LWCONTEXT *pLwc) {
 
 	spawn_field_object(pLwc, 0, -7, 1, 1, LVT_CUBE_WALL, pLwc->tex_programmed[LPT_SOLID_BLUE], 6,
 		1);
-
-	change_to_title_state(pLwc);
-	on_title_enter(pLwc);
 }
 
 void set_sprite_mvp_with_scale(const LWCONTEXT *pLwc, enum _LW_ATLAS_SPRITE las, float x, float y,
@@ -821,79 +743,6 @@ void set_sprite_mvp(const LWCONTEXT *pLwc, enum _LW_ATLAS_SPRITE las, float x, f
 
 	mat4x4_mul(kiwi_mv, kiwi_trans, kiwi_scale_rotate);
 	mat4x4_mul(result, p, kiwi_mv);
-}
-
-float get_greatest_bar_x(const LWCONTEXT *pLwc) {
-	float g = -NORMALIZED_SCREEN_RESOLUTION_X / 2;
-	for (int i = 0; i < ARRAY_SIZE(pLwc->bar); i++) {
-		if (pLwc->bar[i].valid && g < pLwc->bar[i].x) {
-			g = pLwc->bar[i].x;
-		}
-	}
-
-	return g;
-}
-
-int has_collided(const LWCONTEXT *pLwc) {
-	const int sign[][2] =
-	{
-			{+1, +1},
-			{+1, -1},
-			{-1, +1},
-			{-1, -1},
-	};
-
-	// check with ground
-	for (int i = 0; i < ARRAY_SIZE(sign); i++) {
-		const float py = pLwc->kiwi.y + sign[i][1] * pLwc->kiwi.h / 2;
-
-		if (py < pLwc->ground.ground_level_y + LWEPSILON) {
-			return 1;
-		}
-	}
-
-	// check with bars
-	for (int b = 0; b < ARRAY_SIZE(pLwc->bar); b++) {
-		if (!pLwc->bar[b].valid) {
-			continue;
-		}
-
-		for (int i = 0; i < ARRAY_SIZE(sign); i++) {
-			const float px =
-				pLwc->kiwi.x + sign[i][0] * pLwc->kiwi.w * KIWI_COLLISION_BOX_W_MULTIPLIER / 2;
-			const float py =
-				pLwc->kiwi.y + sign[i][1] * pLwc->kiwi.h * KIWI_COLLISION_BOX_H_MULTIPLIER / 2;
-
-			const float bx_l = pLwc->bar[b].x - pLwc->bar[b].w * BAR_COLLISION_BOX_W_MULTIPLIER / 2;
-			const float bx_r = pLwc->bar[b].x + pLwc->bar[b].w * BAR_COLLISION_BOX_W_MULTIPLIER / 2;
-
-			if (bx_l < px && px < bx_r) {
-				// check with an upper bar
-
-				const float by1_b =
-					pLwc->bar[b].y1 - pLwc->bar[b].h * BAR_COLLISION_BOX_H_MULTIPLIER / 2;
-				const float by1_t =
-					pLwc->bar[b].y1 + pLwc->bar[b].h * BAR_COLLISION_BOX_H_MULTIPLIER / 2;
-
-				if (by1_b < py && py < by1_t) {
-					return 1;
-				}
-
-				// check with a lower bar
-
-				const float by2_b =
-					pLwc->bar[b].y2 - pLwc->bar[b].h * BAR_COLLISION_BOX_H_MULTIPLIER / 2;
-				const float by2_t =
-					pLwc->bar[b].y2 + pLwc->bar[b].h * BAR_COLLISION_BOX_H_MULTIPLIER / 2;
-
-				if (by2_b < py && py < by2_t) {
-					return 1;
-				}
-			}
-		}
-	}
-
-	return 0;
 }
 
 void update_anim(LWCONTEXT *pLwc) {
@@ -1414,15 +1263,6 @@ int lw_get_game_scene(LWCONTEXT *pLwc) {
 	return pLwc->game_scene;
 }
 
-void lw_trigger_ready(LWCONTEXT *pLwc) {
-	pLwc->black_curtain_alpha = 1.0f;
-
-	pLwc->game_scene = LGS_INVALID;
-
-	on_title_enter(pLwc);
-	change_to_ready_state(pLwc);
-}
-
 static void convert_touch_coord_to_ui_coord(LWCONTEXT *pLwc, float *x, float *y) {
 	if (pLwc->height < pLwc->width) {
 		*x *= (float)pLwc->width / pLwc->height;
@@ -1571,9 +1411,9 @@ void lw_trigger_touch(LWCONTEXT *pLwc, float x, float y) {
 	if (pLwc->game_scene == LGS_FIELD) {
 
 	} else if (pLwc->game_scene == LGS_DIALOG) {
-		//change_to_playing_state(pLwc);
+		
 	} else if (pLwc->game_scene == LGS_BATTLE) {
-		apply_touch_impulse(pLwc);
+		
 	} else if (pLwc->game_scene == LGS_ADMIN) {
 		
 	}
@@ -1586,25 +1426,14 @@ void lw_trigger_spawn_bar(LWCONTEXT *pLwc) {
 }
 
 void lw_trigger_reset(LWCONTEXT *pLwc) {
-	pLwc->black_curtain_alpha = 1.0f;
-
-	if (pLwc->game_scene == LGS_FIELD) {
-		pLwc->game_scene = LGS_INVALID;
-	}
-
-	change_to_title_state(pLwc);
-
 	reset_runtime_context(pLwc);
 }
 
 void lw_trigger_boast(LWCONTEXT *pLwc) {
-	pLwc->black_curtain_alpha = 1.0f;
-
 	pLwc->game_scene = LGS_INVALID;
 }
 
 void lw_trigger_anim(LWCONTEXT *pLwc) {
-	play_gameover_anim(pLwc, 1);
 }
 
 void lw_trigger_play_sound(LWCONTEXT *pLwc) {

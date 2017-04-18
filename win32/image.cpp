@@ -17,6 +17,7 @@ typedef int HRESULT;
 #include "etc1.h"
 #include "file.h"
 #include "lwcontext.h"
+#include "lwpkm.h"
 
 extern "C" unsigned short swap_bytes(unsigned short aData);
 extern "C" unsigned int swap_4_bytes(unsigned int num);

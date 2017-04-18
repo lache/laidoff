@@ -50,8 +50,6 @@
 
 #if LW_PLATFORM_OSX || LW_PLATFORM_RPI
 #   define HRESULT int
-#   define LPCWSTR const wchar_t*
 #elif LW_PLATFORM_ANDROID || LW_PLATFORM_IOS || LW_PLATFORM_IOS_SIMULATOR
 #   define HRESULT int
-#   define LPCWSTR const wchar_t*
 #endif
