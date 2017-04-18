@@ -5,4 +5,5 @@ build
 /win32/MinSizeRel
 \#*\#
 /.vimrc
-
+build-x64
+build-x86
