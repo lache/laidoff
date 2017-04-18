@@ -1,13 +1,7 @@
-//
-//  lwatlassprite.h
-//  Project
-//
-//  Created by 김거엽 on 2017. 4. 15..
-//
-//
+#pragma once
 
-#ifndef lwatlassprite_h
-#define lwatlassprite_h
+#include "sprite_data.h"
+#include "lwmacro.h"
 
 typedef enum _LW_ATLAS_SPRITE
 {
@@ -25,4 +19,5 @@ typedef enum _LW_ATLAS_SPRITE
     LAS_DONTCARE,
 } LW_ATLAS_SPRITE;
 
-#endif /* lwatlassprite_h */
+
+LwStaticAssert(ARRAY_SIZE(SPRITE_DATA[0]) == LAS_COUNT, "LAS_COUNT error");

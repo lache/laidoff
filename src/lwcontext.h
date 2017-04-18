@@ -2,7 +2,7 @@
 
 #include "lwgl.h"
 #include "linmath.h"
-#include "sprite_data.h"
+
 #include "lwdamagetext.h"
 #include "lwbattlecreature.h"
 #include "lwenemy.h"
@@ -24,21 +24,9 @@
 #include "lwtrail.h"
 
 #define MAX_SHADER (3)
-#define MAX_BAR_SPAWN_COUNT (374) // ((int)(5 * 60 * 1.0/SCROLL_SPEED))
-#define MAX_BAR_COUNT (5) // bar pool size (not the maximum spawning bar count)
 #define MAX_ANIM_COUNT (10)
-#define FIRST_BAR_SPAWN_WAIT_TIME (3)
 #define ANIM_FPS (60)
-#define MAX_HEART (5)
-#define COMPLETION_TARGET_SCORE_WAIT_TIME (1)
-#define TODAY_PLAYING_LIMIT_COUNT_NO_LIMIT (-1)
 #define MAX_TOUCHPROC_COUNT (10)
-#define NORMALIZED_SCREEN_RESOLUTION_X (2.f)
-#define NORMALIZED_SCREEN_RESOLUTION_Y NORMALIZED_SCREEN_RESOLUTION_X
-
-
-LwStaticAssert(ARRAY_SIZE(SPRITE_DATA[0]) == LAS_COUNT, "LAS_COUNT error");
-
 
 static const char* tex_font_atlas_filename[] = {
 	//ASSETS_BASE_PATH "fnt" PATH_SEPARATOR "arita-semi-bold_0.tga",
@@ -49,45 +37,6 @@ static const char* tex_font_atlas_filename[] = {
 
 #define MAX_TEX_FONT_ATLAS (ARRAY_SIZE(tex_font_atlas_filename))
 
-static const char *tex_atlas_filename[] = {
-	ASSETS_BASE_PATH "tex" PATH_SEPARATOR "Twirl.png",
-	ASSETS_BASE_PATH "tex" PATH_SEPARATOR "atlas01.png",
-	ASSETS_BASE_PATH "tex" PATH_SEPARATOR "Twirl.png",
-	ASSETS_BASE_PATH "tex" PATH_SEPARATOR "bg-road.png",
-
-	ASSETS_BASE_PATH "pkm" PATH_SEPARATOR "bg-kitchen.pkm",
-	ASSETS_BASE_PATH "pkm" PATH_SEPARATOR "bg-mart-in.pkm",
-	ASSETS_BASE_PATH "pkm" PATH_SEPARATOR "bg-mart-out.pkm",
-	ASSETS_BASE_PATH "pkm" PATH_SEPARATOR "bg-road.pkm",
-	ASSETS_BASE_PATH "pkm" PATH_SEPARATOR "bg-room.pkm",
-	ASSETS_BASE_PATH "pkm" PATH_SEPARATOR "bg-room-ceiling.pkm",
-
-	ASSETS_BASE_PATH "pkm" PATH_SEPARATOR "p-dohee.pkm",
-	ASSETS_BASE_PATH "pkm" PATH_SEPARATOR "p-dohee_alpha.pkm",
-	ASSETS_BASE_PATH "pkm" PATH_SEPARATOR "p-mother.pkm",
-	ASSETS_BASE_PATH "pkm" PATH_SEPARATOR "p-mother_alpha.pkm",
-
-	ASSETS_BASE_PATH "pkm" PATH_SEPARATOR "u-dialog-balloon.pkm",
-
-	ASSETS_BASE_PATH "ktx" PATH_SEPARATOR "bg-kitchen.ktx",
-	ASSETS_BASE_PATH "ktx" PATH_SEPARATOR "bg-mart-in.ktx",
-	ASSETS_BASE_PATH "ktx" PATH_SEPARATOR "bg-mart-out.ktx",
-	ASSETS_BASE_PATH "ktx" PATH_SEPARATOR "bg-road.ktx",
-	ASSETS_BASE_PATH "ktx" PATH_SEPARATOR "bg-room.ktx",
-	ASSETS_BASE_PATH "ktx" PATH_SEPARATOR "bg-room-ceiling.ktx",
-
-	ASSETS_BASE_PATH "pkm" PATH_SEPARATOR "fx-trail.pkm",
-	ASSETS_BASE_PATH "pkm" PATH_SEPARATOR "fx-trail_alpha.pkm",
-
-	ASSETS_BASE_PATH "pkm" PATH_SEPARATOR "u-glow.pkm",
-	ASSETS_BASE_PATH "pkm" PATH_SEPARATOR "u-glow_alpha.pkm",
-
-	ASSETS_BASE_PATH "ktx" PATH_SEPARATOR "u-enemy-scope-a.ktx",
-	ASSETS_BASE_PATH "ktx" PATH_SEPARATOR "u-enemy-scope-a_alpha.ktx",
-};
-
-#define MAX_TEX_ATLAS (ARRAY_SIZE(tex_atlas_filename))
-LwStaticAssert(ARRAY_SIZE(tex_atlas_filename) == LAE_COUNT, "LAE_COUNT error");
 
 #define MAX_FIELD_OBJECT (32)
 #define MAX_BOX_COLLIDER MAX_FIELD_OBJECT

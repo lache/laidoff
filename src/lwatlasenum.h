@@ -1,13 +1,4 @@
-//
-//  lwatlasenum.h
-//  Project
-//
-//  Created by 김거엽 on 2017. 4. 15..
-//
-//
-
-#ifndef lwatlasenum_h
-#define lwatlasenum_h
+#pragma once
 
 typedef enum _LW_ATLAS_ENUM
 {
@@ -49,4 +40,42 @@ typedef enum _LW_ATLAS_ENUM
     LAE_COUNT,
 } LW_ATLAS_ENUM;
 
-#endif /* lwatlasenum_h */
+static const char *tex_atlas_filename[] = {
+	ASSETS_BASE_PATH "tex" PATH_SEPARATOR "Twirl.png",
+	ASSETS_BASE_PATH "tex" PATH_SEPARATOR "atlas01.png",
+	ASSETS_BASE_PATH "tex" PATH_SEPARATOR "Twirl.png",
+	ASSETS_BASE_PATH "tex" PATH_SEPARATOR "bg-road.png",
+
+	ASSETS_BASE_PATH "pkm" PATH_SEPARATOR "bg-kitchen.pkm",
+	ASSETS_BASE_PATH "pkm" PATH_SEPARATOR "bg-mart-in.pkm",
+	ASSETS_BASE_PATH "pkm" PATH_SEPARATOR "bg-mart-out.pkm",
+	ASSETS_BASE_PATH "pkm" PATH_SEPARATOR "bg-road.pkm",
+	ASSETS_BASE_PATH "pkm" PATH_SEPARATOR "bg-room.pkm",
+	ASSETS_BASE_PATH "pkm" PATH_SEPARATOR "bg-room-ceiling.pkm",
+
+	ASSETS_BASE_PATH "pkm" PATH_SEPARATOR "p-dohee.pkm",
+	ASSETS_BASE_PATH "pkm" PATH_SEPARATOR "p-dohee_alpha.pkm",
+	ASSETS_BASE_PATH "pkm" PATH_SEPARATOR "p-mother.pkm",
+	ASSETS_BASE_PATH "pkm" PATH_SEPARATOR "p-mother_alpha.pkm",
+
+	ASSETS_BASE_PATH "pkm" PATH_SEPARATOR "u-dialog-balloon.pkm",
+
+	ASSETS_BASE_PATH "ktx" PATH_SEPARATOR "bg-kitchen.ktx",
+	ASSETS_BASE_PATH "ktx" PATH_SEPARATOR "bg-mart-in.ktx",
+	ASSETS_BASE_PATH "ktx" PATH_SEPARATOR "bg-mart-out.ktx",
+	ASSETS_BASE_PATH "ktx" PATH_SEPARATOR "bg-road.ktx",
+	ASSETS_BASE_PATH "ktx" PATH_SEPARATOR "bg-room.ktx",
+	ASSETS_BASE_PATH "ktx" PATH_SEPARATOR "bg-room-ceiling.ktx",
+
+	ASSETS_BASE_PATH "pkm" PATH_SEPARATOR "fx-trail.pkm",
+	ASSETS_BASE_PATH "pkm" PATH_SEPARATOR "fx-trail_alpha.pkm",
+
+	ASSETS_BASE_PATH "pkm" PATH_SEPARATOR "u-glow.pkm",
+	ASSETS_BASE_PATH "pkm" PATH_SEPARATOR "u-glow_alpha.pkm",
+
+	ASSETS_BASE_PATH "ktx" PATH_SEPARATOR "u-enemy-scope-a.ktx",
+	ASSETS_BASE_PATH "ktx" PATH_SEPARATOR "u-enemy-scope-a_alpha.ktx",
+};
+
+#define MAX_TEX_ATLAS (ARRAY_SIZE(tex_atlas_filename))
+LwStaticAssert(ARRAY_SIZE(tex_atlas_filename) == LAE_COUNT, "LAE_COUNT error");
