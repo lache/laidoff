@@ -108,6 +108,7 @@ static CGPoint getNormalizedPoint(UIView* view, CGPoint locationInView)
     CGPoint locationInView = [touchEvent locationInView:self.view];
     CGPoint normalizedPoint = getNormalizedPoint(self.view, locationInView);
     //on_touch_press(normalizedPoint.x, normalizedPoint.y);
+    lw_trigger_touch(self.pLwc, normalizedPoint.x, normalizedPoint.y);
     lw_trigger_mouse_press(self.pLwc, normalizedPoint.x, normalizedPoint.y);
 }
 

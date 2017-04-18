@@ -20,13 +20,11 @@ char * create_string_from_file(const char * filename) {
     
     NSString *str = [NSString stringWithContentsOfFile:pathname encoding:NSUTF8StringEncoding error:nil];
     
-    [str retain];
-
-    return (char *)[str UTF8String];
+    return strdup((char *)[str UTF8String]);
 }
 
 void release_string(const char * d) {
-    
+    free((void*)d);
 }
 
 char* create_binary_from_file(const char* filename, size_t* size) {
@@ -37,24 +35,15 @@ char* create_binary_from_file(const char* filename, size_t* size) {
 
     *size = data.length;
     
-    [data retain];
+    char* d = (char*)malloc(data.length);
+    memcpy(d, [data bytes], data.length);
 
-    return (char *)[data bytes];
+    return d;
 }
 
 void release_binary(char * d) {
-    
+    free(d);
 }
-
-/*
-void create_image(const char *filename, LWBITMAPCONTEXT *pBitmapContext, int tex_atlas_index) {
-    memset(pBitmapContext, 0, sizeof(LWBITMAPCONTEXT));
-}
-
-void release_image(LWBITMAPCONTEXT *pBitmapContext) {
-    
-}
- */
 
 void play_sound(enum LW_SOUND lws) {
     
