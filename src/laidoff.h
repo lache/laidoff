@@ -80,6 +80,7 @@ void set_texture_parameter(const LWCONTEXT *pLwc, LWENUM _LW_ATLAS_ENUM lae, LWE
 
 int spawn_field_object(struct _LWCONTEXT* pLwc, float x, float y, float w, float h, enum _LW_VBO_TYPE lvt, unsigned int tex_id, float sx, float sy);
 void lw_app_quit(const LWCONTEXT *pLwc);
+unsigned long hash(const unsigned char *str);
 
 const static float default_uv_offset[2] = { 0, 0 };
 const static float default_uv_scale[2] = { 1, 1 };

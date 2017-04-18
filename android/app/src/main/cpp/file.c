@@ -3,6 +3,7 @@
 #include <android/log.h>
 #include <errno.h>
 #include "file.h"
+#include "laidoff.h"
 
 #define  LOG_TAG    "And9"
 
@@ -22,21 +23,19 @@ static NativeAsset nativeAssetArray[512];
 static int nativeAssetLength;
 static char apkPath[2048];
 
-unsigned long hash(unsigned char *str);
-
 void set_apk_path(const char* apk_path)
 {
     strcpy(apkPath, apk_path);
 }
 
-void release_string(const char* d)
+void release_string(char* d)
 {
-    free((void*)d);
+    free(d);
 }
 
 char* create_asset_file(const char* filename, size_t* size, int binary)
 {
-    unsigned long asset_hash = hash(filename);
+    unsigned long asset_hash = hash((const unsigned char*)filename);
 
     for (int i = 0; i < nativeAssetLength; i++)
     {
@@ -87,7 +86,7 @@ char* create_string_from_file(const char* filename)
 
 void release_binary(char* d)
 {
-    free((void*)d);
+    free(d);
 }
 
 void register_asset(const char* asset_path, int start_offset, int length) {

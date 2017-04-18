@@ -731,7 +731,7 @@ static void render_command_palette(const LWCONTEXT* pLwc) {
 	
 	const int max_command_in_palette = 6;
 
-	const LWSKILL *const *skill = pLwc->player_creature[pLwc->player_turn_creature_index].skill;
+	const LWSKILL *const *const skill = pLwc->player_creature[pLwc->player_turn_creature_index].skill;
 
 	const int selected_command_slot = pLwc->selected_command_slot;
 
