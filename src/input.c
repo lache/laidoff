@@ -82,7 +82,7 @@ void lw_trigger_mouse_press(LWCONTEXT *pLwc, float x, float y) {
 		const float command_palette_pos = -0.5f;
 
 		if (y > command_palette_pos) {
-			exec_attack_with_screen_point(pLwc, x, y);
+			exec_attack_p2e_with_screen_point(pLwc, x, y);
 		} else {
 			// command palette area
 			int command_slot = (int)((x + aspect_ratio) / (2.0f / 10 * aspect_ratio)) - 2;
@@ -286,7 +286,7 @@ void lw_trigger_key_enter(LWCONTEXT *pLwc) {
 		}
 	} else if (pLwc->battle_state == LBS_SELECT_TARGET) {
 
-		exec_attack(pLwc, pLwc->selected_enemy_slot);
+		exec_attack_p2e(pLwc, pLwc->selected_enemy_slot);
 	}
 }
 

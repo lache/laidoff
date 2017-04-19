@@ -3,6 +3,12 @@
 #include "lwbattlecommand.h"
 #include "lwbattlecommandresult.h"
 #include "battlelogic.h"
+#include "battle.h"
+
+int calculate_and_apply_attack_1_on_1(LWCONTEXT *pLwc, LWBATTLECREATURE* ca, const LWSKILL* s, LWBATTLECREATURE* cb,
+	LWBATTLECOMMANDRESULT* cmd_result_a, LWBATTLECOMMANDRESULT* cmd_result_b);
+void play_enemy_hp_desc_anim(LWCONTEXT* pLwc, LWENEMY* enemy, int enemy_slot,
+	const LWBATTLECOMMANDRESULT* cmd_result_a, const LWBATTLECOMMANDRESULT* cmd_result_b);
 
 int spawn_attack_trail(LWCONTEXT *pLwc, float x, float y, float z) {
 	for (int i = 0; i < MAX_TRAIL; i++) {
@@ -174,93 +180,105 @@ void update_enemy_turn(struct _LWCONTEXT* pLwc) {
 		pLwc->battle_state = LBS_ENEMY_TURN_IN_PROGRESS;
 	}
 
-	if (pLwc->enemy_turn_command_wait_time > 0) {
-		pLwc->enemy_turn_command_wait_time -= (float)pLwc->delta_time;
-	} else {
-		pLwc->enemy_turn_command_wait_time = 0;
-		
+	if (pLwc->battle_state == LBS_ENEMY_TURN_IN_PROGRESS) {
+		if (pLwc->enemy_turn_command_wait_time > 0) {
+			pLwc->enemy_turn_command_wait_time -= (float)pLwc->delta_time;
+		} else {
+			pLwc->enemy_turn_command_wait_time = 0;
+
+			//exec_attack_p2e(pLwc, )
+		}
 	}
 }
 
-int exec_attack(LWCONTEXT *pLwc, int enemy_slot) {
+int exec_attack_p2e(struct _LWCONTEXT* pLwc, int enemy_slot) {
 	if (pLwc->battle_state == LBS_SELECT_TARGET && pLwc->player_turn_creature_index >= 0) {
 
-		LWBATTLECREATURE *ca = &pLwc->player[pLwc->player_turn_creature_index];
-		const LWSKILL *s = ca->skill[pLwc->selected_command_slot];
-		if (s && s->valid) {
-			if (s->consume_hp > ca->hp) {
-				return -1;
-			}
+		LWBATTLECREATURE* ca = &pLwc->player[pLwc->player_turn_creature_index];
+		LWBATTLECREATURE* cb = &pLwc->enemy[enemy_slot].c;
+		const LWSKILL* s = ca->skill[pLwc->selected_command_slot];
 
-			if (s->consume_mp > ca->mp) {
-				return -2;
-			}
+		LWBATTLECOMMANDRESULT cmd_result_a = { 0, };
+		LWBATTLECOMMANDRESULT cmd_result_b = { 0, };
 
-			ca->hp -= s->consume_hp;
-			ca->mp -= s->consume_mp;
-		} else {
-			return -3;
-		}
+		calculate_and_apply_attack_1_on_1(pLwc, ca, s, cb, &cmd_result_a, &cmd_result_b);
 
-		pLwc->battle_state = LBS_COMMAND_IN_PROGRESS;
-		pLwc->command_in_progress_anim.t = pLwc->command_in_progress_anim.max_t = 1;
-		pLwc->command_in_progress_anim.max_v = 1;
-
-
-		LWENEMY* enemy = &pLwc->enemy[enemy_slot];
-		LWBATTLECREATURE* cb = &enemy->c;
-
-		LWBATTLECOMMAND cmd;
-		cmd.skill = s;
-
-		LWBATTLECOMMANDRESULT cmd_result_a;
-		LWBATTLECOMMANDRESULT cmd_result_b;
-
-		calculate_battle_command_result(ca, cb, &cmd, &cmd_result_a, &cmd_result_b);
-
-		apply_battle_command_result(ca, &cmd_result_a);
-		apply_battle_command_result(cb, &cmd_result_b);
-
-		if (cb->hp <= 0) {
-			enemy->death_anim.v0[4] = 1; // Phase 0 (last): alpha remove max
-			enemy->death_anim.v1[0] = 1; enemy->death_anim.v1[3] = 1; // Phase 1 (middle): full red
-			enemy->death_anim.v2[3] = 1; // Phase 2 (start): full black
-			enemy->death_anim.anim_1d.t = enemy->death_anim.anim_1d.max_t = 0.45f;
-		}
-
-		const float enemy_x = get_battle_enemy_x_center(enemy_slot);
-
-		char damage_str[128];
-
-		if (cmd_result_a.type == LBCR_MISSED) {
-			snprintf(damage_str, ARRAY_SIZE(damage_str), "MISSED");
-
-			enemy->evasion_anim.t = enemy->evasion_anim.max_t = 0.25f;
-			enemy->evasion_anim.max_v = 0.15f;
-		} else {
-			// 데미지는 음수이기 때문에 - 붙여서 양수로 바꿔줌
-			snprintf(damage_str, ARRAY_SIZE(damage_str), "%d", -cmd_result_b.delta_hp);
-
-			enemy->shake_duration = 0.15f;
-			enemy->shake_magitude = 0.03f;
-		}
-
-		// TODO: MISSED 일 때 트레일을 그리지 않으면 전투가 도중에 멈추는 문제가 있어서 무조건 그려줌
-		spawn_attack_trail(pLwc, enemy_x, -0.1f, 0.5f);
-
-		spawn_damage_text(pLwc, 0, 0, 0, damage_str);
-
-		pLwc->battle_fov_deg = pLwc->battle_fov_mag_deg_0;
-
-		pLwc->battle_cam_center_x = enemy_x;
-
-		return 0;
+		play_enemy_hp_desc_anim(pLwc, &pLwc->enemy[enemy_slot], enemy_slot, &cmd_result_a, &cmd_result_b);
 	}
 
-	return -4;
+	return -1;
 }
 
-void exec_attack_with_screen_point(LWCONTEXT* pLwc, float x, float y) {
+void play_enemy_hp_desc_anim(LWCONTEXT* pLwc, LWENEMY* enemy, int enemy_slot,
+	const LWBATTLECOMMANDRESULT* cmd_result_a, const LWBATTLECOMMANDRESULT* cmd_result_b) {
+	if (enemy->c.hp <= 0) {
+		enemy->death_anim.v0[4] = 1; // Phase 0 (last): alpha remove max
+		enemy->death_anim.v1[0] = 1; enemy->death_anim.v1[3] = 1; // Phase 1 (middle): full red
+		enemy->death_anim.v2[3] = 1; // Phase 2 (start): full black
+		enemy->death_anim.anim_1d.t = enemy->death_anim.anim_1d.max_t = 0.45f;
+	}
+
+	const float enemy_x = get_battle_enemy_x_center(enemy_slot);
+
+	char damage_str[128];
+
+	if (cmd_result_a->type == LBCR_MISSED) {
+		snprintf(damage_str, ARRAY_SIZE(damage_str), "MISSED");
+
+		enemy->evasion_anim.t = enemy->evasion_anim.max_t = 0.25f;
+		enemy->evasion_anim.max_v = 0.15f;
+	} else {
+		// 데미지는 음수이기 때문에 - 붙여서 양수로 바꿔줌
+		snprintf(damage_str, ARRAY_SIZE(damage_str), "%d", -cmd_result_b->delta_hp);
+
+		enemy->shake_duration = 0.15f;
+		enemy->shake_magitude = 0.03f;
+	}
+
+	// TODO: MISSED 일 때 트레일을 그리지 않으면 전투가 도중에 멈추는 문제가 있어서 무조건 그려줌
+	spawn_attack_trail(pLwc, enemy_x, -0.1f, 0.5f);
+
+	spawn_damage_text(pLwc, 0, 0, 0, damage_str);
+
+	pLwc->battle_fov_deg = pLwc->battle_fov_mag_deg_0;
+
+	pLwc->battle_cam_center_x = enemy_x;
+}
+
+int calculate_and_apply_attack_1_on_1(LWCONTEXT* pLwc, LWBATTLECREATURE* ca, const LWSKILL* s, LWBATTLECREATURE* cb,
+	LWBATTLECOMMANDRESULT* cmd_result_a, LWBATTLECOMMANDRESULT* cmd_result_b) {
+	if (s && s->valid) {
+		if (s->consume_hp > ca->hp) {
+			return -1;
+		}
+
+		if (s->consume_mp > ca->mp) {
+			return -2;
+		}
+
+		ca->hp -= s->consume_hp;
+		ca->mp -= s->consume_mp;
+	} else {
+		return -3;
+	}
+
+	pLwc->battle_state = LBS_COMMAND_IN_PROGRESS;
+	pLwc->command_in_progress_anim.t = pLwc->command_in_progress_anim.max_t = 1;
+	pLwc->command_in_progress_anim.max_v = 1;
+
+
+	LWBATTLECOMMAND cmd;
+	cmd.skill = s;
+
+	calculate_battle_command_result(ca, cb, &cmd, cmd_result_a, cmd_result_b);
+
+	apply_battle_command_result(ca, cmd_result_a);
+	apply_battle_command_result(cb, cmd_result_b);
+
+	return 0;
+}
+
+void exec_attack_p2e_with_screen_point(struct _LWCONTEXT* pLwc, float x, float y) {
 
 	for (int i = 0; i < MAX_ENEMY_SLOT; i++) {
 		if (pLwc->enemy[i].valid && pLwc->enemy[i].c.hp > 0) {
@@ -271,7 +289,7 @@ void exec_attack_with_screen_point(LWCONTEXT* pLwc, float x, float y) {
 
 				pLwc->battle_state = LBS_SELECT_TARGET;
 				pLwc->selected_enemy_slot = i;
-				exec_attack(pLwc, i);
+				exec_attack_p2e(pLwc, i);
 			}
 		}
 	}
@@ -290,7 +308,7 @@ void update_battle(struct _LWCONTEXT* pLwc) {
 
 	pLwc->command_in_progress_anim.t = (float)LWMAX(0, pLwc->command_in_progress_anim.t - (float)pLwc->delta_time);
 
-	if (pLwc->battle_state == LBS_ENEMY_TURN_IN_PROGRESS) {
+	if (pLwc->battle_state == LBS_START_ENEMY_TURN) {
 		update_enemy_turn(pLwc);
 	}
 }

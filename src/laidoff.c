@@ -24,6 +24,10 @@
 #include "lwkeyframe.h"
 #include "input.h"
 #include "field.h"
+#include "platform_detection.h"
+
+#define LW_SUPPORT_ETC1_HARDWARE_DECODING LW_PLATFORM_ANDROID
+
 #include "lwpkm.h"
 
 #define LWEPSILON (1e-3)
@@ -96,7 +100,7 @@ int LoadObjAndConvert(float bmin[3], float bmax[3], const char *filename);
 int spawn_attack_trail(LWCONTEXT *pLwc, float x, float y, float z);
 void update_attack_trail(LWCONTEXT *pLwc);
 float get_battle_enemy_x_center(int enemy_slot_index);
-int exec_attack(LWCONTEXT *pLwc, int enemy_slot);
+int exec_attack_p2e(LWCONTEXT *pLwc, int enemy_slot);
 int spawn_damage_text(LWCONTEXT *pLwc, float x, float y, float z, const char *text);
 void update_damage_text(LWCONTEXT *pLwc);
 
@@ -923,12 +927,11 @@ void bind_all_vertex_attrib_etc1_with_alpha(const LWCONTEXT *pLwc, int vbo_index
 	bind_all_vertex_attrib_shader(pLwc, 2, vbo_index);
 }
 
-#if !(LW_PLATFORM_WIN32 || LW_PLATFORM_OSX)
-static void load_pkm_texture(const char *tex_atlas_filename) {
+static void load_pkm_hw_decoding(const char *tex_atlas_filename) {
 	size_t file_size = 0;
 	char *b = create_binary_from_file(tex_atlas_filename, &file_size);
 	if (!b) {
-		LOGE("load_pkm_texture: create_binary_from_file null, filename %s", tex_atlas_filename);
+		LOGE("load_pkm_hw_decoding: create_binary_from_file null, filename %s", tex_atlas_filename);
 		return;
 	}
 	LWPKM *pPkm = (LWPKM *)b;
@@ -939,7 +942,13 @@ static void load_pkm_texture(const char *tex_atlas_filename) {
 	short extended_height = swap_bytes(pPkm->extended_height);
 
 	// TODO: iOS texture
-#if LW_PLATFORM_WIN32 || LW_PLATFORM_OSX || LW_PLATFORM_IOS || LW_PLATFORM_IOS_SIMULATOR || LW_PLATFORM_RPI
+#if LW_SUPPORT_ETC1_HARDWARE_DECODING
+	// calculate size of data with formula (extWidth / 4) * (extHeight / 4) * 8
+	u32 dataLength = ((extended_width >> 2) * (extended_height >> 2)) << 3;
+
+	glCompressedTexImage2D(GL_TEXTURE_2D, 0, GL_ETC1_RGB8_OES, extended_width, extended_height, 0,
+		dataLength, b + sizeof(LWPKM));
+#else
 	LWBITMAPCONTEXT bitmap_context;
 	create_image(tex_atlas_filename, &bitmap_context, 0);
 
@@ -950,12 +959,6 @@ static void load_pkm_texture(const char *tex_atlas_filename) {
 		error_enum);
 
 	release_image(&bitmap_context);
-#else
-	// calculate size of data with formula (extWidth / 4) * (extHeight / 4) * 8
-	u32 dataLength = ((extended_width >> 2) * (extended_height >> 2)) << 3;
-
-	glCompressedTexImage2D(GL_TEXTURE_2D, 0, GL_ETC1_RGB8_OES, extended_width, extended_height, 0,
-		dataLength, b + sizeof(LWPKM));
 #endif
 
 	error_enum = glGetError();
@@ -964,7 +967,34 @@ static void load_pkm_texture(const char *tex_atlas_filename) {
 
 	release_binary(b);
 }
-#endif
+
+static void load_png_pkm_sw_decoding(LWCONTEXT* pLwc, int i, GLenum error_enum) {
+	LWBITMAPCONTEXT bitmap_context;
+
+	create_image(tex_atlas_filename[i], &bitmap_context, i);
+
+	if (bitmap_context.width > 0 && bitmap_context.height > 0) {
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, bitmap_context.width, bitmap_context.height,
+		                          0,
+		                          GL_RGBA, GL_UNSIGNED_BYTE, bitmap_context.data);
+		error_enum = glGetError();
+		LOGI("glTexImage2D result (%dx%d): %d", bitmap_context.width, bitmap_context.height,
+			error_enum);
+
+		release_image(&bitmap_context);
+
+		// all atlas sizes should be equal
+		pLwc->tex_atlas_width[i] = bitmap_context.width;
+		pLwc->tex_atlas_height[i] = bitmap_context.height;
+
+		glGenerateMipmap(GL_TEXTURE_2D);
+		error_enum = glGetError();
+		LOGI("glGenerateMipmap result: %d", error_enum);
+	} else {
+		LOGE("create_image: %s not loaded. Width=%d, height=%d", tex_atlas_filename[i],
+			bitmap_context.width, bitmap_context.height);
+	}
+}
 
 static void load_tex_files(LWCONTEXT *pLwc) {
 	glGenTextures(MAX_TEX_ATLAS, pLwc->tex_atlas);
@@ -974,55 +1004,29 @@ static void load_tex_files(LWCONTEXT *pLwc) {
 
 		size_t tex_atlas_filename_len = (int)strlen(tex_atlas_filename[i]);
 
-		GLenum error_enum;
+		GLenum error_enum = 0;
 
 		size_t filename_index = tex_atlas_filename_len;
 		while (tex_atlas_filename[i][filename_index - 1] != PATH_SEPARATOR[0]) {
 			filename_index--;
 		}
-
-#if LW_PLATFORM_WIN32 || LW_PLATFORM_OSX
-		// Do Nothing
-#else
-		// Hardware decoding of PKM
-		if (strcmp(tex_atlas_filename[i] + tex_atlas_filename_len - 4, ".pkm") == 0) {
-			load_pkm_texture(tex_atlas_filename[i]);
-		} else
-#endif
-			// Software/Hardware decoding of KTX
-			if (strcmp(tex_atlas_filename[i] + tex_atlas_filename_len - 4, ".ktx") == 0) {
-				if (load_ktx_texture(tex_atlas_filename[i]) < 0) {
-					LOGI("load_ktx_texture failure... %s", tex_atlas_filename[i]);
-				}
-			} else {
-				// Software decoding of PNG or PKM
-
-				LWBITMAPCONTEXT bitmap_context;
-
-				create_image(tex_atlas_filename[i], &bitmap_context, i);
-
-				if (bitmap_context.width > 0 && bitmap_context.height > 0) {
-					glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, bitmap_context.width, bitmap_context.height,
-						0,
-						GL_RGBA, GL_UNSIGNED_BYTE, bitmap_context.data);
-					error_enum = glGetError();
-					LOGI("glTexImage2D result (%dx%d): %d", bitmap_context.width, bitmap_context.height,
-						error_enum);
-
-					release_image(&bitmap_context);
-
-					// all atlas sizes should be equal
-					pLwc->tex_atlas_width[i] = bitmap_context.width;
-					pLwc->tex_atlas_height[i] = bitmap_context.height;
-
-					glGenerateMipmap(GL_TEXTURE_2D);
-					error_enum = glGetError();
-					LOGI("glGenerateMipmap result: %d", error_enum);
-				} else {
-					LOGE("create_image: %s not loaded. Width=%d, height=%d", tex_atlas_filename[i],
-						bitmap_context.width, bitmap_context.height);
-				}
+	
+		if (strcmp(tex_atlas_filename[i] + tex_atlas_filename_len - 4, ".ktx") == 0) {
+			if (load_ktx_hw_or_sw(tex_atlas_filename[i]) < 0) {
+				LOGE("load_tex_files: load_ktx_hw_or_sw failure - %s", tex_atlas_filename[i]);
 			}
+		} else if (strcmp(tex_atlas_filename[i] + tex_atlas_filename_len - 4, ".png") == 0) {
+			// Software decoding of PNG
+			load_png_pkm_sw_decoding(pLwc, i, error_enum);
+		} else if (strcmp(tex_atlas_filename[i] + tex_atlas_filename_len - 4, ".pkm") == 0) {
+#if LW_SUPPORT_ETC1_HARDWARE_DECODING
+			load_pkm_hw_decoding(tex_atlas_filename[i]);
+#else
+			load_png_pkm_sw_decoding(pLwc, i, error_enum);
+#endif
+		} else {
+			LOGE("load_tex_files: unknown tex file extension - %s", tex_atlas_filename[i]);
+		}
 
 		pLwc->tex_atlas_hash[i] = hash(
 			(const unsigned char *)&tex_atlas_filename[i][filename_index]);

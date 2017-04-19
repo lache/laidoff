@@ -38,12 +38,12 @@ unsigned char FileIdentifier[] =
 	0xAB, 0x4B, 0x54, 0x58, 0x20, 0x31, 0x31, 0xBB, 0x0D, 0x0A, 0x1A, 0x0A
 };
 
-int load_ktx_texture(const char* tex_atlas_filename)
+int load_ktx_hw_or_sw(const char* tex_atlas_filename)
 {
 	size_t file_size = 0;
 	char *b = create_binary_from_file(tex_atlas_filename, &file_size);
     if (!b) {
-        LOGE("load_ktx_texture: create_binary_from_file null, filename %s", tex_atlas_filename);
+        LOGE("load_ktx_hw_or_sw: create_binary_from_file null, filename %s", tex_atlas_filename);
         return -5;
     }
     
