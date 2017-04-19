@@ -27,6 +27,7 @@
 #include "platform_detection.h"
 
 #define LW_SUPPORT_ETC1_HARDWARE_DECODING LW_PLATFORM_ANDROID
+#define LW_SUPPORT_VAO (LW_PLATFORM_WIN32 || LW_PLATFORM_OSX)
 
 #include "lwpkm.h"
 
@@ -100,7 +101,6 @@ int LoadObjAndConvert(float bmin[3], float bmax[3], const char *filename);
 int spawn_attack_trail(LWCONTEXT *pLwc, float x, float y, float z);
 void update_attack_trail(LWCONTEXT *pLwc);
 float get_battle_enemy_x_center(int enemy_slot_index);
-int exec_attack_p2e(LWCONTEXT *pLwc, int enemy_slot);
 int spawn_damage_text(LWCONTEXT *pLwc, float x, float y, float z, const char *text);
 void update_damage_text(LWCONTEXT *pLwc);
 
@@ -174,20 +174,13 @@ static void
 create_shader(const char *shader_name, LWSHADER *pShader, const GLchar *vst, const GLchar *fst) {
 	pShader->valid = 0;
 
-	GLenum error_enum;
-	// vertex shader
-
 	pShader->vertex_shader = glCreateShader(GL_VERTEX_SHADER);
-	error_enum = glGetError();
 
 	const GLchar* vstarray[] = { vst };
 	glShaderSource(pShader->vertex_shader, 1, vstarray, NULL);
-	error_enum = glGetError();
 	glCompileShader(pShader->vertex_shader);
-	error_enum = glGetError();
 	GLint isCompiled = 0;
 	glGetShaderiv(pShader->vertex_shader, GL_COMPILE_STATUS, &isCompiled);
-	error_enum = glGetError();
 	if (isCompiled == GL_FALSE) {
 		GLint maxLength = 0;
 		glGetShaderiv(pShader->vertex_shader, GL_INFO_LOG_LENGTH, &maxLength);
@@ -207,14 +200,10 @@ create_shader(const char *shader_name, LWSHADER *pShader, const GLchar *vst, con
 	// fragment shader
 
 	pShader->fragment_shader = glCreateShader(GL_FRAGMENT_SHADER);
-	error_enum = glGetError();
 	const GLchar* fstarray[] = { fst };
 	glShaderSource(pShader->fragment_shader, 1, fstarray, NULL);
-	error_enum = glGetError();
 	glCompileShader(pShader->fragment_shader);
-	error_enum = glGetError();
 	glGetShaderiv(pShader->fragment_shader, GL_COMPILE_STATUS, &isCompiled);
-	error_enum = glGetError();
 	if (isCompiled == GL_FALSE) {
 		GLint maxLength = 0;
 		glGetShaderiv(pShader->fragment_shader, GL_INFO_LOG_LENGTH, &maxLength);
@@ -232,17 +221,12 @@ create_shader(const char *shader_name, LWSHADER *pShader, const GLchar *vst, con
 	}
 
 	pShader->program = glCreateProgram();
-	error_enum = glGetError();
 	glAttachShader(pShader->program, pShader->vertex_shader);
-	error_enum = glGetError();
 	glAttachShader(pShader->program, pShader->fragment_shader);
-	error_enum = glGetError();
 	glLinkProgram(pShader->program);
-	error_enum = glGetError();
 	//Note the different functions here: glGetProgram* instead of glGetShader*.
 	GLint isLinked = 0;
 	glGetProgramiv(pShader->program, GL_LINK_STATUS, (int *)&isLinked);
-	error_enum = glGetError();
 	if (isLinked == GL_FALSE) {
 		GLint maxLength = 0;
 		glGetProgramiv(pShader->program, GL_INFO_LOG_LENGTH, &maxLength);
@@ -267,38 +251,23 @@ create_shader(const char *shader_name, LWSHADER *pShader, const GLchar *vst, con
 	glUseProgram(pShader->program);
 	// Uniforms
 	pShader->mvp_location = glGetUniformLocation(pShader->program, "MVP");
-	error_enum = glGetError();
 	pShader->vuvoffset_location = glGetUniformLocation(pShader->program, "vUvOffset");
-	error_enum = glGetError();
 	pShader->vuvscale_location = glGetUniformLocation(pShader->program, "vUvScale");
-	error_enum = glGetError();
 	pShader->vs9offset_location = glGetUniformLocation(pShader->program, "vS9Offset");
-	error_enum = glGetError();
 	pShader->alpha_multiplier_location = glGetUniformLocation(pShader->program, "alpha_multiplier");
-	error_enum = glGetError();
 	pShader->overlay_color_location = glGetUniformLocation(pShader->program, "overlay_color");
-	error_enum = glGetError();
 	pShader->overlay_color_ratio_location = glGetUniformLocation(pShader->program,
 		"overlay_color_ratio");
-	error_enum = glGetError();
 	pShader->diffuse_location = glGetUniformLocation(pShader->program, "diffuse");
-	error_enum = glGetError();
 	pShader->alpha_only_location = glGetUniformLocation(pShader->program, "alpha_only");
-	error_enum = glGetError();
 	pShader->glyph_color_location = glGetUniformLocation(pShader->program, "glyph_color");
-	error_enum = glGetError();
 	pShader->outline_color_location = glGetUniformLocation(pShader->program, "outline_color");
-	error_enum = glGetError();
 
 	// Attribs
 	pShader->vpos_location = glGetAttribLocation(pShader->program, "vPos");
-	error_enum = glGetError();
 	pShader->vcol_location = glGetAttribLocation(pShader->program, "vCol");
-	error_enum = glGetError();
 	pShader->vuv_location = glGetAttribLocation(pShader->program, "vUv");
-	error_enum = glGetError();
 	pShader->vs9_location = glGetAttribLocation(pShader->program, "vS9");
-	error_enum = glGetError();
 
 	pShader->valid = 1;
 }
@@ -421,48 +390,31 @@ static void init_vbo(LWCONTEXT *pLwc) {
 }
 
 void set_vertex_attrib_pointer(const LWCONTEXT* pLwc, int shader_index) {
-	GLenum error_enum;
 	glEnableVertexAttribArray(pLwc->shader[shader_index].vpos_location);
-	error_enum = glGetError();
 	glVertexAttribPointer(pLwc->shader[shader_index].vpos_location, 3, GL_FLOAT, GL_FALSE,
 		stride_in_bytes, (void *)0);
-	error_enum = glGetError();
 	glEnableVertexAttribArray(pLwc->shader[shader_index].vcol_location);
-	error_enum = glGetError();
 	glVertexAttribPointer(pLwc->shader[shader_index].vcol_location, 3, GL_FLOAT, GL_FALSE,
 		stride_in_bytes, (void *)(sizeof(float) * 3));
-	error_enum = glGetError();
 	glEnableVertexAttribArray(pLwc->shader[shader_index].vuv_location);
-	error_enum = glGetError();
 	glVertexAttribPointer(pLwc->shader[shader_index].vuv_location, 2, GL_FLOAT, GL_FALSE,
 		stride_in_bytes, (void *)(sizeof(float) * (3 + 3)));
-	error_enum = glGetError();
 	glEnableVertexAttribArray(pLwc->shader[shader_index].vs9_location);
-	error_enum = glGetError();
 	glVertexAttribPointer(pLwc->shader[shader_index].vs9_location, 2, GL_FLOAT, GL_FALSE,
 		stride_in_bytes, (void *)(sizeof(float) * (3 + 3 + 2)));
-	error_enum = glGetError();
 }
 
 static void init_vao(LWCONTEXT *pLwc, int shader_index) {
-#if LW_PLATFORM_WIN32 || LW_PLATFORM_OSX
-	GLenum error_enum = glGetError();
-
+#if LW_SUPPORT_VAO
 	glGenVertexArrays(VERTEX_BUFFER_COUNT, pLwc->vao);
-	error_enum = glGetError();
-
 	for (int i = 0; i < VERTEX_BUFFER_COUNT; i++) {
 		glBindVertexArray(pLwc->vao[i]);
-		error_enum = glGetError();
 		glBindBuffer(GL_ARRAY_BUFFER, pLwc->vertex_buffer[i].vertex_buffer);
-		error_enum = glGetError();
 		set_vertex_attrib_pointer(pLwc, shader_index);
 	}
 
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
-	error_enum = glGetError();
 	glBindVertexArray(0);
-	error_enum = glGetError();
 #endif
 }
 
@@ -968,16 +920,16 @@ static void load_pkm_hw_decoding(const char *tex_atlas_filename) {
 	release_binary(b);
 }
 
-static void load_png_pkm_sw_decoding(LWCONTEXT* pLwc, int i, GLenum error_enum) {
+static void load_png_pkm_sw_decoding(LWCONTEXT* pLwc, int i) {
 	LWBITMAPCONTEXT bitmap_context;
 
 	create_image(tex_atlas_filename[i], &bitmap_context, i);
 
 	if (bitmap_context.width > 0 && bitmap_context.height > 0) {
 		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, bitmap_context.width, bitmap_context.height,
-		                          0,
-		                          GL_RGBA, GL_UNSIGNED_BYTE, bitmap_context.data);
-		error_enum = glGetError();
+			0,
+			GL_RGBA, GL_UNSIGNED_BYTE, bitmap_context.data);
+		GLenum error_enum = glGetError();
 		LOGI("glTexImage2D result (%dx%d): %d", bitmap_context.width, bitmap_context.height,
 			error_enum);
 
@@ -1004,25 +956,23 @@ static void load_tex_files(LWCONTEXT *pLwc) {
 
 		size_t tex_atlas_filename_len = (int)strlen(tex_atlas_filename[i]);
 
-		GLenum error_enum = 0;
-
 		size_t filename_index = tex_atlas_filename_len;
 		while (tex_atlas_filename[i][filename_index - 1] != PATH_SEPARATOR[0]) {
 			filename_index--;
 		}
-	
+
 		if (strcmp(tex_atlas_filename[i] + tex_atlas_filename_len - 4, ".ktx") == 0) {
 			if (load_ktx_hw_or_sw(tex_atlas_filename[i]) < 0) {
 				LOGE("load_tex_files: load_ktx_hw_or_sw failure - %s", tex_atlas_filename[i]);
 			}
 		} else if (strcmp(tex_atlas_filename[i] + tex_atlas_filename_len - 4, ".png") == 0) {
 			// Software decoding of PNG
-			load_png_pkm_sw_decoding(pLwc, i, error_enum);
+			load_png_pkm_sw_decoding(pLwc, i);
 		} else if (strcmp(tex_atlas_filename[i] + tex_atlas_filename_len - 4, ".pkm") == 0) {
 #if LW_SUPPORT_ETC1_HARDWARE_DECODING
 			load_pkm_hw_decoding(tex_atlas_filename[i]);
 #else
-			load_png_pkm_sw_decoding(pLwc, i, error_enum);
+			load_png_pkm_sw_decoding(pLwc, i);
 #endif
 		} else {
 			LOGE("load_tex_files: unknown tex file extension - %s", tex_atlas_filename[i]);
