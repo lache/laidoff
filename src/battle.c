@@ -1,3 +1,6 @@
+#include <string.h>
+#include <stdio.h>
+
 #include "lwcontext.h"
 #include "lwmacro.h"
 #include "lwbattlecommand.h"
