@@ -133,7 +133,7 @@ typedef struct _LWCONTEXT {
 	int selected_command_slot;
 	int selected_enemy_slot;
 	LW_BATTLE_STATE battle_state;
-	LWANIM1D command_in_progress_anim;
+	LWANIM1D command_banner_anim;
 	LWDAMAGETEXT damage_text[MAX_DAMAGE_TEXT];
 	LWBATTLECREATURE player[MAX_PLAYER_SLOT];
 	LWENEMY enemy[MAX_ENEMY_SLOT];
@@ -143,10 +143,16 @@ typedef struct _LWCONTEXT {
 	float battle_wall_tex_v;
 	mat4x4 battle_proj;
 	mat4x4 battle_view;
+	LWANIM1D center_image_anim;
+	LW_ATLAS_ENUM center_image;
+
+	// Font
 
 	int font_texture_texture_mode;
 
 	LWFBO font_fbo;
+
+	// Input
 
 	float last_mouse_press_x;
 	float last_mouse_press_y;

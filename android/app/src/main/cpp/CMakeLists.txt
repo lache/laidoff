@@ -98,6 +98,7 @@ add_library(native-activity SHARED
             ../../../../../src/lwtimepoint.c
             ../../../../../src/input.c
             ../../../../../src/field.c
+            ../../../../../src/lwbattlecreature.c
             ${LUA_LIB}
             )
 

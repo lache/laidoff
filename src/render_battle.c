@@ -286,7 +286,7 @@ void render_enemy_3d(
 	const int enemy_scope_at_player_turn = (pLwc->battle_state == LBS_SELECT_COMMAND || pLwc->battle_state == LBS_SELECT_TARGET)
 		&& enemy->c.hp > 0;
 
-	const int enemy_scope_at_enemy_turn = (pLwc->battle_state == LBS_START_ENEMY_TURN || pLwc->battle_state == LBS_ENEMY_TURN_WAIT)
+	const int enemy_scope_at_enemy_turn = (pLwc->battle_state == LBS_ENEMY_COMMAND_IN_PROGRESS)
 		&& enemy->c.selected;
 
 	float enemy_scope_ui_width = enemy->right_bottom_ui_point[0] - enemy->left_top_ui_point[0];
@@ -586,23 +586,38 @@ void render_player_creature_ui(const LWCONTEXT* pLwc, const LWBATTLECREATURE* c,
 		render_text_block(pLwc, &turn_token_text_block);
 	}
 
-	// HP
-	{
-		char str[32];
-		sprintf(str, "HP %d", c->hp);
-		text_block.text = str;
-		text_block.text_bytelen = (int)strlen(text_block.text);
-		text_block.begin_index = 0;
-		text_block.end_index = text_block.text_bytelen;
-		text_block.text_block_y -= text_block.text_block_line_height;
+	text_block.text_block_y -= text_block.text_block_line_height;
 
-		render_text_block(pLwc, &text_block);
+	vec2 shake_diff_pos = { 0, };
+	const float shake_magnitude = c->shake_duration > 0 ? c->shake_magitude : 0;
+
+	// offset by shake anim
+	if (shake_magnitude) {
+		shake_diff_pos[0] += (float)rand() / RAND_MAX * shake_magnitude;
+		shake_diff_pos[1] += (float)rand() / RAND_MAX * shake_magnitude;
 	}
 
+	// HP
+	{	
+		LWTEXTBLOCK hp_text_block;
+		memcpy(&hp_text_block, &text_block, sizeof(LWTEXTBLOCK));
+
+		char str[32];
+		sprintf(str, "HP %d", c->hp);
+		hp_text_block.text = str;
+		hp_text_block.text_bytelen = (int)strlen(hp_text_block.text);
+		hp_text_block.begin_index = 0;
+		hp_text_block.end_index = hp_text_block.text_bytelen;
+		hp_text_block.text_block_x += shake_diff_pos[0];
+		hp_text_block.text_block_y += shake_diff_pos[1];
+
+		render_text_block(pLwc, &hp_text_block);
+	}
+	
 	render_solid_box_ui(
 		pLwc,
-		text_block.text_block_x,
-		text_block.text_block_y - text_block.text_block_line_height,
+		text_block.text_block_x + shake_diff_pos[0],
+		text_block.text_block_y + shake_diff_pos[1] - text_block.text_block_line_height,
 		bar_width,
 		bar_height,
 		pLwc->tex_programmed[LPT_SOLID_GRAY]
@@ -610,8 +625,8 @@ void render_player_creature_ui(const LWCONTEXT* pLwc, const LWBATTLECREATURE* c,
 
 	render_solid_box_ui(
 		pLwc,
-		text_block.text_block_x,
-		text_block.text_block_y - text_block.text_block_line_height,// + 0.01f,
+		text_block.text_block_x + shake_diff_pos[0],
+		text_block.text_block_y + shake_diff_pos[1] - text_block.text_block_line_height,// + 0.01f,
 		bar_width * c->hp / c->max_hp,
 		bar_height,
 		pLwc->tex_programmed[LPT_SOLID_RED]
@@ -669,10 +684,25 @@ void render_player_creature_ui(const LWCONTEXT* pLwc, const LWBATTLECREATURE* c,
 
 static void render_command_banner(const LWCONTEXT* pLwc) {
 
+	const char* skill_name = 0;
+
+	// Player turn
 	if (pLwc->player_turn_creature_index >= 0
 		&& pLwc->selected_command_slot >= 0
 		&& pLwc->battle_state == LBS_COMMAND_IN_PROGRESS) {
 
+		skill_name = pLwc->player[pLwc->player_turn_creature_index].skill[pLwc->selected_command_slot]->name;
+	}
+
+	// Enemy turn
+	if (pLwc->enemy_turn_creature_index >= 0
+		&& pLwc->selected_command_slot >= 0
+		&& pLwc->battle_state == LBS_ENEMY_COMMAND_IN_PROGRESS) {
+
+		skill_name = pLwc->enemy[pLwc->enemy_turn_creature_index].c.skill[pLwc->selected_command_slot]->name;
+	}
+
+	if (skill_name) {
 		const float aspect_ratio = (float)pLwc->width / pLwc->height;
 
 		const float x = 0;
@@ -680,7 +710,7 @@ static void render_command_banner(const LWCONTEXT* pLwc) {
 		const float w = 1.0f * aspect_ratio;
 		const float h = 0.2f;
 
-		const float anim_v = LWCLAMP(5 * lwanim_get_1d(&pLwc->command_in_progress_anim), 0, 1);
+		const float anim_v = LWCLAMP(5 * lwanim_get_1d(&pLwc->command_banner_anim), 0, 1);
 		const float bg_alpha = 0.5f;
 
 		render_solid_vb_ui(
@@ -698,7 +728,7 @@ static void render_command_banner(const LWCONTEXT* pLwc) {
 			0
 		);
 
-		LWTEXTBLOCK text_block;
+		LWTEXTBLOCK text_block = { 0, };
 		text_block.text_block_width = DEFAULT_TEXT_BLOCK_WIDTH;
 		text_block.text_block_line_height = DEFAULT_TEXT_BLOCK_LINE_HEIGHT_B;
 		text_block.size = anim_v * DEFAULT_TEXT_BLOCK_SIZE_B;
@@ -706,7 +736,7 @@ static void render_command_banner(const LWCONTEXT* pLwc) {
 		SET_COLOR_RGBA_FLOAT(text_block.color_normal_outline, 1, 1, 1, 1);
 		SET_COLOR_RGBA_FLOAT(text_block.color_emp_glyph, 1, 1, 0, 1);
 		SET_COLOR_RGBA_FLOAT(text_block.color_emp_outline, 0, 0, 0, 1);
-		text_block.text = pLwc->player[pLwc->player_turn_creature_index].skill[pLwc->selected_command_slot]->name;
+		text_block.text = skill_name;
 		text_block.text_bytelen = (int)strlen(text_block.text);
 		text_block.begin_index = 0;
 		text_block.end_index = text_block.text_bytelen;
@@ -836,6 +866,17 @@ static void render_command_palette(const LWCONTEXT* pLwc) {
 	}
 }
 
+void render_center_image(const LWCONTEXT* pLwc) {
+	if (pLwc->center_image_anim.t > 0) {
+		const float s = LWCLAMP(5 * lwanim_get_1d(&pLwc->center_image_anim), 0, 1);
+		if (s > 0) {
+			render_solid_vb_ui_alpha(pLwc, 0, 0, s, s,
+				pLwc->tex_atlas[pLwc->center_image], pLwc->tex_atlas[pLwc->center_image + 1],
+				LVT_CENTER_CENTER_ANCHORED_SQUARE, 1, 0, 0, 0, 0);
+		}
+	}
+}
+
 void lwc_render_battle(const LWCONTEXT* pLwc) {
 	glViewport(0, 0, pLwc->width, pLwc->height);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -925,16 +966,16 @@ void lwc_render_battle(const LWCONTEXT* pLwc) {
 			LOGE("Unknown LWDAMAGETEXT coord value: %d", e->coord);
 		}
 	} ARRAY_ITERATE_VALID_END();
-	
+
 	// Command palette
 	if (pLwc->battle_state != LBS_COMMAND_IN_PROGRESS) {
 		render_command_palette(pLwc);
 	}
 
 	// Command banner
-	if (pLwc->battle_state == LBS_COMMAND_IN_PROGRESS) {
-		render_command_banner(pLwc);
-	}
+	render_command_banner(pLwc);
+
+	render_center_image(pLwc);
 
 	// give up const-ness
 	((LWCONTEXT*)pLwc)->render_count++;

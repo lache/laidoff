@@ -33,9 +33,13 @@ typedef enum _LW_ATLAS_ENUM
     
     LAE_U_GLOW,
     LAE_U_GLOW_ALPHA,
-    
+
     LAE_U_ENEMY_SCOPE_KTX,
     LAE_U_ENEMY_SCOPE_ALPHA_KTX,
+	LAE_U_ENEMY_TURN_KTX,
+	LAE_U_ENEMY_TURN_ALPHA_KTX,
+	LAE_U_PLAYER_TURN_KTX,
+	LAE_U_PLAYER_TURN_ALPHA_KTX,
     
     LAE_COUNT,
 } LW_ATLAS_ENUM;
@@ -75,6 +79,10 @@ static const char *tex_atlas_filename[] = {
 
 	ASSETS_BASE_PATH "ktx" PATH_SEPARATOR "u-enemy-scope-a.ktx",
 	ASSETS_BASE_PATH "ktx" PATH_SEPARATOR "u-enemy-scope-a_alpha.ktx",
+	ASSETS_BASE_PATH "ktx" PATH_SEPARATOR "u-enemy-turn-a.ktx",
+	ASSETS_BASE_PATH "ktx" PATH_SEPARATOR "u-enemy-turn-a_alpha.ktx",
+	ASSETS_BASE_PATH "ktx" PATH_SEPARATOR "u-player-turn-a.ktx",
+	ASSETS_BASE_PATH "ktx" PATH_SEPARATOR "u-player-turn-a_alpha.ktx",
 };
 
 #define MAX_TEX_ATLAS (ARRAY_SIZE(tex_atlas_filename))

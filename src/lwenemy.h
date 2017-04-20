@@ -13,8 +13,6 @@ typedef struct _LWENEMY
 	float scale;
 	float shadow_scale;
 	float time_offset;
-	float shake_duration;
-	float shake_magitude;
 	LWANIM1D evasion_anim;
 	LWANIM5D death_anim;
 	LWBATTLECREATURE c;

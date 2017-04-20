@@ -16,7 +16,7 @@ void update_render_enemy_position(const struct _LWCONTEXT* pLwc, int enemy_slot_
 	pos[1] = 0;
 	pos[2] = 0;
 
-	const float shake_magnitude = enemy->shake_duration > 0 ? enemy->shake_magitude : 0;
+	const float shake_magnitude = enemy->c.shake_duration > 0 ? enemy->c.shake_magitude : 0;
 
 	// offset by shake anim
 	if (shake_magnitude) {
@@ -97,7 +97,7 @@ void update_enemy_scope_ui_point(const LWCONTEXT* pLwc, LWENEMY* enemy) {
 }
 
 void update_enemy(const struct _LWCONTEXT* pLwc, int enemy_slot_index, LWENEMY* enemy) {
-	enemy->shake_duration = (float)LWMAX(0, enemy->shake_duration - (float)pLwc->delta_time);
+	enemy->c.shake_duration = (float)LWMAX(0, enemy->c.shake_duration - (float)pLwc->delta_time);
 	enemy->evasion_anim.t = (float)LWMAX(0, enemy->evasion_anim.t - (float)pLwc->delta_time);
 	enemy->death_anim.anim_1d.t = (float)LWMAX(0, enemy->death_anim.anim_1d.t - (float)pLwc->delta_time);
 

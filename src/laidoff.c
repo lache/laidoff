@@ -837,11 +837,6 @@ void lwc_update(LWCONTEXT *pLwc, double delta_time) {
 
 	update_battle(pLwc);
 
-	ARRAY_ITERATE_VALID(LWENEMY, pLwc->enemy) {
-		update_enemy(pLwc, i, e);
-	}
-	ARRAY_ITERATE_VALID_END();
-
 	move_player(pLwc);
 
 	resolve_player_collision(pLwc);

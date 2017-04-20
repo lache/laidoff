@@ -6,6 +6,8 @@
 
 #define MAX_SKILL_PER_CREATURE (8)
 
+struct _LWCONTEXT;
+
 typedef struct _LWCREATURESTAT {
 	LWATTRIBVALUE attrib;
 	int str; // Strength
@@ -54,6 +56,8 @@ typedef struct _LWBATTLECREATURE {
 	float selected_a;
 	int turn_token;
 	int turn_consumed;
+	float shake_duration;
+	float shake_magitude;
 
 } LWBATTLECREATURE;
 
@@ -103,3 +107,6 @@ typedef struct _LWBATTLECREATURE {
 #define BATTLECREATURE_SQUID { 1, LWU("오징어"), 1, 1, 1, 10, 10, CREATURESTAT_GRADE_1_NON_WEAK }
 #define BATTLECREATURE_SHOE { 1, LWU("신발"), 1, 1, 1, 10, 10, CREATURESTAT_GRADE_1_NON_WEAK }
 #define BATTLECREATURE_TOFU { 1, LWU("두부"), 1, 1, 1, 10, 10, CREATURESTAT_GRADE_1_NON_WEAK }
+
+
+void update_player(const struct _LWCONTEXT* pLwc, int slot_index, LWBATTLECREATURE* player);

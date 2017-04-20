@@ -190,6 +190,7 @@ src/lwatlassprite.h
 src/lwattrib.h
 src/lwbattlecommand.h
 src/lwbattlecommandresult.h
+src/lwbattlecreature.c
 src/lwbattlecreature.h
 src/lwbattlestate.h
 src/lwbitmapcontext.h

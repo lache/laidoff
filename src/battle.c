@@ -55,13 +55,18 @@ int update_next_enemy_turn_creature(LWCONTEXT* pLwc) {
 	if (pLwc->enemy_turn_creature_index >= 0) {
 		pLwc->enemy[pLwc->enemy_turn_creature_index].c.selected = 0;
 		pLwc->enemy[pLwc->enemy_turn_creature_index].c.turn_consumed = 1;
-		const int next_turn_token = pLwc->enemy[pLwc->enemy_turn_creature_index].c.turn_token + 1;
+		int next_turn_token = pLwc->enemy[pLwc->enemy_turn_creature_index].c.turn_token + 1;
 
 		for (int i = 0; i < MAX_ENEMY_SLOT; i++) {
 			if (pLwc->enemy[i].c.turn_token == next_turn_token) {
-				pLwc->enemy[i].c.selected = 1;
-				pLwc->enemy_turn_creature_index = i;
-				return pLwc->enemy_turn_creature_index;
+
+				if (pLwc->enemy[i].c.hp > 0) {
+					pLwc->enemy[i].c.selected = 1;
+					pLwc->enemy_turn_creature_index = i;
+					return pLwc->enemy_turn_creature_index;
+				}
+
+				next_turn_token++;
 			}
 		}
 
@@ -231,11 +236,16 @@ void play_player_hp_desc_anim(struct _LWCONTEXT* pLwc, const int player_slot,
 	
 	char damage_str[128];
 
+	LWBATTLECREATURE* player = &pLwc->player[player_slot];
+
 	if (cmd_result_a->type == LBCR_MISSED) {
 		snprintf(damage_str, ARRAY_SIZE(damage_str), "MISSED");
 	} else {
 		// 데미지는 음수이기 때문에 - 붙여서 양수로 바꿔줌
 		snprintf(damage_str, ARRAY_SIZE(damage_str), "%d", -cmd_result_b->delta_hp);
+
+		player->shake_duration = 0.15f;
+		player->shake_magitude = 0.03f;
 	}
 
 	spawn_damage_text(pLwc, left_top_x + area_width / 2, left_top_y - area_height / 2, 0, damage_str, LDTC_UI);
@@ -258,8 +268,8 @@ int exec_attack_e2p(struct _LWCONTEXT* pLwc) {
 
 		if (error_code == 0) {
 			pLwc->battle_state = LBS_ENEMY_COMMAND_IN_PROGRESS;
-			pLwc->command_in_progress_anim.t = pLwc->command_in_progress_anim.max_t = 1;
-			pLwc->command_in_progress_anim.max_v = 1;
+			pLwc->command_banner_anim.t = pLwc->command_banner_anim.max_t = 1;
+			pLwc->command_banner_anim.max_v = 1;
 
 			play_player_hp_desc_anim(pLwc, player_slot, &cmd_result_a, &cmd_result_b);
 		}
@@ -293,6 +303,10 @@ void update_enemy_turn(struct _LWCONTEXT* pLwc) {
 
 		setup_enemy_turn(pLwc);
 
+		pLwc->center_image_anim.t = pLwc->center_image_anim.max_t = 1.0f;
+		pLwc->center_image_anim.max_v = 1.0f;
+		pLwc->center_image = LAE_U_ENEMY_TURN_KTX;
+
 		pLwc->battle_state = LBS_ENEMY_TURN_WAIT;
 	}
 
@@ -303,19 +317,30 @@ void update_enemy_turn(struct _LWCONTEXT* pLwc) {
 			pLwc->enemy_turn_command_wait_time = 0;
 
 			exec_attack_e2p(pLwc);
+		}
+	}
+
+	if (pLwc->battle_state == LBS_ENEMY_COMMAND_IN_PROGRESS) {
+		
+		// Wait for command banner anim finished.
+		if (pLwc->command_banner_anim.t <= 0) {
+			// Wait for the next enemy creature.
+			pLwc->enemy_turn_command_wait_time = 1.0f;
+			pLwc->battle_state = LBS_ENEMY_TURN_WAIT;
 
 			const int next_enemy_turn_creature_index = update_next_enemy_turn_creature(pLwc);
 
 			if (next_enemy_turn_creature_index < 0) {
 				// Enemy turn finished.
+
+				pLwc->center_image_anim.t = pLwc->center_image_anim.max_t = 1.0f;
+				pLwc->center_image_anim.max_v = 1.0f;
+				pLwc->center_image = LAE_U_PLAYER_TURN_KTX;
+
+				
 				pLwc->battle_state = LBS_SELECT_COMMAND;
 
 				setup_player_turn(pLwc);
-
-			} else {
-				// Wait for the next enemy creature.
-				pLwc->enemy_turn_command_wait_time = 1.0f;
-				pLwc->battle_state = LBS_ENEMY_TURN_WAIT;
 			}
 		}
 	}
@@ -335,8 +360,8 @@ int exec_attack_p2e(struct _LWCONTEXT* pLwc, int enemy_slot) {
 
 		if (error_code == 0) {
 			pLwc->battle_state = LBS_COMMAND_IN_PROGRESS;
-			pLwc->command_in_progress_anim.t = pLwc->command_in_progress_anim.max_t = 1;
-			pLwc->command_in_progress_anim.max_v = 1;
+			pLwc->command_banner_anim.t = pLwc->command_banner_anim.max_t = 1;
+			pLwc->command_banner_anim.max_v = 1;
 
 			play_enemy_hp_desc_anim(pLwc, &pLwc->enemy[enemy_slot], enemy_slot, &cmd_result_a, &cmd_result_b);
 		}
@@ -367,8 +392,8 @@ void play_enemy_hp_desc_anim(LWCONTEXT* pLwc, LWENEMY* enemy, int enemy_slot,
 		// 데미지는 음수이기 때문에 - 붙여서 양수로 바꿔줌
 		snprintf(damage_str, ARRAY_SIZE(damage_str), "%d", -cmd_result_b->delta_hp);
 
-		enemy->shake_duration = 0.15f;
-		enemy->shake_magitude = 0.03f;
+		enemy->c.shake_duration = 0.15f;
+		enemy->c.shake_magitude = 0.03f;
 	}
 
 	// TODO: MISSED 일 때 트레일을 그리지 않으면 전투가 도중에 멈추는 문제가 있어서 무조건 그려줌
@@ -437,7 +462,19 @@ void update_battle(struct _LWCONTEXT* pLwc) {
 	vec3 up = { 0, 0, 1 };
 	mat4x4_look_at(pLwc->battle_view, eye, center, up);
 
-	pLwc->command_in_progress_anim.t = (float)LWMAX(0, pLwc->command_in_progress_anim.t - (float)pLwc->delta_time);
+	pLwc->command_banner_anim.t = (float)LWMAX(0, pLwc->command_banner_anim.t - (float)pLwc->delta_time);
 
 	update_enemy_turn(pLwc);
+
+	ARRAY_ITERATE_VALID(LWENEMY, pLwc->enemy) {
+		update_enemy(pLwc, i, e);
+	}
+	ARRAY_ITERATE_VALID_END();
+
+	ARRAY_ITERATE_VALID(LWBATTLECREATURE, pLwc->player) {
+		update_player(pLwc, i, e);
+	}
+	ARRAY_ITERATE_VALID_END();
+
+	pLwc->center_image_anim.t = (float)LWMAX(0, pLwc->center_image_anim.t - (float)pLwc->delta_time);
 }
