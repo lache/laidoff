@@ -478,6 +478,10 @@ void reset_battle_context(LWCONTEXT* pLwc) {
 			pLwc->enemy[i].c.skill[j] = &SKILL_DATA_LIST[j];
 		}
 	}
+	// Invalidate empty enemy slot
+	for (int i = enemy_count; i < MAX_ENEMY_SLOT; i++) {
+		pLwc->enemy[i].valid = 0;
+	}
 	
 	memset(pLwc->player, 0, sizeof(pLwc->player));
 
