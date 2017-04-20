@@ -130,6 +130,8 @@ typedef struct _LWCONTEXT {
 	float dir_pad_y;
 	int dir_pad_dragging;
 
+	int field_event_id;
+
 	// Battle Mode Components
 
 	LWTRAIL trail[MAX_TRAIL];

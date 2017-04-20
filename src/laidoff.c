@@ -469,7 +469,7 @@ void reset_battle_context(LWCONTEXT* pLwc) {
 	pLwc->battle_fov_deg = pLwc->battle_fov_deg_0;
 	pLwc->selected_enemy_slot = -1;
 
-	const int enemy_count = 1;// MAX_ENEMY_SLOT;
+	const int enemy_count = pLwc->field_event_id;// MAX_ENEMY_SLOT;
 	// Fill enemy slots with test enemies
 	for (int i = 0; i < enemy_count; i++) {
 		pLwc->enemy[i] = ENEMY_DATA_LIST[i];

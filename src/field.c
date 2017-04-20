@@ -4,20 +4,22 @@
 #include "input.h"
 
 void move_player(LWCONTEXT *pLwc) {
-	const float move_speed = 5.0f;
-	const float move_speed_delta = (float)(pLwc->delta_time * move_speed);
+	if (pLwc->game_scene == LGS_FIELD) {
+		const float move_speed = 5.0f;
+		const float move_speed_delta = (float)(pLwc->delta_time * move_speed);
 
-	// Using keyboard
-	pLwc->player_pos_x += (float)((pLwc->player_move_right - pLwc->player_move_left) *
-		move_speed_delta);
-	pLwc->player_pos_y += (float)((pLwc->player_move_up - pLwc->player_move_down) *
-		move_speed_delta);
+		// Using keyboard
+		pLwc->player_pos_x += (float)((pLwc->player_move_right - pLwc->player_move_left) *
+			move_speed_delta);
+		pLwc->player_pos_y += (float)((pLwc->player_move_up - pLwc->player_move_down) *
+			move_speed_delta);
 
-	// Using mouse
-	float dx, dy, dlen;
-	if (lw_get_normalized_dir_pad_input(pLwc, &dx, &dy, &dlen)) {
-		pLwc->player_pos_x += dx * move_speed_delta;
-		pLwc->player_pos_y += dy * move_speed_delta;
+		// Using mouse
+		float dx, dy, dlen;
+		if (lw_get_normalized_dir_pad_input(pLwc, &dx, &dy, &dlen)) {
+			pLwc->player_pos_x += dx * move_speed_delta;
+			pLwc->player_pos_y += dy * move_speed_delta;
+		}
 	}
 }
 
@@ -49,13 +51,16 @@ static void resolve_collision_one_fixed(LWCONTEXT* pLwc, const LWBOX2DCOLLIDER *
 		if (dy) {
 
 			// Enemy encounter
-			if (fixed->field_event_id == 1) {
+			if (fixed->field_event_id >= 1 && fixed->field_event_id <= 5) {
+				pLwc->field_event_id = fixed->field_event_id;
 				change_to_battle(pLwc);
 			}
 
-			if (fixed->field_event_id == 2) {
+			if (fixed->field_event_id == 6) {
+				pLwc->field_event_id = fixed->field_event_id;
 				change_to_dialog(pLwc);
 			}
+
 
 			if (fabs(dx) < fabs(dy)) {
 				movable->x += dx;

@@ -341,6 +341,14 @@ void exec_player_win(struct _LWCONTEXT* pLwc) {
 			e->earn_exp = 10;
 		}
 	} ARRAY_ITERATE_VALID_END();
+
+	// Remove enemy
+	ARRAY_ITERATE_VALID(LWBOX2DCOLLIDER, pLwc->box_collider) {
+		if (e->field_event_id == pLwc->field_event_id) {
+			e->valid = 0;
+			pLwc->field_object[i].valid = 0;
+		}
+	} ARRAY_ITERATE_VALID_END();
 	
 	change_to_battle_result(pLwc);
 }
