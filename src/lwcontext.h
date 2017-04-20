@@ -47,7 +47,7 @@ static const char* tex_font_atlas_filename[] = {
 	v[2] = b; \
 	v[3] = a;
 #define MAX_DAMAGE_TEXT (16)
-#define MAX_BATTLE_CREATURE (4)
+#define MAX_PLAYER_SLOT (4)
 #define MAX_ENEMY_SLOT (5)
 #define VERTEX_BUFFER_COUNT LVT_COUNT
 
@@ -135,7 +135,7 @@ typedef struct _LWCONTEXT {
 	LW_BATTLE_STATE battle_state;
 	LWANIM1D command_in_progress_anim;
 	LWDAMAGETEXT damage_text[MAX_DAMAGE_TEXT];
-	LWBATTLECREATURE player[MAX_BATTLE_CREATURE];
+	LWBATTLECREATURE player[MAX_PLAYER_SLOT];
 	LWENEMY enemy[MAX_ENEMY_SLOT];
 	int player_turn_creature_index;
 	int enemy_turn_creature_index;

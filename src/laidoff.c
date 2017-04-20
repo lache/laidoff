@@ -25,10 +25,6 @@
 #include "input.h"
 #include "field.h"
 #include "platform_detection.h"
-
-#define LW_SUPPORT_ETC1_HARDWARE_DECODING LW_PLATFORM_ANDROID
-#define LW_SUPPORT_VAO (LW_PLATFORM_WIN32 || LW_PLATFORM_OSX)
-
 #include "lwpkm.h"
 
 #define LWEPSILON (1e-3)
@@ -45,6 +41,9 @@
 #define QUIT_WAIT_TIME (3)
 #define COMPLETION_SCORE (3000)
 #define SCROLL_SPEED (0.8f)
+
+#define LW_SUPPORT_ETC1_HARDWARE_DECODING LW_PLATFORM_ANDROID
+#define LW_SUPPORT_VAO (LW_PLATFORM_WIN32 || LW_PLATFORM_OSX)
 
 // Vertex attributes: Coordinates (3) + Normal (3) + UV (2) + S9 (2)
 // See Also: LWVERTEX
@@ -473,12 +472,14 @@ void reset_runtime_context(LWCONTEXT* pLwc) {
 	pLwc->selected_enemy_slot = -1;
 
 	// Fill enemy slots with test enemies
-	pLwc->enemy[0] = ENEMY_DATA_LIST[0];
-	pLwc->enemy[1] = ENEMY_DATA_LIST[1];
-	pLwc->enemy[2] = ENEMY_DATA_LIST[2];
-	pLwc->enemy[3] = ENEMY_DATA_LIST[3];
-	pLwc->enemy[4] = ENEMY_DATA_LIST[4];
+	for (int i = 0; i < MAX_ENEMY_SLOT; i++) {
+		pLwc->enemy[i] = ENEMY_DATA_LIST[i];
 
+		for (int j = 0; j < MAX_SKILL_PER_CREATURE; j++) {
+			pLwc->enemy[i].c.skill[j] = &SKILL_DATA_LIST[j];
+		}
+	}
+	
 	memset(pLwc->player, 0, sizeof(pLwc->player));
 
 	set_creature_data(
@@ -541,7 +542,7 @@ void reset_runtime_context(LWCONTEXT* pLwc) {
 	pLwc->player[3].skill[0] = &SKILL_DATA_LIST[0];
 	pLwc->player[3].skill[1] = &SKILL_DATA_LIST[4];*/
 
-	for (int i = 0; i < MAX_BATTLE_CREATURE; i++) {
+	for (int i = 0; i < MAX_PLAYER_SLOT; i++) {
 		pLwc->player[i].selected = 0;
 	}
 

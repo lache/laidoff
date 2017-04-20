@@ -10,6 +10,7 @@
 #include "lwsimpleanim.h"
 #include "lwenemy.h"
 #include "render_solid.h"
+#include "lwlog.h"
 
 void render_enemy_scope(const LWCONTEXT* pLwc, float ux, float uy, float width, float height, LWATTRIBVALUE enemy_attrib) {
 
@@ -86,7 +87,7 @@ void render_enemy_scope(const LWCONTEXT* pLwc, float ux, float uy, float width, 
 				|| (skill_attrib.bits.ear == LW_ATTRIB_DEFENCE_IMMU && enemy_attrib.bits.ear == LW_ATTRIB_DEFENCE_IMMU)
 				|| (skill_attrib.bits.god == LW_ATTRIB_DEFENCE_IMMU && enemy_attrib.bits.god == LW_ATTRIB_DEFENCE_IMMU)
 				|| (skill_attrib.bits.evl == LW_ATTRIB_DEFENCE_IMMU && enemy_attrib.bits.evl == LW_ATTRIB_DEFENCE_IMMU);
-		}	
+		}
 	}
 
 	// overlay color
@@ -102,14 +103,11 @@ void render_enemy_scope(const LWCONTEXT* pLwc, float ux, float uy, float width, 
 
 	if (!weak && !resi && !immu) {
 		color_preset_index = 0;
-	}
-	else if (weak) {
+	} else if (weak) {
 		color_preset_index = 1;
-	}
-	else if (resi) {
+	} else if (resi) {
 		color_preset_index = 2;
-	}
-	else if (immu) {
+	} else if (immu) {
 		color_preset_index = 3;
 	}
 
@@ -243,7 +241,7 @@ void render_enemy_3d(
 	mat4x4_scale_aniso(model_scale, model_scale, enemy->scale * sprite_aspect_ratio, enemy->scale, enemy->scale);
 
 	mat4x4_translate(model_translate, enemy->render_pos[0], enemy->render_pos[1], enemy->render_pos[2]);
-	
+
 	mat4x4_identity(model);
 	mat4x4_mul(model, model_translate, model_scale);
 	mat4x4_rotate_X(model, model, (float)LWDEG2RAD(90));
@@ -270,8 +268,7 @@ void render_enemy_3d(
 		//glBindTexture(GL_TEXTURE_2D, pLwc->tex_programmed[LPT_SOLID_BLUE]);
 		set_tex_filter(GL_LINEAR_MIPMAP_LINEAR, GL_LINEAR);
 
-		if (selected)
-		{
+		if (selected) {
 			glUniform3f(pLwc->shader[shader_index].overlay_color_location, 1, 0, 0);
 			glUniform1f(pLwc->shader[shader_index].overlay_color_ratio_location, 1.0f);
 			set_texture_parameter(pLwc, LAE_C2_PNG, enemy->las - 1); // fat version
@@ -286,14 +283,17 @@ void render_enemy_3d(
 
 	glUniform1f(pLwc->shader[0].overlay_color_ratio_location, 0);
 
-	const int enemy_scope = pLwc->battle_state != LBS_COMMAND_IN_PROGRESS
+	const int enemy_scope_at_player_turn = (pLwc->battle_state == LBS_SELECT_COMMAND || pLwc->battle_state == LBS_SELECT_TARGET)
 		&& enemy->c.hp > 0;
+
+	const int enemy_scope_at_enemy_turn = (pLwc->battle_state == LBS_START_ENEMY_TURN || pLwc->battle_state == LBS_ENEMY_TURN_WAIT)
+		&& enemy->c.selected;
 
 	float enemy_scope_ui_width = enemy->right_bottom_ui_point[0] - enemy->left_top_ui_point[0];
 	float enemy_scope_ui_height = enemy->left_top_ui_point[1] - enemy->right_bottom_ui_point[1];
 
 	// Enemy Scope
-	if (enemy_scope) {
+	if (enemy_scope_at_player_turn || enemy_scope_at_enemy_turn) {
 		render_enemy_scope(
 			pLwc,
 			enemy->left_top_ui_point[0],
@@ -309,8 +309,7 @@ void render_attack_trail_3d(
 	const LWCONTEXT *pLwc,
 	const LWTRAIL* trail,
 	const mat4x4 view,
-	const mat4x4 proj)
-{
+	const mat4x4 proj) {
 	int shader_index = 2; // ETC1 with alpha shader...
 
 	float scale = 1.0f;
@@ -328,7 +327,7 @@ void render_attack_trail_3d(
 	//const float T = (float)M_PI;
 
 	mat4x4_identity(model_scale);
-	mat4x4_scale_aniso(model_scale, model_scale, scale, scale/1.5f, scale);
+	mat4x4_scale_aniso(model_scale, model_scale, scale, scale / 1.5f, scale);
 
 	mat4x4_translate(model_translate, trail->x, trail->y, trail->z);
 
@@ -353,7 +352,7 @@ void render_attack_trail_3d(
 	glUniform1f(pLwc->shader[shader_index].alpha_multiplier_location, 1);
 	glUniform1i(pLwc->shader[shader_index].diffuse_location, 0); // 0 means GL_TEXTURE0
 	glUniform1i(pLwc->shader[shader_index].alpha_only_location, 1); // 1 means GL_TEXTURE1
-	
+
 	glBindBuffer(GL_ARRAY_BUFFER, pLwc->vertex_buffer[lvt].vertex_buffer);
 	bind_all_vertex_attrib(pLwc, lvt);
 	glUniformMatrix4fv(pLwc->shader[shader_index].mvp_location, 1, GL_FALSE,
@@ -388,13 +387,11 @@ void render_damage_text_3d(
 	const LWCONTEXT *pLwc,
 	const LWDAMAGETEXT* damage_text,
 	const mat4x4 view,
-	const mat4x4 proj)
-{
-	render_text_block(pLwc, &damage_text->text_block);    
+	const mat4x4 proj) {
+	render_text_block(pLwc, &damage_text->text_block);
 }
 
-static void render_battle_twirl(const LWCONTEXT* pLwc, const mat4x4 view, const mat4x4 proj)
-{
+static void render_battle_twirl(const LWCONTEXT* pLwc, const mat4x4 view, const mat4x4 proj) {
 	int shader_index = 0;
 
 	glUseProgram(pLwc->shader[shader_index].program);
@@ -455,8 +452,15 @@ static void render_battle_twirl(const LWCONTEXT* pLwc, const mat4x4 view, const 
 	}
 }
 
-void render_player_creature_ui(const LWCONTEXT* pLwc, const LWBATTLECREATURE* c, int pos)
-{
+void get_player_creature_ui_box(int pos, float screen_aspect_ratio, float* left_top_x, float* left_top_y, float* area_width, float* area_height) {
+	*left_top_x = (-1 + (2.0f / MAX_PLAYER_SLOT * pos)) * screen_aspect_ratio;
+	*left_top_y = 1;
+
+	*area_width = 2.0f / MAX_PLAYER_SLOT * screen_aspect_ratio;
+	*area_height = 0.5f;
+}
+
+void render_player_creature_ui(const LWCONTEXT* pLwc, const LWBATTLECREATURE* c, int pos) {
 	LWTEXTBLOCK text_block;
 	text_block.align = LTBA_LEFT_TOP;
 	text_block.text_block_width = DEFAULT_TEXT_BLOCK_WIDTH;
@@ -470,11 +474,13 @@ void render_player_creature_ui(const LWCONTEXT* pLwc, const LWBATTLECREATURE* c,
 
 	const float screen_aspect_ratio = (float)pLwc->width / pLwc->height;
 
-	const float left_top_x = (-1 + (2.0f / MAX_BATTLE_CREATURE * pos)) * screen_aspect_ratio;
-	const float left_top_y = 1;
+	float left_top_x = 0;
+	float left_top_y = 0;
 
-	const float area_width = 2.0f / MAX_BATTLE_CREATURE * screen_aspect_ratio;
-	const float area_height = 0.5f;
+	float area_width = 0;
+	float area_height = 0;
+
+	get_player_creature_ui_box(pos, screen_aspect_ratio, &left_top_x, &left_top_y, &area_width, &area_height);
 
 	const float block_x_margin = 0.075f * screen_aspect_ratio;
 	const float block_y_margin = 0.025f;
@@ -482,8 +488,7 @@ void render_player_creature_ui(const LWCONTEXT* pLwc, const LWBATTLECREATURE* c,
 	const float bar_width = area_width - block_x_margin * 2;
 	const float bar_height = 0.03f;
 
-	if (c->selected)
-	{
+	if (c->selected) {
 		render_solid_vb_ui(
 			pLwc,
 			left_top_x,
@@ -525,14 +530,12 @@ void render_player_creature_ui(const LWCONTEXT* pLwc, const LWBATTLECREATURE* c,
 	}
 
 	// Turn Token
-	if (c->turn_token > 0)
-	{
+	if (c->turn_token > 0) {
 		const float turn_token_size = area_width / 10;
 		const float turn_token_x = left_top_x + area_width - block_x_margin - turn_token_size / 2;
 		const float turn_token_y = left_top_y - block_y_margin - turn_token_size / 2;
 
-		if (!c->turn_consumed && c->selected)
-		{
+		if (!c->turn_consumed && c->selected) {
 			render_solid_vb_ui_alpha(
 				pLwc,
 				turn_token_x,
@@ -549,7 +552,7 @@ void render_player_creature_ui(const LWCONTEXT* pLwc, const LWBATTLECREATURE* c,
 				1
 			);
 		}
-		
+
 		render_solid_vb_ui(
 			pLwc,
 			turn_token_x,
@@ -564,7 +567,7 @@ void render_player_creature_ui(const LWCONTEXT* pLwc, const LWBATTLECREATURE* c,
 			0,
 			0
 		);
-		
+
 
 		LWTEXTBLOCK turn_token_text_block = text_block;
 		char str[32];
@@ -640,7 +643,7 @@ void render_player_creature_ui(const LWCONTEXT* pLwc, const LWBATTLECREATURE* c,
 	if (c->selected
 		&& c->skill[pLwc->selected_command_slot]
 		&& c->skill[pLwc->selected_command_slot]->consume_mp > 0
-		&& pLwc->battle_state != LBS_COMMAND_IN_PROGRESS ) {
+		&& pLwc->battle_state != LBS_COMMAND_IN_PROGRESS) {
 		display_consume_mp = c->skill[pLwc->selected_command_slot]->consume_mp;
 
 		render_solid_box_ui_alpha(
@@ -718,7 +721,7 @@ static void render_command_palette(const LWCONTEXT* pLwc) {
 	if (pLwc->player_turn_creature_index < 0) {
 		return;
 	}
-	
+
 	const float screen_aspect_ratio = (float)pLwc->width / pLwc->height;
 
 	const float screen_width = 2 * screen_aspect_ratio;
@@ -728,7 +731,7 @@ static void render_command_palette(const LWCONTEXT* pLwc) {
 	const float command_slot_width = screen_width / (command_slot_count + 2 * command_slot_margin_count);
 	const float command_slot_height = screen_height / 4;
 	const float command_desc_height = command_slot_height / 4;
-	
+
 	const int max_command_in_palette = 6;
 
 	const LWSKILL *const *const skill = pLwc->player[pLwc->player_turn_creature_index].skill;
@@ -784,7 +787,7 @@ static void render_command_palette(const LWCONTEXT* pLwc) {
 
 	// command list
 	for (int i = 0; i < max_command_in_palette; i++) {
-		
+
 		cmd_text_block.text_block_x = -screen_width / 2 + command_slot_width * (i + command_slot_margin_count);
 
 		if (skill[i] && skill[i]->valid) {
@@ -806,7 +809,7 @@ static void render_command_palette(const LWCONTEXT* pLwc) {
 					1.0f
 				);
 			}
-			
+
 			// Skill name
 			cmd_text_block.text = skill[i]->name;
 			cmd_text_block.text_bytelen = (int)strlen(cmd_text_block.text);
@@ -817,8 +820,7 @@ static void render_command_palette(const LWCONTEXT* pLwc) {
 			render_text_block(pLwc, &cmd_text_block);
 
 			// MP consumption
-			if (skill[i]->consume_mp > 0)
-			{
+			if (skill[i]->consume_mp > 0) {
 				char str[64];
 				sprintf(str, u8"MP %d", skill[i]->consume_mp);
 				cmd_text_block.text = str;
@@ -831,60 +833,7 @@ static void render_command_palette(const LWCONTEXT* pLwc) {
 				render_text_block(pLwc, &cmd_text_block);
 			}
 		}
-
-		/*
-		// Vertical line between command slots
-		render_solid_vb_ui(
-			pLwc,
-			text_block.text_block_x,
-			-command_slot_height,
-			screen_width / pLwc->width,
-			screen_height / 2 - command_slot_height,
-			pLwc->tex_programmed[LPT_SOLID_BLUE],
-			LVT_RIGHT_TOP_ANCHORED_SQUARE,
-			1.0f,
-			0,
-			0,
-			0,
-			0
-		);
-		*/
 	}
-
-	/*
-	// Last Vertical line between command slots
-	render_solid_vb_ui(
-		pLwc,
-		-screen_width / 2 + command_slot_width * (max_command_in_palette + command_slot_margin_count),
-		-command_slot_height,
-		screen_width / pLwc->width,
-		screen_height / 2 - command_slot_height,
-		pLwc->tex_programmed[LPT_SOLID_BLUE],
-		LVT_RIGHT_TOP_ANCHORED_SQUARE,
-		1.0f,
-		0,
-		0,
-		0,
-		0
-	);
-
-	// Horizontal line
-
-	render_solid_vb_ui(
-		pLwc,
-		0,
-		-command_slot_height,
-		screen_width,
-		screen_height / pLwc->height,
-		pLwc->tex_programmed[LPT_SOLID_BLUE],
-		LVT_CENTER_BOTTOM_ANCHORED_SQUARE,
-		1.0f,
-		0,
-		0,
-		0,
-		0
-	);
-	*/
 }
 
 void lwc_render_battle(const LWCONTEXT* pLwc) {
@@ -916,8 +865,7 @@ void lwc_render_battle(const LWCONTEXT* pLwc) {
 
 	int only_render_ui = 0;
 
-	if (only_render_ui)
-	{
+	if (only_render_ui) {
 		// Make alpha to zero across the entire screen (testing)
 		render_solid_vb_ui(
 			pLwc,
@@ -934,59 +882,50 @@ void lwc_render_battle(const LWCONTEXT* pLwc) {
 			0
 		);
 	}
-	
+
 	// render background & enemy
 	if (!only_render_ui) {
 
 		// background
 		render_battle_twirl(pLwc, pLwc->battle_view, pLwc->battle_proj);
 
-		for (int i = 0; i < ARRAY_SIZE(pLwc->enemy); i++)
-		{
-			if (pLwc->enemy[i].valid)
-			{
-				float overlay[5];
-				lwanim_get_5d(&pLwc->enemy[i].death_anim, overlay);
+		ARRAY_ITERATE_VALID(const LWENEMY, pLwc->enemy) {
+			float overlay[5];
+			lwanim_get_5d(&e->death_anim, overlay);
 
-				render_enemy_3d(pLwc,
-					&pLwc->enemy[i],
-					pLwc->battle_state == LBS_SELECT_TARGET && pLwc->selected_enemy_slot == i,
-					overlay,
-					pLwc->battle_view,
-					pLwc->battle_proj
-				);
-			}
-		}
+			render_enemy_3d(pLwc,
+				e,
+				pLwc->battle_state == LBS_SELECT_TARGET && pLwc->selected_enemy_slot == i,
+				overlay,
+				pLwc->battle_view,
+				pLwc->battle_proj
+			);
+		} ARRAY_ITERATE_VALID_END();
 	}
-	
 
 	// Attack trail
-	for (int i = 0; i < ARRAY_SIZE(pLwc->trail); i++)
-	{
-		if (pLwc->trail[i].valid)
-		{
-			render_attack_trail_3d(pLwc, &pLwc->trail[i], pLwc->battle_view, pLwc->battle_proj);
-		}
-	}
-
-	// Attack damage_text
-	for (int i = 0; i < ARRAY_SIZE(pLwc->damage_text); i++)
-	{
-		if (pLwc->damage_text[i].valid)
-		{
-			render_damage_text_3d(pLwc, &pLwc->damage_text[i], pLwc->battle_view, pLwc->battle_proj);
-		}
-	}
+	ARRAY_ITERATE_VALID(const LWTRAIL, pLwc->trail) {
+		render_attack_trail_3d(pLwc, e, pLwc->battle_view, pLwc->battle_proj);
+	} ARRAY_ITERATE_VALID_END();
 
 	// Player battle creature UI
-	for (int i = 0; i < ARRAY_SIZE(pLwc->player); i++)
-	{
-		if (pLwc->player[i].valid)
-		{
-			render_player_creature_ui(pLwc, &pLwc->player[i], i);
-		}
-	}
+	ARRAY_ITERATE_VALID(const LWBATTLECREATURE, pLwc->player) {
+		render_player_creature_ui(pLwc, e, i);
+	} ARRAY_ITERATE_VALID_END();
 
+	// Attack damage_text
+	ARRAY_ITERATE_VALID(const LWDAMAGETEXT, pLwc->damage_text) {
+		if (e->coord == LDTC_3D) {
+			render_damage_text_3d(pLwc, &pLwc->damage_text[i], pLwc->battle_view, pLwc->battle_proj);
+		} else if (e->coord == LDTC_UI) {
+			mat4x4 identity;
+			mat4x4_identity(identity);
+			render_damage_text_3d(pLwc, &pLwc->damage_text[i], identity, pLwc->proj);
+		} else {
+			LOGE("Unknown LWDAMAGETEXT coord value: %d", e->coord);
+		}
+	} ARRAY_ITERATE_VALID_END();
+	
 	// Command palette
 	if (pLwc->battle_state != LBS_COMMAND_IN_PROGRESS) {
 		render_command_palette(pLwc);

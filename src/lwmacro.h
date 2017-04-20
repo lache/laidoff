@@ -63,3 +63,13 @@
 #define ARRAY_ITERATE_VALID_END() \
 		} \
     }
+
+#define ARRAY_ITERATE_PTR_VALID(t, v) \
+    for (int i = 0; i < ARRAY_SIZE((v)); i++) \
+    { \
+        if (v[i]->valid) { \
+			t* e = v[i];
+
+#define ARRAY_ITERATE_VALID_END() \
+		} \
+    }
