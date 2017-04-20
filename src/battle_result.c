@@ -1,3 +1,4 @@
+#include <stdio.h>
 #include "battle_result.h"
 #include "lwcontext.h"
 #include "battle.h"

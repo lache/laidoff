@@ -31,6 +31,10 @@
 		5644E9F81EA8B69000EAA658 /* skill.c in Sources */ = {isa = PBXBuildFile; fileRef = 5644E9DA1EA8B69000EAA658 /* skill.c */; };
 		5644E9F91EA8B69000EAA658 /* tex.c in Sources */ = {isa = PBXBuildFile; fileRef = 5644E9DD1EA8B69000EAA658 /* tex.c */; };
 		5644E9FA1EA8B69000EAA658 /* unicode.c in Sources */ = {isa = PBXBuildFile; fileRef = 5644E9E01EA8B69000EAA658 /* unicode.c */; };
+		5644EA031EA91D9E00EAA658 /* battle_result.c in Sources */ = {isa = PBXBuildFile; fileRef = 5644E9FB1EA91D9E00EAA658 /* battle_result.c */; };
+		5644EA041EA91D9E00EAA658 /* lwuialign.c in Sources */ = {isa = PBXBuildFile; fileRef = 5644E9FD1EA91D9E00EAA658 /* lwuialign.c */; };
+		5644EA051EA91D9E00EAA658 /* lwuidim.c in Sources */ = {isa = PBXBuildFile; fileRef = 5644E9FF1EA91D9E00EAA658 /* lwuidim.c */; };
+		5644EA061EA91D9E00EAA658 /* render_battle_result.c in Sources */ = {isa = PBXBuildFile; fileRef = 5644EA011EA91D9E00EAA658 /* render_battle_result.c */; };
 		567F39BE1EA29BC90081EB67 /* assets in Resources */ = {isa = PBXBuildFile; fileRef = 567F39BD1EA29BC90081EB67 /* assets */; };
 		567F39C01EA2A2F70081EB67 /* image.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 567F39BF1EA2A2F70081EB67 /* image.cpp */; };
 		567F39C21EA2A4600081EB67 /* etc1.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 567F39C11EA2A4600081EB67 /* etc1.cpp */; };
@@ -168,6 +172,14 @@
 		5644E9E01EA8B69000EAA658 /* unicode.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = unicode.c; sourceTree = "<group>"; };
 		5644E9E11EA8B69000EAA658 /* unicode.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = unicode.h; sourceTree = "<group>"; };
 		5644E9E21EA8B69000EAA658 /* vertices.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = vertices.h; sourceTree = "<group>"; };
+		5644E9FB1EA91D9E00EAA658 /* battle_result.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = battle_result.c; sourceTree = "<group>"; };
+		5644E9FC1EA91D9E00EAA658 /* battle_result.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = battle_result.h; sourceTree = "<group>"; };
+		5644E9FD1EA91D9E00EAA658 /* lwuialign.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = lwuialign.c; sourceTree = "<group>"; };
+		5644E9FE1EA91D9E00EAA658 /* lwuialign.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = lwuialign.h; sourceTree = "<group>"; };
+		5644E9FF1EA91D9E00EAA658 /* lwuidim.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = lwuidim.c; sourceTree = "<group>"; };
+		5644EA001EA91D9E00EAA658 /* lwuidim.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = lwuidim.h; sourceTree = "<group>"; };
+		5644EA011EA91D9E00EAA658 /* render_battle_result.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = render_battle_result.c; sourceTree = "<group>"; };
+		5644EA021EA91D9E00EAA658 /* render_battle_result.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = render_battle_result.h; sourceTree = "<group>"; };
 		567F39BD1EA29BC90081EB67 /* assets */ = {isa = PBXFileReference; lastKnownFileType = folder; name = assets; path = ../assets; sourceTree = "<group>"; };
 		567F39BF1EA2A2F70081EB67 /* image.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = image.cpp; path = ../../win32/image.cpp; sourceTree = "<group>"; };
 		567F39C11EA2A4600081EB67 /* etc1.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = etc1.cpp; path = ../../win32/etc1.cpp; sourceTree = "<group>"; };
@@ -326,6 +338,14 @@
 		6CA16CF41EA20CA700DB7AF0 /* src */ = {
 			isa = PBXGroup;
 			children = (
+				5644E9FB1EA91D9E00EAA658 /* battle_result.c */,
+				5644E9FC1EA91D9E00EAA658 /* battle_result.h */,
+				5644E9FD1EA91D9E00EAA658 /* lwuialign.c */,
+				5644E9FE1EA91D9E00EAA658 /* lwuialign.h */,
+				5644E9FF1EA91D9E00EAA658 /* lwuidim.c */,
+				5644EA001EA91D9E00EAA658 /* lwuidim.h */,
+				5644EA011EA91D9E00EAA658 /* render_battle_result.c */,
+				5644EA021EA91D9E00EAA658 /* render_battle_result.h */,
 				5644E98F1EA8B69000EAA658 /* battle.c */,
 				5644E9901EA8B69000EAA658 /* battle.h */,
 				5644E9911EA8B69000EAA658 /* battlelogic.c */,
@@ -564,7 +584,9 @@
 				5644E9EF1EA8B69000EAA658 /* lwtimepoint.c in Sources */,
 				6CA16D941EA210BB00DB7AF0 /* lopcodes.c in Sources */,
 				6CA16CDB1EA20B5600DB7AF0 /* AppDelegate.m in Sources */,
+				5644EA051EA91D9E00EAA658 /* lwuidim.c in Sources */,
 				5644E9EA1EA8B69000EAA658 /* laidoff.c in Sources */,
+				5644EA031EA91D9E00EAA658 /* battle_result.c in Sources */,
 				6CA16D9D1EA210BB00DB7AF0 /* lua.c in Sources */,
 				5644E9F91EA8B69000EAA658 /* tex.c in Sources */,
 				6CA16D9B1EA210BB00DB7AF0 /* ltablib.c in Sources */,
@@ -596,6 +618,7 @@
 				6CA16D841EA210BB00DB7AF0 /* lcode.c in Sources */,
 				6CA16D911EA210BB00DB7AF0 /* lmem.c in Sources */,
 				6CA16D8B1EA210BB00DB7AF0 /* lfunc.c in Sources */,
+				5644EA041EA91D9E00EAA658 /* lwuialign.c in Sources */,
 				5644E9E71EA8B69000EAA658 /* font.c in Sources */,
 				6CA16D9E1EA210BB00DB7AF0 /* luac.c in Sources */,
 				567F39C01EA2A2F70081EB67 /* image.cpp in Sources */,
@@ -621,6 +644,7 @@
 				6CA16DA21EA210BB00DB7AF0 /* lzio.c in Sources */,
 				5644E9E91EA8B69000EAA658 /* ktx.c in Sources */,
 				6CA16CD81EA20B5600DB7AF0 /* main.m in Sources */,
+				5644EA061EA91D9E00EAA658 /* render_battle_result.c in Sources */,
 				6CA16D851EA210BB00DB7AF0 /* lcorolib.c in Sources */,
 				5644E9F71EA8B69000EAA658 /* script.c in Sources */,
 				5644E9ED1EA8B69000EAA658 /* lwenemy.c in Sources */,

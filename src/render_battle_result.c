@@ -1,4 +1,5 @@
 ﻿#include <stdio.h>
+#include <string.h>
 #include "render_battle_result.h"
 #include "lwcontext.h"
 #include "render_text_block.h"
