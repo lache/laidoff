@@ -167,6 +167,8 @@ src/battle.c
 src/battle.h
 src/battlelogic.c
 src/battlelogic.h
+src/battle_result.c
+src/battle_result.h
 src/constants.h
 src/dialog.c
 src/dialog.h
@@ -218,6 +220,10 @@ src/lwtextblock.h
 src/lwtimepoint.h
 src/lwtouchproc.h
 src/lwtrail.h
+src/lwuialign.c
+src/lwuialign.h
+src/lwuidim.c
+src/lwuidim.h
 src/lwvbo.h
 src/lwvbotype.h
 src/lwtextblock.h
@@ -228,6 +234,8 @@ src/render_admin.c
 src/render_admin.h
 src/render_battle.c
 src/render_battle.h
+src/render_battle_result.c
+src/render_battle_result.h
 src/render_dialog.c
 src/render_dialog.h
 src/render_field.c

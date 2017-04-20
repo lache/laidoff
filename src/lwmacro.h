@@ -11,6 +11,7 @@
 #define WIDEN_TEXT(quote) __WIDEN_TEXT(quote)   // r_winnt
 
 #ifdef LW_PLATFORM_WIN32
+#include <stdlib.h>
 #   define PATH_SEPARATOR "\\"
 #   define ASSETS_BASE_PATH "assets" PATH_SEPARATOR
 #   define ASSETS_BASE_PATH_WIDE L"assets" L"\\"

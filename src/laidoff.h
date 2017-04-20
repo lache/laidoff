@@ -56,6 +56,7 @@ void change_to_dialog(LWCONTEXT* pLwc);
 void change_to_battle(LWCONTEXT* pLwc);
 void change_to_font_test(LWCONTEXT* pLwc);
 void change_to_admin(LWCONTEXT *pLwc);
+void change_to_battle_result(LWCONTEXT *pLwc);
 
 void toggle_font_texture_test_mode(LWCONTEXT* pLwc);
 void reset_runtime_context(LWCONTEXT* pLwc);
@@ -78,9 +79,10 @@ void set_texture_parameter_values(const LWCONTEXT *pLwc, float x, float y, float
 int get_tex_index_by_hash_key(const LWCONTEXT* pLwc, const char* hash_key);
 void set_texture_parameter(const LWCONTEXT *pLwc, LWENUM _LW_ATLAS_ENUM lae, LWENUM _LW_ATLAS_SPRITE las);
 
-int spawn_field_object(struct _LWCONTEXT* pLwc, float x, float y, float w, float h, enum _LW_VBO_TYPE lvt, unsigned int tex_id, float sx, float sy);
+int spawn_field_object(struct _LWCONTEXT* pLwc, float x, float y, float w, float h, enum _LW_VBO_TYPE lvt, unsigned int tex_id, float sx, float sy, float alpha_multiplier, int field_event_id);
 void lw_app_quit(const LWCONTEXT *pLwc);
 unsigned long hash(const unsigned char *str);
+void reset_battle_context(LWCONTEXT* pLwc);
 
 const static float default_uv_offset[2] = { 0, 0 };
 const static float default_uv_scale[2] = { 1, 1 };

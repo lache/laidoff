@@ -28,6 +28,8 @@
 #define ANIM_FPS (60)
 #define MAX_TOUCHPROC_COUNT (10)
 
+const static vec4 EXP_COLOR = { 90 / 255.0f, 173 / 255.0f, 255 / 255.0f, 1 };
+
 static const char* tex_font_atlas_filename[] = {
 	//ASSETS_BASE_PATH "fnt" PATH_SEPARATOR "arita-semi-bold_0.tga",
 	//ASSETS_BASE_PATH "fnt" PATH_SEPARATOR "arita-semi-bold_1.tga",
@@ -46,6 +48,11 @@ static const char* tex_font_atlas_filename[] = {
 	v[1] = g; \
 	v[2] = b; \
 	v[3] = a;
+#define SET_COLOR_RGBA_FLOAT_ARRAY(v, rgba) \
+	v[0] = rgba[0]; \
+	v[1] = rgba[1]; \
+	v[2] = rgba[2]; \
+	v[3] = rgba[3];
 #define MAX_DAMAGE_TEXT (16)
 #define MAX_PLAYER_SLOT (4)
 #define MAX_ENEMY_SLOT (5)
@@ -87,6 +94,7 @@ typedef struct _LWCONTEXT {
 	int render_count;
 
 	double app_time;
+	double scene_time;
 
 	int tex_atlas_index;
 	LWSPRITE* sprite_data;

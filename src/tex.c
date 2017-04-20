@@ -71,6 +71,19 @@ void load_tex_program(struct _LWCONTEXT *pLwc) {
 
 		}
 
+		if (i == LPT_SOLID_EXP_COLOR) {
+			unsigned char grid[] = { 
+				(int)(EXP_COLOR[0] * 255),
+				(int)(EXP_COLOR[1] * 255),
+				(int)(EXP_COLOR[2] * 255),
+			};
+			glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, 1, 1, 0, GL_RGB, GL_UNSIGNED_BYTE, grid);
+			glGenerateMipmap(GL_TEXTURE_2D);
+			//glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+			//glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+
+		}
+
 		if (i == LPT_SOLID_YELLOW) {
 			unsigned char grid[] = { 255, 255, 0 };
 			glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, 1, 1, 0, GL_RGB, GL_UNSIGNED_BYTE, grid);

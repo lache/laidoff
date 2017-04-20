@@ -8,11 +8,14 @@
 #include "battlelogic.h"
 #include "battle.h"
 #include "render_battle.h"
+#include "laidoff.h"
 
 int calculate_and_apply_attack_1_on_1(LWCONTEXT *pLwc, LWBATTLECREATURE* ca, const LWSKILL* s, LWBATTLECREATURE* cb,
 	LWBATTLECOMMANDRESULT* cmd_result_a, LWBATTLECOMMANDRESULT* cmd_result_b);
 void play_enemy_hp_desc_anim(LWCONTEXT* pLwc, LWENEMY* enemy, int enemy_slot,
 	const LWBATTLECOMMANDRESULT* cmd_result_a, const LWBATTLECOMMANDRESULT* cmd_result_b);
+int get_alive_enemy_count(struct _LWCONTEXT* pLwc);
+void exec_player_win(struct _LWCONTEXT* pLwc);
 
 int spawn_attack_trail(LWCONTEXT *pLwc, float x, float y, float z) {
 	for (int i = 0; i < MAX_TRAIL; i++) {
@@ -87,13 +90,17 @@ void revert_battle_cam_and_update_player_turn(LWCONTEXT* pLwc) {
 
 	pLwc->selected_command_slot = 0;
 
-	if (next_player_turn_creature_index < 0) {
-		// Player turn finished.
-		pLwc->enemy_turn_command_wait_time = 2.0f;
-		pLwc->battle_state = LBS_START_ENEMY_TURN;
+	if (get_alive_enemy_count(pLwc) <= 0) {
+		exec_player_win(pLwc);
 	} else {
-		// Turn goes to the Player's next creature.
-		pLwc->battle_state = LBS_SELECT_COMMAND;
+		if (next_player_turn_creature_index < 0) {
+			// Player turn finished.
+			pLwc->enemy_turn_command_wait_time = 2.0f;
+			pLwc->battle_state = LBS_START_ENEMY_TURN;
+		} else {
+			// Turn goes to the Player's next creature.
+			pLwc->battle_state = LBS_SELECT_COMMAND;
+		}
 	}
 }
 
@@ -113,8 +120,8 @@ void update_attack_trail(LWCONTEXT *pLwc) {
 	}
 }
 
-int spawn_damage_text(LWCONTEXT *pLwc, float x, float y, float z, const char *text, LW_DAMAGE_TEXT_COORD coord) {
-	for (int i = 0; i < MAX_TRAIL; i++) {
+int spawn_damage_text_color(LWCONTEXT *pLwc, float x, float y, float z, const char *text, LW_DAMAGE_TEXT_COORD coord, float r, float g, float b) {
+	for (int i = 0; i < MAX_DAMAGE_TEXT; i++) {
 		if (!pLwc->damage_text[i].valid) {
 			LWDAMAGETEXT *dt = &pLwc->damage_text[i];
 
@@ -142,7 +149,7 @@ int spawn_damage_text(LWCONTEXT *pLwc, float x, float y, float z, const char *te
 			tb->text_block_line_height = DEFAULT_TEXT_BLOCK_LINE_HEIGHT;
 			tb->size = DEFAULT_TEXT_BLOCK_SIZE;
 
-			SET_COLOR_RGBA_FLOAT(tb->color_normal_glyph, 1, 0.25f, 0.25f, 1);
+			SET_COLOR_RGBA_FLOAT(tb->color_normal_glyph, r, g, b, 1);
 			SET_COLOR_RGBA_FLOAT(tb->color_normal_outline, 0.1f, 0.1f, 0.1f, 1);
 			SET_COLOR_RGBA_FLOAT(tb->color_emp_glyph, 1, 1, 0, 1);
 			SET_COLOR_RGBA_FLOAT(tb->color_emp_outline, 0, 0, 0, 1);
@@ -152,6 +159,15 @@ int spawn_damage_text(LWCONTEXT *pLwc, float x, float y, float z, const char *te
 	}
 
 	return -1;
+}
+
+
+int spawn_damage_text(LWCONTEXT *pLwc, float x, float y, float z, const char *text, LW_DAMAGE_TEXT_COORD coord) {
+	return spawn_damage_text_color(pLwc, x, y, z, text, coord, 1.00f, 0.25f, 0.25f);
+}
+
+int spawn_exp_text(LWCONTEXT *pLwc, float x, float y, float z, const char *text, LW_DAMAGE_TEXT_COORD coord) {
+	return spawn_damage_text_color(pLwc, x, y, z, text, coord, 90/255.0f, 173/255.0f, 255/255.0f);
 }
 
 void update_damage_text(LWCONTEXT *pLwc) {
@@ -188,7 +204,7 @@ void update_damage_text(LWCONTEXT *pLwc) {
 	}
 }
 
-void reset_enemy_turn(struct _LWCONTEXT* pLwc) {
+int reset_enemy_turn(struct _LWCONTEXT* pLwc) {
 	int turn_token_counter = 0;
 	ARRAY_ITERATE_VALID(LWENEMY, pLwc->enemy) {
 		if (e->c.hp > 0) {
@@ -202,10 +218,14 @@ void reset_enemy_turn(struct _LWCONTEXT* pLwc) {
 			e->c.turn_token = ++turn_token_counter;
 		}
 	} ARRAY_ITERATE_VALID_END();
+
+	return turn_token_counter;
 }
 
-void setup_enemy_turn(struct _LWCONTEXT* pLwc) {
-	reset_enemy_turn(pLwc);
+int setup_enemy_turn(struct _LWCONTEXT* pLwc) {
+	const int turn_token_counter = reset_enemy_turn(pLwc);
+
+	return turn_token_counter;
 }
 
 int pick_target_player(struct _LWCONTEXT* pLwc) {
@@ -301,16 +321,44 @@ void setup_player_turn(struct _LWCONTEXT* pLwc) {
 	reset_player_turn(pLwc);
 }
 
+int get_alive_enemy_count(struct _LWCONTEXT* pLwc) {
+	int count = 0;
+	ARRAY_ITERATE_VALID(const LWENEMY, pLwc->enemy) {
+		if (e->c.hp > 0) {
+			++count;
+		}
+	} ARRAY_ITERATE_VALID_END();
+	return count;
+}
+
+void exec_player_win(struct _LWCONTEXT* pLwc) {
+
+	pLwc->battle_state = LBS_START_PLAYER_WIN;
+
+	// Distribute exp
+	ARRAY_ITERATE_VALID(LWBATTLECREATURE, pLwc->player) {
+		if (e->hp > 0) {
+			e->earn_exp = 10;
+		}
+	} ARRAY_ITERATE_VALID_END();
+	
+	change_to_battle_result(pLwc);
+}
+
 void update_enemy_turn(struct _LWCONTEXT* pLwc) {
 	if (pLwc->battle_state == LBS_START_ENEMY_TURN) {
 
-		setup_enemy_turn(pLwc);
+		const int turn_token_counter = setup_enemy_turn(pLwc);
 
-		pLwc->center_image_anim.t = pLwc->center_image_anim.max_t = 1.0f;
-		pLwc->center_image_anim.max_v = 1.0f;
-		pLwc->center_image = LAE_U_ENEMY_TURN_KTX;
+		if (turn_token_counter > 0) {
+			pLwc->center_image_anim.t = pLwc->center_image_anim.max_t = 1.0f;
+			pLwc->center_image_anim.max_v = 1.0f;
+			pLwc->center_image = LAE_U_ENEMY_TURN_KTX;
 
-		pLwc->battle_state = LBS_ENEMY_TURN_WAIT;
+			pLwc->battle_state = LBS_ENEMY_TURN_WAIT;
+		} else {
+			exec_player_win(pLwc);
+		}
 	}
 
 	if (pLwc->battle_state == LBS_ENEMY_TURN_WAIT) {
@@ -401,6 +449,8 @@ void play_enemy_hp_desc_anim(LWCONTEXT* pLwc, LWENEMY* enemy, int enemy_slot,
 
 	// TODO: MISSED 일 때 트레일을 그리지 않으면 전투가 도중에 멈추는 문제가 있어서 무조건 그려줌
 	spawn_attack_trail(pLwc, enemy_x, -0.1f, 0.5f);
+
+
 
 	spawn_damage_text(pLwc, 0, 0, 0, damage_str, LDTC_3D);
 

@@ -39,7 +39,7 @@ static float resolve_collision_one_fixed_axis(float fp, float fs, float mp, floa
 	return displacement;
 }
 
-static void resolve_collision_one_fixed(const LWBOX2DCOLLIDER *fixed, LWBOX2DCOLLIDER *movable) {
+static void resolve_collision_one_fixed(LWCONTEXT* pLwc, const LWBOX2DCOLLIDER *fixed, LWBOX2DCOLLIDER *movable) {
 	const float dx = resolve_collision_one_fixed_axis(fixed->x, fixed->w, movable->x, movable->w);
 
 	if (dx) {
@@ -47,6 +47,16 @@ static void resolve_collision_one_fixed(const LWBOX2DCOLLIDER *fixed, LWBOX2DCOL
 			movable->h);
 
 		if (dy) {
+
+			// Enemy encounter
+			if (fixed->field_event_id == 1) {
+				change_to_battle(pLwc);
+			}
+
+			if (fixed->field_event_id == 2) {
+				change_to_dialog(pLwc);
+			}
+
 			if (fabs(dx) < fabs(dy)) {
 				movable->x += dx;
 			} else {
@@ -65,7 +75,7 @@ void resolve_player_collision(LWCONTEXT *pLwc) {
 
 	for (int i = 0; i < MAX_BOX_COLLIDER; i++) {
 		if (pLwc->box_collider[i].valid) {
-			resolve_collision_one_fixed(&pLwc->box_collider[i], &player_collider);
+			resolve_collision_one_fixed(pLwc, &pLwc->box_collider[i], &player_collider);
 		}
 	}
 

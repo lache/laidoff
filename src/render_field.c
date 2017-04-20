@@ -4,7 +4,7 @@
 #include "lwmacro.h"
 #include "laidoff.h"
 
-static void render_field_object(const LWCONTEXT* pLwc, int vbo_index, GLuint tex_id, mat4x4 view, mat4x4 proj, float x, float y, float sx, float sy)
+static void render_field_object(const LWCONTEXT* pLwc, int vbo_index, GLuint tex_id, mat4x4 view, mat4x4 proj, float x, float y, float sx, float sy, float alpha_multiplier)
 {
 	int shader_index = 0;
 
@@ -34,6 +34,7 @@ static void render_field_object(const LWCONTEXT* pLwc, int vbo_index, GLuint tex
 
 	glUniform2fv(pLwc->shader[shader_index].vuvoffset_location, 1, gird_uv_offset);
 	glUniform2fv(pLwc->shader[shader_index].vuvscale_location, 1, grid_uv_scale);
+	glUniform1fv(pLwc->shader[shader_index].alpha_multiplier_location, 1, &alpha_multiplier);
 	glDrawArrays(GL_TRIANGLES, 0, pLwc->vertex_buffer[vbo_index].vertex_count);
 }
 
@@ -114,6 +115,7 @@ void lwc_render_field(const LWCONTEXT* pLwc)
 	glActiveTexture(GL_TEXTURE0);
 	glUniform1i(pLwc->shader[shader_index].diffuse_location, 0);
 	glBindTexture(GL_TEXTURE_2D, pLwc->tex_atlas[pLwc->tex_atlas_index]);
+	glUniform1f(pLwc->shader[shader_index].overlay_color_ratio_location, 0);
 	glUniformMatrix4fv(pLwc->shader[shader_index].mvp_location, 1, GL_FALSE, (const GLfloat*)pLwc->proj);
 
 	const float screen_aspect_ratio = (float)pLwc->width / pLwc->height;
@@ -130,7 +132,7 @@ void lwc_render_field(const LWCONTEXT* pLwc)
 
 	render_ground(pLwc, view, perspective);
 	
-	render_field_object(pLwc, LVT_PLAYER, pLwc->tex_programmed[LPT_SOLID_RED], view, perspective, pLwc->player_pos_x, pLwc->player_pos_y, 1, 1);
+	render_field_object(pLwc, LVT_PLAYER, pLwc->tex_programmed[LPT_SOLID_RED], view, perspective, pLwc->player_pos_x, pLwc->player_pos_y, 1, 1, 1);
 
 	for (int i = 0; i < MAX_FIELD_OBJECT; i++)
 	{
@@ -145,7 +147,8 @@ void lwc_render_field(const LWCONTEXT* pLwc)
 				pLwc->field_object[i].x,
 				pLwc->field_object[i].y,
 				pLwc->field_object[i].sx,
-				pLwc->field_object[i].sy
+				pLwc->field_object[i].sy,
+				pLwc->field_object[i].alpha_multiplier
 			);
 		}
 	}

@@ -79,6 +79,7 @@ add_library(native-activity SHARED
             ../../../../../src/lwsimpleanim.c
             ../../../../../src/battle.c
             ../../../../../src/battlelogic.c
+            ../../../../../src/battle_result.c
             ../../../../../src/dialog.c
             ../../../../../src/lwenemy.c
             ../../../../../src/font.c
@@ -86,6 +87,9 @@ add_library(native-activity SHARED
             ../../../../../src/laidoff.c
             ../../../../../src/loadobj.c
             ../../../../../src/render_battle.c
+            ../../../../../src/render_battle_result.c
+            ../../../../../src/lwuialign.c
+            ../../../../../src/lwuidim.c
             ../../../../../src/render_dialog.c
             ../../../../../src/render_field.c
             ../../../../../src/render_text_block.c

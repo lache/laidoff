@@ -1,5 +1,7 @@
 #pragma once
 
+#include "lwmacro.h"
+
 typedef enum _LW_ATLAS_ENUM
 {
     LAE_TWIRL_PNG,
@@ -40,6 +42,17 @@ typedef enum _LW_ATLAS_ENUM
 	LAE_U_ENEMY_TURN_ALPHA_KTX,
 	LAE_U_PLAYER_TURN_KTX,
 	LAE_U_PLAYER_TURN_ALPHA_KTX,
+
+	LAE_C_BIKER_KTX,
+	LAE_C_BIKER_ALPHA_KTX,
+	LAE_C_MADAM_KTX,
+	LAE_C_MADAM_ALPHA_KTX,
+	LAE_C_SPEAKER_KTX,
+	LAE_C_SPEAKER_ALPHA_KTX,
+	LAE_C_TOFU_KTX,
+	LAE_C_TOFU_ALPHA_KTX,
+	LAE_C_TREE_KTX,
+	LAE_C_TREE_ALPHA_KTX,
     
     LAE_COUNT,
 } LW_ATLAS_ENUM;
@@ -83,7 +96,19 @@ static const char *tex_atlas_filename[] = {
 	ASSETS_BASE_PATH "ktx" PATH_SEPARATOR "u-enemy-turn-a_alpha.ktx",
 	ASSETS_BASE_PATH "ktx" PATH_SEPARATOR "u-player-turn-a.ktx",
 	ASSETS_BASE_PATH "ktx" PATH_SEPARATOR "u-player-turn-a_alpha.ktx",
+
+	ASSETS_BASE_PATH "ktx" PATH_SEPARATOR "c-biker-a.ktx",
+	ASSETS_BASE_PATH "ktx" PATH_SEPARATOR "c-biker-a_alpha.ktx",
+	ASSETS_BASE_PATH "ktx" PATH_SEPARATOR "c-madam-a.ktx",
+	ASSETS_BASE_PATH "ktx" PATH_SEPARATOR "c-madam-a_alpha.ktx",
+	ASSETS_BASE_PATH "ktx" PATH_SEPARATOR "c-speaker-a.ktx",
+	ASSETS_BASE_PATH "ktx" PATH_SEPARATOR "c-speaker-a_alpha.ktx",
+	ASSETS_BASE_PATH "ktx" PATH_SEPARATOR "c-tofu-a.ktx",
+	ASSETS_BASE_PATH "ktx" PATH_SEPARATOR "c-tofu-a_alpha.ktx",
+	ASSETS_BASE_PATH "ktx" PATH_SEPARATOR "c-tree-a.ktx",
+	ASSETS_BASE_PATH "ktx" PATH_SEPARATOR "c-tree-a_alpha.ktx",
 };
 
 #define MAX_TEX_ATLAS (ARRAY_SIZE(tex_atlas_filename))
+
 LwStaticAssert(ARRAY_SIZE(tex_atlas_filename) == LAE_COUNT, "LAE_COUNT error");

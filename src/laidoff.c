@@ -26,6 +26,8 @@
 #include "field.h"
 #include "platform_detection.h"
 #include "lwpkm.h"
+#include "render_battle_result.h"
+#include "battle_result.h"
 
 #define LWEPSILON (1e-3)
 #define INCREASE_RENDER_SCORE (20)
@@ -100,7 +102,6 @@ int LoadObjAndConvert(float bmin[3], float bmax[3], const char *filename);
 int spawn_attack_trail(LWCONTEXT *pLwc, float x, float y, float z);
 void update_attack_trail(LWCONTEXT *pLwc);
 float get_battle_enemy_x_center(int enemy_slot_index);
-int spawn_damage_text(LWCONTEXT *pLwc, float x, float y, float z, const char *text);
 void update_damage_text(LWCONTEXT *pLwc);
 
 typedef struct {
@@ -444,9 +445,10 @@ static void init_gl_context(LWCONTEXT *pLwc) {
 	mat4x4_identity(pLwc->mvp);
 }
 
-void set_creature_data(LWBATTLECREATURE* c, const char* name, int lv, int hp, int max_hp, int mp, int max_mp, int turn_token) {
+void set_creature_data(LWBATTLECREATURE* c, const char* name, int lv, int hp, int max_hp, int mp, int max_mp,
+	int turn_token, int exp, int max_exp) {
 	c->valid = 1;
-	strcpy(c->name, name);
+	//strcpy(c->name, name);
 	c->lv = lv;
 	c->hp = hp;
 	c->max_hp = max_hp;
@@ -457,22 +459,19 @@ void set_creature_data(LWBATTLECREATURE* c, const char* name, int lv, int hp, in
 	c->selected_b = 0.5f;
 	c->selected_a = 0.5f;
 	c->turn_token = turn_token;
+	c->exp = exp;
+	c->max_exp = max_exp;
 }
 
-void reset_runtime_context(LWCONTEXT* pLwc) {
-
-	pLwc->sprite_data = SPRITE_DATA[0];
-
-	pLwc->game_scene = LGS_BATTLE;
-	pLwc->font_texture_texture_mode = 0;
-
+void reset_battle_context(LWCONTEXT* pLwc) {
 	pLwc->battle_fov_deg_0 = 49.134f;
 	pLwc->battle_fov_mag_deg_0 = 35.134f;
 	pLwc->battle_fov_deg = pLwc->battle_fov_deg_0;
 	pLwc->selected_enemy_slot = -1;
 
+	const int enemy_count = 1;// MAX_ENEMY_SLOT;
 	// Fill enemy slots with test enemies
-	for (int i = 0; i < MAX_ENEMY_SLOT; i++) {
+	for (int i = 0; i < enemy_count; i++) {
 		pLwc->enemy[i] = ENEMY_DATA_LIST[i];
 
 		for (int j = 0; j < MAX_SKILL_PER_CREATURE; j++) {
@@ -482,6 +481,11 @@ void reset_runtime_context(LWCONTEXT* pLwc) {
 	
 	memset(pLwc->player, 0, sizeof(pLwc->player));
 
+	for (int i = 0; i < MAX_PLAYER_SLOT; i++) {
+		pLwc->player[i] = ENEMY_DATA_LIST[LET_TEST_PLAYER_1 + i].c;
+		pLwc->player[i].valid = 0;
+	}
+	
 	set_creature_data(
 		&pLwc->player[0],
 		u8"주인공",
@@ -490,7 +494,9 @@ void reset_runtime_context(LWCONTEXT* pLwc) {
 		50,
 		30,
 		30,
-		1
+		1,
+		5,
+		38
 	);
 	pLwc->player[0].stat = ENEMY_DATA_LIST[0].c.stat;
 	pLwc->player[0].skill[0] = &SKILL_DATA_LIST[0];
@@ -500,7 +506,7 @@ void reset_runtime_context(LWCONTEXT* pLwc) {
 	pLwc->player[0].skill[4] = &SKILL_DATA_LIST[4];
 	pLwc->player[0].skill[5] = &SKILL_DATA_LIST[5];
 
-	/*set_creature_data(
+	set_creature_data(
 		&pLwc->player[1],
 		u8"극작가",
 		2,
@@ -508,7 +514,9 @@ void reset_runtime_context(LWCONTEXT* pLwc) {
 		50,
 		30,
 		30,
-		2
+		2,
+		1,
+		30
 	);
 	pLwc->player[1].stat = ENEMY_DATA_LIST[0].c.stat;
 	pLwc->player[1].skill[0] = &SKILL_DATA_LIST[0];
@@ -522,7 +530,9 @@ void reset_runtime_context(LWCONTEXT* pLwc) {
 		46,
 		15,
 		55,
-		3
+		3,
+		0,
+		50
 	);
 	pLwc->player[2].stat = ENEMY_DATA_LIST[0].c.stat;
 	pLwc->player[2].skill[0] = &SKILL_DATA_LIST[0];
@@ -536,11 +546,13 @@ void reset_runtime_context(LWCONTEXT* pLwc) {
 		105,
 		0,
 		20,
-		4
+		4,
+		45,
+		56
 	);
 	pLwc->player[3].stat = ENEMY_DATA_LIST[0].c.stat;
 	pLwc->player[3].skill[0] = &SKILL_DATA_LIST[0];
-	pLwc->player[3].skill[1] = &SKILL_DATA_LIST[4];*/
+	pLwc->player[3].skill[1] = &SKILL_DATA_LIST[4];
 
 	for (int i = 0; i < MAX_PLAYER_SLOT; i++) {
 		pLwc->player[i].selected = 0;
@@ -553,6 +565,17 @@ void reset_runtime_context(LWCONTEXT* pLwc) {
 	pLwc->battle_state = LBS_SELECT_COMMAND;
 
 	pLwc->selected_command_slot = 0;
+}
+
+void reset_runtime_context(LWCONTEXT* pLwc) {
+
+	pLwc->sprite_data = SPRITE_DATA[0];
+
+	pLwc->next_game_scene = LGS_FIELD;
+
+	pLwc->font_texture_texture_mode = 0;
+
+	reset_battle_context(pLwc);
 
 	pLwc->font_fbo.dirty = 1;
 
@@ -648,10 +671,10 @@ void init_lwc_runtime_data(LWCONTEXT *pLwc) {
 
 	init_lua(pLwc);
 
-	spawn_field_object(pLwc, 0, 5, 2, 2, LVT_HOME, pLwc->tex_programmed[LPT_SOLID_GREEN], 1, 1);
+	spawn_field_object(pLwc, 0, 5, 2, 2, LVT_HOME, pLwc->tex_programmed[LPT_SOLID_GREEN], 1, 1, 1, 0);
 
 	spawn_field_object(pLwc, 0, -7, 1, 1, LVT_CUBE_WALL, pLwc->tex_programmed[LPT_SOLID_BLUE], 6,
-		1);
+		1, 1, 0);
 }
 
 void set_sprite_mvp_with_scale(const LWCONTEXT *pLwc, enum _LW_ATLAS_SPRITE las, float x, float y,
@@ -799,6 +822,8 @@ void lwc_render(const LWCONTEXT *pLwc) {
 		lwc_render_font_test(pLwc);
 	} else if (pLwc->game_scene == LGS_ADMIN) {
 		lwc_render_admin(pLwc);
+	} else if (pLwc->game_scene == LGS_BATTLE_RESULT) {
+		lwc_render_battle_result(pLwc);
 	}
 }
 
@@ -815,8 +840,25 @@ void lwc_update(LWCONTEXT *pLwc, double delta_time) {
 	pLwc->delta_time = lwtimepoint_diff(&cur_time, &pLwc->last_time);
 	pLwc->last_time = cur_time;
 
+	if (pLwc->next_game_scene == LGS_INVALID && pLwc->game_scene == LGS_INVALID) {
+		// Default game scene
+		pLwc->next_game_scene = LGS_FIELD;
+	}
+
+	if (pLwc->next_game_scene != LGS_INVALID && pLwc->next_game_scene != pLwc->game_scene) {
+
+		pLwc->game_scene = pLwc->next_game_scene;
+		pLwc->next_game_scene = LGS_INVALID;
+		pLwc->scene_time = 0;
+
+		if (pLwc->game_scene == LGS_BATTLE) {
+			reset_battle_context(pLwc);
+		}
+	}
+
 	// accumulate time since app startup
 	pLwc->app_time += pLwc->delta_time;
+	pLwc->scene_time += pLwc->delta_time;
 
 	update_dialog(pLwc);
 
@@ -850,6 +892,10 @@ void lwc_update(LWCONTEXT *pLwc, double delta_time) {
 	if (pLwc->font_fbo.dirty) {
 		lwc_render_font_test_fbo(pLwc);
 		pLwc->font_fbo.dirty = 0;
+	}
+
+	if (pLwc->battle_state == LBS_START_PLAYER_WIN || pLwc->battle_state == LBS_PLAYER_WIN_IN_PROGRESS) {
+		update_battle_result(pLwc);
 	}
 
 	((LWCONTEXT *)pLwc)->update_count++;
@@ -1088,7 +1134,7 @@ int lw_get_game_scene(LWCONTEXT *pLwc) {
 }
 
 int spawn_field_object(struct _LWCONTEXT *pLwc, float x, float y, float w, float h, enum _LW_VBO_TYPE lvt,
-	unsigned int tex_id, float sx, float sy) {
+	unsigned int tex_id, float sx, float sy, float alpha_multiplier, int field_event_id) {
 	for (int i = 0; i < MAX_FIELD_OBJECT; i++) {
 		if (!pLwc->field_object[i].valid) {
 			pLwc->field_object[i].x = x;
@@ -1097,12 +1143,14 @@ int spawn_field_object(struct _LWCONTEXT *pLwc, float x, float y, float w, float
 			pLwc->field_object[i].sy = sy;
 			pLwc->field_object[i].lvt = lvt;
 			pLwc->field_object[i].tex_id = tex_id;
+			pLwc->field_object[i].alpha_multiplier = alpha_multiplier;
 			pLwc->field_object[i].valid = 1;
 
 			pLwc->box_collider[i].x = x;
 			pLwc->box_collider[i].y = y;
 			pLwc->box_collider[i].w = w * sx;
 			pLwc->box_collider[i].h = h * sy;
+			pLwc->box_collider[i].field_event_id = field_event_id;
 			pLwc->box_collider[i].valid = 1;
 
 			return i;
@@ -1113,23 +1161,27 @@ int spawn_field_object(struct _LWCONTEXT *pLwc, float x, float y, float w, float
 }
 
 void change_to_field(LWCONTEXT *pLwc) {
-	pLwc->game_scene = LGS_FIELD;
+	pLwc->next_game_scene = LGS_FIELD;
 }
 
 void change_to_dialog(LWCONTEXT *pLwc) {
-	pLwc->game_scene = LGS_DIALOG;
+	pLwc->next_game_scene = LGS_DIALOG;
 }
 
 void change_to_battle(LWCONTEXT *pLwc) {
-	pLwc->game_scene = LGS_BATTLE;
+	pLwc->next_game_scene = LGS_BATTLE;
 }
 
 void change_to_font_test(LWCONTEXT *pLwc) {
-	pLwc->game_scene = LGS_FONT_TEST;
+	pLwc->next_game_scene = LGS_FONT_TEST;
 }
 
 void change_to_admin(LWCONTEXT *pLwc) {
-	pLwc->game_scene = LGS_ADMIN;
+	pLwc->next_game_scene = LGS_ADMIN;
+}
+
+void change_to_battle_result(LWCONTEXT *pLwc) {
+	pLwc->next_game_scene = LGS_BATTLE_RESULT;
 }
 
 long lw_get_last_time_sec(LWCONTEXT *pLwc) {

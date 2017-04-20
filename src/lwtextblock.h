@@ -1,10 +1,5 @@
 #pragma once
-
-typedef enum _LW_TEXT_BLOCK_ALIGN {
-	LTBA_LEFT_TOP,		LTBA_CENTER_TOP,		LTBA_RIGHT_TOP,
-	LTBA_LEFT_CENTER,	LTBA_CENTER_CENTER,		LTBA_RIGHT_CENTER,
-	LTBA_LEFT_BOTTOM,	LTBA_CENTER_BOTTOM,		LTBA_RIGHT_BOTTOM,
-} LW_TEXT_BLOCK_ALIGN;
+#include "lwuialign.h"
 
 typedef struct _LWTEXTBLOCK
 {
@@ -21,7 +16,7 @@ typedef struct _LWTEXTBLOCK
 	float color_normal_outline[4];
 	float color_emp_glyph[4];
 	float color_emp_outline[4];
-	LW_TEXT_BLOCK_ALIGN align;
+	LW_UI_ALIGN align;
 } LWTEXTBLOCK;
 
 
