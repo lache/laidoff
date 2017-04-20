@@ -567,6 +567,21 @@ void reset_battle_context(LWCONTEXT* pLwc) {
 	pLwc->selected_command_slot = 0;
 }
 
+void reset_field_context(LWCONTEXT* pLwc) {
+
+	despawn_all_field_object(pLwc);
+
+	spawn_all_field_object(pLwc);
+	
+	spawn_field_object(pLwc, 0, 5, 2, 2, LVT_HOME, pLwc->tex_programmed[LPT_SOLID_GREEN], 1, 1, 1, 0);
+
+	spawn_field_object(pLwc, 0, -7, 1, 1, LVT_CUBE_WALL, pLwc->tex_programmed[LPT_SOLID_BLUE], 6,
+		1, 1, 0);
+
+	pLwc->player_pos_x = 0;
+	pLwc->player_pos_y = 0;
+}
+
 void reset_runtime_context(LWCONTEXT* pLwc) {
 
 	pLwc->sprite_data = SPRITE_DATA[0];
@@ -576,6 +591,8 @@ void reset_runtime_context(LWCONTEXT* pLwc) {
 	pLwc->font_texture_texture_mode = 0;
 
 	reset_battle_context(pLwc);
+
+	reset_field_context(pLwc);
 
 	pLwc->font_fbo.dirty = 1;
 
@@ -587,7 +604,7 @@ void reset_runtime_context(LWCONTEXT* pLwc) {
 	pLwc->admin_button_command[2].command_handler = change_to_battle;
 	pLwc->admin_button_command[3].name = LWU("글꼴");
 	pLwc->admin_button_command[3].command_handler = change_to_font_test;
-	pLwc->admin_button_command[4].name = LWU("전투리셋");
+	pLwc->admin_button_command[4].name = LWU("런타임리셋");
 	pLwc->admin_button_command[4].command_handler = reset_runtime_context;
 	pLwc->admin_button_command[5].name = LWU("글꼴디버그");
 	pLwc->admin_button_command[5].command_handler = toggle_font_texture_test_mode;
@@ -649,12 +666,12 @@ void init_lwc_runtime_data(LWCONTEXT *pLwc) {
 
 	init_font_fbo(pLwc);
 
+	init_lua(pLwc);
+
 	reset_runtime_context(pLwc);
 
 	//pLwc->pFnt = load_fnt(ASSETS_BASE_PATH "fnt" PATH_SEPARATOR "arita-semi-bold.fnt");
 	pLwc->pFnt = load_fnt(ASSETS_BASE_PATH "fnt" PATH_SEPARATOR "test6.fnt");
-
-	//const BMF_CHAR *bc = font_binary_search_char(pLwc->pFnt, 100);
 
 	pLwc->dialog = create_string_from_file(ASSETS_BASE_PATH "d" PATH_SEPARATOR "d1.txt");
 	if (pLwc->dialog) {
@@ -662,19 +679,6 @@ void init_lwc_runtime_data(LWCONTEXT *pLwc) {
 	} else {
 		LOGE("dialog loading failed.");
 	}
-
-
-	/*
-	pLwc->dialog_total_len = u8_toucs(pLwc->dialog, ARRAY_SIZE(pLwc->dialog),
-		pLwc->dialog, dialog_utf8_len);
-	 */
-
-	init_lua(pLwc);
-
-	spawn_field_object(pLwc, 0, 5, 2, 2, LVT_HOME, pLwc->tex_programmed[LPT_SOLID_GREEN], 1, 1, 1, 0);
-
-	spawn_field_object(pLwc, 0, -7, 1, 1, LVT_CUBE_WALL, pLwc->tex_programmed[LPT_SOLID_BLUE], 6,
-		1, 1, 0);
 }
 
 void set_sprite_mvp_with_scale(const LWCONTEXT *pLwc, enum _LW_ATLAS_SPRITE las, float x, float y,

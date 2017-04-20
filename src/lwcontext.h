@@ -172,4 +172,8 @@ typedef struct _LWCONTEXT {
 	// Admin
 
 	LWBUTTONCOMMAND admin_button_command[6 * 5];
+
+	// Script
+
+	void* L; // lua VM
 } LWCONTEXT;

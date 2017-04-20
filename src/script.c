@@ -58,26 +58,6 @@ void init_lua(LWCONTEXT* pLwc)
 	lua_setglobal(L, "pLwc");
 
 	{
-		char* script = create_string_from_file(ASSETS_BASE_PATH "l" PATH_SEPARATOR "spawn.lua");
-        if (script) {
-            int result = luaL_dostring(L, script);
-            release_string(script);
-            if (result)
-            {
-                fprintf(stderr, "Failed to run lua: %s\n", lua_tostring(L, -1));
-            }
-            else
-            {
-                printf("Lua result: %lld\n", lua_tointeger(L, -1));
-            }
-            lua_pop(L, 1);
-        } else {
-            LOGE("init_lua: loading script failed");
-        }
-		
-	}
-
-	{
 		int result = luaL_dostring(L, "return ink(1000)");
 		if (result)
 		{
@@ -90,6 +70,33 @@ void init_lua(LWCONTEXT* pLwc)
 		lua_pop(L, 1);
 	}
 
-	lua_close(L);
+	pLwc->L = L;
+	//lua_close(L);
 
+}
+
+void spawn_all_field_object(LWCONTEXT* pLwc) {
+	char* script = create_string_from_file(ASSETS_BASE_PATH "l" PATH_SEPARATOR "spawn.lua");
+	if (script) {
+		int result = luaL_dostring(pLwc->L, script);
+		release_string(script);
+		if (result) {
+			fprintf(stderr, "Failed to run lua: %s\n", lua_tostring(pLwc->L, -1));
+		} else {
+			printf("Lua result: %lld\n", lua_tointeger(pLwc->L, -1));
+		}
+		lua_pop(pLwc->L, 1);
+	} else {
+		LOGE("spawn_all_field_object: loading script failed");
+	}
+}
+
+void despawn_all_field_object(LWCONTEXT* pLwc) {
+	for (int i = 0; i < ARRAY_SIZE(pLwc->field_object); i++) {
+		pLwc->field_object[i].valid = 0;
+	}
+	
+	for (int i = 0; i < ARRAY_SIZE(pLwc->box_collider); i++) {
+		pLwc->box_collider[i].valid = 0;
+	}
 }
