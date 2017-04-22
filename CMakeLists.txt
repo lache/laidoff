@@ -31,6 +31,8 @@ if (WIN32)
     set(ICON win32/laidoff.rc)
 	set(WINCODEC Windowscodecs) # Windows Imaging Codecs
 	set(WINDSHOW Strmiids) # DirectShow
+	set(WINMM Winmm) # PlaySound
+	set(WINXAUDIO2 Xaudio2) # XAudio2
 	set(WINOPENGL32 Opengl32)
 	set(WIN32_DEPS
 		win32/etc1.cpp
@@ -46,6 +48,9 @@ if (WIN32)
 		win32/gl3w.h
 		win32/glcorearb.h
 		win32/main_vulkan.cpp
+		win32/stb_vorbis.c
+		win32/lwxaudio2.cpp
+		win32/lwxaudio2.h
 		)
 elseif (APPLE)
     set(ICON osx/laidoff.icns)
@@ -250,6 +255,7 @@ src/script.c
 src/script.h
 src/skill.c
 src/sprite.h
+src/sound.h
 src/sprite_data.h
 src/tex.c
 src/tex.h
@@ -264,7 +270,7 @@ ${RPI_DEPS}
 ${ICON}
 ${GLAD})
 
-target_link_libraries(laidoff glfw ${WINCODEC} ${WINDSHOW} ${WINOPENGL32})
+target_link_libraries(laidoff glfw ${WINCODEC} ${WINDSHOW} ${WINOPENGL32} ${WINMM} ${WINXAUDIO2})
 
 
 set(WINDOWS_BINARIES laidoff)

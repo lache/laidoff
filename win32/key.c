@@ -1,4 +1,5 @@
 #include "laidoff.h"
+#include "sound.h"
 
 static void handle_move_key_press_release(LWCONTEXT* pLwc, int key, int action) {
 	if (key == GLFW_KEY_RIGHT && action == GLFW_PRESS) {
@@ -101,5 +102,25 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
 
 	if (key == GLFW_KEY_F11 && action == GLFW_PRESS) {
 		toggle_font_texture_test_mode(pLwc);
+	}
+
+	if (key == GLFW_KEY_KP_1 && action == GLFW_PRESS) {
+		play_sound(LWS_DIE);
+	}
+
+	if (key == GLFW_KEY_KP_2 && action == GLFW_PRESS) {
+		play_sound(LWS_HIT);
+	}
+
+	if (key == GLFW_KEY_KP_3 && action == GLFW_PRESS) {
+		play_sound(LWS_POINT);
+	}
+
+	if (key == GLFW_KEY_KP_4 && action == GLFW_PRESS) {
+		play_sound(LWS_SWOOSHING);
+	}
+
+	if (key == GLFW_KEY_KP_5 && action == GLFW_PRESS) {
+		play_sound(LWS_WING);
 	}
 }

@@ -9,6 +9,7 @@
 #include "battle.h"
 #include "render_battle.h"
 #include "laidoff.h"
+#include "sound.h"
 
 int calculate_and_apply_attack_1_on_1(LWCONTEXT *pLwc, LWBATTLECREATURE* ca, const LWSKILL* s, LWBATTLECREATURE* cb,
 	LWBATTLECOMMANDRESULT* cmd_result_a, LWBATTLECOMMANDRESULT* cmd_result_b);
@@ -263,12 +264,18 @@ void play_player_hp_desc_anim(struct _LWCONTEXT* pLwc, const int player_slot,
 
 	if (cmd_result_a->type == LBCR_MISSED) {
 		snprintf(damage_str, ARRAY_SIZE(damage_str), "MISSED");
+
+		play_sound(LWS_WING);
+
 	} else {
 		// 데미지는 음수이기 때문에 - 붙여서 양수로 바꿔줌
 		snprintf(damage_str, ARRAY_SIZE(damage_str), "%d", -cmd_result_b->delta_hp);
 
 		player->shake_duration = 0.15f;
 		player->shake_magitude = 0.03f;
+
+		play_sound(LWS_HIT);
+
 	}
 
 	spawn_damage_text(pLwc, left_top_x + area_width / 2, left_top_y - area_height / 2, 0, damage_str, LDTC_UI);
@@ -447,12 +454,17 @@ void play_enemy_hp_desc_anim(LWCONTEXT* pLwc, LWENEMY* enemy, int enemy_slot,
 
 		enemy->evasion_anim.t = enemy->evasion_anim.max_t = 0.25f;
 		enemy->evasion_anim.max_v = 0.15f;
+
+		play_sound(LWS_WING);
+
 	} else {
 		// 데미지는 음수이기 때문에 - 붙여서 양수로 바꿔줌
 		snprintf(damage_str, ARRAY_SIZE(damage_str), "%d", -cmd_result_b->delta_hp);
 
 		enemy->c.shake_duration = 0.15f;
 		enemy->c.shake_magitude = 0.03f;
+
+		play_sound(LWS_HIT);
 	}
 
 	// TODO: MISSED 일 때 트레일을 그리지 않으면 전투가 도중에 멈추는 문제가 있어서 무조건 그려줌
