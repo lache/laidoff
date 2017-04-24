@@ -13,6 +13,7 @@
 #include "lwbitmapcontext.h"
 #include "constants.h"
 #include "lwmacro.h"
+#include "sound.h"
 
 char * create_string_from_file(const char * filename) {
     
@@ -45,11 +46,11 @@ void release_binary(char * d) {
     free(d);
 }
 
-void play_sound(enum LW_SOUND lws) {
+void play_sound(LW_SOUND lws) {
     
 }
 
-void stop_sound(enum LW_SOUND lws) {
+void stop_sound(LW_SOUND lws) {
     
 }
 

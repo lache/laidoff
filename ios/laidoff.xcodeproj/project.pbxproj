@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		5633AC321EADDF98003F1549 /* net.c in Sources */ = {isa = PBXBuildFile; fileRef = 5633AC311EADDF98003F1549 /* net.c */; };
 		5644E9E31EA8B69000EAA658 /* battle.c in Sources */ = {isa = PBXBuildFile; fileRef = 5644E98F1EA8B69000EAA658 /* battle.c */; };
 		5644E9E41EA8B69000EAA658 /* battlelogic.c in Sources */ = {isa = PBXBuildFile; fileRef = 5644E9911EA8B69000EAA658 /* battlelogic.c */; };
 		5644E9E51EA8B69000EAA658 /* dialog.c in Sources */ = {isa = PBXBuildFile; fileRef = 5644E9941EA8B69000EAA658 /* dialog.c */; };
@@ -88,6 +89,10 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		5633AC301EADDF62003F1549 /* sound.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = sound.h; sourceTree = "<group>"; };
+		5633AC311EADDF98003F1549 /* net.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = net.c; sourceTree = "<group>"; };
+		5633AC331EADDFC7003F1549 /* net.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = net.h; sourceTree = "<group>"; };
+		5633AC341EADE025003F1549 /* lwlog.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = lwlog.h; sourceTree = "<group>"; };
 		5644E98F1EA8B69000EAA658 /* battle.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = battle.c; sourceTree = "<group>"; };
 		5644E9901EA8B69000EAA658 /* battle.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = battle.h; sourceTree = "<group>"; };
 		5644E9911EA8B69000EAA658 /* battlelogic.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = battlelogic.c; sourceTree = "<group>"; };
@@ -323,6 +328,7 @@
 				6CA16CEB1EA20B5600DB7AF0 /* Info.plist */,
 				6CA16CD61EA20B5600DB7AF0 /* Supporting Files */,
 				6CA16DA31EA2110E00DB7AF0 /* lwios.m */,
+				5633AC311EADDF98003F1549 /* net.c */,
 			);
 			path = laidoff;
 			sourceTree = "<group>";
@@ -338,6 +344,9 @@
 		6CA16CF41EA20CA700DB7AF0 /* src */ = {
 			isa = PBXGroup;
 			children = (
+				5633AC341EADE025003F1549 /* lwlog.h */,
+				5633AC331EADDFC7003F1549 /* net.h */,
+				5633AC301EADDF62003F1549 /* sound.h */,
 				5644E9FB1EA91D9E00EAA658 /* battle_result.c */,
 				5644E9FC1EA91D9E00EAA658 /* battle_result.h */,
 				5644E9FD1EA91D9E00EAA658 /* lwuialign.c */,
@@ -598,6 +607,7 @@
 				5644E9EB1EA8B69000EAA658 /* loadobj.c in Sources */,
 				6CA16D9C1EA210BB00DB7AF0 /* ltm.c in Sources */,
 				6CA16D871EA210BB00DB7AF0 /* ldblib.c in Sources */,
+				5633AC321EADDF98003F1549 /* net.c in Sources */,
 				6CA16D9A1EA210BB00DB7AF0 /* ltable.c in Sources */,
 				6CA16D8A1EA210BB00DB7AF0 /* ldump.c in Sources */,
 				6CA16D891EA210BB00DB7AF0 /* ldo.c in Sources */,
