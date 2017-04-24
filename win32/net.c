@@ -9,8 +9,8 @@ void DieWithError(char *errorMessage) {
 
 }
 
-void init_net() {
-	int sock;                        /* Socket descriptor */
+void init_net(struct _LWCONTEXT* pLwc) {
+	UINT_PTR sock;                        /* Socket descriptor */
 	struct sockaddr_in echoServAddr; /* Echo server address */
 	struct sockaddr_in fromAddr;     /* Source address of echo */
 	unsigned short echoServPort;     /* Echo server port */
@@ -25,7 +25,7 @@ void init_net() {
 	servIP = "222.110.4.119";
 	echoString = "desktop!!";
 	echoServPort = 10001;
-	echoStringLen = strlen(echoString);
+	echoStringLen = (int)strlen(echoString);
 	if (WSAStartup(MAKEWORD(2, 0), &wsaData) != 0) /* Load Winsock 2.0 DLL */
 	{
 		fprintf(stderr, "WSAStartup() failed");
@@ -52,10 +52,8 @@ void init_net() {
 		fprintf(stderr, "Error: received a packet from unknown source.\n");
 		exit(1);
 	}
-	if (echoBuffer[respStringLen - 1])  /* Do not printf unless it is terminated */
-		printf("Received an unterminated string\n");
-	else
-		printf("Received: %s\n", echoBuffer);    /* Print the echoed arg */
+	echoBuffer[respStringLen] = '\0';
+	printf("Received: %s\n", echoBuffer);    /* Print the echoed arg */
 	closesocket(sock);
 	WSACleanup();  /* Cleanup Winsock */
 }
