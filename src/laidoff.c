@@ -614,7 +614,7 @@ void reset_runtime_context(LWCONTEXT* pLwc) {
 	pLwc->admin_button_command[5].name = LWU("글꼴디버그");
 	pLwc->admin_button_command[5].command_handler = toggle_font_texture_test_mode;
 	pLwc->admin_button_command[6].name = LWU("UDP");
-	pLwc->admin_button_command[6].command_handler = init_net;
+	pLwc->admin_button_command[6].command_handler = net_rtt_test;
 }
 
 void delete_font_fbo(LWCONTEXT* pLwc) {

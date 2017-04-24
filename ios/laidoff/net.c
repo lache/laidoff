@@ -15,17 +15,20 @@
 #define BUFLEN 512  //Max length of buffer
 #define PORT 10001   //The port on which to send data
 
+
+struct sockaddr_in si_other;
+int s, i, slen=sizeof(si_other);
+char buf[BUFLEN];
+const char* message = "iOS!!! ^_______^";
+
 void die(char *s)
 {
     perror(s);
     exit(1);
 }
 
-void init_net() {
-    struct sockaddr_in si_other;
-    int s, i, slen=sizeof(si_other);
-    char buf[BUFLEN];
-    const char* message = "iOS!!! ^_______^";
+void init_net(struct _LWCONTEXT* pLwc) {
+    
     
     if ( (s=socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP)) == -1)
     {
@@ -41,7 +44,9 @@ void init_net() {
         fprintf(stderr, "inet_aton() failed\n");
         exit(1);
     }
-    
+}
+
+void net_rtt_test(struct _LWCONTEXT* pLwc) {
     LWTIMEPOINT tp;
     lwtimepoint_now(&tp);
     //send the message
@@ -62,7 +67,7 @@ void init_net() {
     lwtimepoint_now(&tp2);
     float rtt = (float)lwtimepoint_diff(&tp2, &tp);
     char buf2[BUFLEN];
-    sprintf(buf2,"NET: %s (rtt: %.6f sec)", buf, rtt);
+    sprintf(buf2,"NET: %s (rtt: %.3f ms)", buf, rtt * 1e3);
     LOGI("%s", buf2);
     
     if (sendto(s, buf2, strlen(buf2) , 0 , (struct sockaddr *) &si_other, slen)==-1)
@@ -70,5 +75,5 @@ void init_net() {
         die("sendto() - 2");
     }
     
-    close(s);
+    //close(s);
 }
