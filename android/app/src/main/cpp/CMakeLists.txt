@@ -76,6 +76,7 @@ add_library(native-activity SHARED
             image.cpp
             sound.cpp
             file.c
+            net.c
             ../../../../../src/lwsimpleanim.c
             ../../../../../src/battle.c
             ../../../../../src/battlelogic.c

@@ -28,6 +28,7 @@
 #include "lwpkm.h"
 #include "render_battle_result.h"
 #include "battle_result.h"
+#include "net.h"
 
 #define LWEPSILON (1e-3)
 #define INCREASE_RENDER_SCORE (20)
@@ -877,7 +878,7 @@ void lwc_update(LWCONTEXT *pLwc, double delta_time) {
 
 	float ratio = pLwc->width / (float)pLwc->height;
 
-	LOGV("Update(): width: %d height: %d ratio: %f", pLwc->width, pLwc->height, ratio);
+	//LOGV("Update(): width: %d height: %d ratio: %f", pLwc->width, pLwc->height, ratio);
 
 	if (ratio > 1) {
 		mat4x4_ortho(pLwc->proj, -ratio, ratio, -1.f, 1.f, 1.f, -1.f);
@@ -1114,6 +1115,8 @@ LWCONTEXT *lw_init(void) {
 	init_lwc_runtime_data(pLwc);
 
 	lwtimepoint_now(&pLwc->last_time);
+
+	init_net();
 
 	return pLwc;
 }

@@ -34,6 +34,7 @@ if (WIN32)
 	set(WINMM Winmm) # PlaySound
 	set(WINXAUDIO2 Xaudio2) # XAudio2
 	set(WINOPENGL32 Opengl32)
+	set(WINSOCK2 ws2_32)
 	set(WIN32_DEPS
 		win32/etc1.cpp
 		win32/file.c
@@ -51,6 +52,7 @@ if (WIN32)
 		win32/stb_vorbis.c
 		win32/lwxaudio2.cpp
 		win32/lwxaudio2.h
+		win32/net.c
 		)
 elseif (APPLE)
     set(ICON osx/laidoff.icns)
@@ -234,6 +236,7 @@ src/lwvbotype.h
 src/lwtextblock.h
 src/lwtimepoint.c
 src/lwtimepoint.h
+src/net.h
 src/platform_detection.h
 src/render_admin.c
 src/render_admin.h
@@ -270,7 +273,7 @@ ${RPI_DEPS}
 ${ICON}
 ${GLAD})
 
-target_link_libraries(laidoff glfw ${WINCODEC} ${WINDSHOW} ${WINOPENGL32} ${WINMM} ${WINXAUDIO2})
+target_link_libraries(laidoff glfw ${WINCODEC} ${WINDSHOW} ${WINOPENGL32} ${WINMM} ${WINXAUDIO2} ${WINSOCK2})
 
 
 set(WINDOWS_BINARIES laidoff)
