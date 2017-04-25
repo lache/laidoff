@@ -50,7 +50,7 @@ void lwc_render_skin(const struct _LWCONTEXT* pLwc) {
 	mat4x4_identity(identity);
 
 	render_ground(pLwc, identity, pLwc->proj);
-	
+
 	render_solid_vb_ui_skin(pLwc, 0, 0, 0.5f,
 		pLwc->tex_atlas[LAE_C_TOFU_KTX], pLwc->tex_atlas[LAE_C_TOFU_ALPHA_KTX],
 		LSVT_TRIANGLE,

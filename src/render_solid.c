@@ -124,12 +124,30 @@ void render_solid_vb_ui_skin(const LWCONTEXT* pLwc,
 
 #define MAX_BONE (32)
 
+	vec3 bone_trans[2] = {
+		{ 1, -1, 0 },
+		{ -1, 0, 0 },
+	};
+
 	mat4x4 bone[MAX_BONE];
 	for (int i = 0; i < MAX_BONE; i++) {
 		mat4x4_identity(bone[i]);
 		//mat4x4_scale_aniso(bone[i], bone[i], 2, 2, 2);
-		mat4x4_translate(bone[i], 1, -1, 0);
+		//mat4x4_translate(bone[i], 1, -1, 0);
 	}
+
+	for (int i = 0; i < pLwc->armature.count; i++) {
+		mat4x4 bone_mat_inv;
+		mat4x4_invert(bone_mat_inv, pLwc->armature.mat[i]);
+
+		mat4x4 bone_mat_trans;
+		mat4x4_translate(bone_mat_trans, bone_trans[i][0], bone_trans[i][1], bone_trans[i][2]);
+
+		mat4x4_mul(bone[i], bone_mat_trans, bone_mat_inv);
+		mat4x4_mul(bone[i], pLwc->armature.mat[i], bone[i]);
+	}
+
+	//memcpy(bone, pLwc->armature.mat, sizeof(mat4x4) * pLwc->armature.count);
 
 	glUseProgram(pLwc->shader[shader_index].program);
 	glUniform2fv(pLwc->shader[shader_index].vuvoffset_location, 1, default_uv_offset);
