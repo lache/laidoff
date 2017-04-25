@@ -124,9 +124,16 @@ void render_solid_vb_ui_skin(const LWCONTEXT* pLwc,
 
 #define MAX_BONE (32)
 
-	vec3 bone_trans[2] = {
-		{ 1, -1, 0 },
+	vec3 bone_trans[] = {
 		{ -1, 0, 0 },
+		{ 0, 1, 0 },
+		{ 0, 0.5f, 0 },
+	};
+
+	float bone_rot[] = {
+		LWDEG2RAD(45),
+		LWDEG2RAD(90),
+		LWDEG2RAD(0),
 	};
 
 	mat4x4 bone[MAX_BONE];
@@ -143,7 +150,12 @@ void render_solid_vb_ui_skin(const LWCONTEXT* pLwc,
 		mat4x4 bone_mat_trans;
 		mat4x4_translate(bone_mat_trans, bone_trans[i][0], bone_trans[i][1], bone_trans[i][2]);
 
-		mat4x4_mul(bone[i], bone_mat_trans, bone_mat_inv);
+		mat4x4 bone_mat_rot;
+		mat4x4_identity(bone_mat_rot);
+		mat4x4_rotate_Z(bone_mat_rot, bone_mat_rot, bone_rot[i]);
+
+		mat4x4_mul(bone[i], bone_mat_rot, bone_mat_inv);
+		mat4x4_mul(bone[i], bone_mat_trans, bone[i]);
 		mat4x4_mul(bone[i], pLwc->armature.mat[i], bone[i]);
 	}
 
