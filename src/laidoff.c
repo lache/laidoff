@@ -29,6 +29,8 @@
 #include "render_battle_result.h"
 #include "battle_result.h"
 #include "net.h"
+#include "render_skin.h"
+#include "armature.h"
 
 #define LWEPSILON (1e-3)
 #define INCREASE_RENDER_SCORE (20)
@@ -48,11 +50,15 @@
 #define LW_SUPPORT_ETC1_HARDWARE_DECODING LW_PLATFORM_ANDROID
 #define LW_SUPPORT_VAO (LW_PLATFORM_WIN32 || LW_PLATFORM_OSX)
 
-// Vertex attributes: Coordinates (3) + Normal (3) + UV (2) + S9 (2)
+// Vertex attributes: Coordinates (3xf) + Normal (3xf) + UV (2xf) + S9 (2xf)
 // See Also: LWVERTEX
 const static GLsizei stride_in_bytes = (GLsizei)(sizeof(float) * (3 + 3 + 2 + 2));
-LwStaticAssert(sizeof(LWVERTEX) == sizeof(float) * (3 + 3 + 2 + 2), "LWVERTEX size error");
+LwStaticAssert(sizeof(LWVERTEX) == (GLsizei)(sizeof(float) * (3 + 3 + 2 + 2)), "LWVERTEX size error");
 
+// Skin Vertex attributes: Coordinates (3xf) + Normal (3xf) + UV (2xf) + Bone Weight (4xf) + Bone Matrix (4xi)
+// See Also: LWSKINVERTEX
+const static GLsizei skin_stride_in_bytes = (GLsizei)(sizeof(float) * (3 + 3 + 2 + 4) + sizeof(int) * 4);
+LwStaticAssert(sizeof(LWSKINVERTEX) == (GLsizei)(sizeof(float) * (3 + 3 + 2 + 4) + sizeof(int) * 4), "LWSKINVERTEX size error");
 
 #if LW_PLATFORM_ANDROID || LW_PLATFORM_IOS || LW_PLATFORM_IOS_SIMULATOR
 double glfwGetTime() {
@@ -263,12 +269,15 @@ create_shader(const char *shader_name, LWSHADER *pShader, const GLchar *vst, con
 	pShader->alpha_only_location = glGetUniformLocation(pShader->program, "alpha_only");
 	pShader->glyph_color_location = glGetUniformLocation(pShader->program, "glyph_color");
 	pShader->outline_color_location = glGetUniformLocation(pShader->program, "outline_color");
+	pShader->bone_location = glGetUniformLocation(pShader->program, "bone");
 
 	// Attribs
 	pShader->vpos_location = glGetAttribLocation(pShader->program, "vPos");
 	pShader->vcol_location = glGetAttribLocation(pShader->program, "vCol");
 	pShader->vuv_location = glGetAttribLocation(pShader->program, "vUv");
 	pShader->vs9_location = glGetAttribLocation(pShader->program, "vS9");
+	pShader->vbweight_location = glGetAttribLocation(pShader->program, "vBw");
+	pShader->vbmat_location = glGetAttribLocation(pShader->program, "vBm");
 
 	pShader->valid = 1;
 }
@@ -281,8 +290,13 @@ void init_gl_shaders(LWCONTEXT *pLwc) {
 #define GLSL_DIR_NAME "glsles"
 #endif
 
+	// Vertex Shader
 	char *default_vert_glsl = create_string_from_file(ASSETS_BASE_PATH
 		GLSL_DIR_NAME PATH_SEPARATOR "default-vert.glsl");
+	char *skin_vert_glsl = create_string_from_file(ASSETS_BASE_PATH
+		GLSL_DIR_NAME PATH_SEPARATOR "skin-vert.glsl");
+
+	// Fragment Shader
 	char *default_frag_glsl = create_string_from_file(ASSETS_BASE_PATH
 		GLSL_DIR_NAME PATH_SEPARATOR "default-frag.glsl");
 	char *font_frag_glsl = create_string_from_file(ASSETS_BASE_PATH
@@ -292,6 +306,11 @@ void init_gl_shaders(LWCONTEXT *pLwc) {
 
 	if (!default_vert_glsl) {
 		LOGE("init_gl_shaders: default-vert.glsl not loaded. Abort...");
+		return;
+	}
+
+	if (!skin_vert_glsl) {
+		LOGE("init_gl_shaders: skin-vert.glsl not loaded. Abort...");
 		return;
 	}
 
@@ -310,11 +329,13 @@ void init_gl_shaders(LWCONTEXT *pLwc) {
 		return;
 	}
 
-	create_shader("Default Shader", &pLwc->shader[0], default_vert_glsl, default_frag_glsl);
-	create_shader("Font Shader", &pLwc->shader[1], default_vert_glsl, font_frag_glsl);
-	create_shader("ETC1 with Alpha Shader", &pLwc->shader[2], default_vert_glsl, etc1_frag_glsl);
+	create_shader("Default Shader", &pLwc->shader[LWST_DEFAULT], default_vert_glsl, default_frag_glsl);
+	create_shader("Font Shader", &pLwc->shader[LWST_FONT], default_vert_glsl, font_frag_glsl);
+	create_shader("ETC1 with Alpha Shader", &pLwc->shader[LWST_ETC1], default_vert_glsl, etc1_frag_glsl);
+	create_shader("Skin Shader", &pLwc->shader[LWST_SKIN], skin_vert_glsl, default_frag_glsl);
 
 	release_string(default_vert_glsl);
+	release_string(skin_vert_glsl);
 	release_string(default_frag_glsl);
 	release_string(font_frag_glsl);
 	release_string(etc1_frag_glsl);
@@ -334,6 +355,23 @@ static void load_vbo(LWCONTEXT *pLwc, const char *filename, LWVBO *pVbo) {
 
 	pVbo->vertex_buffer = vbo;
 	pVbo->vertex_count = (int)(mesh_file_size / stride_in_bytes);
+}
+
+static void load_skin_vbo(LWCONTEXT *pLwc, const char *filename, LWVBO *pSvbo) {
+	GLuint vbo = 0;
+	glGenBuffers(1, &vbo);
+	glBindBuffer(GL_ARRAY_BUFFER, vbo);
+
+	size_t mesh_file_size = 0;
+	char *mesh_vbo_data = create_binary_from_file(filename, &mesh_file_size);
+	LWSKINVERTEX* mesh_vbo_data_debug = (LWSKINVERTEX*)mesh_vbo_data;
+	glBufferData(GL_ARRAY_BUFFER, mesh_file_size, mesh_vbo_data, GL_STATIC_DRAW);
+	release_binary(mesh_vbo_data);
+
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+	pSvbo->vertex_buffer = vbo;
+	pSvbo->vertex_count = (int)(mesh_file_size / skin_stride_in_bytes);
 }
 
 static void init_vbo(LWCONTEXT *pLwc) {
@@ -388,6 +426,13 @@ static void init_vbo(LWCONTEXT *pLwc) {
 	// LVT_TRAIL
 	load_vbo(pLwc, ASSETS_BASE_PATH "vbo" PATH_SEPARATOR "Trail.vbo",
 		&pLwc->vertex_buffer[LVT_TRAIL]);
+
+
+	// === SKIN VERTEX BUFFERS ===
+
+	// LSVT_TRIANGLE
+	load_skin_vbo(pLwc, ASSETS_BASE_PATH "svbo" PATH_SEPARATOR "Triangle.svbo",
+		&pLwc->skin_vertex_buffer[LSVT_TRIANGLE]);
 }
 
 void set_vertex_attrib_pointer(const LWCONTEXT* pLwc, int shader_index) {
@@ -405,7 +450,26 @@ void set_vertex_attrib_pointer(const LWCONTEXT* pLwc, int shader_index) {
 		stride_in_bytes, (void *)(sizeof(float) * (3 + 3 + 2)));
 }
 
+void set_skin_vertex_attrib_pointer(const LWCONTEXT* pLwc, int shader_index) {
+	glEnableVertexAttribArray(pLwc->shader[shader_index].vpos_location);
+	glVertexAttribPointer(pLwc->shader[shader_index].vpos_location, 3, GL_FLOAT, GL_FALSE,
+		skin_stride_in_bytes, (void *)0);
+	glEnableVertexAttribArray(pLwc->shader[shader_index].vcol_location);
+	glVertexAttribPointer(pLwc->shader[shader_index].vcol_location, 3, GL_FLOAT, GL_FALSE,
+		skin_stride_in_bytes, (void *)(sizeof(float) * 3));
+	glEnableVertexAttribArray(pLwc->shader[shader_index].vuv_location);
+	glVertexAttribPointer(pLwc->shader[shader_index].vuv_location, 2, GL_FLOAT, GL_FALSE,
+		skin_stride_in_bytes, (void *)(sizeof(float) * (3 + 3)));
+	glEnableVertexAttribArray(pLwc->shader[shader_index].vbweight_location);
+	glVertexAttribPointer(pLwc->shader[shader_index].vbweight_location, 4, GL_FLOAT, GL_FALSE,
+		skin_stride_in_bytes, (void *)(sizeof(float) * (3 + 3 + 2)));
+	glEnableVertexAttribArray(pLwc->shader[shader_index].vbmat_location);
+	glVertexAttribPointer(pLwc->shader[shader_index].vbmat_location, 4, GL_FLOAT, GL_FALSE,
+		skin_stride_in_bytes, (void *)(sizeof(float) * (3 + 3 + 2 + 4)));
+}
+
 static void init_vao(LWCONTEXT *pLwc, int shader_index) {
+	// Vertex Array Objects
 #if LW_SUPPORT_VAO
 	glGenVertexArrays(VERTEX_BUFFER_COUNT, pLwc->vao);
 	for (int i = 0; i < VERTEX_BUFFER_COUNT; i++) {
@@ -419,12 +483,29 @@ static void init_vao(LWCONTEXT *pLwc, int shader_index) {
 #endif
 }
 
+static void init_skin_vao(LWCONTEXT *pLwc, int shader_index) {
+	// Skin Vertex Array Objects
+#if LW_SUPPORT_VAO
+	glGenVertexArrays(SKIN_VERTEX_BUFFER_COUNT, pLwc->skin_vao);
+	for (int i = 0; i < SKIN_VERTEX_BUFFER_COUNT; i++) {
+		glBindVertexArray(pLwc->skin_vao[i]);
+		glBindBuffer(GL_ARRAY_BUFFER, pLwc->skin_vertex_buffer[i].vertex_buffer);
+		set_skin_vertex_attrib_pointer(pLwc, shader_index);
+	}
+
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
+	glBindVertexArray(0);
+#endif
+}
+
 static void init_gl_context(LWCONTEXT *pLwc) {
 	init_gl_shaders(pLwc);
 
 	init_vbo(pLwc);
 
-	init_vao(pLwc, 0);
+	init_vao(pLwc, 0/* ??? */);
+
+	init_skin_vao(pLwc, LWST_SKIN);
 
 	// Enable culling (CCW is default)
 	glEnable(GL_CULL_FACE);
@@ -591,7 +672,7 @@ void reset_runtime_context(LWCONTEXT* pLwc) {
 
 	pLwc->sprite_data = SPRITE_DATA[0];
 
-	pLwc->next_game_scene = LGS_FIELD;
+	pLwc->next_game_scene = LGS_SKIN;
 
 	pLwc->font_texture_texture_mode = 0;
 
@@ -601,13 +682,13 @@ void reset_runtime_context(LWCONTEXT* pLwc) {
 
 	pLwc->font_fbo.dirty = 1;
 
-	pLwc->admin_button_command[0].name = LWU("필드");
+	pLwc->admin_button_command[0].name = LWU("신:필드");
 	pLwc->admin_button_command[0].command_handler = change_to_field;
-	pLwc->admin_button_command[1].name = LWU("대화");
+	pLwc->admin_button_command[1].name = LWU("신:대화");
 	pLwc->admin_button_command[1].command_handler = change_to_dialog;
-	pLwc->admin_button_command[2].name = LWU("전투");
+	pLwc->admin_button_command[2].name = LWU("신:전투");
 	pLwc->admin_button_command[2].command_handler = change_to_battle;
-	pLwc->admin_button_command[3].name = LWU("글꼴");
+	pLwc->admin_button_command[3].name = LWU("신:글꼴");
 	pLwc->admin_button_command[3].command_handler = change_to_font_test;
 	pLwc->admin_button_command[4].name = LWU("런타임리셋");
 	pLwc->admin_button_command[4].command_handler = reset_runtime_context;
@@ -615,6 +696,8 @@ void reset_runtime_context(LWCONTEXT* pLwc) {
 	pLwc->admin_button_command[5].command_handler = toggle_font_texture_test_mode;
 	pLwc->admin_button_command[6].name = LWU("UDP");
 	pLwc->admin_button_command[6].command_handler = net_rtt_test;
+	pLwc->admin_button_command[7].name = LWU("신:스킨");
+	pLwc->admin_button_command[7].command_handler = change_to_skin;
 }
 
 void delete_font_fbo(LWCONTEXT* pLwc) {
@@ -835,6 +918,8 @@ void lwc_render(const LWCONTEXT *pLwc) {
 		lwc_render_admin(pLwc);
 	} else if (pLwc->game_scene == LGS_BATTLE_RESULT) {
 		lwc_render_battle_result(pLwc);
+	} else if (pLwc->game_scene == LGS_SKIN) {
+		lwc_render_skin(pLwc);
 	}
 }
 
@@ -912,7 +997,7 @@ void lwc_update(LWCONTEXT *pLwc, double delta_time) {
 	((LWCONTEXT *)pLwc)->update_count++;
 }
 
-void bind_all_vertex_attrib_shader(const LWCONTEXT *pLwc, int shader_index, int vbo_index) {
+static void bind_all_vertex_attrib_shader(const LWCONTEXT *pLwc, int shader_index, int vbo_index) {
 #if LW_PLATFORM_WIN32 || LW_PLATFORM_OSX
 	glBindVertexArray(pLwc->vao[vbo_index]);
 #else
@@ -920,16 +1005,28 @@ void bind_all_vertex_attrib_shader(const LWCONTEXT *pLwc, int shader_index, int 
 #endif
 }
 
+static void bind_all_skin_vertex_attrib_shader(const LWCONTEXT *pLwc, int shader_index, int vbo_index) {
+#if LW_PLATFORM_WIN32 || LW_PLATFORM_OSX
+	glBindVertexArray(pLwc->skin_vao[vbo_index]);
+#else
+	set_skin_vertex_attrib_pointer(pLwc, shader_index);
+#endif
+}
+
 void bind_all_vertex_attrib(const LWCONTEXT *pLwc, int vbo_index) {
-	bind_all_vertex_attrib_shader(pLwc, 0, vbo_index);
+	bind_all_vertex_attrib_shader(pLwc, LWST_DEFAULT, vbo_index);
 }
 
 void bind_all_vertex_attrib_font(const LWCONTEXT *pLwc, int vbo_index) {
-	bind_all_vertex_attrib_shader(pLwc, 1, vbo_index);
+	bind_all_vertex_attrib_shader(pLwc, LWST_FONT, vbo_index);
 }
 
 void bind_all_vertex_attrib_etc1_with_alpha(const LWCONTEXT *pLwc, int vbo_index) {
-	bind_all_vertex_attrib_shader(pLwc, 2, vbo_index);
+	bind_all_vertex_attrib_shader(pLwc, LWST_ETC1, vbo_index);
+}
+
+void bind_all_skin_vertex_attrib(const LWCONTEXT *pLwc, int vbo_index) {
+	bind_all_skin_vertex_attrib_shader(pLwc, LWST_SKIN, vbo_index);
 }
 
 static void load_pkm_hw_decoding(const char *tex_atlas_filename) {
@@ -1099,6 +1196,10 @@ void load_test_font(LWCONTEXT *pLwc) {
 	glBindTexture(GL_TEXTURE_2D, 0);
 }
 
+void init_armature(LWCONTEXT* pLwc) {
+	load_armature(ASSETS_BASE_PATH "armature" PATH_SEPARATOR "Armature.arm", &pLwc->armature);
+}
+
 LWCONTEXT *lw_init(void) {
 	init_ext_image_lib();
 
@@ -1119,6 +1220,8 @@ LWCONTEXT *lw_init(void) {
 	lwtimepoint_now(&pLwc->last_time);
 
 	init_net(pLwc);
+
+	init_armature(pLwc);
 
 	return pLwc;
 }
@@ -1197,6 +1300,10 @@ void change_to_battle_result(LWCONTEXT *pLwc) {
 	pLwc->next_game_scene = LGS_BATTLE_RESULT;
 }
 
+void change_to_skin(LWCONTEXT *pLwc) {
+	pLwc->next_game_scene = LGS_SKIN;
+}
+
 long lw_get_last_time_sec(LWCONTEXT *pLwc) {
 	return lwtimepoint_get_second_portion(&pLwc->last_time);
 }
@@ -1220,4 +1327,5 @@ int lw_get_render_count(LWCONTEXT *pLwc) {
 void lw_on_destroy(LWCONTEXT *pLwc) {
 	release_font(pLwc->pFnt);
 	release_string(pLwc->dialog);
+	deinit_net(pLwc);
 }

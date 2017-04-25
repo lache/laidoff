@@ -74,9 +74,10 @@ int load_sound(int i) {
 	short *output;
 	int bits_per_samp = 16;
 	unsigned int num_samples = stb_vorbis_decode_filename(SOUND_FILE[i], &num_chan, &samprate, &output);
-	LOGI("sfx num_samples: %u\n", num_samples);
-	LOGI("sfx num_chan: %d\n", num_chan);
-	LOGI("sfx samprate: %d\n", samprate);
+	LOGI("Loading sfx %s...", SOUND_FILE[i]);
+	LOGI(" - sfx num_samples: %u", num_samples);
+	LOGI(" - sfx num_chan: %d", num_chan);
+	LOGI(" - sfx samprate: %d", samprate);
 	int total_payload_bytes = num_samples * num_chan * bits_per_samp / 8;
 	WORD blockAlign = num_chan * bits_per_samp / 8;
 	DWORD avgBytesPerSec = samprate * num_chan * bits_per_samp / 8;

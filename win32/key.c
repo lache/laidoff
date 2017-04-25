@@ -100,6 +100,10 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
 		change_to_battle_result(pLwc);
 	}
 
+	if (key == GLFW_KEY_F7 && action == GLFW_PRESS) {
+		change_to_skin(pLwc);
+	}
+
 	if (key == GLFW_KEY_F11 && action == GLFW_PRESS) {
 		toggle_font_texture_test_mode(pLwc);
 	}

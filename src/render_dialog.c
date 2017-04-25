@@ -9,7 +9,7 @@
 
 static void render_portrait(const LWCONTEXT* pLwc)
 {
-	int shader_index = 2; // ETC1 with alpha shader...
+	int shader_index = LWST_ETC1;
 
 	glUseProgram(pLwc->shader[shader_index].program);
 	glUniform2fv(pLwc->shader[shader_index].vuvoffset_location, 1, default_uv_offset);
@@ -33,7 +33,7 @@ static void render_portrait(const LWCONTEXT* pLwc)
 
 static void render_dialog_balloon(const LWCONTEXT* pLwc)
 {
-	int shader_index = 0;
+	int shader_index = LWST_DEFAULT;
 
 	glUseProgram(pLwc->shader[shader_index].program);
 	glUniform2fv(pLwc->shader[shader_index].vuvoffset_location, 1, default_uv_offset);
@@ -85,7 +85,7 @@ static void render_dialog_balloon(const LWCONTEXT* pLwc)
 
 static void render_bg(const LWCONTEXT* pLwc)
 {
-	int shader_index = 0;
+	int shader_index = LWST_DEFAULT;
 
 	const float screen_aspect_ratio = (float)pLwc->width / pLwc->height;
 
@@ -151,7 +151,7 @@ void lwc_render_dialog(const LWCONTEXT* pLwc)
 	//mat4x4 identity;
 	//mat4x4_identity(identity);
 
-	int shader_index = 0;
+	int shader_index = LWST_DEFAULT;
 
 	glUseProgram(pLwc->shader[shader_index].program);
 	glUniform2fv(pLwc->shader[shader_index].vuvoffset_location, 1, default_uv_offset);

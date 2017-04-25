@@ -2,7 +2,6 @@
 
 #include "lwgl.h"
 #include "linmath.h"
-
 #include "lwdamagetext.h"
 #include "lwbattlecreature.h"
 #include "lwenemy.h"
@@ -22,8 +21,18 @@
 #include "lwfieldobject.h"
 #include "lwfbo.h"
 #include "lwtrail.h"
+#include "armature.h"
 
-#define MAX_SHADER (3)
+typedef enum _LW_SHADER_TYPE {
+	LWST_DEFAULT,
+	LWST_FONT,
+	LWST_ETC1,
+	LWST_SKIN,
+
+	LWST_COUNT,
+} LW_SHADER_TYPE;
+
+#define MAX_SHADER (LWST_COUNT)
 #define MAX_ANIM_COUNT (10)
 #define ANIM_FPS (60)
 #define MAX_TOUCHPROC_COUNT (10)
@@ -57,6 +66,7 @@ static const char* tex_font_atlas_filename[] = {
 #define MAX_PLAYER_SLOT (4)
 #define MAX_ENEMY_SLOT (5)
 #define VERTEX_BUFFER_COUNT LVT_COUNT
+#define SKIN_VERTEX_BUFFER_COUNT LSVT_COUNT
 
 
 typedef struct _LWCONTEXT {
@@ -66,8 +76,10 @@ typedef struct _LWCONTEXT {
 
 	LWSHADER shader[MAX_SHADER];
 	LWVBO vertex_buffer[VERTEX_BUFFER_COUNT];
+	LWVBO skin_vertex_buffer[SKIN_VERTEX_BUFFER_COUNT];
 	//GLuint index_buffer;
 	GLuint vao[VERTEX_BUFFER_COUNT];
+	GLuint skin_vao[SKIN_VERTEX_BUFFER_COUNT];
 
 	GLuint tex_atlas[MAX_TEX_ATLAS];
 	int tex_atlas_width[MAX_TEX_ATLAS];
@@ -176,4 +188,8 @@ typedef struct _LWCONTEXT {
 	// Script
 
 	void* L; // lua VM
+
+	// Skin
+
+	LWARMATURE armature;
 } LWCONTEXT;

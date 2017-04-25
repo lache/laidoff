@@ -18,3 +18,8 @@ void render_solid_vb_ui_flip_y_uv(const LWCONTEXT* pLwc,
 	GLuint tex_index,
 	enum _LW_VBO_TYPE lvt,
 	float alpha_multiplier, float or , float og, float ob, float oratio, int flip_y_uv);
+void render_solid_vb_ui_skin(const LWCONTEXT* pLwc,
+	float x, float y, float scale,
+	GLuint tex_index, GLuint tex_alpha_index,
+	enum _LW_SKIN_VBO_TYPE lvt,
+	float alpha_multiplier, float or , float og, float ob, float oratio);

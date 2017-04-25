@@ -266,6 +266,10 @@ src/tinyobj_loader_c.h
 src/unicode.c
 src/unicode.h
 src/vertices.h
+src/render_skin.c
+src/render_skin.h
+src/armature.c
+src/armature.h
 ${LUA_LIB}
 ${WIN32_DEPS}
 ${OSX_DEPS}

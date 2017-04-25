@@ -104,6 +104,8 @@ add_library(native-activity SHARED
             ../../../../../src/input.c
             ../../../../../src/field.c
             ../../../../../src/lwbattlecreature.c
+            ../../../../../src/armature.c
+            ../../../../../src/render_skin
             ${LUA_LIB}
             )
 

@@ -19,7 +19,7 @@ void render_enemy_scope(const LWCONTEXT* pLwc, float ux, float uy, float width, 
 		return;
 	}
 
-	int shader_index = 2; // ETC1 with alpha shader...
+	int shader_index = LWST_ETC1;
 
 	float scale = 0.2f;
 	//float sprite_aspect_ratio = 1.0f;
@@ -186,7 +186,7 @@ void render_enemy_shadow_3d(
 	mat4x4_mul(pvm, view, pvm);
 	mat4x4_mul(pvm, proj, pvm);
 
-	int shader_index = 0;
+	int shader_index = LWST_DEFAULT;
 
 	glUseProgram(pLwc->shader[shader_index].program);
 	glUniform2fv(pLwc->shader[shader_index].vuvoffset_location, 1, default_uv_offset);
@@ -218,7 +218,7 @@ void render_enemy_3d(
 	const mat4x4 view,
 	const mat4x4 proj) {
 
-	int shader_index = 0;
+	int shader_index = LWST_DEFAULT;
 
 	float sprite_aspect_ratio = 1.0f;
 
@@ -312,7 +312,8 @@ void render_attack_trail_3d(
 	const LWTRAIL* trail,
 	const mat4x4 view,
 	const mat4x4 proj) {
-	int shader_index = 2; // ETC1 with alpha shader...
+
+	int shader_index = LWST_ETC1;
 
 	float scale = 1.0f;
 	//float sprite_aspect_ratio = 1.0f;
@@ -394,7 +395,7 @@ void render_damage_text_3d(
 }
 
 static void render_battle_twirl(const LWCONTEXT* pLwc, const mat4x4 view, const mat4x4 proj) {
-	int shader_index = 0;
+	int shader_index = LWST_DEFAULT;
 
 	glUseProgram(pLwc->shader[shader_index].program);
 	glUniform1f(pLwc->shader[shader_index].overlay_color_ratio_location, 0);
@@ -902,7 +903,7 @@ void lwc_render_battle(const LWCONTEXT* pLwc) {
 	//mat4x4_identity(identity);
 
 
-	int shader_index = 0;
+	int shader_index = LWST_DEFAULT;
 
 	glUseProgram(pLwc->shader[shader_index].program);
 

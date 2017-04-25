@@ -15,3 +15,9 @@ typedef enum _LW_VBO_TYPE
 
 	LVT_COUNT,
 } LW_VBO_TYPE;
+
+typedef enum _LW_SKIN_VBO_TYPE {
+	LSVT_TRIANGLE,
+
+	LSVT_COUNT,
+} LW_SKIN_VBO_TYPE;

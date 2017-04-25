@@ -1,7 +1,6 @@
 #pragma once 
 
-typedef struct
-{
+typedef struct _LWVERTEX {
 	float x, y, z;
 	float r, g, b;
 	float u, v;
@@ -19,3 +18,11 @@ static const LWVERTEX full_square_vertices[] =
 };
 
 #define VERTEX_COUNT_PER_ARRAY (6)
+
+typedef struct _LWSKINVERTEX{
+	float x, y, z;
+	float r, g, b;
+	float u, v;
+	float bw0, bw1, bw2, bw3;
+	float bm0, bm1, bm2, bm3;
+} LWSKINVERTEX;

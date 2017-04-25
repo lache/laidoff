@@ -6,7 +6,7 @@
 
 static void render_field_object(const LWCONTEXT* pLwc, int vbo_index, GLuint tex_id, mat4x4 view, mat4x4 proj, float x, float y, float sx, float sy, float alpha_multiplier)
 {
-	int shader_index = 0;
+	int shader_index = LWST_DEFAULT;
 
 	mat4x4 model;
 	mat4x4_identity(model);
@@ -40,7 +40,7 @@ static void render_field_object(const LWCONTEXT* pLwc, int vbo_index, GLuint tex
 
 static void render_ground(const LWCONTEXT* pLwc, const mat4x4 view, const mat4x4 proj)
 {
-	int shader_index = 0;
+	int shader_index = LWST_DEFAULT;
 	const int vbo_index = LVT_CENTER_CENTER_ANCHORED_SQUARE;
 
 	const float quad_scale = 10;
@@ -72,7 +72,7 @@ static void render_ground(const LWCONTEXT* pLwc, const mat4x4 view, const mat4x4
 
 static void render_ui(const LWCONTEXT* pLwc)
 {
-	int shader_index = 0;
+	int shader_index = LWST_DEFAULT;
 	const int vbo_index = LVT_CENTER_CENTER_ANCHORED_SQUARE;
 
 	//float aspect_ratio = (float)pLwc->width / pLwc->height;
@@ -106,7 +106,7 @@ void lwc_render_field(const LWCONTEXT* pLwc)
 	glViewport(0, 0, pLwc->width, pLwc->height);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-	int shader_index = 0;
+	int shader_index = LWST_DEFAULT;
 
 	glUseProgram(pLwc->shader[shader_index].program);
 	glUniform2fv(pLwc->shader[shader_index].vuvoffset_location, 1, default_uv_offset);
