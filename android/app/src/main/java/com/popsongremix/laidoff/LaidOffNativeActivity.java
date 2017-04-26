@@ -68,6 +68,7 @@ public class LaidOffNativeActivity extends NativeActivity
         assetsLoader.registerAllAssetsOfType("vbo");
         assetsLoader.registerAllAssetsOfType("svbo");
         assetsLoader.registerAllAssetsOfType("armature");
+        assetsLoader.registerAllAssetsOfType("action");
         assetsLoader.registerAllAssetsOfType("fnt");
         assetsLoader.registerAllAssetsOfType("d");
         assetsLoader.registerAllAssetsOfType("glsles");

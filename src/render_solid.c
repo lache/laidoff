@@ -1,6 +1,7 @@
 #include "lwcontext.h"
 #include "render_solid.h"
 #include "laidoff.h"
+#include "lwanim.h"
 
 void render_solid_box_ui_lvt_flip_y_uv(const LWCONTEXT* pLwc, float x, float y, float w, float h, GLuint tex_index, enum _LW_VBO_TYPE lvt, int flip_y_uv)
 {
@@ -122,19 +123,42 @@ void render_solid_vb_ui_skin(const LWCONTEXT* pLwc,
 
 	int shader_index = LWST_SKIN;
 
+	// MAX_BONE should be matched with a shader code
 #define MAX_BONE (32)
 
-	vec3 bone_trans[] = {
-		{ -1, 0, 0 },
-		{ 0, 1, 0 },
-		{ 0, 0.5f, 0 },
-	};
+	vec3 bone_trans[3] = { 0, };
+	quat bone_q[3];
+	for (int i = 0; i < ARRAY_SIZE(bone_q); i++) {
+		quat_identity(bone_q[i]);
+	}
 
+	const float t = (float)(pLwc->skin_time * 60); // 60 = FPS
+
+	for (int i = 0; i < pLwc->action.curve_num; i++) {
+		const LWANIMCURVE* curve = &pLwc->action.anim_curve[i];
+
+		int bi = curve->bone_index;
+		int ci = curve->anim_curve_index;
+		const LWANIMKEY* anim_key = pLwc->action.anim_key + curve->key_offset;
+
+		if (curve->anim_curve_type == LACT_LOCATION) {
+			get_curve_value(anim_key, curve->key_num, t, &bone_trans[bi][ci]);
+		}
+
+		if (curve->anim_curve_type == LACT_ROTATION_QUATERNION) {
+			// Anim curve saved in w, x, y, z order, but client needs x, y, z, w order.
+			get_curve_value(anim_key, curve->key_num, t, &bone_q[bi][(ci + 3) % 4]);
+		}
+
+	}
+
+	/*
 	float bone_rot[] = {
-		LWDEG2RAD(45),
-		LWDEG2RAD(90),
-		LWDEG2RAD(0),
+		(float)LWDEG2RAD(0),
+		(float)LWDEG2RAD(0),
+		(float)LWDEG2RAD(0),
 	};
+	*/
 
 	mat4x4 bone[MAX_BONE];
 	for (int i = 0; i < MAX_BONE; i++) {
@@ -142,6 +166,9 @@ void render_solid_vb_ui_skin(const LWCONTEXT* pLwc,
 		//mat4x4_scale_aniso(bone[i], bone[i], 2, 2, 2);
 		//mat4x4_translate(bone[i], 1, -1, 0);
 	}
+
+	//mat4x4 identity;
+	//mat4x4_identity(identity);
 
 	for (int i = 0; i < pLwc->armature.count; i++) {
 		mat4x4 bone_mat_inv;
@@ -151,8 +178,9 @@ void render_solid_vb_ui_skin(const LWCONTEXT* pLwc,
 		mat4x4_translate(bone_mat_trans, bone_trans[i][0], bone_trans[i][1], bone_trans[i][2]);
 
 		mat4x4 bone_mat_rot;
-		mat4x4_identity(bone_mat_rot);
-		mat4x4_rotate_Z(bone_mat_rot, bone_mat_rot, bone_rot[i]);
+		//mat4x4_identity(bone_mat_rot);
+		//mat4x4_rotate_Z(bone_mat_rot, bone_mat_rot, bone_rot[i]);
+		mat4x4_from_quat(bone_mat_rot, bone_q[i]);
 
 		mat4x4_mul(bone[i], bone_mat_rot, bone_mat_inv);
 		mat4x4_mul(bone[i], bone_mat_trans, bone[i]);

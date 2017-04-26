@@ -42,7 +42,7 @@ android {
     }
 
     aaptOptions {
-        noCompress 'vbo', 'png', 'tga', 'fnt', 'txt', 'pvr', 'pkm', 'ktx', 'glsl', 'lua', 'svbo', 'arm'
+        noCompress 'vbo', 'png', 'tga', 'fnt', 'txt', 'pvr', 'pkm', 'ktx', 'glsl', 'lua', 'svbo', 'arm', 'act'
     }
 }
 

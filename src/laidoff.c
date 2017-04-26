@@ -31,6 +31,7 @@
 #include "net.h"
 #include "render_skin.h"
 #include "armature.h"
+#include "lwanim.h"
 
 #define LWEPSILON (1e-3)
 #define INCREASE_RENDER_SCORE (20)
@@ -670,6 +671,8 @@ void reset_field_context(LWCONTEXT* pLwc) {
 
 void reset_runtime_context(LWCONTEXT* pLwc) {
 
+	pLwc->skin_time = 0;
+
 	pLwc->sprite_data = SPRITE_DATA[0];
 
 	pLwc->next_game_scene = LGS_SKIN;
@@ -956,6 +959,8 @@ void lwc_update(LWCONTEXT *pLwc, double delta_time) {
 	pLwc->app_time += pLwc->delta_time;
 	pLwc->scene_time += pLwc->delta_time;
 
+	pLwc->skin_time += pLwc->delta_time;
+
 	update_dialog(pLwc);
 
 	//****//
@@ -1200,6 +1205,10 @@ void init_armature(LWCONTEXT* pLwc) {
 	load_armature(ASSETS_BASE_PATH "armature" PATH_SEPARATOR "Armature.arm", &pLwc->armature);
 }
 
+void init_action(LWCONTEXT* pLwc) {
+	load_action(ASSETS_BASE_PATH "action" PATH_SEPARATOR "TestAction2.act", &pLwc->action);
+}
+
 LWCONTEXT *lw_init(void) {
 	init_ext_image_lib();
 
@@ -1223,10 +1232,15 @@ LWCONTEXT *lw_init(void) {
 
 	init_armature(pLwc);
 
+	init_action(pLwc);
+
 	return pLwc;
 }
 
 void lw_deinit(LWCONTEXT *pLwc) {
+
+	unload_action(&pLwc->action);
+
 	free(pLwc);
 }
 

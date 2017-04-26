@@ -149,11 +149,21 @@ void lw_trigger_mouse_release(LWCONTEXT *pLwc, float x, float y) {
 
 	const float aspect_ratio = (float)pLwc->width / pLwc->height;
 
+	// Touch left top corner of the screen
 	if (pLwc->game_scene != LGS_ADMIN
 		&& x < -aspect_ratio + 0.25f
 		&& y > 1.0f - 0.25f) {
 
 		change_to_admin(pLwc);
+		return;
+	}
+
+	// Touch right top corner of the screen
+	if (pLwc->game_scene != LGS_ADMIN
+		&& x > aspect_ratio - 0.25f
+		&& y > 1.0f - 0.25f) {
+
+		reset_runtime_context(pLwc);
 		return;
 	}
 

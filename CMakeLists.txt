@@ -193,6 +193,7 @@ src/input.h
 src/laidoff.c
 src/laidoff.h
 src/loadobj.c
+src/lwanim.c
 src/lwanim.h
 src/lwatlasenum.h
 src/lwatlassprite.h
