@@ -163,7 +163,7 @@ void lw_trigger_mouse_release(LWCONTEXT *pLwc, float x, float y) {
 		&& x > aspect_ratio - 0.25f
 		&& y > 1.0f - 0.25f) {
 
-		reset_runtime_context(pLwc);
+		reset_time(pLwc);
 		return;
 	}
 

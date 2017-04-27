@@ -2,6 +2,7 @@
 #include "render_solid.h"
 #include "laidoff.h"
 #include "lwanim.h"
+#include "lwlog.h"
 
 void render_solid_box_ui_lvt_flip_y_uv(const LWCONTEXT* pLwc, float x, float y, float w, float h, GLuint tex_index, enum _LW_VBO_TYPE lvt, int flip_y_uv)
 {
@@ -126,7 +127,12 @@ void render_solid_vb_ui_skin(const LWCONTEXT* pLwc,
 	int shader_index = LWST_SKIN;
 
 	// MAX_BONE should be matched with a shader code
-#define MAX_BONE (32)
+#define MAX_BONE (16)
+
+	if (armature->count > MAX_BONE) {
+		LOGE("Armature bone count (=%d) exceeding the supported bone count(=%d)!", armature->count, MAX_BONE);
+		return;
+	}
 
 	vec3 bone_trans[MAX_BONE] = { 0, };
 	quat bone_q[MAX_BONE];

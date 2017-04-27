@@ -674,9 +674,13 @@ void reset_field_context(LWCONTEXT* pLwc) {
 	pLwc->player_pos_y = 0;
 }
 
+void reset_time(LWCONTEXT* pLwc) {
+	pLwc->skin_time = 0;
+}
+
 void reset_runtime_context(LWCONTEXT* pLwc) {
 
-	pLwc->skin_time = 0;
+	reset_time(pLwc);
 
 	pLwc->sprite_data = SPRITE_DATA[0];
 

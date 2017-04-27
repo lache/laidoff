@@ -61,6 +61,7 @@ void change_to_skin(LWCONTEXT *pLwc);
 
 void toggle_font_texture_test_mode(LWCONTEXT* pLwc);
 void reset_runtime_context(LWCONTEXT* pLwc);
+void reset_time(LWCONTEXT* pLwc);
 
 #ifndef __cplusplus
 enum _LW_ATLAS_ENUM;
