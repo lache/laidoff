@@ -22,4 +22,6 @@ void render_solid_vb_ui_skin(const LWCONTEXT* pLwc,
 	float x, float y, float scale,
 	GLuint tex_index, GLuint tex_alpha_index,
 	enum _LW_SKIN_VBO_TYPE lvt,
+	const struct _LWANIMACTION* action,
+	const struct _LWARMATURE* armature,
 	float alpha_multiplier, float or , float og, float ob, float oratio);

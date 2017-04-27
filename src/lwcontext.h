@@ -191,7 +191,7 @@ typedef struct _LWCONTEXT {
 
 	// Skin
 
-	LWARMATURE armature;
-	LWANIMACTION action;
+	LWARMATURE armature[LWAR_COUNT];
+	LWANIMACTION action[LWAC_COUNT];
 	double skin_time;
 } LWCONTEXT;

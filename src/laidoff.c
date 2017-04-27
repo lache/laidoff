@@ -32,6 +32,7 @@
 #include "render_skin.h"
 #include "armature.h"
 #include "lwanim.h"
+#include "lwskinmesh.h"
 
 #define LWEPSILON (1e-3)
 #define INCREASE_RENDER_SCORE (20)
@@ -434,6 +435,10 @@ static void init_vbo(LWCONTEXT *pLwc) {
 	// LSVT_TRIANGLE
 	load_skin_vbo(pLwc, ASSETS_BASE_PATH "svbo" PATH_SEPARATOR "Triangle.svbo",
 		&pLwc->skin_vertex_buffer[LSVT_TRIANGLE]);
+
+	// LSVT_TREEPLANE
+	load_skin_vbo(pLwc, ASSETS_BASE_PATH "svbo" PATH_SEPARATOR "TreePlane.svbo",
+		&pLwc->skin_vertex_buffer[LSVT_TREEPLANE]);
 }
 
 void set_vertex_attrib_pointer(const LWCONTEXT* pLwc, int shader_index) {
@@ -1202,11 +1207,15 @@ void load_test_font(LWCONTEXT *pLwc) {
 }
 
 void init_armature(LWCONTEXT* pLwc) {
-	load_armature(ASSETS_BASE_PATH "armature" PATH_SEPARATOR "Armature.arm", &pLwc->armature);
+	for (int i = 0; i < LWAR_COUNT; i++) {
+		load_armature(armature_filename[i], &pLwc->armature[i]);
+	}
 }
 
 void init_action(LWCONTEXT* pLwc) {
-	load_action(ASSETS_BASE_PATH "action" PATH_SEPARATOR "TestAction2.act", &pLwc->action);
+	for (int i = 0; i < LWAC_COUNT; i++) {
+		load_action(action_filename[i], &pLwc->action[i]);
+	}
 }
 
 LWCONTEXT *lw_init(void) {
@@ -1239,7 +1248,13 @@ LWCONTEXT *lw_init(void) {
 
 void lw_deinit(LWCONTEXT *pLwc) {
 
-	unload_action(&pLwc->action);
+	for (int i = 0; i < LWAC_COUNT; i++) {
+		unload_action(&pLwc->action[i]);
+	}
+
+	for (int i = 0; i < LWAR_COUNT; i++) {
+		unload_armature(&pLwc->armature[i]);
+	}
 
 	free(pLwc);
 }

@@ -54,6 +54,15 @@ void lwc_render_skin(const struct _LWCONTEXT* pLwc) {
 	render_solid_vb_ui_skin(pLwc, 0, 0, 0.5f,
 		pLwc->tex_atlas[LAE_C_TOFU_KTX], pLwc->tex_atlas[LAE_C_TOFU_ALPHA_KTX],
 		LSVT_TRIANGLE,
+		&pLwc->action[LWAC_TESTACTION2],
+		&pLwc->armature[LWAR_ARMATURE],
+		1, 0, 0, 0, 0);
+
+	render_solid_vb_ui_skin(pLwc, 0, 0, 0.5f,
+		pLwc->tex_atlas[LAE_C_TOFU_KTX], pLwc->tex_atlas[LAE_C_TOFU_ALPHA_KTX],
+		LSVT_TREEPLANE,
+		&pLwc->action[LWAC_TREEARMATUREACTION],
+		&pLwc->armature[LWAR_TREEARMATURE],
 		1, 0, 0, 0, 0);
 
 	glEnable(GL_DEPTH_TEST);

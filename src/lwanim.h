@@ -1,5 +1,6 @@
 #pragma once
 #include <linmath.h>
+#include "lwmacro.h"
 
 typedef struct _LWKEYFRAME LWKEYFRAME;
 typedef struct _LWCONTEXT LWCONTEXT;
@@ -33,6 +34,7 @@ typedef enum _LW_ANIM_CURVE_TYPE {
 	LACT_LINEAR,
 	LACT_LOCATION,
 	LACT_ROTATION_QUATERNION,
+	LACT_SCALE,
 } LW_ANIM_CURVE_TYPE;
 
 typedef struct _LWANIMKEY {
@@ -66,6 +68,19 @@ typedef struct _LWANIMACTION {
 	LWANIMKEY* anim_key;
 	char* d;
 } LWANIMACTION;
+
+
+typedef enum _LW_ACTION {
+	LWAC_TESTACTION2,
+	LWAC_TREEARMATUREACTION,
+
+	LWAC_COUNT,
+} LW_ACTION;
+
+static const char* action_filename[] = {
+	ASSETS_BASE_PATH "action" PATH_SEPARATOR "TestAction2.act",
+	ASSETS_BASE_PATH "action" PATH_SEPARATOR "TreeArmatureAction.act",
+};
 
 void load_action(const char* filename, LWANIMACTION* action);
 void unload_action(LWANIMACTION* action);

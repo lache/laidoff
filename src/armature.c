@@ -6,8 +6,9 @@ int load_armature(const char* filename, LWARMATURE* ar) {
 	size_t s;
 	char* c = create_binary_from_file(filename, &s);
 	int bone_count = (int)(s / sizeof(mat4x4));
-	ar->count = bone_count;
-	ar->mat = (mat4x4*)c;
+	ar->count = *(int*)c;
+	ar->mat = (mat4x4*)(c + sizeof(int));
+	ar->parent_index = (int*)(c + sizeof(int) + sizeof(mat4x4) * bone_count);
 	return 0;
 }
 

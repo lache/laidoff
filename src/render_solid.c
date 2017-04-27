@@ -119,6 +119,8 @@ void render_solid_vb_ui_skin(const LWCONTEXT* pLwc,
 	float x, float y, float scale,
 	GLuint tex_index, GLuint tex_alpha_index,
 	enum _LW_SKIN_VBO_TYPE lvt,
+	const struct _LWANIMACTION* action,
+	const struct _LWARMATURE* armature,
 	float alpha_multiplier, float or, float og, float ob, float oratio) {
 
 	int shader_index = LWST_SKIN;
@@ -126,68 +128,77 @@ void render_solid_vb_ui_skin(const LWCONTEXT* pLwc,
 	// MAX_BONE should be matched with a shader code
 #define MAX_BONE (32)
 
-	vec3 bone_trans[3] = { 0, };
-	quat bone_q[3];
+	vec3 bone_trans[MAX_BONE] = { 0, };
+	quat bone_q[MAX_BONE];
 	for (int i = 0; i < ARRAY_SIZE(bone_q); i++) {
 		quat_identity(bone_q[i]);
 	}
 
-	const float t = (float)(pLwc->skin_time * 60); // 60 = FPS
+	const float f = (float)(pLwc->skin_time * 60); // 60 = FPS
+	//const float f = 0;// 89;
 
-	for (int i = 0; i < pLwc->action.curve_num; i++) {
-		const LWANIMCURVE* curve = &pLwc->action.anim_curve[i];
+	for (int i = 0; i < action->curve_num; i++) {
+		const LWANIMCURVE* curve = &action->anim_curve[i];
 
 		int bi = curve->bone_index;
 		int ci = curve->anim_curve_index;
-		const LWANIMKEY* anim_key = pLwc->action.anim_key + curve->key_offset;
+		const LWANIMKEY* anim_key = action->anim_key + curve->key_offset;
 
 		if (curve->anim_curve_type == LACT_LOCATION) {
-			get_curve_value(anim_key, curve->key_num, t, &bone_trans[bi][ci]);
+			get_curve_value(anim_key, curve->key_num, f, &bone_trans[bi][ci]);
 		}
 
 		if (curve->anim_curve_type == LACT_ROTATION_QUATERNION) {
 			// Anim curve saved in w, x, y, z order, but client needs x, y, z, w order.
-			get_curve_value(anim_key, curve->key_num, t, &bone_q[bi][(ci + 3) % 4]);
+			get_curve_value(anim_key, curve->key_num, f, &bone_q[bi][(ci + 3) % 4]);
 		}
 
 	}
 
-	/*
-	float bone_rot[] = {
-		(float)LWDEG2RAD(0),
-		(float)LWDEG2RAD(0),
-		(float)LWDEG2RAD(0),
-	};
-	*/
-
+	// Renormalize quaternion since linear interpolation applied by anim curve.
+	for (int i = 0; i < armature->count; i++) {
+		quat_norm(bone_q[i], bone_q[i]);
+	}
+	
 	mat4x4 bone[MAX_BONE];
-	for (int i = 0; i < MAX_BONE; i++) {
+	for (int i = 0; i < armature->count; i++) {
 		mat4x4_identity(bone[i]);
-		//mat4x4_scale_aniso(bone[i], bone[i], 2, 2, 2);
-		//mat4x4_translate(bone[i], 1, -1, 0);
 	}
 
-	//mat4x4 identity;
-	//mat4x4_identity(identity);
-
-	for (int i = 0; i < pLwc->armature.count; i++) {
-		mat4x4 bone_mat_inv;
-		mat4x4_invert(bone_mat_inv, pLwc->armature.mat[i]);
-
-		mat4x4 bone_mat_trans;
-		mat4x4_translate(bone_mat_trans, bone_trans[i][0], bone_trans[i][1], bone_trans[i][2]);
-
-		mat4x4 bone_mat_rot;
-		//mat4x4_identity(bone_mat_rot);
-		//mat4x4_rotate_Z(bone_mat_rot, bone_mat_rot, bone_rot[i]);
-		mat4x4_from_quat(bone_mat_rot, bone_q[i]);
-
-		mat4x4_mul(bone[i], bone_mat_rot, bone_mat_inv);
-		mat4x4_mul(bone[i], bone_mat_trans, bone[i]);
-		mat4x4_mul(bone[i], pLwc->armature.mat[i], bone[i]);
+	mat4x4 bone_unmod_world[MAX_BONE];
+	for (int i = 0; i < armature->count; i++) {
+		if (armature->parent_index[i] >= 0) {
+			mat4x4_mul(bone_unmod_world[i], armature->mat[i], bone_unmod_world[armature->parent_index[i]]);
+		} else {
+			mat4x4_dup(bone_unmod_world[i], armature->mat[i]);
+		}
 	}
 
-	//memcpy(bone, pLwc->armature.mat, sizeof(mat4x4) * pLwc->armature.count);
+	for (int i = 0; i < armature->count; i++) {
+		mat4x4 bone_mat_anim_trans;
+		if (armature->parent_index[i] >= 0) {
+			// child bone should not have translation component. ignored...
+			mat4x4_identity(bone_mat_anim_trans);
+		} else {
+			mat4x4_translate(bone_mat_anim_trans, bone_trans[i][0], bone_trans[i][1], bone_trans[i][2]);
+		}
+
+		mat4x4 bone_mat_anim_rot;
+		mat4x4_from_quat(bone_mat_anim_rot, bone_q[i]);
+
+		mat4x4 trans_bone_to_origin, trans_bone_to_its_position;
+		mat4x4_translate(trans_bone_to_origin, -bone_unmod_world[i][3][0], -bone_unmod_world[i][3][1], -bone_unmod_world[i][3][2]);
+		mat4x4_translate(trans_bone_to_its_position, bone_unmod_world[i][3][0], bone_unmod_world[i][3][1], bone_unmod_world[i][3][2]);
+
+		mat4x4_identity(bone[i]);
+		mat4x4_mul(bone[i], trans_bone_to_origin, bone[i]);
+		mat4x4_mul(bone[i], bone_mat_anim_rot, bone[i]);
+		mat4x4_mul(bone[i], bone_mat_anim_trans, bone[i]);
+		mat4x4_mul(bone[i], trans_bone_to_its_position, bone[i]);
+		if (armature->parent_index[i] >= 0) {
+			mat4x4_mul(bone[i], bone[armature->parent_index[i]], bone[i]);
+		}
+	}
 
 	glUseProgram(pLwc->shader[shader_index].program);
 	glUniform2fv(pLwc->shader[shader_index].vuvoffset_location, 1, default_uv_offset);

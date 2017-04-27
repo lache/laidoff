@@ -63,7 +63,7 @@ int lower_bound_float(const float* a, int len, size_t stride, float v) {
 	return beg;
 }
 
-int get_curve_value(const LWANIMKEY* key, int key_len, float t, float* v) {
+int get_curve_value(const LWANIMKEY* key, int key_len, float f, float* v) {
 
 	if (key->interpolation != LACT_LINEAR) {
 		LOGE("get_curve_value: Only LACT_LINEAR supported. A curve value of 0 always returned.");
@@ -77,7 +77,7 @@ int get_curve_value(const LWANIMKEY* key, int key_len, float t, float* v) {
 		return -1;
 	}
 
-	int idx = lower_bound_float(&key[0].co[0], key_len, sizeof(LWANIMKEY), t);
+	int idx = lower_bound_float(&key[0].co[0], key_len, sizeof(LWANIMKEY), f);
 
 	if (idx == -1) {
 		*v = key[0].co[1];
@@ -87,7 +87,7 @@ int get_curve_value(const LWANIMKEY* key, int key_len, float t, float* v) {
 		float dx = key[idx + 1].co[0] - key[idx].co[0];
 		float dy = key[idx + 1].co[1] - key[idx].co[1];
 		float slope = dy / dx;
-		float tr = t - key[idx].co[0];
+		float tr = f - key[idx].co[0];
 
 		*v = key[idx].co[1] + slope * tr;
 	}
