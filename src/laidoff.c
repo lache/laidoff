@@ -439,6 +439,10 @@ static void init_vbo(LWCONTEXT *pLwc) {
 	// LSVT_TREEPLANE
 	load_skin_vbo(pLwc, ASSETS_BASE_PATH "svbo" PATH_SEPARATOR "TreePlane.svbo",
 		&pLwc->skin_vertex_buffer[LSVT_TREEPLANE]);
+
+	// LSVT_PLAYER
+	load_skin_vbo(pLwc, ASSETS_BASE_PATH "svbo" PATH_SEPARATOR "Player.svbo",
+		&pLwc->skin_vertex_buffer[LSVT_PLAYER]);
 }
 
 void set_vertex_attrib_pointer(const LWCONTEXT* pLwc, int shader_index) {
@@ -684,7 +688,7 @@ void reset_runtime_context(LWCONTEXT* pLwc) {
 
 	pLwc->sprite_data = SPRITE_DATA[0];
 
-	pLwc->next_game_scene = LGS_SKIN;
+	pLwc->next_game_scene = LGS_FIELD;
 
 	pLwc->font_texture_texture_mode = 0;
 

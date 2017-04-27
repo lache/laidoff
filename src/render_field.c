@@ -3,6 +3,7 @@
 #include "lwlog.h"
 #include "lwmacro.h"
 #include "laidoff.h"
+#include "render_solid.h"
 
 static void render_field_object(const LWCONTEXT* pLwc, int vbo_index, GLuint tex_id, mat4x4 view, mat4x4 proj, float x, float y, float sx, float sy, float alpha_multiplier)
 {
@@ -94,6 +95,7 @@ static void render_ui(const LWCONTEXT* pLwc)
 	mat4x4_identity(proj_view_model);
 	mat4x4_mul(proj_view_model, pLwc->proj, view_model);
 
+	glUseProgram(pLwc->shader[shader_index].program);
 	glBindBuffer(GL_ARRAY_BUFFER, pLwc->vertex_buffer[vbo_index].vertex_buffer);
 	bind_all_vertex_attrib(pLwc, vbo_index);
 	glUniformMatrix4fv(pLwc->shader[shader_index].mvp_location, 1, GL_FALSE, (const GLfloat*)proj_view_model);
@@ -121,9 +123,9 @@ void lwc_render_field(const LWCONTEXT* pLwc)
 	const float screen_aspect_ratio = (float)pLwc->width / pLwc->height;
 
 	mat4x4 perspective;
-	mat4x4_perspective(perspective, (float)(LWDEG2RAD(49.134) / screen_aspect_ratio), screen_aspect_ratio, 1.0f, 50.0f);
+	mat4x4_perspective(perspective, (float)(LWDEG2RAD(49.134) / screen_aspect_ratio), screen_aspect_ratio, 1.0f, 500.0f);
 
-	const float cam_dist = 20;
+	const float cam_dist = 50;
 	mat4x4 view;
 	vec3 eye = { pLwc->player_pos_x, pLwc->player_pos_y - cam_dist, cam_dist };
 	vec3 center = { pLwc->player_pos_x, pLwc->player_pos_y, 0.0f };
@@ -152,6 +154,16 @@ void lwc_render_field(const LWCONTEXT* pLwc)
 			);
 		}
 	}
+
+	mat4x4 skin_model;
+	mat4x4_identity(skin_model);
+
+	render_skin(pLwc,
+		pLwc->tex_atlas[LAE_C_TOFU_KTX], pLwc->tex_atlas[LAE_C_TOFU_ALPHA_KTX],
+		LSVT_PLAYER,
+		&pLwc->action[LWAC_PLAYERACTION],
+		&pLwc->armature[LWAR_PLAYERARMATURE],
+		1, 0, 0, 0, 0, perspective, view, skin_model);
 
 	render_ui(pLwc);
 	

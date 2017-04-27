@@ -116,18 +116,18 @@ void render_solid_vb_ui_alpha(const LWCONTEXT* pLwc,
 	glActiveTexture(GL_TEXTURE0);
 }
 
-void render_solid_vb_ui_skin(const LWCONTEXT* pLwc,
-	float x, float y, float scale,
+void render_skin(const LWCONTEXT* pLwc,
 	GLuint tex_index, GLuint tex_alpha_index,
 	enum _LW_SKIN_VBO_TYPE lvt,
 	const struct _LWANIMACTION* action,
 	const struct _LWARMATURE* armature,
-	float alpha_multiplier, float or, float og, float ob, float oratio) {
+	float alpha_multiplier, float or , float og, float ob, float oratio,
+	const mat4x4 proj, const mat4x4 view, const mat4x4 model) {
 
 	int shader_index = LWST_SKIN;
 
 	// MAX_BONE should be matched with a shader code
-#define MAX_BONE (16)
+#define MAX_BONE (32)
 
 	if (armature->count > MAX_BONE) {
 		LOGE("Armature bone count (=%d) exceeding the supported bone count(=%d)!", armature->count, MAX_BONE);
@@ -174,7 +174,7 @@ void render_solid_vb_ui_skin(const LWCONTEXT* pLwc,
 	mat4x4 bone_unmod_world[MAX_BONE];
 	for (int i = 0; i < armature->count; i++) {
 		if (armature->parent_index[i] >= 0) {
-			mat4x4_mul(bone_unmod_world[i], armature->mat[i], bone_unmod_world[armature->parent_index[i]]);
+			mat4x4_mul(bone_unmod_world[i], bone_unmod_world[armature->parent_index[i]], armature->mat[i]);
 		} else {
 			mat4x4_dup(bone_unmod_world[i], armature->mat[i]);
 		}
@@ -192,15 +192,19 @@ void render_solid_vb_ui_skin(const LWCONTEXT* pLwc,
 		mat4x4 bone_mat_anim_rot;
 		mat4x4_from_quat(bone_mat_anim_rot, bone_q[i]);
 
+		mat4x4 bone_unmod_world_inv;
+		mat4x4_invert(bone_unmod_world_inv, bone_unmod_world[i]);
+
 		mat4x4 trans_bone_to_origin, trans_bone_to_its_position;
 		mat4x4_translate(trans_bone_to_origin, -bone_unmod_world[i][3][0], -bone_unmod_world[i][3][1], -bone_unmod_world[i][3][2]);
 		mat4x4_translate(trans_bone_to_its_position, bone_unmod_world[i][3][0], bone_unmod_world[i][3][1], bone_unmod_world[i][3][2]);
 
 		mat4x4_identity(bone[i]);
-		mat4x4_mul(bone[i], trans_bone_to_origin, bone[i]);
+		mat4x4_mul(bone[i], bone_unmod_world_inv, bone[i]);
 		mat4x4_mul(bone[i], bone_mat_anim_rot, bone[i]);
 		mat4x4_mul(bone[i], bone_mat_anim_trans, bone[i]);
-		mat4x4_mul(bone[i], trans_bone_to_its_position, bone[i]);
+		mat4x4_mul(bone[i], bone_unmod_world[i], bone[i]);
+		
 		if (armature->parent_index[i] >= 0) {
 			mat4x4_mul(bone[i], bone[armature->parent_index[i]], bone[i]);
 		}
@@ -217,21 +221,11 @@ void render_solid_vb_ui_skin(const LWCONTEXT* pLwc,
 	glUniformMatrix4fv(pLwc->shader[shader_index].mvp_location, 1, GL_FALSE, (const GLfloat*)pLwc->proj);
 	glUniformMatrix4fv(pLwc->shader[shader_index].bone_location, MAX_BONE, GL_FALSE, (const GLfloat*)bone);
 
-	mat4x4 model_translate;
-	mat4x4 model;
-	mat4x4 identity_view; mat4x4_identity(identity_view);
 	mat4x4 view_model;
 	mat4x4 proj_view_model;
-	mat4x4 model_scale;
-
-	mat4x4_identity(model_scale);
-	mat4x4_scale_aniso(model_scale, model_scale, scale, scale, scale);
-	mat4x4_translate(model_translate, x, y, 0);
-	mat4x4_identity(model);
-	mat4x4_mul(model, model_translate, model_scale);
-	mat4x4_mul(view_model, identity_view, model);
-	mat4x4_identity(proj_view_model);
-	mat4x4_mul(proj_view_model, pLwc->proj, view_model);
+	
+	mat4x4_mul(view_model, view, model);
+	mat4x4_mul(proj_view_model, proj, view_model);
 
 	glBindBuffer(GL_ARRAY_BUFFER, pLwc->skin_vertex_buffer[lvt].vertex_buffer);
 	bind_all_skin_vertex_attrib(pLwc, lvt);
@@ -245,6 +239,30 @@ void render_solid_vb_ui_skin(const LWCONTEXT* pLwc,
 	glDrawArrays(GL_TRIANGLES, 0, pLwc->skin_vertex_buffer[lvt].vertex_count);
 
 	glActiveTexture(GL_TEXTURE0);
+}
+
+void render_solid_vb_ui_skin(const LWCONTEXT* pLwc,
+	float x, float y, float scale,
+	GLuint tex_index, GLuint tex_alpha_index,
+	enum _LW_SKIN_VBO_TYPE lvt,
+	const struct _LWANIMACTION* action,
+	const struct _LWARMATURE* armature,
+	float alpha_multiplier, float or , float og, float ob, float oratio) {
+
+	mat4x4 model;
+	mat4x4 model_translate;
+	mat4x4 model_scale;
+
+	mat4x4_identity(model_scale);
+	mat4x4_scale_aniso(model_scale, model_scale, scale, scale, scale);
+	mat4x4_translate(model_translate, x, y, 0);
+	mat4x4_identity(model);
+	mat4x4_mul(model, model_translate, model_scale);
+
+	mat4x4 identity_view;
+	mat4x4_identity(identity_view);
+
+	render_skin(pLwc, tex_index, tex_alpha_index, lvt, action, armature, alpha_multiplier, or , og, ob, oratio, pLwc->proj, identity_view, model);
 }
 
 void render_solid_vb_ui(const LWCONTEXT* pLwc,

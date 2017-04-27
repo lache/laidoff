@@ -73,6 +73,9 @@ typedef struct _LWANIMACTION {
 typedef enum _LW_ACTION {
 	LWAC_TESTACTION2,
 	LWAC_TREEARMATUREACTION,
+	LWAC_PLAYERACTION,
+	LWAC_PLAYERSIMPLEACTION,
+	LWAC_PLAYERLEFTARMACTION,
 
 	LWAC_COUNT,
 } LW_ACTION;
@@ -80,6 +83,9 @@ typedef enum _LW_ACTION {
 static const char* action_filename[] = {
 	ASSETS_BASE_PATH "action" PATH_SEPARATOR "TestAction2.act",
 	ASSETS_BASE_PATH "action" PATH_SEPARATOR "TreeArmatureAction.act",
+	ASSETS_BASE_PATH "action" PATH_SEPARATOR "PlayerAction.act",
+	ASSETS_BASE_PATH "action" PATH_SEPARATOR "PlayerSimpleAction.act",
+	ASSETS_BASE_PATH "action" PATH_SEPARATOR "PlayerLeftArmAction.act",
 };
 
 void load_action(const char* filename, LWANIMACTION* action);

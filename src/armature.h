@@ -12,6 +12,7 @@ typedef struct _LWARMATURE {
 typedef enum _LW_ARMATURE {
 	LWAR_ARMATURE,
 	LWAR_TREEARMATURE,
+	LWAR_PLAYERARMATURE,
 
 	LWAR_COUNT,
 } LW_ARMATURE;
@@ -19,6 +20,7 @@ typedef enum _LW_ARMATURE {
 static const char* armature_filename[] = {
 	ASSETS_BASE_PATH "armature" PATH_SEPARATOR "Armature.arm",
 	ASSETS_BASE_PATH "armature" PATH_SEPARATOR "TreeArmature.arm",
+	ASSETS_BASE_PATH "armature" PATH_SEPARATOR "PlayerArmature.arm",
 };
 
 int load_armature(const char* filename, LWARMATURE* ar);

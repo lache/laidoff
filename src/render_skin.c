@@ -65,5 +65,14 @@ void lwc_render_skin(const struct _LWCONTEXT* pLwc) {
 		&pLwc->armature[LWAR_TREEARMATURE],
 		1, 0, 0, 0, 0);
 
+	/*
+	render_solid_vb_ui_skin(pLwc, 0, 0, 0.5f,
+		pLwc->tex_atlas[LAE_C_TOFU_KTX], pLwc->tex_atlas[LAE_C_TOFU_ALPHA_KTX],
+		LSVT_PLAYER,
+		&pLwc->action[LWAC_PLAYERACTION],
+		&pLwc->armature[LWAR_PLAYERARMATURE],
+		1, 0, 0, 0, 0);
+	*/
+
 	glEnable(GL_DEPTH_TEST);
 }
