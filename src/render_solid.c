@@ -117,7 +117,7 @@ void render_solid_vb_ui_alpha(const LWCONTEXT* pLwc,
 }
 
 void render_skin(const LWCONTEXT* pLwc,
-	GLuint tex_index, GLuint tex_alpha_index,
+	GLuint tex_index,
 	enum _LW_SKIN_VBO_TYPE lvt,
 	const struct _LWANIMACTION* action,
 	const struct _LWARMATURE* armature,
@@ -127,7 +127,7 @@ void render_skin(const LWCONTEXT* pLwc,
 	int shader_index = LWST_SKIN;
 
 	// MAX_BONE should be matched with a shader code
-#define MAX_BONE (32)
+#define MAX_BONE (40)
 
 	if (armature->count > MAX_BONE) {
 		LOGE("Armature bone count (=%d) exceeding the supported bone count(=%d)!", armature->count, MAX_BONE);
@@ -140,7 +140,7 @@ void render_skin(const LWCONTEXT* pLwc,
 		quat_identity(bone_q[i]);
 	}
 
-	const float f = (float)(pLwc->skin_time * 60); // 60 = FPS
+	const float f = (float)(pLwc->skin_time * 23.98f); // FPS multiplied
 	//const float f = 0;// 89;
 
 	for (int i = 0; i < action->curve_num; i++) {
@@ -232,9 +232,6 @@ void render_skin(const LWCONTEXT* pLwc,
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, tex_index);
 	set_tex_filter(GL_LINEAR, GL_LINEAR);
-	glActiveTexture(GL_TEXTURE1);
-	glBindTexture(GL_TEXTURE_2D, tex_alpha_index);
-	set_tex_filter(GL_LINEAR, GL_LINEAR);
 	glUniformMatrix4fv(pLwc->shader[shader_index].mvp_location, 1, GL_FALSE, (const GLfloat*)proj_view_model);
 	glDrawArrays(GL_TRIANGLES, 0, pLwc->skin_vertex_buffer[lvt].vertex_count);
 
@@ -243,7 +240,7 @@ void render_skin(const LWCONTEXT* pLwc,
 
 void render_solid_vb_ui_skin(const LWCONTEXT* pLwc,
 	float x, float y, float scale,
-	GLuint tex_index, GLuint tex_alpha_index,
+	GLuint tex_index,
 	enum _LW_SKIN_VBO_TYPE lvt,
 	const struct _LWANIMACTION* action,
 	const struct _LWARMATURE* armature,
@@ -262,7 +259,7 @@ void render_solid_vb_ui_skin(const LWCONTEXT* pLwc,
 	mat4x4 identity_view;
 	mat4x4_identity(identity_view);
 
-	render_skin(pLwc, tex_index, tex_alpha_index, lvt, action, armature, alpha_multiplier, or , og, ob, oratio, pLwc->proj, identity_view, model);
+	render_skin(pLwc, tex_index, lvt, action, armature, alpha_multiplier, or , og, ob, oratio, pLwc->proj, identity_view, model);
 }
 
 void render_solid_vb_ui(const LWCONTEXT* pLwc,

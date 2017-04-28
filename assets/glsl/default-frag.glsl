@@ -11,7 +11,7 @@ out vec4 fragColor;
 
 void main()
 {
-    vec4 t = texture(diffuse, uv) + vec4(color, 0.0);
+    vec4 t = texture(diffuse, uv); // + vec4(color, 0.0);
     fragColor = (1.0 - overlay_color_ratio) * t + overlay_color_ratio * vec4(overlay_color, t.a);
     fragColor.a *= alpha_multiplier;
 }

@@ -440,9 +440,13 @@ static void init_vbo(LWCONTEXT *pLwc) {
 	load_skin_vbo(pLwc, ASSETS_BASE_PATH "svbo" PATH_SEPARATOR "TreePlane.svbo",
 		&pLwc->skin_vertex_buffer[LSVT_TREEPLANE]);
 
-	// LSVT_PLAYER
-	load_skin_vbo(pLwc, ASSETS_BASE_PATH "svbo" PATH_SEPARATOR "Player.svbo",
-		&pLwc->skin_vertex_buffer[LSVT_PLAYER]);
+	// LSVT_HUMAN
+	load_skin_vbo(pLwc, ASSETS_BASE_PATH "svbo" PATH_SEPARATOR "Human.svbo",
+		&pLwc->skin_vertex_buffer[LSVT_HUMAN]);
+
+	// LSVT_DETACHPLANE
+	load_skin_vbo(pLwc, ASSETS_BASE_PATH "svbo" PATH_SEPARATOR "DetachPlane.svbo",
+		&pLwc->skin_vertex_buffer[LSVT_DETACHPLANE]);
 }
 
 void set_vertex_attrib_pointer(const LWCONTEXT* pLwc, int shader_index) {
@@ -1365,4 +1369,8 @@ void lw_on_destroy(LWCONTEXT *pLwc) {
 	release_font(pLwc->pFnt);
 	release_string(pLwc->dialog);
 	deinit_net(pLwc);
+}
+
+void lw_set_kp(LWCONTEXT *pLwc, int kp) {
+	pLwc->kp = kp;
 }

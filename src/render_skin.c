@@ -51,28 +51,34 @@ void lwc_render_skin(const struct _LWCONTEXT* pLwc) {
 
 	render_ground(pLwc, identity, pLwc->proj);
 
-	render_solid_vb_ui_skin(pLwc, 0, 0, 0.5f,
-		pLwc->tex_atlas[LAE_C_TOFU_KTX], pLwc->tex_atlas[LAE_C_TOFU_ALPHA_KTX],
-		LSVT_TRIANGLE,
-		&pLwc->action[LWAC_TESTACTION2],
-		&pLwc->armature[LWAR_ARMATURE],
-		1, 0, 0, 0, 0);
-
-	render_solid_vb_ui_skin(pLwc, 0, 0, 0.5f,
-		pLwc->tex_atlas[LAE_C_TOFU_KTX], pLwc->tex_atlas[LAE_C_TOFU_ALPHA_KTX],
-		LSVT_TREEPLANE,
-		&pLwc->action[LWAC_TREEARMATUREACTION],
-		&pLwc->armature[LWAR_TREEARMATURE],
-		1, 0, 0, 0, 0);
-
-	/*
-	render_solid_vb_ui_skin(pLwc, 0, 0, 0.5f,
-		pLwc->tex_atlas[LAE_C_TOFU_KTX], pLwc->tex_atlas[LAE_C_TOFU_ALPHA_KTX],
-		LSVT_PLAYER,
-		&pLwc->action[LWAC_PLAYERACTION],
-		&pLwc->armature[LWAR_PLAYERARMATURE],
-		1, 0, 0, 0, 0);
-	*/
-
+	switch (pLwc->kp) {
+	case 1:
+		render_solid_vb_ui_skin(pLwc, 0, 0, 0.5f,
+			pLwc->tex_atlas[LAE_C_TOFU_KTX],
+			LSVT_TRIANGLE,
+			&pLwc->action[LWAC_TRIANGLEACTION],
+			&pLwc->armature[LWAR_TRIANGLEARMATURE],
+			1, 0, 0, 0, 0);
+		break;
+	case 2:
+		render_solid_vb_ui_skin(pLwc, 0, 0, 0.5f,
+			pLwc->tex_atlas[LAE_C_TOFU_KTX],
+			LSVT_TREEPLANE,
+			&pLwc->action[LWAC_TREEPLANEACTION],
+			&pLwc->armature[LWAR_TREEPLANEARMATURE],
+			1, 0, 0, 0, 0);
+		break;
+	case 3:
+		render_solid_vb_ui_skin(pLwc, 0, 0, 0.5f,
+			pLwc->tex_atlas[LAE_C_TOFU_KTX],
+			LSVT_DETACHPLANE,
+			&pLwc->action[LWAC_DETACHPLANEACTION],
+			&pLwc->armature[LWAR_DETACHPLANEARMATURE],
+			1, 0, 0, 0, 0);
+		break;
+	default:
+		break;
+	}
+	
 	glEnable(GL_DEPTH_TEST);
 }

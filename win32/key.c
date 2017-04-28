@@ -110,21 +110,26 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
 
 	if (key == GLFW_KEY_KP_1 && action == GLFW_PRESS) {
 		play_sound(LWS_DIE);
+		lw_set_kp(pLwc, 1);
 	}
 
 	if (key == GLFW_KEY_KP_2 && action == GLFW_PRESS) {
 		play_sound(LWS_HIT);
+		lw_set_kp(pLwc, 2);
 	}
 
 	if (key == GLFW_KEY_KP_3 && action == GLFW_PRESS) {
 		play_sound(LWS_POINT);
+		lw_set_kp(pLwc, 3);
 	}
 
 	if (key == GLFW_KEY_KP_4 && action == GLFW_PRESS) {
 		play_sound(LWS_SWOOSHING);
+		lw_set_kp(pLwc, 4);
 	}
 
 	if (key == GLFW_KEY_KP_5 && action == GLFW_PRESS) {
 		play_sound(LWS_WING);
+		lw_set_kp(pLwc, 5);
 	}
 }

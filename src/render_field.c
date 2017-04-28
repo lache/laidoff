@@ -159,10 +159,10 @@ void lwc_render_field(const LWCONTEXT* pLwc)
 	mat4x4_identity(skin_model);
 
 	render_skin(pLwc,
-		pLwc->tex_atlas[LAE_C_TOFU_KTX], pLwc->tex_atlas[LAE_C_TOFU_ALPHA_KTX],
-		LSVT_PLAYER,
-		&pLwc->action[LWAC_PLAYERACTION],
-		&pLwc->armature[LWAR_PLAYERARMATURE],
+		pLwc->tex_atlas[LAE_3D_PLAYER_TEX_KTX],
+		LSVT_HUMAN,
+		&pLwc->action[LWAC_HUMANACTION_WALKNONE],
+		&pLwc->armature[LWAR_HUMANARMATURE],
 		1, 0, 0, 0, 0, perspective, view, skin_model);
 
 	render_ui(pLwc);

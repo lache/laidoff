@@ -105,6 +105,8 @@ typedef struct _LWCONTEXT {
 	int update_count;
 	int render_count;
 
+	int kp; // last keypad number (debug)
+
 	double app_time;
 	double scene_time;
 

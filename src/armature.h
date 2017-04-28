@@ -10,17 +10,19 @@ typedef struct _LWARMATURE {
 } LWARMATURE;
 
 typedef enum _LW_ARMATURE {
-	LWAR_ARMATURE,
-	LWAR_TREEARMATURE,
-	LWAR_PLAYERARMATURE,
+	LWAR_TRIANGLEARMATURE,
+	LWAR_TREEPLANEARMATURE,
+	LWAR_HUMANARMATURE,
+	LWAR_DETACHPLANEARMATURE,
 
 	LWAR_COUNT,
 } LW_ARMATURE;
 
 static const char* armature_filename[] = {
-	ASSETS_BASE_PATH "armature" PATH_SEPARATOR "Armature.arm",
-	ASSETS_BASE_PATH "armature" PATH_SEPARATOR "TreeArmature.arm",
-	ASSETS_BASE_PATH "armature" PATH_SEPARATOR "PlayerArmature.arm",
+	ASSETS_BASE_PATH "armature" PATH_SEPARATOR "TriangleArmature.arm",
+	ASSETS_BASE_PATH "armature" PATH_SEPARATOR "TreePlaneArmature.arm",
+	ASSETS_BASE_PATH "armature" PATH_SEPARATOR "HumanArmature.arm",
+	ASSETS_BASE_PATH "armature" PATH_SEPARATOR "DetachPlaneArmature.arm",
 };
 
 int load_armature(const char* filename, LWARMATURE* ar);
