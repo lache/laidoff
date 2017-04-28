@@ -103,6 +103,31 @@ static void render_ui(const LWCONTEXT* pLwc)
 	glDrawArrays(GL_TRIANGLES, 0, pLwc->vertex_buffer[vbo_index].vertex_count);
 }
 
+void render_player(const LWCONTEXT* pLwc, mat4x4 perspective, mat4x4 view) {
+	mat4x4 skin_trans;
+	mat4x4_identity(skin_trans);
+	mat4x4_translate(skin_trans, pLwc->player_pos_x, pLwc->player_pos_y, 0);
+	mat4x4 skin_scale;
+	mat4x4_identity(skin_scale);
+	mat4x4_scale_aniso(skin_scale, skin_scale, 0.5f, 0.5f, 0.5f);
+	mat4x4 skin_rot;
+	mat4x4_identity(skin_rot);
+	mat4x4_rotate_Z(skin_rot, skin_rot, pLwc->player_rot_z + (float)LWDEG2RAD(90));
+
+	mat4x4 skin_model;
+	mat4x4_identity(skin_model);
+	mat4x4_mul(skin_model, skin_rot, skin_model);
+	mat4x4_mul(skin_model, skin_scale, skin_model);
+	mat4x4_mul(skin_model, skin_trans, skin_model);
+
+	render_skin(pLwc,
+	            pLwc->tex_atlas[LAE_3D_PLAYER_TEX_KTX],
+	            LSVT_HUMAN,
+	            &pLwc->action[pLwc->player_moving ? LWAC_HUMANACTION_WALKPOLISHBAKED : LWAC_HUMANACTION_IDLEBAKED],
+	            &pLwc->armature[LWAR_HUMANARMATURE],
+	            1, 0, 0, 0, 0, perspective, view, skin_model);
+}
+
 void lwc_render_field(const LWCONTEXT* pLwc)
 {
 	glViewport(0, 0, pLwc->width, pLwc->height);
@@ -125,7 +150,7 @@ void lwc_render_field(const LWCONTEXT* pLwc)
 	mat4x4 perspective;
 	mat4x4_perspective(perspective, (float)(LWDEG2RAD(49.134) / screen_aspect_ratio), screen_aspect_ratio, 1.0f, 500.0f);
 
-	const float cam_dist = 50;
+	const float cam_dist = 30;
 	mat4x4 view;
 	vec3 eye = { pLwc->player_pos_x, pLwc->player_pos_y - cam_dist, cam_dist };
 	vec3 center = { pLwc->player_pos_x, pLwc->player_pos_y, 0.0f };
@@ -134,8 +159,6 @@ void lwc_render_field(const LWCONTEXT* pLwc)
 
 	render_ground(pLwc, view, perspective);
 	
-	render_field_object(pLwc, LVT_PLAYER, pLwc->tex_programmed[LPT_SOLID_RED], view, perspective, pLwc->player_pos_x, pLwc->player_pos_y, 1, 1, 1);
-
 	for (int i = 0; i < MAX_FIELD_OBJECT; i++)
 	{
 		if (pLwc->field_object[i].valid)
@@ -155,15 +178,7 @@ void lwc_render_field(const LWCONTEXT* pLwc)
 		}
 	}
 
-	mat4x4 skin_model;
-	mat4x4_identity(skin_model);
-
-	render_skin(pLwc,
-		pLwc->tex_atlas[LAE_3D_PLAYER_TEX_KTX],
-		LSVT_HUMAN,
-		&pLwc->action[LWAC_HUMANACTION_WALKNONE],
-		&pLwc->armature[LWAR_HUMANARMATURE],
-		1, 0, 0, 0, 0, perspective, view, skin_model);
+	render_player(pLwc, perspective, view);
 
 	render_ui(pLwc);
 	

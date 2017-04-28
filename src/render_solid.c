@@ -140,7 +140,9 @@ void render_skin(const LWCONTEXT* pLwc,
 		quat_identity(bone_q[i]);
 	}
 
-	const float f = (float)(pLwc->skin_time * 23.98f); // FPS multiplied
+	float f = (float)(pLwc->skin_time * 23.98f); // FPS multiplied
+	f = fmodf(f, action->last_key_f);
+
 	//const float f = 0;// 89;
 
 	for (int i = 0; i < action->curve_num; i++) {
@@ -182,13 +184,14 @@ void render_skin(const LWCONTEXT* pLwc,
 
 	for (int i = 0; i < armature->count; i++) {
 		mat4x4 bone_mat_anim_trans;
-		if (armature->parent_index[i] >= 0) {
-			// child bone should not have translation component. ignored...
+
+		// Connected bones should not have their own translation.
+		if (armature->use_connect[i]) {
 			mat4x4_identity(bone_mat_anim_trans);
 		} else {
 			mat4x4_translate(bone_mat_anim_trans, bone_trans[i][0], bone_trans[i][1], bone_trans[i][2]);
 		}
-
+	
 		mat4x4 bone_mat_anim_rot;
 		mat4x4_from_quat(bone_mat_anim_rot, bone_q[i]);
 

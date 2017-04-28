@@ -72,7 +72,7 @@ void lwc_render_skin(const struct _LWCONTEXT* pLwc) {
 		render_solid_vb_ui_skin(pLwc, 0, 0, 0.5f,
 			pLwc->tex_atlas[LAE_C_TOFU_KTX],
 			LSVT_DETACHPLANE,
-			&pLwc->action[LWAC_DETACHPLANEACTION],
+			&pLwc->action[LWAC_DETACHPLANEACTION_CHILDTRANS],
 			&pLwc->armature[LWAR_DETACHPLANEARMATURE],
 			1, 0, 0, 0, 0);
 		break;

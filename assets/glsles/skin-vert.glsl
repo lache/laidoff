@@ -6,7 +6,7 @@ precision highp float;
 uniform mat4 MVP;
 uniform vec2 vUvOffset;
 uniform vec2 vUvScale;
-uniform mat4 bone[32];
+uniform mat4 bone[40];
 
 attribute vec3 vPos;
 attribute vec3 vCol;

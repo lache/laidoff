@@ -7,6 +7,8 @@ typedef struct _LWARMATURE {
 	int count;
 	mat4x4* mat;
 	int* parent_index;
+	int* use_connect;
+	char* d;
 } LWARMATURE;
 
 typedef enum _LW_ARMATURE {

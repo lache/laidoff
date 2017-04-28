@@ -63,6 +63,7 @@ typedef struct _LWANIMCURVE {
 
 typedef struct _LWANIMACTION {
 	int curve_num;
+	float last_key_f;
 	LWANIMCURVE* anim_curve;
 	int key_num;
 	LWANIMKEY* anim_key;
@@ -75,7 +76,10 @@ typedef enum _LW_ACTION {
 	LWAC_HUMANACTION_WALKPOLISH,
 	LWAC_HUMANACTION_WALKSIMPLE,
 	LWAC_HUMANACTION_WALKNONE,
+	LWAC_HUMANACTION_WALKPOLISHBAKED,
+	LWAC_HUMANACTION_IDLEBAKED,
 	LWAC_DETACHPLANEACTION,
+	LWAC_DETACHPLANEACTION_CHILDTRANS,
 
 	LWAC_COUNT,
 } LW_ACTION;
@@ -86,7 +90,10 @@ static const char* action_filename[] = {
 	ASSETS_BASE_PATH "action" PATH_SEPARATOR "HumanAction_WalkPolish.act",
 	ASSETS_BASE_PATH "action" PATH_SEPARATOR "HumanAction_WalkSimple.act",
 	ASSETS_BASE_PATH "action" PATH_SEPARATOR "HumanAction_WalkNone.act",
+	ASSETS_BASE_PATH "action" PATH_SEPARATOR "HumanAction_WalkPolishBaked.act",
+	ASSETS_BASE_PATH "action" PATH_SEPARATOR "HumanAction_IdleBaked.act",
 	ASSETS_BASE_PATH "action" PATH_SEPARATOR "DetachPlaneAction.act",
+	ASSETS_BASE_PATH "action" PATH_SEPARATOR "DetachPlaneAction_ChildTrans.act",
 };
 
 void load_action(const char* filename, LWANIMACTION* action);

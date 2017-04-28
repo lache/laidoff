@@ -11,6 +11,8 @@ void load_action(const char* filename, LWANIMACTION* action) {
 
 	action->curve_num = *(int*)p;
 	p += sizeof(int);
+	action->last_key_f = *(float*)p;
+	p += sizeof(float);
 	action->anim_curve = (LWANIMCURVE*)p;
 	p += sizeof(LWANIMCURVE) * action->curve_num;
 	action->key_num = *(int*)p;

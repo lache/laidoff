@@ -5,7 +5,7 @@
 
 void move_player(LWCONTEXT *pLwc) {
 	if (pLwc->game_scene == LGS_FIELD) {
-		const float move_speed = 5.0f;
+		const float move_speed = 3.5f;
 		const float move_speed_delta = (float)(pLwc->delta_time * move_speed);
 
 		// Using keyboard
@@ -19,6 +19,10 @@ void move_player(LWCONTEXT *pLwc) {
 		if (lw_get_normalized_dir_pad_input(pLwc, &dx, &dy, &dlen)) {
 			pLwc->player_pos_x += dx * move_speed_delta;
 			pLwc->player_pos_y += dy * move_speed_delta;
+			pLwc->player_rot_z = atan2f(dy, dx);
+			pLwc->player_moving = 1;
+		} else {
+			pLwc->player_moving = 0;
 		}
 	}
 }

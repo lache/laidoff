@@ -136,6 +136,8 @@ typedef struct _LWCONTEXT {
 
 	float player_pos_x;
 	float player_pos_y;
+	float player_rot_z;
+	int player_moving;
 
 	LWBOX2DCOLLIDER box_collider[MAX_BOX_COLLIDER];
 	LWFIELDOBJECT field_object[MAX_FIELD_OBJECT];
