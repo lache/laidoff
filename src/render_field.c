@@ -4,6 +4,7 @@
 #include "lwmacro.h"
 #include "laidoff.h"
 #include "render_solid.h"
+#include "render_skin.h"
 
 static void render_field_object(const LWCONTEXT* pLwc, int vbo_index, GLuint tex_id, mat4x4 view, mat4x4 proj, float x, float y, float sx, float sy, float alpha_multiplier)
 {
