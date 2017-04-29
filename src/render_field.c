@@ -123,7 +123,7 @@ void render_player(const LWCONTEXT* pLwc, mat4x4 perspective, mat4x4 view) {
 	render_skin(pLwc,
 	            pLwc->tex_atlas[LAE_3D_PLAYER_TEX_KTX],
 	            LSVT_HUMAN,
-	            &pLwc->action[pLwc->player_moving ? LWAC_HUMANACTION_WALKPOLISHBAKED : LWAC_HUMANACTION_IDLEBAKED],
+	            &pLwc->action[pLwc->player_moving ? LWAC_HUMANACTION_WALKPOLISH : LWAC_HUMANACTION_IDLE],
 	            &pLwc->armature[LWAR_HUMANARMATURE],
 	            1, 0, 0, 0, 0, perspective, view, skin_model);
 }
