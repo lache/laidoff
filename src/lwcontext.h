@@ -198,4 +198,6 @@ typedef struct _LWCONTEXT {
 	LWARMATURE armature[LWAR_COUNT];
 	LWANIMACTION action[LWAC_COUNT];
 	double skin_time;
+
+	struct _LWFIELD* field;
 } LWCONTEXT;

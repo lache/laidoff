@@ -33,7 +33,7 @@
 #include "armature.h"
 #include "lwanim.h"
 #include "lwskinmesh.h"
-#include <ode/ode.h>
+#include "render_physics.h"
 
 #define LWEPSILON (1e-3)
 #define INCREASE_RENDER_SCORE (20)
@@ -719,6 +719,8 @@ void reset_runtime_context(LWCONTEXT* pLwc) {
 	pLwc->admin_button_command[6].command_handler = net_rtt_test;
 	pLwc->admin_button_command[7].name = LWU("신:스킨");
 	pLwc->admin_button_command[7].command_handler = change_to_skin;
+	pLwc->admin_button_command[8].name = LWU("신:피직스");
+	pLwc->admin_button_command[8].command_handler = change_to_physics;
 }
 
 void delete_font_fbo(LWCONTEXT* pLwc) {
@@ -941,6 +943,8 @@ void lwc_render(const LWCONTEXT *pLwc) {
 		lwc_render_battle_result(pLwc);
 	} else if (pLwc->game_scene == LGS_SKIN) {
 		lwc_render_skin(pLwc);
+	} else if (pLwc->game_scene == LGS_PHYSICS) {
+		lwc_render_physics(pLwc);
 	}
 }
 
@@ -1015,6 +1019,10 @@ void lwc_update(LWCONTEXT *pLwc, double delta_time) {
 
 	if (pLwc->battle_state == LBS_START_PLAYER_WIN || pLwc->battle_state == LBS_PLAYER_WIN_IN_PROGRESS) {
 		update_battle_result(pLwc);
+	}
+
+	if (pLwc->game_scene == LGS_FIELD) {
+		update_field(pLwc->field);
 	}
 
 	((LWCONTEXT *)pLwc)->update_count++;
@@ -1232,7 +1240,7 @@ void init_action(LWCONTEXT* pLwc) {
 }
 
 void init_physics(LWCONTEXT* pLwc) {
-	dInitODE2(0);
+	pLwc->field = load_field();
 }
 
 LWCONTEXT *lw_init(void) {
@@ -1350,6 +1358,10 @@ void change_to_battle_result(LWCONTEXT *pLwc) {
 
 void change_to_skin(LWCONTEXT *pLwc) {
 	pLwc->next_game_scene = LGS_SKIN;
+}
+
+void change_to_physics(LWCONTEXT *pLwc) {
+	pLwc->next_game_scene = LGS_PHYSICS;
 }
 
 long lw_get_last_time_sec(LWCONTEXT *pLwc) {
