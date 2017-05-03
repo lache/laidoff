@@ -103,7 +103,7 @@ LWFIELD* load_field(const char* filename) {
 
 	LWFIELD* field = (LWFIELD*)calloc(1, sizeof(LWFIELD));
 
-	field->player_radius = (dReal)1.0;
+	field->player_radius = (dReal)0.75;
 	field->player_length = (dReal)3.0;
 	field->world = dWorldCreate();
 	field->space = dHashSpaceCreate(0);

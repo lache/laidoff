@@ -26,8 +26,8 @@
 #include "hinge2.h"
 #include "joint_internal.h"
 
-
-
+int  dSafeNormalize3 (dVector3 a);
+bool dxSafeNormalize3 (dVector3 a);
 
 //****************************************************************************
 // hinge 2. note that this joint must be attached to two bodies for it to work

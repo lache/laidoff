@@ -191,15 +191,27 @@ static inline void getClockCount (unsigned long cc[2])
 
 #else // macintosh
 
-#include <CoreServices/CoreServices.h>
-#include <ode/Timer.h>
+//#include <CoreServices/CoreServices.h>
+//#include <ode/Timer.h>
+
+//static inline void getClockCount (unsigned long cc[2])
+//{
+//    UnsignedWide ms;
+//    Microseconds (&ms);
+//    cc[1] = ms.lo / 1000000;
+//    cc[0] = ms.lo - ( cc[1] * 1000000 );
+//}
+
+#include <sys/time.h>
+#include <unistd.h>
+
 
 static inline void getClockCount (unsigned long cc[2])
 {
-    UnsignedWide ms;
-    Microseconds (&ms);
-    cc[1] = ms.lo / 1000000;
-    cc[0] = ms.lo - ( cc[1] * 1000000 );
+    struct timeval tv;
+    gettimeofday (&tv,0);
+    cc[0] = tv.tv_usec;
+    cc[1] = tv.tv_sec;
 }
 
 #endif
