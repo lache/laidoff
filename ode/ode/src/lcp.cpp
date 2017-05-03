@@ -364,6 +364,10 @@ void checkPermutations (unsigned i, unsigned n, unsigned nC, unsigned nN, unsign
 
 #ifdef dLCP_FAST
 
+// _L, _C is defined in ctype.h on Android...
+#undef _L
+#undef _C
+
 struct dLCP {
     const unsigned m_n;
     const unsigned m_nskip;

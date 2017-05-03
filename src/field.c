@@ -4,6 +4,7 @@
 #include "laidoff.h"
 #include "input.h"
 #include "lwlog.h"
+#include "file.h"
 
 void move_player(LWCONTEXT *pLwc) {
 	if (pLwc->game_scene == LGS_FIELD) {
@@ -23,6 +24,8 @@ void move_player(LWCONTEXT *pLwc) {
 			pLwc->player_pos_y += dy * move_speed_delta;
 			pLwc->player_rot_z = atan2f(dy, dx);
 			pLwc->player_moving = 1;
+
+			set_field_player_delta(pLwc->field, dx * move_speed_delta, dy * move_speed_delta, 0);
 		} else {
 			pLwc->player_moving = 0;
 		}
@@ -94,11 +97,12 @@ void resolve_player_collision(LWCONTEXT *pLwc) {
 	pLwc->player_pos_y = player_collider.y;
 }
 
-LWFIELD* load_field() {
-	
+LWFIELD* load_field(const char* filename) {
+
 	dInitODE2(0);
 
 	LWFIELD* field = (LWFIELD*)calloc(1, sizeof(LWFIELD));
+
 	field->player_radius = (dReal)1.0;
 	field->player_length = (dReal)3.0;
 	field->world = dWorldCreate();
@@ -130,6 +134,24 @@ LWFIELD* load_field() {
 	field->ground_normal[0] = 0;
 	field->ground_normal[1] = 0;
 	field->ground_normal[2] = 1;
+
+	size_t size;
+	char* d = create_binary_from_file(filename, &size);
+	field->d = d;
+	field->field_cube_object = (LWFIELDCUBEOBJECT*)d;
+	field->field_cube_object_count = size / sizeof(LWFIELDCUBEOBJECT);
+
+	for (int i = 0; i < field->field_cube_object_count; i++) {
+		const LWFIELDCUBEOBJECT* lco = &field->field_cube_object[i];
+
+		field->box_geom[field->box_geom_count] = dCreateBox(field->space, lco->dimx, lco->dimy, lco->dimz);
+		dMatrix3 r;
+		dRFromAxisAndAngle(r, lco->axis_angle[0], lco->axis_angle[1], lco->axis_angle[2], lco->axis_angle[3]);
+		dGeomSetPosition(field->box_geom[field->box_geom_count], lco->x, lco->y, lco->z);
+		dGeomSetRotation(field->box_geom[field->box_geom_count], r);
+
+		field->box_geom_count++;
+	}
 
 	return field;
 }
@@ -212,6 +234,18 @@ void reset_ray_result(LWFIELD* field) {
 	field->contact_ray_result_count = 0;
 }
 
+void set_field_player_delta(LWFIELD* field, float x, float y, float z) {
+	field->geom_pos_delta[0] = x;
+	field->geom_pos_delta[1] = y;
+	field->geom_pos_delta[2] = z;
+}
+
+void get_field_player_position(const LWFIELD* field, float* x, float* y, float* z) {
+	*x = (float)field->geom_pos[0];
+	*y = (float)field->geom_pos[1];
+	*z = (float)(field->geom_pos[2] - field->player_length / 2 - field->player_radius);
+}
+
 void move_player_geom_by_input(LWFIELD* field) {
 	dVector3 u_x_n, up;
 
@@ -268,14 +302,14 @@ void move_player_to_ground(LWFIELD* field) {
 
 	if (min_ray_index >= 0) {
 
-		LOGI("min ray length:%.3f / g pos:%.2f,%.2f,%.2f / g nor:%.2f,%.2f,%.2f",
+		/*LOGI("min ray length:%.3f / g pos:%.2f,%.2f,%.2f / g nor:%.2f,%.2f,%.2f",
 			field->center_ray_result[min_ray_index].geom.depth,
 			field->center_ray_result[min_ray_index].geom.pos[0],
 			field->center_ray_result[min_ray_index].geom.pos[1],
 			field->center_ray_result[min_ray_index].geom.pos[2],
 			field->center_ray_result[min_ray_index].geom.normal[0],
 			field->center_ray_result[min_ray_index].geom.normal[1],
-			field->center_ray_result[min_ray_index].geom.normal[2]);
+			field->center_ray_result[min_ray_index].geom.normal[2]);*/
 
 		field->ground_normal[0] = field->center_ray_result[min_ray_index].geom.normal[0];
 		field->ground_normal[1] = field->center_ray_result[min_ray_index].geom.normal[1];
@@ -325,4 +359,22 @@ void update_field(LWFIELD* field) {
 	//dWorldStep(field->world, 0.05);
 
 	move_player_to_ground(field);
+}
+
+void unload_field(LWFIELD* field) 	{
+	release_binary(field->d);
+
+	dGeomDestroy(field->ground);
+	dGeomDestroy(field->player_geom);
+	dGeomDestroy(field->player_center_ray);
+	dGeomDestroy(field->player_contact_ray);
+	for (int i = 0; i < field->box_geom_count; i++) {
+		dGeomDestroy(field->box_geom[i]);
+	}
+	dSpaceDestroy(field->space);
+	dWorldDestroy(field->world);
+
+	dCloseODE();
+
+	memset(field, 0, sizeof(LWFIELD));
 }

@@ -5,8 +5,9 @@
 #include "laidoff.h"
 #include "render_solid.h"
 #include "render_skin.h"
+#include "field.h"
 
-static void render_field_object(const LWCONTEXT* pLwc, int vbo_index, GLuint tex_id, mat4x4 view, mat4x4 proj, float x, float y, float sx, float sy, float alpha_multiplier)
+static void render_field_object(const LWCONTEXT* pLwc, int vbo_index, GLuint tex_id, mat4x4 view, mat4x4 proj, float x, float y, float sx, float sy, float alpha_multiplier, int mipmap)
 {
 	int shader_index = LWST_DEFAULT;
 
@@ -29,7 +30,7 @@ static void render_field_object(const LWCONTEXT* pLwc, int vbo_index, GLuint tex
 	bind_all_vertex_attrib(pLwc, vbo_index);
 	glUniformMatrix4fv(pLwc->shader[shader_index].mvp_location, 1, GL_FALSE, (const GLfloat*)proj_view_model);
 	glBindTexture(GL_TEXTURE_2D, tex_id);
-	set_tex_filter(GL_LINEAR_MIPMAP_LINEAR, GL_LINEAR);
+	set_tex_filter(mipmap ? GL_LINEAR_MIPMAP_LINEAR : GL_LINEAR, GL_LINEAR);
 
 	const float gird_uv_offset[2] = { 0, 0 };
 	const float grid_uv_scale[2] = { 1, 1 };
@@ -107,7 +108,10 @@ static void render_ui(const LWCONTEXT* pLwc)
 void render_player(const LWCONTEXT* pLwc, mat4x4 perspective, mat4x4 view) {
 	mat4x4 skin_trans;
 	mat4x4_identity(skin_trans);
-	mat4x4_translate(skin_trans, pLwc->player_pos_x, pLwc->player_pos_y, 0);
+	float player_x = 0, player_y = 0, player_z = 0;
+	get_field_player_position(pLwc->field, &player_x, &player_y, &player_z);
+	//mat4x4_translate(skin_trans, pLwc->player_pos_x, pLwc->player_pos_y, 0);
+	mat4x4_translate(skin_trans, player_x, player_y, player_z);
 	mat4x4 skin_scale;
 	mat4x4_identity(skin_scale);
 	mat4x4_scale_aniso(skin_scale, skin_scale, 0.5f, 0.5f, 0.5f);
@@ -151,14 +155,31 @@ void lwc_render_field(const LWCONTEXT* pLwc)
 	mat4x4 perspective;
 	mat4x4_perspective(perspective, (float)(LWDEG2RAD(49.134) / screen_aspect_ratio), screen_aspect_ratio, 1.0f, 500.0f);
 
-	const float cam_dist = 30;
+	float player_x = 0, player_y = 0, player_z = 0;
+	get_field_player_position(pLwc->field, &player_x, &player_y, &player_z);
+
+	const float cam_dist = 20;
 	mat4x4 view;
-	vec3 eye = { pLwc->player_pos_x, pLwc->player_pos_y - cam_dist, cam_dist };
-	vec3 center = { pLwc->player_pos_x, pLwc->player_pos_y, 0.0f };
+	vec3 eye = { player_x, player_y - cam_dist, cam_dist };
+	vec3 center = { player_x, player_y, player_z };
 	vec3 up = { 0, 0, 1 };
 	mat4x4_look_at(view, eye, center, up);
 
-	render_ground(pLwc, view, perspective);
+	//render_ground(pLwc, view, perspective);
+
+	render_field_object(
+		pLwc,
+		LVT_FLOOR,
+		pLwc->tex_atlas[LAE_3D_FLOOR_TEX_KTX],
+		view,
+		perspective,
+		0,
+		0,
+		1,
+		1,
+		1,
+		0
+	);
 	
 	for (int i = 0; i < MAX_FIELD_OBJECT; i++)
 	{
@@ -174,7 +195,8 @@ void lwc_render_field(const LWCONTEXT* pLwc)
 				pLwc->field_object[i].y,
 				pLwc->field_object[i].sx,
 				pLwc->field_object[i].sy,
-				pLwc->field_object[i].alpha_multiplier
+				pLwc->field_object[i].alpha_multiplier,
+				1
 			);
 		}
 	}

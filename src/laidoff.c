@@ -430,6 +430,10 @@ static void init_vbo(LWCONTEXT *pLwc) {
 	load_vbo(pLwc, ASSETS_BASE_PATH "vbo" PATH_SEPARATOR "Trail.vbo",
 		&pLwc->vertex_buffer[LVT_TRAIL]);
 
+	// LVT_TRAIL
+	load_vbo(pLwc, ASSETS_BASE_PATH "vbo" PATH_SEPARATOR "Floor.vbo",
+		&pLwc->vertex_buffer[LVT_FLOOR]);
+
 
 	// === SKIN VERTEX BUFFERS ===
 
@@ -674,10 +678,12 @@ void reset_field_context(LWCONTEXT* pLwc) {
 
 	spawn_all_field_object(pLwc);
 	
+	/*
 	spawn_field_object(pLwc, 0, 5, 2, 2, LVT_HOME, pLwc->tex_programmed[LPT_SOLID_GREEN], 1, 1, 1, 0);
 
 	spawn_field_object(pLwc, 0, -7, 1, 1, LVT_CUBE_WALL, pLwc->tex_programmed[LPT_SOLID_BLUE], 6,
 		1, 1, 0);
+	*/
 
 	pLwc->player_pos_x = 0;
 	pLwc->player_pos_y = 0;
@@ -1240,7 +1246,7 @@ void init_action(LWCONTEXT* pLwc) {
 }
 
 void init_physics(LWCONTEXT* pLwc) {
-	pLwc->field = load_field();
+	pLwc->field = load_field(ASSETS_BASE_PATH "field" PATH_SEPARATOR "testfield.field");
 }
 
 LWCONTEXT *lw_init(void) {
