@@ -33,6 +33,7 @@
 #include "armature.h"
 #include "lwanim.h"
 #include "lwskinmesh.h"
+#include <ode/ode.h>
 
 #define LWEPSILON (1e-3)
 #define INCREASE_RENDER_SCORE (20)
@@ -1230,6 +1231,10 @@ void init_action(LWCONTEXT* pLwc) {
 	}
 }
 
+void init_physics(LWCONTEXT* pLwc) {
+	dInitODE2(0);
+}
+
 LWCONTEXT *lw_init(void) {
 	init_ext_image_lib();
 
@@ -1254,6 +1259,8 @@ LWCONTEXT *lw_init(void) {
 	init_armature(pLwc);
 
 	init_action(pLwc);
+
+	init_physics(pLwc);
 
 	return pLwc;
 }

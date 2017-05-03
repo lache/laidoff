@@ -14,6 +14,10 @@ include_directories("src")
 
 include_directories("lua-5.3.4")
 
+include_directories("ode/include")
+include_directories("ode/ou/include")
+include_directories("ode/ode/src")
+
 #include_directories(libpng-1.6.28)
 
 #link_directories(libpng-1.6.28/projects/vstudio/Release)
@@ -25,6 +29,7 @@ CHECK_INCLUDE_FILE(/opt/vc/include/bcm_host.h BCM_HOST_AVAILABLE)
 
 if (MSVC)
     add_definitions(-D_CRT_SECURE_NO_WARNINGS)
+	add_definitions(-DdDOUBLE)
 endif()
 
 if (WIN32)
@@ -99,178 +104,21 @@ set(GETOPT "${GLFW_SOURCE_DIR}/deps/getopt.h"
 set(TINYCTHREAD "${GLFW_SOURCE_DIR}/deps/tinycthread.h"
                 "${GLFW_SOURCE_DIR}/deps/tinycthread.c")
 
-set(LUA_LIB
-lua-5.3.4/ldblib.c
-lua-5.3.4/ldebug.c
-lua-5.3.4/ldebug.h
-lua-5.3.4/ldo.c
-lua-5.3.4/ldo.h
-lua-5.3.4/ldump.c
-lua-5.3.4/lfunc.c
-lua-5.3.4/lfunc.h
-lua-5.3.4/lgc.c
-lua-5.3.4/lgc.h
-lua-5.3.4/linit.c
-lua-5.3.4/liolib.c
-lua-5.3.4/llex.c
-lua-5.3.4/llex.h
-lua-5.3.4/llimits.h
-lua-5.3.4/lmathlib.c
-lua-5.3.4/lmem.c
-lua-5.3.4/lmem.h
-lua-5.3.4/loadlib.c
-lua-5.3.4/lobject.c
-lua-5.3.4/lobject.h
-lua-5.3.4/lopcodes.c
-lua-5.3.4/lopcodes.h
-lua-5.3.4/loslib.c
-lua-5.3.4/lparser.c
-lua-5.3.4/lparser.h
-lua-5.3.4/lprefix.h
-lua-5.3.4/lstate.c
-lua-5.3.4/lstate.h
-lua-5.3.4/lstring.c
-lua-5.3.4/lstring.h
-lua-5.3.4/lstrlib.c
-lua-5.3.4/ltable.c
-lua-5.3.4/ltable.h
-lua-5.3.4/ltablib.c
-lua-5.3.4/ltm.c
-lua-5.3.4/ltm.h
-lua-5.3.4/lua.c
-lua-5.3.4/lua.h
-lua-5.3.4/lua.hpp
-lua-5.3.4/luac.c
-lua-5.3.4/luaconf.h
-lua-5.3.4/lualib.h
-lua-5.3.4/lundump.c
-lua-5.3.4/lundump.h
-lua-5.3.4/lutf8lib.c
-lua-5.3.4/lvm.c
-lua-5.3.4/lvm.h
-lua-5.3.4/lzio.c
-lua-5.3.4/lzio.h
-lua-5.3.4/lapi.c
-lua-5.3.4/lapi.h
-lua-5.3.4/lauxlib.c
-lua-5.3.4/lauxlib.h
-lua-5.3.4/lbaselib.c
-lua-5.3.4/lbitlib.c
-lua-5.3.4/lcode.c
-lua-5.3.4/lcode.h
-lua-5.3.4/lcorolib.c
-lua-5.3.4/lctype.c
-lua-5.3.4/lctype.h
-)
+file(GLOB LUA_LIB "lua-5.3.4/*.h" "lua-5.3.4/*.c")
+file(GLOB ODE_LIB "ode/ode/src/*.h" "ode/ode/src/*.c" "ode/ode/src/*.cpp" "ode/ode/src/joints/*.h" "ode/ode/src/joints/*.cpp" "ode/ou/src/ou/*.cpp" "ode/include/ode/*.h" "ode/ou/include/ou/*.h")
+file(GLOB LAIDOFF_LIB "src/*.h" "src/*.c")
 
 source_group(Lua FILES ${LUA_LIB})
+
+source_group(Ode FILES ${ODE_LIB})
 
 source_group(Win32 FILES ${WIN32_DEPS} ${ICON})
 
 #add_executable(laidoff WIN32 MACOSX_BUNDLE laidoff.c ${ICON} ${GLAD})
 add_executable(laidoff
 MACOSX_BUNDLE
-src/battle.c
-src/battle.h
-src/battlelogic.c
-src/battlelogic.h
-src/battle_result.c
-src/battle_result.h
-src/constants.h
-src/dialog.c
-src/dialog.h
-src/etc1.h
-src/field.c
-src/field.h
-src/file.h
-src/font.c
-src/font.h
-src/ktx.c
-src/ktx.h
-src/image.h
-src/input.c
-src/input.h
-src/laidoff.c
-src/laidoff.h
-src/loadobj.c
-src/lwanim.c
-src/lwanim.h
-src/lwatlasenum.h
-src/lwatlassprite.h
-src/lwattrib.h
-src/lwbattlecommand.h
-src/lwbattlecommandresult.h
-src/lwbattlecreature.c
-src/lwbattlecreature.h
-src/lwbattlestate.h
-src/lwbitmapcontext.h
-src/lwbox2dcollider.h
-src/lwbuttoncommand.h
-src/lwcontext.h
-src/lwdamagetext.h
-src/lwenemy.c
-src/lwenemy.h
-src/lwfbo.h
-src/lwfieldobject.h
-src/lwgamescene.h
-src/lwgl.h
-src/lwkeyframe.h
-src/lwlog.h
-src/lwmacro.h
-src/lwpkm.h
-src/lwprogrammedtex.h
-src/lwshader.h
-src/lwsimpleanim.c
-src/lwsimpleanim.h
-src/lwskill.h
-src/lwskilleffect.h
-src/lwtextblock.h
-src/lwtimepoint.h
-src/lwtouchproc.h
-src/lwtrail.h
-src/lwuialign.c
-src/lwuialign.h
-src/lwuidim.c
-src/lwuidim.h
-src/lwvbo.h
-src/lwvbotype.h
-src/lwtextblock.h
-src/lwtimepoint.c
-src/lwtimepoint.h
-src/net.h
-src/platform_detection.h
-src/render_admin.c
-src/render_admin.h
-src/render_battle.c
-src/render_battle.h
-src/render_battle_result.c
-src/render_battle_result.h
-src/render_dialog.c
-src/render_dialog.h
-src/render_field.c
-src/render_field.h
-src/render_font_test.c
-src/render_font_test.h
-src/render_solid.c
-src/render_solid.h
-src/render_text_block.c
-src/render_text_block.h
-src/script.c
-src/script.h
-src/skill.c
-src/sprite.h
-src/sound.h
-src/sprite_data.h
-src/tex.c
-src/tex.h
-src/tinyobj_loader_c.h
-src/unicode.c
-src/unicode.h
-src/vertices.h
-src/render_skin.c
-src/render_skin.h
-src/armature.c
-src/armature.h
+${LAIDOFF_LIB}
+${ODE_LIB}
 ${LUA_LIB}
 ${WIN32_DEPS}
 ${OSX_DEPS}
