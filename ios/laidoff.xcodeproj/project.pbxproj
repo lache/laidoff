@@ -131,6 +131,14 @@
 		567F39C51EA2A7500081EB67 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 567F39C41EA2A7500081EB67 /* UIKit.framework */; };
 		567F39C71EA2A7620081EB67 /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 567F39C61EA2A7620081EB67 /* CoreGraphics.framework */; };
 		567F39C91EA2AAD80081EB67 /* ImageIO.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 567F39C81EA2AAD80081EB67 /* ImageIO.framework */; };
+		56ED77A11EBB9C0900FABA64 /* nav.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 56ED779F1EBB9C0900FABA64 /* nav.cpp */; };
+		56ED77B61EBB9C1C00FABA64 /* DetourAlloc.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 56ED77AF1EBB9C1C00FABA64 /* DetourAlloc.cpp */; };
+		56ED77B71EBB9C1C00FABA64 /* DetourAssert.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 56ED77B01EBB9C1C00FABA64 /* DetourAssert.cpp */; };
+		56ED77B81EBB9C1C00FABA64 /* DetourCommon.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 56ED77B11EBB9C1C00FABA64 /* DetourCommon.cpp */; };
+		56ED77B91EBB9C1C00FABA64 /* DetourNavMesh.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 56ED77B21EBB9C1C00FABA64 /* DetourNavMesh.cpp */; };
+		56ED77BA1EBB9C1C00FABA64 /* DetourNavMeshBuilder.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 56ED77B31EBB9C1C00FABA64 /* DetourNavMeshBuilder.cpp */; };
+		56ED77BB1EBB9C1C00FABA64 /* DetourNavMeshQuery.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 56ED77B41EBB9C1C00FABA64 /* DetourNavMeshQuery.cpp */; };
+		56ED77BC1EBB9C1C00FABA64 /* DetourNode.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 56ED77B51EBB9C1C00FABA64 /* DetourNode.cpp */; };
 		6CA16CD81EA20B5600DB7AF0 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 6CA16CD71EA20B5600DB7AF0 /* main.m */; };
 		6CA16CDB1EA20B5600DB7AF0 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 6CA16CDA1EA20B5600DB7AF0 /* AppDelegate.m */; };
 		6CA16CDD1EA20B5600DB7AF0 /* Shader.fsh in Resources */ = {isa = PBXBuildFile; fileRef = 6CA16CDC1EA20B5600DB7AF0 /* Shader.fsh */; };
@@ -478,6 +486,24 @@
 		567F39C41EA2A7500081EB67 /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
 		567F39C61EA2A7620081EB67 /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = System/Library/Frameworks/CoreGraphics.framework; sourceTree = SDKROOT; };
 		567F39C81EA2AAD80081EB67 /* ImageIO.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = ImageIO.framework; path = System/Library/Frameworks/ImageIO.framework; sourceTree = SDKROOT; };
+		56ED779F1EBB9C0900FABA64 /* nav.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = nav.cpp; sourceTree = "<group>"; };
+		56ED77A01EBB9C0900FABA64 /* nav.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = nav.h; sourceTree = "<group>"; };
+		56ED77A51EBB9C1C00FABA64 /* DetourAlloc.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DetourAlloc.h; sourceTree = "<group>"; };
+		56ED77A61EBB9C1C00FABA64 /* DetourAssert.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DetourAssert.h; sourceTree = "<group>"; };
+		56ED77A71EBB9C1C00FABA64 /* DetourCommon.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DetourCommon.h; sourceTree = "<group>"; };
+		56ED77A81EBB9C1C00FABA64 /* DetourMath.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DetourMath.h; sourceTree = "<group>"; };
+		56ED77A91EBB9C1C00FABA64 /* DetourNavMesh.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DetourNavMesh.h; sourceTree = "<group>"; };
+		56ED77AA1EBB9C1C00FABA64 /* DetourNavMeshBuilder.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DetourNavMeshBuilder.h; sourceTree = "<group>"; };
+		56ED77AB1EBB9C1C00FABA64 /* DetourNavMeshQuery.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DetourNavMeshQuery.h; sourceTree = "<group>"; };
+		56ED77AC1EBB9C1C00FABA64 /* DetourNode.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DetourNode.h; sourceTree = "<group>"; };
+		56ED77AD1EBB9C1C00FABA64 /* DetourStatus.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DetourStatus.h; sourceTree = "<group>"; };
+		56ED77AF1EBB9C1C00FABA64 /* DetourAlloc.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = DetourAlloc.cpp; sourceTree = "<group>"; };
+		56ED77B01EBB9C1C00FABA64 /* DetourAssert.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = DetourAssert.cpp; sourceTree = "<group>"; };
+		56ED77B11EBB9C1C00FABA64 /* DetourCommon.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = DetourCommon.cpp; sourceTree = "<group>"; };
+		56ED77B21EBB9C1C00FABA64 /* DetourNavMesh.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = DetourNavMesh.cpp; sourceTree = "<group>"; };
+		56ED77B31EBB9C1C00FABA64 /* DetourNavMeshBuilder.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = DetourNavMeshBuilder.cpp; sourceTree = "<group>"; };
+		56ED77B41EBB9C1C00FABA64 /* DetourNavMeshQuery.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = DetourNavMeshQuery.cpp; sourceTree = "<group>"; };
+		56ED77B51EBB9C1C00FABA64 /* DetourNode.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = DetourNode.cpp; sourceTree = "<group>"; };
 		6CA16CD31EA20B5600DB7AF0 /* laidoff.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = laidoff.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		6CA16CD71EA20B5600DB7AF0 /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
 		6CA16CD91EA20B5600DB7AF0 /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
@@ -857,6 +883,54 @@
 			name = Frameworks;
 			sourceTree = "<group>";
 		};
+		56ED77A21EBB9C1C00FABA64 /* recastnavigation */ = {
+			isa = PBXGroup;
+			children = (
+				56ED77A31EBB9C1C00FABA64 /* Detour */,
+			);
+			name = recastnavigation;
+			path = ../../recastnavigation;
+			sourceTree = "<group>";
+		};
+		56ED77A31EBB9C1C00FABA64 /* Detour */ = {
+			isa = PBXGroup;
+			children = (
+				56ED77A41EBB9C1C00FABA64 /* Include */,
+				56ED77AE1EBB9C1C00FABA64 /* Source */,
+			);
+			path = Detour;
+			sourceTree = "<group>";
+		};
+		56ED77A41EBB9C1C00FABA64 /* Include */ = {
+			isa = PBXGroup;
+			children = (
+				56ED77A51EBB9C1C00FABA64 /* DetourAlloc.h */,
+				56ED77A61EBB9C1C00FABA64 /* DetourAssert.h */,
+				56ED77A71EBB9C1C00FABA64 /* DetourCommon.h */,
+				56ED77A81EBB9C1C00FABA64 /* DetourMath.h */,
+				56ED77A91EBB9C1C00FABA64 /* DetourNavMesh.h */,
+				56ED77AA1EBB9C1C00FABA64 /* DetourNavMeshBuilder.h */,
+				56ED77AB1EBB9C1C00FABA64 /* DetourNavMeshQuery.h */,
+				56ED77AC1EBB9C1C00FABA64 /* DetourNode.h */,
+				56ED77AD1EBB9C1C00FABA64 /* DetourStatus.h */,
+			);
+			path = Include;
+			sourceTree = "<group>";
+		};
+		56ED77AE1EBB9C1C00FABA64 /* Source */ = {
+			isa = PBXGroup;
+			children = (
+				56ED77AF1EBB9C1C00FABA64 /* DetourAlloc.cpp */,
+				56ED77B01EBB9C1C00FABA64 /* DetourAssert.cpp */,
+				56ED77B11EBB9C1C00FABA64 /* DetourCommon.cpp */,
+				56ED77B21EBB9C1C00FABA64 /* DetourNavMesh.cpp */,
+				56ED77B31EBB9C1C00FABA64 /* DetourNavMeshBuilder.cpp */,
+				56ED77B41EBB9C1C00FABA64 /* DetourNavMeshQuery.cpp */,
+				56ED77B51EBB9C1C00FABA64 /* DetourNode.cpp */,
+			);
+			path = Source;
+			sourceTree = "<group>";
+		};
 		6CA16CCA1EA20B5600DB7AF0 = {
 			isa = PBXGroup;
 			children = (
@@ -878,6 +952,7 @@
 		6CA16CD51EA20B5600DB7AF0 /* laidoff */ = {
 			isa = PBXGroup;
 			children = (
+				56ED77A21EBB9C1C00FABA64 /* recastnavigation */,
 				566372621EBA52D3001DA3F4 /* ode */,
 				567F39C11EA2A4600081EB67 /* etc1.cpp */,
 				567F39BF1EA2A2F70081EB67 /* image.cpp */,
@@ -911,6 +986,8 @@
 		6CA16CF41EA20CA700DB7AF0 /* src */ = {
 			isa = PBXGroup;
 			children = (
+				56ED779F1EBB9C0900FABA64 /* nav.cpp */,
+				56ED77A01EBB9C0900FABA64 /* nav.h */,
 				566373811EBA52FB001DA3F4 /* render_physics.c */,
 				566373821EBA52FB001DA3F4 /* render_physics.h */,
 				565676AB1EB0E96100FF64B3 /* lwanim.c */,
@@ -1177,6 +1254,7 @@
 				566373501EBA52D4001DA3F4 /* ball.cpp in Sources */,
 				566373771EBA52D4001DA3F4 /* threading_impl.cpp in Sources */,
 				5663736E1EBA52D4001DA3F4 /* odeou.cpp in Sources */,
+				56ED77A11EBB9C0900FABA64 /* nav.cpp in Sources */,
 				566373751EBA52D4001DA3F4 /* step.cpp in Sources */,
 				6CA16CDB1EA20B5600DB7AF0 /* AppDelegate.m in Sources */,
 				5644EA051EA91D9E00EAA658 /* lwuidim.c in Sources */,
@@ -1263,8 +1341,10 @@
 				6CA16D9E1EA210BB00DB7AF0 /* luac.c in Sources */,
 				567F39C01EA2A2F70081EB67 /* image.cpp in Sources */,
 				5663735D1EBA52D4001DA3F4 /* pu.cpp in Sources */,
+				56ED77B81EBB9C1C00FABA64 /* DetourCommon.cpp in Sources */,
 				6CA16D8D1EA210BB00DB7AF0 /* linit.c in Sources */,
 				5644E9F21EA8B69000EAA658 /* render_dialog.c in Sources */,
+				56ED77B71EBB9C1C00FABA64 /* DetourAssert.cpp in Sources */,
 				5644E9E81EA8B69000EAA658 /* input.c in Sources */,
 				567F39C21EA2A4600081EB67 /* etc1.cpp in Sources */,
 				6CA16D991EA210BB00DB7AF0 /* lstrlib.c in Sources */,
@@ -1272,15 +1352,18 @@
 				5663734E1EBA52D4001DA3F4 /* heightfield.cpp in Sources */,
 				6CA16D961EA210BB00DB7AF0 /* lparser.c in Sources */,
 				566373801EBA52D4001DA3F4 /* threadlocalstorage.cpp in Sources */,
+				56ED77B91EBB9C1C00FABA64 /* DetourNavMesh.cpp in Sources */,
 				566373531EBA52D4001DA3F4 /* dhinge.cpp in Sources */,
 				5663736A1EBA52D4001DA3F4 /* obstack.cpp in Sources */,
 				566373611EBA52D4001DA3F4 /* lcp.cpp in Sources */,
 				566373831EBA52FB001DA3F4 /* render_physics.c in Sources */,
 				566373681EBA52D4001DA3F4 /* nextafterf.c in Sources */,
 				5644E9F31EA8B69000EAA658 /* render_field.c in Sources */,
+				56ED77B61EBB9C1C00FABA64 /* DetourAlloc.cpp in Sources */,
 				6CA16DA11EA210BB00DB7AF0 /* lvm.c in Sources */,
 				566373561EBA52D4001DA3F4 /* hinge2.cpp in Sources */,
 				6CA16D8E1EA210BB00DB7AF0 /* liolib.c in Sources */,
+				56ED77BA1EBB9C1C00FABA64 /* DetourNavMeshBuilder.cpp in Sources */,
 				6CA16D821EA210BB00DB7AF0 /* lbaselib.c in Sources */,
 				5663737F1EBA52D4001DA3F4 /* malloc.cpp in Sources */,
 				566373571EBA52D4001DA3F4 /* joint.cpp in Sources */,
@@ -1304,12 +1387,14 @@
 				5663736F1EBA52D4001DA3F4 /* odetls.cpp in Sources */,
 				5644E9EC1EA8B69000EAA658 /* lwbattlecreature.c in Sources */,
 				6CA16D831EA210BB00DB7AF0 /* lbitlib.c in Sources */,
+				56ED77BB1EBB9C1C00FABA64 /* DetourNavMeshQuery.cpp in Sources */,
 				5663732D1EBA52D3001DA3F4 /* box.cpp in Sources */,
 				6CA16DA21EA210BB00DB7AF0 /* lzio.c in Sources */,
 				5644E9E91EA8B69000EAA658 /* ktx.c in Sources */,
 				6CA16CD81EA20B5600DB7AF0 /* main.m in Sources */,
 				5663732F1EBA52D3001DA3F4 /* collision_convex_trimesh.cpp in Sources */,
 				5644EA061EA91D9E00EAA658 /* render_battle_result.c in Sources */,
+				56ED77BC1EBB9C1C00FABA64 /* DetourNode.cpp in Sources */,
 				566373521EBA52D4001DA3F4 /* dball.cpp in Sources */,
 				566373511EBA52D4001DA3F4 /* contact.cpp in Sources */,
 				6CA16D851EA210BB00DB7AF0 /* lcorolib.c in Sources */,
@@ -1457,6 +1542,7 @@
 					"-DdDOUBLE",
 					"-miphoneos-version-min=8.0",
 					"-Werror=partial-availability",
+					"-I../recastnavigation/Detour/Include",
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.popsongremix.laidoff.dev;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -1482,6 +1568,7 @@
 					"-DdDOUBLE",
 					"-miphoneos-version-min=8.0",
 					"-Werror=partial-availability",
+					"-I../recastnavigation/Detour/Include",
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.popsongremix.laidoff.dev;
 				PRODUCT_NAME = "$(TARGET_NAME)";
