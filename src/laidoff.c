@@ -65,9 +65,9 @@ LwStaticAssert(sizeof(LWSKINVERTEX) == (GLsizei)(sizeof(float) * (3 + 3 + 2 + 4)
 
 #if LW_PLATFORM_ANDROID || LW_PLATFORM_IOS || LW_PLATFORM_IOS_SIMULATOR
 double glfwGetTime() {
-	struct timespec now;
-	clock_gettime(CLOCK_MONOTONIC, &now);
-	return now.tv_sec + (double)now.tv_nsec / 1e9;
+    LWTIMEPOINT tp;
+    lwtimepoint_now(&tp);
+	return tp.last_time.tv_sec + (double)tp.last_time.tv_nsec / 1e9;
 }
 
 void glfwGetFramebufferSize(void *p, int *w, int *h) {

@@ -42,8 +42,15 @@
     
     [self setupGL];
     
+    CGRect screenRect = [[UIScreen mainScreen] bounds];
+    CGFloat screenScale = [[UIScreen mainScreen] scale];
+    
+    CGFloat screenWidth = screenScale * screenRect.size.width;
+    CGFloat screenHeight = screenScale * screenRect.size.height;
+    
+    
     self.pLwc = lw_init();
-    lw_set_size(self.pLwc, 1920, 1080);
+    lw_set_size(self.pLwc, (int)screenWidth, (int)screenHeight);
 }
 
 - (void)dealloc

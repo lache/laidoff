@@ -1446,6 +1446,7 @@
 				GCC_C_LANGUAGE_STANDARD = c11;
 				HEADER_SEARCH_PATHS = "";
 				INFOPLIST_FILE = laidoff/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				OTHER_CFLAGS = (
 					"-I../glfw-3.2.1/deps",
@@ -1454,6 +1455,8 @@
 					"-I../ode/ou/include",
 					"-I../ode/include",
 					"-DdDOUBLE",
+					"-miphoneos-version-min=8.0",
+					"-Werror=partial-availability",
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.popsongremix.laidoff.dev;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -1468,6 +1471,7 @@
 				GCC_C_LANGUAGE_STANDARD = c11;
 				HEADER_SEARCH_PATHS = "";
 				INFOPLIST_FILE = laidoff/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				OTHER_CFLAGS = (
 					"-I../glfw-3.2.1/deps",
@@ -1476,6 +1480,8 @@
 					"-I../ode/ou/include",
 					"-I../ode/include",
 					"-DdDOUBLE",
+					"-miphoneos-version-min=8.0",
+					"-Werror=partial-availability",
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.popsongremix.laidoff.dev;
 				PRODUCT_NAME = "$(TARGET_NAME)";

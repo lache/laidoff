@@ -1,14 +1,25 @@
 #include "lwtimepoint.h"
 #if LW_TIMESPEC_AVAILABLE
-// Nothing
+#   if LW_PLATFORM_IOS
+#       include <sys/time.h>
+#   endif
 #else
-#include "GLFW/glfw3.h"
+#   include "GLFW/glfw3.h"
 #endif
+
 
 void lwtimepoint_now(LWTIMEPOINT* tp) {
 #if LW_TIMESPEC_AVAILABLE
-	struct timespec now;
-	clock_gettime(CLOCK_MONOTONIC, &now);
+    struct timespec now = {0,};
+#   if LW_PLATFORM_IOS
+    // clock_gettime is not supported at '< iOS 10.0'.
+    struct timeval time;
+    gettimeofday(&time, 0);
+    now.tv_sec = time.tv_sec;
+    now.tv_nsec = time.tv_usec * 1000;
+#   else
+    clock_gettime(CLOCK_MONOTONIC, &now);
+#   endif
 	tp->last_time = now;
 #else
 	tp->last_time = glfwGetTime();
