@@ -4,6 +4,7 @@
 #include "laidoff.h"
 #include "render_admin.h"
 #include "battle_result.h"
+#include "field.h"
 
 void get_dir_pad_center(float aspect_ratio, float *x, float *y) {
 	if (aspect_ratio > 1) {
@@ -77,6 +78,10 @@ void lw_trigger_mouse_press(LWCONTEXT *pLwc, float x, float y) {
 		pLwc->dir_pad_x = x;
 		pLwc->dir_pad_y = y;
 		pLwc->dir_pad_dragging = 1;
+	}
+
+	if (pLwc->game_scene == LGS_FIELD && fabs(aspect_ratio - 0.3f - 0.75f/2 - x) < 0.75f && fabs(-1 + 0.75f/2 - y) < 0.75f) {
+		field_attack(pLwc);
 	}
 
 	if (pLwc->battle_state != LBS_COMMAND_IN_PROGRESS && pLwc->player_turn_creature_index >= 0) {

@@ -42,6 +42,8 @@ typedef enum _LW_ATLAS_ENUM
 	LAE_U_ENEMY_TURN_ALPHA_KTX,
 	LAE_U_PLAYER_TURN_KTX,
 	LAE_U_PLAYER_TURN_ALPHA_KTX,
+	LAE_U_FIST_ICON_KTX,
+	LAE_U_FIST_ICON_ALPHA_KTX,
 
 	LAE_C_BIKER_KTX,
 	LAE_C_BIKER_ALPHA_KTX,
@@ -99,6 +101,8 @@ static const char *tex_atlas_filename[] = {
 	ASSETS_BASE_PATH "ktx" PATH_SEPARATOR "u-enemy-turn-a_alpha.ktx",
 	ASSETS_BASE_PATH "ktx" PATH_SEPARATOR "u-player-turn-a.ktx",
 	ASSETS_BASE_PATH "ktx" PATH_SEPARATOR "u-player-turn-a_alpha.ktx",
+	ASSETS_BASE_PATH "ktx" PATH_SEPARATOR "u-fist-icon-a.ktx",
+	ASSETS_BASE_PATH "ktx" PATH_SEPARATOR "u-fist-icon-a_alpha.ktx",
 
 	ASSETS_BASE_PATH "ktx" PATH_SEPARATOR "c-biker-a.ktx",
 	ASSETS_BASE_PATH "ktx" PATH_SEPARATOR "c-biker-a_alpha.ktx",

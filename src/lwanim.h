@@ -75,6 +75,7 @@ typedef enum _LW_ACTION {
 	LWAC_TREEPLANEACTION,
 	LWAC_HUMANACTION_WALKPOLISH,
 	LWAC_HUMANACTION_IDLE,
+	LWAC_HUMANACTION_ATTACK,
 	LWAC_DETACHPLANEACTION,
 	LWAC_DETACHPLANEACTION_CHILDTRANS,
 
@@ -86,6 +87,7 @@ static const char* action_filename[] = {
 	ASSETS_BASE_PATH "action" PATH_SEPARATOR "TreePlaneAction.act",
 	ASSETS_BASE_PATH "action" PATH_SEPARATOR "HumanAction_WalkPolish.act",
 	ASSETS_BASE_PATH "action" PATH_SEPARATOR "HumanAction_Idle.act",
+	ASSETS_BASE_PATH "action" PATH_SEPARATOR "HumanAction_Attack.act",
 	ASSETS_BASE_PATH "action" PATH_SEPARATOR "DetachPlaneAction.act",
 	ASSETS_BASE_PATH "action" PATH_SEPARATOR "DetachPlaneAction_ChildTrans.act",
 };

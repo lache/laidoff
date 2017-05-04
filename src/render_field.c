@@ -103,6 +103,15 @@ static void render_ui(const LWCONTEXT* pLwc)
 	glUniformMatrix4fv(pLwc->shader[shader_index].mvp_location, 1, GL_FALSE, (const GLfloat*)proj_view_model);
 	glBindTexture(GL_TEXTURE_2D, pLwc->tex_programmed[LPT_DIR_PAD]);
 	glDrawArrays(GL_TRIANGLES, 0, pLwc->vertex_buffer[vbo_index].vertex_count);
+
+	const float aspect_ratio = (float)pLwc->width / pLwc->height;
+
+	const float fist_icon_margin_x = 0.3f;
+	const float fist_icon_margin_y = 0.2f;
+
+	render_solid_vb_ui_alpha(pLwc, aspect_ratio - fist_icon_margin_x, -1 + fist_icon_margin_y, 0.75f, 0.75f,
+		pLwc->tex_atlas[LAE_U_FIST_ICON_KTX], pLwc->tex_atlas[LAE_U_FIST_ICON_ALPHA_KTX],
+		LVT_RIGHT_BOTTOM_ANCHORED_SQUARE, 1, 0, 0, 0, 0);
 }
 
 void render_player(const LWCONTEXT* pLwc, mat4x4 perspective, mat4x4 view) {
@@ -125,12 +134,14 @@ void render_player(const LWCONTEXT* pLwc, mat4x4 perspective, mat4x4 view) {
 	mat4x4_mul(skin_model, skin_scale, skin_model);
 	mat4x4_mul(skin_model, skin_trans, skin_model);
 
-	render_skin(pLwc,
-	            pLwc->tex_atlas[LAE_3D_PLAYER_TEX_KTX],
-	            LSVT_HUMAN,
-	            &pLwc->action[pLwc->player_moving ? LWAC_HUMANACTION_WALKPOLISH : LWAC_HUMANACTION_IDLE],
-	            &pLwc->armature[LWAR_HUMANARMATURE],
-	            1, 0, 0, 0, 0, perspective, view, skin_model);
+	if (pLwc->player_action) {
+		render_skin(pLwc,
+			pLwc->tex_atlas[LAE_3D_PLAYER_TEX_KTX],
+			LSVT_HUMAN,
+			pLwc->player_action,
+			&pLwc->armature[LWAR_HUMANARMATURE],
+			1, 0, 0, 0, 0, perspective, view, skin_model);
+	}
 }
 
 void lwc_render_field(const LWCONTEXT* pLwc)
@@ -204,7 +215,7 @@ void lwc_render_field(const LWCONTEXT* pLwc)
 	render_player(pLwc, perspective, view);
 
 	render_ui(pLwc);
-	
+
 	// give up const-ness
 	((LWCONTEXT*)pLwc)->render_count++;
 }

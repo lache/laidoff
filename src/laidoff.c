@@ -1028,7 +1028,7 @@ void lwc_update(LWCONTEXT *pLwc, double delta_time) {
 	}
 
 	if (pLwc->game_scene == LGS_FIELD) {
-		update_field(pLwc->field);
+		update_field(pLwc, pLwc->field);
 	}
 
 	((LWCONTEXT *)pLwc)->update_count++;

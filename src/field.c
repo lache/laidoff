@@ -345,7 +345,7 @@ void move_player_to_ground(LWFIELD* field) {
 	}
 }
 
-void update_field(LWFIELD* field) {
+void update_field(LWCONTEXT* pLwc, LWFIELD* field) {
 	if (!field) {
 		return;
 	}
@@ -359,6 +359,22 @@ void update_field(LWFIELD* field) {
 	//dWorldStep(field->world, 0.05);
 
 	move_player_to_ground(field);
+
+	LW_ACTION player_anim;
+	if (pLwc->player_attacking) {
+		player_anim = LWAC_HUMANACTION_ATTACK;
+	} else if (pLwc->player_moving) {
+		player_anim = LWAC_HUMANACTION_WALKPOLISH;
+	} else {
+		player_anim = LWAC_HUMANACTION_IDLE;
+	}
+
+	pLwc->player_action = &pLwc->action[player_anim];
+
+	float f = (float)(pLwc->skin_time * 23.98f); // FPS multiplied
+	if (pLwc->player_attacking && pLwc->player_action && f > pLwc->player_action->last_key_f) {
+		pLwc->player_attacking = 0;
+	}
 }
 
 void unload_field(LWFIELD* field) 	{
@@ -377,4 +393,12 @@ void unload_field(LWFIELD* field) 	{
 	dCloseODE();
 
 	memset(field, 0, sizeof(LWFIELD));
+}
+
+void field_attack(LWCONTEXT* pLwc) {
+	if (!pLwc->player_attacking) {
+		// start attack anim
+		pLwc->player_attacking = 1;
+		pLwc->skin_time = 0;
+	}
 }

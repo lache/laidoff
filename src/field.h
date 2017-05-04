@@ -40,6 +40,7 @@ void move_player(LWCONTEXT *pLwc);
 void resolve_player_collision(LWCONTEXT *pLwc);
 LWFIELD* load_field(const char* filename);
 void unload_field(LWFIELD* field);
-void update_field(LWFIELD* field);
+void update_field(LWCONTEXT* pLwc, LWFIELD* field);
 void set_field_player_delta(LWFIELD* field, float x, float y, float z);
 void get_field_player_position(const LWFIELD* field, float* x, float* y, float* z);
+void field_attack(LWCONTEXT* pLwc);
