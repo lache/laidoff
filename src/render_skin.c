@@ -59,7 +59,7 @@ void lwc_render_skin(const struct _LWCONTEXT* pLwc) {
 			LSVT_TRIANGLE,
 			&pLwc->action[LWAC_TRIANGLEACTION],
 			&pLwc->armature[LWAR_TRIANGLEARMATURE],
-			1, 0, 0, 0, 0);
+			1, 0, 0, 0, 0, pLwc->player_skin_time);
 		break;
 	case 2:
 		render_skin_ui(pLwc, 0, 0, 0.5f,
@@ -67,7 +67,7 @@ void lwc_render_skin(const struct _LWCONTEXT* pLwc) {
 			LSVT_TREEPLANE,
 			&pLwc->action[LWAC_TREEPLANEACTION],
 			&pLwc->armature[LWAR_TREEPLANEARMATURE],
-			1, 0, 0, 0, 0);
+			1, 0, 0, 0, 0, pLwc->player_skin_time);
 		break;
 	case 3:
 		render_skin_ui(pLwc, 0, 0, 0.5f,
@@ -75,7 +75,7 @@ void lwc_render_skin(const struct _LWCONTEXT* pLwc) {
 			LSVT_DETACHPLANE,
 			&pLwc->action[LWAC_DETACHPLANEACTION_CHILDTRANS],
 			&pLwc->armature[LWAR_DETACHPLANEARMATURE],
-			1, 0, 0, 0, 0);
+			1, 0, 0, 0, 0, pLwc->player_skin_time);
 		break;
 	default:
 		break;
@@ -91,7 +91,7 @@ void render_skin(const LWCONTEXT* pLwc,
 	const struct _LWANIMACTION* action,
 	const struct _LWARMATURE* armature,
 	float alpha_multiplier, float or , float og, float ob, float oratio,
-	const mat4x4 proj, const mat4x4 view, const mat4x4 model) {
+	const mat4x4 proj, const mat4x4 view, const mat4x4 model, double skin_time) {
 
 	int shader_index = LWST_SKIN;
 
@@ -109,7 +109,7 @@ void render_skin(const LWCONTEXT* pLwc,
 		quat_identity(bone_q[i]);
 	}
 
-	float f = (float)(pLwc->skin_time * action->fps);
+	float f = (float)(skin_time * action->fps);
 	f = fmodf(f, action->last_key_f);
 
 	//const float f = 0;// 89;
@@ -216,7 +216,7 @@ void render_skin_ui(const LWCONTEXT* pLwc,
 	enum _LW_SKIN_VBO_TYPE lvt,
 	const struct _LWANIMACTION* action,
 	const struct _LWARMATURE* armature,
-	float alpha_multiplier, float or , float og, float ob, float oratio) {
+	float alpha_multiplier, float or , float og, float ob, float oratio, double skin_time) {
 
 	mat4x4 model;
 	mat4x4 model_translate;
@@ -231,5 +231,5 @@ void render_skin_ui(const LWCONTEXT* pLwc,
 	mat4x4 identity_view;
 	mat4x4_identity(identity_view);
 
-	render_skin(pLwc, tex_index, lvt, action, armature, alpha_multiplier, or , og, ob, oratio, pLwc->proj, identity_view, model);
+	render_skin(pLwc, tex_index, lvt, action, armature, alpha_multiplier, or , og, ob, oratio, pLwc->proj, identity_view, model, skin_time);
 }

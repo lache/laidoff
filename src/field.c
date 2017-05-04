@@ -110,24 +110,24 @@ LWFIELD* load_field(const char* filename) {
 	field->ground = dCreatePlane(field->space, 0, 0, 1, 0);
 
 	// Player geom
-	field->geom_pos[0] = 0;
-	field->geom_pos[1] = 0;
-	field->geom_pos[2] = 10;
+	field->player_pos[0] = 0;
+	field->player_pos[1] = 0;
+	field->player_pos[2] = 10;
 	field->player_geom = dCreateCapsule(field->space, field->player_radius, field->player_length);
-	dGeomSetPosition(field->player_geom, field->geom_pos[0], field->geom_pos[1], field->geom_pos[2]);
+	dGeomSetPosition(field->player_geom, field->player_pos[0], field->player_pos[1], field->player_pos[2]);
 
 	const dReal ray_length = 50;
 	dMatrix3 R;
 
 	// Player center ray
 	field->player_center_ray = dCreateRay(field->space, ray_length);
-	dGeomSetPosition(field->player_center_ray, field->geom_pos[0], field->geom_pos[1], field->geom_pos[2]);
+	dGeomSetPosition(field->player_center_ray, field->player_pos[0], field->player_pos[1], field->player_pos[2]);
 	dRFromAxisAndAngle(R, 1, 0, 0, M_PI); // ray direction: downward (-Z)
 	dGeomSetRotation(field->player_center_ray, R);
 
 	// Player contact ray
 	field->player_contact_ray = dCreateRay(field->space, ray_length);
-	dGeomSetPosition(field->player_contact_ray, field->geom_pos[0], field->geom_pos[1], field->geom_pos[2]);
+	dGeomSetPosition(field->player_contact_ray, field->player_pos[0], field->player_pos[1], field->player_pos[2]);
 	dRFromAxisAndAngle(R, 1, 0, 0, M_PI); // ray direction: downward (-Z)
 	dGeomSetRotation(field->player_contact_ray, R);
 
@@ -221,8 +221,8 @@ static void field_near_callback(void *data, dGeomID o1, dGeomID o2) {
 					dReal* n = contact[i].geom.normal;
 					dReal d = contact[i].geom.depth;
 
-					field->geom_pos[0] += sign * n[0] * d;
-					field->geom_pos[1] += sign * n[1] * d;
+					field->player_pos[0] += sign * n[0] * d;
+					field->player_pos[1] += sign * n[1] * d;
 				}
 			}
 		}
@@ -235,15 +235,15 @@ void reset_ray_result(LWFIELD* field) {
 }
 
 void set_field_player_delta(LWFIELD* field, float x, float y, float z) {
-	field->geom_pos_delta[0] = x;
-	field->geom_pos_delta[1] = y;
-	field->geom_pos_delta[2] = z;
+	field->player_pos_delta[0] = x;
+	field->player_pos_delta[1] = y;
+	field->player_pos_delta[2] = z;
 }
 
 void get_field_player_position(const LWFIELD* field, float* x, float* y, float* z) {
-	*x = (float)field->geom_pos[0];
-	*y = (float)field->geom_pos[1];
-	*z = (float)(field->geom_pos[2] - field->player_length / 2 - field->player_radius);
+	*x = (float)field->player_pos[0];
+	*y = (float)field->player_pos[1];
+	*z = (float)(field->player_pos[2] - field->player_length / 2 - field->player_radius);
 }
 
 void move_player_geom_by_input(LWFIELD* field) {
@@ -266,14 +266,14 @@ void move_player_geom_by_input(LWFIELD* field) {
 	dQtoR(qmove, qmoveR);
 
 	dVector3 geom_pos_delta_rotated;
-	dMultiply0_331(geom_pos_delta_rotated, qmoveR, field->geom_pos_delta);
+	dMultiply0_331(geom_pos_delta_rotated, qmoveR, field->player_pos_delta);
 
 	for (int i = 0; i < 3; i++) {
-		field->geom_pos[i] += geom_pos_delta_rotated[i];
-		field->geom_pos_delta[i] = 0;
+		field->player_pos[i] += geom_pos_delta_rotated[i];
+		field->player_pos_delta[i] = 0;
 	}
-	dGeomSetPosition(field->player_geom, field->geom_pos[0], field->geom_pos[1], field->geom_pos[2]);
-	dGeomSetPosition(field->player_center_ray, field->geom_pos[0], field->geom_pos[1], field->geom_pos[2]);
+	dGeomSetPosition(field->player_geom, field->player_pos[0], field->player_pos[1], field->player_pos[2]);
+	dGeomSetPosition(field->player_center_ray, field->player_pos[0], field->player_pos[1], field->player_pos[2]);
 	const dReal* player_contact_ray_pos = dGeomGetPosition(field->player_contact_ray);
 	dGeomSetPosition(field->player_contact_ray,
 		player_contact_ray_pos[0] + geom_pos_delta_rotated[0],
@@ -317,7 +317,7 @@ void move_player_to_ground(LWFIELD* field) {
 
 		dReal tz = field->center_ray_result[min_ray_index].geom.pos[2] + field->player_radius / field->center_ray_result[min_ray_index].geom.normal[2] + field->player_length / 2;
 
-		dReal d1 = tz - field->geom_pos[2];
+		dReal d1 = tz - field->player_pos[2];
 
 		dReal d2 = FLT_MIN;
 		if (min_side_ray_index >= 0) {
@@ -326,22 +326,22 @@ void move_player_to_ground(LWFIELD* field) {
 		}
 
 		if (d1 > d2) {
-			field->geom_pos[2] += d2;
+			field->player_pos[2] += d2;
 		} else {
-			field->geom_pos[2] += d1;
+			field->player_pos[2] += d1;
 		}
 	}
 
-	dGeomSetPosition(field->player_geom, field->geom_pos[0], field->geom_pos[1], field->geom_pos[2]);
-	dGeomSetPosition(field->player_center_ray, field->geom_pos[0], field->geom_pos[1], field->geom_pos[2]);
+	dGeomSetPosition(field->player_geom, field->player_pos[0], field->player_pos[1], field->player_pos[2]);
+	dGeomSetPosition(field->player_center_ray, field->player_pos[0], field->player_pos[1], field->player_pos[2]);
 	if (min_ray_index >= 0) {
 		dGeomSetPosition(field->player_contact_ray,
-			field->geom_pos[0] - field->player_radius * field->center_ray_result[min_ray_index].geom.normal[0],
-			field->geom_pos[1] - field->player_radius * field->center_ray_result[min_ray_index].geom.normal[1],
-			field->geom_pos[2]);
+			field->player_pos[0] - field->player_radius * field->center_ray_result[min_ray_index].geom.normal[0],
+			field->player_pos[1] - field->player_radius * field->center_ray_result[min_ray_index].geom.normal[1],
+			field->player_pos[2]);
 
 	} else {
-		dGeomSetPosition(field->player_contact_ray, field->geom_pos[0], field->geom_pos[1], field->geom_pos[2]);
+		dGeomSetPosition(field->player_contact_ray, field->player_pos[0], field->player_pos[1], field->player_pos[2]);
 	}
 }
 
@@ -371,10 +371,36 @@ void update_field(LWCONTEXT* pLwc, LWFIELD* field) {
 
 	pLwc->player_action = &pLwc->action[player_anim];
 
-	float f = (float)(pLwc->skin_time * pLwc->player_action->fps);
+	float f = (float)(pLwc->player_skin_time * pLwc->player_action->fps);
 	if (pLwc->player_attacking && pLwc->player_action && f > pLwc->player_action->last_key_f) {
 		pLwc->player_attacking = 0;
 	}
+
+	pLwc->player_skin_time += pLwc->delta_time;
+	pLwc->test_player_skin_time += pLwc->delta_time;
+
+	if (pLwc->path_query.n_smooth_path) {
+
+		pLwc->path_query_time += (float)pLwc->delta_time;
+
+		int idx = (int)fmodf((float)(pLwc->path_query_time * 30), (float)pLwc->path_query.n_smooth_path);
+		const float* p = &pLwc->path_query.smooth_path[3 * idx];
+		pLwc->path_query_test_player_pos[0] = p[0];
+		pLwc->path_query_test_player_pos[1] = -p[2];
+		pLwc->path_query_test_player_pos[2] = p[1];
+
+		if (idx < pLwc->path_query.n_smooth_path - 1) {
+			const float* p2 = &pLwc->path_query.smooth_path[3 * (idx + 1)];
+			pLwc->path_query_test_player_rot = atan2f((-p2[2]) - (-p[2]), (p2[0]) - (p[0]));
+		}
+
+		// query other random path
+		if (idx >= pLwc->path_query.n_smooth_path - 1) {
+			set_random_start_end_pos(pLwc->nav, &pLwc->path_query);
+			nav_query(pLwc->nav, &pLwc->path_query);
+			pLwc->path_query_time = 0;
+		}
+	}	
 }
 
 void unload_field(LWFIELD* field) 	{
@@ -399,6 +425,6 @@ void field_attack(LWCONTEXT* pLwc) {
 	if (!pLwc->player_attacking) {
 		// start attack anim
 		pLwc->player_attacking = 1;
-		pLwc->skin_time = 0;
+		pLwc->player_skin_time = 0;
 	}
 }

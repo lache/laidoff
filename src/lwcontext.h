@@ -22,6 +22,7 @@
 #include "lwfbo.h"
 #include "lwtrail.h"
 #include "armature.h"
+#include "nav.h"
 
 typedef enum _LW_SHADER_TYPE {
 	LWST_DEFAULT,
@@ -199,7 +200,14 @@ typedef struct _LWCONTEXT {
 
 	LWARMATURE armature[LWAR_COUNT];
 	LWANIMACTION action[LWAC_COUNT];
-	double skin_time;
+	double player_skin_time;
 
 	struct _LWFIELD* field;
+
+	void* nav;
+	LWPATHQUERY path_query;
+	float path_query_time;
+	vec3 path_query_test_player_pos;
+	float path_query_test_player_rot;
+	double test_player_skin_time;
 } LWCONTEXT;

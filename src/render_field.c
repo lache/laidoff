@@ -7,16 +7,16 @@
 #include "render_skin.h"
 #include "field.h"
 
-static void render_field_object(const LWCONTEXT* pLwc, int vbo_index, GLuint tex_id, mat4x4 view, mat4x4 proj, float x, float y, float sx, float sy, float alpha_multiplier, int mipmap)
+static void render_field_object(const LWCONTEXT* pLwc, int vbo_index, GLuint tex_id, mat4x4 view, mat4x4 proj, float x, float y, float z, float sx, float sy, float sz, float alpha_multiplier, int mipmap)
 {
 	int shader_index = LWST_DEFAULT;
 
 	mat4x4 model;
 	mat4x4_identity(model);
 	mat4x4_rotate_X(model, model, 0);
-	mat4x4_scale_aniso(model, model, sx, sy, 1);
+	mat4x4_scale_aniso(model, model, sx, sy, sz);
 	mat4x4 model_translate;
-	mat4x4_translate(model_translate, x, y, 0);
+	mat4x4_translate(model_translate, x, y, z);
 	mat4x4_mul(model, model_translate, model);
 
 	mat4x4 view_model;
@@ -26,6 +26,7 @@ static void render_field_object(const LWCONTEXT* pLwc, int vbo_index, GLuint tex
 	mat4x4_identity(proj_view_model);
 	mat4x4_mul(proj_view_model, proj, view_model);
 
+	glUseProgram(pLwc->shader[shader_index].program);
 	glBindBuffer(GL_ARRAY_BUFFER, pLwc->vertex_buffer[vbo_index].vertex_buffer);
 	bind_all_vertex_attrib(pLwc, vbo_index);
 	glUniformMatrix4fv(pLwc->shader[shader_index].mvp_location, 1, GL_FALSE, (const GLfloat*)proj_view_model);
@@ -114,6 +115,70 @@ static void render_ui(const LWCONTEXT* pLwc)
 		LVT_RIGHT_BOTTOM_ANCHORED_SQUARE, 1, 0, 0, 0, 0);
 }
 
+void render_debug_sphere(const LWCONTEXT* pLwc, GLuint tex_id, mat4x4 perspective, mat4x4 view, float x, float y, float z) {
+
+	render_field_object(
+		pLwc,
+		LVT_SPHERE,
+		tex_id,
+		view,
+		perspective,
+		x,
+		y,
+		z,
+		1.0f,
+		1.0f,
+		1.0f,
+		1,
+		1
+	);
+}
+
+void render_path_query_test_player(const LWCONTEXT* pLwc, mat4x4 perspective, mat4x4 view) {
+
+	render_debug_sphere(pLwc,
+		pLwc->tex_programmed[LPT_SOLID_RED],
+		perspective,
+		view,
+		pLwc->path_query.spos[0],
+		-pLwc->path_query.spos[2],
+		pLwc->path_query.spos[1]);
+
+	render_debug_sphere(pLwc,
+		pLwc->tex_programmed[LPT_SOLID_BLUE],
+		perspective,
+		view,
+		pLwc->path_query.epos[0],
+		-pLwc->path_query.epos[2],
+		pLwc->path_query.epos[1]);
+
+	if (pLwc->path_query.n_smooth_path) {
+
+		mat4x4 skin_trans;
+		mat4x4_identity(skin_trans);
+		mat4x4_translate(skin_trans, pLwc->path_query_test_player_pos[0], pLwc->path_query_test_player_pos[1], pLwc->path_query_test_player_pos[2]);
+		mat4x4 skin_scale;
+		mat4x4_identity(skin_scale);
+		mat4x4_scale_aniso(skin_scale, skin_scale, 0.5f, 0.5f, 0.5f);
+		mat4x4 skin_rot;
+		mat4x4_identity(skin_rot);
+		mat4x4_rotate_Z(skin_rot, skin_rot, pLwc->path_query_test_player_rot + (float)LWDEG2RAD(90));
+
+		mat4x4 skin_model;
+		mat4x4_identity(skin_model);
+		mat4x4_mul(skin_model, skin_rot, skin_model);
+		mat4x4_mul(skin_model, skin_scale, skin_model);
+		mat4x4_mul(skin_model, skin_trans, skin_model);
+
+		render_skin(pLwc,
+			pLwc->tex_atlas[LAE_3D_PLAYER_TEX_KTX],
+			LSVT_HUMAN,
+			&pLwc->action[LWAC_HUMANACTION_WALKPOLISH],
+			&pLwc->armature[LWAR_HUMANARMATURE],
+			1, 0, 0, 0, 0, perspective, view, skin_model, pLwc->test_player_skin_time * 5);
+	}
+}
+
 void render_player(const LWCONTEXT* pLwc, mat4x4 perspective, mat4x4 view) {
 	mat4x4 skin_trans;
 	mat4x4_identity(skin_trans);
@@ -140,7 +205,7 @@ void render_player(const LWCONTEXT* pLwc, mat4x4 perspective, mat4x4 view) {
 			LSVT_HUMAN,
 			pLwc->player_action,
 			&pLwc->armature[LWAR_HUMANARMATURE],
-			1, 0, 0, 0, 0, perspective, view, skin_model);
+			1, 0, 0, 0, 0, perspective, view, skin_model, pLwc->player_skin_time);
 	}
 }
 
@@ -169,7 +234,7 @@ void lwc_render_field(const LWCONTEXT* pLwc)
 	float player_x = 0, player_y = 0, player_z = 0;
 	get_field_player_position(pLwc->field, &player_x, &player_y, &player_z);
 
-	const float cam_dist = 20;
+	const float cam_dist = 30;
 	mat4x4 view;
 	vec3 eye = { player_x, player_y - cam_dist, cam_dist };
 	vec3 center = { player_x, player_y, player_z };
@@ -186,6 +251,8 @@ void lwc_render_field(const LWCONTEXT* pLwc)
 		perspective,
 		0,
 		0,
+		0,
+		1,
 		1,
 		1,
 		1,
@@ -204,8 +271,10 @@ void lwc_render_field(const LWCONTEXT* pLwc)
 				perspective,
 				pLwc->field_object[i].x,
 				pLwc->field_object[i].y,
+				0,
 				pLwc->field_object[i].sx,
 				pLwc->field_object[i].sy,
+				1.0f,
 				pLwc->field_object[i].alpha_multiplier,
 				1
 			);
@@ -213,6 +282,8 @@ void lwc_render_field(const LWCONTEXT* pLwc)
 	}
 
 	render_player(pLwc, perspective, view);
+
+	render_path_query_test_player(pLwc, perspective, view);
 
 	render_ui(pLwc);
 

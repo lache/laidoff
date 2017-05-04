@@ -10,7 +10,7 @@ void render_skin_ui(const LWCONTEXT* pLwc,
 	enum _LW_SKIN_VBO_TYPE lvt,
 	const struct _LWANIMACTION* action,
 	const struct _LWARMATURE* armature,
-	float alpha_multiplier, float or , float og, float ob, float oratio);
+	float alpha_multiplier, float or , float og, float ob, float oratio, double skin_time);
 
 void render_skin(const LWCONTEXT* pLwc,
 	GLuint tex_index,
@@ -18,4 +18,4 @@ void render_skin(const LWCONTEXT* pLwc,
 	const struct _LWANIMACTION* action,
 	const struct _LWARMATURE* armature,
 	float alpha_multiplier, float or , float og, float ob, float oratio,
-	const mat4x4 proj, const mat4x4 view, const mat4x4 model);
+	const mat4x4 proj, const mat4x4 view, const mat4x4 model, double skin_time);

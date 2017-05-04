@@ -28,8 +28,8 @@ typedef struct _LWFIELD {
 	int center_ray_result_count;
 	dContact contact_ray_result[MAX_CONTACT_RAY_RESULT];
 	int contact_ray_result_count;
-	dVector3 geom_pos;
-	dVector3 geom_pos_delta;
+	dVector3 player_pos;
+	dVector3 player_pos_delta;
 	dVector3 ground_normal;
 	LWFIELDCUBEOBJECT* field_cube_object;
 	int field_cube_object_count;

@@ -34,6 +34,7 @@
 #include "lwanim.h"
 #include "lwskinmesh.h"
 #include "render_physics.h"
+#include "nav.h"
 
 #define LWEPSILON (1e-3)
 #define INCREASE_RENDER_SCORE (20)
@@ -430,9 +431,13 @@ static void init_vbo(LWCONTEXT *pLwc) {
 	load_vbo(pLwc, ASSETS_BASE_PATH "vbo" PATH_SEPARATOR "Trail.vbo",
 		&pLwc->vertex_buffer[LVT_TRAIL]);
 
-	// LVT_TRAIL
+	// LVT_FLOOR
 	load_vbo(pLwc, ASSETS_BASE_PATH "vbo" PATH_SEPARATOR "Floor.vbo",
 		&pLwc->vertex_buffer[LVT_FLOOR]);
+
+	// LVT_SPHERE
+	load_vbo(pLwc, ASSETS_BASE_PATH "vbo" PATH_SEPARATOR "Sphere.vbo",
+		&pLwc->vertex_buffer[LVT_SPHERE]);
 
 
 	// === SKIN VERTEX BUFFERS ===
@@ -690,7 +695,7 @@ void reset_field_context(LWCONTEXT* pLwc) {
 }
 
 void reset_time(LWCONTEXT* pLwc) {
-	pLwc->skin_time = 0;
+	pLwc->player_skin_time = 0;
 }
 
 void reset_runtime_context(LWCONTEXT* pLwc) {
@@ -987,8 +992,6 @@ void lwc_update(LWCONTEXT *pLwc, double delta_time) {
 	pLwc->app_time += pLwc->delta_time;
 	pLwc->scene_time += pLwc->delta_time;
 
-	pLwc->skin_time += pLwc->delta_time;
-
 	update_dialog(pLwc);
 
 	//****//
@@ -1249,6 +1252,13 @@ void init_physics(LWCONTEXT* pLwc) {
 	pLwc->field = load_field(ASSETS_BASE_PATH "field" PATH_SEPARATOR "testfield.field");
 }
 
+void init_nav(LWCONTEXT* pLwc) {
+	pLwc->nav = load_nav(ASSETS_BASE_PATH "nav" PATH_SEPARATOR "test.nav");
+
+	set_random_start_end_pos(pLwc->nav, &pLwc->path_query);
+	nav_query(pLwc->nav, &pLwc->path_query);
+}
+
 LWCONTEXT *lw_init(void) {
 	init_ext_image_lib();
 
@@ -1276,6 +1286,8 @@ LWCONTEXT *lw_init(void) {
 
 	init_physics(pLwc);
 
+	init_nav(pLwc);
+
 	return pLwc;
 }
 
@@ -1288,6 +1300,10 @@ void lw_deinit(LWCONTEXT *pLwc) {
 	for (int i = 0; i < LWAR_COUNT; i++) {
 		unload_armature(&pLwc->armature[i]);
 	}
+
+	unload_field(pLwc->field);
+
+	unload_nav(pLwc->nav);
 
 	free(pLwc);
 }

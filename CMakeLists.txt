@@ -17,6 +17,7 @@ include_directories("lua-5.3.4")
 include_directories("ode/include")
 include_directories("ode/ou/include")
 include_directories("ode/ode/src")
+include_directories("recastnavigation/Detour/Include")
 
 #include_directories(libpng-1.6.28)
 
@@ -96,7 +97,6 @@ elseif (RPI)
 
 endif()
 
-
 set(GLAD "${GLFW_SOURCE_DIR}/deps/glad/glad.h"
          "${GLFW_SOURCE_DIR}/deps/glad.c")
 set(GETOPT "${GLFW_SOURCE_DIR}/deps/getopt.h"
@@ -106,12 +106,12 @@ set(TINYCTHREAD "${GLFW_SOURCE_DIR}/deps/tinycthread.h"
 
 file(GLOB LUA_LIB "lua-5.3.4/*.h" "lua-5.3.4/*.c")
 file(GLOB ODE_LIB "ode/ode/src/*.h" "ode/ode/src/*.c" "ode/ode/src/*.cpp" "ode/ode/src/joints/*.h" "ode/ode/src/joints/*.cpp" "ode/ou/src/ou/*.cpp" "ode/include/ode/*.h" "ode/ou/include/ou/*.h")
-file(GLOB LAIDOFF_LIB "src/*.h" "src/*.c")
+file(GLOB LAIDOFF_LIB "src/*.h" "src/*.c" "src/*.cpp")
+file(GLOB DETOUR_LIB "recastnavigation/Detour/Include/*.h" "recastnavigation/Detour/Source/*.cpp")
 
 source_group(Lua FILES ${LUA_LIB})
-
 source_group(Ode FILES ${ODE_LIB})
-
+source_group(Detour FILES ${DETOUR_LIB})
 source_group(Win32 FILES ${WIN32_DEPS} ${ICON})
 
 #add_executable(laidoff WIN32 MACOSX_BUNDLE laidoff.c ${ICON} ${GLAD})
@@ -120,6 +120,7 @@ MACOSX_BUNDLE
 ${LAIDOFF_LIB}
 ${ODE_LIB}
 ${LUA_LIB}
+${DETOUR_LIB}
 ${WIN32_DEPS}
 ${OSX_DEPS}
 ${RPI_DEPS}
