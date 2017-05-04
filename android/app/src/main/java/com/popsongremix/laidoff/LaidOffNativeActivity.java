@@ -74,6 +74,7 @@ public class LaidOffNativeActivity extends NativeActivity
         assetsLoader.registerAllAssetsOfType("glsles");
         assetsLoader.registerAllAssetsOfType("l");
         assetsLoader.registerAllAssetsOfType("field");
+        assetsLoader.registerAllAssetsOfType("nav");
         sendApkPath(assetsLoader.GetAPKPath());
 
         //noinspection deprecation

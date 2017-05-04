@@ -24,9 +24,14 @@ file(GLOB ODE_LIB
     "../../../../../ode/ou/include/ou/*.h"
 )
 
+file(GLOB DETOUR_LIB
+    "../../../../../recastnavigation/Detour/Include/*.h"
+    "../../../../../recastnavigation/Detour/Source/*.cpp")
+
 file(GLOB LAIDOFF_LIB
     "../../../../../src/*.h"
     "../../../../../src/*.c"
+    "../../../../../src/*.cpp"
 )
 
 source_group(Lua FILES ${LUA_LIB})
@@ -42,6 +47,7 @@ add_library(native-activity SHARED
     ${LAIDOFF_LIB}
     ${LUA_LIB}
     ${ODE_LIB}
+    ${DETOUR_LIB}
 )
 
 target_include_directories(native-activity PRIVATE
@@ -51,7 +57,8 @@ target_include_directories(native-activity PRIVATE
                            ../../../../../lua-5.3.4
                            ../../../../../ode/include
                            ../../../../../ode/ou/include
-                           ../../../../../ode/ode/src)
+                           ../../../../../ode/ode/src
+                           ../../../../../recastnavigation/Detour/Include)
 
 # add lib dependencies
 target_link_libraries(native-activity
