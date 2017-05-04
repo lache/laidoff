@@ -43,8 +43,7 @@
     [self setupGL];
     
     CGRect screenRect = [[UIScreen mainScreen] bounds];
-    CGFloat screenScale = [[UIScreen mainScreen] scale];
-    
+    CGFloat screenScale = [[UIScreen mainScreen] nativeScale];
     CGFloat screenWidth = screenScale * screenRect.size.width;
     CGFloat screenHeight = screenScale * screenRect.size.height;
     
