@@ -62,6 +62,7 @@ typedef struct _LWANIMCURVE {
 #define MAX_ANIM_CURVE (32 * 4)
 
 typedef struct _LWANIMACTION {
+	float fps;
 	int curve_num;
 	float last_key_f;
 	LWANIMCURVE* anim_curve;

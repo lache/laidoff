@@ -9,6 +9,8 @@ void load_action(const char* filename, LWANIMACTION* action) {
 	char* p = create_binary_from_file(filename, &s);
 	action->d = p;
 
+	action->fps = *(float*)p;
+	p += sizeof(float);
 	action->curve_num = *(int*)p;
 	p += sizeof(int);
 	action->last_key_f = *(float*)p;

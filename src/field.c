@@ -371,7 +371,7 @@ void update_field(LWCONTEXT* pLwc, LWFIELD* field) {
 
 	pLwc->player_action = &pLwc->action[player_anim];
 
-	float f = (float)(pLwc->skin_time * 23.98f); // FPS multiplied
+	float f = (float)(pLwc->skin_time * pLwc->player_action->fps);
 	if (pLwc->player_attacking && pLwc->player_action && f > pLwc->player_action->last_key_f) {
 		pLwc->player_attacking = 0;
 	}

@@ -109,7 +109,7 @@ void render_skin(const LWCONTEXT* pLwc,
 		quat_identity(bone_q[i]);
 	}
 
-	float f = (float)(pLwc->skin_time * 23.98f); // FPS multiplied
+	float f = (float)(pLwc->skin_time * action->fps);
 	f = fmodf(f, action->last_key_f);
 
 	//const float f = 0;// 89;
