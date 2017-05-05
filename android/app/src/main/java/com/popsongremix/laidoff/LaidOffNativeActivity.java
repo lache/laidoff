@@ -16,6 +16,7 @@ import android.os.Environment;
 import android.util.Log;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -43,10 +44,10 @@ public class LaidOffNativeActivity extends NativeActivity
     private static int mSound_GameStart01;
     private static int mSound_Point;
 
-    public native String stringFromJNI(Class<LaidOffNativeActivity> and9NativeActivityClass);
-    public native int pushTextureData(int width, int height, int[] data, int texAtlasIndex);
+    public static native String signalResourceReady(Class<LaidOffNativeActivity> and9NativeActivityClass);
+    public static native int pushTextureData(int width, int height, int[] data, int texAtlasIndex);
     public static native void registerAsset(String assetPath, int startOffset, int length);
-    private native void sendApkPath(String apkPath, String filesPath);
+    private static native void sendApkPath(String apkPath, String filesPath);
 
     public static final String PREFS_NAME = "LaidOffPrefs";
     public static final String PREFS_KEY_HIGHSCORE = "highscore";
@@ -110,15 +111,15 @@ public class LaidOffNativeActivity extends NativeActivity
         //mBgmPlayer.prepare();
         //mBgmPlayer.start();
 
-        Log.i(LOG_TAG, "onCreate [JAVA] - calling JNI func result: " + stringFromJNI(LaidOffNativeActivity.class));
-
         INSTANCE = this;
 
+        /*
         final int atlasCount = 3;
         for (int i = 0; i < atlasCount; i++) {
             String assetName = String.format(Locale.US, "tex/kiwi-atlas-set-%02d.png", i + 1);
             loadBitmap(assetName);
         }
+        */
     }
 
     private void downloadResFromServer() {
@@ -134,9 +135,13 @@ public class LaidOffNativeActivity extends NativeActivity
             Log.i(LOG_TAG, String.format(" - file: %s", fileList[i].getAbsolutePath()));
         }
 
-         new UpdateResTask().execute(files.getAbsolutePath(),
-                "http://222.110.4.119:18080/list.txt",
-                "list.txt");
+        UpdateResTaskParam urtp = new UpdateResTaskParam();
+        urtp.fileAbsolutePath = files.getAbsolutePath();
+        urtp.remoteBasePath = "http://222.110.4.119:18080";
+        urtp.remoteListFilePath = "list.txt";
+        urtp.localListFilename = "list.txt";
+
+         new UpdateResTask().execute(urtp);
     }
 
     static public int loadBitmap(String assetName) {
@@ -164,7 +169,18 @@ public class LaidOffNativeActivity extends NativeActivity
         InputStream inputStr;
         Bitmap bitmap = null;
         try {
-            inputStr = assetManager.open(filePath);
+            boolean fromDownloaded = true;
+            if (fromDownloaded) {
+
+                String filenameOnly = filePath.substring(filePath.lastIndexOf("/")+1);
+
+                File f = new File(context.getFilesDir().getAbsoluteFile(), filenameOnly);
+
+                inputStr = new FileInputStream(f);
+            } else {
+                inputStr = assetManager.open(filePath);
+            }
+
             bitmap = BitmapFactory.decodeStream(inputStr);
         } catch (IOException e) {
             // handle exception

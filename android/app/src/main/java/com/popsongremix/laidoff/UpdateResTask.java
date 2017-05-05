@@ -1,46 +1,46 @@
 package com.popsongremix.laidoff;
 
-import android.graphics.Path;
 import android.os.AsyncTask;
 import android.util.Log;
 
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
-import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.ArrayList;
-import java.util.List;
+import java.util.concurrent.atomic.AtomicLong;
 
-public class UpdateResTask extends AsyncTask<String, Void, File> {
+class UpdateResTask extends AsyncTask<UpdateResTaskParam, Void, File> {
 
-    String fileAbsolutePath;
-    ArrayList<String> assetFile = new ArrayList<String>();
+    private String fileAbsolutePath;
+    private ArrayList<String> assetFile = new ArrayList<>();
+    private GetFileResult listGfr;
+    private final AtomicLong sequenceNumber = new AtomicLong(0);
+    private String remoteBasePath;
 
-    protected File doInBackground(String... params) {
+    @Override
+    protected File doInBackground(UpdateResTaskParam... params) {
 
         try {
-            File file = DownloadTask.getFile(params[0], params[1], params[2]);
+            GetFileResult gfr = DownloadTask.getFile(
+                    params[0].fileAbsolutePath,
+                    params[0].remoteBasePath + "/" + params[0].remoteListFilePath,
+                    params[0].localListFilename,
+                    false
+            );
 
-            fileAbsolutePath = params[0];
+            fileAbsolutePath = params[0].fileAbsolutePath;
+            remoteBasePath = params[0].remoteBasePath;
 
-            File listFile = new File(params[0], params[2]);
+
+            File listFile = new File(params[0].fileAbsolutePath, params[0].localListFilename);
             String[] assetFileList = DownloadTask.getStringFromFile(listFile).split("\n");
-            for (int i = 0; i < assetFileList.length; i++) {
-                String assetFilename = assetFileList[i].split("\t")[0];
+            for (String anAssetFileList : assetFileList) {
+                String assetFilename = anAssetFileList.split("\t")[0];
                 assetFile.add(assetFilename.replace("assets/", ""));
             }
-            return file;
-        } catch (MalformedURLException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
+
+            listGfr = gfr;
+
+            return gfr.file;
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -48,19 +48,44 @@ public class UpdateResTask extends AsyncTask<String, Void, File> {
         return null;
     }
 
-    protected void onPostExecute(File feed) {
+    @Override
+    protected void onPostExecute(File result) {
         // TODO: check this.exception
-        // TODO: do something with the feed
+        // TODO: do something with the result
 
-        for (int i = 0; i < assetFile.size(); i++) {
+        if (listGfr.newlyDownloaded) {
+            for (int i = 0; i < assetFile.size(); i++) {
 
-            String filename = assetFile.get(i);
-            String filenameOnly = filename.substring(filename.lastIndexOf("/")+1);
+                String filename = assetFile.get(i);
+                String filenameOnly = filename.substring(filename.lastIndexOf("/")+1);
 
-            new DownloadTask().execute(
-                    fileAbsolutePath,
-                    "http://222.110.4.119:18080/" + filename,
-                    filenameOnly);
+                DownloadTaskParams dtp = new DownloadTaskParams();
+                dtp.fileAbsolutePath = fileAbsolutePath;
+                dtp.remotePath = remoteBasePath + "/" + filename;
+                dtp.localFilename = filenameOnly;
+                dtp.writeEtag = true;
+                dtp.totalSequenceNumber = assetFile.size();
+                dtp.sequenceNumber = sequenceNumber;
+                dtp.urt = this;
+
+                new DownloadTask().execute(dtp);
+            }
+        } else {
+            Log.i(LaidOffNativeActivity.LOG_TAG, "Resource update not needed. (latest list file)");
+            onResourceLoadFinished();
         }
+    }
+
+    void writeListEtag() {
+        try {
+            DownloadTask.writeEtagToFile(listGfr.etag, new File(listGfr.file.getAbsoluteFile() + ".Etag"));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    void onResourceLoadFinished() {
+        String result = LaidOffNativeActivity.signalResourceReady(LaidOffNativeActivity.class);
+        Log.i(LaidOffNativeActivity.LOG_TAG, "onResourceLoadFinished() [JAVA] - calling signalResourceReady() result: " + result);
     }
 }

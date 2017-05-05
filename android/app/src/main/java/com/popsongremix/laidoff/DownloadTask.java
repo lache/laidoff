@@ -10,32 +10,24 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
 import java.net.URL;
 
-public class DownloadTask extends AsyncTask<String, Void, File> {
+class DownloadTask extends AsyncTask<DownloadTaskParams, Void, GetFileResult> {
+    private DownloadTaskParams dtp;
 
-    private Exception exception;
-
-    public static String convertStreamToString(InputStream is) throws Exception {
+    private static String convertStreamToString(InputStream is) throws Exception {
         BufferedReader reader = new BufferedReader(new InputStreamReader(is));
         StringBuilder sb = new StringBuilder();
-        String line = null;
-        while ((line = reader.readLine()) != null) {
+        String line;
+        while (null != (line = reader.readLine())) {
             sb.append(line).append("\n");
         }
         reader.close();
         return sb.toString();
     }
 
-    public static String getStringFromFilePath(String filePath) throws Exception {
-        File fl = new File(filePath);
-        return getStringFromFile(fl);
-    }
-
-    public static String getStringFromFile(File fl) throws Exception {
+    static String getStringFromFile(File fl) throws Exception {
         FileInputStream fin = new FileInputStream(fl);
         String ret = convertStreamToString(fin);
         //Make sure you close all streams.
@@ -43,8 +35,7 @@ public class DownloadTask extends AsyncTask<String, Void, File> {
         return ret;
     }
 
-
-    public static File getFile(String fileAbsolutePath, String remotePath, String localFilename) throws Exception {
+    static GetFileResult getFile(String fileAbsolutePath, String remotePath, String localFilename, boolean writeEtag) throws Exception {
         //set the download URL, a url that points to a file on the internet
         //this is the file to be downloaded
         URL url = new URL(remotePath);
@@ -57,7 +48,7 @@ public class DownloadTask extends AsyncTask<String, Void, File> {
         urlConnection.setDoOutput(false);
         urlConnection.connect();
         String etagServer = urlConnection.getHeaderField("Etag").trim();
-        Log.i(LaidOffNativeActivity.LOG_TAG, String.format("Etag: %s", etagServer));
+        Log.i(LaidOffNativeActivity.LOG_TAG, String.format("%s - server Etag: %s", remotePath, etagServer));
 
         File etagFile = new File(fileAbsolutePath, localFilename + ".Etag");
 
@@ -100,7 +91,7 @@ public class DownloadTask extends AsyncTask<String, Void, File> {
 
             //create a buffer...
             byte[] buffer = new byte[1024];
-            int bufferLength = 0; //used to store a temporary size of the buffer
+            int bufferLength; //used to store a temporary size of the buffer
 
             //now, read through the input buffer and write the contents to the file
             while ( (bufferLength = inputStream.read(buffer)) > 0 ) {
@@ -115,25 +106,34 @@ public class DownloadTask extends AsyncTask<String, Void, File> {
             //close the output stream when done
             fileOutput.close();
 
-            FileOutputStream etagFileOutput = new FileOutputStream(etagFile);
-            try {
-                etagFileOutput.write(etagServer.getBytes());
-            } finally {
-                etagFileOutput.close();
+            // Write etag file
+            if (writeEtag) {
+                writeEtagToFile(etagServer, etagFile);
             }
         }
-        return file;
+
+        GetFileResult gfr = new GetFileResult();
+        gfr.file = file;
+        gfr.etag = etagServer;
+        gfr.newlyDownloaded = doDownload;
+        return gfr;
     }
 
-
-    protected File doInBackground(String... params) {
-
+    static void writeEtagToFile(String etag, File file) throws IOException {
+        FileOutputStream etagFileOutput = new FileOutputStream(file);
+        //noinspection TryFinallyCanBeTryWithResources
         try {
-            return getFile(params[0], params[1], params[2]);
-        } catch (MalformedURLException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
+            etagFileOutput.write(etag.getBytes());
+        } finally {
+            etagFileOutput.close();
+        }
+    }
+
+    @Override
+    protected GetFileResult doInBackground(DownloadTaskParams... params) {
+        try {
+            dtp = params[0];
+            return getFile(dtp.fileAbsolutePath, dtp.remotePath, dtp.localFilename, dtp.writeEtag);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -141,11 +141,19 @@ public class DownloadTask extends AsyncTask<String, Void, File> {
         return null;
     }
 
-    protected void onPostExecute(File feed) {
+    @Override
+    protected void onPostExecute(GetFileResult result) {
         // TODO: check this.exception
-        // TODO: do something with the feed
+        // TODO: do something with the result
+
+        if (dtp.sequenceNumber.incrementAndGet() == dtp.totalSequenceNumber) {
+            Log.i(LaidOffNativeActivity.LOG_TAG, "Resource update finished.");
+            dtp.urt.writeListEtag();
+            dtp.urt.onResourceLoadFinished();
+        }
     }
 
+    @SuppressWarnings("UnusedParameters")
     private static void updateProgress(String filename, int downloadedSize, int totalSize) {
         //Log.i(LaidOffNativeActivity.LOG_TAG, String.format("Downloading %s... (%d/%d bytes)", filename, downloadedSize, totalSize));
     }

@@ -671,6 +671,7 @@ void android_main(struct android_app* state) {
     double delta_time = 0.1;
     // loop waiting for stuff to do.
     long loop_tick = 0;
+
     while (1) {
         struct timespec loop_begin;
         clock_gettime(CLOCK_MONOTONIC, &loop_begin);
@@ -820,7 +821,7 @@ void android_main(struct android_app* state) {
     }
 }
 
-extern "C" JNIEXPORT jstring JNICALL Java_com_popsongremix_laidoff_LaidOffNativeActivity_stringFromJNI(JNIEnv *env, jobject obj, jclass and9NativeActivityClass)
+extern "C" JNIEXPORT jstring JNICALL Java_com_popsongremix_laidoff_LaidOffNativeActivity_signalResourceReady(JNIEnv *env, jobject obj, jclass and9NativeActivityClass)
 {
     s_env_from_java = env;
     s_obj_from_java = obj;

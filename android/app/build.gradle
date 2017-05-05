@@ -38,7 +38,7 @@ android {
     sourceSets {
         //main.java.srcDirs += 'src/main/../../../..'
 
-        main.assets.srcDirs += '../../assets'
+        //main.assets.srcDirs += '../../assets'
     }
 
     aaptOptions {
