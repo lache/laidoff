@@ -82,6 +82,12 @@ void lw_trigger_mouse_press(LWCONTEXT *pLwc, float x, float y) {
 
 	if (pLwc->game_scene == LGS_FIELD && fabs(aspect_ratio - 0.3f - 0.75f/2 - x) < 0.75f && fabs(-1 + 0.75f/2 - y) < 0.75f) {
 		field_attack(pLwc);
+
+		pLwc->hide_field = !pLwc->hide_field;
+	}
+
+	if (pLwc->game_scene == LGS_FIELD && fabs(aspect_ratio - 0.3f - 0.75f / 2 - x) < 0.75f && fabs(1 - 0.75f / 2 - y) < 0.75f) {
+		pLwc->fps_mode = !pLwc->fps_mode;
 	}
 
 	if (pLwc->battle_state != LBS_COMMAND_IN_PROGRESS && pLwc->player_turn_creature_index >= 0) {

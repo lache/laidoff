@@ -210,4 +210,7 @@ typedef struct _LWCONTEXT {
 	vec3 path_query_test_player_pos;
 	float path_query_test_player_rot;
 	double test_player_skin_time;
+
+	int fps_mode;
+	int hide_field;
 } LWCONTEXT;

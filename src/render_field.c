@@ -152,7 +152,7 @@ void render_path_query_test_player(const LWCONTEXT* pLwc, mat4x4 perspective, ma
 		-pLwc->path_query.epos[2],
 		pLwc->path_query.epos[1]);
 
-	if (pLwc->path_query.n_smooth_path) {
+	if (!pLwc->fps_mode && pLwc->path_query.n_smooth_path) {
 
 		mat4x4 skin_trans;
 		mat4x4_identity(skin_trans);
@@ -234,31 +234,55 @@ void lwc_render_field(const LWCONTEXT* pLwc)
 	float player_x = 0, player_y = 0, player_z = 0;
 	get_field_player_position(pLwc->field, &player_x, &player_y, &player_z);
 
+	
+
 	//const float cam_dist = 30;
 	const float cam_dist = 230;
 	mat4x4 view;
-	vec3 eye = { 270 + player_x, player_y - cam_dist + 200, cam_dist - 100 };
-	vec3 center = { player_x, player_y, player_z + 60 };
+	vec3 eye = {
+		pLwc->path_query_test_player_pos[0],
+		pLwc->path_query_test_player_pos[1],
+		pLwc->path_query_test_player_pos[2] + 5
+	};
+
+	vec3 center = {
+		pLwc->path_query_test_player_pos[0] + cosf(pLwc->path_query_test_player_rot),
+		pLwc->path_query_test_player_pos[1] + sinf(pLwc->path_query_test_player_rot),
+		pLwc->path_query_test_player_pos[2] + 5
+	};
+
+	if (!pLwc->fps_mode) {
+		eye[0] = 270 + player_x;
+		eye[1] = player_y - cam_dist + 200;
+		eye[2] = cam_dist - 100;
+
+		center[0] = player_x;
+		center[1] = player_y;
+		center[2] = player_z + 60;
+	}
+
 	vec3 up = { 0, 0, 1 };
 	mat4x4_look_at(view, eye, center, up);
 
 	//render_ground(pLwc, view, perspective);
 
-	render_field_object(
-		pLwc,
-		LVT_APT, //LVT_FLOOR,
-		pLwc->tex_atlas[LAE_3D_APT_TEX_KTX],  //pLwc->tex_atlas[LAE_3D_FLOOR_TEX_KTX],
-		view,
-		perspective,
-		0,
-		0,
-		0,
-		1,
-		1,
-		1,
-		1,
-		0
-	);
+	if (!pLwc->hide_field) {
+		render_field_object(
+			pLwc,
+			LVT_APT, //LVT_FLOOR,
+			pLwc->tex_atlas[LAE_3D_APT_TEX_KTX],  //pLwc->tex_atlas[LAE_3D_FLOOR_TEX_KTX],
+			view,
+			perspective,
+			0,
+			0,
+			0,
+			1,
+			1,
+			1,
+			1,
+			0
+		);
+	}
 	
 	for (int i = 0; i < MAX_FIELD_OBJECT; i++)
 	{
