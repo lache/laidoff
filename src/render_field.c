@@ -244,21 +244,21 @@ void lwc_render_field(const LWCONTEXT* pLwc)
 
 	//render_ground(pLwc, view, perspective);
 
-	//render_field_object(
-	//	pLwc,
-	//	LVT_APT, //LVT_FLOOR,
-	//	pLwc->tex_atlas[LAE_3D_APT_TEX_KTX],  //pLwc->tex_atlas[LAE_3D_FLOOR_TEX_KTX],
-	//	view,
-	//	perspective,
-	//	0,
-	//	0,
-	//	0,
-	//	1,
-	//	1,
-	//	1,
-	//	1,
-	//	0
-	//);
+	render_field_object(
+		pLwc,
+		LVT_APT, //LVT_FLOOR,
+		pLwc->tex_atlas[LAE_3D_APT_TEX_KTX],  //pLwc->tex_atlas[LAE_3D_FLOOR_TEX_KTX],
+		view,
+		perspective,
+		0,
+		0,
+		0,
+		1,
+		1,
+		1,
+		1,
+		0
+	);
 	
 	for (int i = 0; i < MAX_FIELD_OBJECT; i++)
 	{
