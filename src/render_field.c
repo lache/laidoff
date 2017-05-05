@@ -159,7 +159,7 @@ void render_path_query_test_player(const LWCONTEXT* pLwc, mat4x4 perspective, ma
 		mat4x4_translate(skin_trans, pLwc->path_query_test_player_pos[0], pLwc->path_query_test_player_pos[1], pLwc->path_query_test_player_pos[2]);
 		mat4x4 skin_scale;
 		mat4x4_identity(skin_scale);
-		mat4x4_scale_aniso(skin_scale, skin_scale, 0.5f, 0.5f, 0.5f);
+		mat4x4_scale_aniso(skin_scale, skin_scale, 0.9f, 0.9f, 0.9f);
 		mat4x4 skin_rot;
 		mat4x4_identity(skin_rot);
 		mat4x4_rotate_Z(skin_rot, skin_rot, pLwc->path_query_test_player_rot + (float)LWDEG2RAD(90));
@@ -188,7 +188,7 @@ void render_player(const LWCONTEXT* pLwc, mat4x4 perspective, mat4x4 view) {
 	mat4x4_translate(skin_trans, player_x, player_y, player_z);
 	mat4x4 skin_scale;
 	mat4x4_identity(skin_scale);
-	mat4x4_scale_aniso(skin_scale, skin_scale, 0.5f, 0.5f, 0.5f);
+	mat4x4_scale_aniso(skin_scale, skin_scale, 1.0f, 1.0f, 1.0f);
 	mat4x4 skin_rot;
 	mat4x4_identity(skin_rot);
 	mat4x4_rotate_Z(skin_rot, skin_rot, pLwc->player_rot_z + (float)LWDEG2RAD(90));
@@ -234,30 +234,31 @@ void lwc_render_field(const LWCONTEXT* pLwc)
 	float player_x = 0, player_y = 0, player_z = 0;
 	get_field_player_position(pLwc->field, &player_x, &player_y, &player_z);
 
-	const float cam_dist = 30;
+	//const float cam_dist = 30;
+	const float cam_dist = 230;
 	mat4x4 view;
-	vec3 eye = { player_x, player_y - cam_dist, cam_dist };
-	vec3 center = { player_x, player_y, player_z };
+	vec3 eye = { 270 + player_x, player_y - cam_dist + 200, cam_dist - 100 };
+	vec3 center = { player_x, player_y, player_z + 60 };
 	vec3 up = { 0, 0, 1 };
 	mat4x4_look_at(view, eye, center, up);
 
 	//render_ground(pLwc, view, perspective);
 
-	render_field_object(
-		pLwc,
-		LVT_FLOOR,
-		pLwc->tex_atlas[LAE_3D_FLOOR_TEX_KTX],
-		view,
-		perspective,
-		0,
-		0,
-		0,
-		1,
-		1,
-		1,
-		1,
-		0
-	);
+	//render_field_object(
+	//	pLwc,
+	//	LVT_APT, //LVT_FLOOR,
+	//	pLwc->tex_atlas[LAE_3D_APT_TEX_KTX],  //pLwc->tex_atlas[LAE_3D_FLOOR_TEX_KTX],
+	//	view,
+	//	perspective,
+	//	0,
+	//	0,
+	//	0,
+	//	1,
+	//	1,
+	//	1,
+	//	1,
+	//	0
+	//);
 	
 	for (int i = 0; i < MAX_FIELD_OBJECT; i++)
 	{

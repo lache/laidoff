@@ -14,6 +14,7 @@ typedef enum _LW_VBO_TYPE
 	LVT_TRAIL,
 	LVT_FLOOR,
 	LVT_SPHERE,
+	LVT_APT,
 
 	LVT_COUNT,
 } LW_VBO_TYPE;

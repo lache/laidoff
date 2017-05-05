@@ -439,6 +439,9 @@ static void init_vbo(LWCONTEXT *pLwc) {
 	load_vbo(pLwc, ASSETS_BASE_PATH "vbo" PATH_SEPARATOR "Sphere.vbo",
 		&pLwc->vertex_buffer[LVT_SPHERE]);
 
+	// LVT_APT
+	load_vbo(pLwc, ASSETS_BASE_PATH "vbo" PATH_SEPARATOR "Apt.vbo",
+		&pLwc->vertex_buffer[LVT_APT]);
 
 	// === SKIN VERTEX BUFFERS ===
 
@@ -1253,7 +1256,8 @@ void init_physics(LWCONTEXT* pLwc) {
 }
 
 void init_nav(LWCONTEXT* pLwc) {
-	pLwc->nav = load_nav(ASSETS_BASE_PATH "nav" PATH_SEPARATOR "test.nav");
+	//pLwc->nav = load_nav(ASSETS_BASE_PATH "nav" PATH_SEPARATOR "test.nav");
+	pLwc->nav = load_nav(ASSETS_BASE_PATH "nav" PATH_SEPARATOR "apt.nav");
 
 	set_random_start_end_pos(pLwc->nav, &pLwc->path_query);
 	nav_query(pLwc->nav, &pLwc->path_query);
