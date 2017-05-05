@@ -16,6 +16,7 @@
 
 extern "C" void register_asset(const char* asset_path, int start_offset, int length);
 extern "C" void set_apk_path(const char* apk_path);
+extern "C" void set_files_path(const char* files_path);
 
 void request_void_string_command(const char* command_name, const char* param1);
 int request_int_string_command(const char* command_name, const char* param1);
@@ -80,10 +81,12 @@ extern "C" JNIEXPORT void JNICALL Java_com_popsongremix_laidoff_LaidOffNativeAct
     env->ReleaseStringUTFChars(assetpath, buffer);
 }
 
-extern "C" JNIEXPORT void JNICALL Java_com_popsongremix_laidoff_LaidOffNativeActivity_sendApkPath(JNIEnv * env, jclass cls, jstring apkPath) {
-    const char *buffer = env->GetStringUTFChars(apkPath, JNI_FALSE);
+extern "C" JNIEXPORT void JNICALL Java_com_popsongremix_laidoff_LaidOffNativeActivity_sendApkPath(JNIEnv * env, jclass cls, jstring apkPath, jstring filesPath) {
+    const char *apkPathBuffer = env->GetStringUTFChars(apkPath, JNI_FALSE);
+    set_apk_path(apkPathBuffer);
+    env->ReleaseStringUTFChars(apkPath, apkPathBuffer);
 
-    set_apk_path(buffer);
-
-    env->ReleaseStringUTFChars(apkPath, buffer);
+    const char *filesPathBuffer = env->GetStringUTFChars(filesPath, JNI_FALSE);
+    set_files_path(filesPathBuffer);
+    env->ReleaseStringUTFChars(filesPath, filesPathBuffer);
 }

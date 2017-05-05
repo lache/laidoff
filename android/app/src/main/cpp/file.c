@@ -22,10 +22,16 @@ typedef struct _NativeAsset
 static NativeAsset nativeAssetArray[512];
 static int nativeAssetLength;
 static char apkPath[2048];
+static char filesPath[2048];
 
 void set_apk_path(const char* apk_path)
 {
     strcpy(apkPath, apk_path);
+}
+
+void set_files_path(const char* files_path)
+{
+    strcpy(filesPath, files_path);
 }
 
 void release_string(char* d)

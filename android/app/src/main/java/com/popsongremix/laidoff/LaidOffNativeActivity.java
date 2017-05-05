@@ -9,12 +9,20 @@ import android.graphics.BitmapFactory;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.media.SoundPool;
+import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Environment;
 import android.util.Log;
 
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.util.Date;
 import java.util.Locale;
 
 public class LaidOffNativeActivity extends NativeActivity
@@ -38,14 +46,14 @@ public class LaidOffNativeActivity extends NativeActivity
     public native String stringFromJNI(Class<LaidOffNativeActivity> and9NativeActivityClass);
     public native int pushTextureData(int width, int height, int[] data, int texAtlasIndex);
     public static native void registerAsset(String assetPath, int startOffset, int length);
-    private native void sendApkPath(String apkPath);
+    private native void sendApkPath(String apkPath, String filesPath);
 
     public static final String PREFS_NAME = "LaidOffPrefs";
     public static final String PREFS_KEY_HIGHSCORE = "highscore";
 
     private static LaidOffNativeActivity INSTANCE;
     
-    private static final String LOG_TAG = "and9";
+    public static final String LOG_TAG = "and9";
 
     private static AssetsLoader assetsLoader;
 
@@ -75,7 +83,9 @@ public class LaidOffNativeActivity extends NativeActivity
         assetsLoader.registerAllAssetsOfType("l");
         assetsLoader.registerAllAssetsOfType("field");
         assetsLoader.registerAllAssetsOfType("nav");
-        sendApkPath(assetsLoader.GetAPKPath());
+        sendApkPath(assetsLoader.GetAPKPath(), getApplicationContext().getFilesDir().getAbsolutePath());
+
+        downloadResFromServer();
 
         //noinspection deprecation
         mSoundPool = new SoundPool(5, AudioManager.STREAM_MUSIC, 0);
@@ -109,6 +119,24 @@ public class LaidOffNativeActivity extends NativeActivity
             String assetName = String.format(Locale.US, "tex/kiwi-atlas-set-%02d.png", i + 1);
             loadBitmap(assetName);
         }
+    }
+
+    private void downloadResFromServer() {
+
+        File files = getApplicationContext().getFilesDir();
+
+        File[] fileList = files.listFiles();
+
+        Log.i(LOG_TAG, String.format("Download cache dir: %s (%d files)", files.getAbsolutePath(), fileList.length));
+
+        for (int i = 0; i < fileList.length; i++) {
+            //Date d = new Date(fileList[i].lastModified());
+            Log.i(LOG_TAG, String.format(" - file: %s", fileList[i].getAbsolutePath()));
+        }
+
+         new UpdateResTask().execute(files.getAbsolutePath(),
+                "http://222.110.4.119:18080/list.txt",
+                "list.txt");
     }
 
     static public int loadBitmap(String assetName) {
