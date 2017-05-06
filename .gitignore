@@ -8,3 +8,4 @@ build
 build-x64
 build-x86
 /android/keystore.properties
+/assets/list.txt
