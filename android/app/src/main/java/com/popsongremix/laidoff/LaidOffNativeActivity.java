@@ -141,7 +141,7 @@ public class LaidOffNativeActivity extends NativeActivity
         urtp.remoteListFilePath = "list.txt";
         urtp.localListFilename = "list.txt";
 
-         new UpdateResTask().execute(urtp);
+         new UpdateResTask(this).execute(urtp);
     }
 
     static public int loadBitmap(String assetName) {

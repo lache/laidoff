@@ -146,6 +146,10 @@ class DownloadTask extends AsyncTask<DownloadTaskParams, Void, GetFileResult> {
         // TODO: check this.exception
         // TODO: do something with the result
 
+        writeEtag();
+    }
+
+    private void writeEtag() {
         if (dtp.sequenceNumber.incrementAndGet() == dtp.totalSequenceNumber) {
             Log.i(LaidOffNativeActivity.LOG_TAG, "Resource update finished.");
             dtp.urt.writeListEtag();

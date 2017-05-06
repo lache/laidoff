@@ -1,5 +1,7 @@
 package com.popsongremix.laidoff;
 
+import android.app.Activity;
+import android.app.ProgressDialog;
 import android.os.AsyncTask;
 import android.util.Log;
 
@@ -10,11 +12,26 @@ import java.util.concurrent.atomic.AtomicLong;
 
 class UpdateResTask extends AsyncTask<UpdateResTaskParam, Void, File> {
 
+    private final ProgressDialog asyncDialog;
     private String fileAbsolutePath;
     private ArrayList<String> assetFile = new ArrayList<>();
     private GetFileResult listGfr;
     private final AtomicLong sequenceNumber = new AtomicLong(0);
     private String remoteBasePath;
+
+    UpdateResTask(Activity activity) {
+        asyncDialog = new ProgressDialog(activity);
+    }
+
+    @Override
+    protected void onPreExecute() {
+        asyncDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
+        asyncDialog.setMessage("로딩중입니다...");
+
+        // show dialog
+        asyncDialog.show();
+        super.onPreExecute();
+    }
 
     @Override
     protected File doInBackground(UpdateResTaskParam... params) {
@@ -53,6 +70,13 @@ class UpdateResTask extends AsyncTask<UpdateResTaskParam, Void, File> {
         // TODO: check this.exception
         // TODO: do something with the result
 
+        updateAssetOneByOne();
+
+        asyncDialog.dismiss();
+        super.onPostExecute(result);
+    }
+
+    private void updateAssetOneByOne() {
         if (listGfr.newlyDownloaded) {
             for (int i = 0; i < assetFile.size(); i++) {
 
