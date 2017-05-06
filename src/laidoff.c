@@ -692,6 +692,8 @@ void reset_field_context(LWCONTEXT* pLwc) {
 	spawn_field_object(pLwc, 0, -7, 1, 1, LVT_CUBE_WALL, pLwc->tex_programmed[LPT_SOLID_BLUE], 6,
 		1, 1, 0);
 	*/
+	
+	set_field_player_position(pLwc->field, 0, 0, 10); // should fall from the sky (ray check...)
 
 	pLwc->player_pos_x = 0;
 	pLwc->player_pos_y = 0;
@@ -733,8 +735,10 @@ void reset_runtime_context(LWCONTEXT* pLwc) {
 	pLwc->admin_button_command[6].command_handler = net_rtt_test;
 	pLwc->admin_button_command[7].name = LWU("신:스킨");
 	pLwc->admin_button_command[7].command_handler = change_to_skin;
-	pLwc->admin_button_command[8].name = LWU("신:피직스");
-	pLwc->admin_button_command[8].command_handler = change_to_physics;
+	pLwc->admin_button_command[8].name = LWU("신:필드1로드");
+	pLwc->admin_button_command[8].command_handler = load_field_1;
+	pLwc->admin_button_command[9].name = LWU("신:필드2로드");
+	pLwc->admin_button_command[9].command_handler = load_field_2;
 }
 
 void delete_font_fbo(LWCONTEXT* pLwc) {
@@ -1251,16 +1255,25 @@ void init_action(LWCONTEXT* pLwc) {
 	}
 }
 
-void init_physics(LWCONTEXT* pLwc) {
-	pLwc->field = load_field(ASSETS_BASE_PATH "field" PATH_SEPARATOR "testfield.field");
-}
+void init_field(LWCONTEXT* pLwc, const char* field_filename, const char* nav_filename, LW_VBO_TYPE vbo, GLuint tex_id, int tex_mip, float skin_scale, int follow_cam) {
+	if (pLwc->field) {
+		if (pLwc->field->nav) {
+			unload_nav(pLwc->field->nav);
+		}
 
-void init_nav(LWCONTEXT* pLwc) {
-	//pLwc->nav = load_nav(ASSETS_BASE_PATH "nav" PATH_SEPARATOR "test.nav");
-	pLwc->nav = load_nav(ASSETS_BASE_PATH "nav" PATH_SEPARATOR "apt.nav");
+		unload_field(pLwc->field);
+	}
 
-	set_random_start_end_pos(pLwc->nav, &pLwc->path_query);
-	nav_query(pLwc->nav, &pLwc->path_query);
+	pLwc->field = load_field(field_filename);
+	pLwc->field->nav = load_nav(nav_filename);
+	pLwc->field->field_vbo = vbo;
+	pLwc->field->field_tex_id = tex_id;
+	pLwc->field->field_tex_mip = tex_mip;
+	pLwc->field->skin_scale = skin_scale;
+	pLwc->field->follow_cam = follow_cam;
+
+	set_random_start_end_pos(pLwc->field->nav, &pLwc->field->path_query);
+	nav_query(pLwc->field->nav, &pLwc->field->path_query);
 }
 
 LWCONTEXT *lw_init(void) {
@@ -1278,8 +1291,6 @@ LWCONTEXT *lw_init(void) {
 
 	init_load_textures(pLwc);
 
-	init_lwc_runtime_data(pLwc);
-
 	lwtimepoint_now(&pLwc->last_time);
 
 	init_net(pLwc);
@@ -1288,9 +1299,25 @@ LWCONTEXT *lw_init(void) {
 
 	init_action(pLwc);
 
-	init_physics(pLwc);
+	init_field(pLwc,
+		ASSETS_BASE_PATH "field" PATH_SEPARATOR "testfield.field",
+		ASSETS_BASE_PATH "nav" PATH_SEPARATOR "apt.nav", // "test.nav"
+		LVT_APT,
+		pLwc->tex_atlas[LAE_3D_APT_TEX_MIP_KTX],
+		1,
+		0.9f,
+		0);
 
-	init_nav(pLwc);
+	/*init_field(pLwc,
+		ASSETS_BASE_PATH "field" PATH_SEPARATOR "testfield.field",
+		ASSETS_BASE_PATH "nav" PATH_SEPARATOR "test.nav",
+		LVT_FLOOR,
+		pLwc->tex_atlas[LAE_3D_FLOOR_TEX_KTX],
+		0,
+		0.5f,
+		1);*/
+
+	init_lwc_runtime_data(pLwc);
 
 	return pLwc;
 }
@@ -1306,8 +1333,6 @@ void lw_deinit(LWCONTEXT *pLwc) {
 	}
 
 	unload_field(pLwc->field);
-
-	unload_nav(pLwc->nav);
 
 	free(pLwc);
 }
@@ -1388,6 +1413,36 @@ void change_to_skin(LWCONTEXT *pLwc) {
 
 void change_to_physics(LWCONTEXT *pLwc) {
 	pLwc->next_game_scene = LGS_PHYSICS;
+}
+
+void load_field_1(LWCONTEXT *pLwc) {
+	pLwc->next_game_scene = LGS_FIELD;
+
+	init_field(pLwc,
+		ASSETS_BASE_PATH "field" PATH_SEPARATOR "testfield.field",
+		ASSETS_BASE_PATH "nav" PATH_SEPARATOR "apt.nav",
+		LVT_APT,
+		pLwc->tex_atlas[LAE_3D_APT_TEX_MIP_KTX],
+		1,
+		0.9f,
+		0);
+
+	init_lwc_runtime_data(pLwc);
+}
+
+void load_field_2(LWCONTEXT *pLwc) {
+	pLwc->next_game_scene = LGS_FIELD;
+
+	init_field(pLwc,
+		ASSETS_BASE_PATH "field" PATH_SEPARATOR "testfield.field",
+		ASSETS_BASE_PATH "nav" PATH_SEPARATOR "test.nav",
+		LVT_FLOOR,
+		pLwc->tex_atlas[LAE_3D_FLOOR_TEX_KTX],
+		0,
+		0.5f,
+		1);
+
+	init_lwc_runtime_data(pLwc);
 }
 
 long lw_get_last_time_sec(LWCONTEXT *pLwc) {

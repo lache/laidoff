@@ -31,7 +31,7 @@ assets/glsles/default-vert.glsl	a6ed3f7c27d4cdc79d169e8daf4add08
 assets/glsles/etc1-frag.glsl	13697062bccf11235fcc20cd8519f3a2
 assets/glsles/font-frag.glsl	69e1b6cf5e0c693beb95f48d59492e18
 assets/glsles/skin-vert.glsl	96f04c2121e12a58bc0ab827ef615c36
-assets/ktx/3d-apt-tex.ktx	5728bf4a7c7f99205f6b8fccf2a6b2bd
+assets/ktx/3d-apt-tex-mip.ktx	16d933f21ef0077f73b21d4754e66492
 assets/ktx/3d-floor-tex.ktx	11195667a9b8ff94eaa6bebb0008eeb9
 assets/ktx/3d-player-tex.ktx	eb713dfc5281332f5874285002a9d6ba
 assets/ktx/bg-kitchen.ktx	a6374b5562bdd064d4a55fdb2dd56e60
@@ -104,7 +104,7 @@ assets/tex/kiwi-atlas-set-02.png	c6532039dd6f6629a84b81b56e9a0757
 assets/tex/kiwi-atlas-set-03.png	40dd094a53531740883937caba88b4bc
 assets/tex/kiwi1.png	c765d90dd0b1c4c52ce3fca9d0d0de73
 assets/tex/Twirl.png	3ce5c69929877dd6fbbfc6b4c5e5cd04
-assets/vbo/Apt.vbo	d4cd5d7743c0e5ae004580e8669a5205
+assets/vbo/Apt.vbo	9dd1bb3447480f05d910a3bc9840abca
 assets/vbo/Bowl_Inner.vbo	eea6ea190782aa73bb4d8730b0262349
 assets/vbo/Bowl_Outer.vbo	de3669a84bf1a729948c06ce80b52332
 assets/vbo/CubeWall.vbo	b12138f99853739d76cc46446db4cd8e

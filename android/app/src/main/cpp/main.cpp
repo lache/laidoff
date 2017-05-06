@@ -280,7 +280,7 @@ static int engine_init_display(struct engine* engine) {
                               EGL_RED_SIZE,
                               8,
                               EGL_DEPTH_SIZE,
-                              16,
+                              24,
                               EGL_NONE};
     EGLint w, h, dummy, format;
     EGLint numConfigs;

@@ -52,30 +52,30 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
 	if (key == GLFW_KEY_S && action == GLFW_PRESS) {
 		float player_x = 0, player_y = 0, player_z = 0;
 		get_field_player_position(pLwc->field, &player_x, &player_y, &player_z);
-		pLwc->path_query.spos[0] = player_x;
-		pLwc->path_query.spos[1] = player_z;
-		pLwc->path_query.spos[2] = -player_y;
+		pLwc->field->path_query.spos[0] = player_x;
+		pLwc->field->path_query.spos[1] = player_z;
+		pLwc->field->path_query.spos[2] = -player_y;
 		LOGI("Nav: start pos set to (%.2f, %.2f, %.2f) [nav coordinates]",
-			pLwc->path_query.spos[0],
-			pLwc->path_query.spos[1],
-			pLwc->path_query.spos[2]);
+			pLwc->field->path_query.spos[0],
+			pLwc->field->path_query.spos[1],
+			pLwc->field->path_query.spos[2]);
 	}
 
 	if (key == GLFW_KEY_E && action == GLFW_PRESS) {
 		float player_x = 0, player_y = 0, player_z = 0;
 		get_field_player_position(pLwc->field, &player_x, &player_y, &player_z);
-		pLwc->path_query.epos[0] = player_x;
-		pLwc->path_query.epos[1] = player_z;
-		pLwc->path_query.epos[2] = -player_y;
+		pLwc->field->path_query.epos[0] = player_x;
+		pLwc->field->path_query.epos[1] = player_z;
+		pLwc->field->path_query.epos[2] = -player_y;
 		LOGI("Nav: end pos set to (%.2f, %.2f, %.2f) [nav coordinates]",
-			pLwc->path_query.epos[0],
-			pLwc->path_query.epos[1],
-			pLwc->path_query.epos[2]);
+			pLwc->field->path_query.epos[0],
+			pLwc->field->path_query.epos[1],
+			pLwc->field->path_query.epos[2]);
 	}
 
 	if (key == GLFW_KEY_F && action == GLFW_PRESS) {
-		nav_query(pLwc->nav, &pLwc->path_query);
-		LOGI("Nav: path query result - %d points", pLwc->path_query.n_smooth_path);
+		nav_query(pLwc->field->nav, &pLwc->field->path_query);
+		LOGI("Nav: path query result - %d points", pLwc->field->path_query.n_smooth_path);
 	}
 
 	if (key == GLFW_KEY_R && action == GLFW_PRESS) {

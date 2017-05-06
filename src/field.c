@@ -5,6 +5,7 @@
 #include "input.h"
 #include "lwlog.h"
 #include "file.h"
+#include "nav.h"
 
 void move_player(LWCONTEXT *pLwc) {
 	if (pLwc->game_scene == LGS_FIELD) {
@@ -240,6 +241,12 @@ void set_field_player_delta(LWFIELD* field, float x, float y, float z) {
 	field->player_pos_delta[2] = z;
 }
 
+void set_field_player_position(LWFIELD* field, float x, float y, float z) {
+	field->player_pos[0] = x;
+	field->player_pos[1] = y;
+	field->player_pos[2] = z + field->player_length / 2 + field->player_radius;
+}
+
 void get_field_player_position(const LWFIELD* field, float* x, float* y, float* z) {
 	*x = (float)field->player_pos[0];
 	*y = (float)field->player_pos[1];
@@ -379,26 +386,26 @@ void update_field(LWCONTEXT* pLwc, LWFIELD* field) {
 	pLwc->player_skin_time += pLwc->delta_time;
 	pLwc->test_player_skin_time += pLwc->delta_time;
 
-	if (pLwc->path_query.n_smooth_path) {
+	if (pLwc->field->path_query.n_smooth_path) {
 
-		pLwc->path_query_time += (float)pLwc->delta_time;
+		pLwc->field->path_query_time += (float)pLwc->delta_time;
 
-		int idx = (int)fmodf((float)(pLwc->path_query_time * 30), (float)pLwc->path_query.n_smooth_path);
-		const float* p = &pLwc->path_query.smooth_path[3 * idx];
-		pLwc->path_query_test_player_pos[0] = p[0];
-		pLwc->path_query_test_player_pos[1] = -p[2];
-		pLwc->path_query_test_player_pos[2] = p[1];
+		int idx = (int)fmodf((float)(pLwc->field->path_query_time * 30), (float)pLwc->field->path_query.n_smooth_path);
+		const float* p = &pLwc->field->path_query.smooth_path[3 * idx];
+		pLwc->field->path_query_test_player_pos[0] = p[0];
+		pLwc->field->path_query_test_player_pos[1] = -p[2];
+		pLwc->field->path_query_test_player_pos[2] = p[1];
 
-		if (idx < pLwc->path_query.n_smooth_path - 1) {
-			const float* p2 = &pLwc->path_query.smooth_path[3 * (idx + 1)];
-			pLwc->path_query_test_player_rot = atan2f((-p2[2]) - (-p[2]), (p2[0]) - (p[0]));
+		if (idx < pLwc->field->path_query.n_smooth_path - 1) {
+			const float* p2 = &pLwc->field->path_query.smooth_path[3 * (idx + 1)];
+			pLwc->field->path_query_test_player_rot = atan2f((-p2[2]) - (-p[2]), (p2[0]) - (p[0]));
 		}
 
 		// query other random path
-		if (idx >= pLwc->path_query.n_smooth_path - 1) {
-			set_random_start_end_pos(pLwc->nav, &pLwc->path_query);
-			nav_query(pLwc->nav, &pLwc->path_query);
-			pLwc->path_query_time = 0;
+		if (idx >= pLwc->field->path_query.n_smooth_path - 1) {
+			set_random_start_end_pos(pLwc->field->nav, &pLwc->field->path_query);
+			nav_query(pLwc->field->nav, &pLwc->field->path_query);
+			pLwc->field->path_query_time = 0;
 		}
 	}	
 }

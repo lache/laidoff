@@ -201,15 +201,11 @@ typedef struct _LWCONTEXT {
 	LWARMATURE armature[LWAR_COUNT];
 	LWANIMACTION action[LWAC_COUNT];
 	double player_skin_time;
+	double test_player_skin_time;
+
+	// Field
 
 	struct _LWFIELD* field;
-
-	void* nav;
-	LWPATHQUERY path_query;
-	float path_query_time;
-	vec3 path_query_test_player_pos;
-	float path_query_test_player_rot;
-	double test_player_skin_time;
 
 	int fps_mode;
 	int hide_field;

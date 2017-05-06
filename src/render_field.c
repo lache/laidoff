@@ -140,29 +140,29 @@ void render_path_query_test_player(const LWCONTEXT* pLwc, mat4x4 perspective, ma
 		pLwc->tex_programmed[LPT_SOLID_RED],
 		perspective,
 		view,
-		pLwc->path_query.spos[0],
-		-pLwc->path_query.spos[2],
-		pLwc->path_query.spos[1]);
+		pLwc->field->path_query.spos[0],
+		-pLwc->field->path_query.spos[2],
+		pLwc->field->path_query.spos[1]);
 
 	render_debug_sphere(pLwc,
 		pLwc->tex_programmed[LPT_SOLID_BLUE],
 		perspective,
 		view,
-		pLwc->path_query.epos[0],
-		-pLwc->path_query.epos[2],
-		pLwc->path_query.epos[1]);
+		pLwc->field->path_query.epos[0],
+		-pLwc->field->path_query.epos[2],
+		pLwc->field->path_query.epos[1]);
 
-	if (!pLwc->fps_mode && pLwc->path_query.n_smooth_path) {
+	if (!pLwc->fps_mode && pLwc->field->path_query.n_smooth_path) {
 
 		mat4x4 skin_trans;
 		mat4x4_identity(skin_trans);
-		mat4x4_translate(skin_trans, pLwc->path_query_test_player_pos[0], pLwc->path_query_test_player_pos[1], pLwc->path_query_test_player_pos[2]);
+		mat4x4_translate(skin_trans, pLwc->field->path_query_test_player_pos[0], pLwc->field->path_query_test_player_pos[1], pLwc->field->path_query_test_player_pos[2]);
 		mat4x4 skin_scale;
 		mat4x4_identity(skin_scale);
-		mat4x4_scale_aniso(skin_scale, skin_scale, 0.9f, 0.9f, 0.9f);
+		mat4x4_scale_aniso(skin_scale, skin_scale, pLwc->field->skin_scale, pLwc->field->skin_scale, pLwc->field->skin_scale);
 		mat4x4 skin_rot;
 		mat4x4_identity(skin_rot);
-		mat4x4_rotate_Z(skin_rot, skin_rot, pLwc->path_query_test_player_rot + (float)LWDEG2RAD(90));
+		mat4x4_rotate_Z(skin_rot, skin_rot, pLwc->field->path_query_test_player_rot + (float)LWDEG2RAD(90));
 
 		mat4x4 skin_model;
 		mat4x4_identity(skin_model);
@@ -188,7 +188,7 @@ void render_player(const LWCONTEXT* pLwc, mat4x4 perspective, mat4x4 view) {
 	mat4x4_translate(skin_trans, player_x, player_y, player_z);
 	mat4x4 skin_scale;
 	mat4x4_identity(skin_scale);
-	mat4x4_scale_aniso(skin_scale, skin_scale, 1.0f, 1.0f, 1.0f);
+	mat4x4_scale_aniso(skin_scale, skin_scale, pLwc->field->skin_scale, pLwc->field->skin_scale, pLwc->field->skin_scale);
 	mat4x4 skin_rot;
 	mat4x4_identity(skin_rot);
 	mat4x4_rotate_Z(skin_rot, skin_rot, pLwc->player_rot_z + (float)LWDEG2RAD(90));
@@ -234,31 +234,41 @@ void lwc_render_field(const LWCONTEXT* pLwc)
 	float player_x = 0, player_y = 0, player_z = 0;
 	get_field_player_position(pLwc->field, &player_x, &player_y, &player_z);
 
-	
-
-	//const float cam_dist = 30;
-	const float cam_dist = 230;
 	mat4x4 view;
 	vec3 eye = {
-		pLwc->path_query_test_player_pos[0],
-		pLwc->path_query_test_player_pos[1],
-		pLwc->path_query_test_player_pos[2] + 5
+		pLwc->field->path_query_test_player_pos[0],
+		pLwc->field->path_query_test_player_pos[1],
+		pLwc->field->path_query_test_player_pos[2] + 5
 	};
 
 	vec3 center = {
-		pLwc->path_query_test_player_pos[0] + cosf(pLwc->path_query_test_player_rot),
-		pLwc->path_query_test_player_pos[1] + sinf(pLwc->path_query_test_player_rot),
-		pLwc->path_query_test_player_pos[2] + 5
+		pLwc->field->path_query_test_player_pos[0] + cosf(pLwc->field->path_query_test_player_rot),
+		pLwc->field->path_query_test_player_pos[1] + sinf(pLwc->field->path_query_test_player_rot),
+		pLwc->field->path_query_test_player_pos[2] + 5
 	};
 
 	if (!pLwc->fps_mode) {
-		eye[0] = 270 + player_x;
-		eye[1] = player_y - cam_dist + 200;
-		eye[2] = cam_dist - 100;
+		if (pLwc->field->follow_cam) {
+			const float cam_dist = 30;
 
-		center[0] = player_x;
-		center[1] = player_y;
-		center[2] = player_z + 60;
+			eye[0] = player_x;
+			eye[1] = player_y - cam_dist;
+			eye[2] = player_z + cam_dist;
+
+			center[0] = player_x;
+			center[1] = player_y;
+			center[2] = player_z;
+		} else {
+			const float cam_dist = 230;
+
+			eye[0] = 270 + player_x;
+			eye[1] = player_y - cam_dist + 200;
+			eye[2] = cam_dist - 100;
+
+			center[0] = player_x;
+			center[1] = player_y;
+			center[2] = player_z + 60;
+		}
 	}
 
 	vec3 up = { 0, 0, 1 };
@@ -269,8 +279,8 @@ void lwc_render_field(const LWCONTEXT* pLwc)
 	if (!pLwc->hide_field) {
 		render_field_object(
 			pLwc,
-			LVT_APT, //LVT_FLOOR,
-			pLwc->tex_atlas[LAE_3D_APT_TEX_KTX],  //pLwc->tex_atlas[LAE_3D_FLOOR_TEX_KTX],
+			pLwc->field->field_vbo,//LVT_APT, //LVT_FLOOR,
+			pLwc->field->field_tex_id,// pLwc->tex_atlas[LAE_3D_APT_TEX_MIP_KTX],  //pLwc->tex_atlas[LAE_3D_FLOOR_TEX_KTX],
 			view,
 			perspective,
 			0,
@@ -280,7 +290,7 @@ void lwc_render_field(const LWCONTEXT* pLwc)
 			1,
 			1,
 			1,
-			0
+			pLwc->field->field_tex_mip
 		);
 	}
 	
