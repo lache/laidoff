@@ -13,6 +13,7 @@ import java.util.concurrent.atomic.AtomicLong;
 class UpdateResTask extends AsyncTask<UpdateResTaskParam, Void, File> {
 
     private final ProgressDialog asyncDialog;
+    private final Activity activity;
     private String fileAbsolutePath;
     private ArrayList<String> assetFile = new ArrayList<>();
     private GetFileResult listGfr;
@@ -21,12 +22,14 @@ class UpdateResTask extends AsyncTask<UpdateResTaskParam, Void, File> {
 
     UpdateResTask(Activity activity) {
         asyncDialog = new ProgressDialog(activity);
+        this.activity = activity;
     }
 
     @Override
     protected void onPreExecute() {
         asyncDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
-        asyncDialog.setMessage("로딩중입니다...");
+        asyncDialog.setMessage("애셋 리스트 체크...");
+        asyncDialog.setMax(1);
 
         // show dialog
         asyncDialog.show();
@@ -57,6 +60,10 @@ class UpdateResTask extends AsyncTask<UpdateResTaskParam, Void, File> {
 
             listGfr = gfr;
 
+            asyncDialog.setProgress(1);
+
+            updateAssetOneByOneSync();
+
             return gfr.file;
         } catch (Exception e) {
             e.printStackTrace();
@@ -70,13 +77,13 @@ class UpdateResTask extends AsyncTask<UpdateResTaskParam, Void, File> {
         // TODO: check this.exception
         // TODO: do something with the result
 
-        updateAssetOneByOne();
+        //updateAssetOneByOneUsingTask();
 
         asyncDialog.dismiss();
         super.onPostExecute(result);
     }
 
-    private void updateAssetOneByOne() {
+    private void updateAssetOneByOneUsingTask() {
         if (listGfr.newlyDownloaded) {
             for (int i = 0; i < assetFile.size(); i++) {
 
@@ -93,6 +100,52 @@ class UpdateResTask extends AsyncTask<UpdateResTaskParam, Void, File> {
                 dtp.urt = this;
 
                 new DownloadTask().execute(dtp);
+            }
+        } else {
+            Log.i(LaidOffNativeActivity.LOG_TAG, "Resource update not needed. (latest list file)");
+            onResourceLoadFinished();
+        }
+    }
+
+    private void updateAssetOneByOneSync() {
+        if (listGfr.newlyDownloaded) {
+            asyncDialog.setMax(assetFile.size());
+            for (int i = 0; i < assetFile.size(); i++) {
+
+                String filename = assetFile.get(i);
+                final String filenameOnly = filename.substring(filename.lastIndexOf("/")+1);
+
+                /*
+                activity.runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        asyncDialog.setMessage("다운로딩: " + filenameOnly);
+                    }
+                });
+                */
+
+                DownloadTaskParams dtp = new DownloadTaskParams();
+                dtp.fileAbsolutePath = fileAbsolutePath;
+                dtp.remotePath = remoteBasePath + "/" + filename;
+                dtp.localFilename = filenameOnly;
+                dtp.writeEtag = true;
+                dtp.totalSequenceNumber = assetFile.size();
+                dtp.sequenceNumber = sequenceNumber;
+                dtp.urt = this;
+
+                try {
+                    DownloadTask.getFile(dtp.fileAbsolutePath, dtp.remotePath, dtp.localFilename, dtp.writeEtag);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+
+                asyncDialog.setProgress(i + 1);
+
+                if (dtp.sequenceNumber.incrementAndGet() == dtp.totalSequenceNumber) {
+                    Log.i(LaidOffNativeActivity.LOG_TAG, "Resource update finished.");
+                    dtp.urt.writeListEtag();
+                    dtp.urt.onResourceLoadFinished();
+                }
             }
         } else {
             Log.i(LaidOffNativeActivity.LOG_TAG, "Resource update not needed. (latest list file)");

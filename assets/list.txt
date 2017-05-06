@@ -9,7 +9,7 @@ assets/armature/DetachPlaneArmature.arm	0a4584c79bdd0edbd3714ed35857992d
 assets/armature/HumanArmature.arm	840aca28a1d33330593e2e4db142fb5e
 assets/armature/TreePlaneArmature.arm	4a2668537615dbf55e8892f9218a2acf
 assets/armature/TriangleArmature.arm	31ea193cfc5301b2c0b8971caa047f5c
-assets/d/d1.txt	aee0e7e841f0c54a7cb603c6ba9473c9
+assets/d/d1.txt	366dffd8f24423d800f8c9194c344acf
 assets/d/d2.txt	bd200dc590f1fa494eb2fb4dc209536d
 assets/field/testfield.field	d05337c01d56887dfeea11764c36536b
 assets/fnt/arita-semi-bold.fnt	985335517dbed6602b0074cefcb54f9a

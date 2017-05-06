@@ -130,14 +130,15 @@ public class LaidOffNativeActivity extends NativeActivity
 
         Log.i(LOG_TAG, String.format("Download cache dir: %s (%d files)", files.getAbsolutePath(), fileList.length));
 
-        for (int i = 0; i < fileList.length; i++) {
+        for (File aFileList : fileList) {
             //Date d = new Date(fileList[i].lastModified());
-            Log.i(LOG_TAG, String.format(" - file: %s", fileList[i].getAbsolutePath()));
+            Log.i(LOG_TAG, String.format(" - file: %s", aFileList.getAbsolutePath()));
         }
 
         UpdateResTaskParam urtp = new UpdateResTaskParam();
         urtp.fileAbsolutePath = files.getAbsolutePath();
-        urtp.remoteBasePath = "http://222.110.4.119:18080";
+        urtp.remoteBasePath = "http://sky.popsongremix.com/laidoff/assets";
+        //urtp.remoteBasePath = "http://222.110.4.119:18080";
         urtp.remoteListFilePath = "list.txt";
         urtp.localListFilename = "list.txt";
 
