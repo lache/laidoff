@@ -82,7 +82,12 @@ class UpdateResTask extends AsyncTask<UpdateResTaskParam, Void, File> {
 
             String versionNameFromServer = DownloadTask.getStringFromFile(versionNameFileResult.file).trim();
             if (packageVersionName.compareTo(versionNameFromServer) != 0) {
-                Toast.makeText(activity.getApplicationContext(), "최신 버전이 있습니다.", Toast.LENGTH_SHORT).show();
+                activity.runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        Toast.makeText(activity.getApplicationContext(), "최신 버전이 있습니다.", Toast.LENGTH_SHORT).show();
+                    }
+                });
                 Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(param.remoteApkBasePath + "/laidoff.apk"));
                 activity.startActivity(browserIntent);
             }
