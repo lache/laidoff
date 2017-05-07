@@ -43,6 +43,7 @@ static void render_ground(const LWCONTEXT* pLwc, const mat4x4 view, const mat4x4
 
 void lwc_render_skin(const struct _LWCONTEXT* pLwc) {
 	glViewport(0, 0, pLwc->width, pLwc->height);
+	lw_clear_color();
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	glDisable(GL_DEPTH_TEST);

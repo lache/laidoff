@@ -6,6 +6,7 @@
 #include "render_solid.h"
 #include "render_battle.h"
 #include "lwuidim.h"
+#include "laidoff.h"
 
 const float header_y_center = 0.9f;
 const float header_height = 0.2f;
@@ -208,6 +209,7 @@ void render_footer_button(const struct _LWCONTEXT* pLwc) {
 
 void lwc_render_battle_result(const struct _LWCONTEXT* pLwc) {
 	glViewport(0, 0, pLwc->width, pLwc->height);
+	lw_clear_color();
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	render_header(pLwc);

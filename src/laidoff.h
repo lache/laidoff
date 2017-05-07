@@ -62,6 +62,8 @@ void change_to_physics(LWCONTEXT *pLwc);
 void load_field_1(LWCONTEXT *pLwc);
 void load_field_2(LWCONTEXT *pLwc);
 
+void lw_clear_color();
+
 void toggle_font_texture_test_mode(LWCONTEXT* pLwc);
 void reset_runtime_context(LWCONTEXT* pLwc);
 void reset_time(LWCONTEXT* pLwc);

@@ -3,12 +3,14 @@
 #include "lwcontext.h"
 #include "render_text_block.h"
 #include "render_solid.h"
+#include "laidoff.h"
 
 void lwc_render_font_test_fbo(const struct _LWCONTEXT* pLwc) {
 	glBindFramebuffer(GL_FRAMEBUFFER, pLwc->font_fbo.fbo);
 	glDisable(GL_DEPTH_TEST);
 
 	glViewport(0, 0, pLwc->font_fbo.width, pLwc->font_fbo.height);
+	lw_clear_color();
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	const float aspect_ratio = (float)pLwc->font_fbo.width / pLwc->font_fbo.height;
@@ -129,6 +131,7 @@ void lwc_render_font_test_fbo(const struct _LWCONTEXT* pLwc) {
 
 void lwc_render_font_test(const struct _LWCONTEXT* pLwc) {
 	glViewport(0, 0, pLwc->width, pLwc->height);
+	lw_clear_color();
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	const float aspect_ratio = (float)pLwc->width / pLwc->height;

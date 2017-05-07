@@ -896,6 +896,7 @@ void render_damage_text(const LWCONTEXT* pLwc) {
 
 void lwc_render_battle(const LWCONTEXT* pLwc) {
 	glViewport(0, 0, pLwc->width, pLwc->height);
+	lw_clear_color();
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	// Result curtain

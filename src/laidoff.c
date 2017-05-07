@@ -525,6 +525,11 @@ static void init_skin_vao(LWCONTEXT *pLwc, int shader_index) {
 #endif
 }
 
+void lw_clear_color() {
+	// Alpha component should be 1 in RPI platform.
+	glClearColor(90 / 255.f, 173 / 255.f, 255 / 255.f, 1);
+}
+
 static void init_gl_context(LWCONTEXT *pLwc) {
 	init_gl_shaders(pLwc);
 
@@ -540,10 +545,8 @@ static void init_gl_context(LWCONTEXT *pLwc) {
 	//glEnable(GL_ALPHA_TEST);
 	//glCullFace(GL_CW);
 	//glDisable(GL_CULL_FACE);
-
-	// Alpha component should be 1 in RPI platform.
-	glClearColor(90 / 255.f, 173 / 255.f, 255 / 255.f, 1);
-
+	lw_clear_color();
+	
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	//glBlendFunc(GL_ONE, GL_ONE);

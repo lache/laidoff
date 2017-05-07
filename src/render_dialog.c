@@ -144,6 +144,7 @@ void lwc_render_dialog(const LWCONTEXT* pLwc)
 	// ****
 
 	glViewport(0, 0, pLwc->width, pLwc->height);
+	lw_clear_color();
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	//LOGV("Viewport size: %d x %d", pLwc->width, pLwc->height);

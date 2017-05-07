@@ -212,6 +212,7 @@ void render_player(const LWCONTEXT* pLwc, mat4x4 perspective, mat4x4 view) {
 void lwc_render_field(const LWCONTEXT* pLwc)
 {
 	glViewport(0, 0, pLwc->width, pLwc->height);
+	lw_clear_color();
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	int shader_index = LWST_DEFAULT;
