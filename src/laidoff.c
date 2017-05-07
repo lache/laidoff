@@ -1299,7 +1299,7 @@ LWCONTEXT *lw_init(void) {
 
 	init_action(pLwc);
 
-	load_field_2(pLwc);
+	load_field_1(pLwc);
 
 	return pLwc;
 }
