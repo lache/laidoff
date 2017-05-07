@@ -1299,25 +1299,7 @@ LWCONTEXT *lw_init(void) {
 
 	init_action(pLwc);
 
-	init_field(pLwc,
-		ASSETS_BASE_PATH "field" PATH_SEPARATOR "testfield.field",
-		ASSETS_BASE_PATH "nav" PATH_SEPARATOR "apt.nav", // "test.nav"
-		LVT_APT,
-		pLwc->tex_atlas[LAE_3D_APT_TEX_MIP_KTX],
-		1,
-		0.9f,
-		0);
-
-	/*init_field(pLwc,
-		ASSETS_BASE_PATH "field" PATH_SEPARATOR "testfield.field",
-		ASSETS_BASE_PATH "nav" PATH_SEPARATOR "test.nav",
-		LVT_FLOOR,
-		pLwc->tex_atlas[LAE_3D_FLOOR_TEX_KTX],
-		0,
-		0.5f,
-		1);*/
-
-	init_lwc_runtime_data(pLwc);
+	load_field_2(pLwc);
 
 	return pLwc;
 }
