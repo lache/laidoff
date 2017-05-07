@@ -5,7 +5,8 @@ import android.app.Activity;
 class UpdateResTaskParam {
     Activity activity;
     String fileAbsolutePath;
-    String remoteBasePath;
+    String remoteAssetsBasePath;
+    String remoteApkBasePath;
     String remoteListFilePath;
     String localListFilename;
 }

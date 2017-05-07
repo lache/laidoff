@@ -10,6 +10,19 @@ def keystoreProperties = new Properties()
 // Load your keystore.properties file into the keystoreProperties object.
 keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
 
+def versionProperties = new Properties()
+
+versionProperties['versionCode'] = "1"
+versionProperties['versionName'] = "0.1.0"
+
+if (project.hasProperty('versionName')) {
+    versionProperties['versionName'] = project.versionName
+}
+
+if (project.hasProperty('versionCode')) {
+    versionProperties['versionCode'] = project.versionCode
+}
+
 android {
     compileSdkVersion 23
     buildToolsVersion "25.0.2"
@@ -27,6 +40,9 @@ android {
         applicationId "com.popsongremix.laidoff"
         minSdkVersion   15
         targetSdkVersion 15
+
+        versionCode versionProperties['versionCode'] as int
+        versionName versionProperties['versionName']
 
         ndk {
             abiFilters 'armeabi-v7a'//, 'x86' //'x86_64', 'armeabi', 'armeabi-v7a', 'arm64-v8a'
@@ -86,3 +102,4 @@ dependencies {
     //compile 'com.squareup.okhttp3:logging-interceptor:3.6.0'
 
 }
+

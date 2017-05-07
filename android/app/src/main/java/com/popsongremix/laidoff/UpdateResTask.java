@@ -2,6 +2,10 @@ package com.popsongremix.laidoff;
 
 import android.app.Activity;
 import android.app.ProgressDialog;
+import android.content.Intent;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.util.Log;
 
@@ -40,36 +44,59 @@ class UpdateResTask extends AsyncTask<UpdateResTaskParam, Void, File> {
     protected File doInBackground(UpdateResTaskParam... params) {
 
         try {
-            GetFileResult gfr = DownloadTask.getFile(
+            GetFileResult versionNameFileResult = DownloadTask.getFile(
                     params[0].fileAbsolutePath,
-                    params[0].remoteBasePath + "/" + params[0].remoteListFilePath,
-                    params[0].localListFilename,
+                    params[0].remoteApkBasePath + "/versionName.txt",
+                    "versionName.txt",
                     false
             );
 
-            fileAbsolutePath = params[0].fileAbsolutePath;
-            remoteBasePath = params[0].remoteBasePath;
-
-
-            File listFile = new File(params[0].fileAbsolutePath, params[0].localListFilename);
-            String[] assetFileList = DownloadTask.getStringFromFile(listFile).split("\n");
-            for (String anAssetFileList : assetFileList) {
-                String assetFilename = anAssetFileList.split("\t")[0];
-                assetFile.add(assetFilename.replace("assets/", ""));
+            String versionNameFromServer = DownloadTask.getStringFromFile(versionNameFileResult.file).trim();
+            try {
+                PackageInfo packageInfo = activity.getPackageManager().getPackageInfo(activity.getPackageName(), 0);
+                if (versionNameFromServer.compareTo(packageInfo.versionName) != 0) {
+                    Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(params[0].remoteApkBasePath + "/laidoff.apk"));
+                    activity.startActivity(browserIntent);
+                }
+            } catch (PackageManager.NameNotFoundException e) {
+                e.printStackTrace();
             }
 
-            listGfr = gfr;
+            GetFileResult listFileResult = getListFile(params[0]);
+
+            listGfr = listFileResult;
 
             asyncDialog.setProgress(1);
 
             updateAssetOneByOneSync();
 
-            return gfr.file;
+            return listFileResult.file;
         } catch (Exception e) {
             e.printStackTrace();
         }
 
         return null;
+    }
+
+    private GetFileResult getListFile(UpdateResTaskParam param) throws Exception {
+        GetFileResult gfr = DownloadTask.getFile(
+                param.fileAbsolutePath,
+                param.remoteAssetsBasePath + "/" + param.remoteListFilePath,
+                param.localListFilename,
+                false
+        );
+
+        fileAbsolutePath = param.fileAbsolutePath;
+        remoteBasePath = param.remoteAssetsBasePath;
+
+
+        File listFile = new File(param.fileAbsolutePath, param.localListFilename);
+        String[] assetFileList = DownloadTask.getStringFromFile(listFile).split("\n");
+        for (String anAssetFileList : assetFileList) {
+            String assetFilename = anAssetFileList.split("\t")[0];
+            assetFile.add(assetFilename.replace("assets/", ""));
+        }
+        return gfr;
     }
 
     @Override

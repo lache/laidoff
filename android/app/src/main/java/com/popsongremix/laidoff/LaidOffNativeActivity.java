@@ -2,28 +2,20 @@ package com.popsongremix.laidoff;
 
 import android.app.NativeActivity;
 import android.content.Context;
-import android.content.SharedPreferences;
 import android.content.res.AssetManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.media.SoundPool;
-import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.Environment;
 import android.util.Log;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.util.Date;
 import java.util.Locale;
 
 public class LaidOffNativeActivity extends NativeActivity
@@ -137,8 +129,9 @@ public class LaidOffNativeActivity extends NativeActivity
 
         UpdateResTaskParam urtp = new UpdateResTaskParam();
         urtp.fileAbsolutePath = files.getAbsolutePath();
-        urtp.remoteBasePath = "http://sky.popsongremix.com/laidoff/assets";
-        //urtp.remoteBasePath = "http://222.110.4.119:18080";
+        urtp.remoteAssetsBasePath = "http://sky.popsongremix.com/laidoff/assets";
+        urtp.remoteApkBasePath = "http://sky.popsongremix.com/laidoff/apk";
+        //urtp.remoteAssetsBasePath = "http://222.110.4.119:18080";
         urtp.remoteListFilePath = "list.txt";
         urtp.localListFilename = "list.txt";
 
