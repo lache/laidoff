@@ -8,6 +8,7 @@ import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.util.Log;
+import android.widget.Toast;
 
 import java.io.File;
 import java.io.IOException;
@@ -32,7 +33,7 @@ class UpdateResTask extends AsyncTask<UpdateResTaskParam, Void, File> {
     @Override
     protected void onPreExecute() {
         asyncDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
-        asyncDialog.setMessage("애셋 리스트 체크...");
+        asyncDialog.setMessage("로딩중");
         asyncDialog.setMax(1);
 
         // show dialog
@@ -44,33 +45,15 @@ class UpdateResTask extends AsyncTask<UpdateResTaskParam, Void, File> {
     protected File doInBackground(UpdateResTaskParam... params) {
 
         try {
-            GetFileResult versionNameFileResult = DownloadTask.getFile(
-                    params[0].fileAbsolutePath,
-                    params[0].remoteApkBasePath + "/versionName.txt",
-                    "versionName.txt",
-                    false
-            );
+            checkNewVersion(params[0]);
 
-            String versionNameFromServer = DownloadTask.getStringFromFile(versionNameFileResult.file).trim();
-            try {
-                PackageInfo packageInfo = activity.getPackageManager().getPackageInfo(activity.getPackageName(), 0);
-                if (versionNameFromServer.compareTo(packageInfo.versionName) != 0) {
-                    Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(params[0].remoteApkBasePath + "/laidoff.apk"));
-                    activity.startActivity(browserIntent);
-                }
-            } catch (PackageManager.NameNotFoundException e) {
-                e.printStackTrace();
-            }
-
-            GetFileResult listFileResult = getListFile(params[0]);
-
-            listGfr = listFileResult;
+            getListFile(params[0]);
 
             asyncDialog.setProgress(1);
 
             updateAssetOneByOneSync();
 
-            return listFileResult.file;
+            return listGfr.file;
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -78,7 +61,35 @@ class UpdateResTask extends AsyncTask<UpdateResTaskParam, Void, File> {
         return null;
     }
 
-    private GetFileResult getListFile(UpdateResTaskParam param) throws Exception {
+    private void checkNewVersion(UpdateResTaskParam param) throws Exception {
+        String packageVersionName = "";
+        try {
+            PackageInfo packageInfo = activity.getPackageManager().getPackageInfo(activity.getPackageName(), 0);
+            packageVersionName = packageInfo.versionName;
+        } catch (PackageManager.NameNotFoundException e) {
+            e.printStackTrace();
+        }
+
+        if (packageVersionName.compareTo("0.1.0") == 0) {
+            Log.i(LaidOffNativeActivity.LOG_TAG, "Development version name detected. Version check will be skipped.");
+        } else {
+            GetFileResult versionNameFileResult = DownloadTask.getFile(
+                    param.fileAbsolutePath,
+                    param.remoteApkBasePath + "/versionName.txt",
+                    "versionName.txt",
+                    false
+            );
+
+            String versionNameFromServer = DownloadTask.getStringFromFile(versionNameFileResult.file).trim();
+            if (packageVersionName.compareTo(versionNameFromServer) != 0) {
+                Toast.makeText(activity.getApplicationContext(), "최신 버전이 있습니다.", Toast.LENGTH_SHORT).show();
+                Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(param.remoteApkBasePath + "/laidoff.apk"));
+                activity.startActivity(browserIntent);
+            }
+        }
+    }
+
+    private void getListFile(UpdateResTaskParam param) throws Exception {
         GetFileResult gfr = DownloadTask.getFile(
                 param.fileAbsolutePath,
                 param.remoteAssetsBasePath + "/" + param.remoteListFilePath,
@@ -96,7 +107,8 @@ class UpdateResTask extends AsyncTask<UpdateResTaskParam, Void, File> {
             String assetFilename = anAssetFileList.split("\t")[0];
             assetFile.add(assetFilename.replace("assets/", ""));
         }
-        return gfr;
+
+        listGfr = gfr;
     }
 
     @Override
@@ -110,6 +122,7 @@ class UpdateResTask extends AsyncTask<UpdateResTaskParam, Void, File> {
         super.onPostExecute(result);
     }
 
+    @SuppressWarnings("unused")
     private void updateAssetOneByOneUsingTask() {
         if (listGfr.newlyDownloaded) {
             for (int i = 0; i < assetFile.size(); i++) {
