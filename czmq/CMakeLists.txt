@@ -98,10 +98,10 @@ find_library( # Defines the name of the path variable that stores the
               # CMake needs to locate.
               log )
 
-if(log-lib_FOUND)
-else(log-lib_FOUND)
+if(log-lib)
+else(log-lib)
 set(log-lib "")
-endif(log-lib_FOUND)
+endif(log-lib)
 
 list(APPEND CMAKE_MODULE_PATH "${SOURCE_DIR}")
 set(OPTIONAL_LIBRARIES)
