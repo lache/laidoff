@@ -1,13 +1,10 @@
-/*
-    Simple udp client
-*/
-#include<stdio.h> //printf
-#include<string.h> //memset
-#include<stdlib.h> //exit(0);
-#include<arpa/inet.h>
-#include<sys/socket.h>
+#include <stdio.h> //printf
+#include <string.h> //memset
+#include <stdlib.h> //exit(0);
+#include <arpa/inet.h>
+#include <sys/socket.h>
 #include <unistd.h>
-#include <lwlog.h>
+#include "lwlog.h"
 #include "net.h"
 
 #define SERVER "222.110.4.119"

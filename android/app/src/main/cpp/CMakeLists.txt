@@ -8,6 +8,23 @@ add_library(app-glue STATIC
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=gnu++11 -DdDOUBLE")
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -DdDOUBLE")
 
+# Android Studio에서 CMake 빌드 오류나는 부분 수정
+set(ZMQ_HAVE_EVENTFD_CLOEXEC_EXITCODE 0)
+set(ZMQ_HAVE_SO_KEEPALIVE_EXITCODE 0)
+set(ZMQ_HAVE_TCP_KEEPCNT_EXITCODE 0)
+set(ZMQ_HAVE_TCP_KEEPIDLE_EXITCODE 0)
+set(ZMQ_HAVE_TCP_KEEPINTVL_EXITCODE 0)
+
+# ZeroMQ 라이브러리 중 테스트 프로젝트는 빌드하지 않는다.
+set (ZMQ_BUILD_TESTS OFF CACHE BOOL "" FORCE)
+
+add_subdirectory(../../../../../zeromq-4.2.1 zeromq)
+
+# ZeroMQ 프로젝트는 ZeroMQ 솔루션 디렉토리에 모은다.
+#set_target_properties(libzmq-static local_lat local_thr remote_lat remote_thr inproc_lat inproc_thr PROPERTIES EXCLUDE_FROM_ALL 1 EXCLUDE_FROM_DEFAULT_BUILD 1)
+
+include_directories(../../../../../zeromq-4.2.1/include)
+
 file(GLOB LUA_LIB
     "../../../../../lua-5.3.4/*.h"
     "../../../../../lua-5.3.4/*.c"
@@ -66,4 +83,5 @@ target_link_libraries(native-activity
                       app-glue
                       EGL
                       GLESv2
-                      log)
+                      log
+                      libzmq)

@@ -35,6 +35,7 @@
 #include "lwskinmesh.h"
 #include "render_physics.h"
 #include "nav.h"
+#include "mq.h"
 
 #define LWEPSILON (1e-3)
 #define INCREASE_RENDER_SCORE (20)
@@ -1297,6 +1298,8 @@ LWCONTEXT *lw_init(void) {
 	lwtimepoint_now(&pLwc->last_time);
 
 	init_net(pLwc);
+
+	init_zmq();
 
 	init_armature(pLwc);
 
