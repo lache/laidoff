@@ -22,11 +22,11 @@
 
 #include "czmq_classes.h"
 
-#include "platform.hpp"
-
-#ifdef IOS
-#include <net/if.h>
-#endif
+//#include "platform.hpp"
+//
+//#ifdef IOS
+//#include <net/if.h>
+//#endif
 //  --------------------------------------------------------------------------
 //  Signal handling
 

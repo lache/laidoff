@@ -27,11 +27,11 @@
 
 #include "czmq_classes.h"
 
-#include "platform.hpp"
-
-#ifdef IOS
-#include <net/if.h>
-#endif
+//#include "platform.hpp"
+//
+//#ifdef IOS
+//#include <net/if.h>
+//#endif
 
 //  Constants
 #define INTERVAL_DFLT  1000         //  Default interval = 1 second

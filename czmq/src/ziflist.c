@@ -24,11 +24,11 @@
 
 #include "czmq_classes.h"
 
-#include "platform.hpp"
-
-#ifdef IOS
-#include <net/if.h>
-#endif
+//#include "platform.hpp"
+//
+//#ifdef IOS
+//#include <net/if.h>
+//#endif
 
 //  Structure of an interface
 typedef struct {
