@@ -1,6 +1,7 @@
 #include "zhelpers.h"
 #include "mq.h"
 #include "lwlog.h"
+#include <czmq.h>
 
 void init_zmq() {
 	//  Socket to talk to server
@@ -19,7 +20,7 @@ void init_zmq() {
 	//  Process 100 updates
 	int update_nbr;
 	long total_temp = 0;
-	for (update_nbr = 0; update_nbr < 100; update_nbr++) {
+	for (update_nbr = 0; update_nbr < 2; update_nbr++) {
 		char *string = s_recv(subscriber);
 
 		int zipcode, temperature, relhumidity;
@@ -35,3 +36,11 @@ void init_zmq() {
 	zmq_ctx_destroy(context);
 }
 
+void init_czmq() {
+	zsock_t* frontend = zsock_new(ZMQ_REQ);
+	zsock_destroy(&frontend);
+}
+
+void mq_shutdown() {
+	zsys_shutdown();
+}

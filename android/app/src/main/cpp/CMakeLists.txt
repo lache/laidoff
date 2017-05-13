@@ -21,9 +21,23 @@ set (ZMQ_BUILD_TESTS OFF CACHE BOOL "" FORCE)
 add_subdirectory(../../../../../zeromq-4.2.1 zeromq)
 
 # ZeroMQ 프로젝트는 ZeroMQ 솔루션 디렉토리에 모은다.
-#set_target_properties(libzmq-static local_lat local_thr remote_lat remote_thr inproc_lat inproc_thr PROPERTIES EXCLUDE_FROM_ALL 1 EXCLUDE_FROM_DEFAULT_BUILD 1)
+set_target_properties(libzmq-static PROPERTIES EXCLUDE_FROM_ALL 1 EXCLUDE_FROM_DEFAULT_BUILD 1)
 
 include_directories(../../../../../zeromq-4.2.1/include)
+
+# CZMQ CMake 의존성 추가
+
+add_subdirectory(../../../../../czmq czmq)
+include_directories(../../../../../czmq/include)
+
+# ZeroMQ 라이브러리 중 사용할 것만 제외하고는 빌드되지 않도록 한다.
+set_target_properties(czmq czmq_selftest zmakecert zsp PROPERTIES FOLDER "ZeroMQ")
+# ZeroMQ 프로젝트는 ZeroMQ 솔루션 디렉토리에 모은다.
+set_target_properties(czmq_selftest zmakecert zsp PROPERTIES EXCLUDE_FROM_ALL 1 EXCLUDE_FROM_DEFAULT_BUILD 1)
+
+include_directories(czmq/include)
+
+
 
 file(GLOB LUA_LIB
     "../../../../../lua-5.3.4/*.h"
@@ -84,4 +98,5 @@ target_link_libraries(native-activity
                       EGL
                       GLESv2
                       log
-                      libzmq)
+                      libzmq
+                      czmq)

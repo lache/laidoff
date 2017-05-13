@@ -29,6 +29,18 @@ set_target_properties(libzmq-static local_lat local_thr remote_lat remote_thr in
 
 include_directories(zeromq-4.2.1/include)
 
+# CZMQ CMake 의존성 추가
+
+add_subdirectory(czmq)
+include_directories(czmq/include)
+
+# ZeroMQ 라이브러리 중 사용할 것만 제외하고는 빌드되지 않도록 한다.
+set_target_properties(czmq czmq_selftest zmakecert zsp PROPERTIES FOLDER "ZeroMQ")
+# ZeroMQ 프로젝트는 ZeroMQ 솔루션 디렉토리에 모은다.
+set_target_properties(czmq_selftest zmakecert zsp PROPERTIES EXCLUDE_FROM_ALL 1 EXCLUDE_FROM_DEFAULT_BUILD 1)
+
+include_directories(czmq/include)
+
 
 include_directories("src")
 
@@ -152,6 +164,7 @@ ${GLAD})
 target_link_libraries(laidoff
 	glfw
 	libzmq
+	czmq
 	${WINCODEC}
 	${WINDSHOW}
 	${WINOPENGL32}
@@ -170,7 +183,11 @@ elseif (APPLE)
 
 endif()
 
-# ZeroMQ DLL 파일을 필요한 위치로 복사
+# 빌드 결과를 한곳으로 모은다. (DLL, EXE)
 
-add_custom_command(TARGET laidoff POST_BUILD 
-  COMMAND ${CMAKE_COMMAND} -E copy_if_different "$<TARGET_FILE:libzmq>" $<TARGET_FILE_DIR:laidoff>)
+set_target_properties(laidoff libzmq czmq
+    PROPERTIES
+    ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib"
+    LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib"
+    RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin"
+)

@@ -23,25 +23,7 @@ set(pkg_config_libs_private "")
 # options
 ########################################################################
 if (NOT CMAKE_BUILD_TYPE)
-    if (EXISTS "${SOURCE_DIR}/.git")
-        set (CMAKE_BUILD_TYPE Debug)
-    else ()
-# http://xit0.org/2013/04/cmake-use-git-branch-and-commit-details-in-project/
-# http://stackoverflow.com/questions/6797395/cmake-execute-process-always-fails-with-no-such-file-or-directory-when-i-cal
-        execute_process(
-            COMMAND git rev-parse --show-toplevel
-            WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}
-            RESULT_VARIABLE git_result
-            OUTPUT_VARIABLE git_root
-            OUTPUT_STRIP_TRAILING_WHITESPACE
-        )
-        message(STATUS "git workspace root [${git_result}]: ${git_root}")
-        if ( "${git_result}" == "0" )
-            set (CMAKE_BUILD_TYPE Debug)
-        else ()
-            set (CMAKE_BUILD_TYPE Release)
-        endif ()
-    endif ()
+    set (CMAKE_BUILD_TYPE Debug)
 endif ()
 if (${CMAKE_BUILD_TYPE} STREQUAL "Debug")
     OPTION (ENABLE_DRAFTS "Build and install draft classes and methods" ON)
@@ -107,6 +89,14 @@ endif()
 if (CYGWIN)
     set(MORE_LIBRARIES)
 endif()
+
+find_library( # Defines the name of the path variable that stores the
+              # location of the NDK library.
+              log-lib
+
+              # Specifies the name of the NDK library that
+              # CMake needs to locate.
+              log )
 
 list(APPEND CMAKE_MODULE_PATH "${SOURCE_DIR}")
 set(OPTIONAL_LIBRARIES)
@@ -264,7 +254,7 @@ source_group("Header Files" FILES ${czmq_headers})
 if (NOT DEFINED BUILD_SHARED_LIBS)
     SET(BUILD_SHARED_LIBS ON)
 endif()
-add_library(czmq ${czmq_sources} ${czmq_headers})
+add_library(czmq SHARED ${czmq_sources} ${czmq_headers})
 set_target_properties(czmq
     PROPERTIES DEFINE_SYMBOL "CZMQ_EXPORTS"
 )
@@ -273,6 +263,7 @@ set_target_properties (czmq
 )
 target_link_libraries(czmq
 	libzmq
+	${log-lib}
     ${ZEROMQ_LIBRARIES} ${MORE_LIBRARIES}
 )
 

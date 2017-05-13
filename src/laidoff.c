@@ -1301,6 +1301,8 @@ LWCONTEXT *lw_init(void) {
 
 	init_zmq();
 
+	init_czmq();
+
 	init_armature(pLwc);
 
 	init_action(pLwc);
@@ -1457,6 +1459,7 @@ void lw_on_destroy(LWCONTEXT *pLwc) {
 	release_font(pLwc->pFnt);
 	release_string(pLwc->dialog);
 	deinit_net(pLwc);
+	mq_shutdown();
 }
 
 void lw_set_kp(LWCONTEXT *pLwc, int kp) {

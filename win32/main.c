@@ -172,7 +172,7 @@ int main(void)
 	destroy_ext_sound_lib();
 
 	lw_on_destroy(pLwc);
-    
+	
     printf(LWU("용사는 휴직중 종료\n"));
 
 	exit(EXIT_SUCCESS);
