@@ -739,9 +739,9 @@ void reset_runtime_context(LWCONTEXT* pLwc) {
 	pLwc->admin_button_command[7].name = LWU("신:스킨");
 	pLwc->admin_button_command[7].command_handler = change_to_skin;
 	pLwc->admin_button_command[8].name = LWU("신:필드1로드");
-	pLwc->admin_button_command[8].command_handler = load_field_1;
+	pLwc->admin_button_command[8].command_handler = load_field_1_init_runtime_data;
 	pLwc->admin_button_command[9].name = LWU("신:필드2로드");
-	pLwc->admin_button_command[9].command_handler = load_field_2;
+	pLwc->admin_button_command[9].command_handler = load_field_2_init_runtime_data;
 }
 
 void delete_font_fbo(LWCONTEXT* pLwc) {
@@ -1302,7 +1302,7 @@ LWCONTEXT *lw_init(void) {
 
 	init_action(pLwc);
 
-	load_field_1(pLwc);
+	load_field_1_init_runtime_data(pLwc);
 
 	return pLwc;
 }
@@ -1400,7 +1400,7 @@ void change_to_physics(LWCONTEXT *pLwc) {
 	pLwc->next_game_scene = LGS_PHYSICS;
 }
 
-void load_field_1(LWCONTEXT *pLwc) {
+void load_field_1_init_runtime_data(LWCONTEXT *pLwc) {
 	pLwc->next_game_scene = LGS_FIELD;
 
 	init_field(pLwc,
@@ -1415,7 +1415,7 @@ void load_field_1(LWCONTEXT *pLwc) {
 	init_lwc_runtime_data(pLwc);
 }
 
-void load_field_2(LWCONTEXT *pLwc) {
+void load_field_2_init_runtime_data(LWCONTEXT *pLwc) {
 	pLwc->next_game_scene = LGS_FIELD;
 
 	init_field(pLwc,

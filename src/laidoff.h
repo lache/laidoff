@@ -59,8 +59,8 @@ void change_to_admin(LWCONTEXT *pLwc);
 void change_to_battle_result(LWCONTEXT *pLwc);
 void change_to_skin(LWCONTEXT *pLwc);
 void change_to_physics(LWCONTEXT *pLwc);
-void load_field_1(LWCONTEXT *pLwc);
-void load_field_2(LWCONTEXT *pLwc);
+void load_field_1_init_runtime_data(LWCONTEXT *pLwc);
+void load_field_2_init_runtime_data(LWCONTEXT *pLwc);
 
 void lw_clear_color();
 
