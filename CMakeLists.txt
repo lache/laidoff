@@ -1,5 +1,10 @@
 cmake_minimum_required(VERSION 3.6)
 
+# CMake의 Visual Studio Solution Folders 기능 켬
+set_property(GLOBAL PROPERTY USE_FOLDERS ON)
+
+# GLFW CMake 의존성 추가
+
 set(GLFW_BUILD_DOCS OFF CACHE BOOL "" FORCE)
 set(GLFW_BUILD_TESTS OFF CACHE BOOL "" FORCE)
 set(GLFW_BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
@@ -7,8 +12,23 @@ set(GLFW_BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
 add_subdirectory(glfw-3.2.1)
 
 include_directories(${glfw_INCLUDE_DIRS})
-
 include_directories("${GLFW_SOURCE_DIR}/deps")
+
+
+# ZeroMQ CMake 의존성 추가
+
+# ZeroMQ 라이브러리 중 테스트 프로젝트는 빌드하지 않는다.
+set (ZMQ_BUILD_TESTS OFF CACHE BOOL "" FORCE)
+
+add_subdirectory(zeromq-4.2.1)
+
+# ZeroMQ 라이브러리 중 사용할 것만 제외하고는 빌드되지 않도록 한다.
+set_target_properties(libzmq libzmq-static local_lat local_thr remote_lat remote_thr inproc_lat inproc_thr PROPERTIES FOLDER "ZeroMQ")
+# ZeroMQ 프로젝트는 ZeroMQ 솔루션 디렉토리에 모은다.
+set_target_properties(libzmq-static local_lat local_thr remote_lat remote_thr inproc_lat inproc_thr PROPERTIES EXCLUDE_FROM_ALL 1 EXCLUDE_FROM_DEFAULT_BUILD 1)
+
+include_directories(zeromq-4.2.1/include)
+
 
 include_directories("src")
 
@@ -18,6 +38,7 @@ include_directories("ode/include")
 include_directories("ode/ou/include")
 include_directories("ode/ode/src")
 include_directories("recastnavigation/Detour/Include")
+include_directories("zmq/include")
 
 #include_directories(libpng-1.6.28)
 
@@ -47,8 +68,6 @@ if (WIN32)
 		win32/image.cpp
 		win32/key.c
 		win32/main.c
-		win32/main2.c
-		win32/main3.c
 		win32/mouse.c
 		win32/sound.cpp
 		win32/gl3w.c
@@ -108,10 +127,12 @@ file(GLOB LUA_LIB "lua-5.3.4/*.h" "lua-5.3.4/*.c")
 file(GLOB ODE_LIB "ode/ode/src/*.h" "ode/ode/src/*.c" "ode/ode/src/*.cpp" "ode/ode/src/joints/*.h" "ode/ode/src/joints/*.cpp" "ode/ou/src/ou/*.cpp" "ode/include/ode/*.h" "ode/ou/include/ou/*.h")
 file(GLOB LAIDOFF_LIB "src/*.h" "src/*.c" "src/*.cpp")
 file(GLOB DETOUR_LIB "recastnavigation/Detour/Include/*.h" "recastnavigation/Detour/Source/*.cpp")
+file(GLOB ZMQ_LIB "zmq/src/*.c" "zmq/src/*.hpp" "zmq/src/*.cpp" "zmq/include/*.h")
 
 source_group(Lua FILES ${LUA_LIB})
 source_group(Ode FILES ${ODE_LIB})
 source_group(Detour FILES ${DETOUR_LIB})
+source_group(Zmq FILES ${ZMQ_LIB})
 source_group(Win32 FILES ${WIN32_DEPS} ${ICON})
 
 #add_executable(laidoff WIN32 MACOSX_BUNDLE laidoff.c ${ICON} ${GLAD})
@@ -121,17 +142,25 @@ ${LAIDOFF_LIB}
 ${ODE_LIB}
 ${LUA_LIB}
 ${DETOUR_LIB}
+#${ZMQ_LIB}
 ${WIN32_DEPS}
 ${OSX_DEPS}
 ${RPI_DEPS}
 ${ICON}
 ${GLAD})
 
-target_link_libraries(laidoff glfw ${WINCODEC} ${WINDSHOW} ${WINOPENGL32} ${WINMM} ${WINXAUDIO2} ${WINSOCK2})
-
+target_link_libraries(laidoff
+	glfw
+	libzmq
+	${WINCODEC}
+	${WINDSHOW}
+	${WINOPENGL32}
+	${WINMM}
+	${WINXAUDIO2}
+	${WINSOCK2}
+)
 
 set(WINDOWS_BINARIES laidoff)
-
 
 if (MSVC)
     # Tell MSVC to use main instead of WinMain for Windows subsystem executables
@@ -140,3 +169,8 @@ if (MSVC)
 elseif (APPLE)
 
 endif()
+
+# ZeroMQ DLL 파일을 필요한 위치로 복사
+
+add_custom_command(TARGET laidoff POST_BUILD 
+  COMMAND ${CMAKE_COMMAND} -E copy_if_different "$<TARGET_FILE:libzmq>" $<TARGET_FILE_DIR:laidoff>)
