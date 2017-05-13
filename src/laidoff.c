@@ -36,6 +36,7 @@
 #include "render_physics.h"
 #include "nav.h"
 #include "mq.h"
+#include "sysmsg.h"
 
 #define LWEPSILON (1e-3)
 #define INCREASE_RENDER_SCORE (20)
@@ -968,6 +969,8 @@ void lwc_render(const LWCONTEXT *pLwc) {
 	} else if (pLwc->game_scene == LGS_PHYSICS) {
 		lwc_render_physics(pLwc);
 	}
+
+	render_sys_msg(pLwc, pLwc->def_sys_msg);
 }
 
 static void update_battle_wall(LWCONTEXT* pLwc) {
@@ -1003,6 +1006,8 @@ void lwc_update(LWCONTEXT *pLwc, double delta_time) {
 	pLwc->app_time += pLwc->delta_time;
 	pLwc->scene_time += pLwc->delta_time;
 
+	mq_poll(pLwc->def_sys_msg, pLwc->mq);
+
 	update_dialog(pLwc);
 
 	//****//
@@ -1031,6 +1036,8 @@ void lwc_update(LWCONTEXT *pLwc, double delta_time) {
 	update_damage_text(pLwc);
 
 	update_battle_wall(pLwc);
+
+	update_sys_msg(pLwc->def_sys_msg, (float)pLwc->delta_time);
 
 	if (pLwc->font_fbo.dirty) {
 		lwc_render_font_test_fbo(pLwc);
@@ -1295,13 +1302,15 @@ LWCONTEXT *lw_init(void) {
 
 	init_load_textures(pLwc);
 
+	pLwc->def_sys_msg = init_sys_msg();
+
 	lwtimepoint_now(&pLwc->last_time);
 
 	init_net(pLwc);
 
-	init_zmq();
+	pLwc->mq = init_mq();
 
-	init_czmq();
+	init_czmq(); // test (maintain reference to czmq)
 
 	init_armature(pLwc);
 
@@ -1323,6 +1332,10 @@ void lw_deinit(LWCONTEXT *pLwc) {
 	}
 
 	unload_field(pLwc->field);
+
+	deinit_sys_msg(pLwc->def_sys_msg);
+
+	deinit_mq(pLwc->mq);
 
 	free(pLwc);
 }

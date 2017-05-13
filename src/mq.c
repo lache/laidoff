@@ -2,8 +2,16 @@
 #include "mq.h"
 #include "lwlog.h"
 #include <czmq.h>
+#include "sysmsg.h"
 
-void init_zmq() {
+typedef struct _LWMESSAGEQUEUE {
+	void* context;
+	void* subscriber;
+} LWMESSAGEQUEUE;
+
+void* init_mq() {
+	LWMESSAGEQUEUE* mq = (LWMESSAGEQUEUE*)malloc(sizeof(LWMESSAGEQUEUE));
+
 	//  Socket to talk to server
 	LOGI("Collecting updates from weather server...");
 	void *context = zmq_ctx_new();
@@ -17,23 +25,32 @@ void init_zmq() {
 		filter, strlen(filter));
 	assert(rc == 0);
 
-	//  Process 100 updates
-	int update_nbr;
-	long total_temp = 0;
-	for (update_nbr = 0; update_nbr < 2; update_nbr++) {
-		char *string = s_recv(subscriber);
+	mq->context = context;
+	mq->subscriber = subscriber;
+	return mq;
+}
 
-		int zipcode, temperature, relhumidity;
-		sscanf(string, "%d %d %d",
-			&zipcode, &temperature, &relhumidity);
-		total_temp += temperature;
-		free(string);
+void mq_poll(void* sm, void* _mq) {
+	char msg_str[256];
+	LWMESSAGEQUEUE* mq = (LWMESSAGEQUEUE*)_mq;
+	int size = zmq_recv(mq->subscriber, msg_str, 255, ZMQ_DONTWAIT);
+	if (size == -1) {
+		return;
+	} else {
+		msg_str[size] = '\0';
+		show_sys_msg(sm, msg_str);
 	}
-	LOGI("Average temperature for zipcode '%s' was %dF",
-		filter, (int)(total_temp / update_nbr));
 
-	zmq_close(subscriber);
-	zmq_ctx_destroy(context);
+	//int zipcode, temperature, relhumidity;
+	//sscanf(string, "%d %d %d",
+	//	&zipcode, &temperature, &relhumidity);
+	//total_temp += temperature;
+}
+
+void deinit_mq(void* _mq) {
+	LWMESSAGEQUEUE* mq = (LWMESSAGEQUEUE*)_mq;
+	zmq_close(mq->subscriber);
+	zmq_ctx_destroy(mq->context);
 }
 
 void init_czmq() {

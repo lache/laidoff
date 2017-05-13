@@ -209,4 +209,7 @@ typedef struct _LWCONTEXT {
 
 	int fps_mode;
 	int hide_field;
+
+	void* def_sys_msg;
+	void* mq;
 } LWCONTEXT;
