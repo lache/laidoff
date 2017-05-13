@@ -46,6 +46,8 @@ int alt_clock_gettime (int clock_id, timespec *ts);
 #endif
 #endif
 
+#include "platform.hpp"
+
 namespace zmq
 {
 

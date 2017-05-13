@@ -238,6 +238,11 @@ uint64_t zmq::clock_t::rdtsc ()
     uint64_t tsc;
     asm("\tstck\t%0\n" : "=Q" (tsc) : : "cc");
     return(tsc);
+#elif defined(DONT_HAVE_CLOCK_GETTIME)
+    // clock_gettime is not supported at '< iOS 10.0'.
+    struct timeval tv;
+    gettimeofday(&tv, 0);
+    return (uint64_t)(tv.tv_sec) * 1000000000 + tv.tv_usec * 1000;
 #else
     struct timespec ts;
     clock_gettime(CLOCK_MONOTONIC, &ts);

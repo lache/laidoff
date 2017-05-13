@@ -3,6 +3,8 @@
 #include "lwcontext.h"
 #include "render_solid.h"
 #include "render_text_block.h"
+#include <stdlib.h>
+#include <string.h>
 
 #define LW_SYS_MSG_MAX_LEN (256)
 
