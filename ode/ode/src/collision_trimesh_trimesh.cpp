@@ -1,4 +1,4 @@
-/*************************************************************************
+ï»¿/*************************************************************************
  *                                                                       *
  * Open Dynamics Engine, Copyright (C) 2001-2003 Russell L. Smith.       *
  * All rights reserved.  Email: russ@q12.org   Web: www.q12.org          *
@@ -21,7 +21,7 @@
  *************************************************************************/
 
 // OPCODE TriMesh/TriMesh collision code
-// Written at 2006-10-28 by Francisco León (http://gimpact.sourceforge.net)
+// Written at 2006-10-28 by Francisco Le? (http://gimpact.sourceforge.net)
 
 #ifdef _MSC_VER
 #pragma warning(disable:4244 4305)  // for VC++, no precision loss complaints
@@ -136,7 +136,7 @@ void SwapNormals(dVector3 *&pen_v, dVector3 *&col_v, dVector3* v1, dVector3* v2,
 }
 
 ///////////////////////MECHANISM FOR AVOID CONTACT REDUNDANCE///////////////////////////////
-////* Written by Francisco León (http://gimpact.sourceforge.net) *///
+////* Written by Francisco Le? (http://gimpact.sourceforge.net) *///
 #define CONTACT_DIFF_EPSILON REAL(0.00001)
 #if defined(dDOUBLE)
 #define CONTACT_NORMAL_ZERO REAL(0.0000001)
