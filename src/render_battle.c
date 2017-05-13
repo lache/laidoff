@@ -601,7 +601,7 @@ void render_player_creature_ui(const LWCONTEXT* pLwc, const LWBATTLECREATURE* c,
 	}
 
 	// HP
-	{	
+	{
 		LWTEXTBLOCK hp_text_block;
 		memcpy(&hp_text_block, &text_block, sizeof(LWTEXTBLOCK));
 
@@ -616,7 +616,7 @@ void render_player_creature_ui(const LWCONTEXT* pLwc, const LWBATTLECREATURE* c,
 
 		render_text_block(pLwc, &hp_text_block);
 	}
-	
+
 	render_solid_box_ui(
 		pLwc,
 		text_block.text_block_x + shake_diff_pos[0],
@@ -882,16 +882,16 @@ void render_center_image(const LWCONTEXT* pLwc) {
 
 void render_damage_text(const LWCONTEXT* pLwc) {
 	ARRAY_ITERATE_VALID(const LWDAMAGETEXT, pLwc->damage_text) {
-			if (e->coord == LDTC_3D) {
-				render_damage_text_3d(pLwc, &pLwc->damage_text[i], pLwc->battle_view, pLwc->battle_proj);
-			} else if (e->coord == LDTC_UI) {
-				mat4x4 identity;
-				mat4x4_identity(identity);
-				render_damage_text_3d(pLwc, &pLwc->damage_text[i], identity, pLwc->proj);
-			} else {
-				LOGE("Unknown LWDAMAGETEXT coord value: %d", e->coord);
-			}
-		} ARRAY_ITERATE_VALID_END();
+		if (e->coord == LDTC_3D) {
+			render_damage_text_3d(pLwc, &pLwc->damage_text[i], pLwc->battle_view, pLwc->battle_proj);
+		} else if (e->coord == LDTC_UI) {
+			mat4x4 identity;
+			mat4x4_identity(identity);
+			render_damage_text_3d(pLwc, &pLwc->damage_text[i], identity, pLwc->proj);
+		} else {
+			LOGE("Unknown LWDAMAGETEXT coord value: %d", e->coord);
+		}
+	} ARRAY_ITERATE_VALID_END();
 }
 
 void lwc_render_battle(const LWCONTEXT* pLwc) {
