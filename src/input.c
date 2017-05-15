@@ -5,6 +5,7 @@
 #include "render_admin.h"
 #include "battle_result.h"
 #include "field.h"
+#include "mq.h"
 
 void get_dir_pad_center(float aspect_ratio, float *x, float *y) {
 	if (aspect_ratio > 1) {
@@ -64,6 +65,8 @@ void lw_trigger_mouse_press(LWCONTEXT *pLwc, float x, float y) {
 	convert_touch_coord_to_ui_coord(pLwc, &x, &y);
 
 	LOGI("mouse press ui coord x=%f, y=%f\n", x, y);
+
+	mq_publish_now(pLwc->mq);
 
 	pLwc->last_mouse_press_x = x;
 	pLwc->last_mouse_press_y = y;
@@ -157,6 +160,8 @@ void lw_trigger_mouse_release(LWCONTEXT *pLwc, float x, float y) {
 
 	printf("mouse release ui coord x=%f, y=%f (last move ui coord x=%f, y=%f)\n",
 		x, y, pLwc->last_mouse_press_x, pLwc->last_mouse_press_y);
+
+	mq_publish_now(pLwc->mq);
 
 	const float aspect_ratio = (float)pLwc->width / pLwc->height;
 

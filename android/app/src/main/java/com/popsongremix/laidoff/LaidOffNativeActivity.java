@@ -23,6 +23,8 @@ public class LaidOffNativeActivity extends NativeActivity
     private static boolean mBgmOn;
 
     static {
+        System.loadLibrary("zmq");
+        System.loadLibrary("czmq");
         System.loadLibrary("native-activity");
     }
 
