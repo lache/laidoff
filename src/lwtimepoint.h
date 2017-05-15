@@ -20,3 +20,4 @@ void lwtimepoint_now(LWTIMEPOINT* tp);
 double lwtimepoint_diff(const LWTIMEPOINT* a, const LWTIMEPOINT* b);
 long lwtimepoint_get_second_portion(const LWTIMEPOINT* tp);
 long lwtimepoint_get_nanosecond_portion(const LWTIMEPOINT* tp);
+double lwtimepoint_now_seconds();

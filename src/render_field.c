@@ -7,6 +7,8 @@
 #include "render_skin.h"
 #include "field.h"
 #include "mq.h"
+#include "extrapolator.h"
+#include <czmq.h>
 
 static void render_field_object(const LWCONTEXT* pLwc, int vbo_index, GLuint tex_id, mat4x4 view, mat4x4 proj, float x, float y, float z, float sx, float sy, float sz, float alpha_multiplier, int mipmap)
 {
@@ -318,14 +320,25 @@ void lwc_render_field(const LWCONTEXT* pLwc)
 	render_player_model(pLwc, perspective, view, player_x, player_y, player_z, pLwc->player_rot_z);
 
 	// Render remote players
-	const LWMQMSG* value = mq_sync_first(pLwc->mq);
+	//const LWMQMSG* value = mq_sync_first(pLwc->mq);
+	//while (value) {
+	//	const char* cursor = mq_sync_cursor(pLwc->mq);
+	//	// Exclude the player itself
+	//	if (strcmp(cursor + strlen(mq_subtree(pLwc->mq)), mq_uuid_str(pLwc->mq)) != 0) {
+	//		render_player_model(pLwc, perspective, view, value->x, value->y, value->z, value->a);
+	//	}
+	//	value = mq_sync_next(pLwc->mq);
+	//}
+	const void* value = mq_possync_first(pLwc->mq);
 	while (value) {
-		const char* cursor = mq_sync_cursor(pLwc->mq);
+		const char* cursor = mq_possync_cursor(pLwc->mq);
 		// Exclude the player itself
 		if (strcmp(cursor + strlen(mq_subtree(pLwc->mq)), mq_uuid_str(pLwc->mq)) != 0) {
-			render_player_model(pLwc, perspective, view, value->x, value->y, value->z, value->a);
+			float x, y, z, a;
+			vec4_extrapolator_read(value, zclock_time() / 1e3, &x, &y, &z, &a);
+			render_player_model(pLwc, perspective, view, x, y, z, a);
 		}
-		value = mq_sync_next(pLwc->mq);
+		value = mq_possync_next(pLwc->mq);
 	}
 
 	render_path_query_test_player(pLwc, perspective, view);

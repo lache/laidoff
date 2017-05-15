@@ -26,6 +26,16 @@ void lwtimepoint_now(LWTIMEPOINT* tp) {
 #endif
 }
 
+double lwtimepoint_now_seconds() {
+	LWTIMEPOINT tp;
+	lwtimepoint_now(&tp);
+#if LW_TIMESPEC_AVAILABLE
+	return tp.last_time.tv_sec + tp.last_time.tv_nsec / 1e9;
+#else
+	return tp.last_time;
+#endif
+}
+
 double lwtimepoint_diff(const LWTIMEPOINT* a, const LWTIMEPOINT* b) {
 #if LW_TIMESPEC_AVAILABLE
 	long nsec_diff = a->last_time.tv_nsec - b->last_time.tv_nsec;
