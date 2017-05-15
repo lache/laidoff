@@ -1006,7 +1006,7 @@ void lwc_update(LWCONTEXT *pLwc, double delta_time) {
 	pLwc->app_time += pLwc->delta_time;
 	pLwc->scene_time += pLwc->delta_time;
 
-	mq_poll(pLwc->def_sys_msg, pLwc->mq);
+	mq_poll(pLwc, pLwc->def_sys_msg, pLwc->mq);
 
 	update_dialog(pLwc);
 
@@ -1316,7 +1316,7 @@ LWCONTEXT *lw_init(void) {
 
 	init_action(pLwc);
 
-	load_field_1_init_runtime_data(pLwc);
+	load_field_2_init_runtime_data(pLwc);
 
 	return pLwc;
 }

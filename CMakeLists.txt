@@ -14,6 +14,15 @@ add_subdirectory(glfw-3.2.1)
 include_directories(${glfw_INCLUDE_DIRS})
 include_directories("${GLFW_SOURCE_DIR}/deps")
 
+# 컴파일 플래그 설정
+
+if (MSVC)
+# disable warning C4996: 'The POSIX name for this item is deprecated. Instead, use the ISO C and C++ conformant name'.
+#set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} /wd4996")
+#set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /wd4996")
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} /D_CRT_NONSTDC_NO_WARNINGS /D_CRT_SECURE_NO_WARNINGS")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /D_CRT_NONSTDC_NO_WARNINGS /D_CRT_SECURE_NO_WARNINGS")
+endif()
 
 # ZeroMQ CMake 의존성 추가
 
@@ -34,9 +43,9 @@ include_directories(zeromq-4.2.1/include)
 add_subdirectory(czmq)
 include_directories(czmq/include)
 
-# ZeroMQ 라이브러리 중 사용할 것만 제외하고는 빌드되지 않도록 한다.
+# CZMQ 라이브러리 중 사용할 것만 제외하고는 빌드되지 않도록 한다.
 set_target_properties(czmq czmq_selftest zmakecert zsp PROPERTIES FOLDER "ZeroMQ")
-# ZeroMQ 프로젝트는 ZeroMQ 솔루션 디렉토리에 모은다.
+# CZMQ 프로젝트는 ZeroMQ 솔루션 디렉토리에 모은다.
 set_target_properties(czmq_selftest zmakecert zsp PROPERTIES EXCLUDE_FROM_ALL 1 EXCLUDE_FROM_DEFAULT_BUILD 1)
 
 include_directories(czmq/include)
@@ -191,3 +200,4 @@ set_target_properties(laidoff libzmq czmq
     LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib"
     RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin"
 )
+

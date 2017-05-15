@@ -6,6 +6,7 @@
 #include "render_solid.h"
 #include "render_skin.h"
 #include "field.h"
+#include "mq.h"
 
 static void render_field_object(const LWCONTEXT* pLwc, int vbo_index, GLuint tex_id, mat4x4 view, mat4x4 proj, float x, float y, float z, float sx, float sy, float sz, float alpha_multiplier, int mipmap)
 {
@@ -179,19 +180,16 @@ void render_path_query_test_player(const LWCONTEXT* pLwc, mat4x4 perspective, ma
 	}
 }
 
-void render_player(const LWCONTEXT* pLwc, mat4x4 perspective, mat4x4 view) {
+void render_player_model(const LWCONTEXT* pLwc, mat4x4 perspective, mat4x4 view, float x, float y, float z, float a) {
 	mat4x4 skin_trans;
 	mat4x4_identity(skin_trans);
-	float player_x = 0, player_y = 0, player_z = 0;
-	get_field_player_position(pLwc->field, &player_x, &player_y, &player_z);
-	//mat4x4_translate(skin_trans, pLwc->player_pos_x, pLwc->player_pos_y, 0);
-	mat4x4_translate(skin_trans, player_x, player_y, player_z);
+	mat4x4_translate(skin_trans, x, y, z);
 	mat4x4 skin_scale;
 	mat4x4_identity(skin_scale);
 	mat4x4_scale_aniso(skin_scale, skin_scale, pLwc->field->skin_scale, pLwc->field->skin_scale, pLwc->field->skin_scale);
 	mat4x4 skin_rot;
 	mat4x4_identity(skin_rot);
-	mat4x4_rotate_Z(skin_rot, skin_rot, pLwc->player_rot_z + (float)LWDEG2RAD(90));
+	mat4x4_rotate_Z(skin_rot, skin_rot, a + (float)LWDEG2RAD(90));
 
 	mat4x4 skin_model;
 	mat4x4_identity(skin_model);
@@ -317,7 +315,18 @@ void lwc_render_field(const LWCONTEXT* pLwc)
 		}
 	}
 
-	render_player(pLwc, perspective, view);
+	render_player_model(pLwc, perspective, view, player_x, player_y, player_z, pLwc->player_rot_z);
+
+	// Render remote players
+	const LWMQMSG* value = mq_sync_first(pLwc->mq);
+	while (value) {
+		const char* cursor = mq_sync_cursor(pLwc->mq);
+		// Exclude the player itself
+		if (strcmp(cursor + strlen(mq_subtree(pLwc->mq)), mq_uuid_str(pLwc->mq)) != 0) {
+			render_player_model(pLwc, perspective, view, value->x, value->y, value->z, value->a);
+		}
+		value = mq_sync_next(pLwc->mq);
+	}
 
 	render_path_query_test_player(pLwc, perspective, view);
 

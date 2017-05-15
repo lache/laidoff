@@ -39,7 +39,7 @@ enum SamplePolyFlags {
 	SAMPLE_POLYFLAGS_ALL = 0xffff	// All abilities.
 };
 
-// Returns a random number [0..1)
+// Returns a random number [0..1]
 static float frand() {
 	//	return ((float)(rand() & 0xffff)/(float)0xffff);
 	return (float)rand() / (float)RAND_MAX;
