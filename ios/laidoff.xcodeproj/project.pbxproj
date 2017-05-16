@@ -36,6 +36,7 @@
 		5644EA041EA91D9E00EAA658 /* lwuialign.c in Sources */ = {isa = PBXBuildFile; fileRef = 5644E9FD1EA91D9E00EAA658 /* lwuialign.c */; };
 		5644EA051EA91D9E00EAA658 /* lwuidim.c in Sources */ = {isa = PBXBuildFile; fileRef = 5644E9FF1EA91D9E00EAA658 /* lwuidim.c */; };
 		5644EA061EA91D9E00EAA658 /* render_battle_result.c in Sources */ = {isa = PBXBuildFile; fileRef = 5644EA011EA91D9E00EAA658 /* render_battle_result.c */; };
+		564D11931ECA2812002CCCAE /* kvmsg.c in Sources */ = {isa = PBXBuildFile; fileRef = 564D11911ECA2812002CCCAE /* kvmsg.c */; };
 		565676A91EAFB4F800FF64B3 /* armature.c in Sources */ = {isa = PBXBuildFile; fileRef = 565676A51EAFB4F800FF64B3 /* armature.c */; };
 		565676AA1EAFB4F800FF64B3 /* render_skin.c in Sources */ = {isa = PBXBuildFile; fileRef = 565676A71EAFB4F800FF64B3 /* render_skin.c */; };
 		565676AC1EB0E96100FF64B3 /* lwanim.c in Sources */ = {isa = PBXBuildFile; fileRef = 565676AB1EB0E96100FF64B3 /* lwanim.c */; };
@@ -445,6 +446,8 @@
 		5644EA001EA91D9E00EAA658 /* lwuidim.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = lwuidim.h; sourceTree = "<group>"; };
 		5644EA011EA91D9E00EAA658 /* render_battle_result.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = render_battle_result.c; sourceTree = "<group>"; };
 		5644EA021EA91D9E00EAA658 /* render_battle_result.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = render_battle_result.h; sourceTree = "<group>"; };
+		564D11911ECA2812002CCCAE /* kvmsg.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = kvmsg.c; sourceTree = "<group>"; };
+		564D11921ECA2812002CCCAE /* kvmsg.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = kvmsg.h; sourceTree = "<group>"; };
 		565676A51EAFB4F800FF64B3 /* armature.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = armature.c; sourceTree = "<group>"; };
 		565676A61EAFB4F800FF64B3 /* armature.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = armature.h; sourceTree = "<group>"; };
 		565676A71EAFB4F800FF64B3 /* render_skin.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = render_skin.c; sourceTree = "<group>"; };
@@ -1900,6 +1903,8 @@
 		6CA16CF41EA20CA700DB7AF0 /* src */ = {
 			isa = PBXGroup;
 			children = (
+				564D11911ECA2812002CCCAE /* kvmsg.c */,
+				564D11921ECA2812002CCCAE /* kvmsg.h */,
 				56F1866D1EC74D430019312F /* mq.c */,
 				56F1866E1EC74D430019312F /* mq.h */,
 				56F1866F1EC74D430019312F /* sysmsg.c */,
@@ -2408,6 +2413,7 @@
 				56F188CB1EC74DB60019312F /* null_mechanism.cpp in Sources */,
 				6CA16DA11EA210BB00DB7AF0 /* lvm.c in Sources */,
 				566373561EBA52D4001DA3F4 /* hinge2.cpp in Sources */,
+				564D11931ECA2812002CCCAE /* kvmsg.c in Sources */,
 				56F188C41EC74DB60019312F /* mailbox.cpp in Sources */,
 				6CA16D8E1EA210BB00DB7AF0 /* liolib.c in Sources */,
 				56F188FE1EC74DB60019312F /* udp_address.cpp in Sources */,
