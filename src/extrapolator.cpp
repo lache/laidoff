@@ -179,10 +179,11 @@ extern "C" void vec4_extrapolator_destroy(void** self_p) {
 	*self_p = 0;
 }
 
-extern "C" void vec4_extrapolator_reset(void* s) {
+extern "C" void vec4_extrapolator_reset(void* s, double packet_time, double now, float x, float y, float z,
+	float dx, float dy) {
 	//LOGI("vec4_extrapolator_reset");
 	auto self = reinterpret_cast<Vec4Extrapolator*>(s);
-	float pos[5] = { 0, 0, 0, 0, 0 };
+	float pos[5] = { x, y, z, dx, dy };
 	self->Reset(0, 0, pos);
 }
 
