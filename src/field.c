@@ -420,7 +420,7 @@ void update_field(LWCONTEXT* pLwc, LWFIELD* field) {
 		// Exclude the player itself
 		if (strcmp(cursor + strlen(mq_subtree(pLwc->mq)), mq_uuid_str(pLwc->mq)) != 0) {
 			float dx = 0, dy = 0;
-			vec4_extrapolator_read(value->extrapolator, zclock_time() / 1e3, &value->x, &value->y, &value->z, &dx, &dy);
+			vec4_extrapolator_read(value->extrapolator, mq_sync_time(pLwc->mq), &value->x, &value->y, &value->z, &dx, &dy);
 			value->a = atan2f(dy, dx);
 			LW_ACTION remote_player_anim;
 			if (value->attacking) {

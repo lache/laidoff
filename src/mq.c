@@ -9,6 +9,7 @@
 
 typedef enum _LW_MESSAGE_QUEUE_STATE {
 	LMQS_INIT,
+	LMQS_TIME,
 	LMQS_SNAPSHOT,
 	LMQS_READY,
 	LMQS_TERM,
@@ -27,9 +28,13 @@ typedef struct _LWMESSAGEQUEUE {
 	int64_t alarm;
 	zuuid_t* uuid;
 	int verbose;
+	double delta;
+	int deltareq;
 } LWMESSAGEQUEUE;
 
 #define SERVER_ADDR "222.110.4.119"
+
+static void s_req_time(LWMESSAGEQUEUE* mq);
 
 void* init_mq() {
 	LWMESSAGEQUEUE* mq = (LWMESSAGEQUEUE*)malloc(sizeof(LWMESSAGEQUEUE));
@@ -51,12 +56,21 @@ void* init_mq() {
 	mq->sequence = 0;
 
 	mq->uuid = zuuid_new();
+	mq->deltareq = 100;
+	mq->delta = 0;
+
+	// First we request a time sync:
+	s_req_time(mq);
 	
-	// We first request a state snapshot:
-	zstr_sendm(mq->snapshot, "ICANHAZ?");
-	zstr_send(mq->snapshot, mq->subtree);
-	mq->state = LMQS_SNAPSHOT;
 	return mq;
+}
+
+static void s_req_time(LWMESSAGEQUEUE* mq) {
+	zstr_sendm(mq->snapshot, "WHTTAIM?");
+	char clienttime[64];
+	sprintf(clienttime, "%f", zclock_time() / 1e3);
+	zstr_send(mq->snapshot, clienttime);
+	mq->state = LMQS_TIME;
 }
 
 static void
@@ -69,7 +83,7 @@ s_kvmsg_free_posmap(void* ptr) {
 }
 
 static void
-s_kvmsg_store_posmap_noown(kvmsg_t** self_p, zhash_t* hash) {
+s_kvmsg_store_posmap_noown(kvmsg_t** self_p, zhash_t* hash, double sync_time) {
 	assert(self_p);
 	if (*self_p) {
 		kvmsg_t* self = *self_p;
@@ -89,18 +103,56 @@ s_kvmsg_store_posmap_noown(kvmsg_t** self_p, zhash_t* hash) {
 				possyncmsg = (LWPOSSYNCMSG*)malloc(sizeof(LWPOSSYNCMSG));
 				possyncmsg->a = 0;
 				possyncmsg->extrapolator = vec4_extrapolator_new();
-				vec4_extrapolator_reset(possyncmsg->extrapolator, msg->t, zclock_time() / 1e3, msg->x, msg->y, msg->z, msg->dx, msg->dy);
+				vec4_extrapolator_reset(possyncmsg->extrapolator, msg->t, sync_time, msg->x, msg->y, msg->z, msg->dx, msg->dy);
 				zhash_update(hash, kvmsg_key(self), possyncmsg);
 				zhash_freefn(hash, kvmsg_key(self), s_kvmsg_free_posmap);
 				//LOGI("New possyncmsg entry with key %s created.", kvmsg_key(self));
 			}
 			possyncmsg->attacking = msg->attacking;
 			possyncmsg->moving = msg->moving;
-			vec4_extrapolator_add(possyncmsg->extrapolator, msg->t, zclock_time() / 1e3, msg->x,
+			vec4_extrapolator_add(possyncmsg->extrapolator, msg->t, sync_time, msg->x,
 									  msg->y, msg->z, msg->dx, msg->dy);
 			//LOGI("New possyncmsg entry with key %s updated.", kvmsg_key(self));
 		} else {
 			zhash_delete(hash, kvmsg_key(self));
+		}
+	}
+}
+
+static void s_mq_poll_time(void* _mq) {
+	LWMESSAGEQUEUE* mq = (LWMESSAGEQUEUE*)_mq;
+	zmq_pollitem_t items[] = { { zsock_resolve(mq->snapshot), 0, ZMQ_POLLIN, 0 } };
+	int rc = zmq_poll(items, 1, 0);
+	if (rc == -1) {
+		return;
+	}
+
+	if (items[0].revents & ZMQ_POLLIN) {
+		char* name = zstr_recv(mq->snapshot);
+		if (name) {
+			free(name);
+			char* timereply = zstr_recv(mq->snapshot);
+			if (timereply) {
+				double t2 = 0, t1 = 0, t0 = 0;
+				sscanf(timereply, "%lf %lf %lf", &t2, &t1, &t0);
+				double t3 = zclock_time() / 1e3;
+				double delta = ((t1 - t0) + (t2 - t3)) / 2;
+				mq->delta = (mq->delta + delta) / 2;
+
+				if (mq->verbose) {
+					LOGI("REQ %d: DELTA = %f, delta = %f, t3 = %f, t2 = %f, t1 = %f, t0 = %f", mq->deltareq, mq->delta, delta, t3, t2, t1, t0);
+				}
+				
+				mq->deltareq--;
+				if (mq->deltareq > 0) {
+					s_req_time(mq);
+				} else {
+					// Next, we request a state snapshot:
+					zstr_sendm(mq->snapshot, "ICANHAZ?");
+					zstr_send(mq->snapshot, mq->subtree);
+					mq->state = LMQS_SNAPSHOT;
+				}
+			}
 		}
 	}
 }
@@ -126,7 +178,7 @@ static void s_mq_poll_snapshot(void* _mq) {
 			mq->alarm = zclock_time() + 100;
 			return;
 		}
-		s_kvmsg_store_posmap_noown(&kvmsg, mq->posmap);
+		s_kvmsg_store_posmap_noown(&kvmsg, mq->posmap, mq_sync_time(mq));
 		kvmsg_store(&kvmsg, mq->kvmap);
 	}
 }
@@ -140,7 +192,7 @@ static void s_send_pos(const LWCONTEXT* pLwc, LWMESSAGEQUEUE* mq) {
 	msg.dy = pLwc->player_pos_last_moved_dy;
 	msg.moving = pLwc->player_moving;
 	msg.attacking = pLwc->player_attacking;
-	msg.t = zclock_time() / 1e3;
+	msg.t = mq_sync_time(mq);
 	kvmsg_set_body(kvmsg, (byte*)&msg, sizeof(msg));
 	kvmsg_set_prop(kvmsg, "ttl", "%d", 2);
 	kvmsg_send(kvmsg, zsock_resolve(mq->publisher));
@@ -171,7 +223,7 @@ static void s_mq_poll_ready(void* _pLwc, void* _mq) {
 			if (mq->verbose) {
 				LOGI("Update: %"PRId64" key:%s, bodylen:%zd\n", mq->sequence, kvmsg_key(kvmsg), kvmsg_size(kvmsg));
 			}
-			s_kvmsg_store_posmap_noown(&kvmsg, mq->posmap);
+			s_kvmsg_store_posmap_noown(&kvmsg, mq->posmap, mq_sync_time(mq));
 			kvmsg_store(&kvmsg, mq->kvmap);
 		} else {
 			kvmsg_destroy(&kvmsg);
@@ -247,6 +299,9 @@ void mq_poll(void* _pLwc, void* sm, void* _mq) {
 	switch (mq->state) {
 	case LMQS_INIT:
 		break;
+	case LMQS_TIME:
+		s_mq_poll_time(mq);
+		break;
 	case LMQS_SNAPSHOT:
 		s_mq_poll_snapshot(mq);
 		break;
@@ -282,4 +337,9 @@ void mq_shutdown() {
 void mq_publish_now(void* _mq) {
 	LWMESSAGEQUEUE* mq = (LWMESSAGEQUEUE*)_mq;
 	mq->alarm = 0;
+}
+
+double mq_sync_time(void* _mq) {
+	LWMESSAGEQUEUE* mq = (LWMESSAGEQUEUE*)_mq;
+	return zclock_time() / 1e3 + mq->delta;
 }

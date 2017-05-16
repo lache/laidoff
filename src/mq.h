@@ -44,3 +44,5 @@ const char* mq_uuid_str(void* _mq);
 const char* mq_subtree(void* _mq);
 
 void mq_publish_now(void* _mq);
+
+double mq_sync_time(void* _mq);
