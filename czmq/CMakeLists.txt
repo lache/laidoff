@@ -51,7 +51,10 @@ if (NOT HAVE_NET_IF_H)
     CHECK_INCLUDE_FILE("net/if.h" HAVE_NET_IF_H)
 endif()
 
-file(WRITE "${SOURCE_DIR}/src/platform.h.in" "
+# 하나의 작업 사본에서 여러 플랫폼 빌드가 나오므로 platform.h 파일 생성은
+# 각 플랫폼 별 빌드 디렉토리에 생성되도록 한다.
+
+file(WRITE "${CMAKE_BINARY_DIR}/include/platform.h.in" "
 #cmakedefine HAVE_LINUX_WIRELESS_H
 #cmakedefine HAVE_NET_IF_H
 //#cmakedefine HAVE_NET_IF_MEDIA_H
@@ -59,7 +62,9 @@ file(WRITE "${SOURCE_DIR}/src/platform.h.in" "
 #cmakedefine HAVE_FREEIFADDRS
 ")
 
-configure_file("${SOURCE_DIR}/src/platform.h.in" "${SOURCE_DIR}/src/platform.h")
+configure_file("${CMAKE_BINARY_DIR}/include/platform.h.in" "${CMAKE_BINARY_DIR}/include/platform.h")
+
+include_directories("${CMAKE_BINARY_DIR}/include")
 
 #The MSVC C compiler is too out of date,
 #so the sources have to be compiled as c++
