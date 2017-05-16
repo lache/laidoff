@@ -1288,6 +1288,7 @@ void init_field(LWCONTEXT* pLwc, const char* field_filename, const char* nav_fil
 }
 
 LWCONTEXT *lw_init(void) {
+
 	init_ext_image_lib();
 
 	init_ext_sound_lib();

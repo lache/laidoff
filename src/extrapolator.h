@@ -133,8 +133,9 @@ extern "C" { ;
 void* vec4_extrapolator_new();
 void vec4_extrapolator_destroy(void** self_p);
 void vec4_extrapolator_reset(void* s);
-void vec4_extrapolator_add(void* s, double packet_time, double now, float x, float y, float z, float a);
-void vec4_extrapolator_read(const void* s, double now, float* x, float* y, float* z, float* a);
+void vec4_extrapolator_add(void* s, double packet_time, double now, float x, float y, float z,
+							   float dx, float dy);
+void vec4_extrapolator_read(const void* s, double now, float* x, float* y, float* z, float* dx, float* dy);
 #ifdef __cplusplus
 }
 #endif // #ifdef __cplusplus

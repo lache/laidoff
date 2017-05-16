@@ -2,6 +2,7 @@
 #include <math.h>
 #include <string.h>
 #include "extrapolator.h"
+#include "lwlog.h"
 
 template<int Count, typename Type>
 Extrapolator<Count, Type>::Extrapolator() {
@@ -115,7 +116,7 @@ bool Extrapolator<Count, Type>::ReadPosition(double forTime, Type oPos[Count], T
 		oPos[i] = (Type)(snapPos_[i] + oVel[i] * (forTime - snapTime_));
 	}
 	if (!ok) {
-		memset(oVel, 0, sizeof(oVel));
+		memset(oVel, 0, sizeof(Type) * Count);
 	}
 
 	return ok;
@@ -165,34 +166,46 @@ bool Extrapolator<Count, Type>::Estimates(double packet, double cur) {
 
 /////////////////////////
 
-typedef Extrapolator<4, float> Vec4Extrapolator;
+typedef Extrapolator<5, float> Vec4Extrapolator;
 
-void* vec4_extrapolator_new() {
+extern "C" void* vec4_extrapolator_new() {
+	//LOGI("vec4_extrapolator_new");
 	return new Vec4Extrapolator();
 }
 
-void vec4_extrapolator_destroy(void** self_p) {
+extern "C" void vec4_extrapolator_destroy(void** self_p) {
 	auto self = *reinterpret_cast<Vec4Extrapolator**>(self_p);
 	delete(self);
 	*self_p = 0;
 }
 
-void vec4_extrapolator_reset(void* s) {
+extern "C" void vec4_extrapolator_reset(void* s) {
+	//LOGI("vec4_extrapolator_reset");
 	auto self = reinterpret_cast<Vec4Extrapolator*>(s);
+	float pos[5] = { 0, 0, 0, 0, 0 };
+	self->Reset(0, 0, pos);
 }
 
-void vec4_extrapolator_add(void* s, double packet_time, double now, float x, float y, float z, float a) {
+extern "C" void vec4_extrapolator_add(void* s, double packet_time, double now, float x, float y, float z,
+							   float dx, float dy) {
 	auto self = reinterpret_cast<Vec4Extrapolator*>(s);
-	float pos[] = { x, y, z, a };
+	float pos[] = { x, y, z, dx, dy };
 	self->AddSample(packet_time, now, pos);
 }
 
-void vec4_extrapolator_read(const void* s, double now, float* x, float* y, float* z, float* a) {
+extern "C" void vec4_extrapolator_read(const void* s, double now, float* x, float* y, float* z, float* dx, float* dy) {
+	//LOGI("vec4_extrapolator_read");
 	auto self = reinterpret_cast<const Vec4Extrapolator*>(s);
-	float pos[4];
+	float pos[5];
 	self->ReadPosition(now, pos);
 	*x = pos[0];
 	*y = pos[1];
 	*z = pos[2];
-	*a = pos[3];
+	if (pos[3] != 0 || pos[4] != 0) {
+		*dx = pos[3];
+		*dy = pos[4];
+	} else {
+		*dx = 0;
+		*dy = 0;
+	}
 }

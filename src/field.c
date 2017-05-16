@@ -6,6 +6,9 @@
 #include "lwlog.h"
 #include "file.h"
 #include "nav.h"
+#include "mq.h"
+#include "extrapolator.h"
+#include <czmq.h>
 
 void move_player(LWCONTEXT *pLwc) {
 	if (pLwc->game_scene == LGS_FIELD) {
@@ -19,11 +22,13 @@ void move_player(LWCONTEXT *pLwc) {
 			move_speed_delta);
 
 		// Using mouse
-		float dx, dy, dlen;
+		float dx = 0, dy = 0, dlen = 0;
 		if (lw_get_normalized_dir_pad_input(pLwc, &dx, &dy, &dlen)) {
 			pLwc->player_pos_x += dx * move_speed_delta;
 			pLwc->player_pos_y += dy * move_speed_delta;
 			pLwc->player_rot_z = atan2f(dy, dx);
+			pLwc->player_pos_last_moved_dx = dx;
+			pLwc->player_pos_last_moved_dy = dy;
 			pLwc->player_moving = 1;
 
 			set_field_player_delta(pLwc->field, dx * move_speed_delta, dy * move_speed_delta, 0);
@@ -407,7 +412,28 @@ void update_field(LWCONTEXT* pLwc, LWFIELD* field) {
 			nav_query(pLwc->field->nav, &pLwc->field->path_query);
 			pLwc->field->path_query_time = 0;
 		}
-	}	
+	}
+	// Update remote players' position and orientation, anim action:
+	LWPOSSYNCMSG* value = mq_possync_first(pLwc->mq);
+	while (value) {
+		const char* cursor = mq_possync_cursor(pLwc->mq);
+		// Exclude the player itself
+		if (strcmp(cursor + strlen(mq_subtree(pLwc->mq)), mq_uuid_str(pLwc->mq)) != 0) {
+			float dx = 0, dy = 0;
+			vec4_extrapolator_read(value->extrapolator, zclock_time() / 1e3, &value->x, &value->y, &value->z, &dx, &dy);
+			value->a = atan2f(dy, dx);
+			LW_ACTION remote_player_anim;
+			if (value->attacking) {
+				remote_player_anim = LWAC_HUMANACTION_ATTACK;
+			} else if (value->moving) {
+				remote_player_anim = LWAC_HUMANACTION_WALKPOLISH;
+			} else {
+				remote_player_anim = LWAC_HUMANACTION_IDLE;
+			}
+			value->action = &pLwc->action[remote_player_anim];
+		}
+		value = mq_possync_next(pLwc->mq);
+	}
 }
 
 void unload_field(LWFIELD* field) 	{

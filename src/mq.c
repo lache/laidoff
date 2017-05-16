@@ -60,9 +60,11 @@ void* init_mq() {
 }
 
 static void
-s_kvmsg_free_posmap(void *ptr) {
+s_kvmsg_free_posmap(void* ptr) {
 	if (ptr) {
-		vec4_extrapolator_destroy(&ptr);
+		LWPOSSYNCMSG* possyncmsg = (LWPOSSYNCMSG*)ptr;
+		vec4_extrapolator_destroy(&possyncmsg->extrapolator);
+		free(ptr);
 	}
 }
 
@@ -73,24 +75,35 @@ s_kvmsg_store_posmap_noown(kvmsg_t** self_p, zhash_t* hash) {
 		kvmsg_t* self = *self_p;
 		assert(self);
 		if (kvmsg_size(self)) {
-			LWMQMSG* msg = (LWMQMSG*)kvmsg_body(self);
-			void* extrapolator = zhash_lookup(hash, kvmsg_key(self));
-			if (extrapolator) {
+			LWMQMSG* msg_unaligned = (LWMQMSG*)kvmsg_body(self);
+			LWMQMSG msg_aligned;
+			for (int i = 0; i < sizeof(LWMQMSG); i++) {
+				((char*)&msg_aligned)[i] = ((char*)msg_unaligned)[i];
+			}
+			LWMQMSG* msg = &msg_aligned;
+			LWPOSSYNCMSG* possyncmsg = zhash_lookup(hash, kvmsg_key(self));
+			if (possyncmsg) {
 				// Do nothing if the entry already exists
 			} else {
 				// Create a new extrapolator
-				extrapolator = vec4_extrapolator_new();
-				vec4_extrapolator_reset(extrapolator);
-				zhash_update(hash, kvmsg_key(self), vec4_extrapolator_new());
+				possyncmsg = (LWPOSSYNCMSG*)malloc(sizeof(LWPOSSYNCMSG));
+				possyncmsg->a = 0;
+				possyncmsg->extrapolator = vec4_extrapolator_new();
+				vec4_extrapolator_reset(possyncmsg->extrapolator);
+				zhash_update(hash, kvmsg_key(self), possyncmsg);
+				zhash_freefn(hash, kvmsg_key(self), s_kvmsg_free_posmap);
+				//LOGI("New possyncmsg entry with key %s created.", kvmsg_key(self));
 			}
-			vec4_extrapolator_add(extrapolator, msg->t, zclock_time() / 1e3, msg->x, msg->y, msg->z, msg->a);
-			zhash_freefn(hash, kvmsg_key(self), s_kvmsg_free_posmap);
+			possyncmsg->attacking = msg->attacking;
+			possyncmsg->moving = msg->moving;
+			vec4_extrapolator_add(possyncmsg->extrapolator, msg->t, zclock_time() / 1e3, msg->x,
+									  msg->y, msg->z, msg->dx, msg->dy);
+			//LOGI("New possyncmsg entry with key %s updated.", kvmsg_key(self));
 		} else {
 			zhash_delete(hash, kvmsg_key(self));
 		}
 	}
 }
-
 
 static void s_mq_poll_snapshot(void* _mq) {
 	LWMESSAGEQUEUE* mq = (LWMESSAGEQUEUE*)_mq;
@@ -123,12 +136,18 @@ static void s_send_pos(const LWCONTEXT* pLwc, LWMESSAGEQUEUE* mq) {
 	kvmsg_fmt_key(kvmsg, "%s%s", mq->subtree, zuuid_str(mq->uuid));
 	LWMQMSG msg;
 	get_field_player_position(pLwc->field, &msg.x, &msg.y, &msg.z);
-	msg.a = pLwc->player_rot_z;
+	msg.dx = pLwc->player_pos_last_moved_dx;
+	msg.dy = pLwc->player_pos_last_moved_dy;
+	msg.moving = pLwc->player_moving;
+	msg.attacking = pLwc->player_attacking;
 	msg.t = zclock_time() / 1e3;
 	kvmsg_set_body(kvmsg, (byte*)&msg, sizeof(msg));
 	kvmsg_set_prop(kvmsg, "ttl", "%d", 2);
 	kvmsg_send(kvmsg, zsock_resolve(mq->publisher));
 	kvmsg_destroy(&kvmsg);
+	if (mq->verbose) {
+		LOGI("s_send_pos");
+	}
 }
 
 static void s_mq_poll_ready(void* _pLwc, void* _mq) {
@@ -198,9 +217,9 @@ const LWMQMSG* mq_sync_next(void* _mq) {
 	return 0;
 }
 
-const void* mq_possync_first(void* _mq) {
+LWPOSSYNCMSG* mq_possync_first(void* _mq) {
 	LWMESSAGEQUEUE* mq = (LWMESSAGEQUEUE*)_mq;
-	return zhash_first(mq->posmap);
+	return (LWPOSSYNCMSG*)zhash_first(mq->posmap);
 }
 
 const char* mq_possync_cursor(void* _mq) {
@@ -208,9 +227,9 @@ const char* mq_possync_cursor(void* _mq) {
 	return zhash_cursor(mq->posmap);
 }
 
-const void* mq_possync_next(void* _mq) {
+LWPOSSYNCMSG* mq_possync_next(void* _mq) {
 	LWMESSAGEQUEUE* mq = (LWMESSAGEQUEUE*)_mq;
-	return zhash_next(mq->posmap);
+	return (LWPOSSYNCMSG*)zhash_next(mq->posmap);
 }
 
 const char* mq_uuid_str(void* _mq) {

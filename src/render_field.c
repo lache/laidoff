@@ -8,7 +8,6 @@
 #include "field.h"
 #include "mq.h"
 #include "extrapolator.h"
-#include <czmq.h>
 
 static void render_field_object(const LWCONTEXT* pLwc, int vbo_index, GLuint tex_id, mat4x4 view, mat4x4 proj, float x, float y, float z, float sx, float sy, float sz, float alpha_multiplier, int mipmap)
 {
@@ -182,7 +181,7 @@ void render_path_query_test_player(const LWCONTEXT* pLwc, mat4x4 perspective, ma
 	}
 }
 
-void render_player_model(const LWCONTEXT* pLwc, mat4x4 perspective, mat4x4 view, float x, float y, float z, float a) {
+void render_player_model(const LWCONTEXT* pLwc, mat4x4 perspective, mat4x4 view, float x, float y, float z, float a, const LWANIMACTION* action) {
 	mat4x4 skin_trans;
 	mat4x4_identity(skin_trans);
 	mat4x4_translate(skin_trans, x, y, z);
@@ -203,7 +202,7 @@ void render_player_model(const LWCONTEXT* pLwc, mat4x4 perspective, mat4x4 view,
 		render_skin(pLwc,
 			pLwc->tex_atlas[LAE_3D_PLAYER_TEX_KTX],
 			LSVT_HUMAN,
-			pLwc->player_action,
+			action,
 			&pLwc->armature[LWAR_HUMANARMATURE],
 			1, 0, 0, 0, 0, perspective, view, skin_model, pLwc->player_skin_time);
 	}
@@ -317,7 +316,7 @@ void lwc_render_field(const LWCONTEXT* pLwc)
 		}
 	}
 
-	render_player_model(pLwc, perspective, view, player_x, player_y, player_z, pLwc->player_rot_z);
+	render_player_model(pLwc, perspective, view, player_x, player_y, player_z, pLwc->player_rot_z, pLwc->player_action);
 
 	// Render remote players
 	//const LWMQMSG* value = mq_sync_first(pLwc->mq);
@@ -329,14 +328,12 @@ void lwc_render_field(const LWCONTEXT* pLwc)
 	//	}
 	//	value = mq_sync_next(pLwc->mq);
 	//}
-	const void* value = mq_possync_first(pLwc->mq);
+	LWPOSSYNCMSG* value = mq_possync_first(pLwc->mq);
 	while (value) {
 		const char* cursor = mq_possync_cursor(pLwc->mq);
 		// Exclude the player itself
 		if (strcmp(cursor + strlen(mq_subtree(pLwc->mq)), mq_uuid_str(pLwc->mq)) != 0) {
-			float x, y, z, a;
-			vec4_extrapolator_read(value, zclock_time() / 1e3, &x, &y, &z, &a);
-			render_player_model(pLwc, perspective, view, x, y, z, a);
+			render_player_model(pLwc, perspective, view, value->x, value->y, value->z, value->a, value->action);
 		}
 		value = mq_possync_next(pLwc->mq);
 	}

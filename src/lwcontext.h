@@ -138,6 +138,8 @@ typedef struct _LWCONTEXT {
 	float player_pos_x;
 	float player_pos_y;
 	float player_rot_z;
+	float player_pos_last_moved_dx;
+	float player_pos_last_moved_dy;
 	int player_moving;
 	int player_attacking;
 	const LWANIMACTION* player_action;
