@@ -37,6 +37,7 @@
 		5644EA051EA91D9E00EAA658 /* lwuidim.c in Sources */ = {isa = PBXBuildFile; fileRef = 5644E9FF1EA91D9E00EAA658 /* lwuidim.c */; };
 		5644EA061EA91D9E00EAA658 /* render_battle_result.c in Sources */ = {isa = PBXBuildFile; fileRef = 5644EA011EA91D9E00EAA658 /* render_battle_result.c */; };
 		564D11931ECA2812002CCCAE /* kvmsg.c in Sources */ = {isa = PBXBuildFile; fileRef = 564D11911ECA2812002CCCAE /* kvmsg.c */; };
+		564D11961ECA511E002CCCAE /* extrapolator.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 564D11941ECA511E002CCCAE /* extrapolator.cpp */; };
 		565676A91EAFB4F800FF64B3 /* armature.c in Sources */ = {isa = PBXBuildFile; fileRef = 565676A51EAFB4F800FF64B3 /* armature.c */; };
 		565676AA1EAFB4F800FF64B3 /* render_skin.c in Sources */ = {isa = PBXBuildFile; fileRef = 565676A71EAFB4F800FF64B3 /* render_skin.c */; };
 		565676AC1EB0E96100FF64B3 /* lwanim.c in Sources */ = {isa = PBXBuildFile; fileRef = 565676AB1EB0E96100FF64B3 /* lwanim.c */; };
@@ -448,6 +449,8 @@
 		5644EA021EA91D9E00EAA658 /* render_battle_result.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = render_battle_result.h; sourceTree = "<group>"; };
 		564D11911ECA2812002CCCAE /* kvmsg.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = kvmsg.c; sourceTree = "<group>"; };
 		564D11921ECA2812002CCCAE /* kvmsg.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = kvmsg.h; sourceTree = "<group>"; };
+		564D11941ECA511E002CCCAE /* extrapolator.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = extrapolator.cpp; sourceTree = "<group>"; };
+		564D11951ECA511E002CCCAE /* extrapolator.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = extrapolator.h; sourceTree = "<group>"; };
 		565676A51EAFB4F800FF64B3 /* armature.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = armature.c; sourceTree = "<group>"; };
 		565676A61EAFB4F800FF64B3 /* armature.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = armature.h; sourceTree = "<group>"; };
 		565676A71EAFB4F800FF64B3 /* render_skin.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = render_skin.c; sourceTree = "<group>"; };
@@ -1903,6 +1906,8 @@
 		6CA16CF41EA20CA700DB7AF0 /* src */ = {
 			isa = PBXGroup;
 			children = (
+				564D11941ECA511E002CCCAE /* extrapolator.cpp */,
+				564D11951ECA511E002CCCAE /* extrapolator.h */,
 				564D11911ECA2812002CCCAE /* kvmsg.c */,
 				564D11921ECA2812002CCCAE /* kvmsg.h */,
 				56F1866D1EC74D430019312F /* mq.c */,
@@ -2235,6 +2240,7 @@
 				566373721EBA52D4001DA3F4 /* ray.cpp in Sources */,
 				56F188DF1EC74DB60019312F /* radio.cpp in Sources */,
 				5663736C1EBA52D4001DA3F4 /* odeinit.cpp in Sources */,
+				564D11961ECA511E002CCCAE /* extrapolator.cpp in Sources */,
 				56F188CD1EC74DB60019312F /* options.cpp in Sources */,
 				56F188B51EC74DB60019312F /* gather.cpp in Sources */,
 				6CA16D9B1EA210BB00DB7AF0 /* ltablib.c in Sources */,
