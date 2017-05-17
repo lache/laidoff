@@ -214,4 +214,6 @@ typedef struct _LWCONTEXT {
 
 	void* def_sys_msg;
 	void* mq;
+
+	int server_index;
 } LWCONTEXT;

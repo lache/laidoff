@@ -1,13 +1,12 @@
 #include "mq.h"
 #include "lwlog.h"
 #include <czmq.h>
-//#include "sysmsg.h"
+#include "sysmsg.h"
 #include "kvmsg.h"
 #include "field.h"
 #include "lwcontext.h"
 #include "extrapolator.h"
 #include <stdlib.h>
-#include "field.h"
 
 typedef enum _LW_MESSAGE_QUEUE_STATE {
 	LMQS_INIT,
@@ -35,12 +34,13 @@ typedef struct _LWMESSAGEQUEUE {
 	int deltasequence;
 } LWMESSAGEQUEUE;
 
-#define SERVER_ADDR "222.110.4.119"
 #define DELTA_REQ_COUNT (100)
 
 static void s_req_time(LWMESSAGEQUEUE* mq);
 
-void* init_mq() {
+void* init_mq(const char* addr, void* sm) {
+	zsys_init();
+
 	LWMESSAGEQUEUE* mq = (LWMESSAGEQUEUE*)calloc(1, sizeof(LWMESSAGEQUEUE));
 	mq->state = LMQS_INIT;
 	mq->subtree = "/l/";
@@ -48,12 +48,12 @@ void* init_mq() {
 	mq->verbose = 0;
 	// Prepare our context and subscriber
 	mq->snapshot = zsock_new(ZMQ_DEALER);
-	zsock_connect(mq->snapshot, "tcp://%s:%d", SERVER_ADDR, mq->port);
+	zsock_connect(mq->snapshot, "tcp://%s:%d", addr, mq->port);
 	mq->subscriber = zsock_new(ZMQ_SUB);
 	zsock_set_subscribe(mq->subscriber, mq->subtree);
-	zsock_connect(mq->subscriber, "tcp://%s:%d", SERVER_ADDR, mq->port + 1);
+	zsock_connect(mq->subscriber, "tcp://%s:%d", addr, mq->port + 1);
 	mq->publisher = zsock_new(ZMQ_PUSH);
-	zsock_connect(mq->publisher, "tcp://%s:%d", SERVER_ADDR, mq->port + 2);
+	zsock_connect(mq->publisher, "tcp://%s:%d", addr, mq->port + 2);
 
 	mq->kvmap = zhash_new();
 	mq->posmap = zhash_new();
@@ -63,6 +63,10 @@ void* init_mq() {
 	mq->deltasequence = 0;
 	mq->delta = 0;
 	mq->deltasamples = (double*)malloc(sizeof(double) * DELTA_REQ_COUNT);
+
+	char sys_msg[128];
+	sprintf(sys_msg, LWU("Connecting %s"), addr);
+	show_sys_msg(sm, sys_msg);
 
 	// First we request a time sync:
 	s_req_time(mq);
@@ -151,7 +155,7 @@ static int s_delta_cmp(const void* a, const void* b) {
 	return d > 0 ? 1 : d < 0 ? -1 : 0;
 }
 
-static void s_mq_poll_time(void* _mq) {
+static void s_mq_poll_time(void* _mq, void* sm) {
 	LWMESSAGEQUEUE* mq = (LWMESSAGEQUEUE*)_mq;
 	zmq_pollitem_t items[] = { { zsock_resolve(mq->snapshot), 0, ZMQ_POLLIN, 0 } };
 	int rc = zmq_poll(items, 1, 0);
@@ -174,6 +178,10 @@ static void s_mq_poll_time(void* _mq) {
 				if (mq->verbose) {
 					LOGI("REQ %d: delta = %f", mq->deltasequence, delta);
 				}
+
+				char sys_msg[128];
+				sprintf(sys_msg, LWU("Timesyncing %d/%d"), mq->deltasequence, DELTA_REQ_COUNT);
+				show_sys_msg(sm, sys_msg);
 
 				if (mq->deltasequence < DELTA_REQ_COUNT) {
 					s_req_time(mq);
@@ -200,7 +208,7 @@ static void s_mq_poll_time(void* _mq) {
 	}
 }
 
-static void s_mq_poll_snapshot(void* _mq) {
+static void s_mq_poll_snapshot(void* _mq, void* sm) {
 	LWMESSAGEQUEUE* mq = (LWMESSAGEQUEUE*)_mq;
 	zmq_pollitem_t items[] = { { zsock_resolve(mq->snapshot), 0, ZMQ_POLLIN, 0 } };
 	int rc = zmq_poll(items, 1, 0);
@@ -219,8 +227,10 @@ static void s_mq_poll_snapshot(void* _mq) {
 			kvmsg_destroy(&kvmsg);
 			mq->state = LMQS_READY;
 			mq->alarm = zclock_time() + 100;
+			show_sys_msg(sm, LWU("Snapshot downloaded"));
 			return;
 		}
+		show_sys_msg(sm, LWU("Receiving snapshot"));
 		s_kvmsg_store_posmap_noown(&kvmsg, mq->posmap, mq_sync_time(mq), mq);
 		kvmsg_store(&kvmsg, mq->kvmap);
 	}
@@ -345,10 +355,10 @@ void mq_poll(void* _pLwc, void* sm, void* _mq) {
 	case LMQS_INIT:
 		break;
 	case LMQS_TIME:
-		s_mq_poll_time(mq);
+		s_mq_poll_time(mq, sm);
 		break;
 	case LMQS_SNAPSHOT:
-		s_mq_poll_snapshot(mq);
+		s_mq_poll_snapshot(mq, sm);
 		break;
 	case LMQS_READY:
 		s_mq_poll_ready(_pLwc, mq);
@@ -370,11 +380,6 @@ void deinit_mq(void* _mq) {
 	free(mq);
 }
 
-void init_czmq() {
-	zsock_t* frontend = zsock_new(ZMQ_REQ);
-	zsock_destroy(&frontend);
-}
-
 void mq_shutdown() {
 	zsys_shutdown();
 }
@@ -393,4 +398,9 @@ double mq_sync_time(void* _mq) {
 int mq_cursor_player(void* _mq, const char* cursor) {
 	LWMESSAGEQUEUE* mq = (LWMESSAGEQUEUE*)_mq;
 	return strcmp(cursor + strlen(mq_subtree(mq)), mq_uuid_str(mq)) == 0;
+}
+
+void mq_interrupt() {
+	zsys_interrupted = 1;
+	zctx_interrupted = 1;
 }

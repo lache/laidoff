@@ -1,9 +1,8 @@
 #pragma once
 
-void* init_mq();
+void* init_mq(const char* addr, void* sm);
 void deinit_mq(void* _mq);
 void mq_poll(void* pLwc, void* sm, void* _mq);
-void init_czmq();
 void mq_shutdown();
 
 typedef struct _LWANIMACTION LWANIMACTION;
@@ -46,3 +45,4 @@ void mq_publish_now(void* pLwc, void* _mq, int stop);
 
 double mq_sync_time(void* _mq);
 int mq_cursor_player(void* _mq, const char* cursor);
+void mq_interrupt();

@@ -97,6 +97,10 @@ typedef struct {
 } TGAHEADER;
 #pragma pack(pop)
 
+static const char* server_addr[] = {
+	"13.113.44.14", // AWS Tokyo
+	"222.110.4.119", // private dev
+};
 
 void play_sound(enum LW_SOUND lws);
 void stop_sound(enum LW_SOUND lws);
@@ -116,6 +120,7 @@ int spawn_attack_trail(LWCONTEXT *pLwc, float x, float y, float z);
 void update_attack_trail(LWCONTEXT *pLwc);
 float get_battle_enemy_x_center(int enemy_slot_index);
 void update_damage_text(LWCONTEXT *pLwc);
+static void reinit_mq(LWCONTEXT *pLwc);
 
 typedef struct {
 	GLuint vb;
@@ -744,6 +749,10 @@ void reset_runtime_context(LWCONTEXT* pLwc) {
 	pLwc->admin_button_command[8].command_handler = load_field_1_init_runtime_data;
 	pLwc->admin_button_command[9].name = LWU("신:필드2로드");
 	pLwc->admin_button_command[9].command_handler = load_field_2_init_runtime_data;
+	pLwc->admin_button_command[10].name = LWU("Server #0");
+	pLwc->admin_button_command[10].command_handler = connect_to_server_0;
+	pLwc->admin_button_command[11].name = LWU("Server #1");
+	pLwc->admin_button_command[11].command_handler = connect_to_server_1;
 }
 
 void delete_font_fbo(LWCONTEXT* pLwc) {
@@ -1309,9 +1318,7 @@ LWCONTEXT *lw_init(void) {
 
 	init_net(pLwc);
 
-	pLwc->mq = init_mq();
-
-	init_czmq(); // test (maintain reference to czmq)
+	pLwc->mq = init_mq(server_addr[pLwc->server_index], pLwc->def_sys_msg);
 
 	init_armature(pLwc);
 
@@ -1447,6 +1454,27 @@ void load_field_2_init_runtime_data(LWCONTEXT *pLwc) {
 		1);
 
 	init_lwc_runtime_data(pLwc);
+}
+
+static void reinit_mq(LWCONTEXT *pLwc) {
+
+	//mq_interrupt();
+	
+	deinit_mq(pLwc->mq);
+
+	pLwc->mq = init_mq(server_addr[pLwc->server_index], pLwc->def_sys_msg);
+}
+
+void connect_to_server_0(LWCONTEXT *pLwc) {
+	pLwc->server_index = 0;
+
+	reinit_mq(pLwc);
+}
+
+void connect_to_server_1(LWCONTEXT *pLwc) {
+	pLwc->server_index = 1;
+
+	reinit_mq(pLwc);
 }
 
 long lw_get_last_time_sec(LWCONTEXT *pLwc) {
