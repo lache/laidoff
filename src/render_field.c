@@ -318,16 +318,6 @@ void lwc_render_field(const LWCONTEXT* pLwc)
 
 	render_player_model(pLwc, perspective, view, player_x, player_y, player_z, pLwc->player_rot_z, pLwc->player_action);
 
-	// Render remote players
-	//const LWMQMSG* value = mq_sync_first(pLwc->mq);
-	//while (value) {
-	//	const char* cursor = mq_sync_cursor(pLwc->mq);
-	//	// Exclude the player itself
-	//	if (strcmp(cursor + strlen(mq_subtree(pLwc->mq)), mq_uuid_str(pLwc->mq)) != 0) {
-	//		render_player_model(pLwc, perspective, view, value->x, value->y, value->z, value->a);
-	//	}
-	//	value = mq_sync_next(pLwc->mq);
-	//}
 	LWPOSSYNCMSG* value = mq_possync_first(pLwc->mq);
 	while (value) {
 		const char* cursor = mq_possync_cursor(pLwc->mq);

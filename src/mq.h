@@ -9,22 +9,15 @@ void mq_shutdown();
 typedef struct _LWANIMACTION LWANIMACTION;
 
 typedef struct _LWMQMSG {
-	double t;				// Time
-
 	float x;				// Current position X
 	float y;				// Current position Y
 	float z;				// Current position Z
 	float dx;				// Last moved delta X
 	float dy;				// Last moved delta y
-	float vx;				// Current velocity X
-	float vy;				// Current velocity Y
-	float vz;				// Current velocity Z
-	float vdx;				// Last moved delta velocity X
-	float vdy;				// Last moved delta velocity y
 	int moving;				// 1 if moving, 0 if stopped
 	int attacking;			// 1 if attacking, 0 if stopped
 	int stop;				// 1 if movement stopped, 0 if not
-
+	double t;				// Time
 } LWMQMSG;
 
 typedef struct _LWPOSSYNCMSG {

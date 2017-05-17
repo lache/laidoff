@@ -41,7 +41,7 @@ typedef struct _LWMESSAGEQUEUE {
 static void s_req_time(LWMESSAGEQUEUE* mq);
 
 void* init_mq() {
-	LWMESSAGEQUEUE* mq = (LWMESSAGEQUEUE*)malloc(sizeof(LWMESSAGEQUEUE));
+	LWMESSAGEQUEUE* mq = (LWMESSAGEQUEUE*)calloc(1, sizeof(LWMESSAGEQUEUE));
 	mq->state = LMQS_INIT;
 	mq->subtree = "/l/";
 	mq->port = 5556;
@@ -63,6 +63,7 @@ void* init_mq() {
 	mq->deltasequence = 0;
 	mq->delta = 0;
 	mq->deltasamples = (double*)malloc(sizeof(double) * DELTA_REQ_COUNT);
+
 	// First we request a time sync:
 	s_req_time(mq);
 
@@ -92,6 +93,8 @@ s_kvmsg_store_posmap_noown(kvmsg_t** self_p, zhash_t* hash, double sync_time, LW
 	if (*self_p) {
 		kvmsg_t* self = *self_p;
 		assert(self);
+		// kvmsg_size(self) would be 0 if repeat_last is 1.
+		// Any of these is nonzero, we process the message.
 		if (kvmsg_size(self)) {
 			// kvmsg_body may return unaligned memory address
 			// which may signal SIGBUS error on Android when
@@ -106,13 +109,14 @@ s_kvmsg_store_posmap_noown(kvmsg_t** self_p, zhash_t* hash, double sync_time, LW
 			LWMQMSG* msg = &msg_aligned;
 			LWPOSSYNCMSG* possyncmsg = zhash_lookup(hash, kvmsg_key(self));
 			if (possyncmsg) {
-				// Do nothing if the entry already exists
+				// Do nothing
 			} else {
 				// Create a new extrapolator
 				possyncmsg = (LWPOSSYNCMSG*)malloc(sizeof(LWPOSSYNCMSG));
 				possyncmsg->a = 0;
 				possyncmsg->extrapolator = vec4_extrapolator_new();
-				vec4_extrapolator_reset(possyncmsg->extrapolator, msg->t, sync_time, msg->x, msg->y, msg->z, msg->dx, msg->dy);
+				vec4_extrapolator_reset(possyncmsg->extrapolator, LWMIN(msg->t, sync_time) /* avoid assertion in extrapolator*/,
+					sync_time, msg->x, msg->y, msg->z, msg->dx, msg->dy);
 				zhash_update(hash, kvmsg_key(self), possyncmsg);
 				zhash_freefn(hash, kvmsg_key(self), s_kvmsg_free_posmap);
 				if (mq->verbose) {
@@ -121,8 +125,8 @@ s_kvmsg_store_posmap_noown(kvmsg_t** self_p, zhash_t* hash, double sync_time, LW
 			}
 
 			if (mq->verbose && !mq_cursor_player(mq, kvmsg_key(self))) {
-				LOGI("UPDATE: POS (%.2f, %.2f, %.2f) DXY (%.2f, %.2f) V (%.2f, %.2f, %.2f)", msg->x,
-					msg->y, msg->z, msg->dx, msg->dy, msg->vx, msg->vy, msg->vz);
+				LOGI("UPDATE: POS (%.2f, %.2f, %.2f) DXY (%.2f, %.2f)", msg->x,
+					msg->y, msg->z, msg->dx, msg->dy);
 			}
 
 			possyncmsg->attacking = msg->attacking;
@@ -135,6 +139,7 @@ s_kvmsg_store_posmap_noown(kvmsg_t** self_p, zhash_t* hash, double sync_time, LW
 					msg->y, msg->z, msg->dx, msg->dy);
 			}
 			//LOGI("New possyncmsg entry with key %s updated.", kvmsg_key(self));
+			
 		} else {
 			zhash_delete(hash, kvmsg_key(self));
 		}
@@ -227,17 +232,14 @@ static void s_send_pos(const LWCONTEXT* pLwc, LWMESSAGEQUEUE* mq, int stop) {
 	LWMQMSG msg;
 	memset(&msg, 0, sizeof(LWMQMSG));
 	get_field_player_position(pLwc->field, &msg.x, &msg.y, &msg.z);
-	msg.vx = (float)pLwc->field->player_vel[0];
-	msg.vy = (float)pLwc->field->player_vel[1];
-	msg.vz = (float)pLwc->field->player_vel[2];
 	msg.dx = pLwc->player_pos_last_moved_dx;
 	msg.dy = pLwc->player_pos_last_moved_dy;
 	msg.moving = pLwc->player_moving;
 	msg.attacking = pLwc->player_attacking;
-	msg.t = mq_sync_time(mq);
 	msg.stop = stop;
+	msg.t = mq_sync_time(mq);
+	kvmsg_set_prop(kvmsg, "ttl", "%d", 2); // Set TTL to 2 seconds.
 	kvmsg_set_body(kvmsg, (byte*)&msg, sizeof(msg));
-	kvmsg_set_prop(kvmsg, "ttl", "%d", 2);
 	kvmsg_send(kvmsg, zsock_resolve(mq->publisher));
 	kvmsg_destroy(&kvmsg);
 	if (mq->verbose) {
