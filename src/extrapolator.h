@@ -128,14 +128,18 @@ private:
 #endif // #ifdef __cplusplus
 
 #ifdef __cplusplus
-extern "C" { ;
+extern "C" {;
 #endif // #ifdef __cplusplus
 void* vec4_extrapolator_new();
 void vec4_extrapolator_destroy(void** self_p);
 void vec4_extrapolator_reset(void* s, double packet_time, double now, float x, float y, float z,
 	float dx, float dy);
 void vec4_extrapolator_add(void* s, double packet_time, double now, float x, float y, float z,
-							   float dx, float dy);
+	float dx, float dy);
+void vec4_extrapolator_add_stop(void* s, double packet_time, double now, float x, float y, float z,
+	float dx, float dy);
+void vec4_extrapolator_addex(void* s, double packet_time, double now, float x, float y, float z,
+	float dx, float dy, float vx, float vy, float vz);
 void vec4_extrapolator_read(const void* s, double now, float* x, float* y, float* z, float* dx, float* dy);
 #ifdef __cplusplus
 }

@@ -7,6 +7,7 @@
 #include "lwcontext.h"
 #include "extrapolator.h"
 #include <stdlib.h>
+#include "field.h"
 
 typedef enum _LW_MESSAGE_QUEUE_STATE {
 	LMQS_INIT,
@@ -64,7 +65,7 @@ void* init_mq() {
 	mq->deltasamples = (double*)malloc(sizeof(double) * DELTA_REQ_COUNT);
 	// First we request a time sync:
 	s_req_time(mq);
-	
+
 	return mq;
 }
 
@@ -86,14 +87,19 @@ s_kvmsg_free_posmap(void* ptr) {
 }
 
 static void
-s_kvmsg_store_posmap_noown(kvmsg_t** self_p, zhash_t* hash, double sync_time) {
+s_kvmsg_store_posmap_noown(kvmsg_t** self_p, zhash_t* hash, double sync_time, LWMESSAGEQUEUE* mq) {
 	assert(self_p);
 	if (*self_p) {
 		kvmsg_t* self = *self_p;
 		assert(self);
 		if (kvmsg_size(self)) {
+			// kvmsg_body may return unaligned memory address
+			// which may signal SIGBUS error on Android when
+			// accessing struct member variables.
+			// We workaround by copying it to aligned memory address.
 			LWMQMSG* msg_unaligned = (LWMQMSG*)kvmsg_body(self);
 			LWMQMSG msg_aligned;
+			// Should not use 'memcpy'. It is not supported on unaligned addresses.
 			for (int i = 0; i < sizeof(LWMQMSG); i++) {
 				((char*)&msg_aligned)[i] = ((char*)msg_unaligned)[i];
 			}
@@ -109,12 +115,25 @@ s_kvmsg_store_posmap_noown(kvmsg_t** self_p, zhash_t* hash, double sync_time) {
 				vec4_extrapolator_reset(possyncmsg->extrapolator, msg->t, sync_time, msg->x, msg->y, msg->z, msg->dx, msg->dy);
 				zhash_update(hash, kvmsg_key(self), possyncmsg);
 				zhash_freefn(hash, kvmsg_key(self), s_kvmsg_free_posmap);
-				//LOGI("New possyncmsg entry with key %s created.", kvmsg_key(self));
+				if (mq->verbose) {
+					LOGI("New possyncmsg entry with key %s created.", kvmsg_key(self));
+				}
 			}
+
+			if (mq->verbose && !mq_cursor_player(mq, kvmsg_key(self))) {
+				LOGI("UPDATE: POS (%.2f, %.2f, %.2f) DXY (%.2f, %.2f) V (%.2f, %.2f, %.2f)", msg->x,
+					msg->y, msg->z, msg->dx, msg->dy, msg->vx, msg->vy, msg->vz);
+			}
+
 			possyncmsg->attacking = msg->attacking;
 			possyncmsg->moving = msg->moving;
-			vec4_extrapolator_add(possyncmsg->extrapolator, msg->t, sync_time, msg->x,
-									  msg->y, msg->z, msg->dx, msg->dy);
+			if (msg->stop) {
+				vec4_extrapolator_add_stop(possyncmsg->extrapolator, msg->t, sync_time, msg->x,
+					msg->y, msg->z, msg->dx, msg->dy);
+			} else {
+				vec4_extrapolator_add(possyncmsg->extrapolator, msg->t, sync_time, msg->x,
+					msg->y, msg->z, msg->dx, msg->dy);
+			}
 			//LOGI("New possyncmsg entry with key %s updated.", kvmsg_key(self));
 		} else {
 			zhash_delete(hash, kvmsg_key(self));
@@ -150,7 +169,7 @@ static void s_mq_poll_time(void* _mq) {
 				if (mq->verbose) {
 					LOGI("REQ %d: delta = %f", mq->deltasequence, delta);
 				}
-				
+
 				if (mq->deltasequence < DELTA_REQ_COUNT) {
 					s_req_time(mq);
 				} else {
@@ -197,21 +216,26 @@ static void s_mq_poll_snapshot(void* _mq) {
 			mq->alarm = zclock_time() + 100;
 			return;
 		}
-		s_kvmsg_store_posmap_noown(&kvmsg, mq->posmap, mq_sync_time(mq));
+		s_kvmsg_store_posmap_noown(&kvmsg, mq->posmap, mq_sync_time(mq), mq);
 		kvmsg_store(&kvmsg, mq->kvmap);
 	}
 }
 
-static void s_send_pos(const LWCONTEXT* pLwc, LWMESSAGEQUEUE* mq) {
+static void s_send_pos(const LWCONTEXT* pLwc, LWMESSAGEQUEUE* mq, int stop) {
 	kvmsg_t* kvmsg = kvmsg_new(0);
 	kvmsg_fmt_key(kvmsg, "%s%s", mq->subtree, zuuid_str(mq->uuid));
 	LWMQMSG msg;
+	memset(&msg, 0, sizeof(LWMQMSG));
 	get_field_player_position(pLwc->field, &msg.x, &msg.y, &msg.z);
+	msg.vx = (float)pLwc->field->player_vel[0];
+	msg.vy = (float)pLwc->field->player_vel[1];
+	msg.vz = (float)pLwc->field->player_vel[2];
 	msg.dx = pLwc->player_pos_last_moved_dx;
 	msg.dy = pLwc->player_pos_last_moved_dy;
 	msg.moving = pLwc->player_moving;
 	msg.attacking = pLwc->player_attacking;
 	msg.t = mq_sync_time(mq);
+	msg.stop = stop;
 	kvmsg_set_body(kvmsg, (byte*)&msg, sizeof(msg));
 	kvmsg_set_prop(kvmsg, "ttl", "%d", 2);
 	kvmsg_send(kvmsg, zsock_resolve(mq->publisher));
@@ -242,15 +266,15 @@ static void s_mq_poll_ready(void* _pLwc, void* _mq) {
 			if (mq->verbose) {
 				LOGI("Update: %"PRId64" key:%s, bodylen:%zd\n", mq->sequence, kvmsg_key(kvmsg), kvmsg_size(kvmsg));
 			}
-			s_kvmsg_store_posmap_noown(&kvmsg, mq->posmap, mq_sync_time(mq));
+			s_kvmsg_store_posmap_noown(&kvmsg, mq->posmap, mq_sync_time(mq), mq);
 			kvmsg_store(&kvmsg, mq->kvmap);
 		} else {
 			kvmsg_destroy(&kvmsg);
 		}
 	}
-	
+
 	if (zclock_time() >= mq->alarm) {
-		s_send_pos(pLwc, mq);
+		s_send_pos(pLwc, mq, 0);
 		mq->alarm = zclock_time() + 100;
 	}
 }
@@ -353,12 +377,18 @@ void mq_shutdown() {
 	zsys_shutdown();
 }
 
-void mq_publish_now(void* _mq) {
+void mq_publish_now(void* pLwc, void* _mq, int stop) {
 	LWMESSAGEQUEUE* mq = (LWMESSAGEQUEUE*)_mq;
-	mq->alarm = 0;
+	s_send_pos(pLwc, mq, stop);
+	//mq->alarm = 0;
 }
 
 double mq_sync_time(void* _mq) {
 	LWMESSAGEQUEUE* mq = (LWMESSAGEQUEUE*)_mq;
 	return zclock_time() / 1e3 + mq->delta;
+}
+
+int mq_cursor_player(void* _mq, const char* cursor) {
+	LWMESSAGEQUEUE* mq = (LWMESSAGEQUEUE*)_mq;
+	return strcmp(cursor + strlen(mq_subtree(mq)), mq_uuid_str(mq)) == 0;
 }

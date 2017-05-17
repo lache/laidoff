@@ -184,14 +184,30 @@ extern "C" void vec4_extrapolator_reset(void* s, double packet_time, double now,
 	//LOGI("vec4_extrapolator_reset");
 	auto self = reinterpret_cast<Vec4Extrapolator*>(s);
 	float pos[5] = { x, y, z, dx, dy };
-	self->Reset(0, 0, pos);
+	self->Reset(packet_time, now, pos);
 }
 
 extern "C" void vec4_extrapolator_add(void* s, double packet_time, double now, float x, float y, float z,
-							   float dx, float dy) {
+	float dx, float dy) {
 	auto self = reinterpret_cast<Vec4Extrapolator*>(s);
 	float pos[] = { x, y, z, dx, dy };
 	self->AddSample(packet_time, now, pos);
+}
+
+extern "C" void vec4_extrapolator_add_stop(void* s, double packet_time, double now, float x, float y, float z,
+	float dx, float dy) {
+	auto self = reinterpret_cast<Vec4Extrapolator*>(s);
+	float pos[] = { x, y, z, dx, dy };
+	float vel[] = { 0, 0, 0, 0, 0 };
+	self->AddSample(packet_time, now, pos, vel);
+}
+
+extern "C" void vec4_extrapolator_addex(void* s, double packet_time, double now, float x, float y, float z,
+	float dx, float dy, float vx, float vy, float vz) {
+	auto self = reinterpret_cast<Vec4Extrapolator*>(s);
+	float pos[] = { x, y, z, dx, dy };
+	float vel[] = { vx, vy, vz, 0, 0 };
+	self->AddSample(packet_time, now, pos, vel);
 }
 
 extern "C" void vec4_extrapolator_read(const void* s, double now, float* x, float* y, float* z, float* dx, float* dy) {
@@ -202,11 +218,6 @@ extern "C" void vec4_extrapolator_read(const void* s, double now, float* x, floa
 	*x = pos[0];
 	*y = pos[1];
 	*z = pos[2];
-	if (pos[3] != 0 || pos[4] != 0) {
-		*dx = pos[3];
-		*dy = pos[4];
-	} else {
-		*dx = 0;
-		*dy = 0;
-	}
+	*dx = pos[3];
+	*dy = pos[4];
 }

@@ -34,6 +34,7 @@ typedef struct _LWFIELD {
 	dVector3 player_pos;
 	dVector3 player_pos_delta;
 	dVector3 ground_normal;
+	dVector3 player_vel;
 	LWFIELDCUBEOBJECT* field_cube_object;
 	int field_cube_object_count;
 	char* d;

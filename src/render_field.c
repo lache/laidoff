@@ -331,8 +331,8 @@ void lwc_render_field(const LWCONTEXT* pLwc)
 	LWPOSSYNCMSG* value = mq_possync_first(pLwc->mq);
 	while (value) {
 		const char* cursor = mq_possync_cursor(pLwc->mq);
-		// Exclude the player itself
-		if (strcmp(cursor + strlen(mq_subtree(pLwc->mq)), mq_uuid_str(pLwc->mq)) != 0) {
+		// Exclude the player
+		if (!mq_cursor_player(pLwc->mq, cursor)) {
 			render_player_model(pLwc, perspective, view, value->x, value->y, value->z, value->a, value->action);
 		}
 		value = mq_possync_next(pLwc->mq);

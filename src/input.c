@@ -66,7 +66,7 @@ void lw_trigger_mouse_press(LWCONTEXT *pLwc, float x, float y) {
 
 	LOGI("mouse press ui coord x=%f, y=%f\n", x, y);
 
-	mq_publish_now(pLwc->mq);
+	mq_publish_now(pLwc, pLwc->mq, 0);
 
 	pLwc->last_mouse_press_x = x;
 	pLwc->last_mouse_press_y = y;
@@ -161,7 +161,7 @@ void lw_trigger_mouse_release(LWCONTEXT *pLwc, float x, float y) {
 	printf("mouse release ui coord x=%f, y=%f (last move ui coord x=%f, y=%f)\n",
 		x, y, pLwc->last_mouse_press_x, pLwc->last_mouse_press_y);
 
-	mq_publish_now(pLwc->mq);
+	mq_publish_now(pLwc, pLwc->mq, 1);
 
 	const float aspect_ratio = (float)pLwc->width / pLwc->height;
 

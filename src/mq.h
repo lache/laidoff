@@ -16,8 +16,14 @@ typedef struct _LWMQMSG {
 	float z;				// Current position Z
 	float dx;				// Last moved delta X
 	float dy;				// Last moved delta y
+	float vx;				// Current velocity X
+	float vy;				// Current velocity Y
+	float vz;				// Current velocity Z
+	float vdx;				// Last moved delta velocity X
+	float vdy;				// Last moved delta velocity y
 	int moving;				// 1 if moving, 0 if stopped
 	int attacking;			// 1 if attacking, 0 if stopped
+	int stop;				// 1 if movement stopped, 0 if not
 
 } LWMQMSG;
 
@@ -43,6 +49,7 @@ LWPOSSYNCMSG* mq_possync_next(void* _mq);
 const char* mq_uuid_str(void* _mq);
 const char* mq_subtree(void* _mq);
 
-void mq_publish_now(void* _mq);
+void mq_publish_now(void* pLwc, void* _mq, int stop);
 
 double mq_sync_time(void* _mq);
+int mq_cursor_player(void* _mq, const char* cursor);

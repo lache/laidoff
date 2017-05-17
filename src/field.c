@@ -364,6 +364,9 @@ void update_field(LWCONTEXT* pLwc, LWFIELD* field) {
 
 	reset_ray_result(field);
 
+	dVector3 player_pos_0;
+	dCopyVector3(player_pos_0, field->player_pos);
+
 	move_player_geom_by_input(field);
 	
 	dSpaceCollide(field->space, field, &field_near_callback);
@@ -372,6 +375,11 @@ void update_field(LWCONTEXT* pLwc, LWFIELD* field) {
 
 	move_player_to_ground(field);
 
+	dSubtractVectors3(field->player_vel, field->player_pos, player_pos_0);
+	dScaleVector3(field->player_vel, (dReal)1.0 / pLwc->delta_time);
+
+	//LOGI("%f, %f, %f", field->player_vel[0], field->player_vel[1], field->player_vel[2]);
+	
 	LW_ACTION player_anim;
 	if (pLwc->player_attacking) {
 		player_anim = LWAC_HUMANACTION_ATTACK;
@@ -387,10 +395,10 @@ void update_field(LWCONTEXT* pLwc, LWFIELD* field) {
 	if (pLwc->player_attacking && pLwc->player_action && f > pLwc->player_action->last_key_f) {
 		pLwc->player_attacking = 0;
 	}
-
+	// Update skin time
 	pLwc->player_skin_time += pLwc->delta_time;
 	pLwc->test_player_skin_time += pLwc->delta_time;
-
+	// Read pathfinding result and set the test player's position
 	if (pLwc->field->path_query.n_smooth_path) {
 
 		pLwc->field->path_query_time += (float)pLwc->delta_time;
@@ -417,10 +425,13 @@ void update_field(LWCONTEXT* pLwc, LWFIELD* field) {
 	LWPOSSYNCMSG* value = mq_possync_first(pLwc->mq);
 	while (value) {
 		const char* cursor = mq_possync_cursor(pLwc->mq);
-		// Exclude the player itself
-		if (strcmp(cursor + strlen(mq_subtree(pLwc->mq)), mq_uuid_str(pLwc->mq)) != 0) {
+		// Exclude the player
+		if (!mq_cursor_player(pLwc->mq, cursor)) {
 			float dx = 0, dy = 0;
 			vec4_extrapolator_read(value->extrapolator, mq_sync_time(pLwc->mq), &value->x, &value->y, &value->z, &dx, &dy);
+			
+			//LOGI("READ: POS (%.2f, %.2f, %.2f) DXY (%.2f, %.2f)", value->x, value->y, value->z, dx, dy);
+
 			value->a = atan2f(dy, dx);
 			LW_ACTION remote_player_anim;
 			if (value->attacking) {
