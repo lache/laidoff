@@ -6,6 +6,7 @@
 #include "field.h"
 #include "lwcontext.h"
 #include "extrapolator.h"
+#include <stdlib.h>
 
 typedef enum _LW_MESSAGE_QUEUE_STATE {
 	LMQS_INIT,
@@ -29,10 +30,12 @@ typedef struct _LWMESSAGEQUEUE {
 	zuuid_t* uuid;
 	int verbose;
 	double delta;
-	int deltareq;
+	double* deltasamples;
+	int deltasequence;
 } LWMESSAGEQUEUE;
 
 #define SERVER_ADDR "222.110.4.119"
+#define DELTA_REQ_COUNT (100)
 
 static void s_req_time(LWMESSAGEQUEUE* mq);
 
@@ -56,9 +59,9 @@ void* init_mq() {
 	mq->sequence = 0;
 
 	mq->uuid = zuuid_new();
-	mq->deltareq = 100;
+	mq->deltasequence = 0;
 	mq->delta = 0;
-
+	mq->deltasamples = (double*)malloc(sizeof(double) * DELTA_REQ_COUNT);
 	// First we request a time sync:
 	s_req_time(mq);
 	
@@ -119,6 +122,10 @@ s_kvmsg_store_posmap_noown(kvmsg_t** self_p, zhash_t* hash, double sync_time) {
 	}
 }
 
+static int s_delta_cmp(const void* a, const void* b) {
+	return (int)(*(double*)a - *(double*)b);
+}
+
 static void s_mq_poll_time(void* _mq) {
 	LWMESSAGEQUEUE* mq = (LWMESSAGEQUEUE*)_mq;
 	zmq_pollitem_t items[] = { { zsock_resolve(mq->snapshot), 0, ZMQ_POLLIN, 0 } };
@@ -137,16 +144,27 @@ static void s_mq_poll_time(void* _mq) {
 				sscanf(timereply, "%lf %lf %lf", &t2, &t1, &t0);
 				double t3 = zclock_time() / 1e3;
 				double delta = ((t1 - t0) + (t2 - t3)) / 2;
-				mq->delta = (mq->delta + delta) / 2;
+				mq->deltasamples[mq->deltasequence++] = delta;
 
 				if (mq->verbose) {
-					LOGI("REQ %d: DELTA = %f, delta = %f, t3 = %f, t2 = %f, t1 = %f, t0 = %f", mq->deltareq, mq->delta, delta, t3, t2, t1, t0);
+					LOGI("REQ %d: delta = %f", mq->deltasequence, delta);
 				}
 				
-				mq->deltareq--;
-				if (mq->deltareq > 0) {
+				if (mq->deltasequence < DELTA_REQ_COUNT) {
 					s_req_time(mq);
 				} else {
+					// Calculate averaged delta around a median delta:
+					qsort(mq->deltasamples, DELTA_REQ_COUNT, sizeof(mq->deltasamples[0]), s_delta_cmp);
+					int nselsamples = 10;
+					int ibeg = LWMAX(0, DELTA_REQ_COUNT / 2 - nselsamples / 2);
+					int iend = LWMIN(DELTA_REQ_COUNT / 2 + nselsamples / 2, DELTA_REQ_COUNT);
+					double selsum = 0;
+					for (int i = ibeg; i < iend; i++) {
+						selsum += mq->deltasamples[i];
+					}
+					mq->delta = selsum / nselsamples;
+					LOGI("FINAL delta = %f", mq->delta);
+
 					// Next, we request a state snapshot:
 					zstr_sendm(mq->snapshot, "ICANHAZ?");
 					zstr_send(mq->snapshot, mq->subtree);
