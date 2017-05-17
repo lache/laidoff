@@ -123,7 +123,8 @@ s_kvmsg_store_posmap_noown(kvmsg_t** self_p, zhash_t* hash, double sync_time) {
 }
 
 static int s_delta_cmp(const void* a, const void* b) {
-	return (int)(*(double*)a - *(double*)b);
+	double d = *(double*)a - *(double*)b;
+	return d > 0 ? 1 : d < 0 ? -1 : 0;
 }
 
 static void s_mq_poll_time(void* _mq) {
