@@ -34,7 +34,8 @@ typedef struct _LWMESSAGEQUEUE {
 	int deltasequence;
 } LWMESSAGEQUEUE;
 
-#define DELTA_REQ_COUNT (100)
+#define DELTA_REQ_COUNT (50)
+#define SUBTREE "/l/"
 
 static void s_req_time(LWMESSAGEQUEUE* mq);
 
@@ -43,7 +44,7 @@ void* init_mq(const char* addr, void* sm) {
 
 	LWMESSAGEQUEUE* mq = (LWMESSAGEQUEUE*)calloc(1, sizeof(LWMESSAGEQUEUE));
 	mq->state = LMQS_INIT;
-	mq->subtree = "/l/";
+	mq->subtree = SUBTREE;
 	mq->port = 5556;
 	mq->verbose = 0;
 	// Prepare our context and subscriber
@@ -257,7 +258,7 @@ static void s_send_pos(const LWCONTEXT* pLwc, LWMESSAGEQUEUE* mq, int stop) {
 	}
 }
 
-static void s_mq_poll_ready(void* _pLwc, void* _mq) {
+static void s_mq_poll_ready(void* _pLwc, void* _mq, void* sm) {
 	LWMESSAGEQUEUE* mq = (LWMESSAGEQUEUE*)_mq;
 	LWCONTEXT* pLwc = (LWCONTEXT*)_pLwc;
 	zmq_pollitem_t items[] = { { zsock_resolve(mq->subscriber), 0, ZMQ_POLLIN, 0 } };
@@ -272,16 +273,22 @@ static void s_mq_poll_ready(void* _pLwc, void* _mq) {
 			return;
 		}
 
-		// Discard out-of-sequence kvmsgs, incl. heartbeats
-		if (kvmsg_sequence(kvmsg) > mq->sequence) {
-			mq->sequence = kvmsg_sequence(kvmsg);
-			if (mq->verbose) {
-				LOGI("Update: %"PRId64" key:%s, bodylen:%zd\n", mq->sequence, kvmsg_key(kvmsg), kvmsg_size(kvmsg));
-			}
-			s_kvmsg_store_posmap_noown(&kvmsg, mq->posmap, mq_sync_mono_clock(mq), mq);
-			kvmsg_store(&kvmsg, mq->kvmap);
-		} else {
+		if (streq(kvmsg_key(kvmsg), SUBTREE "announce")) {
+			show_sys_msg(sm, (char*)kvmsg_body(kvmsg)); // kvmsg body is assumed to be a null terminated string.
 			kvmsg_destroy(&kvmsg);
+		} else {
+			// Discard out-of-sequence kvmsgs, incl. heartbeats
+			if (kvmsg_sequence(kvmsg) > mq->sequence) {
+				mq->sequence = kvmsg_sequence(kvmsg);
+				if (mq->verbose) {
+					LOGI("Update: %"PRId64" key:%s, bodylen:%zd\n", mq->sequence, kvmsg_key(kvmsg), kvmsg_size(kvmsg));
+				}
+
+				s_kvmsg_store_posmap_noown(&kvmsg, mq->posmap, mq_sync_mono_clock(mq), mq);
+				kvmsg_store(&kvmsg, mq->kvmap);
+			} else {
+				kvmsg_destroy(&kvmsg);
+			}
 		}
 	}
 
@@ -361,7 +368,7 @@ void mq_poll(void* _pLwc, void* sm, void* _mq) {
 		s_mq_poll_snapshot(mq, sm);
 		break;
 	case LMQS_READY:
-		s_mq_poll_ready(_pLwc, mq);
+		s_mq_poll_ready(_pLwc, mq, sm);
 		break;
 	default:
 		break;
