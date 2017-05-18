@@ -428,7 +428,7 @@ void update_field(LWCONTEXT* pLwc, LWFIELD* field) {
 		// Exclude the player
 		if (!mq_cursor_player(pLwc->mq, cursor)) {
 			float dx = 0, dy = 0;
-			vec4_extrapolator_read(value->extrapolator, mq_sync_time(pLwc->mq), &value->x, &value->y, &value->z, &dx, &dy);
+			vec4_extrapolator_read(value->extrapolator, mq_sync_mono_clock(pLwc->mq), &value->x, &value->y, &value->z, &dx, &dy);
 			
 			//LOGI("READ: POS (%.2f, %.2f, %.2f) DXY (%.2f, %.2f)", value->x, value->y, value->z, dx, dy);
 

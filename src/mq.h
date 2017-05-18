@@ -43,6 +43,7 @@ const char* mq_subtree(void* _mq);
 
 void mq_publish_now(void* pLwc, void* _mq, int stop);
 
-double mq_sync_time(void* _mq);
+double mq_mono_clock();
+double mq_sync_mono_clock(void* _mq);
 int mq_cursor_player(void* _mq, const char* cursor);
 void mq_interrupt();

@@ -77,7 +77,7 @@ void* init_mq(const char* addr, void* sm) {
 static void s_req_time(LWMESSAGEQUEUE* mq) {
 	zstr_sendm(mq->snapshot, "WHTTAIM?");
 	char clienttime[64];
-	sprintf(clienttime, "%f", zclock_time() / 1e3);
+	sprintf(clienttime, "%f", mq_mono_clock());
 	zstr_send(mq->snapshot, clienttime);
 	mq->state = LMQS_TIME;
 }
@@ -171,11 +171,11 @@ static void s_mq_poll_time(void* _mq, void* sm) {
 			if (timereply) {
 				double t2 = 0, t1 = 0, t0 = 0;
 				sscanf(timereply, "%lf %lf %lf", &t2, &t1, &t0);
-				double t3 = zclock_time() / 1e3;
+				double t3 = mq_mono_clock();
 				double delta = ((t1 - t0) + (t2 - t3)) / 2;
 				mq->deltasamples[mq->deltasequence++] = delta;
 
-				if (mq->verbose) {
+				/*if (mq->verbose)*/ {
 					LOGI("REQ %d: delta = %f", mq->deltasequence, delta);
 				}
 
@@ -231,7 +231,7 @@ static void s_mq_poll_snapshot(void* _mq, void* sm) {
 			return;
 		}
 		show_sys_msg(sm, LWU("Receiving snapshot"));
-		s_kvmsg_store_posmap_noown(&kvmsg, mq->posmap, mq_sync_time(mq), mq);
+		s_kvmsg_store_posmap_noown(&kvmsg, mq->posmap, mq_sync_mono_clock(mq), mq);
 		kvmsg_store(&kvmsg, mq->kvmap);
 	}
 }
@@ -247,7 +247,7 @@ static void s_send_pos(const LWCONTEXT* pLwc, LWMESSAGEQUEUE* mq, int stop) {
 	msg.moving = pLwc->player_moving;
 	msg.attacking = pLwc->player_attacking;
 	msg.stop = stop;
-	msg.t = mq_sync_time(mq);
+	msg.t = mq_sync_mono_clock(mq);
 	kvmsg_set_prop(kvmsg, "ttl", "%d", 2); // Set TTL to 2 seconds.
 	kvmsg_set_body(kvmsg, (byte*)&msg, sizeof(msg));
 	kvmsg_send(kvmsg, zsock_resolve(mq->publisher));
@@ -278,7 +278,7 @@ static void s_mq_poll_ready(void* _pLwc, void* _mq) {
 			if (mq->verbose) {
 				LOGI("Update: %"PRId64" key:%s, bodylen:%zd\n", mq->sequence, kvmsg_key(kvmsg), kvmsg_size(kvmsg));
 			}
-			s_kvmsg_store_posmap_noown(&kvmsg, mq->posmap, mq_sync_time(mq), mq);
+			s_kvmsg_store_posmap_noown(&kvmsg, mq->posmap, mq_sync_mono_clock(mq), mq);
 			kvmsg_store(&kvmsg, mq->kvmap);
 		} else {
 			kvmsg_destroy(&kvmsg);
@@ -390,9 +390,13 @@ void mq_publish_now(void* pLwc, void* _mq, int stop) {
 	//mq->alarm = 0;
 }
 
-double mq_sync_time(void* _mq) {
+double mq_mono_clock() {
+	return zclock_mono() / 1e3;
+}
+
+double mq_sync_mono_clock(void* _mq) {
 	LWMESSAGEQUEUE* mq = (LWMESSAGEQUEUE*)_mq;
-	return zclock_time() / 1e3 + mq->delta;
+	return mq_mono_clock() + mq->delta;
 }
 
 int mq_cursor_player(void* _mq, const char* cursor) {

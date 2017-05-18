@@ -98,7 +98,7 @@ typedef struct {
 #pragma pack(pop)
 
 static const char* server_addr[] = {
-	"13.113.44.14", // AWS Tokyo
+	"s.popsongremix.com", // AWS Tokyo
 	"222.110.4.119", // private dev
 };
 
