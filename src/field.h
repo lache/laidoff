@@ -25,15 +25,17 @@ typedef struct _LWFIELD {
 	dGeomID box_geom[MAX_BOX_GEOM];
 	int box_geom_count;
 	dGeomID player_geom;
+	dReal player_radius;
+	dReal player_length;
+
 	dGeomID player_center_ray;
 	dGeomID player_contact_ray;
 	dGeomID player_aim_sector_ray[MAX_AIM_SECTOR_RAY];
-	dReal player_radius;
-	dReal player_length;
 	dContact center_ray_result[MAX_CENTER_RAY_RESULT];
 	int center_ray_result_count;
 	dContact contact_ray_result[MAX_CONTACT_RAY_RESULT];
 	int contact_ray_result_count;
+
 	dVector3 player_pos;
 	dVector3 player_pos_delta;
 	dVector3 ground_normal;

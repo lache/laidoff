@@ -178,25 +178,22 @@ static void field_near_callback(void *data, dGeomID o1, dGeomID o2) {
 
 	} else {
 
-		int i, n;
-
 		// only collide things with the ground
 		int g1 = (o1 == field->player_center_ray || o1 == field->player_contact_ray || o1 == field->player_geom);
 		int g2 = (o2 == field->player_center_ray || o2 == field->player_contact_ray || o2 == field->player_geom);
 		if (!(g1 ^ g2)) return;
 
 		dContact contact[MAX_FIELD_CONTACT];
-		n = dCollide(o1, o2, MAX_FIELD_CONTACT, &contact[0].geom, sizeof(dContact));
+		int n = dCollide(o1, o2, MAX_FIELD_CONTACT, &contact[0].geom, sizeof(dContact));
 		if (n > 0) {
-			for (i = 0; i < n; i++) {
+			for (int i = 0; i < n; i++) {
 
 				if (contact[i].geom.g1 == field->player_center_ray || contact[i].geom.g2 == field->player_center_ray) {
 					field->center_ray_result[field->center_ray_result_count] = contact[i];
 
+					// Negate normal direction if 'g2' is ray. (in other words, not negate if 'g1' is ray)
 					if (contact[i].geom.g2 == field->player_center_ray) {
-						field->center_ray_result[field->center_ray_result_count].geom.normal[0] = -field->center_ray_result[field->center_ray_result_count].geom.normal[0];
-						field->center_ray_result[field->center_ray_result_count].geom.normal[1] = -field->center_ray_result[field->center_ray_result_count].geom.normal[1];
-						field->center_ray_result[field->center_ray_result_count].geom.normal[2] = -field->center_ray_result[field->center_ray_result_count].geom.normal[2];
+						dNegateVector3(field->center_ray_result[field->center_ray_result_count].geom.normal);
 					}
 
 					field->center_ray_result_count++;
@@ -204,10 +201,9 @@ static void field_near_callback(void *data, dGeomID o1, dGeomID o2) {
 				if (contact[i].geom.g1 == field->player_contact_ray || contact[i].geom.g2 == field->player_contact_ray) {
 					field->contact_ray_result[field->contact_ray_result_count] = contact[i];
 
+					// Negate normal direction if 'g2' is ray. (in other words, not negate if 'g1' is ray)
 					if (contact[i].geom.g2 == field->player_contact_ray) {
-						field->contact_ray_result[field->contact_ray_result_count].geom.normal[0] = -field->contact_ray_result[field->contact_ray_result_count].geom.normal[0];
-						field->contact_ray_result[field->contact_ray_result_count].geom.normal[1] = -field->contact_ray_result[field->contact_ray_result_count].geom.normal[1];
-						field->contact_ray_result[field->contact_ray_result_count].geom.normal[2] = -field->contact_ray_result[field->contact_ray_result_count].geom.normal[2];
+						dNegateVector3(field->contact_ray_result[field->contact_ray_result_count].geom.normal);
 					}
 
 					field->contact_ray_result_count++;
@@ -221,14 +217,11 @@ static void field_near_callback(void *data, dGeomID o1, dGeomID o2) {
 				}
 
 				if (sign) {
+					dReal* normal = contact[i].geom.normal;
+					dReal depth = contact[i].geom.depth;
 
-					const dReal * p = dGeomGetPosition(field->player_geom);
-
-					dReal* n = contact[i].geom.normal;
-					dReal d = contact[i].geom.depth;
-
-					field->player_pos[0] += sign * n[0] * d;
-					field->player_pos[1] += sign * n[1] * d;
+					field->player_pos[0] += sign * normal[0] * depth;
+					field->player_pos[1] += sign * normal[1] * depth;
 				}
 			}
 		}
@@ -258,18 +251,18 @@ void get_field_player_position(const LWFIELD* field, float* x, float* y, float* 
 	*z = (float)(field->player_pos[2] - field->player_length / 2 - field->player_radius);
 }
 
-void rotation_matrix_from_vectors(dMatrix3 r, dReal* vec_a, dReal* vec_b) {
+void rotation_matrix_from_vectors(dMatrix3 r, const dReal* vec_a, const dReal* vec_b) {
 	// Calculate rotation matrix 'r' which rotates 'vec_a' to 'vec_b'.
 	// Assumes that both 'vec_a' and 'vec_b' are unit vectors.
 	// http://stackoverflow.com/questions/1171849/finding-quaternion-representing-the-rotation-from-one-vector-to-another
-	dVector3 u_x_n;
-	dCalcVectorCross3(u_x_n, vec_a, vec_b);
+	dVector3 a_x_b;
+	dCalcVectorCross3(a_x_b, vec_a, vec_b);
 	dReal dot = dCalcVectorDot3(vec_a, vec_b);
 	dQuaternion q;
 	q[0] = 1 + dot;
-	q[1] = u_x_n[0];
-	q[2] = u_x_n[1];
-	q[3] = u_x_n[2];
+	q[1] = a_x_b[0];
+	q[2] = a_x_b[1];
+	q[3] = a_x_b[2];
 	dNormalize4(q);
 	dQtoR(q, r);
 }
@@ -282,11 +275,14 @@ void move_player_geom_by_input(LWFIELD* field) {
 	up[2] = 1;
 	rotation_matrix_from_vectors(r, up, field->ground_normal);
 
+	// Match 'player_pos_delta' (XY-plane movement) to the ground.
 	dVector3 geom_pos_delta_rotated;
 	dMultiply0_331(geom_pos_delta_rotated, r, field->player_pos_delta);
 
 	for (int i = 0; i < 3; i++) {
 		field->player_pos[i] += geom_pos_delta_rotated[i];
+		// Reset to zero to make movement stop in subsequent frames.
+		// (can only move again if another player_pos_delta is set by user input.)
 		field->player_pos_delta[i] = 0;
 	}
 	dGeomSetPosition(field->player_geom, field->player_pos[0], field->player_pos[1], field->player_pos[2]);
