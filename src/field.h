@@ -20,8 +20,8 @@ typedef struct _LWFIELDCUBEOBJECT {
 typedef enum _LW_RAY_ID {
 	LRI_PLAYER_CENTER,
 	LRI_PLAYER_CONTACT,
-	LRI_AIM_SECTOR_FIRST,
-	LRI_AIM_SECTOR_LAST = LRI_AIM_SECTOR_FIRST + MAX_AIM_SECTOR_RAY,
+	LRI_AIM_SECTOR_FIRST_INCLUSIVE,
+	LRI_AIM_SECTOR_LAST_INCLUSIVE = LRI_AIM_SECTOR_FIRST_INCLUSIVE + MAX_AIM_SECTOR_RAY,
 
 	LRI_COUNT
 } LW_RAY_ID;
@@ -39,6 +39,8 @@ typedef struct _LWFIELD {
 	dGeomID ray[LRI_COUNT];
 	dContact ray_result[LRI_COUNT][MAX_RAY_RESULT_COUNT];
 	int ray_result_count[LRI_COUNT];
+	dReal ray_nearest_depth[LRI_COUNT];
+	int ray_nearest_index[LRI_COUNT];
 
 	dVector3 player_pos;
 	dVector3 player_pos_delta;

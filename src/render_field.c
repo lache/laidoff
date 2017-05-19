@@ -330,7 +330,7 @@ void lwc_render_field(const LWCONTEXT* pLwc)
 
 	render_path_query_test_player(pLwc, perspective, view);
 
-	render_fan(pLwc, perspective, view, player_x, player_y, player_z, pLwc->player_rot_z, (float)(M_PI / 2));
+	render_fan(pLwc, perspective, view, player_x, player_y, player_z, pLwc->player_rot_z, pLwc->player_aim_theta);
 
 	render_ui(pLwc);
 

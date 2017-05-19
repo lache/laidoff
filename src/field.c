@@ -10,6 +10,24 @@
 #include "extrapolator.h"
 #include <czmq.h>
 
+void rotation_matrix_from_vectors(dMatrix3 r, const dReal* vec_a, const dReal* vec_b);
+
+dReal get_dreal_max() {
+#ifdef dDOUBLE
+	return DBL_MAX;
+#else
+	return FLT_MAX;
+#endif
+}
+
+dReal get_dreal_min() {
+#ifdef dDOUBLE
+	return DBL_MIN;
+#else
+	return FLT_MIN;
+#endif
+}
+
 void move_player(LWCONTEXT *pLwc) {
 	if (pLwc->game_scene == LGS_FIELD) {
 		const float move_speed = 3.5f;
@@ -123,11 +141,11 @@ LWFIELD* load_field(const char* filename) {
 	dGeomSetPosition(field->player_geom, field->player_pos[0], field->player_pos[1], field->player_pos[2]);
 
 	const dReal ray_length = 50;
-	dMatrix3 R;
-
+	
 	for (int i = 0; i < LRI_COUNT; i++) {
 		field->ray[i] = dCreateRay(field->space, ray_length);
 		dGeomSetPosition(field->ray[i], field->player_pos[0], field->player_pos[1], field->player_pos[2]);
+		dMatrix3 R;
 		dRFromAxisAndAngle(R, 1, 0, 0, M_PI); // ray direction: downward (-Z)
 		dGeomSetRotation(field->ray[i], R);
 	}
@@ -265,6 +283,8 @@ static void field_near_callback(void *data, dGeomID o1, dGeomID o2) {
 void reset_ray_result(LWFIELD* field) {
 	for (int i = 0; i < LRI_COUNT; i++) {
 		field->ray_result_count[i] = 0;
+		field->ray_nearest_depth[i] = get_dreal_max();
+		field->ray_nearest_index[i] = -1;
 	}
 	/*field->center_ray_result_count = 0;
 	field->contact_ray_result_count = 0;*/
@@ -332,7 +352,7 @@ void move_player_geom_by_input(LWFIELD* field) {
 }
 
 void move_player_to_ground(LWFIELD* field) {
-	dReal min_ray_length = FLT_MAX;
+	/*dReal min_ray_length = FLT_MAX;
 	int min_ray_index = -1;
 	for (int i = 0; i < field->ray_result_count[LRI_PLAYER_CENTER]; i++) {
 		if (min_ray_length > field->ray_result[LRI_PLAYER_CENTER][i].geom.depth) {
@@ -348,9 +368,11 @@ void move_player_to_ground(LWFIELD* field) {
 			min_side_ray_length = field->ray_result[LRI_PLAYER_CONTACT][i].geom.depth;
 			min_side_ray_index = i;
 		}
-	}
+	}*/
 
-	if (min_ray_index >= 0) {
+	const int center_nearest_ray_index = field->ray_nearest_index[LRI_PLAYER_CENTER];
+
+	if (center_nearest_ray_index >= 0) {
 
 		/*LOGI("min ray length:%.3f / g pos:%.2f,%.2f,%.2f / g nor:%.2f,%.2f,%.2f",
 			field->center_ray_result[min_ray_index].geom.depth,
@@ -361,14 +383,16 @@ void move_player_to_ground(LWFIELD* field) {
 			field->center_ray_result[min_ray_index].geom.normal[1],
 			field->center_ray_result[min_ray_index].geom.normal[2]);*/
 
-		dCopyVector3(field->ground_normal, field->ray_result[LRI_PLAYER_CENTER][min_ray_index].geom.normal);
+		dCopyVector3(field->ground_normal, field->ray_result[LRI_PLAYER_CENTER][center_nearest_ray_index].geom.normal);
 
-		dReal tz = field->ray_result[LRI_PLAYER_CENTER][min_ray_index].geom.pos[2] + field->player_radius / field->ray_result[LRI_PLAYER_CENTER][min_ray_index].geom.normal[2] + field->player_length / 2;
+		dReal tz = field->ray_result[LRI_PLAYER_CENTER][center_nearest_ray_index].geom.pos[2] + field->player_radius / field->ray_result[LRI_PLAYER_CENTER][center_nearest_ray_index].geom.normal[2] + field->player_length / 2;
 
 		dReal d1 = tz - field->player_pos[2];
 
-		dReal d2 = FLT_MIN;
-		if (min_side_ray_index >= 0) {
+		dReal d2 = get_dreal_min();
+		const int contact_nearest_ray_index = field->ray_nearest_index[LRI_PLAYER_CONTACT];
+		if (contact_nearest_ray_index >= 0) {
+			const dReal min_side_ray_length = field->ray_nearest_depth[LRI_PLAYER_CONTACT];
 			dReal d = min_side_ray_length - field->player_length / 2 - field->player_radius;
 			d2 = -d;
 		}
@@ -382,14 +406,42 @@ void move_player_to_ground(LWFIELD* field) {
 
 	dGeomSetPosition(field->player_geom, field->player_pos[0], field->player_pos[1], field->player_pos[2]);
 	dGeomSetPosition(field->ray[LRI_PLAYER_CENTER], field->player_pos[0], field->player_pos[1], field->player_pos[2]);
-	if (min_ray_index >= 0) {
+	if (center_nearest_ray_index >= 0) {
 		dGeomSetPosition(field->ray[LRI_PLAYER_CONTACT],
-			field->player_pos[0] - field->player_radius * field->ray_result[LRI_PLAYER_CENTER][min_ray_index].geom.normal[0],
-			field->player_pos[1] - field->player_radius * field->ray_result[LRI_PLAYER_CENTER][min_ray_index].geom.normal[1],
+			field->player_pos[0] - field->player_radius * field->ray_result[LRI_PLAYER_CENTER][center_nearest_ray_index].geom.normal[0],
+			field->player_pos[1] - field->player_radius * field->ray_result[LRI_PLAYER_CENTER][center_nearest_ray_index].geom.normal[1],
 			field->player_pos[2]);
 
 	} else {
 		dGeomSetPosition(field->ray[LRI_PLAYER_CONTACT], field->player_pos[0], field->player_pos[1], field->player_pos[2]);
+	}
+}
+
+void move_aim_ray(LWFIELD* field, float aim_theta) {
+	dVector3 up = { 1, 0, 0 };
+	for (int i = LRI_AIM_SECTOR_FIRST_INCLUSIVE; i <= LRI_AIM_SECTOR_LAST_INCLUSIVE; i++) {
+		dGeomSetPosition(field->ray[i], field->player_pos[0], field->player_pos[1], field->player_pos[2]);
+		
+		const double theta = (M_PI - aim_theta) / 2 + aim_theta / MAX_AIM_SECTOR_RAY * (i - LRI_AIM_SECTOR_FIRST_INCLUSIVE);
+		dMatrix4 r;
+		const dVector3 aim_dir = { cos(theta), sin(theta), 0 };
+		rotation_matrix_from_vectors(r, up, aim_dir);
+		dGeomSetRotation(field->ray[i], r);
+	}
+}
+
+void gather_ray_result(LWFIELD* field) {
+	for (int i = 0; i < LRI_COUNT; i++) {
+		dReal nearest_ray_length = get_dreal_max();
+		int nearest_ray_index = -1;
+		for (int j = 0; j < field->ray_result_count[i]; j++) {
+			if (nearest_ray_length > field->ray_result[i][j].geom.depth) {
+				nearest_ray_length = field->ray_result[i][j].geom.depth;
+				nearest_ray_index = j;
+			}
+		}
+		field->ray_nearest_depth[i] = nearest_ray_length;
+		field->ray_nearest_index[i] = nearest_ray_index;
 	}
 }
 
@@ -404,11 +456,15 @@ void update_field(LWCONTEXT* pLwc, LWFIELD* field) {
 	dCopyVector3(player_pos_0, field->player_pos);
 
 	move_player_geom_by_input(field);
+
+	move_aim_ray(field, pLwc->player_aim_theta);
 	
 	dSpaceCollide(field->space, field, &field_near_callback);
 	
 	// No physics simulation needed for ray testing.
 	//dWorldStep(field->world, 0.05);
+
+	gather_ray_result(field);
 
 	move_player_to_ground(field);
 
@@ -439,8 +495,8 @@ void update_field(LWCONTEXT* pLwc, LWFIELD* field) {
 	if (pLwc->field->path_query.n_smooth_path) {
 
 		pLwc->field->path_query_time += (float)pLwc->delta_time;
-
-		int idx = (int)fmodf((float)(pLwc->field->path_query_time * 30), (float)pLwc->field->path_query.n_smooth_path);
+		const float move_speed = 30.0f;
+		int idx = (int)fmodf((float)(pLwc->field->path_query_time * move_speed), (float)pLwc->field->path_query.n_smooth_path);
 		const float* p = &pLwc->field->path_query.smooth_path[3 * idx];
 		// path query result's coordinates is different from world coordinates.
 		const vec3 pvec = { p[0], -p[2], p[1] };

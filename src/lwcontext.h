@@ -147,6 +147,7 @@ typedef struct _LWCONTEXT {
 	int player_moving;
 	int player_attacking;
 	const LWANIMACTION* player_action;
+	float player_aim_theta;
 
 	LWBOX2DCOLLIDER box_collider[MAX_BOX_COLLIDER];
 	LWFIELDOBJECT field_object[MAX_FIELD_OBJECT];
