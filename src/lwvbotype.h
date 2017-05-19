@@ -27,3 +27,9 @@ typedef enum _LW_SKIN_VBO_TYPE {
 
 	LSVT_COUNT,
 } LW_SKIN_VBO_TYPE;
+
+typedef enum _LW_FAN_VBO_TYPE {
+	LFVT_DEFAULT,
+
+	LFVT_COUNT,
+} LW_FAN_VBO_TYPE;

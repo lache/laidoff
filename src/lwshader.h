@@ -31,5 +31,7 @@ typedef struct _LWSHADER
 	GLint glyph_color_location;
 	GLint outline_color_location;
 	GLint bone_location;
+	GLint rscale_location;
+	GLint angleminus_location;
 
 } LWSHADER;

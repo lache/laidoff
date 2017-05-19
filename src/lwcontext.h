@@ -29,6 +29,7 @@ typedef enum _LW_SHADER_TYPE {
 	LWST_FONT,
 	LWST_ETC1,
 	LWST_SKIN,
+	LWST_FAN,
 
 	LWST_COUNT,
 } LW_SHADER_TYPE;
@@ -68,6 +69,7 @@ static const char* tex_font_atlas_filename[] = {
 #define MAX_ENEMY_SLOT (5)
 #define VERTEX_BUFFER_COUNT LVT_COUNT
 #define SKIN_VERTEX_BUFFER_COUNT LSVT_COUNT
+#define FAN_VERTEX_BUFFER_COUNT LFVT_COUNT
 
 
 typedef struct _LWCONTEXT {
@@ -78,6 +80,7 @@ typedef struct _LWCONTEXT {
 	LWSHADER shader[MAX_SHADER];
 	LWVBO vertex_buffer[VERTEX_BUFFER_COUNT];
 	LWVBO skin_vertex_buffer[SKIN_VERTEX_BUFFER_COUNT];
+	LWVBO fan_vertex_buffer[FAN_VERTEX_BUFFER_COUNT];
 	//GLuint index_buffer;
 	GLuint vao[VERTEX_BUFFER_COUNT];
 	GLuint skin_vao[SKIN_VERTEX_BUFFER_COUNT];

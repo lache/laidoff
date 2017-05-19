@@ -188,6 +188,15 @@ set_texture_parameter(const LWCONTEXT *pLwc, LWENUM _LW_ATLAS_ENUM lae, LWENUM _
 	);
 }
 
+static void delete_shader(LWSHADER *pShader) {
+	glDeleteProgram(pShader->program);
+	pShader->program = 0;
+	glDeleteShader(pShader->vertex_shader);
+	pShader->vertex_shader = 0;
+	glDeleteShader(pShader->fragment_shader);
+	pShader->fragment_shader = 0;
+}
+
 static void
 create_shader(const char *shader_name, LWSHADER *pShader, const GLchar *vst, const GLchar *fst) {
 	pShader->valid = 0;
@@ -281,6 +290,8 @@ create_shader(const char *shader_name, LWSHADER *pShader, const GLchar *vst, con
 	pShader->glyph_color_location = glGetUniformLocation(pShader->program, "glyph_color");
 	pShader->outline_color_location = glGetUniformLocation(pShader->program, "outline_color");
 	pShader->bone_location = glGetUniformLocation(pShader->program, "bone");
+	pShader->rscale_location = glGetUniformLocation(pShader->program, "rscale");
+	pShader->angleminus_location = glGetUniformLocation(pShader->program, "angleminus");
 
 	// Attribs
 	pShader->vpos_location = glGetAttribLocation(pShader->program, "vPos");
@@ -306,6 +317,8 @@ void init_gl_shaders(LWCONTEXT *pLwc) {
 		GLSL_DIR_NAME PATH_SEPARATOR "default-vert.glsl");
 	char *skin_vert_glsl = create_string_from_file(ASSETS_BASE_PATH
 		GLSL_DIR_NAME PATH_SEPARATOR "skin-vert.glsl");
+	char *fan_vert_glsl = create_string_from_file(ASSETS_BASE_PATH
+		GLSL_DIR_NAME PATH_SEPARATOR "fan-vert.glsl");
 
 	// Fragment Shader
 	char *default_frag_glsl = create_string_from_file(ASSETS_BASE_PATH
@@ -314,6 +327,8 @@ void init_gl_shaders(LWCONTEXT *pLwc) {
 		GLSL_DIR_NAME PATH_SEPARATOR "font-frag.glsl");
 	char *etc1_frag_glsl = create_string_from_file(ASSETS_BASE_PATH
 		GLSL_DIR_NAME PATH_SEPARATOR "etc1-frag.glsl");
+	char *fan_frag_glsl = create_string_from_file(ASSETS_BASE_PATH
+		GLSL_DIR_NAME PATH_SEPARATOR "fan-frag.glsl");
 
 	if (!default_vert_glsl) {
 		LOGE("init_gl_shaders: default-vert.glsl not loaded. Abort...");
@@ -322,6 +337,11 @@ void init_gl_shaders(LWCONTEXT *pLwc) {
 
 	if (!skin_vert_glsl) {
 		LOGE("init_gl_shaders: skin-vert.glsl not loaded. Abort...");
+		return;
+	}
+
+	if (!fan_vert_glsl) {
+		LOGE("init_gl_shaders: fan-vert.glsl not loaded. Abort...");
 		return;
 	}
 
@@ -340,16 +360,24 @@ void init_gl_shaders(LWCONTEXT *pLwc) {
 		return;
 	}
 
+	if (!fan_frag_glsl) {
+		LOGE("init_gl_shaders: fan-frag.glsl not loaded. Abort...");
+		return;
+	}
+
 	create_shader("Default Shader", &pLwc->shader[LWST_DEFAULT], default_vert_glsl, default_frag_glsl);
 	create_shader("Font Shader", &pLwc->shader[LWST_FONT], default_vert_glsl, font_frag_glsl);
 	create_shader("ETC1 with Alpha Shader", &pLwc->shader[LWST_ETC1], default_vert_glsl, etc1_frag_glsl);
 	create_shader("Skin Shader", &pLwc->shader[LWST_SKIN], skin_vert_glsl, default_frag_glsl);
+	create_shader("Fan Shader", &pLwc->shader[LWST_FAN], fan_vert_glsl, fan_frag_glsl);
 
 	release_string(default_vert_glsl);
 	release_string(skin_vert_glsl);
+	release_string(fan_vert_glsl);
 	release_string(default_frag_glsl);
 	release_string(font_frag_glsl);
 	release_string(etc1_frag_glsl);
+	release_string(fan_frag_glsl);
 }
 
 static void load_vbo(LWCONTEXT *pLwc, const char *filename, LWVBO *pVbo) {
@@ -385,7 +413,27 @@ static void load_skin_vbo(LWCONTEXT *pLwc, const char *filename, LWVBO *pSvbo) {
 	pSvbo->vertex_count = (int)(mesh_file_size / skin_stride_in_bytes);
 }
 
+static void load_fan_vbo(LWCONTEXT* pLwc) {
+	LWFANVERTEX fan_vertices[1 + FAN_VERTEX_COUNT_PER_ARRAY + 1];
+	fan_vertices[0].r = 0;
+	fan_vertices[0].theta = 0;
+	fan_vertices[0].index = 0;
+	for (int i = 1; i < 1 + FAN_VERTEX_COUNT_PER_ARRAY + 1; i++) {
+		fan_vertices[i].r = 1.0f;
+		fan_vertices[i].theta = (float)((i - 1) * (2 * M_PI / FAN_VERTEX_COUNT_PER_ARRAY));
+		fan_vertices[i].index = (float)i;
+	}
+	glGenBuffers(1, &pLwc->fan_vertex_buffer[LFVT_DEFAULT].vertex_buffer);
+	glBindBuffer(GL_ARRAY_BUFFER, pLwc->fan_vertex_buffer[LFVT_DEFAULT].vertex_buffer);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(LWFANVERTEX) * (1 + FAN_VERTEX_COUNT_PER_ARRAY + 1),
+	             fan_vertices, GL_STATIC_DRAW);
+	pLwc->fan_vertex_buffer[LFVT_DEFAULT].vertex_count = 1 + FAN_VERTEX_COUNT_PER_ARRAY + 1;
+}
+
 static void init_vbo(LWCONTEXT *pLwc) {
+
+	// === STATIC MESHES ===
+
 	// LVT_BATTLE_BOWL_OUTER
 	load_vbo(pLwc, ASSETS_BASE_PATH "vbo" PATH_SEPARATOR "Bowl_Outer.vbo",
 		&pLwc->vertex_buffer[LVT_BATTLE_BOWL_OUTER]);
@@ -397,30 +445,6 @@ static void init_vbo(LWCONTEXT *pLwc) {
 	// LVT_ENEMY_SCOPE
 	load_vbo(pLwc, ASSETS_BASE_PATH "vbo" PATH_SEPARATOR "EnemyScope.vbo",
 		&pLwc->vertex_buffer[LVT_ENEMY_SCOPE]);
-
-	// LVT_LEFT_TOP_ANCHORED_SQUARE ~ LVT_RIGHT_BOTTOM_ANCHORED_SQUARE
-	// 9 anchored squares...
-	const float anchored_square_offset[][2] = {
-		{ +1, -1 }, { +0, -1 }, { -1, -1 },
-		{ +1, +0 }, { +0, +0 }, { -1, +0 },
-		{ +1, +1 }, { +0, +1 }, { -1, +1 },
-	};
-	for (int i = 0; i < ARRAY_SIZE(anchored_square_offset); i++) {
-		LWVERTEX square_vertices[VERTEX_COUNT_PER_ARRAY];
-		memcpy(square_vertices, full_square_vertices, sizeof(full_square_vertices));
-		for (int r = 0; r < VERTEX_COUNT_PER_ARRAY; r++) {
-			square_vertices[r].x += anchored_square_offset[i][0];
-			square_vertices[r].y += anchored_square_offset[i][1];
-		}
-
-		const LW_VBO_TYPE lvt = LVT_LEFT_TOP_ANCHORED_SQUARE + i;
-
-		glGenBuffers(1, &pLwc->vertex_buffer[lvt].vertex_buffer);
-		glBindBuffer(GL_ARRAY_BUFFER, pLwc->vertex_buffer[lvt].vertex_buffer);
-		glBufferData(GL_ARRAY_BUFFER, sizeof(LWVERTEX) * VERTEX_COUNT_PER_ARRAY,
-			square_vertices, GL_STATIC_DRAW);
-		pLwc->vertex_buffer[lvt].vertex_count = VERTEX_COUNT_PER_ARRAY;
-	}
 
 	// LVT_PLAYER
 	load_vbo(pLwc, ASSETS_BASE_PATH "vbo" PATH_SEPARATOR "Player.vbo",
@@ -450,6 +474,30 @@ static void init_vbo(LWCONTEXT *pLwc) {
 	load_vbo(pLwc, ASSETS_BASE_PATH "vbo" PATH_SEPARATOR "Apt.vbo",
 		&pLwc->vertex_buffer[LVT_APT]);
 
+	// LVT_LEFT_TOP_ANCHORED_SQUARE ~ LVT_RIGHT_BOTTOM_ANCHORED_SQUARE
+	// 9 anchored squares...
+	const float anchored_square_offset[][2] = {
+		{ +1, -1 },{ +0, -1 },{ -1, -1 },
+		{ +1, +0 },{ +0, +0 },{ -1, +0 },
+		{ +1, +1 },{ +0, +1 },{ -1, +1 },
+	};
+	for (int i = 0; i < ARRAY_SIZE(anchored_square_offset); i++) {
+		LWVERTEX square_vertices[VERTEX_COUNT_PER_ARRAY];
+		memcpy(square_vertices, full_square_vertices, sizeof(full_square_vertices));
+		for (int r = 0; r < VERTEX_COUNT_PER_ARRAY; r++) {
+			square_vertices[r].x += anchored_square_offset[i][0];
+			square_vertices[r].y += anchored_square_offset[i][1];
+		}
+
+		const LW_VBO_TYPE lvt = LVT_LEFT_TOP_ANCHORED_SQUARE + i;
+
+		glGenBuffers(1, &pLwc->vertex_buffer[lvt].vertex_buffer);
+		glBindBuffer(GL_ARRAY_BUFFER, pLwc->vertex_buffer[lvt].vertex_buffer);
+		glBufferData(GL_ARRAY_BUFFER, sizeof(LWVERTEX) * VERTEX_COUNT_PER_ARRAY,
+			square_vertices, GL_STATIC_DRAW);
+		pLwc->vertex_buffer[lvt].vertex_count = VERTEX_COUNT_PER_ARRAY;
+	}
+
 	// === SKIN VERTEX BUFFERS ===
 
 	// LSVT_TRIANGLE
@@ -467,6 +515,9 @@ static void init_vbo(LWCONTEXT *pLwc) {
 	// LSVT_DETACHPLANE
 	load_skin_vbo(pLwc, ASSETS_BASE_PATH "svbo" PATH_SEPARATOR "DetachPlane.svbo",
 		&pLwc->skin_vertex_buffer[LSVT_DETACHPLANE]);
+
+	// === STATIC MESHES (FAN TYPE) ===
+	load_fan_vbo(pLwc);
 }
 
 void set_vertex_attrib_pointer(const LWCONTEXT* pLwc, int shader_index) {
@@ -1331,6 +1382,33 @@ LWCONTEXT *lw_init(void) {
 
 void lw_deinit(LWCONTEXT *pLwc) {
 
+	for (int i = 0; i < LVT_COUNT; i++) {
+		glDeleteBuffers(1, &pLwc->vertex_buffer[i].vertex_buffer);
+		pLwc->vertex_buffer[i].vertex_buffer = 0;
+		pLwc->vertex_buffer[i].vertex_count = 0;
+	}
+
+	for (int i = 0; i < LSVT_COUNT; i++) {
+		glDeleteBuffers(1, &pLwc->skin_vertex_buffer[i].vertex_buffer);
+		pLwc->skin_vertex_buffer[i].vertex_buffer = 0;
+		pLwc->skin_vertex_buffer[i].vertex_count = 0;
+	}
+
+	for (int i = 0; i < LFVT_COUNT; i++) {
+		glDeleteBuffers(1, &pLwc->fan_vertex_buffer[i].vertex_buffer);
+		pLwc->fan_vertex_buffer[i].vertex_buffer = 0;
+		pLwc->fan_vertex_buffer[i].vertex_count = 0;
+	}
+
+	glDeleteTextures(1, &pLwc->font_fbo.color_tex);
+	glDeleteTextures(MAX_TEX_ATLAS, pLwc->tex_atlas);
+	glDeleteTextures(MAX_TEX_FONT_ATLAS, pLwc->tex_font_atlas);
+	glDeleteTextures(MAX_TEX_PROGRAMMED, pLwc->tex_programmed);
+
+	for (int i = 0; i < LWST_COUNT; i++) {
+		delete_shader(&pLwc->shader[i]);
+	}
+
 	for (int i = 0; i < LWAC_COUNT; i++) {
 		unload_action(&pLwc->action[i]);
 	}
@@ -1501,6 +1579,7 @@ void lw_on_destroy(LWCONTEXT *pLwc) {
 	release_font(pLwc->pFnt);
 	release_string(pLwc->dialog);
 	deinit_net(pLwc);
+	lw_deinit(pLwc);
 	mq_shutdown();
 }
 
