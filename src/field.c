@@ -361,9 +361,7 @@ void move_player_to_ground(LWFIELD* field) {
 			field->center_ray_result[min_ray_index].geom.normal[1],
 			field->center_ray_result[min_ray_index].geom.normal[2]);*/
 
-		field->ground_normal[0] = field->ray_result[LRI_PLAYER_CENTER][min_ray_index].geom.normal[0];
-		field->ground_normal[1] = field->ray_result[LRI_PLAYER_CENTER][min_ray_index].geom.normal[1];
-		field->ground_normal[2] = field->ray_result[LRI_PLAYER_CENTER][min_ray_index].geom.normal[2];
+		dCopyVector3(field->ground_normal, field->ray_result[LRI_PLAYER_CENTER][min_ray_index].geom.normal);
 
 		dReal tz = field->ray_result[LRI_PLAYER_CENTER][min_ray_index].geom.pos[2] + field->player_radius / field->ray_result[LRI_PLAYER_CENTER][min_ray_index].geom.normal[2] + field->player_length / 2;
 
@@ -409,6 +407,7 @@ void update_field(LWCONTEXT* pLwc, LWFIELD* field) {
 	
 	dSpaceCollide(field->space, field, &field_near_callback);
 	
+	// No physics simulation needed for ray testing.
 	//dWorldStep(field->world, 0.05);
 
 	move_player_to_ground(field);
@@ -443,13 +442,15 @@ void update_field(LWCONTEXT* pLwc, LWFIELD* field) {
 
 		int idx = (int)fmodf((float)(pLwc->field->path_query_time * 30), (float)pLwc->field->path_query.n_smooth_path);
 		const float* p = &pLwc->field->path_query.smooth_path[3 * idx];
-		pLwc->field->path_query_test_player_pos[0] = p[0];
-		pLwc->field->path_query_test_player_pos[1] = -p[2];
-		pLwc->field->path_query_test_player_pos[2] = p[1];
-
+		// path query result's coordinates is different from world coordinates.
+		const vec3 pvec = { p[0], -p[2], p[1] };
+		memcpy(pLwc->field->path_query_test_player_pos, pvec, sizeof(vec3));
+		
 		if (idx < pLwc->field->path_query.n_smooth_path - 1) {
 			const float* p2 = &pLwc->field->path_query.smooth_path[3 * (idx + 1)];
-			pLwc->field->path_query_test_player_rot = atan2f((-p2[2]) - (-p[2]), (p2[0]) - (p[0]));
+			// path query result's coordinates is different from world coordinates.
+			const vec3 p2vec = { p2[0], -p2[2], p2[1] };
+			pLwc->field->path_query_test_player_rot = atan2f(p2vec[1] - pvec[1], p2vec[0] - pvec[0]);
 		}
 
 		// query other random path
