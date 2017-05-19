@@ -1441,9 +1441,11 @@ void lw_deinit(LWCONTEXT *pLwc) {
 	glDeleteTextures(MAX_TEX_FONT_ATLAS, pLwc->tex_font_atlas);
 	glDeleteTextures(MAX_TEX_PROGRAMMED, pLwc->tex_programmed);
 
+#if LW_SUPPORT_VAO
 	glDeleteVertexArrays(VERTEX_BUFFER_COUNT, pLwc->vao);
 	glDeleteVertexArrays(SKIN_VERTEX_BUFFER_COUNT, pLwc->skin_vao);
 	glDeleteVertexArrays(FAN_VERTEX_BUFFER_COUNT, pLwc->fan_vao);
+#endif
 
 	for (int i = 0; i < LWST_COUNT; i++) {
 		delete_shader(&pLwc->shader[i]);
