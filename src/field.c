@@ -125,22 +125,26 @@ LWFIELD* load_field(const char* filename) {
 	const dReal ray_length = 50;
 	dMatrix3 R;
 
-	// Player center ray
-	field->player_center_ray = dCreateRay(field->space, ray_length);
-	dGeomSetPosition(field->player_center_ray, field->player_pos[0], field->player_pos[1], field->player_pos[2]);
-	dRFromAxisAndAngle(R, 1, 0, 0, M_PI); // ray direction: downward (-Z)
-	dGeomSetRotation(field->player_center_ray, R);
+	for (int i = 0; i < LRI_COUNT; i++) {
+		field->ray[i] = dCreateRay(field->space, ray_length);
+		dGeomSetPosition(field->ray[i], field->player_pos[0], field->player_pos[1], field->player_pos[2]);
+		dRFromAxisAndAngle(R, 1, 0, 0, M_PI); // ray direction: downward (-Z)
+		dGeomSetRotation(field->ray[i], R);
+	}
+	//// Player center ray
+	//field->player_center_ray = dCreateRay(field->space, ray_length);
+	//dGeomSetPosition(field->player_center_ray, field->player_pos[0], field->player_pos[1], field->player_pos[2]);
+	//dRFromAxisAndAngle(R, 1, 0, 0, M_PI); // ray direction: downward (-Z)
+	//dGeomSetRotation(field->player_center_ray, R);
 
-	// Player contact ray
-	field->player_contact_ray = dCreateRay(field->space, ray_length);
-	dGeomSetPosition(field->player_contact_ray, field->player_pos[0], field->player_pos[1], field->player_pos[2]);
-	dRFromAxisAndAngle(R, 1, 0, 0, M_PI); // ray direction: downward (-Z)
-	dGeomSetRotation(field->player_contact_ray, R);
-
-	field->ground_normal[0] = 0;
-	field->ground_normal[1] = 0;
-	field->ground_normal[2] = 1;
-
+	//// Player contact ray
+	//field->player_contact_ray = dCreateRay(field->space, ray_length);
+	//dGeomSetPosition(field->player_contact_ray, field->player_pos[0], field->player_pos[1], field->player_pos[2]);
+	//dRFromAxisAndAngle(R, 1, 0, 0, M_PI); // ray direction: downward (-Z)
+	//dGeomSetRotation(field->player_contact_ray, R);
+	
+	dAssignVector3(field->ground_normal, 0, 0, 1);
+	
 	size_t size;
 	char* d = create_binary_from_file(filename, &size);
 	field->d = d;
@@ -162,6 +166,20 @@ LWFIELD* load_field(const char* filename) {
 	return field;
 }
 
+static int s_is_ray_or_player_geom(const LWFIELD* field, dGeomID o) {
+	if (field->player_geom == o) {
+		return 1;
+	}
+
+	for (int i = 0; i < LRI_COUNT; i++) {
+		if (field->ray[i] == o) {
+			return 1;
+		}
+	}
+
+	return 0;
+}
+
 static void field_near_callback(void *data, dGeomID o1, dGeomID o2) {
 	LWFIELD* field = (LWFIELD*)data;
 
@@ -179,35 +197,51 @@ static void field_near_callback(void *data, dGeomID o1, dGeomID o2) {
 	} else {
 
 		// only collide things with the ground
-		int g1 = (o1 == field->player_center_ray || o1 == field->player_contact_ray || o1 == field->player_geom);
-		int g2 = (o2 == field->player_center_ray || o2 == field->player_contact_ray || o2 == field->player_geom);
-		if (!(g1 ^ g2)) return;
+		int g1 = s_is_ray_or_player_geom(field, o1);
+		int g2 = s_is_ray_or_player_geom(field, o2);
+		if (!(g1 ^ g2)) {
+			return;
+		}
 
 		dContact contact[MAX_FIELD_CONTACT];
 		int n = dCollide(o1, o2, MAX_FIELD_CONTACT, &contact[0].geom, sizeof(dContact));
 		if (n > 0) {
 			for (int i = 0; i < n; i++) {
 
-				if (contact[i].geom.g1 == field->player_center_ray || contact[i].geom.g2 == field->player_center_ray) {
-					field->center_ray_result[field->center_ray_result_count] = contact[i];
+				for (int j = 0; j < LRI_COUNT; j++) {
+					if (contact[i].geom.g1 == field->ray[j] || contact[i].geom.g2 == field->ray[j]) {
+						field->ray_result[j][field->ray_result_count[j]] = contact[i];
 
-					// Negate normal direction if 'g2' is ray. (in other words, not negate if 'g1' is ray)
-					if (contact[i].geom.g2 == field->player_center_ray) {
-						dNegateVector3(field->center_ray_result[field->center_ray_result_count].geom.normal);
+						// Negate normal direction if 'g2' is ray. (in other words, not negate if 'g1' is ray)
+						if (contact[i].geom.g2 == field->ray[j]) {
+							dNegateVector3(field->ray_result[j][field->ray_result_count[j]].geom.normal);
+						}
+
+						field->ray_result_count[j]++;
 					}
-
-					field->center_ray_result_count++;
 				}
-				if (contact[i].geom.g1 == field->player_contact_ray || contact[i].geom.g2 == field->player_contact_ray) {
-					field->contact_ray_result[field->contact_ray_result_count] = contact[i];
+				
+				//if (contact[i].geom.g1 == field->player_center_ray || contact[i].geom.g2 == field->player_center_ray) {
+				//	field->center_ray_result[field->center_ray_result_count] = contact[i];
 
-					// Negate normal direction if 'g2' is ray. (in other words, not negate if 'g1' is ray)
-					if (contact[i].geom.g2 == field->player_contact_ray) {
-						dNegateVector3(field->contact_ray_result[field->contact_ray_result_count].geom.normal);
-					}
+				//	// Negate normal direction if 'g2' is ray. (in other words, not negate if 'g1' is ray)
+				//	if (contact[i].geom.g2 == field->player_center_ray) {
+				//		dNegateVector3(field->center_ray_result[field->center_ray_result_count].geom.normal);
+				//	}
 
-					field->contact_ray_result_count++;
-				}
+				//	field->center_ray_result_count++;
+				//}
+
+				//if (contact[i].geom.g1 == field->player_contact_ray || contact[i].geom.g2 == field->player_contact_ray) {
+				//	field->contact_ray_result[field->contact_ray_result_count] = contact[i];
+
+				//	// Negate normal direction if 'g2' is ray. (in other words, not negate if 'g1' is ray)
+				//	if (contact[i].geom.g2 == field->player_contact_ray) {
+				//		dNegateVector3(field->contact_ray_result[field->contact_ray_result_count].geom.normal);
+				//	}
+
+				//	field->contact_ray_result_count++;
+				//}
 
 				dReal sign = 0;
 				if (contact[i].geom.g1 == field->player_geom) {
@@ -229,8 +263,11 @@ static void field_near_callback(void *data, dGeomID o1, dGeomID o2) {
 }
 
 void reset_ray_result(LWFIELD* field) {
-	field->center_ray_result_count = 0;
-	field->contact_ray_result_count = 0;
+	for (int i = 0; i < LRI_COUNT; i++) {
+		field->ray_result_count[i] = 0;
+	}
+	/*field->center_ray_result_count = 0;
+	field->contact_ray_result_count = 0;*/
 }
 
 void set_field_player_delta(LWFIELD* field, float x, float y, float z) {
@@ -286,9 +323,9 @@ void move_player_geom_by_input(LWFIELD* field) {
 		field->player_pos_delta[i] = 0;
 	}
 	dGeomSetPosition(field->player_geom, field->player_pos[0], field->player_pos[1], field->player_pos[2]);
-	dGeomSetPosition(field->player_center_ray, field->player_pos[0], field->player_pos[1], field->player_pos[2]);
-	const dReal* player_contact_ray_pos = dGeomGetPosition(field->player_contact_ray);
-	dGeomSetPosition(field->player_contact_ray,
+	dGeomSetPosition(field->ray[LRI_PLAYER_CENTER], field->player_pos[0], field->player_pos[1], field->player_pos[2]);
+	const dReal* player_contact_ray_pos = dGeomGetPosition(field->ray[LRI_PLAYER_CONTACT]);
+	dGeomSetPosition(field->ray[LRI_PLAYER_CONTACT],
 		player_contact_ray_pos[0] + geom_pos_delta_rotated[0],
 		player_contact_ray_pos[1] + geom_pos_delta_rotated[1],
 		player_contact_ray_pos[2] + geom_pos_delta_rotated[2]);
@@ -297,18 +334,18 @@ void move_player_geom_by_input(LWFIELD* field) {
 void move_player_to_ground(LWFIELD* field) {
 	dReal min_ray_length = FLT_MAX;
 	int min_ray_index = -1;
-	for (int i = 0; i < field->center_ray_result_count; i++) {
-		if (min_ray_length > field->center_ray_result[i].geom.depth) {
-			min_ray_length = field->center_ray_result[i].geom.depth;
+	for (int i = 0; i < field->ray_result_count[LRI_PLAYER_CENTER]; i++) {
+		if (min_ray_length > field->ray_result[LRI_PLAYER_CENTER][i].geom.depth) {
+			min_ray_length = field->ray_result[LRI_PLAYER_CENTER][i].geom.depth;
 			min_ray_index = i;
 		}
 	}
 
 	dReal min_side_ray_length = FLT_MAX;
 	int min_side_ray_index = -1;
-	for (int i = 0; i < field->contact_ray_result_count; i++) {
-		if (min_side_ray_length > field->contact_ray_result[i].geom.depth) {
-			min_side_ray_length = field->contact_ray_result[i].geom.depth;
+	for (int i = 0; i < field->ray_result_count[LRI_PLAYER_CONTACT]; i++) {
+		if (min_side_ray_length > field->ray_result[LRI_PLAYER_CONTACT][i].geom.depth) {
+			min_side_ray_length = field->ray_result[LRI_PLAYER_CONTACT][i].geom.depth;
 			min_side_ray_index = i;
 		}
 	}
@@ -324,11 +361,11 @@ void move_player_to_ground(LWFIELD* field) {
 			field->center_ray_result[min_ray_index].geom.normal[1],
 			field->center_ray_result[min_ray_index].geom.normal[2]);*/
 
-		field->ground_normal[0] = field->center_ray_result[min_ray_index].geom.normal[0];
-		field->ground_normal[1] = field->center_ray_result[min_ray_index].geom.normal[1];
-		field->ground_normal[2] = field->center_ray_result[min_ray_index].geom.normal[2];
+		field->ground_normal[0] = field->ray_result[LRI_PLAYER_CENTER][min_ray_index].geom.normal[0];
+		field->ground_normal[1] = field->ray_result[LRI_PLAYER_CENTER][min_ray_index].geom.normal[1];
+		field->ground_normal[2] = field->ray_result[LRI_PLAYER_CENTER][min_ray_index].geom.normal[2];
 
-		dReal tz = field->center_ray_result[min_ray_index].geom.pos[2] + field->player_radius / field->center_ray_result[min_ray_index].geom.normal[2] + field->player_length / 2;
+		dReal tz = field->ray_result[LRI_PLAYER_CENTER][min_ray_index].geom.pos[2] + field->player_radius / field->ray_result[LRI_PLAYER_CENTER][min_ray_index].geom.normal[2] + field->player_length / 2;
 
 		dReal d1 = tz - field->player_pos[2];
 
@@ -346,15 +383,15 @@ void move_player_to_ground(LWFIELD* field) {
 	}
 
 	dGeomSetPosition(field->player_geom, field->player_pos[0], field->player_pos[1], field->player_pos[2]);
-	dGeomSetPosition(field->player_center_ray, field->player_pos[0], field->player_pos[1], field->player_pos[2]);
+	dGeomSetPosition(field->ray[LRI_PLAYER_CENTER], field->player_pos[0], field->player_pos[1], field->player_pos[2]);
 	if (min_ray_index >= 0) {
-		dGeomSetPosition(field->player_contact_ray,
-			field->player_pos[0] - field->player_radius * field->center_ray_result[min_ray_index].geom.normal[0],
-			field->player_pos[1] - field->player_radius * field->center_ray_result[min_ray_index].geom.normal[1],
+		dGeomSetPosition(field->ray[LRI_PLAYER_CONTACT],
+			field->player_pos[0] - field->player_radius * field->ray_result[LRI_PLAYER_CENTER][min_ray_index].geom.normal[0],
+			field->player_pos[1] - field->player_radius * field->ray_result[LRI_PLAYER_CENTER][min_ray_index].geom.normal[1],
 			field->player_pos[2]);
 
 	} else {
-		dGeomSetPosition(field->player_contact_ray, field->player_pos[0], field->player_pos[1], field->player_pos[2]);
+		dGeomSetPosition(field->ray[LRI_PLAYER_CONTACT], field->player_pos[0], field->player_pos[1], field->player_pos[2]);
 	}
 }
 
@@ -453,8 +490,11 @@ void unload_field(LWFIELD* field) 	{
 
 	dGeomDestroy(field->ground);
 	dGeomDestroy(field->player_geom);
-	dGeomDestroy(field->player_center_ray);
-	dGeomDestroy(field->player_contact_ray);
+	for (int i = 0; i < LRI_COUNT; i++) {
+		dGeomDestroy(field->ray[i]);
+	}
+	/*dGeomDestroy(field->player_center_ray);
+	dGeomDestroy(field->player_contact_ray);*/
 	for (int i = 0; i < field->box_geom_count; i++) {
 		dGeomDestroy(field->box_geom[i]);
 	}

@@ -7,8 +7,7 @@
 #include "vertices.h"
 
 #define MAX_BOX_GEOM (100)
-#define MAX_CENTER_RAY_RESULT (10)
-#define MAX_CONTACT_RAY_RESULT (10)
+#define MAX_RAY_RESULT_COUNT (10)
 #define MAX_FIELD_CONTACT (10)
 #define MAX_AIM_SECTOR_RAY FAN_SECTOR_COUNT_PER_ARRAY
 
@@ -17,6 +16,15 @@ typedef struct _LWFIELDCUBEOBJECT {
 	float dimx, dimy, dimz;
 	float axis_angle[4];
 } LWFIELDCUBEOBJECT;
+
+typedef enum _LW_RAY_ID {
+	LRI_PLAYER_CENTER,
+	LRI_PLAYER_CONTACT,
+	LRI_AIM_SECTOR_FIRST,
+	LRI_AIM_SECTOR_LAST = LRI_AIM_SECTOR_FIRST + MAX_AIM_SECTOR_RAY,
+
+	LRI_COUNT
+} LW_RAY_ID;
 
 typedef struct _LWFIELD {
 	dWorldID world;
@@ -28,13 +36,9 @@ typedef struct _LWFIELD {
 	dReal player_radius;
 	dReal player_length;
 
-	dGeomID player_center_ray;
-	dGeomID player_contact_ray;
-	dGeomID player_aim_sector_ray[MAX_AIM_SECTOR_RAY];
-	dContact center_ray_result[MAX_CENTER_RAY_RESULT];
-	int center_ray_result_count;
-	dContact contact_ray_result[MAX_CONTACT_RAY_RESULT];
-	int contact_ray_result_count;
+	dGeomID ray[LRI_COUNT];
+	dContact ray_result[LRI_COUNT][MAX_RAY_RESULT_COUNT];
+	int ray_result_count[LRI_COUNT];
 
 	dVector3 player_pos;
 	dVector3 player_pos_delta;
