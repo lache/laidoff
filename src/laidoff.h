@@ -85,6 +85,7 @@ void bind_all_vertex_attrib(const LWCONTEXT* pLwc, int vbo_index);
 void bind_all_vertex_attrib_font(const LWCONTEXT* pLwc, int vbo_index);
 void bind_all_vertex_attrib_etc1_with_alpha(const LWCONTEXT *pLwc, int vbo_index);
 void bind_all_skin_vertex_attrib(const LWCONTEXT *pLwc, int vbo_index);
+void bind_all_fan_vertex_attrib(const LWCONTEXT *pLwc, int vbo_index);
 
 void set_texture_parameter_values(const LWCONTEXT *pLwc, float x, float y, float w, float h, float atlas_w, float atlas_h, int shader_index);
 int get_tex_index_by_hash_key(const LWCONTEXT* pLwc, const char* hash_key);

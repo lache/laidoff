@@ -1,15 +1,6 @@
 #pragma once
+#include <linmath.h>
 
 typedef struct _LWCONTEXT LWCONTEXT;
-typedef struct _LWTEXTBLOCK LWTEXTBLOCK;
 
-#define LW_MAX_FAN_VERTEX_COUNT (180)
-
-typedef struct _LWFAN {
-	int count;
-	float radius[LW_MAX_FAN_VERTEX_COUNT];
-	float angle;
-} LWFAN;
-
-void* init_fan();
-void render_fan(const struct _LWCONTEXT *pLwc, const LWFAN* fan);
+void render_fan(const struct _LWCONTEXT *pLwc, const mat4x4 proj, const mat4x4 view, float x, float y, float z, float a, float sector_theta);

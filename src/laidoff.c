@@ -66,6 +66,12 @@ LwStaticAssert(sizeof(LWVERTEX) == (GLsizei)(sizeof(float) * (3 + 3 + 2 + 2)), "
 const static GLsizei skin_stride_in_bytes = (GLsizei)(sizeof(float) * (3 + 3 + 2 + 4) + sizeof(int) * 4);
 LwStaticAssert(sizeof(LWSKINVERTEX) == (GLsizei)(sizeof(float) * (3 + 3 + 2 + 4) + sizeof(int) * 4), "LWSKINVERTEX size error");
 
+// Fan Vertex attributes: Coordinates (3xf)
+// See Also: LWFANVERTEX
+const static GLsizei fan_stride_in_bytes = (GLsizei)(sizeof(float) * 3);
+LwStaticAssert(sizeof(LWFANVERTEX) == (GLsizei)(sizeof(float) * 3), "LWFANVERTEX size error");
+
+
 #if LW_PLATFORM_ANDROID || LW_PLATFORM_IOS || LW_PLATFORM_IOS_SIMULATOR
 double glfwGetTime() {
     LWTIMEPOINT tp;
@@ -291,7 +297,7 @@ create_shader(const char *shader_name, LWSHADER *pShader, const GLchar *vst, con
 	pShader->outline_color_location = glGetUniformLocation(pShader->program, "outline_color");
 	pShader->bone_location = glGetUniformLocation(pShader->program, "bone");
 	pShader->rscale_location = glGetUniformLocation(pShader->program, "rscale");
-	pShader->angleminus_location = glGetUniformLocation(pShader->program, "angleminus");
+	pShader->thetascale_location = glGetUniformLocation(pShader->program, "thetascale");
 
 	// Attribs
 	pShader->vpos_location = glGetAttribLocation(pShader->program, "vPos");
@@ -414,20 +420,20 @@ static void load_skin_vbo(LWCONTEXT *pLwc, const char *filename, LWVBO *pSvbo) {
 }
 
 static void load_fan_vbo(LWCONTEXT* pLwc) {
-	LWFANVERTEX fan_vertices[1 + FAN_VERTEX_COUNT_PER_ARRAY + 1];
+	LWFANVERTEX fan_vertices[FAN_VERTEX_COUNT_PER_ARRAY];
 	fan_vertices[0].r = 0;
 	fan_vertices[0].theta = 0;
 	fan_vertices[0].index = 0;
-	for (int i = 1; i < 1 + FAN_VERTEX_COUNT_PER_ARRAY + 1; i++) {
+	for (int i = 1; i < FAN_VERTEX_COUNT_PER_ARRAY; i++) {
 		fan_vertices[i].r = 1.0f;
-		fan_vertices[i].theta = (float)((i - 1) * (2 * M_PI / FAN_VERTEX_COUNT_PER_ARRAY));
+		fan_vertices[i].theta = (float)((i - 1) * (2 * M_PI / FAN_SECTOR_COUNT_PER_ARRAY));
 		fan_vertices[i].index = (float)i;
 	}
 	glGenBuffers(1, &pLwc->fan_vertex_buffer[LFVT_DEFAULT].vertex_buffer);
 	glBindBuffer(GL_ARRAY_BUFFER, pLwc->fan_vertex_buffer[LFVT_DEFAULT].vertex_buffer);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(LWFANVERTEX) * (1 + FAN_VERTEX_COUNT_PER_ARRAY + 1),
+	glBufferData(GL_ARRAY_BUFFER, sizeof(LWFANVERTEX) * FAN_VERTEX_COUNT_PER_ARRAY,
 	             fan_vertices, GL_STATIC_DRAW);
-	pLwc->fan_vertex_buffer[LFVT_DEFAULT].vertex_count = 1 + FAN_VERTEX_COUNT_PER_ARRAY + 1;
+	pLwc->fan_vertex_buffer[LFVT_DEFAULT].vertex_count = FAN_VERTEX_COUNT_PER_ARRAY;
 }
 
 static void init_vbo(LWCONTEXT *pLwc) {
@@ -553,6 +559,12 @@ void set_skin_vertex_attrib_pointer(const LWCONTEXT* pLwc, int shader_index) {
 		skin_stride_in_bytes, (void *)(sizeof(float) * (3 + 3 + 2 + 4)));
 }
 
+void set_fan_vertex_attrib_pointer(const LWCONTEXT* pLwc, int shader_index) {
+	glEnableVertexAttribArray(pLwc->shader[shader_index].vpos_location);
+	glVertexAttribPointer(pLwc->shader[shader_index].vpos_location, 3, GL_FLOAT, GL_FALSE,
+		fan_stride_in_bytes, (void *)0);
+}
+
 static void init_vao(LWCONTEXT *pLwc, int shader_index) {
 	// Vertex Array Objects
 #if LW_SUPPORT_VAO
@@ -583,6 +595,21 @@ static void init_skin_vao(LWCONTEXT *pLwc, int shader_index) {
 #endif
 }
 
+static void init_fan_vao(LWCONTEXT *pLwc, int shader_index) {
+	// Skin Vertex Array Objects
+#if LW_SUPPORT_VAO
+	glGenVertexArrays(FAN_VERTEX_BUFFER_COUNT, pLwc->fan_vao);
+	for (int i = 0; i < FAN_VERTEX_BUFFER_COUNT; i++) {
+		glBindVertexArray(pLwc->fan_vao[i]);
+		glBindBuffer(GL_ARRAY_BUFFER, pLwc->fan_vertex_buffer[i].vertex_buffer);
+		set_fan_vertex_attrib_pointer(pLwc, shader_index);
+	}
+
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
+	glBindVertexArray(0);
+#endif
+}
+
 void lw_clear_color() {
 	// Alpha component should be 1 in RPI platform.
 	glClearColor(90 / 255.f, 173 / 255.f, 255 / 255.f, 1);
@@ -596,6 +623,8 @@ static void init_gl_context(LWCONTEXT *pLwc) {
 	init_vao(pLwc, 0/* ??? */);
 
 	init_skin_vao(pLwc, LWST_SKIN);
+
+	init_fan_vao(pLwc, LWST_FAN);
 
 	// Enable culling (CCW is default)
 	glEnable(GL_CULL_FACE);
@@ -1131,6 +1160,14 @@ static void bind_all_skin_vertex_attrib_shader(const LWCONTEXT *pLwc, int shader
 #endif
 }
 
+static void bind_all_fan_vertex_attrib_shader(const LWCONTEXT *pLwc, int shader_index, int vbo_index) {
+#if LW_PLATFORM_WIN32 || LW_PLATFORM_OSX
+	glBindVertexArray(pLwc->fan_vao[vbo_index]);
+#else
+	set_fan_vertex_attrib_pointer(pLwc, shader_index);
+#endif
+}
+
 void bind_all_vertex_attrib(const LWCONTEXT *pLwc, int vbo_index) {
 	bind_all_vertex_attrib_shader(pLwc, LWST_DEFAULT, vbo_index);
 }
@@ -1145,6 +1182,10 @@ void bind_all_vertex_attrib_etc1_with_alpha(const LWCONTEXT *pLwc, int vbo_index
 
 void bind_all_skin_vertex_attrib(const LWCONTEXT *pLwc, int vbo_index) {
 	bind_all_skin_vertex_attrib_shader(pLwc, LWST_SKIN, vbo_index);
+}
+
+void bind_all_fan_vertex_attrib(const LWCONTEXT *pLwc, int vbo_index) {
+	bind_all_fan_vertex_attrib_shader(pLwc, LWST_FAN, vbo_index);
 }
 
 static void load_pkm_hw_decoding(const char *tex_atlas_filename) {
@@ -1384,26 +1425,24 @@ void lw_deinit(LWCONTEXT *pLwc) {
 
 	for (int i = 0; i < LVT_COUNT; i++) {
 		glDeleteBuffers(1, &pLwc->vertex_buffer[i].vertex_buffer);
-		pLwc->vertex_buffer[i].vertex_buffer = 0;
-		pLwc->vertex_buffer[i].vertex_count = 0;
 	}
 
 	for (int i = 0; i < LSVT_COUNT; i++) {
 		glDeleteBuffers(1, &pLwc->skin_vertex_buffer[i].vertex_buffer);
-		pLwc->skin_vertex_buffer[i].vertex_buffer = 0;
-		pLwc->skin_vertex_buffer[i].vertex_count = 0;
 	}
 
 	for (int i = 0; i < LFVT_COUNT; i++) {
 		glDeleteBuffers(1, &pLwc->fan_vertex_buffer[i].vertex_buffer);
-		pLwc->fan_vertex_buffer[i].vertex_buffer = 0;
-		pLwc->fan_vertex_buffer[i].vertex_count = 0;
 	}
 
 	glDeleteTextures(1, &pLwc->font_fbo.color_tex);
 	glDeleteTextures(MAX_TEX_ATLAS, pLwc->tex_atlas);
 	glDeleteTextures(MAX_TEX_FONT_ATLAS, pLwc->tex_font_atlas);
 	glDeleteTextures(MAX_TEX_PROGRAMMED, pLwc->tex_programmed);
+
+	glDeleteVertexArrays(VERTEX_BUFFER_COUNT, pLwc->vao);
+	glDeleteVertexArrays(SKIN_VERTEX_BUFFER_COUNT, pLwc->skin_vao);
+	glDeleteVertexArrays(FAN_VERTEX_BUFFER_COUNT, pLwc->fan_vao);
 
 	for (int i = 0; i < LWST_COUNT; i++) {
 		delete_shader(&pLwc->shader[i]);

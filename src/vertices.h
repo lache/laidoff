@@ -27,7 +27,8 @@ typedef struct _LWSKINVERTEX{
 	float bm0, bm1, bm2, bm3;
 } LWSKINVERTEX;
 
-#define FAN_VERTEX_COUNT_PER_ARRAY (72) // 5 degrees interval
+#define FAN_SECTOR_COUNT_PER_ARRAY (72/4) // 5*4 degrees interval
+#define FAN_VERTEX_COUNT_PER_ARRAY (1 + FAN_SECTOR_COUNT_PER_ARRAY + 1) // 1 for a center vertex, 1 for the end vertex
 
 typedef struct _LWFANVERTEX {
 	float r;

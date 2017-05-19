@@ -4,11 +4,13 @@
 #include "lwanim.h"
 #include "nav.h"
 #include "lwvbotype.h"
+#include "vertices.h"
 
 #define MAX_BOX_GEOM (100)
 #define MAX_CENTER_RAY_RESULT (10)
 #define MAX_CONTACT_RAY_RESULT (10)
 #define MAX_FIELD_CONTACT (10)
+#define MAX_AIM_SECTOR_RAY FAN_SECTOR_COUNT_PER_ARRAY
 
 typedef struct _LWFIELDCUBEOBJECT {
 	float x, y, z;
@@ -25,6 +27,7 @@ typedef struct _LWFIELD {
 	dGeomID player_geom;
 	dGeomID player_center_ray;
 	dGeomID player_contact_ray;
+	dGeomID player_aim_sector_ray[MAX_AIM_SECTOR_RAY];
 	dReal player_radius;
 	dReal player_length;
 	dContact center_ray_result[MAX_CENTER_RAY_RESULT];

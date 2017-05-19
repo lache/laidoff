@@ -258,27 +258,32 @@ void get_field_player_position(const LWFIELD* field, float* x, float* y, float* 
 	*z = (float)(field->player_pos[2] - field->player_length / 2 - field->player_radius);
 }
 
-void move_player_geom_by_input(LWFIELD* field) {
-	dVector3 u_x_n, up;
+void rotation_matrix_from_vectors(dMatrix3 r, dReal* vec_a, dReal* vec_b) {
+	// Calculate rotation matrix 'r' which rotates 'vec_a' to 'vec_b'.
+	// Assumes that both 'vec_a' and 'vec_b' are unit vectors.
+	// http://stackoverflow.com/questions/1171849/finding-quaternion-representing-the-rotation-from-one-vector-to-another
+	dVector3 u_x_n;
+	dCalcVectorCross3(u_x_n, vec_a, vec_b);
+	dReal dot = dCalcVectorDot3(vec_a, vec_b);
+	dQuaternion q;
+	q[0] = 1 + dot;
+	q[1] = u_x_n[0];
+	q[2] = u_x_n[1];
+	q[3] = u_x_n[2];
+	dNormalize4(q);
+	dQtoR(q, r);
+}
 
+void move_player_geom_by_input(LWFIELD* field) {
+	dMatrix3 r;
+	dVector3 up;
 	up[0] = 0;
 	up[1] = 0;
 	up[2] = 1;
-
-	dCalcVectorCross3(u_x_n, up, field->ground_normal);
-	dReal dot = dCalcVectorDot3(up, field->ground_normal);
-
-	dQuaternion qmove;
-	qmove[0] = 1 + dot;
-	qmove[1] = u_x_n[0];
-	qmove[2] = u_x_n[1];
-	qmove[3] = u_x_n[2];
-	dNormalize4(qmove);
-	dMatrix3 qmoveR;
-	dQtoR(qmove, qmoveR);
+	rotation_matrix_from_vectors(r, up, field->ground_normal);
 
 	dVector3 geom_pos_delta_rotated;
-	dMultiply0_331(geom_pos_delta_rotated, qmoveR, field->player_pos_delta);
+	dMultiply0_331(geom_pos_delta_rotated, r, field->player_pos_delta);
 
 	for (int i = 0; i < 3; i++) {
 		field->player_pos[i] += geom_pos_delta_rotated[i];

@@ -84,6 +84,7 @@ typedef struct _LWCONTEXT {
 	//GLuint index_buffer;
 	GLuint vao[VERTEX_BUFFER_COUNT];
 	GLuint skin_vao[SKIN_VERTEX_BUFFER_COUNT];
+	GLuint fan_vao[SKIN_VERTEX_BUFFER_COUNT];
 
 	GLuint tex_atlas[MAX_TEX_ATLAS];
 	int tex_atlas_width[MAX_TEX_ATLAS];

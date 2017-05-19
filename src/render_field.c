@@ -7,7 +7,7 @@
 #include "render_skin.h"
 #include "field.h"
 #include "mq.h"
-#include "extrapolator.h"
+#include "render_fan.h"
 
 static void render_field_object(const LWCONTEXT* pLwc, int vbo_index, GLuint tex_id, mat4x4 view, mat4x4 proj, float x, float y, float z, float sx, float sy, float sz, float alpha_multiplier, int mipmap)
 {
@@ -329,6 +329,8 @@ void lwc_render_field(const LWCONTEXT* pLwc)
 	}
 
 	render_path_query_test_player(pLwc, perspective, view);
+
+	render_fan(pLwc, perspective, view, player_x, player_y, player_z, pLwc->player_rot_z, (float)(M_PI / 2));
 
 	render_ui(pLwc);
 
