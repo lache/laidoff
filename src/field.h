@@ -9,7 +9,7 @@
 #define MAX_BOX_GEOM (100)
 #define MAX_RAY_RESULT_COUNT (10)
 #define MAX_FIELD_CONTACT (10)
-#define MAX_AIM_SECTOR_RAY FAN_SECTOR_COUNT_PER_ARRAY
+#define MAX_AIM_SECTOR_RAY (FAN_SECTOR_COUNT_PER_ARRAY + 1) // 1 for the end vertex
 
 typedef struct _LWFIELDCUBEOBJECT {
 	float x, y, z;
@@ -36,12 +36,13 @@ typedef struct _LWFIELD {
 	dReal player_radius;
 	dReal player_length;
 
+	dReal ray_max_length;
 	dGeomID ray[LRI_COUNT];
 	dContact ray_result[LRI_COUNT][MAX_RAY_RESULT_COUNT];
 	int ray_result_count[LRI_COUNT];
 	dReal ray_nearest_depth[LRI_COUNT];
 	int ray_nearest_index[LRI_COUNT];
-
+	
 	dVector3 player_pos;
 	dVector3 player_pos_delta;
 	dVector3 ground_normal;

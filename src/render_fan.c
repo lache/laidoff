@@ -3,13 +3,13 @@
 #include "laidoff.h"
 
 void render_fan(const struct _LWCONTEXT *pLwc, const mat4x4 proj, const mat4x4 view,
-	float x, float y, float z, float a, float sector_theta) {
+	float x, float y, float z, float a, float sector_theta, float rscale[FAN_VERTEX_COUNT_PER_ARRAY]) {
 	int shader_index = LWST_FAN;
 
-	float rscale[FAN_VERTEX_COUNT_PER_ARRAY];
+	/*float rscale[FAN_VERTEX_COUNT_PER_ARRAY];
 	for (int i = 0; i < FAN_VERTEX_COUNT_PER_ARRAY; i++) {
 		rscale[i] = 15.0f;
-	}
+	}*/
 
 	mat4x4 skin_trans;
 	mat4x4_identity(skin_trans);
@@ -19,7 +19,7 @@ void render_fan(const struct _LWCONTEXT *pLwc, const mat4x4 proj, const mat4x4 v
 	mat4x4_scale_aniso(skin_scale, skin_scale, 1, 1, 1);
 	mat4x4 skin_rot;
 	mat4x4_identity(skin_rot);
-	mat4x4_rotate_Z(skin_rot, skin_rot, a + (float)LWDEG2RAD(-90) + sector_theta / 2);
+	mat4x4_rotate_Z(skin_rot, skin_rot, a - sector_theta / 2/* + (float)LWDEG2RAD(90) + sector_theta / 2*/);
 
 	mat4x4 skin_model;
 	mat4x4_identity(skin_model);

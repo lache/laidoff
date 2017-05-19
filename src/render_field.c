@@ -330,7 +330,14 @@ void lwc_render_field(const LWCONTEXT* pLwc)
 
 	render_path_query_test_player(pLwc, perspective, view);
 
-	render_fan(pLwc, perspective, view, player_x, player_y, player_z, pLwc->player_rot_z, pLwc->player_aim_theta);
+	float rscale[FAN_VERTEX_COUNT_PER_ARRAY];
+	rscale[0] = 0; // center vertex has no meaningful rscale
+	for (int i = 1; i < FAN_VERTEX_COUNT_PER_ARRAY; i++) {
+		rscale[i] = (float)pLwc->field->ray_nearest_depth[LRI_AIM_SECTOR_FIRST_INCLUSIVE + i - 1];
+	}
+
+	render_fan(pLwc, perspective, view,
+		player_x, player_y, player_z, pLwc->player_rot_z, pLwc->player_aim_theta, rscale);
 
 	render_ui(pLwc);
 

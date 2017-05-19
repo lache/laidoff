@@ -140,10 +140,10 @@ LWFIELD* load_field(const char* filename) {
 	field->player_geom = dCreateCapsule(field->space, field->player_radius, field->player_length);
 	dGeomSetPosition(field->player_geom, field->player_pos[0], field->player_pos[1], field->player_pos[2]);
 
-	const dReal ray_length = 50;
+	field->ray_max_length = 50;
 	
 	for (int i = 0; i < LRI_COUNT; i++) {
-		field->ray[i] = dCreateRay(field->space, ray_length);
+		field->ray[i] = dCreateRay(field->space, field->ray_max_length);
 		dGeomSetPosition(field->ray[i], field->player_pos[0], field->player_pos[1], field->player_pos[2]);
 		dMatrix3 R;
 		dRFromAxisAndAngle(R, 1, 0, 0, M_PI); // ray direction: downward (-Z)
@@ -283,7 +283,7 @@ static void field_near_callback(void *data, dGeomID o1, dGeomID o2) {
 void reset_ray_result(LWFIELD* field) {
 	for (int i = 0; i < LRI_COUNT; i++) {
 		field->ray_result_count[i] = 0;
-		field->ray_nearest_depth[i] = get_dreal_max();
+		field->ray_nearest_depth[i] = field->ray_max_length;// get_dreal_max();
 		field->ray_nearest_index[i] = -1;
 	}
 	/*field->center_ray_result_count = 0;
@@ -392,8 +392,7 @@ void move_player_to_ground(LWFIELD* field) {
 		dReal d2 = get_dreal_min();
 		const int contact_nearest_ray_index = field->ray_nearest_index[LRI_PLAYER_CONTACT];
 		if (contact_nearest_ray_index >= 0) {
-			const dReal min_side_ray_length = field->ray_nearest_depth[LRI_PLAYER_CONTACT];
-			dReal d = min_side_ray_length - field->player_length / 2 - field->player_radius;
+			dReal d = field->ray_nearest_depth[LRI_PLAYER_CONTACT] - field->player_length / 2 - field->player_radius;
 			d2 = -d;
 		}
 
@@ -417,22 +416,27 @@ void move_player_to_ground(LWFIELD* field) {
 	}
 }
 
-void move_aim_ray(LWFIELD* field, float aim_theta) {
+void move_aim_ray(LWFIELD* field, float aim_theta, float rot_z) {
 	dVector3 up = { 1, 0, 0 };
 	for (int i = LRI_AIM_SECTOR_FIRST_INCLUSIVE; i <= LRI_AIM_SECTOR_LAST_INCLUSIVE; i++) {
-		dGeomSetPosition(field->ray[i], field->player_pos[0], field->player_pos[1], field->player_pos[2]);
-		
-		const double theta = (M_PI - aim_theta) / 2 + aim_theta / MAX_AIM_SECTOR_RAY * (i - LRI_AIM_SECTOR_FIRST_INCLUSIVE);
-		dMatrix4 r;
-		const dVector3 aim_dir = { cos(theta), sin(theta), 0 };
-		rotation_matrix_from_vectors(r, up, aim_dir);
+		dGeomSetPosition(field->ray[i], field->player_pos[0], field->player_pos[1], field->player_pos[2] - field->player_length / 2 /* foot level */);
+
+		dMatrix3 r_minus_y;
+		dMatrix3 r_z;
+		dMatrix3 r;
+		const double dtheta = -aim_theta / 2 + aim_theta / MAX_AIM_SECTOR_RAY * (i - LRI_AIM_SECTOR_FIRST_INCLUSIVE);
+
+		// rot_z == 0 --> global +X
+		dRFromAxisAndAngle(r_minus_y, 1, 0, 0, M_PI / 2); // ray direction: global -Y
+		dRFromAxisAndAngle(r_z, 0, 0, 1, rot_z + LWDEG2RAD(90) + dtheta); // rotation around global +Z
+		dMultiply0_333(r, r_z, r_minus_y);
 		dGeomSetRotation(field->ray[i], r);
 	}
 }
 
 void gather_ray_result(LWFIELD* field) {
 	for (int i = 0; i < LRI_COUNT; i++) {
-		dReal nearest_ray_length = get_dreal_max();
+		dReal nearest_ray_length = field->ray_max_length; // get_dreal_max();
 		int nearest_ray_index = -1;
 		for (int j = 0; j < field->ray_result_count[i]; j++) {
 			if (nearest_ray_length > field->ray_result[i][j].geom.depth) {
@@ -457,7 +461,7 @@ void update_field(LWCONTEXT* pLwc, LWFIELD* field) {
 
 	move_player_geom_by_input(field);
 
-	move_aim_ray(field, pLwc->player_aim_theta);
+	move_aim_ray(field, pLwc->player_aim_theta, pLwc->player_rot_z);
 	
 	dSpaceCollide(field->space, field, &field_near_callback);
 	
