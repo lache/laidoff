@@ -788,7 +788,7 @@ void reset_field_context(LWCONTEXT* pLwc) {
 
 	pLwc->player_pos_x = 0;
 	pLwc->player_pos_y = 0;
-	pLwc->player_aim_theta = (float)(M_PI / 4);
+	pLwc->player_aim_theta = (float)(M_PI / 8);
 }
 
 void reset_time(LWCONTEXT* pLwc) {
