@@ -41,6 +41,7 @@
 		565676A91EAFB4F800FF64B3 /* armature.c in Sources */ = {isa = PBXBuildFile; fileRef = 565676A51EAFB4F800FF64B3 /* armature.c */; };
 		565676AA1EAFB4F800FF64B3 /* render_skin.c in Sources */ = {isa = PBXBuildFile; fileRef = 565676A71EAFB4F800FF64B3 /* render_skin.c */; };
 		565676AC1EB0E96100FF64B3 /* lwanim.c in Sources */ = {isa = PBXBuildFile; fileRef = 565676AB1EB0E96100FF64B3 /* lwanim.c */; };
+		565DD4401ECF58A8002C4493 /* render_fan.c in Sources */ = {isa = PBXBuildFile; fileRef = 565DD43E1ECF58A8002C4493 /* render_fan.c */; };
 		5663732C1EBA52D3001DA3F4 /* array.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 566372811EBA52D3001DA3F4 /* array.cpp */; };
 		5663732D1EBA52D3001DA3F4 /* box.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 566372831EBA52D3001DA3F4 /* box.cpp */; };
 		5663732E1EBA52D3001DA3F4 /* capsule.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 566372841EBA52D3001DA3F4 /* capsule.cpp */; };
@@ -456,6 +457,8 @@
 		565676A71EAFB4F800FF64B3 /* render_skin.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = render_skin.c; sourceTree = "<group>"; };
 		565676A81EAFB4F800FF64B3 /* render_skin.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = render_skin.h; sourceTree = "<group>"; };
 		565676AB1EB0E96100FF64B3 /* lwanim.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = lwanim.c; sourceTree = "<group>"; };
+		565DD43E1ECF58A8002C4493 /* render_fan.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = render_fan.c; sourceTree = "<group>"; };
+		565DD43F1ECF58A8002C4493 /* render_fan.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = render_fan.h; sourceTree = "<group>"; };
 		566372651EBA52D3001DA3F4 /* collision.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = collision.h; sourceTree = "<group>"; };
 		566372661EBA52D3001DA3F4 /* collision_space.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = collision_space.h; sourceTree = "<group>"; };
 		566372671EBA52D3001DA3F4 /* collision_trimesh.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = collision_trimesh.h; sourceTree = "<group>"; };
@@ -1906,6 +1909,8 @@
 		6CA16CF41EA20CA700DB7AF0 /* src */ = {
 			isa = PBXGroup;
 			children = (
+				565DD43E1ECF58A8002C4493 /* render_fan.c */,
+				565DD43F1ECF58A8002C4493 /* render_fan.h */,
 				564D11941ECA511E002CCCAE /* extrapolator.cpp */,
 				564D11951ECA511E002CCCAE /* extrapolator.h */,
 				564D11911ECA2812002CCCAE /* kvmsg.c */,
@@ -2275,6 +2280,7 @@
 				566373711EBA52D4001DA3F4 /* quickstep.cpp in Sources */,
 				56F1890C1EC74DB60019312F /* zmq_utils.cpp in Sources */,
 				56F189B31EC751950019312F /* zrex.c in Sources */,
+				565DD4401ECF58A8002C4493 /* render_fan.c in Sources */,
 				56F188DB1EC74DB60019312F /* proxy.cpp in Sources */,
 				56F188E11EC74DB60019312F /* raw_decoder.cpp in Sources */,
 				56F1899E1EC751950019312F /* zfile.c in Sources */,
