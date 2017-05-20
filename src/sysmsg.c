@@ -38,12 +38,12 @@ void update_sys_msg(void* _sm, float delta_time) {
 }
 
 static const float header_y_center = 0.9f;
-static const float header_height = 0.2f;
+static const float header_height = 0.1f;
 
 static void s_render(const struct _LWCONTEXT* pLwc, const char* msg) {
 
 	const float aspect_ratio = (float)pLwc->width / pLwc->height;
-	render_solid_vb_ui_flip_y_uv(pLwc, 0, header_y_center, 2 * aspect_ratio, header_height,
+	render_solid_vb_ui_flip_y_uv(pLwc, 0, -header_y_center, 2 * aspect_ratio, header_height,
 		pLwc->tex_programmed[LPT_BOTH_END_GRADIENT_HORIZONTAL], LVT_CENTER_CENTER_ANCHORED_SQUARE,
 		1, 39 / 255.0f, 74 / 255.0f, 110 / 255.0f, 1.0f, 0);
 
@@ -51,7 +51,7 @@ static void s_render(const struct _LWCONTEXT* pLwc, const char* msg) {
 	text_block.align = LTBA_CENTER_CENTER;
 	text_block.text_block_width = DEFAULT_TEXT_BLOCK_WIDTH;
 	text_block.text_block_line_height = DEFAULT_TEXT_BLOCK_LINE_HEIGHT_E;
-	text_block.size = DEFAULT_TEXT_BLOCK_SIZE_A;
+	text_block.size = DEFAULT_TEXT_BLOCK_SIZE_D;
 	SET_COLOR_RGBA_FLOAT(text_block.color_normal_glyph, 1, 1, 1, 1);
 	SET_COLOR_RGBA_FLOAT(text_block.color_normal_outline, 0, 0, 0, 1);
 	SET_COLOR_RGBA_FLOAT(text_block.color_emp_glyph, 1, 1, 0, 1);
@@ -61,7 +61,7 @@ static void s_render(const struct _LWCONTEXT* pLwc, const char* msg) {
 	text_block.begin_index = 0;
 	text_block.end_index = text_block.text_bytelen;
 	text_block.text_block_x = 0;
-	text_block.text_block_y = header_y_center;
+	text_block.text_block_y = -header_y_center;
 	render_text_block(pLwc, &text_block);
 }
 

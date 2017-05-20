@@ -37,6 +37,7 @@
 #include "nav.h"
 #include "mq.h"
 #include "sysmsg.h"
+#include "render_text_block.h"
 
 #define INCREASE_RENDER_SCORE (20)
 #define RENDER_SCORE_INITIAL (-5)
@@ -126,6 +127,7 @@ void update_attack_trail(LWCONTEXT *pLwc);
 float get_battle_enemy_x_center(int enemy_slot_index);
 void update_damage_text(LWCONTEXT *pLwc);
 static void reinit_mq(LWCONTEXT *pLwc);
+static double s_get_delta_time_history_avg(const LWCONTEXT* pLwc);
 
 typedef struct {
 	GLuint vb;
@@ -1042,6 +1044,30 @@ int get_tex_index_by_hash_key(const LWCONTEXT *pLwc, const char *hash_key) {
 	return 0;
 }
 
+void render_stat(const LWCONTEXT* pLwc) {
+
+	const float aspect_ratio = (float)pLwc->width / pLwc->height;
+
+	LWTEXTBLOCK text_block;
+	text_block.align = LTBA_LEFT_TOP;
+	text_block.text_block_width = DEFAULT_TEXT_BLOCK_WIDTH;
+	text_block.text_block_line_height = DEFAULT_TEXT_BLOCK_LINE_HEIGHT_F;
+	text_block.size = DEFAULT_TEXT_BLOCK_SIZE_F;
+	SET_COLOR_RGBA_FLOAT(text_block.color_normal_glyph, 1, 1, 1, 1);
+	SET_COLOR_RGBA_FLOAT(text_block.color_normal_outline, 0, 0, 0, 1);
+	SET_COLOR_RGBA_FLOAT(text_block.color_emp_glyph, 1, 1, 0, 1);
+	SET_COLOR_RGBA_FLOAT(text_block.color_emp_outline, 0, 0, 0, 1);
+	char msg[32];
+	sprintf(msg, "%.1f FPS", (float)(1.0 / s_get_delta_time_history_avg(pLwc)));
+	text_block.text = msg;
+	text_block.text_bytelen = (int)strlen(text_block.text);
+	text_block.begin_index = 0;
+	text_block.end_index = text_block.text_bytelen;
+	text_block.text_block_x = -aspect_ratio;
+	text_block.text_block_y = 1.0f;
+	render_text_block(pLwc, &text_block);
+}
+
 void lwc_render(const LWCONTEXT *pLwc) {
 	if (pLwc->game_scene == LGS_BATTLE) {
 		lwc_render_battle(pLwc);
@@ -1062,11 +1088,26 @@ void lwc_render(const LWCONTEXT *pLwc) {
 	}
 
 	render_sys_msg(pLwc, pLwc->def_sys_msg);
+
+	render_stat(pLwc);
 }
 
 static void update_battle_wall(LWCONTEXT* pLwc) {
 	pLwc->battle_wall_tex_v += (float)(pLwc->delta_time / 34);
 	pLwc->battle_wall_tex_v = fmodf(pLwc->battle_wall_tex_v, 1.0f);
+}
+
+static double s_get_delta_time_history_avg(const LWCONTEXT* pLwc) {
+	double delta_time_sum = 0;
+	const int cnt = LWMIN(pLwc->delta_time_history_index, MAX_DELTA_TIME_HISTORY);
+	for (int i = 0; i < cnt; i++) {
+		delta_time_sum += pLwc->delta_time_history[i];
+	}
+	if (cnt > 0) {
+		return delta_time_sum / cnt;
+	} else {
+		return 0;
+	}
 }
 
 void lwc_update(LWCONTEXT *pLwc, double delta_time) {
@@ -1075,6 +1116,7 @@ void lwc_update(LWCONTEXT *pLwc, double delta_time) {
 	lwtimepoint_now(&cur_time);
 
 	pLwc->delta_time = lwtimepoint_diff(&cur_time, &pLwc->last_time);
+	pLwc->delta_time_history[(pLwc->delta_time_history_index++) % MAX_DELTA_TIME_HISTORY] = pLwc->delta_time;
 	pLwc->last_time = cur_time;
 
 	if (pLwc->next_game_scene == LGS_INVALID && pLwc->game_scene == LGS_INVALID) {

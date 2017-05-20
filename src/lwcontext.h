@@ -70,7 +70,7 @@ static const char* tex_font_atlas_filename[] = {
 #define VERTEX_BUFFER_COUNT LVT_COUNT
 #define SKIN_VERTEX_BUFFER_COUNT LSVT_COUNT
 #define FAN_VERTEX_BUFFER_COUNT LFVT_COUNT
-
+#define MAX_DELTA_TIME_HISTORY (60)
 
 typedef struct _LWCONTEXT {
 	struct GLFWwindow* window;
@@ -98,6 +98,8 @@ typedef struct _LWCONTEXT {
 
 	LWTIMEPOINT last_time;
 	double delta_time;
+	double delta_time_history[MAX_DELTA_TIME_HISTORY];
+	int delta_time_history_index;
 
 	mat4x4 proj;
 	
