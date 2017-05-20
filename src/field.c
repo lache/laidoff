@@ -489,7 +489,7 @@ void update_field(LWCONTEXT* pLwc, LWFIELD* field) {
 	
 	LW_ACTION player_anim;
 	if (pLwc->player_attacking) {
-		player_anim = LWAC_HUMANACTION_ATTACK;
+		player_anim = LWAC_HUMANACTION_STAND_FIRE;
 	} else if (pLwc->player_moving) {
 		player_anim = LWAC_HUMANACTION_WALKPOLISH;
 	} else {

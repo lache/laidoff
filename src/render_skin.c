@@ -115,7 +115,7 @@ void render_skin(const LWCONTEXT* pLwc,
 
 	//const float f = 0;// 89;
 
-	for (int i = 0; i < action->curve_num; i++) {
+	for (int i = 0; i < action->anim_curve_num; i++) {
 		const LWANIMCURVE* curve = &action->anim_curve[i];
 
 		int bi = curve->bone_index;

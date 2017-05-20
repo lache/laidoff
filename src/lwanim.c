@@ -11,15 +11,19 @@ void load_action(const char* filename, LWANIMACTION* action) {
 
 	action->fps = *(float*)p;
 	p += sizeof(float);
-	action->curve_num = *(int*)p;
-	p += sizeof(int);
 	action->last_key_f = *(float*)p;
 	p += sizeof(float);
-	action->anim_curve = (LWANIMCURVE*)p;
-	p += sizeof(LWANIMCURVE) * action->curve_num;
-	action->key_num = *(int*)p;
+	action->anim_curve_num = *(int*)p;
 	p += sizeof(int);
-	action->anim_key = (LWANIMKEY*)p;
+	action->anim_curve = action->anim_curve_num ? (LWANIMCURVE*)p : 0;
+	p += sizeof(LWANIMCURVE) * action->anim_curve_num;
+	action->anim_key_num = *(int*)p;
+	p += sizeof(int);
+	action->anim_key = action->anim_key_num ? (LWANIMKEY*)p : 0;
+	p += sizeof(LWANIMKEY) * action->anim_key_num;
+	action->anim_marker_num = *(int*)p;
+	p += sizeof(int);
+	action->anim_marker = action->anim_marker_num ? (LWANIMMARKER*)p : 0;
 }
 
 void unload_action(LWANIMACTION* action) {

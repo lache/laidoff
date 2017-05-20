@@ -59,15 +59,22 @@ typedef struct _LWANIMCURVE {
 	int key_num;
 } LWANIMCURVE;
 
+typedef struct _LWANIMMARKER {
+	char name[32];
+	int f;
+} LWANIMMARKER;
+
 #define MAX_ANIM_CURVE (32 * 4)
 
 typedef struct _LWANIMACTION {
 	float fps;
-	int curve_num;
 	float last_key_f;
+	int anim_curve_num;
 	LWANIMCURVE* anim_curve;
-	int key_num;
+	int anim_key_num;
 	LWANIMKEY* anim_key;
+	int anim_marker_num;
+	LWANIMMARKER* anim_marker;
 	char* d;
 } LWANIMACTION;
 
@@ -77,6 +84,10 @@ typedef enum _LW_ACTION {
 	LWAC_HUMANACTION_WALKPOLISH,
 	LWAC_HUMANACTION_IDLE,
 	LWAC_HUMANACTION_ATTACK,
+	LWAC_HUMANACTION_STAND_AIM,
+	LWAC_HUMANACTION_STAND_UNAIM,
+	LWAC_HUMANACTION_STAND_FIRE,
+	LWAC_HUMANACTION_DEATH,
 	LWAC_DETACHPLANEACTION,
 	LWAC_DETACHPLANEACTION_CHILDTRANS,
 
@@ -89,6 +100,10 @@ static const char* action_filename[] = {
 	ASSETS_BASE_PATH "action" PATH_SEPARATOR "HumanAction_WalkPolish.act",
 	ASSETS_BASE_PATH "action" PATH_SEPARATOR "HumanAction_Idle.act",
 	ASSETS_BASE_PATH "action" PATH_SEPARATOR "HumanAction_Attack.act",
+	ASSETS_BASE_PATH "action" PATH_SEPARATOR "HumanAction_Stand_Aim.act",
+	ASSETS_BASE_PATH "action" PATH_SEPARATOR "HumanAction_Stand_Unaim.act",
+	ASSETS_BASE_PATH "action" PATH_SEPARATOR "HumanAction_Stand_Fire.act",
+	ASSETS_BASE_PATH "action" PATH_SEPARATOR "HumanAction_Death.act",
 	ASSETS_BASE_PATH "action" PATH_SEPARATOR "DetachPlaneAction.act",
 	ASSETS_BASE_PATH "action" PATH_SEPARATOR "DetachPlaneAction_ChildTrans.act",
 };
