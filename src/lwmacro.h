@@ -68,3 +68,5 @@
 #define ARRAY_ITERATE_VALID_END() \
 		} \
     }
+
+#define LWEPSILON (1e-3)

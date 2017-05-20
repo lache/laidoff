@@ -38,7 +38,6 @@
 #include "mq.h"
 #include "sysmsg.h"
 
-#define LWEPSILON (1e-3)
 #define INCREASE_RENDER_SCORE (20)
 #define RENDER_SCORE_INITIAL (-5)
 #define APPLY_IMPULSE_COOLTIME (0.1f)

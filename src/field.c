@@ -41,7 +41,7 @@ void move_player(LWCONTEXT *pLwc) {
 
 		// Using mouse
 		float dx = 0, dy = 0, dlen = 0;
-		if (lw_get_normalized_dir_pad_input(pLwc, &dx, &dy, &dlen)) {
+		if (lw_get_normalized_dir_pad_input(pLwc, &dx, &dy, &dlen) && (dx || dy)) {
 			pLwc->player_pos_x += dx * move_speed_delta;
 			pLwc->player_pos_y += dy * move_speed_delta;
 			pLwc->player_rot_z = atan2f(dy, dx);

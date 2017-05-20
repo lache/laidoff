@@ -31,9 +31,15 @@ int lw_get_normalized_dir_pad_input(const LWCONTEXT *pLwc, float *dx, float *dy,
 	*dy = pLwc->dir_pad_y - dir_pad_center_y;
 
 	*dlen = sqrtf(*dx * *dx + *dy * *dy);
-
-	*dx /= *dlen;
-	*dy /= *dlen;
+	
+	if (*dlen < LWEPSILON) {
+		*dlen = 0;
+		*dx = 0;
+		*dy = 0;
+	} else {
+		*dx /= *dlen;
+		*dy /= *dlen;
+	}
 
 	return 1;
 }
