@@ -221,4 +221,5 @@ typedef struct _LWCONTEXT {
 	void* mq;
 
 	int server_index;
+	int ray_test;
 } LWCONTEXT;

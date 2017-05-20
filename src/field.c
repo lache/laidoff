@@ -449,6 +449,16 @@ void gather_ray_result(LWFIELD* field) {
 	}
 }
 
+void field_enable_ray_test(LWFIELD* field, int enable) {
+	for (int i = LRI_AIM_SECTOR_FIRST_INCLUSIVE; i <= LRI_AIM_SECTOR_LAST_INCLUSIVE; i++) {
+		if (dGeomIsEnabled(field->ray[i])) {
+			dGeomDisable(field->ray[i]);
+		} else {
+			dGeomEnable(field->ray[i]);
+		}
+	}
+}
+
 void update_field(LWCONTEXT* pLwc, LWFIELD* field) {
 	if (!field) {
 		return;

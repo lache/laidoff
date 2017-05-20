@@ -73,3 +73,4 @@ void set_field_player_delta(LWFIELD* field, float x, float y, float z);
 void set_field_player_position(LWFIELD* field, float x, float y, float z);
 void get_field_player_position(const LWFIELD* field, float* x, float* y, float* z);
 void field_attack(LWCONTEXT* pLwc);
+void field_enable_ray_test(LWFIELD* field, int enable);

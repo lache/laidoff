@@ -834,6 +834,8 @@ void reset_runtime_context(LWCONTEXT* pLwc) {
 	pLwc->admin_button_command[10].command_handler = connect_to_server_0;
 	pLwc->admin_button_command[11].name = LWU("Server #1");
 	pLwc->admin_button_command[11].command_handler = connect_to_server_1;
+	pLwc->admin_button_command[12].name = LWU("레이테스트토글");
+	pLwc->admin_button_command[12].command_handler = toggle_ray_test;
 }
 
 void delete_font_fbo(LWCONTEXT* pLwc) {
@@ -1595,6 +1597,12 @@ void connect_to_server_1(LWCONTEXT *pLwc) {
 	pLwc->server_index = 1;
 
 	reinit_mq(pLwc);
+}
+
+void toggle_ray_test(LWCONTEXT *pLwc) {
+	pLwc->ray_test = !pLwc->ray_test;
+
+	field_enable_ray_test(pLwc->field, pLwc->ray_test);
 }
 
 long lw_get_last_time_sec(LWCONTEXT *pLwc) {
