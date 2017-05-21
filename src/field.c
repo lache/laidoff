@@ -76,7 +76,7 @@ typedef struct _LWFIELD {
 	pcg32_random_t rng;
 } LWFIELD;
 
-void s_rotation_matrix_from_vectors(dMatrix3 r, const dReal* vec_a, const dReal* vec_b);
+static void s_rotation_matrix_from_vectors(dMatrix3 r, const dReal* vec_a, const dReal* vec_b);
 
 dReal get_dreal_max() {
 #ifdef dDOUBLE
