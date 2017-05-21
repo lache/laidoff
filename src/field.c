@@ -113,11 +113,11 @@ void move_player(LWCONTEXT *pLwc) {
 			pLwc->player_state_data.rot_z = atan2f(dy, dx);
 			pLwc->player_pos_last_moved_dx = dx;
 			pLwc->player_pos_last_moved_dy = dy;
-			pLwc->player_moving = 1;
+			//pLwc->player_moving = 1;
 
 			set_field_player_delta(pLwc->field, dx * move_speed_delta, dy * move_speed_delta, 0);
 		} else {
-			pLwc->player_moving = 0;
+			//pLwc->player_moving = 0;
 		}
 	}
 }
@@ -397,12 +397,11 @@ void rotation_matrix_from_vectors(mat4x4 m, const vec3 a, const vec3 b) {
 	dVector3 vec_a = { a[0], a[1], a[2] };
 	dVector3 vec_b = { b[0], b[1], b[2] };
 	s_rotation_matrix_from_vectors(r, vec_a, vec_b);
-	m[0][0] = r[0]; m[0][1] = r[4]; m[0][2] = r[8]; m[0][3] = 0;
-	m[1][0] = r[1]; m[1][1] = r[5]; m[1][2] = r[9]; m[1][3] = 0;
-	m[2][0] = r[2]; m[2][1] = r[6]; m[2][2] = r[10]; m[2][3] = 0;
-	m[3][0] = r[3]; m[3][1] = r[7]; m[3][2] = r[11]; m[3][3] = 1;
+	m[0][0] = (float)r[0]; m[0][1] = (float)r[4]; m[0][2] = (float)r[8]; m[0][3] = 0;
+	m[1][0] = (float)r[1]; m[1][1] = (float)r[5]; m[1][2] = (float)r[9]; m[1][3] = 0;
+	m[2][0] = (float)r[2]; m[2][1] = (float)r[6]; m[2][2] = (float)r[10]; m[2][3] = 0;
+	m[3][0] = (float)r[3]; m[3][1] = (float)r[7]; m[3][2] = (float)r[11]; m[3][3] = 1;
 }
-
 
 void move_player_geom_by_input(LWFIELD* field) {
 	dMatrix3 r;
@@ -516,11 +515,26 @@ static void s_update_sphere(LWFIELD* field, float delta_time) {
 	for (int i = 0; i < MAX_FIELD_SPHERE_COUNT; i++) {
 		if (dGeomIsEnabled(field->sphere[i])) {
 			const dReal* pos = dGeomGetPosition(field->sphere[i]);
-			dGeomSetPosition(
-				field->sphere[i],
-				pos[0] + delta_time * field->sphere_vel[i][0],
-				pos[1] + delta_time * field->sphere_vel[i][1],
-				pos[2] + delta_time * field->sphere_vel[i][2]);
+
+			const dReal new_x = pos[0] + delta_time * field->sphere_vel[i][0];
+			const dReal new_y = pos[1] + delta_time * field->sphere_vel[i][1];
+			const dReal new_z = pos[2] + delta_time * field->sphere_vel[i][2];
+
+			const dReal domain_size = 100.0f;
+
+			if (new_x > domain_size || new_x < -domain_size
+				|| new_y > domain_size || new_y < -domain_size
+				|| new_z > domain_size || new_z < -domain_size) {
+				// Out-of-bound geom should be disabled.
+				LOGI("Field sphere[%d] out-of-bound. It will be disabled.", i);
+				dGeomDisable(field->sphere[i]);
+			} else {
+				dGeomSetPosition(
+					field->sphere[i],
+					pos[0] + delta_time * field->sphere_vel[i][0],
+					pos[1] + delta_time * field->sphere_vel[i][1],
+					pos[2] + delta_time * field->sphere_vel[i][2]);
+			}
 		}
 	}
 }
@@ -623,15 +637,7 @@ void update_field(LWCONTEXT* pLwc, LWFIELD* field) {
 			//LOGI("READ: POS (%.2f, %.2f, %.2f) DXY (%.2f, %.2f)", value->x, value->y, value->z, dx, dy);
 
 			value->a = atan2f(dy, dx);
-			LW_ACTION remote_player_anim;
-			if (value->attacking) {
-				remote_player_anim = LWAC_HUMANACTION_ATTACK;
-			} else if (value->moving) {
-				remote_player_anim = LWAC_HUMANACTION_WALKPOLISH;
-			} else {
-				remote_player_anim = LWAC_HUMANACTION_IDLE;
-			}
-			value->action = &pLwc->action[remote_player_anim];
+			value->anim_action = &pLwc->action[(LW_ACTION)value->action];
 		}
 		value = mq_possync_next(pLwc->mq);
 	}
@@ -668,11 +674,11 @@ void unload_field(LWFIELD* field) 	{
 }
 
 void field_attack(LWCONTEXT* pLwc) {
-	if (!pLwc->player_attacking) {
-		// start attack anim
-		pLwc->player_attacking = 1;
-		pLwc->player_skin_time = 0;
-	}
+	//if (!pLwc->player_attacking) {
+	//	// start attack anim
+	//	pLwc->player_attacking = 1;
+	//	pLwc->player_skin_time = 0;
+	//}
 }
 
 void field_path_query_spos(const LWFIELD* field, float* p) {

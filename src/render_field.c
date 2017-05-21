@@ -379,7 +379,7 @@ void lwc_render_field(const LWCONTEXT* pLwc) {
 		const char* cursor = mq_possync_cursor(pLwc->mq);
 		// Exclude the player
 		if (!mq_cursor_player(pLwc->mq, cursor)) {
-			render_player_model(pLwc, perspective, view, value->x, value->y, value->z, value->a, value->action, pLwc->player_skin_time, 1);
+			render_player_model(pLwc, perspective, view, value->x, value->y, value->z, value->a, value->anim_action, pLwc->player_skin_time, 1);
 		}
 		value = mq_possync_next(pLwc->mq);
 	}

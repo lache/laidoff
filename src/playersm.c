@@ -184,7 +184,9 @@ static const struct {
 };
 
 LW_ACTION get_anim_by_state(LW_PLAYER_STATE cur_state, int* loop) {
-	*loop = S_ANIM_BY_STATE[cur_state].loop;
+	if (loop) {
+		*loop = S_ANIM_BY_STATE[cur_state].loop;
+	}
 	return S_ANIM_BY_STATE[cur_state].action;
 }
 

@@ -13,21 +13,23 @@ typedef struct _LWMQMSG {
 	float z;				// Current position Z
 	float dx;				// Last moved delta X
 	float dy;				// Last moved delta y
-	int moving;				// 1 if moving, 0 if stopped
-	int attacking;			// 1 if attacking, 0 if stopped
+	//int moving;				// 1 if moving, 0 if stopped
+	//int attacking;			// 1 if attacking, 0 if stopped
 	int stop;				// 1 if movement stopped, 0 if not
+	int action;				// LW_ACTION enum
 	double t;				// Time
 } LWMQMSG;
 
 typedef struct _LWPOSSYNCMSG {
-	float x;					// Last position X (extrapolated)
-	float y;					// Last position Y (extrapolated)
-	float z;					// Last position Z (extrapolated)
-	float a;					// Last orientation (extrapolated)
-	void* extrapolator;			// Extrapolator for a remote entity
-	int moving;					// 1 if moving, 0 if stopped
-	int attacking;				// 1 if attacking, 0 if stopped
-	const LWANIMACTION* action; // Last anim action
+	float x;							// Last position X (extrapolated)
+	float y;							// Last position Y (extrapolated)
+	float z;							// Last position Z (extrapolated)
+	float a;							// Last orientation (extrapolated)
+	void* extrapolator;					// Extrapolator for a remote entity
+	//int moving;						// 1 if moving, 0 if stopped
+	//int attacking;					// 1 if attacking, 0 if stopped
+	int action;							// LW_ACTION enum
+	const LWANIMACTION* anim_action;	// Last anim action
 } LWPOSSYNCMSG;
 
 const LWMQMSG* mq_sync_first(void* _mq);

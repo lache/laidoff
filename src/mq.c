@@ -134,8 +134,9 @@ s_kvmsg_store_posmap_noown(kvmsg_t** self_p, zhash_t* hash, double sync_time, LW
 					msg->y, msg->z, msg->dx, msg->dy);
 			}
 
-			possyncmsg->attacking = msg->attacking;
-			possyncmsg->moving = msg->moving;
+			//possyncmsg->attacking = msg->attacking;
+			//possyncmsg->moving = msg->moving;
+			possyncmsg->action = msg->action;
 			if (msg->stop) {
 				vec4_extrapolator_add_stop(possyncmsg->extrapolator, msg->t, sync_time, msg->x,
 					msg->y, msg->z, msg->dx, msg->dy);
@@ -247,9 +248,10 @@ static void s_send_pos(const LWCONTEXT* pLwc, LWMESSAGEQUEUE* mq, int stop) {
 	get_field_player_position(pLwc->field, &msg.x, &msg.y, &msg.z);
 	msg.dx = pLwc->player_pos_last_moved_dx;
 	msg.dy = pLwc->player_pos_last_moved_dy;
-	msg.moving = pLwc->player_moving;
-	msg.attacking = pLwc->player_attacking;
+	//msg.moving = pLwc->player_moving;
+	//msg.attacking = pLwc->player_attacking;
 	msg.stop = stop;
+	msg.action = get_anim_by_state(pLwc->player_state_data.state, 0);
 	msg.t = mq_sync_mono_clock(mq);
 	kvmsg_set_prop(kvmsg, "ttl", "%d", 2); // Set TTL to 2 seconds.
 	kvmsg_set_body(kvmsg, (byte*)&msg, sizeof(msg));

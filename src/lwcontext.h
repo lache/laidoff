@@ -145,9 +145,9 @@ typedef struct _LWCONTEXT {
 	float player_pos_y;
 	float player_pos_last_moved_dx;
 	float player_pos_last_moved_dy;
-	int player_moving; // Player is moving
-	int player_attacking; // Player is attacking with its fist
-	int player_aiming; // Player is aiming with its pistol
+	//int player_moving; // Player is moving
+	//int player_attacking; // Player is attacking with its fist
+	//int player_aiming; // Player is aiming with its pistol
 	const LWANIMACTION* player_action;
 	//float player_aim_theta;
 	LWPLAYERSTATEDATA player_state_data;
