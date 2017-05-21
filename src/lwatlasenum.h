@@ -59,6 +59,8 @@ typedef enum _LW_ATLAS_ENUM
 	LAE_3D_PLAYER_TEX_KTX,
 	LAE_3D_FLOOR_TEX_KTX,
 	LAE_3D_APT_TEX_MIP_KTX,
+
+	LAE_BEAM_KTX,
     
     LAE_COUNT,
 } LW_ATLAS_ENUM;
@@ -119,6 +121,8 @@ static const char *tex_atlas_filename[] = {
 	ASSETS_BASE_PATH "ktx" PATH_SEPARATOR "3d-player-tex.ktx",
 	ASSETS_BASE_PATH "ktx" PATH_SEPARATOR "3d-floor-tex.ktx",
 	ASSETS_BASE_PATH "ktx" PATH_SEPARATOR "3d-apt-tex-mip.ktx",
+
+	ASSETS_BASE_PATH "ktx" PATH_SEPARATOR "fx-beam.ktx",
 };
 
 #define MAX_TEX_ATLAS (ARRAY_SIZE(tex_atlas_filename))

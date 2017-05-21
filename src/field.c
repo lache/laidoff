@@ -76,7 +76,7 @@ typedef struct _LWFIELD {
 	pcg32_random_t rng;
 } LWFIELD;
 
-void rotation_matrix_from_vectors(dMatrix3 r, const dReal* vec_a, const dReal* vec_b);
+void s_rotation_matrix_from_vectors(dMatrix3 r, const dReal* vec_a, const dReal* vec_b);
 
 dReal get_dreal_max() {
 #ifdef dDOUBLE
@@ -376,7 +376,7 @@ void get_field_player_geom_position(const LWFIELD* field, float* x, float* y, fl
 	*z = (float)field->player_pos[2];
 }
 
-void rotation_matrix_from_vectors(dMatrix3 r, const dReal* vec_a, const dReal* vec_b) {
+static void s_rotation_matrix_from_vectors(dMatrix3 r, const dReal* vec_a, const dReal* vec_b) {
 	// Calculate rotation matrix 'r' which rotates 'vec_a' to 'vec_b'.
 	// Assumes that both 'vec_a' and 'vec_b' are unit vectors.
 	// http://stackoverflow.com/questions/1171849/finding-quaternion-representing-the-rotation-from-one-vector-to-another
@@ -392,13 +392,25 @@ void rotation_matrix_from_vectors(dMatrix3 r, const dReal* vec_a, const dReal* v
 	dQtoR(q, r);
 }
 
+void rotation_matrix_from_vectors(mat4x4 m, const vec3 a, const vec3 b) {
+	dMatrix3 r;
+	dVector3 vec_a = { a[0], a[1], a[2] };
+	dVector3 vec_b = { b[0], b[1], b[2] };
+	s_rotation_matrix_from_vectors(r, vec_a, vec_b);
+	m[0][0] = r[0]; m[0][1] = r[4]; m[0][2] = r[8]; m[0][3] = 0;
+	m[1][0] = r[1]; m[1][1] = r[5]; m[1][2] = r[9]; m[1][3] = 0;
+	m[2][0] = r[2]; m[2][1] = r[6]; m[2][2] = r[10]; m[2][3] = 0;
+	m[3][0] = r[3]; m[3][1] = r[7]; m[3][2] = r[11]; m[3][3] = 1;
+}
+
+
 void move_player_geom_by_input(LWFIELD* field) {
 	dMatrix3 r;
 	dVector3 up;
 	up[0] = 0;
 	up[1] = 0;
 	up[2] = 1;
-	rotation_matrix_from_vectors(r, up, field->ground_normal);
+	s_rotation_matrix_from_vectors(r, up, field->ground_normal);
 
 	// Match 'player_pos_delta' (XY-plane movement) to the ground.
 	dVector3 geom_pos_delta_rotated;
@@ -769,6 +781,17 @@ int field_sphere_pos(const LWFIELD* field, int i, float* pos) {
 	pos[2] = (float)p[2];
 	return 1;
 }
+
+int field_sphere_vel(const LWFIELD* field, int i, float* vel) {
+	if (!dGeomIsEnabled(field->sphere[i])) {
+		return 0;
+	}
+	vel[0] = (float)field->sphere_vel[i][0];
+	vel[1] = (float)field->sphere_vel[i][1];
+	vel[2] = (float)field->sphere_vel[i][2];
+	return 1;
+}
+
 
 float field_sphere_radius(const LWFIELD* field, int i) {
 	if (!dGeomIsEnabled(field->sphere[i])) {

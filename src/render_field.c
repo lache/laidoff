@@ -9,13 +9,12 @@
 #include "mq.h"
 #include "render_fan.h"
 
-static void render_field_object(const LWCONTEXT* pLwc, int vbo_index, GLuint tex_id, const mat4x4 view, const mat4x4 proj, float x, float y, float z, float sx, float sy, float sz, float alpha_multiplier, int mipmap)
-{
+static void render_field_object_rot(const LWCONTEXT* pLwc, int vbo_index, GLuint tex_id, const mat4x4 view, const mat4x4 proj, float x, float y, float z, float sx, float sy, float sz, float alpha_multiplier, int mipmap, const mat4x4 rot) {
 	int shader_index = LWST_DEFAULT;
 
 	mat4x4 model;
 	mat4x4_identity(model);
-	mat4x4_rotate_X(model, model, 0);
+	mat4x4_mul(model, model, rot);
 	mat4x4_scale_aniso(model, model, sx, sy, sz);
 	mat4x4 model_translate;
 	mat4x4_translate(model_translate, x, y, z);
@@ -44,8 +43,13 @@ static void render_field_object(const LWCONTEXT* pLwc, int vbo_index, GLuint tex
 	glDrawArrays(GL_TRIANGLES, 0, pLwc->vertex_buffer[vbo_index].vertex_count);
 }
 
-static void render_ground(const LWCONTEXT* pLwc, const mat4x4 view, const mat4x4 proj)
-{
+static void render_field_object(const LWCONTEXT* pLwc, int vbo_index, GLuint tex_id, const mat4x4 view, const mat4x4 proj, float x, float y, float z, float sx, float sy, float sz, float alpha_multiplier, int mipmap) {
+	mat4x4 mat_iden;
+	mat4x4_identity(mat_iden);
+	render_field_object_rot(pLwc, vbo_index, tex_id, view, proj, x, y, z, sx, sy, sz, alpha_multiplier, mipmap, mat_iden);
+}
+
+static void render_ground(const LWCONTEXT* pLwc, const mat4x4 view, const mat4x4 proj) {
 	int shader_index = LWST_DEFAULT;
 	const int vbo_index = LVT_CENTER_CENTER_ANCHORED_SQUARE;
 
@@ -76,8 +80,7 @@ static void render_ground(const LWCONTEXT* pLwc, const mat4x4 view, const mat4x4
 	glDrawArrays(GL_TRIANGLES, 0, pLwc->vertex_buffer[vbo_index].vertex_count);
 }
 
-static void render_ui(const LWCONTEXT* pLwc)
-{
+static void render_ui(const LWCONTEXT* pLwc) {
 	int shader_index = LWST_DEFAULT;
 	const int vbo_index = LVT_CENTER_CENTER_ANCHORED_SQUARE;
 
@@ -223,20 +226,45 @@ static void s_render_field_sphere(const LWCONTEXT* pLwc, struct _LWFIELD* const 
 	for (int i = 0; i < MAX_FIELD_SPHERE_COUNT; i++) {
 		float pos[3];
 		if (field_sphere_pos(field, i, pos)) {
-			render_debug_sphere(pLwc,
+			const float s_x = 4.0f;
+			const float s_y = 3.0f;
+			const float s_z = 3.0f;
+			mat4x4 rot;
+			vec3 xaxis = { 1, 0, 0 };
+			vec3 vel, vel_norm;
+			field_sphere_vel(field, i, vel);
+			vec3_norm(vel_norm, vel);
+			rotation_matrix_from_vectors(rot, xaxis, vel_norm);
+			render_field_object_rot(
+				pLwc,
+				LVT_BEAM,
+				pLwc->tex_atlas[LAE_BEAM_KTX],
+				view,
+				proj,
+				pos[0],
+				pos[1],
+				pos[2],
+				s_x,
+				s_y,
+				s_z,
+				1,
+				0,
+				rot
+			);
+
+			/*render_debug_sphere(pLwc,
 				pLwc->tex_programmed[LPT_SOLID_GREEN],
 				proj,
 				view,
 				pos[0],
 				pos[1],
 				pos[2],
-				field_sphere_radius(field, i));
+				field_sphere_radius(field, i));*/
 		}
 	}
 }
 
-void lwc_render_field(const LWCONTEXT* pLwc)
-{
+void lwc_render_field(const LWCONTEXT* pLwc) {
 	glViewport(0, 0, pLwc->width, pLwc->height);
 	lw_clear_color();
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -323,11 +351,9 @@ void lwc_render_field(const LWCONTEXT* pLwc)
 			field_field_tex_mip(pLwc->field)
 		);
 	}
-	
-	for (int i = 0; i < MAX_FIELD_OBJECT; i++)
-	{
-		if (pLwc->field_object[i].valid)
-		{
+
+	for (int i = 0; i < MAX_FIELD_OBJECT; i++) {
+		if (pLwc->field_object[i].valid) {
 			render_field_object(
 				pLwc,
 				pLwc->field_object[i].lvt,
@@ -360,6 +386,8 @@ void lwc_render_field(const LWCONTEXT* pLwc)
 
 	render_path_query_test_player(pLwc, perspective, view);
 
+	s_render_field_sphere(pLwc, pLwc->field, perspective, view);
+
 	float rscale[FAN_VERTEX_COUNT_PER_ARRAY];
 	rscale[0] = 0; // center vertex has no meaningful rscale
 	for (int i = 1; i < FAN_VERTEX_COUNT_PER_ARRAY; i++) {
@@ -372,8 +400,6 @@ void lwc_render_field(const LWCONTEXT* pLwc)
 	}
 
 	render_ui(pLwc);
-
-	s_render_field_sphere(pLwc, pLwc->field, perspective, view);
 
 	// give up const-ness
 	((LWCONTEXT*)pLwc)->render_count++;
