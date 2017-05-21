@@ -22,9 +22,19 @@ typedef struct _LWFIELDCUBEOBJECT {
 	float axis_angle[4];
 } LWFIELDCUBEOBJECT;
 
+typedef enum _LW_SPACE_GROUP {
+	LSG_PLAYER,
+	LSG_WORLD,
+	LSG_RAY,
+	LSG_BULLET,
+
+	LSG_COUNT,
+} LW_SPACE_GROUP;
+
 typedef struct _LWFIELD {
 	dWorldID world;
-	dSpaceID space;
+	dSpaceID space; // root space
+	dSpaceID space_group[LSG_COUNT];
 	dGeomID ground;
 	dGeomID box_geom[MAX_BOX_GEOM];
 	int box_geom_count;
@@ -58,6 +68,8 @@ typedef struct _LWFIELD {
 	int field_tex_mip;
 	float skin_scale;
 	int follow_cam;
+
+	int collision_matrix[LSG_COUNT][LSG_COUNT];
 } LWFIELD;
 
 void rotation_matrix_from_vectors(dMatrix3 r, const dReal* vec_a, const dReal* vec_b);
@@ -171,6 +183,30 @@ void resolve_player_collision(LWCONTEXT *pLwc) {
 	pLwc->player_pos_y = player_collider.y;
 }
 
+void s_init_collision_matrix(LWFIELD* field) {
+	memset(field->collision_matrix, 0, sizeof(field->collision_matrix));
+
+	field->collision_matrix[LSG_PLAYER][LSG_PLAYER] = 0;
+	field->collision_matrix[LSG_PLAYER][LSG_WORLD] = 1;
+	field->collision_matrix[LSG_PLAYER][LSG_RAY] = 0;
+	field->collision_matrix[LSG_PLAYER][LSG_BULLET] = 1;
+
+	field->collision_matrix[LSG_WORLD][LSG_PLAYER] = field->collision_matrix[LSG_PLAYER][LSG_WORLD];
+	field->collision_matrix[LSG_WORLD][LSG_WORLD] = 0;
+	field->collision_matrix[LSG_WORLD][LSG_RAY] = 1;
+	field->collision_matrix[LSG_WORLD][LSG_BULLET] = 1;
+
+	field->collision_matrix[LSG_RAY][LSG_PLAYER] = field->collision_matrix[LSG_PLAYER][LSG_RAY];
+	field->collision_matrix[LSG_RAY][LSG_WORLD] = field->collision_matrix[LSG_WORLD][LSG_RAY];
+	field->collision_matrix[LSG_RAY][LSG_RAY] = 0;
+	field->collision_matrix[LSG_RAY][LSG_BULLET] = 0;
+
+	field->collision_matrix[LSG_BULLET][LSG_PLAYER] = field->collision_matrix[LSG_PLAYER][LSG_BULLET];
+	field->collision_matrix[LSG_BULLET][LSG_WORLD] = field->collision_matrix[LSG_WORLD][LSG_BULLET];
+	field->collision_matrix[LSG_BULLET][LSG_RAY] = field->collision_matrix[LSG_RAY][LSG_BULLET];
+	field->collision_matrix[LSG_BULLET][LSG_BULLET] = 0;
+}
+
 LWFIELD* load_field(const char* filename) {
 
 	dInitODE2(0);
@@ -181,19 +217,25 @@ LWFIELD* load_field(const char* filename) {
 	field->player_length = (dReal)3.0;
 	field->world = dWorldCreate();
 	field->space = dHashSpaceCreate(0);
-	field->ground = dCreatePlane(field->space, 0, 0, 1, 0);
+	for (int i = 0; i < LSG_COUNT; i++) {
+		field->space_group[i] = dHashSpaceCreate(field->space);
+	}
+	
+	s_init_collision_matrix(field);
+
+	field->ground = dCreatePlane(field->space_group[LSG_WORLD], 0, 0, 1, 0);
 
 	// Player geom
 	field->player_pos[0] = 0;
 	field->player_pos[1] = 0;
 	field->player_pos[2] = 10;
-	field->player_geom = dCreateCapsule(field->space, field->player_radius, field->player_length);
+	field->player_geom = dCreateCapsule(field->space_group[LSG_PLAYER], field->player_radius, field->player_length);
 	dGeomSetPosition(field->player_geom, field->player_pos[0], field->player_pos[1], field->player_pos[2]);
 
 	field->ray_max_length = 50;
 	
 	for (int i = 0; i < LRI_COUNT; i++) {
-		field->ray[i] = dCreateRay(field->space, field->ray_max_length);
+		field->ray[i] = dCreateRay(field->space_group[LSG_RAY], field->ray_max_length);
 		dGeomSetPosition(field->ray[i], field->player_pos[0], field->player_pos[1], field->player_pos[2]);
 		dMatrix3 R;
 		dRFromAxisAndAngle(R, 1, 0, 0, M_PI); // ray direction: downward (-Z)
@@ -222,7 +264,7 @@ LWFIELD* load_field(const char* filename) {
 	for (int i = 0; i < field->field_cube_object_count; i++) {
 		const LWFIELDCUBEOBJECT* lco = &field->field_cube_object[i];
 
-		field->box_geom[field->box_geom_count] = dCreateBox(field->space, lco->dimx, lco->dimy, lco->dimz);
+		field->box_geom[field->box_geom_count] = dCreateBox(field->space_group[LSG_WORLD], lco->dimx, lco->dimy, lco->dimz);
 		dMatrix3 r;
 		dRFromAxisAndAngle(r, lco->axis_angle[0], lco->axis_angle[1], lco->axis_angle[2], lco->axis_angle[3]);
 		dGeomSetPosition(field->box_geom[field->box_geom_count], lco->x, lco->y, lco->z);
@@ -277,6 +319,7 @@ static void field_near_callback(void *data, dGeomID o1, dGeomID o2) {
 			for (int i = 0; i < n; i++) {
 
 				for (int j = 0; j < LRI_COUNT; j++) {
+
 					if (contact[i].geom.g1 == field->ray[j] || contact[i].geom.g2 == field->ray[j]) {
 						field->ray_result[j][field->ray_result_count[j]] = contact[i];
 
@@ -289,28 +332,6 @@ static void field_near_callback(void *data, dGeomID o1, dGeomID o2) {
 					}
 				}
 				
-				//if (contact[i].geom.g1 == field->player_center_ray || contact[i].geom.g2 == field->player_center_ray) {
-				//	field->center_ray_result[field->center_ray_result_count] = contact[i];
-
-				//	// Negate normal direction if 'g2' is ray. (in other words, not negate if 'g1' is ray)
-				//	if (contact[i].geom.g2 == field->player_center_ray) {
-				//		dNegateVector3(field->center_ray_result[field->center_ray_result_count].geom.normal);
-				//	}
-
-				//	field->center_ray_result_count++;
-				//}
-
-				//if (contact[i].geom.g1 == field->player_contact_ray || contact[i].geom.g2 == field->player_contact_ray) {
-				//	field->contact_ray_result[field->contact_ray_result_count] = contact[i];
-
-				//	// Negate normal direction if 'g2' is ray. (in other words, not negate if 'g1' is ray)
-				//	if (contact[i].geom.g2 == field->player_contact_ray) {
-				//		dNegateVector3(field->contact_ray_result[field->contact_ray_result_count].geom.normal);
-				//	}
-
-				//	field->contact_ray_result_count++;
-				//}
-
 				dReal sign = 0;
 				if (contact[i].geom.g1 == field->player_geom) {
 					sign = 1;
@@ -328,6 +349,12 @@ static void field_near_callback(void *data, dGeomID o1, dGeomID o2) {
 			}
 		}
 	}
+}
+
+static void collide_between_spaces(LWFIELD* field, dSpaceID o1, dSpaceID o2) {
+	dSpaceCollide2((dGeomID)o1, (dGeomID)o2, field, &field_near_callback);
+	dSpaceCollide(o1, field, &field_near_callback);
+	dSpaceCollide(o2, field, &field_near_callback);
 }
 
 void reset_ray_result(LWFIELD* field) {
@@ -523,7 +550,11 @@ void update_field(LWCONTEXT* pLwc, LWFIELD* field) {
 
 	move_aim_ray(field, pLwc->player_state_data.aim_theta, pLwc->player_rot_z);
 	
-	dSpaceCollide(field->space, field, &field_near_callback);
+	//dSpaceCollide(field->space, field, &field_near_callback);
+	collide_between_spaces(field, field->space_group[LSG_PLAYER], field->space_group[LSG_WORLD]);
+	collide_between_spaces(field, field->space_group[LSG_PLAYER], field->space_group[LSG_BULLET]);
+	collide_between_spaces(field, field->space_group[LSG_WORLD], field->space_group[LSG_RAY]);
+	collide_between_spaces(field, field->space_group[LSG_WORLD], field->space_group[LSG_BULLET]);
 	
 	// No physics simulation needed for ray testing.
 	//dWorldStep(field->world, 0.05);
@@ -642,6 +673,9 @@ void unload_field(LWFIELD* field) 	{
 	dGeomDestroy(field->player_contact_ray);*/
 	for (int i = 0; i < field->box_geom_count; i++) {
 		dGeomDestroy(field->box_geom[i]);
+	}
+	for (int i = 0; i < LSG_COUNT; i++) {
+		dSpaceDestroy(field->space_group[i]);
 	}
 	dSpaceDestroy(field->space);
 	dWorldDestroy(field->world);
