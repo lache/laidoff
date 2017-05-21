@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		562DAF601ED1920300208E62 /* playersm.c in Sources */ = {isa = PBXBuildFile; fileRef = 562DAF5E1ED1920300208E62 /* playersm.c */; };
 		5633AC321EADDF98003F1549 /* net.c in Sources */ = {isa = PBXBuildFile; fileRef = 5633AC311EADDF98003F1549 /* net.c */; };
 		5644E9E31EA8B69000EAA658 /* battle.c in Sources */ = {isa = PBXBuildFile; fileRef = 5644E98F1EA8B69000EAA658 /* battle.c */; };
 		5644E9E41EA8B69000EAA658 /* battlelogic.c in Sources */ = {isa = PBXBuildFile; fileRef = 5644E9911EA8B69000EAA658 /* battlelogic.c */; };
@@ -352,6 +353,8 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		562DAF5E1ED1920300208E62 /* playersm.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = playersm.c; sourceTree = "<group>"; };
+		562DAF5F1ED1920300208E62 /* playersm.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = playersm.h; sourceTree = "<group>"; };
 		5633AC301EADDF62003F1549 /* sound.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = sound.h; sourceTree = "<group>"; };
 		5633AC311EADDF98003F1549 /* net.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = net.c; sourceTree = "<group>"; };
 		5633AC331EADDFC7003F1549 /* net.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = net.h; sourceTree = "<group>"; };
@@ -1909,6 +1912,8 @@
 		6CA16CF41EA20CA700DB7AF0 /* src */ = {
 			isa = PBXGroup;
 			children = (
+				562DAF5E1ED1920300208E62 /* playersm.c */,
+				562DAF5F1ED1920300208E62 /* playersm.h */,
 				565DD43E1ECF58A8002C4493 /* render_fan.c */,
 				565DD43F1ECF58A8002C4493 /* render_fan.h */,
 				564D11941ECA511E002CCCAE /* extrapolator.cpp */,
@@ -2419,6 +2424,7 @@
 				56F189A91EC751950019312F /* ziflist.c in Sources */,
 				56F188EF1EC74DB60019312F /* socks_connecter.cpp in Sources */,
 				56F189BA1EC751950019312F /* ztimerset.c in Sources */,
+				562DAF601ED1920300208E62 /* playersm.c in Sources */,
 				56F189AA1EC751950019312F /* zlist.c in Sources */,
 				56F189981EC751950019312F /* zchunk.c in Sources */,
 				56F188CA1EC74DB60019312F /* norm_engine.cpp in Sources */,
