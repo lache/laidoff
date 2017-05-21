@@ -329,10 +329,10 @@ static void field_world_bullet_near(void *data, dGeomID o1, dGeomID o2) {
 	dContact contact[1];
 	int n = dCollide(o1, o2, 1, &contact[0].geom, sizeof(dContact));
 	if (n > 0) {
-		LOGI("Bullet boom!!! at %f,%f,%f",
+		/*LOGI("Bullet boom!!! at %f,%f,%f",
 			contact[0].geom.pos[0],
 			contact[0].geom.pos[1],
-			contact[0].geom.pos[2]);
+			contact[0].geom.pos[2]);*/
 		dGeomDisable(o2);
 	}
 }
