@@ -92,7 +92,7 @@ void render_skin(const LWCONTEXT* pLwc,
 	const struct _LWANIMACTION* action,
 	const struct _LWARMATURE* armature,
 	float alpha_multiplier, float or , float og, float ob, float oratio,
-	const mat4x4 proj, const mat4x4 view, const mat4x4 model, double skin_time) {
+	const mat4x4 proj, const mat4x4 view, const mat4x4 model, double skin_time, int loop) {
 
 	int shader_index = LWST_SKIN;
 
@@ -111,7 +111,7 @@ void render_skin(const LWCONTEXT* pLwc,
 	}
 
 	float f = (float)(skin_time * action->fps);
-	f = fmodf(f, action->last_key_f);
+	f = loop ? fmodf(f, action->last_key_f) : LWMIN(f, action->last_key_f);
 
 	//const float f = 0;// 89;
 
@@ -232,5 +232,5 @@ void render_skin_ui(const LWCONTEXT* pLwc,
 	mat4x4 identity_view;
 	mat4x4_identity(identity_view);
 
-	render_skin(pLwc, tex_index, lvt, action, armature, alpha_multiplier, or , og, ob, oratio, pLwc->proj, identity_view, model, skin_time);
+	render_skin(pLwc, tex_index, lvt, action, armature, alpha_multiplier, or , og, ob, oratio, pLwc->proj, identity_view, model, skin_time, 1);
 }

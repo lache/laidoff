@@ -9,6 +9,7 @@
 #include "mq.h"
 #include "extrapolator.h"
 #include <czmq.h>
+#include "playersm.h"
 
 void rotation_matrix_from_vectors(dMatrix3 r, const dReal* vec_a, const dReal* vec_b);
 
@@ -471,7 +472,7 @@ void update_field(LWCONTEXT* pLwc, LWFIELD* field) {
 
 	move_player_geom_by_input(field);
 
-	move_aim_ray(field, pLwc->player_aim_theta, pLwc->player_rot_z);
+	move_aim_ray(field, pLwc->player_state_data.aim_theta, pLwc->player_rot_z);
 	
 	dSpaceCollide(field->space, field, &field_near_callback);
 	
@@ -486,25 +487,45 @@ void update_field(LWCONTEXT* pLwc, LWFIELD* field) {
 	dScaleVector3(field->player_vel, (dReal)1.0 / pLwc->delta_time);
 
 	//LOGI("%f, %f, %f", field->player_vel[0], field->player_vel[1], field->player_vel[2]);
+
+	LW_ACTION player_anim_0 = get_anim_by_state(pLwc->player_state_data.state, &pLwc->player_action_loop);
+	pLwc->player_action = &pLwc->action[player_anim_0];
+
+	float f = (float)(pLwc->player_state_data.skin_time * pLwc->player_action->fps);
+	const int player_action_animfin = f > pLwc->player_action->last_key_f;
+
+	// Update player state data
+	// Set inputs
+	pLwc->player_state_data.delta_time = (float)pLwc->delta_time;
+	pLwc->player_state_data.dir = pLwc->dir_pad_dragging;
+	pLwc->player_state_data.atk = pLwc->atk_pad_dragging;
+	pLwc->player_state_data.animfin = player_action_animfin;
+	pLwc->player_state_data.aim_last_skin_time = pLwc->action[LWAC_HUMANACTION_STAND_AIM].last_key_f / pLwc->action[LWAC_HUMANACTION_STAND_AIM].fps;
+	// Get outputs
+	pLwc->player_state_data.state = run_state(pLwc->player_state_data.state, &pLwc->player_state_data);
 	
-	LW_ACTION player_anim;
-	if (pLwc->player_attacking) {
-		player_anim = LWAC_HUMANACTION_STAND_FIRE;
+	LW_ACTION player_anim_1 = get_anim_by_state(pLwc->player_state_data.state, &pLwc->player_action_loop);
+	/*if (pLwc->player_attacking) {
+		player_anim = LWAC_HUMANACTION_ATTACK;
+		pLwc->player_action_loop = 0;
+	} else if (pLwc->player_aiming) {
+		player_anim = LWAC_HUMANACTION_STAND_AIM;
+		pLwc->player_action_loop = 0;
 	} else if (pLwc->player_moving) {
 		player_anim = LWAC_HUMANACTION_WALKPOLISH;
+		pLwc->player_action_loop = 1;
 	} else {
 		player_anim = LWAC_HUMANACTION_IDLE;
-	}
+		pLwc->player_action_loop = 1;
+	}*/
 
-	pLwc->player_action = &pLwc->action[player_anim];
-
-	float f = (float)(pLwc->player_skin_time * pLwc->player_action->fps);
-	if (pLwc->player_attacking && pLwc->player_action && f > pLwc->player_action->last_key_f) {
-		pLwc->player_attacking = 0;
+	pLwc->player_action = &pLwc->action[player_anim_1];
+	if (pLwc->player_attacking && pLwc->player_action && player_action_animfin) {
+		//pLwc->player_attacking = 0;
 	}
 	// Update skin time
-	pLwc->player_skin_time += pLwc->delta_time;
-	pLwc->test_player_skin_time += pLwc->delta_time;
+	pLwc->player_skin_time += (float)pLwc->delta_time;
+	pLwc->test_player_skin_time += (float)pLwc->delta_time;
 	// Read pathfinding result and set the test player's position
 	if (pLwc->field->path_query.n_smooth_path) {
 

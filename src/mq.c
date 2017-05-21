@@ -170,14 +170,16 @@ static void s_mq_poll_time(void* _mq, void* sm) {
 			free(name);
 			char* timereply = zstr_recv(mq->snapshot);
 			if (timereply) {
+				// https://en.wikipedia.org/wiki/Network_Time_Protocol#Clock_synchronization_algorithm
 				double t2 = 0, t1 = 0, t0 = 0;
 				sscanf(timereply, "%lf %lf %lf", &t2, &t1, &t0);
 				double t3 = mq_mono_clock();
 				double delta = ((t1 - t0) + (t2 - t3)) / 2;
 				mq->deltasamples[mq->deltasequence++] = delta;
+				double roundtrip_delay = (t3 - t0) - (t2 - t1);
 
 				/*if (mq->verbose)*/ {
-					LOGI("REQ %d: delta = %f", mq->deltasequence, delta);
+					LOGI("REQ %d: delta = %f sec, rtd = %f sec", mq->deltasequence, delta, roundtrip_delay);
 				}
 
 				char sys_msg[128];

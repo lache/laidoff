@@ -70,7 +70,7 @@ void lw_trigger_mouse_press(LWCONTEXT *pLwc, float x, float y) {
 
 	convert_touch_coord_to_ui_coord(pLwc, &x, &y);
 
-	LOGI("mouse press ui coord x=%f, y=%f\n", x, y);
+	//LOGI("mouse press ui coord x=%f, y=%f\n", x, y);
 
 	mq_publish_now(pLwc, pLwc->mq, 0);
 
@@ -93,6 +93,8 @@ void lw_trigger_mouse_press(LWCONTEXT *pLwc, float x, float y) {
 		field_attack(pLwc);
 
 		//pLwc->hide_field = !pLwc->hide_field;
+		pLwc->atk_pad_dragging = 1;
+		//LOGI("atk_pad_dragging ON");
 	}
 
 	if (pLwc->game_scene == LGS_FIELD && fabs(aspect_ratio - 0.3f - 0.75f / 2 - x) < 0.75f && fabs(1 - 0.75f / 2 - y) < 0.75f) {
@@ -164,8 +166,7 @@ void lw_trigger_mouse_release(LWCONTEXT *pLwc, float x, float y) {
 
 	convert_touch_coord_to_ui_coord(pLwc, &x, &y);
 
-	printf("mouse release ui coord x=%f, y=%f (last move ui coord x=%f, y=%f)\n",
-		x, y, pLwc->last_mouse_press_x, pLwc->last_mouse_press_y);
+	//printf("mouse release ui coord x=%f, y=%f (last move ui coord x=%f, y=%f)\n", x, y, pLwc->last_mouse_press_x, pLwc->last_mouse_press_y);
 
 	mq_publish_now(pLwc, pLwc->mq, 1);
 
@@ -192,6 +193,8 @@ void lw_trigger_mouse_release(LWCONTEXT *pLwc, float x, float y) {
 	reset_dir_pad_position(pLwc);
 
 	pLwc->dir_pad_dragging = 0;
+	pLwc->atk_pad_dragging = 0;
+	//LOGI("atk_pad_dragging OFF");
 
 	if (pLwc->game_scene == LGS_ADMIN) {
 		touch_admin(pLwc, pLwc->last_mouse_press_x, pLwc->last_mouse_press_y, x, y);

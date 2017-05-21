@@ -177,11 +177,11 @@ void render_path_query_test_player(const LWCONTEXT* pLwc, mat4x4 perspective, ma
 			LSVT_HUMAN,
 			&pLwc->action[LWAC_HUMANACTION_WALKPOLISH],
 			&pLwc->armature[LWAR_HUMANARMATURE],
-			1, 0, 0, 0, 0, perspective, view, skin_model, pLwc->test_player_skin_time * 5);
+			1, 0, 0, 0, 0, perspective, view, skin_model, pLwc->test_player_skin_time * 5, 1);
 	}
 }
 
-void render_player_model(const LWCONTEXT* pLwc, mat4x4 perspective, mat4x4 view, float x, float y, float z, float a, const LWANIMACTION* action) {
+void render_player_model(const LWCONTEXT* pLwc, mat4x4 perspective, mat4x4 view, float x, float y, float z, float a, const LWANIMACTION* action, float skin_time, int loop) {
 	mat4x4 skin_trans;
 	mat4x4_identity(skin_trans);
 	mat4x4_translate(skin_trans, x, y, z);
@@ -204,7 +204,7 @@ void render_player_model(const LWCONTEXT* pLwc, mat4x4 perspective, mat4x4 view,
 			LSVT_HUMAN,
 			action,
 			&pLwc->armature[LWAR_HUMANARMATURE],
-			1, 0, 0, 0, 0, perspective, view, skin_model, pLwc->player_skin_time);
+			1, 0, 0, 0, 0, perspective, view, skin_model, skin_time, loop);
 	}
 }
 
@@ -316,14 +316,14 @@ void lwc_render_field(const LWCONTEXT* pLwc)
 		}
 	}
 
-	render_player_model(pLwc, perspective, view, player_x, player_y, player_z, pLwc->player_rot_z, pLwc->player_action);
+	render_player_model(pLwc, perspective, view, player_x, player_y, player_z, pLwc->player_rot_z, pLwc->player_action, pLwc->player_state_data.skin_time, pLwc->player_action_loop);
 
 	LWPOSSYNCMSG* value = mq_possync_first(pLwc->mq);
 	while (value) {
 		const char* cursor = mq_possync_cursor(pLwc->mq);
 		// Exclude the player
 		if (!mq_cursor_player(pLwc->mq, cursor)) {
-			render_player_model(pLwc, perspective, view, value->x, value->y, value->z, value->a, value->action);
+			render_player_model(pLwc, perspective, view, value->x, value->y, value->z, value->a, value->action, pLwc->player_skin_time, 1);
 		}
 		value = mq_possync_next(pLwc->mq);
 	}
@@ -336,8 +336,10 @@ void lwc_render_field(const LWCONTEXT* pLwc)
 		rscale[i] = (float)pLwc->field->ray_nearest_depth[LRI_AIM_SECTOR_FIRST_INCLUSIVE + i - 1];
 	}
 
-	render_fan(pLwc, perspective, view,
-		player_x, player_y, player_z, pLwc->player_rot_z, pLwc->player_aim_theta, rscale);
+	if (pLwc->player_state_data.state == LPS_AIM || pLwc->player_state_data.state == LPS_FIRE) {
+		render_fan(pLwc, perspective, view,
+			player_x, player_y, player_z, pLwc->player_rot_z, pLwc->player_state_data.aim_theta, rscale);
+	}
 
 	render_ui(pLwc);
 

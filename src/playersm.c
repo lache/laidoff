@@ -1,0 +1,191 @@
+#include "playersm.h"
+#include "lwmacro.h"
+#include "lwlog.h"
+
+static int s_verbose = 0;
+
+typedef LW_PLAYER_STATE STATE_FUNC(LWPLAYERSTATEDATA* data);
+
+static LW_PLAYER_STATE s_do_state_idle(LWPLAYERSTATEDATA* data) {
+	data->skin_time += data->delta_time;
+	// Start moving
+	if (data->dir) {
+		return LPS_MOVE;
+	}
+	// Start aiming
+	if (data->atk) {
+		return LPS_AIM;
+	}
+	return LPS_IDLE;
+}
+
+static LW_PLAYER_STATE s_do_state_move(LWPLAYERSTATEDATA* data) {
+	data->skin_time += data->delta_time;
+	// Stop moving
+	if (!data->dir) {
+		return LPS_IDLE;
+	}
+	// Start aiming
+	if (data->atk) {
+		return LPS_AIM;
+	}
+	return LPS_MOVE;
+}
+
+static LW_PLAYER_STATE s_do_state_aim(LWPLAYERSTATEDATA* data) {
+	data->skin_time += data->delta_time;
+	// Fire!
+	if (!data->atk) {
+		return LPS_FIRE;
+	}
+	// Increase aiming precision
+	data->aim_theta = LWMAX((float)LWDEG2RAD(5), data->aim_theta + data->aim_theta_speed * data->delta_time);
+	return LPS_AIM;
+}
+
+static LW_PLAYER_STATE s_do_state_fire(LWPLAYERSTATEDATA* data) {
+	data->skin_time += data->delta_time;
+	// Start moving
+	if (data->dir) {
+		return LPS_MOVE;
+	}
+	// Start aiming
+	if (data->atk) {
+		return LPS_AIM;
+	}
+	// Finished fire anim
+	if (data->animfin) {
+		return LPS_UNAIM;
+	}
+	return LPS_FIRE;
+}
+
+static LW_PLAYER_STATE s_do_state_unaim(LWPLAYERSTATEDATA* data) {
+	data->skin_time += data->delta_time;
+	// Start moving
+	if (data->dir) {
+		return LPS_IDLE;
+	}
+	// Start aiming
+	if (data->atk) {
+		return LPS_AIM;
+	}
+	// Finished unaim anim
+	if (data->animfin) {
+		return LPS_IDLE;
+	}
+	return LPS_UNAIM;
+}
+
+static STATE_FUNC* const s_state[LPS_COUNT] = {
+	s_do_state_idle,
+	s_do_state_move,
+	s_do_state_aim,
+	s_do_state_fire,
+	s_do_state_unaim,
+};
+
+static void s_on_enter_aim(LWPLAYERSTATEDATA* data);
+
+static void s_do_idle_to_move(LWPLAYERSTATEDATA* data) {
+	if (s_verbose) { LOGI("s_do_idle_to_move"); }
+	data->skin_time = 0;
+}
+
+static void s_do_move_to_idle(LWPLAYERSTATEDATA* data) {
+	if (s_verbose) { LOGI("s_do_move_to_idle"); }
+	data->skin_time = 0;
+}
+
+static void s_do_move_to_aim(LWPLAYERSTATEDATA* data) {
+	if (s_verbose) { LOGI("s_do_move_to_aim"); }
+	data->skin_time = 0;
+	s_on_enter_aim(data);
+}
+
+static void s_do_idle_to_aim(LWPLAYERSTATEDATA* data) {
+	if (s_verbose) { LOGI("s_do_idle_to_aim"); }
+	data->skin_time = 0;
+	s_on_enter_aim(data);
+}
+
+static void s_do_aim_to_idle(LWPLAYERSTATEDATA* data) {
+	if (s_verbose) { LOGI("s_do_aim_to_idle"); }
+	data->skin_time = 0;
+}
+
+static void s_do_aim_to_fire(LWPLAYERSTATEDATA* data) {
+	if (s_verbose) { LOGI("s_do_aim_to_fire"); }
+	data->skin_time = 0;
+	if (s_verbose) { LOGI("Fire!"); }
+}
+
+static void s_do_fire_to_unaim(LWPLAYERSTATEDATA* data) {
+	if (s_verbose) { LOGI("s_do_fire_to_unaim"); }
+	data->skin_time = 0;
+}
+
+static void s_do_fire_to_move(LWPLAYERSTATEDATA* data) {
+	if (s_verbose) { LOGI("s_do_fire_to_move"); }
+	data->skin_time = 0;
+}
+
+static void s_do_fire_to_aim(LWPLAYERSTATEDATA* data) {
+	if (s_verbose) { LOGI("s_do_fire_to_aim"); }
+	data->skin_time = data->aim_last_skin_time; // Start with aim finished pose
+	s_on_enter_aim(data);
+}
+
+static void s_do_unaim_to_idle(LWPLAYERSTATEDATA* data) {
+	if (s_verbose) { LOGI("s_do_unaim_to_idle"); }
+	data->skin_time = 0;
+}
+
+static void s_do_unaim_to_aim(LWPLAYERSTATEDATA* data) {
+	if (s_verbose) { LOGI("s_do_unaim_to_aim"); }
+	data->skin_time = 0;//
+	s_on_enter_aim(data);
+}
+
+
+typedef void TRANSITION_FUNC(LWPLAYERSTATEDATA* data);
+
+static TRANSITION_FUNC* const s_transition[LPS_COUNT][LPS_COUNT] = {
+	//			IDLE					MOVE					AIM						FIRE				UNAIM
+	/* IDLE */	{ 0,					s_do_idle_to_move,		s_do_idle_to_aim,		0,					0,					},
+	/* MOVE */	{ s_do_move_to_idle,	0,						s_do_move_to_aim,		0,					0,					},
+	/* AIM */	{ s_do_aim_to_idle,		0,						0,						s_do_aim_to_fire,	0,					},
+	/* FIRE */	{ 0,					s_do_fire_to_move,		s_do_fire_to_aim,		0,					s_do_fire_to_unaim	},
+	/* UNAIM*/	{ s_do_unaim_to_idle,	0,						s_do_unaim_to_aim,		0,					0,					},
+};
+
+LW_PLAYER_STATE run_state(LW_PLAYER_STATE cur_state, LWPLAYERSTATEDATA* data) {
+	LW_PLAYER_STATE new_state = s_state[cur_state](data);
+	TRANSITION_FUNC* transition = s_transition[cur_state][new_state];
+	if (transition) {
+		transition(data);
+	}
+	return new_state;
+}
+
+static const struct {
+	LW_ACTION action;
+	int loop;
+} S_ANIM_BY_STATE[LPS_COUNT] = {
+	{ LWAC_HUMANACTION_IDLE,		1 },
+	{ LWAC_HUMANACTION_WALKPOLISH,	1 },
+	{ LWAC_HUMANACTION_STAND_AIM,	0 },
+	{ LWAC_HUMANACTION_STAND_FIRE,	0 },
+	{ LWAC_HUMANACTION_STAND_UNAIM, 0 },
+};
+
+LW_ACTION get_anim_by_state(LW_PLAYER_STATE cur_state, int* loop) {
+	*loop = S_ANIM_BY_STATE[cur_state].loop;
+	return S_ANIM_BY_STATE[cur_state].action;
+}
+
+static void s_on_enter_aim(LWPLAYERSTATEDATA* data) {
+	// Set start aim theta
+	data->aim_theta = (float)(M_PI / 4);
+	data->aim_theta_speed = -(float)LWDEG2RAD(90);
+}

@@ -19,7 +19,7 @@ void mouse_button_callback(GLFWwindow* window, int button, int action, int mods)
 
 		if (action == GLFW_PRESS)
 		{
-			printf("glfw mouse press pos x=%f, y=%f (normalized x=%f, y=%f)\n", xpos, ypos, normalized_xpos, normalized_ypos);
+			//printf("glfw mouse press pos x=%f, y=%f (normalized x=%f, y=%f)\n", xpos, ypos, normalized_xpos, normalized_ypos);
 
 			lw_trigger_touch(pLwc, (float)normalized_xpos, (float)normalized_ypos);
 

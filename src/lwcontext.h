@@ -22,7 +22,7 @@
 #include "lwfbo.h"
 #include "lwtrail.h"
 #include "armature.h"
-#include "nav.h"
+#include "playersm.h"
 
 typedef enum _LW_SHADER_TYPE {
 	LWST_DEFAULT,
@@ -146,10 +146,12 @@ typedef struct _LWCONTEXT {
 	float player_rot_z;
 	float player_pos_last_moved_dx;
 	float player_pos_last_moved_dy;
-	int player_moving;
-	int player_attacking;
+	int player_moving; // Player is moving
+	int player_attacking; // Player is attacking with its fist
+	int player_aiming; // Player is aiming with its pistol
 	const LWANIMACTION* player_action;
-	float player_aim_theta;
+	//float player_aim_theta;
+	LWPLAYERSTATEDATA player_state_data;
 
 	LWBOX2DCOLLIDER box_collider[MAX_BOX_COLLIDER];
 	LWFIELDOBJECT field_object[MAX_FIELD_OBJECT];
@@ -157,6 +159,7 @@ typedef struct _LWCONTEXT {
 	float dir_pad_x;
 	float dir_pad_y;
 	int dir_pad_dragging;
+	int atk_pad_dragging;
 
 	int field_event_id;
 
@@ -209,8 +212,9 @@ typedef struct _LWCONTEXT {
 
 	LWARMATURE armature[LWAR_COUNT];
 	LWANIMACTION action[LWAC_COUNT];
-	double player_skin_time;
-	double test_player_skin_time;
+	float player_skin_time;
+	float test_player_skin_time;
+	int player_action_loop;
 
 	// Field
 
