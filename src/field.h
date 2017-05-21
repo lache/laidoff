@@ -1,8 +1,6 @@
 #pragma once
-#include <ode/ode.h>
 #include "lwgl.h"
 #include "lwanim.h"
-#include "nav.h"
 #include "lwvbotype.h"
 #include "vertices.h"
 
@@ -26,43 +24,7 @@ typedef enum _LW_RAY_ID {
 	LRI_COUNT
 } LW_RAY_ID;
 
-typedef struct _LWFIELD {
-	dWorldID world;
-	dSpaceID space;
-	dGeomID ground;
-	dGeomID box_geom[MAX_BOX_GEOM];
-	int box_geom_count;
-	dGeomID player_geom;
-	dReal player_radius;
-	dReal player_length;
-
-	dReal ray_max_length;
-	dGeomID ray[LRI_COUNT];
-	dContact ray_result[LRI_COUNT][MAX_RAY_RESULT_COUNT];
-	int ray_result_count[LRI_COUNT];
-	dReal ray_nearest_depth[LRI_COUNT];
-	int ray_nearest_index[LRI_COUNT];
-	
-	dVector3 player_pos;
-	dVector3 player_pos_delta;
-	dVector3 ground_normal;
-	dVector3 player_vel;
-	LWFIELDCUBEOBJECT* field_cube_object;
-	int field_cube_object_count;
-	char* d;
-
-	void* nav;
-	LWPATHQUERY path_query;
-	float path_query_time;
-	vec3 path_query_test_player_pos;
-	float path_query_test_player_rot;
-
-	LW_VBO_TYPE field_vbo;
-	GLuint field_tex_id;
-	int field_tex_mip;
-	float skin_scale;
-	int follow_cam;
-} LWFIELD;
+typedef struct _LWFIELD LWFIELD;
 
 void move_player(LWCONTEXT *pLwc);
 void resolve_player_collision(LWCONTEXT *pLwc);
@@ -74,3 +36,18 @@ void set_field_player_position(LWFIELD* field, float x, float y, float z);
 void get_field_player_position(const LWFIELD* field, float* x, float* y, float* z);
 void field_attack(LWCONTEXT* pLwc);
 void field_enable_ray_test(LWFIELD* field, int enable);
+void field_path_query_spos(const LWFIELD* field, float* p);
+void field_path_query_epos(const LWFIELD* field, float* p);
+void field_set_path_query_spos(LWFIELD* field, float x, float y, float z);
+void field_set_path_query_epos(LWFIELD* field, float x, float y, float z);
+int field_path_query_n_smooth_path(const LWFIELD* field);
+const float* field_path_query_test_player_pos(const LWFIELD* field);
+float field_path_query_test_player_rot(const LWFIELD* field);
+float field_skin_scale(const LWFIELD* field);
+int field_follow_cam(const LWFIELD* field);
+LW_VBO_TYPE field_field_vbo(const LWFIELD* field);
+GLuint field_field_tex_id(const LWFIELD* field);
+int field_field_tex_mip(const LWFIELD* field);
+double field_ray_nearest_depth(const LWFIELD* field, LW_RAY_ID lri);
+void field_nav_query(LWFIELD* field);
+void init_field(LWCONTEXT* pLwc, const char* field_filename, const char* nav_filename, LW_VBO_TYPE vbo, GLuint tex_id, int tex_mip, float skin_scale, int follow_cam);

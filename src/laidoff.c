@@ -34,7 +34,6 @@
 #include "lwanim.h"
 #include "lwskinmesh.h"
 #include "render_physics.h"
-#include "nav.h"
 #include "mq.h"
 #include "sysmsg.h"
 #include "render_text_block.h"
@@ -1409,27 +1408,6 @@ void init_action(LWCONTEXT* pLwc) {
 	for (int i = 0; i < LWAC_COUNT; i++) {
 		load_action(action_filename[i], &pLwc->action[i]);
 	}
-}
-
-void init_field(LWCONTEXT* pLwc, const char* field_filename, const char* nav_filename, LW_VBO_TYPE vbo, GLuint tex_id, int tex_mip, float skin_scale, int follow_cam) {
-	if (pLwc->field) {
-		if (pLwc->field->nav) {
-			unload_nav(pLwc->field->nav);
-		}
-
-		unload_field(pLwc->field);
-	}
-
-	pLwc->field = load_field(field_filename);
-	pLwc->field->nav = load_nav(nav_filename);
-	pLwc->field->field_vbo = vbo;
-	pLwc->field->field_tex_id = tex_id;
-	pLwc->field->field_tex_mip = tex_mip;
-	pLwc->field->skin_scale = skin_scale;
-	pLwc->field->follow_cam = follow_cam;
-
-	set_random_start_end_pos(pLwc->field->nav, &pLwc->field->path_query);
-	nav_query(pLwc->field->nav, &pLwc->field->path_query);
 }
 
 LWCONTEXT *lw_init(void) {

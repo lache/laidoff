@@ -138,33 +138,40 @@ void render_debug_sphere(const LWCONTEXT* pLwc, GLuint tex_id, mat4x4 perspectiv
 
 void render_path_query_test_player(const LWCONTEXT* pLwc, mat4x4 perspective, mat4x4 view) {
 
+	float spos[3], epos[3];
+	field_path_query_spos(pLwc->field, spos);
+	field_path_query_epos(pLwc->field, epos);
+
 	render_debug_sphere(pLwc,
 		pLwc->tex_programmed[LPT_SOLID_RED],
 		perspective,
 		view,
-		pLwc->field->path_query.spos[0],
-		-pLwc->field->path_query.spos[2],
-		pLwc->field->path_query.spos[1]);
+		spos[0],
+		spos[1],
+		spos[2]);
 
 	render_debug_sphere(pLwc,
 		pLwc->tex_programmed[LPT_SOLID_BLUE],
 		perspective,
 		view,
-		pLwc->field->path_query.epos[0],
-		-pLwc->field->path_query.epos[2],
-		pLwc->field->path_query.epos[1]);
+		epos[0],
+		epos[1],
+		epos[2]);
 
-	if (!pLwc->fps_mode && pLwc->field->path_query.n_smooth_path) {
+	if (!pLwc->fps_mode && field_path_query_n_smooth_path(pLwc->field)) {
+
+		const float* path_query_test_player_pos = field_path_query_test_player_pos(pLwc->field);
+		const float skin_scale_f = field_skin_scale(pLwc->field);
 
 		mat4x4 skin_trans;
 		mat4x4_identity(skin_trans);
-		mat4x4_translate(skin_trans, pLwc->field->path_query_test_player_pos[0], pLwc->field->path_query_test_player_pos[1], pLwc->field->path_query_test_player_pos[2]);
+		mat4x4_translate(skin_trans, path_query_test_player_pos[0], path_query_test_player_pos[1], path_query_test_player_pos[2]);
 		mat4x4 skin_scale;
 		mat4x4_identity(skin_scale);
-		mat4x4_scale_aniso(skin_scale, skin_scale, pLwc->field->skin_scale, pLwc->field->skin_scale, pLwc->field->skin_scale);
+		mat4x4_scale_aniso(skin_scale, skin_scale, skin_scale_f, skin_scale_f, skin_scale_f);
 		mat4x4 skin_rot;
 		mat4x4_identity(skin_rot);
-		mat4x4_rotate_Z(skin_rot, skin_rot, pLwc->field->path_query_test_player_rot + (float)LWDEG2RAD(90));
+		mat4x4_rotate_Z(skin_rot, skin_rot, field_path_query_test_player_rot(pLwc->field) + (float)LWDEG2RAD(90));
 
 		mat4x4 skin_model;
 		mat4x4_identity(skin_model);
@@ -182,12 +189,14 @@ void render_path_query_test_player(const LWCONTEXT* pLwc, mat4x4 perspective, ma
 }
 
 void render_player_model(const LWCONTEXT* pLwc, mat4x4 perspective, mat4x4 view, float x, float y, float z, float a, const LWANIMACTION* action, float skin_time, int loop) {
+	const float skin_scale_f = field_skin_scale(pLwc->field);
+
 	mat4x4 skin_trans;
 	mat4x4_identity(skin_trans);
 	mat4x4_translate(skin_trans, x, y, z);
 	mat4x4 skin_scale;
 	mat4x4_identity(skin_scale);
-	mat4x4_scale_aniso(skin_scale, skin_scale, pLwc->field->skin_scale, pLwc->field->skin_scale, pLwc->field->skin_scale);
+	mat4x4_scale_aniso(skin_scale, skin_scale, skin_scale_f, skin_scale_f, skin_scale_f);
 	mat4x4 skin_rot;
 	mat4x4_identity(skin_rot);
 	mat4x4_rotate_Z(skin_rot, skin_rot, a + (float)LWDEG2RAD(90));
@@ -234,21 +243,24 @@ void lwc_render_field(const LWCONTEXT* pLwc)
 	float player_x = 0, player_y = 0, player_z = 0;
 	get_field_player_position(pLwc->field, &player_x, &player_y, &player_z);
 
+	const float* path_query_test_player_pos = field_path_query_test_player_pos(pLwc->field);
+	const float path_query_test_player_rot = field_path_query_test_player_rot(pLwc->field);
+
 	mat4x4 view;
 	vec3 eye = {
-		pLwc->field->path_query_test_player_pos[0],
-		pLwc->field->path_query_test_player_pos[1],
-		pLwc->field->path_query_test_player_pos[2] + 5
+		path_query_test_player_pos[0],
+		path_query_test_player_pos[1],
+		path_query_test_player_pos[2] + 5
 	};
 
 	vec3 center = {
-		pLwc->field->path_query_test_player_pos[0] + cosf(pLwc->field->path_query_test_player_rot),
-		pLwc->field->path_query_test_player_pos[1] + sinf(pLwc->field->path_query_test_player_rot),
-		pLwc->field->path_query_test_player_pos[2] + 5
+		path_query_test_player_pos[0] + cosf(path_query_test_player_rot),
+		path_query_test_player_pos[1] + sinf(path_query_test_player_rot),
+		path_query_test_player_pos[2] + 5
 	};
 
 	if (!pLwc->fps_mode) {
-		if (pLwc->field->follow_cam) {
+		if (field_follow_cam(pLwc->field)) {
 			const float cam_dist = 30;
 
 			eye[0] = player_x;
@@ -279,8 +291,8 @@ void lwc_render_field(const LWCONTEXT* pLwc)
 	if (!pLwc->hide_field) {
 		render_field_object(
 			pLwc,
-			pLwc->field->field_vbo,//LVT_APT, //LVT_FLOOR,
-			pLwc->field->field_tex_id,// pLwc->tex_atlas[LAE_3D_APT_TEX_MIP_KTX],  //pLwc->tex_atlas[LAE_3D_FLOOR_TEX_KTX],
+			field_field_vbo(pLwc->field),
+			field_field_tex_id(pLwc->field),
 			view,
 			perspective,
 			0,
@@ -290,7 +302,7 @@ void lwc_render_field(const LWCONTEXT* pLwc)
 			1,
 			1,
 			1,
-			pLwc->field->field_tex_mip
+			field_field_tex_mip(pLwc->field)
 		);
 	}
 	
@@ -333,7 +345,7 @@ void lwc_render_field(const LWCONTEXT* pLwc)
 	float rscale[FAN_VERTEX_COUNT_PER_ARRAY];
 	rscale[0] = 0; // center vertex has no meaningful rscale
 	for (int i = 1; i < FAN_VERTEX_COUNT_PER_ARRAY; i++) {
-		rscale[i] = (float)pLwc->field->ray_nearest_depth[LRI_AIM_SECTOR_FIRST_INCLUSIVE + i - 1];
+		rscale[i] = (float)field_ray_nearest_depth(pLwc->field, LRI_AIM_SECTOR_FIRST_INCLUSIVE + i - 1);
 	}
 
 	if (pLwc->player_state_data.state == LPS_AIM || pLwc->player_state_data.state == LPS_FIRE) {

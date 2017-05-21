@@ -9,7 +9,46 @@
 #include "mq.h"
 #include "extrapolator.h"
 #include <czmq.h>
+#include <ode/ode.h>
 #include "playersm.h"
+
+typedef struct _LWFIELD {
+	dWorldID world;
+	dSpaceID space;
+	dGeomID ground;
+	dGeomID box_geom[MAX_BOX_GEOM];
+	int box_geom_count;
+	dGeomID player_geom;
+	dReal player_radius;
+	dReal player_length;
+
+	dReal ray_max_length;
+	dGeomID ray[LRI_COUNT];
+	dContact ray_result[LRI_COUNT][MAX_RAY_RESULT_COUNT];
+	int ray_result_count[LRI_COUNT];
+	dReal ray_nearest_depth[LRI_COUNT];
+	int ray_nearest_index[LRI_COUNT];
+
+	dVector3 player_pos;
+	dVector3 player_pos_delta;
+	dVector3 ground_normal;
+	dVector3 player_vel;
+	LWFIELDCUBEOBJECT* field_cube_object;
+	int field_cube_object_count;
+	char* d;
+
+	void* nav;
+	LWPATHQUERY path_query;
+	float path_query_time;
+	vec3 path_query_test_player_pos;
+	float path_query_test_player_rot;
+
+	LW_VBO_TYPE field_vbo;
+	GLuint field_tex_id;
+	int field_tex_mip;
+	float skin_scale;
+	int follow_cam;
+} LWFIELD;
 
 void rotation_matrix_from_vectors(dMatrix3 r, const dReal* vec_a, const dReal* vec_b);
 
@@ -578,6 +617,10 @@ void update_field(LWCONTEXT* pLwc, LWFIELD* field) {
 }
 
 void unload_field(LWFIELD* field) 	{
+	if (field->nav) {
+		unload_nav(field->nav);
+	}
+
 	release_binary(field->d);
 
 	dGeomDestroy(field->ground);
@@ -604,4 +647,85 @@ void field_attack(LWCONTEXT* pLwc) {
 		pLwc->player_attacking = 1;
 		pLwc->player_skin_time = 0;
 	}
+}
+
+void field_path_query_spos(const LWFIELD* field, float* p) {
+	p[0] = field->path_query.spos[0];
+	p[1] = -field->path_query.spos[2];
+	p[2] = field->path_query.spos[1];
+}
+
+void field_path_query_epos(const LWFIELD* field, float* p) {
+	p[0] = field->path_query.epos[0];
+	p[1] = -field->path_query.epos[2];
+	p[2] = field->path_query.epos[1];
+}
+
+void field_set_path_query_spos(LWFIELD* field, float x, float y, float z) {
+	field->path_query.spos[0] = x;
+	field->path_query.spos[1] = z;
+	field->path_query.spos[2] = -y;
+}
+
+void field_set_path_query_epos(LWFIELD* field, float x, float y, float z) {
+	field->path_query.epos[0] = x;
+	field->path_query.epos[1] = z;
+	field->path_query.epos[2] = -y;
+}
+
+int field_path_query_n_smooth_path(const LWFIELD* field) {
+	return field->path_query.n_smooth_path;
+}
+
+const float* field_path_query_test_player_pos(const LWFIELD* field) {
+	return field->path_query_test_player_pos;
+}
+
+float field_path_query_test_player_rot(const LWFIELD* field) {
+	return field->path_query_test_player_rot;
+}
+
+float field_skin_scale(const LWFIELD* field) {
+	return field->skin_scale;
+}
+
+int field_follow_cam(const LWFIELD* field) {
+	return field->follow_cam;
+}
+
+LW_VBO_TYPE field_field_vbo(const LWFIELD* field) {
+	return field->field_vbo;
+}
+
+GLuint field_field_tex_id(const LWFIELD* field) {
+	return field->field_tex_id;
+}
+
+int field_field_tex_mip(const LWFIELD* field) {
+	return field->field_tex_mip;
+}
+
+double field_ray_nearest_depth(const LWFIELD* field, LW_RAY_ID lri) {
+	return field->ray_nearest_depth[lri];
+}
+
+void field_nav_query(LWFIELD* field) {
+	nav_query(field->nav, &field->path_query);
+}
+
+void init_field(LWCONTEXT* pLwc, const char* field_filename, const char* nav_filename, LW_VBO_TYPE vbo, GLuint tex_id, int tex_mip, float skin_scale, int follow_cam) {
+	if (pLwc->field) {
+		unload_field(pLwc->field);
+	}
+
+	pLwc->field = load_field(field_filename);
+	pLwc->field->nav = load_nav(nav_filename);
+	pLwc->field->field_vbo = vbo;
+	pLwc->field->field_tex_id = tex_id;
+	pLwc->field->field_tex_mip = tex_mip;
+	pLwc->field->skin_scale = skin_scale;
+	pLwc->field->follow_cam = follow_cam;
+
+	set_random_start_end_pos(pLwc->field->nav, &pLwc->field->path_query);
+	nav_query(pLwc->field->nav, &pLwc->field->path_query);
 }
