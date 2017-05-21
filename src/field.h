@@ -5,6 +5,7 @@
 #include "vertices.h"
 
 #define MAX_AIM_SECTOR_RAY (FAN_SECTOR_COUNT_PER_ARRAY + 1) // 1 for the end vertex
+#define MAX_FIELD_SPHERE_COUNT (50)
 
 typedef enum _LW_RAY_ID {
 	LRI_PLAYER_CENTER,
@@ -42,3 +43,9 @@ int field_field_tex_mip(const LWFIELD* field);
 double field_ray_nearest_depth(const LWFIELD* field, LW_RAY_ID lri);
 void field_nav_query(LWFIELD* field);
 void init_field(LWCONTEXT* pLwc, const char* field_filename, const char* nav_filename, LW_VBO_TYPE vbo, GLuint tex_id, int tex_mip, float skin_scale, int follow_cam);
+int field_sphere_pos(const LWFIELD* field, int i, float* pos);
+void field_spawn_sphere(LWFIELD* field, vec3 pos, vec3 vel);
+float field_sphere_radius(const LWFIELD* field, int i);
+unsigned int field_random_unsigned_int(LWFIELD* field, unsigned int bound);
+double field_random_double(LWFIELD* field);
+void get_field_player_geom_position(const LWFIELD* field, float* x, float* y, float* z);

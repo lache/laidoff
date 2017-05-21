@@ -11,6 +11,7 @@
 #include "mq.h"
 #include "extrapolator.h"
 #include "playersm.h"
+#include "pcg_basic.h"
 
 #define MAX_BOX_GEOM (100)
 #define MAX_RAY_RESULT_COUNT (10)
@@ -49,6 +50,9 @@ typedef struct _LWFIELD {
 	dReal ray_nearest_depth[LRI_COUNT];
 	int ray_nearest_index[LRI_COUNT];
 
+	dGeomID sphere[MAX_FIELD_SPHERE_COUNT];
+	vec3 sphere_vel[MAX_FIELD_SPHERE_COUNT];
+
 	dVector3 player_pos;
 	dVector3 player_pos_delta;
 	dVector3 ground_normal;
@@ -68,6 +72,8 @@ typedef struct _LWFIELD {
 	int field_tex_mip;
 	float skin_scale;
 	int follow_cam;
+
+	pcg32_random_t rng;
 } LWFIELD;
 
 void rotation_matrix_from_vectors(dMatrix3 r, const dReal* vec_a, const dReal* vec_b);
@@ -104,7 +110,7 @@ void move_player(LWCONTEXT *pLwc) {
 		if (lw_get_normalized_dir_pad_input(pLwc, &dx, &dy, &dlen) && (dx || dy)) {
 			pLwc->player_pos_x += dx * move_speed_delta;
 			pLwc->player_pos_y += dy * move_speed_delta;
-			pLwc->player_rot_z = atan2f(dy, dx);
+			pLwc->player_state_data.rot_z = atan2f(dy, dx);
 			pLwc->player_pos_last_moved_dx = dx;
 			pLwc->player_pos_last_moved_dy = dy;
 			pLwc->player_moving = 1;
@@ -182,47 +188,46 @@ void resolve_player_collision(LWCONTEXT *pLwc) {
 }
 
 LWFIELD* load_field(const char* filename) {
-
+	// Initialize OpenDE
 	dInitODE2(0);
-
+	// Create a new field instance
 	LWFIELD* field = (LWFIELD*)calloc(1, sizeof(LWFIELD));
-
-	field->player_radius = (dReal)0.75;
-	field->player_length = (dReal)3.0;
+	// Create a world and a root space 
 	field->world = dWorldCreate();
 	field->space = dHashSpaceCreate(0);
+	// Create space groups
 	for (int i = 0; i < LSG_COUNT; i++) {
 		field->space_group[i] = dHashSpaceCreate(field->space);
 	}
-
+	// Create ground infinite plane geom
 	field->ground = dCreatePlane(field->space_group[LSG_WORLD], 0, 0, 1, 0);
-
-	// Player geom
+	// Create player geom
+	field->player_radius = (dReal)0.75;
+	field->player_length = (dReal)3.0;
 	field->player_pos[0] = 0;
 	field->player_pos[1] = 0;
 	field->player_pos[2] = 10;
 	field->player_geom = dCreateCapsule(field->space_group[LSG_PLAYER], field->player_radius, field->player_length);
 	dGeomSetPosition(field->player_geom, field->player_pos[0], field->player_pos[1], field->player_pos[2]);
-
+	// Create ray geoms (see LW_RAY_ID enum for usage)
 	field->ray_max_length = 50;
-	
 	for (int i = 0; i < LRI_COUNT; i++) {
 		field->ray[i] = dCreateRay(field->space_group[LSG_RAY], field->ray_max_length);
 		dGeomSetData(field->ray[i], (void*)i); // Use ray ID as custom data for quick indexing in near callback
 		dGeomSetPosition(field->ray[i], field->player_pos[0], field->player_pos[1], field->player_pos[2]);
-		dMatrix3 R;
-		dRFromAxisAndAngle(R, 1, 0, 0, M_PI); // ray direction: downward (-Z)
-		dGeomSetRotation(field->ray[i], R);
+		dMatrix3 r;
+		dRFromAxisAndAngle(r, 1, 0, 0, M_PI); // Make ray direction downward (-Z axis)
+		dGeomSetRotation(field->ray[i], r);
 	}
-	
+	// Set initial ground normal as +Z axis
 	dAssignVector3(field->ground_normal, 0, 0, 1);
-	
+	// Load field cube objects (field colliders) from specified file
 	size_t size;
 	char* d = create_binary_from_file(filename, &size);
 	field->d = d;
 	field->field_cube_object = (LWFIELDCUBEOBJECT*)d;
 	field->field_cube_object_count = size / sizeof(LWFIELDCUBEOBJECT);
-
+	// Create geoms for field cube objects
 	for (int i = 0; i < field->field_cube_object_count; i++) {
 		const LWFIELDCUBEOBJECT* lco = &field->field_cube_object[i];
 
@@ -234,7 +239,15 @@ LWFIELD* load_field(const char* filename) {
 
 		field->box_geom_count++;
 	}
-
+	// Create sphere geom pool for bullets, projectiles, ...
+	// which are initially disabled and enabled before they are used.
+	for (int i = 0; i < MAX_FIELD_SPHERE_COUNT; i++) {
+		field->sphere[i] = dCreateSphere(field->space_group[LSG_BULLET], 0.5f);
+		dGeomDisable(field->sphere[i]);
+	}
+	// Seed a random number generator
+	pcg32_srandom_r(&field->rng, 0x0DEEC2CBADF00D77, 0x15881588CA11DAC1);
+	// Here it is. A brand new field instance just out of the oven!
 	return field;
 }
 
@@ -313,9 +326,14 @@ static void field_world_bullet_near(void *data, dGeomID o1, dGeomID o2) {
 	assert(dGeomGetSpace(o1) == field->space_group[LSG_WORLD]);
 	assert(dGeomGetSpace(o2) == field->space_group[LSG_BULLET]);
 
-	dContact contact[MAX_FIELD_CONTACT];
-	int n = dCollide(o1, o2, MAX_FIELD_CONTACT, &contact[0].geom, sizeof(dContact));
-	for (int i = 0; i < n; i++) {
+	dContact contact[1];
+	int n = dCollide(o1, o2, 1, &contact[0].geom, sizeof(dContact));
+	if (n > 0) {
+		LOGI("Bullet boom!!! at %f,%f,%f",
+			contact[0].geom.pos[0],
+			contact[0].geom.pos[1],
+			contact[0].geom.pos[2]);
+		dGeomDisable(o2);
 	}
 }
 
@@ -350,6 +368,12 @@ void get_field_player_position(const LWFIELD* field, float* x, float* y, float* 
 	*x = (float)field->player_pos[0];
 	*y = (float)field->player_pos[1];
 	*z = (float)(field->player_pos[2] - field->player_length / 2 - field->player_radius);
+}
+
+void get_field_player_geom_position(const LWFIELD* field, float* x, float* y, float* z) {
+	*x = (float)field->player_pos[0];
+	*y = (float)field->player_pos[1];
+	*z = (float)field->player_pos[2];
 }
 
 void rotation_matrix_from_vectors(dMatrix3 r, const dReal* vec_a, const dReal* vec_b) {
@@ -476,60 +500,77 @@ void field_enable_ray_test(LWFIELD* field, int enable) {
 	}
 }
 
+static void s_update_sphere(LWFIELD* field, float delta_time) {
+	for (int i = 0; i < MAX_FIELD_SPHERE_COUNT; i++) {
+		if (dGeomIsEnabled(field->sphere[i])) {
+			const dReal* pos = dGeomGetPosition(field->sphere[i]);
+			dGeomSetPosition(
+				field->sphere[i],
+				pos[0] + delta_time * field->sphere_vel[i][0],
+				pos[1] + delta_time * field->sphere_vel[i][1],
+				pos[2] + delta_time * field->sphere_vel[i][2]);
+		}
+	}
+}
+
 void update_field(LWCONTEXT* pLwc, LWFIELD* field) {
-	if (!field) {
+	// Check for invalid input
+	if (!pLwc) {
+		LOGE("update_field: context null");
 		return;
 	}
-
+	if (!field) {
+		LOGE("update_field: field null");
+		return;
+	}
+	// Clear ray result from the previous frame
 	reset_ray_result(field);
-
+	// Get player position before integration (for calculating player velocity)
 	dVector3 player_pos_0;
 	dCopyVector3(player_pos_0, field->player_pos);
-
+	// Move player geom by user input.
+	// Collision not resolved after this function is called which means that
+	// the player geom may overlapped with other geoms.
 	move_player_geom_by_input(field);
-
-	move_aim_ray(field, pLwc->player_state_data.aim_theta, pLwc->player_rot_z);
-	
-	//dSpaceCollide(field->space, field, &field_near_callback);
+	// Move aim (sector) rays accordingly.
+	move_aim_ray(field, pLwc->player_state_data.aim_theta, pLwc->player_state_data.rot_z);
+	// Resolve collision
 	collide_between_spaces(field, field->space_group[LSG_PLAYER], field->space_group[LSG_WORLD], field_player_world_near);
 	collide_between_spaces(field, field->space_group[LSG_PLAYER], field->space_group[LSG_BULLET], field_player_bullet_near);
 	collide_between_spaces(field, field->space_group[LSG_WORLD], field->space_group[LSG_RAY], field_world_ray_near);
 	collide_between_spaces(field, field->space_group[LSG_WORLD], field->space_group[LSG_BULLET], field_world_bullet_near);
-	
-	// No physics simulation needed for ray testing.
-	//dWorldStep(field->world, 0.05);
-
+	// No physics simulation needed for now...
+	//----dWorldStep(field->world, 0.05);-----
+	// Gather ray result reported by collision report.
+	// Specifically, get minimum ray length collision point.
 	gather_ray_result(field);
-
+	// maybe-overlapped player geom's collision is resolved.
+	// Bring the player straight to the ground.
 	move_player_to_ground(field);
-
+	// Calculate player velocity using backward euler formula.
 	dSubtractVectors3(field->player_vel, field->player_pos, player_pos_0);
 	dScaleVector3(field->player_vel, (dReal)1.0 / pLwc->delta_time);
-
 	//LOGI("%f, %f, %f", field->player_vel[0], field->player_vel[1], field->player_vel[2]);
-
+	// Get current player anim action
 	LW_ACTION player_anim_0 = get_anim_by_state(pLwc->player_state_data.state, &pLwc->player_action_loop);
 	pLwc->player_action = &pLwc->action[player_anim_0];
-
+	// Get current frame index of the anim action
 	float f = (float)(pLwc->player_state_data.skin_time * pLwc->player_action->fps);
+	// Check current anim action sequence reaches its end
 	const int player_action_animfin = f > pLwc->player_action->last_key_f;
-
-	// Update player state data
-	// Set inputs
+	// Update player state data:
+	// (1) Set inputs
 	pLwc->player_state_data.delta_time = (float)pLwc->delta_time;
 	pLwc->player_state_data.dir = pLwc->dir_pad_dragging;
 	pLwc->player_state_data.atk = pLwc->atk_pad_dragging;
 	pLwc->player_state_data.animfin = player_action_animfin;
 	pLwc->player_state_data.aim_last_skin_time = pLwc->action[LWAC_HUMANACTION_STAND_AIM].last_key_f / pLwc->action[LWAC_HUMANACTION_STAND_AIM].fps;
-	// Get outputs
+	pLwc->player_state_data.field = field;
+	// (2) Get outputs - which is a new state
 	pLwc->player_state_data.state = run_state(pLwc->player_state_data.state, &pLwc->player_state_data);
-	
+	// Get updated player anim action
 	LW_ACTION player_anim_1 = get_anim_by_state(pLwc->player_state_data.state, &pLwc->player_action_loop);
-
 	pLwc->player_action = &pLwc->action[player_anim_1];
-	if (pLwc->player_attacking && pLwc->player_action && player_action_animfin) {
-		//pLwc->player_attacking = 0;
-	}
 	// Update skin time
 	pLwc->player_skin_time += (float)pLwc->delta_time;
 	pLwc->test_player_skin_time += (float)pLwc->delta_time;
@@ -582,6 +623,7 @@ void update_field(LWCONTEXT* pLwc, LWFIELD* field) {
 		}
 		value = mq_possync_next(pLwc->mq);
 	}
+	s_update_sphere(field, (float)pLwc->delta_time);
 }
 
 void unload_field(LWFIELD* field) 	{
@@ -596,7 +638,9 @@ void unload_field(LWFIELD* field) 	{
 	for (int i = 0; i < LRI_COUNT; i++) {
 		dGeomDestroy(field->ray[i]);
 	}
-
+	for (int i = 0; i < MAX_FIELD_SPHERE_COUNT; i++) {
+		dGeomDestroy(field->sphere[i]);
+	}
 	for (int i = 0; i < field->box_geom_count; i++) {
 		dGeomDestroy(field->box_geom[i]);
 	}
@@ -698,4 +742,47 @@ void init_field(LWCONTEXT* pLwc, const char* field_filename, const char* nav_fil
 
 	set_random_start_end_pos(pLwc->field->nav, &pLwc->field->path_query);
 	nav_query(pLwc->field->nav, &pLwc->field->path_query);
+}
+
+void field_spawn_sphere(LWFIELD* field, vec3 pos, vec3 vel) {
+	for (int i = 0; i < MAX_FIELD_SPHERE_COUNT; i++) {
+		if (dGeomIsEnabled(field->sphere[i])) {
+			continue;
+		}
+		dGeomSetPosition(field->sphere[i], pos[0], pos[1], pos[2]);
+		dGeomSphereSetRadius(field->sphere[i], 0.1f);
+		dGeomEnable(field->sphere[i]);
+		field->sphere_vel[i][0] = vel[0];
+		field->sphere_vel[i][1] = vel[1];
+		field->sphere_vel[i][2] = vel[2];
+		break;
+	}
+}
+
+int field_sphere_pos(const LWFIELD* field, int i, float* pos) {
+	if (!dGeomIsEnabled(field->sphere[i])) {
+		return 0;
+	}
+	const dReal* p = dGeomGetPosition(field->sphere[i]);
+	pos[0] = (float)p[0];
+	pos[1] = (float)p[1];
+	pos[2] = (float)p[2];
+	return 1;
+}
+
+float field_sphere_radius(const LWFIELD* field, int i) {
+	if (!dGeomIsEnabled(field->sphere[i])) {
+		return 0;
+	}
+	return (float)dGeomSphereGetRadius(field->sphere[i]);
+}
+
+// return 0 <= x < bound unsigned integer
+unsigned int field_random_unsigned_int(LWFIELD* field, unsigned int bound) {
+	return pcg32_boundedrand_r(&field->rng, bound);
+}
+
+// return [0, 1) double
+double field_random_double(LWFIELD* field) {
+	return ldexp(pcg32_random_r(&field->rng), -32);
 }

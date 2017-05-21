@@ -891,7 +891,6 @@ void init_font_fbo(LWCONTEXT* pLwc) {
 }
 
 void init_lwc_runtime_data(LWCONTEXT *pLwc) {
-
 	init_font_fbo(pLwc);
 
 	init_lua(pLwc);

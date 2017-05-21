@@ -1,8 +1,11 @@
 #include "playersm.h"
 #include "lwmacro.h"
 #include "lwlog.h"
+#include "field.h"
 
 static int s_verbose = 0;
+
+static void s_fire_bullet(LWPLAYERSTATEDATA* data);
 
 typedef LW_PLAYER_STATE STATE_FUNC(LWPLAYERSTATEDATA* data);
 
@@ -118,6 +121,7 @@ static void s_do_aim_to_fire(LWPLAYERSTATEDATA* data) {
 	if (s_verbose) { LOGI("s_do_aim_to_fire"); }
 	data->skin_time = 0;
 	if (s_verbose) { LOGI("Fire!"); }
+	s_fire_bullet(data);
 }
 
 static void s_do_fire_to_unaim(LWPLAYERSTATEDATA* data) {
@@ -188,4 +192,16 @@ static void s_on_enter_aim(LWPLAYERSTATEDATA* data) {
 	// Set start aim theta
 	data->aim_theta = (float)(M_PI / 4);
 	data->aim_theta_speed = -(float)LWDEG2RAD(90);
+}
+
+static void s_fire_bullet(LWPLAYERSTATEDATA* data) {
+	float pos[3];
+	get_field_player_geom_position(data->field, pos + 0, pos + 1, pos + 2);
+	float speed = 60.0f;
+	
+	// random range around rot_z: [rot_z - data->aim_theta / 2, rot_z + data->aim_theta / 2)
+	const float aimed_rot_z = (float)(data->rot_z - data->aim_theta / 2 + data->aim_theta * field_random_double(data->field));
+	
+	float vel[3] = { speed * cosf(aimed_rot_z), speed * sinf(aimed_rot_z), 0 };
+	field_spawn_sphere(data->field, pos, vel);
 }

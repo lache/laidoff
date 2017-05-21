@@ -9,7 +9,7 @@
 #include "mq.h"
 #include "render_fan.h"
 
-static void render_field_object(const LWCONTEXT* pLwc, int vbo_index, GLuint tex_id, mat4x4 view, mat4x4 proj, float x, float y, float z, float sx, float sy, float sz, float alpha_multiplier, int mipmap)
+static void render_field_object(const LWCONTEXT* pLwc, int vbo_index, GLuint tex_id, const mat4x4 view, const mat4x4 proj, float x, float y, float z, float sx, float sy, float sz, float alpha_multiplier, int mipmap)
 {
 	int shader_index = LWST_DEFAULT;
 
@@ -117,7 +117,7 @@ static void render_ui(const LWCONTEXT* pLwc)
 		LVT_RIGHT_BOTTOM_ANCHORED_SQUARE, 1, 0, 0, 0, 0);
 }
 
-void render_debug_sphere(const LWCONTEXT* pLwc, GLuint tex_id, mat4x4 perspective, mat4x4 view, float x, float y, float z) {
+void render_debug_sphere(const LWCONTEXT* pLwc, GLuint tex_id, const mat4x4 perspective, const mat4x4 view, float x, float y, float z, float s) {
 
 	render_field_object(
 		pLwc,
@@ -128,9 +128,9 @@ void render_debug_sphere(const LWCONTEXT* pLwc, GLuint tex_id, mat4x4 perspectiv
 		x,
 		y,
 		z,
-		1.0f,
-		1.0f,
-		1.0f,
+		s,
+		s,
+		s,
 		1,
 		1
 	);
@@ -148,7 +148,8 @@ void render_path_query_test_player(const LWCONTEXT* pLwc, mat4x4 perspective, ma
 		view,
 		spos[0],
 		spos[1],
-		spos[2]);
+		spos[2],
+		1.0f);
 
 	render_debug_sphere(pLwc,
 		pLwc->tex_programmed[LPT_SOLID_BLUE],
@@ -156,7 +157,8 @@ void render_path_query_test_player(const LWCONTEXT* pLwc, mat4x4 perspective, ma
 		view,
 		epos[0],
 		epos[1],
-		epos[2]);
+		epos[2],
+		1.0f);
 
 	if (!pLwc->fps_mode && field_path_query_n_smooth_path(pLwc->field)) {
 
@@ -214,6 +216,22 @@ void render_player_model(const LWCONTEXT* pLwc, mat4x4 perspective, mat4x4 view,
 			action,
 			&pLwc->armature[LWAR_HUMANARMATURE],
 			1, 0, 0, 0, 0, perspective, view, skin_model, skin_time, loop);
+	}
+}
+
+static void s_render_field_sphere(const LWCONTEXT* pLwc, struct _LWFIELD* const field, const mat4x4 proj, const mat4x4 view) {
+	for (int i = 0; i < MAX_FIELD_SPHERE_COUNT; i++) {
+		float pos[3];
+		if (field_sphere_pos(field, i, pos)) {
+			render_debug_sphere(pLwc,
+				pLwc->tex_programmed[LPT_SOLID_GREEN],
+				proj,
+				view,
+				pos[0],
+				pos[1],
+				pos[2],
+				field_sphere_radius(field, i));
+		}
 	}
 }
 
@@ -328,7 +346,7 @@ void lwc_render_field(const LWCONTEXT* pLwc)
 		}
 	}
 
-	render_player_model(pLwc, perspective, view, player_x, player_y, player_z, pLwc->player_rot_z, pLwc->player_action, pLwc->player_state_data.skin_time, pLwc->player_action_loop);
+	render_player_model(pLwc, perspective, view, player_x, player_y, player_z, pLwc->player_state_data.rot_z, pLwc->player_action, pLwc->player_state_data.skin_time, pLwc->player_action_loop);
 
 	LWPOSSYNCMSG* value = mq_possync_first(pLwc->mq);
 	while (value) {
@@ -350,10 +368,12 @@ void lwc_render_field(const LWCONTEXT* pLwc)
 
 	if (pLwc->player_state_data.state == LPS_AIM || pLwc->player_state_data.state == LPS_FIRE) {
 		render_fan(pLwc, perspective, view,
-			player_x, player_y, player_z, pLwc->player_rot_z, pLwc->player_state_data.aim_theta, rscale);
+			player_x, player_y, player_z, pLwc->player_state_data.rot_z, pLwc->player_state_data.aim_theta, rscale);
 	}
 
 	render_ui(pLwc);
+
+	s_render_field_sphere(pLwc, pLwc->field, perspective, view);
 
 	// give up const-ness
 	((LWCONTEXT*)pLwc)->render_count++;

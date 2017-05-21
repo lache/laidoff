@@ -2,6 +2,7 @@
 #include "field.h"
 
 typedef enum _LW_ACTION LW_ACTION;
+typedef struct _LWFIELD LWFIELD;
 
 typedef enum _LW_PLAYER_STATE {
 	LPS_IDLE,
@@ -24,6 +25,8 @@ typedef struct _LWPLAYERSTATEDATA {
 	float delta_time;
 	float skin_time;
 	float aim_last_skin_time; // hack hack hack
+	float rot_z;
+	LWFIELD* field;
 } LWPLAYERSTATEDATA;
 
 LW_PLAYER_STATE run_state(LW_PLAYER_STATE cur_state, LWPLAYERSTATEDATA* data);
