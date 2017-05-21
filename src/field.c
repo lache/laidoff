@@ -592,6 +592,7 @@ void update_field(LWCONTEXT* pLwc, LWFIELD* field) {
 	pLwc->player_state_data.animfin = player_action_animfin;
 	pLwc->player_state_data.aim_last_skin_time = pLwc->action[LWAC_HUMANACTION_STAND_AIM].last_key_f / pLwc->action[LWAC_HUMANACTION_STAND_AIM].fps;
 	pLwc->player_state_data.field = field;
+	pLwc->player_state_data.mq = pLwc->mq;
 	// (2) Get outputs - which is a new state
 	pLwc->player_state_data.state = run_state(pLwc->player_state_data.state, &pLwc->player_state_data);
 	// Get updated player anim action
@@ -637,7 +638,13 @@ void update_field(LWCONTEXT* pLwc, LWFIELD* field) {
 			//LOGI("READ: POS (%.2f, %.2f, %.2f) DXY (%.2f, %.2f)", value->x, value->y, value->z, dx, dy);
 
 			value->a = atan2f(dy, dx);
-			value->anim_action = &pLwc->action[(LW_ACTION)value->action];
+			if (value->action >= 0 && value->action < LWAC_COUNT) {
+				value->anim_action = &pLwc->action[(LW_ACTION)value->action];
+			} else {
+				LOGE("Unknown action enum detected on remote player. Has message structure been changed?");
+				value->anim_action = &pLwc->action[LWAC_HUMANACTION_IDLE];
+			}
+			
 		}
 		value = mq_possync_next(pLwc->mq);
 	}

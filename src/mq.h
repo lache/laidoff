@@ -2,10 +2,11 @@
 
 void* init_mq(const char* addr, void* sm);
 void deinit_mq(void* _mq);
-void mq_poll(void* pLwc, void* sm, void* _mq);
+void mq_poll(void* pLwc, void* sm, void* _mq, void* field);
 void mq_shutdown();
 
 typedef struct _LWANIMACTION LWANIMACTION;
+typedef struct _LWMESSAGEQUEUE LWMESSAGEQUEUE;
 
 typedef struct _LWMQMSG {
 	float x;				// Current position X
@@ -19,6 +20,17 @@ typedef struct _LWMQMSG {
 	int action;				// LW_ACTION enum
 	double t;				// Time
 } LWMQMSG;
+
+typedef struct _LWFIREMSG {
+	int type;
+	float pos[3];
+	float vel[3];
+} LWFIREMSG;
+
+typedef struct _LWACTIONMSG {
+	int type;
+	int action;
+} LWACTIONMSG;
 
 typedef struct _LWPOSSYNCMSG {
 	float x;							// Last position X (extrapolated)
@@ -49,3 +61,5 @@ double mq_mono_clock();
 double mq_sync_mono_clock(void* _mq);
 int mq_cursor_player(void* _mq, const char* cursor);
 void mq_interrupt();
+void mq_send_fire(LWMESSAGEQUEUE* mq, const float* pos, const float* vel);
+void mq_send_action(LWMESSAGEQUEUE* mq, int action);

@@ -7,6 +7,7 @@
 #include "lwcontext.h"
 #include "extrapolator.h"
 #include <stdlib.h>
+#include "field.h"
 
 typedef enum _LW_MESSAGE_QUEUE_STATE {
 	LMQS_INIT,
@@ -145,7 +146,7 @@ s_kvmsg_store_posmap_noown(kvmsg_t** self_p, zhash_t* hash, double sync_time, LW
 					msg->y, msg->z, msg->dx, msg->dy);
 			}
 			//LOGI("New possyncmsg entry with key %s updated.", kvmsg_key(self));
-			
+
 		} else {
 			zhash_delete(hash, kvmsg_key(self));
 		}
@@ -179,7 +180,8 @@ static void s_mq_poll_time(void* _mq, void* sm) {
 				mq->deltasamples[mq->deltasequence++] = delta;
 				double roundtrip_delay = (t3 - t0) - (t2 - t1);
 
-				/*if (mq->verbose)*/ {
+				/*if (mq->verbose)*/
+				{
 					LOGI("REQ %d: delta = %f sec, rtd = %f sec", mq->deltasequence, delta, roundtrip_delay);
 				}
 
@@ -262,7 +264,37 @@ static void s_send_pos(const LWCONTEXT* pLwc, LWMESSAGEQUEUE* mq, int stop) {
 	}
 }
 
-static void s_mq_poll_ready(void* _pLwc, void* _mq, void* sm) {
+void mq_send_fire(LWMESSAGEQUEUE* mq, const float* pos, const float* vel) {
+	kvmsg_t* kvmsg = kvmsg_new(0);
+	kvmsg_fmt_key(kvmsg, "%s%s/%s/tznt", mq->subtree, zuuid_str(mq->uuid), "fire");
+	LWFIREMSG msg;
+	memset(&msg, 0, sizeof(LWFIREMSG));
+	msg.type = 0x01;
+	memcpy(msg.pos, pos, sizeof(msg.pos));
+	memcpy(msg.vel, vel, sizeof(msg.vel));
+	kvmsg_set_body(kvmsg, (byte*)&msg, sizeof(msg));
+	kvmsg_send(kvmsg, zsock_resolve(mq->publisher));
+	kvmsg_destroy(&kvmsg);
+	if (mq->verbose) {
+		LOGI("mq_send_fire");
+	}
+}
+
+void mq_send_action(LWMESSAGEQUEUE* mq, int action) {
+	kvmsg_t* kvmsg = kvmsg_new(0);
+	kvmsg_fmt_key(kvmsg, "%s%s/%s/tznt", mq->subtree, zuuid_str(mq->uuid), "action");
+	LWACTIONMSG msg;
+	msg.type = 0x02;
+	msg.action = action;
+	kvmsg_set_body(kvmsg, (byte*)&msg, sizeof(msg));
+	kvmsg_send(kvmsg, zsock_resolve(mq->publisher));
+	kvmsg_destroy(&kvmsg);
+	if (mq->verbose) {
+		LOGI("mq_send_action");
+	}
+}
+
+static void s_mq_poll_ready(void* _pLwc, void* _mq, void* sm, void* field) {
 	LWMESSAGEQUEUE* mq = (LWMESSAGEQUEUE*)_mq;
 	LWCONTEXT* pLwc = (LWCONTEXT*)_pLwc;
 	zmq_pollitem_t items[] = { { zsock_resolve(mq->subscriber), 0, ZMQ_POLLIN, 0 } };
@@ -277,8 +309,34 @@ static void s_mq_poll_ready(void* _pLwc, void* _mq, void* sm) {
 			return;
 		}
 
+		size_t key_len = strlen(kvmsg_key(kvmsg));
+		const static char* TRANSIENT = "/tznt";
+		size_t transient_postfix_len = strlen(TRANSIENT);
+
 		if (streq(kvmsg_key(kvmsg), SUBTREE "announce")) {
 			show_sys_msg(sm, (char*)kvmsg_body(kvmsg)); // kvmsg body is assumed to be a null terminated string.
+			kvmsg_destroy(&kvmsg);
+		} else if (key_len > transient_postfix_len && streq(kvmsg_key(kvmsg) + (key_len - transient_postfix_len), TRANSIENT)) {
+			int type = *(int*)kvmsg_body(kvmsg);
+			switch (type) {
+			case 1:
+			{
+				LWFIREMSG* msg = (LWFIREMSG*)kvmsg_body(kvmsg);
+				field_spawn_sphere(field, msg->pos, msg->vel);
+				break;
+			}
+			case 2:
+			{
+				LWACTIONMSG* msg = (LWACTIONMSG*)kvmsg_body(kvmsg);
+				// TODO Update action field only
+				break;
+			}
+			default:
+			{
+				LOGE("Unknown transient message received: type %d", type);
+				break;
+			}
+			}
 			kvmsg_destroy(&kvmsg);
 		} else {
 			// Discard out-of-sequence kvmsgs, incl. heartbeats
@@ -360,7 +418,7 @@ const char* mq_subtree(void* _mq) {
 	return mq->subtree;
 }
 
-void mq_poll(void* _pLwc, void* sm, void* _mq) {
+void mq_poll(void* _pLwc, void* sm, void* _mq, void* field) {
 	LWMESSAGEQUEUE* mq = (LWMESSAGEQUEUE*)_mq;
 	switch (mq->state) {
 	case LMQS_INIT:
@@ -372,7 +430,7 @@ void mq_poll(void* _pLwc, void* sm, void* _mq) {
 		s_mq_poll_snapshot(mq, sm);
 		break;
 	case LMQS_READY:
-		s_mq_poll_ready(_pLwc, mq, sm);
+		s_mq_poll_ready(_pLwc, mq, sm, field);
 		break;
 	default:
 		break;

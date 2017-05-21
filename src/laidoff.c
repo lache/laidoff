@@ -1141,7 +1141,7 @@ void lwc_update(LWCONTEXT *pLwc, double delta_time) {
 	pLwc->app_time += pLwc->delta_time;
 	pLwc->scene_time += pLwc->delta_time;
 
-	mq_poll(pLwc, pLwc->def_sys_msg, pLwc->mq);
+	mq_poll(pLwc, pLwc->def_sys_msg, pLwc->mq, pLwc->field);
 
 	update_dialog(pLwc);
 

@@ -3,6 +3,7 @@
 
 typedef enum _LW_ACTION LW_ACTION;
 typedef struct _LWFIELD LWFIELD;
+typedef struct _LWMESSAGEQUEUE LWMESSAGEQUEUE;
 
 typedef enum _LW_PLAYER_STATE {
 	LPS_IDLE,
@@ -27,6 +28,7 @@ typedef struct _LWPLAYERSTATEDATA {
 	float aim_last_skin_time; // hack hack hack
 	float rot_z;
 	LWFIELD* field;
+	LWMESSAGEQUEUE* mq;
 } LWPLAYERSTATEDATA;
 
 LW_PLAYER_STATE run_state(LW_PLAYER_STATE cur_state, LWPLAYERSTATEDATA* data);
