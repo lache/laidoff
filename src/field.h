@@ -4,16 +4,7 @@
 #include "lwvbotype.h"
 #include "vertices.h"
 
-#define MAX_BOX_GEOM (100)
-#define MAX_RAY_RESULT_COUNT (10)
-#define MAX_FIELD_CONTACT (10)
 #define MAX_AIM_SECTOR_RAY (FAN_SECTOR_COUNT_PER_ARRAY + 1) // 1 for the end vertex
-
-typedef struct _LWFIELDCUBEOBJECT {
-	float x, y, z;
-	float dimx, dimy, dimz;
-	float axis_angle[4];
-} LWFIELDCUBEOBJECT;
 
 typedef enum _LW_RAY_ID {
 	LRI_PLAYER_CENTER,

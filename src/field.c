@@ -1,4 +1,6 @@
 #include <stdlib.h>
+#include <czmq.h>
+#include <ode/ode.h>
 #include "field.h"
 #include "lwanim.h"
 #include "laidoff.h"
@@ -8,9 +10,17 @@
 #include "nav.h"
 #include "mq.h"
 #include "extrapolator.h"
-#include <czmq.h>
-#include <ode/ode.h>
 #include "playersm.h"
+
+#define MAX_BOX_GEOM (100)
+#define MAX_RAY_RESULT_COUNT (10)
+#define MAX_FIELD_CONTACT (10)
+
+typedef struct _LWFIELDCUBEOBJECT {
+	float x, y, z;
+	float dimx, dimy, dimz;
+	float axis_angle[4];
+} LWFIELDCUBEOBJECT;
 
 typedef struct _LWFIELD {
 	dWorldID world;
