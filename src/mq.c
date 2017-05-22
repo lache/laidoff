@@ -132,7 +132,7 @@ s_kvmsg_store_posmap_noown(kvmsg_t** self_p, zhash_t* hash, double sync_time, LW
 				}
 			}
 
-			if (/*mq->verbose && */!mq_cursor_player(mq, kvmsg_key(self))) {
+			if (mq->verbose && !mq_cursor_player(mq, kvmsg_key(self))) {
 				LOGI("UPDATE: t %.2f POS (%.2f, %.2f, %.2f) DXY (%.2f, %.2f)", msg->t, msg->x,
 					msg->y, msg->z, msg->dx, msg->dy);
 			}
