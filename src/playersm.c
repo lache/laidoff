@@ -202,7 +202,7 @@ static void s_on_enter_aim(LWPLAYERSTATEDATA* data) {
 static void s_fire_bullet(LWPLAYERSTATEDATA* data) {
 	float pos[3];
 	get_field_player_geom_position(data->field, pos + 0, pos + 1, pos + 2);
-	float speed = 60.0f;
+	float speed = 100.0f;
 	
 	// random range around rot_z: [rot_z - data->aim_theta / 2, rot_z + data->aim_theta / 2)
 	const float aimed_rot_z = (float)(data->rot_z - data->aim_theta / 2 + data->aim_theta * field_random_double(data->field));

@@ -1,13 +1,12 @@
+#include <czmq.h>
+#include <stdlib.h>
 #include "mq.h"
 #include "lwlog.h"
-#include <czmq.h>
 #include "sysmsg.h"
 #include "kvmsg.h"
 #include "field.h"
 #include "lwcontext.h"
 #include "extrapolator.h"
-#include <stdlib.h>
-#include "field.h"
 
 typedef enum _LW_MESSAGE_QUEUE_STATE {
 	LMQS_INIT,

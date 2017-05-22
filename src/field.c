@@ -1,3 +1,6 @@
+// ReSharper disable CppUnusedIncludeDirective
+#include <inttypes.h> // Needed for suppressing 'PRId6' redefined warning.
+// ReSharper restore CppUnusedIncludeDirective
 #include <stdlib.h>
 #include <czmq.h>
 #include <ode/ode.h>
@@ -52,6 +55,7 @@ typedef struct _LWFIELD {
 
 	dGeomID sphere[MAX_FIELD_SPHERE_COUNT];
 	vec3 sphere_vel[MAX_FIELD_SPHERE_COUNT];
+	dBodyID sphere_body[MAX_FIELD_SPHERE_COUNT];
 
 	dVector3 player_pos;
 	dVector3 player_pos_delta;
@@ -145,7 +149,7 @@ static void resolve_collision_one_fixed(LWCONTEXT* pLwc, const LWBOX2DCOLLIDER *
 
 	if (dx) {
 		const float dy = resolve_collision_one_fixed_axis(fixed->y, fixed->h, movable->y,
-			movable->h);
+		                                                  movable->h);
 
 		if (dy) {
 
@@ -243,6 +247,12 @@ LWFIELD* load_field(const char* filename) {
 	// which are initially disabled and enabled before they are used.
 	for (int i = 0; i < MAX_FIELD_SPHERE_COUNT; i++) {
 		field->sphere[i] = dCreateSphere(field->space_group[LSG_BULLET], 0.5f);
+		field->sphere_body[i] = dBodyCreate(field->world);
+		//dMassSetSphere(field->sphere_body[i], 1, 1);
+		//dMassAdjust(field->sphere_body[i], 1);
+		dBodySetKinematic(field->sphere_body[i]);
+		//dBodyDisable(field->sphere_body[i]);
+		dGeomSetBody(field->sphere[i], field->sphere_body[i]);
 		dGeomDisable(field->sphere[i]);
 	}
 	// Seed a random number generator
@@ -425,9 +435,9 @@ void move_player_geom_by_input(LWFIELD* field) {
 	dGeomSetPosition(field->ray[LRI_PLAYER_CENTER], field->player_pos[0], field->player_pos[1], field->player_pos[2]);
 	const dReal* player_contact_ray_pos = dGeomGetPosition(field->ray[LRI_PLAYER_CONTACT]);
 	dGeomSetPosition(field->ray[LRI_PLAYER_CONTACT],
-		player_contact_ray_pos[0] + geom_pos_delta_rotated[0],
-		player_contact_ray_pos[1] + geom_pos_delta_rotated[1],
-		player_contact_ray_pos[2] + geom_pos_delta_rotated[2]);
+	                 player_contact_ray_pos[0] + geom_pos_delta_rotated[0],
+	                 player_contact_ray_pos[1] + geom_pos_delta_rotated[1],
+	                 player_contact_ray_pos[2] + geom_pos_delta_rotated[2]);
 }
 
 void move_player_to_ground(LWFIELD* field) {
@@ -459,9 +469,9 @@ void move_player_to_ground(LWFIELD* field) {
 	dGeomSetPosition(field->ray[LRI_PLAYER_CENTER], field->player_pos[0], field->player_pos[1], field->player_pos[2]);
 	if (center_nearest_ray_index >= 0) {
 		dGeomSetPosition(field->ray[LRI_PLAYER_CONTACT],
-			field->player_pos[0] - field->player_radius * field->ray_result[LRI_PLAYER_CENTER][center_nearest_ray_index].geom.normal[0],
-			field->player_pos[1] - field->player_radius * field->ray_result[LRI_PLAYER_CENTER][center_nearest_ray_index].geom.normal[1],
-			field->player_pos[2]);
+		                 field->player_pos[0] - field->player_radius * field->ray_result[LRI_PLAYER_CENTER][center_nearest_ray_index].geom.normal[0],
+		                 field->player_pos[1] - field->player_radius * field->ray_result[LRI_PLAYER_CENTER][center_nearest_ray_index].geom.normal[1],
+		                 field->player_pos[2]);
 
 	} else {
 		dGeomSetPosition(field->ray[LRI_PLAYER_CONTACT], field->player_pos[0], field->player_pos[1], field->player_pos[2]);
@@ -511,7 +521,7 @@ void field_enable_ray_test(LWFIELD* field, int enable) {
 	}
 }
 
-static void s_update_sphere(LWFIELD* field, float delta_time) {
+static void s_deactivate_out_of_domain_sphere(LWFIELD* field, float delta_time) {
 	for (int i = 0; i < MAX_FIELD_SPHERE_COUNT; i++) {
 		if (dGeomIsEnabled(field->sphere[i])) {
 			const dReal* pos = dGeomGetPosition(field->sphere[i]);
@@ -525,15 +535,15 @@ static void s_update_sphere(LWFIELD* field, float delta_time) {
 			if (new_x > domain_size || new_x < -domain_size
 				|| new_y > domain_size || new_y < -domain_size
 				|| new_z > domain_size || new_z < -domain_size) {
-				// Out-of-bound geom should be disabled.
+				// Out-of-domain geom should be disabled.
 				LOGI("Field sphere[%d] out-of-bound. It will be disabled.", i);
 				dGeomDisable(field->sphere[i]);
 			} else {
-				dGeomSetPosition(
+				/*dGeomSetPosition(
 					field->sphere[i],
 					pos[0] + delta_time * field->sphere_vel[i][0],
 					pos[1] + delta_time * field->sphere_vel[i][1],
-					pos[2] + delta_time * field->sphere_vel[i][2]);
+					pos[2] + delta_time * field->sphere_vel[i][2]);*/
 			}
 		}
 	}
@@ -565,8 +575,8 @@ void update_field(LWCONTEXT* pLwc, LWFIELD* field) {
 	collide_between_spaces(field, field->space_group[LSG_PLAYER], field->space_group[LSG_BULLET], field_player_bullet_near);
 	collide_between_spaces(field, field->space_group[LSG_WORLD], field->space_group[LSG_RAY], field_world_ray_near);
 	collide_between_spaces(field, field->space_group[LSG_WORLD], field->space_group[LSG_BULLET], field_world_bullet_near);
-	// No physics simulation needed for now...
-	//----dWorldStep(field->world, 0.05);-----
+	// Stepping the physics world
+	dWorldStep(field->world, 1.0f/60.0f);
 	// Gather ray result reported by collision report.
 	// Specifically, get minimum ray length collision point.
 	gather_ray_result(field);
@@ -648,7 +658,7 @@ void update_field(LWCONTEXT* pLwc, LWFIELD* field) {
 		}
 		value = mq_possync_next(pLwc->mq);
 	}
-	s_update_sphere(field, (float)pLwc->delta_time);
+	s_deactivate_out_of_domain_sphere(field, (float)pLwc->delta_time);
 }
 
 void unload_field(LWFIELD* field) 	{
@@ -774,7 +784,9 @@ void field_spawn_sphere(LWFIELD* field, vec3 pos, vec3 vel) {
 		if (dGeomIsEnabled(field->sphere[i])) {
 			continue;
 		}
-		dGeomSetPosition(field->sphere[i], pos[0], pos[1], pos[2]);
+		//dGeomSetPosition(field->sphere[i], pos[0], pos[1], pos[2]);
+		dBodySetPosition(field->sphere_body[i], pos[0], pos[1], pos[2]);
+		dBodySetLinearVel(field->sphere_body[i], vel[0], vel[1], vel[2]);
 		dGeomSphereSetRadius(field->sphere[i], 0.1f);
 		dGeomEnable(field->sphere[i]);
 		field->sphere_vel[i][0] = vel[0];
