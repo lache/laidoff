@@ -33,9 +33,10 @@ typedef struct _LWMESSAGEQUEUE {
 	double delta;
 	double* deltasamples;
 	int deltasequence;
+	int64_t start_req_time_mono;
 } LWMESSAGEQUEUE;
 
-#define DELTA_REQ_COUNT (50)
+#define DELTA_REQ_COUNT (15)
 #define SUBTREE "/l/"
 
 static void s_req_time(LWMESSAGEQUEUE* mq);
@@ -71,6 +72,7 @@ void* init_mq(const char* addr, void* sm) {
 	show_sys_msg(sm, sys_msg);
 
 	// First we request a time sync:
+	mq->start_req_time_mono = zclock_mono();
 	s_req_time(mq);
 
 	return mq;
@@ -130,8 +132,8 @@ s_kvmsg_store_posmap_noown(kvmsg_t** self_p, zhash_t* hash, double sync_time, LW
 				}
 			}
 
-			if (mq->verbose && !mq_cursor_player(mq, kvmsg_key(self))) {
-				LOGI("UPDATE: POS (%.2f, %.2f, %.2f) DXY (%.2f, %.2f)", msg->x,
+			if (/*mq->verbose && */!mq_cursor_player(mq, kvmsg_key(self))) {
+				LOGI("UPDATE: t %.2f POS (%.2f, %.2f, %.2f) DXY (%.2f, %.2f)", msg->t, msg->x,
 					msg->y, msg->z, msg->dx, msg->dy);
 			}
 
@@ -188,10 +190,13 @@ static void s_mq_poll_time(void* _mq, void* sm) {
 				char sys_msg[128];
 				sprintf(sys_msg, LWU("Timesyncing %d/%d"), mq->deltasequence, DELTA_REQ_COUNT);
 				show_sys_msg(sm, sys_msg);
-
+				// Request for another or finish
 				if (mq->deltasequence < DELTA_REQ_COUNT) {
 					s_req_time(mq);
 				} else {
+					int64_t req_time_elapsed = zclock_mono() - mq->start_req_time_mono;
+					LOGI("Tymesyncing duration: %f sec (%f sec / req)", req_time_elapsed / 1e3, req_time_elapsed / 1e3 / DELTA_REQ_COUNT);
+
 					// Calculate averaged delta around a median delta:
 					qsort(mq->deltasamples, DELTA_REQ_COUNT, sizeof(mq->deltasamples[0]), s_delta_cmp);
 					int nselsamples = 10;
