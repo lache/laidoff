@@ -8,7 +8,7 @@ void mq_shutdown();
 typedef struct _LWANIMACTION LWANIMACTION;
 typedef struct _LWMESSAGEQUEUE LWMESSAGEQUEUE;
 
-// ALIGNMENT important!
+// ALIGNMENT matters!
 typedef struct _LWMQMSG {
 	double t;				// Time
 	float x;				// Current position X
@@ -22,14 +22,14 @@ typedef struct _LWMQMSG {
 	int action;				// LW_ACTION enum
 } LWMQMSG;
 
-// ALIGNMENT important!
+// ALIGNMENT matters!
 typedef struct _LWFIREMSG {
 	int type;
 	float pos[3];
 	float vel[3];
 } LWFIREMSG;
 
-// ALIGNMENT important!
+// ALIGNMENT matters!
 typedef struct _LWACTIONMSG {
 	int type;
 	int action;

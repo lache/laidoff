@@ -1188,6 +1188,8 @@ void lwc_update(LWCONTEXT *pLwc, double delta_time) {
 	}
 
 	((LWCONTEXT *)pLwc)->update_count++;
+
+	LOGI("X");
 }
 
 static void bind_all_vertex_attrib_shader(const LWCONTEXT *pLwc, int shader_index, int vbo_index) {

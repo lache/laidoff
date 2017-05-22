@@ -303,58 +303,57 @@ static void s_mq_poll_ready(void* _pLwc, void* _mq, void* sm, void* field) {
 	LWMESSAGEQUEUE* mq = (LWMESSAGEQUEUE*)_mq;
 	LWCONTEXT* pLwc = (LWCONTEXT*)_pLwc;
 	zmq_pollitem_t items[] = { { zsock_resolve(mq->subscriber), 0, ZMQ_POLLIN, 0 } };
-	int rc = zmq_poll(items, 1, 0);
-	if (rc == -1) {
-		return;
-	}
-	// Polling subscriber socket to get update
-	if (items[0].revents & ZMQ_POLLIN) {
-		kvmsg_t* kvmsg = kvmsg_recv(zsock_resolve(mq->subscriber));
-		if (!kvmsg) {
-			return;
-		}
+	// Process all queued messages at once
+	while (zmq_poll(items, 1, 0) > 0) {
+		// Polling subscriber socket to get update
+		if (items[0].revents & ZMQ_POLLIN) {
+			kvmsg_t* kvmsg = kvmsg_recv(zsock_resolve(mq->subscriber));
+			if (!kvmsg) {
+				return;
+			}
 
-		size_t key_len = strlen(kvmsg_key(kvmsg));
-		const static char* TRANSIENT = "/tznt";
-		size_t transient_postfix_len = strlen(TRANSIENT);
+			size_t key_len = strlen(kvmsg_key(kvmsg));
+			const static char* TRANSIENT = "/tznt";
+			size_t transient_postfix_len = strlen(TRANSIENT);
 
-		if (streq(kvmsg_key(kvmsg), SUBTREE "announce")) {
-			show_sys_msg(sm, (char*)kvmsg_body(kvmsg)); // kvmsg body is assumed to be a null terminated string.
-			kvmsg_destroy(&kvmsg);
-		} else if (key_len > transient_postfix_len && streq(kvmsg_key(kvmsg) + (key_len - transient_postfix_len), TRANSIENT)) {
-			int type = *(int*)kvmsg_body(kvmsg);
-			switch (type) {
-			case 1:
-			{
-				LWFIREMSG* msg = (LWFIREMSG*)kvmsg_body(kvmsg);
-				field_spawn_sphere(field, msg->pos, msg->vel);
-				break;
-			}
-			case 2:
-			{
-				LWACTIONMSG* msg = (LWACTIONMSG*)kvmsg_body(kvmsg);
-				// TODO Update action field only
-				break;
-			}
-			default:
-			{
-				LOGE("Unknown transient message received: type %d", type);
-				break;
-			}
-			}
-			kvmsg_destroy(&kvmsg);
-		} else {
-			// Discard out-of-sequence kvmsgs, incl. heartbeats
-			if (kvmsg_sequence(kvmsg) > mq->sequence) {
-				mq->sequence = kvmsg_sequence(kvmsg);
-				if (mq->verbose) {
-					LOGI("Update: %"PRId64" key:%s, bodylen:%zd\n", mq->sequence, kvmsg_key(kvmsg), kvmsg_size(kvmsg));
-				}
-
-				s_kvmsg_store_posmap_noown(&kvmsg, mq->posmap, mq_sync_mono_clock(mq), mq);
-				kvmsg_store(&kvmsg, mq->kvmap);
-			} else {
+			if (streq(kvmsg_key(kvmsg), SUBTREE "announce")) {
+				show_sys_msg(sm, (char*)kvmsg_body(kvmsg)); // kvmsg body is assumed to be a null terminated string.
 				kvmsg_destroy(&kvmsg);
+			} else if (key_len > transient_postfix_len && streq(kvmsg_key(kvmsg) + (key_len - transient_postfix_len), TRANSIENT)) {
+				int type = *(int*)kvmsg_body(kvmsg);
+				switch (type) {
+				case 1:
+				{
+					LWFIREMSG* msg = (LWFIREMSG*)kvmsg_body(kvmsg);
+					field_spawn_sphere(field, msg->pos, msg->vel);
+					break;
+				}
+				case 2:
+				{
+					LWACTIONMSG* msg = (LWACTIONMSG*)kvmsg_body(kvmsg);
+					// TODO Update action field only
+					break;
+				}
+				default:
+				{
+					LOGE("Unknown transient message received: type %d", type);
+					break;
+				}
+				}
+				kvmsg_destroy(&kvmsg);
+			} else {
+				// Discard out-of-sequence kvmsgs, incl. heartbeats
+				if (kvmsg_sequence(kvmsg) > mq->sequence) {
+					mq->sequence = kvmsg_sequence(kvmsg);
+					if (mq->verbose) {
+						LOGI("Update: %"PRId64" key:%s, bodylen:%zd\n", mq->sequence, kvmsg_key(kvmsg), kvmsg_size(kvmsg));
+					}
+
+					s_kvmsg_store_posmap_noown(&kvmsg, mq->posmap, mq_sync_mono_clock(mq), mq);
+					kvmsg_store(&kvmsg, mq->kvmap);
+				} else {
+					kvmsg_destroy(&kvmsg);
+				}
 			}
 		}
 	}
