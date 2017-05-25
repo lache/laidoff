@@ -101,7 +101,7 @@ dReal get_dreal_min() {
 void move_player(LWCONTEXT *pLwc) {
 	if (pLwc->game_scene == LGS_FIELD) {
 		const float move_speed = 3.5f;
-		const float move_speed_delta = (float)(pLwc->delta_time * move_speed);
+		const float move_speed_delta = (float)(lwcontext_delta_time(pLwc) * move_speed);
 
 		// Using keyboard
 		pLwc->player_pos_x += (float)((pLwc->player_move_right - pLwc->player_move_left) *
@@ -585,7 +585,7 @@ void update_field(LWCONTEXT* pLwc, LWFIELD* field) {
 	move_player_to_ground(field);
 	// Calculate player velocity using backward euler formula.
 	dSubtractVectors3(field->player_vel, field->player_pos, player_pos_0);
-	dScaleVector3(field->player_vel, (dReal)1.0 / pLwc->delta_time);
+	dScaleVector3(field->player_vel, (dReal)1.0 / lwcontext_delta_time(pLwc));
 	//LOGI("%f, %f, %f", field->player_vel[0], field->player_vel[1], field->player_vel[2]);
 	// Get current player anim action
 	LW_ACTION player_anim_0 = get_anim_by_state(pLwc->player_state_data.state, &pLwc->player_action_loop);
@@ -596,7 +596,7 @@ void update_field(LWCONTEXT* pLwc, LWFIELD* field) {
 	const int player_action_animfin = f > pLwc->player_action->last_key_f;
 	// Update player state data:
 	// (1) Set inputs
-	pLwc->player_state_data.delta_time = (float)pLwc->delta_time;
+	pLwc->player_state_data.delta_time = (float)lwcontext_delta_time(pLwc);
 	pLwc->player_state_data.dir = pLwc->dir_pad_dragging;
 	pLwc->player_state_data.atk = pLwc->atk_pad_dragging;
 	pLwc->player_state_data.animfin = player_action_animfin;
@@ -609,12 +609,12 @@ void update_field(LWCONTEXT* pLwc, LWFIELD* field) {
 	LW_ACTION player_anim_1 = get_anim_by_state(pLwc->player_state_data.state, &pLwc->player_action_loop);
 	pLwc->player_action = &pLwc->action[player_anim_1];
 	// Update skin time
-	pLwc->player_skin_time += (float)pLwc->delta_time;
-	pLwc->test_player_skin_time += (float)pLwc->delta_time;
+	pLwc->player_skin_time += (float)lwcontext_delta_time(pLwc);
+	pLwc->test_player_skin_time += (float)lwcontext_delta_time(pLwc);
 	// Read pathfinding result and set the test player's position
 	if (pLwc->field->path_query.n_smooth_path) {
 
-		pLwc->field->path_query_time += (float)pLwc->delta_time;
+		pLwc->field->path_query_time += (float)lwcontext_delta_time(pLwc);
 		const float move_speed = 30.0f;
 		int idx = (int)fmodf((float)(pLwc->field->path_query_time * move_speed), (float)pLwc->field->path_query.n_smooth_path);
 		const float* p = &pLwc->field->path_query.smooth_path[3 * idx];
@@ -637,6 +637,7 @@ void update_field(LWCONTEXT* pLwc, LWFIELD* field) {
 		}
 	}
 	// Update remote players' position and orientation, anim action:
+	mq_lock_mutex(pLwc->mq);
 	LWPOSSYNCMSG* value = mq_possync_first(pLwc->mq);
 	while (value) {
 		const char* cursor = mq_possync_cursor(pLwc->mq);
@@ -658,7 +659,8 @@ void update_field(LWCONTEXT* pLwc, LWFIELD* field) {
 		}
 		value = mq_possync_next(pLwc->mq);
 	}
-	s_deactivate_out_of_domain_sphere(field, (float)pLwc->delta_time);
+	mq_unlock_mutex(pLwc->mq);
+	s_deactivate_out_of_domain_sphere(field, (float)lwcontext_delta_time(pLwc));
 }
 
 void unload_field(LWFIELD* field) 	{

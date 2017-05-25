@@ -66,3 +66,5 @@ int mq_cursor_player(void* _mq, const char* cursor);
 void mq_interrupt();
 void mq_send_fire(LWMESSAGEQUEUE* mq, const float* pos, const float* vel);
 void mq_send_action(LWMESSAGEQUEUE* mq, int action);
+void mq_lock_mutex(void* _mq);
+void mq_unlock_mutex(void* _mq);

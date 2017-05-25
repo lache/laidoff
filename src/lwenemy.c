@@ -97,9 +97,9 @@ void update_enemy_scope_ui_point(const LWCONTEXT* pLwc, LWENEMY* enemy) {
 }
 
 void update_enemy(const struct _LWCONTEXT* pLwc, int enemy_slot_index, LWENEMY* enemy) {
-	enemy->c.shake_duration = (float)LWMAX(0, enemy->c.shake_duration - (float)pLwc->delta_time);
-	enemy->evasion_anim.t = (float)LWMAX(0, enemy->evasion_anim.t - (float)pLwc->delta_time);
-	enemy->death_anim.anim_1d.t = (float)LWMAX(0, enemy->death_anim.anim_1d.t - (float)pLwc->delta_time);
+	enemy->c.shake_duration = (float)LWMAX(0, enemy->c.shake_duration - (float)lwcontext_delta_time(pLwc));
+	enemy->evasion_anim.t = (float)LWMAX(0, enemy->evasion_anim.t - (float)lwcontext_delta_time(pLwc));
+	enemy->death_anim.anim_1d.t = (float)LWMAX(0, enemy->death_anim.anim_1d.t - (float)lwcontext_delta_time(pLwc));
 
 	update_render_enemy_position(pLwc, enemy_slot_index, enemy, enemy->render_pos);
 	update_enemy_scope_ui_point(pLwc, enemy);

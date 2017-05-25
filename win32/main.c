@@ -1,8 +1,8 @@
 ﻿#include <time.h>
-
 #include "lwgl.h"
 #include "laidoff.h"
-#include "lwmacro.h"
+#include "czmq.h"
+#include "lwdeltatime.h"
 
 #ifndef BOOL
 #define BOOL int
@@ -62,6 +62,17 @@ void window_size_callback(GLFWwindow* window, int width, int height)
 static GLFWwindow* create_glfw_window()
 {
 	return glfwCreateWindow(INITIAL_SCREEN_RESOLUTION_X, INITIAL_SCREEN_RESOLUTION_Y, "LAID OFF", NULL, NULL);
+}
+
+static void s_logic_worker(zsock_t *pipe, void *args) {
+	GLFWwindow* window = args;
+	LWCONTEXT* pLwc = glfwGetWindowUserPointer(window);
+
+	zsock_signal(pipe, 0);
+
+	while (!glfwWindowShouldClose(window)) {
+		lwc_update(pLwc, 1.0 / 60);
+	}
 }
 
 int main(void)
@@ -154,10 +165,14 @@ int main(void)
 	lw_set_size(pLwc, width, height);
 
 	glfwSetWindowUserPointer(window, pLwc);
+	// Start a logic thread
+	zactor_new(s_logic_worker, window);
 	
 	while (!glfwWindowShouldClose(window))
 	{
-		lwc_update(pLwc, 1.0/60);
+		deltatime_tick(pLwc->render_dt);
+
+		//lwc_update(pLwc, 1.0 / 60);
 
 		lwc_render(pLwc);
 

@@ -27,6 +27,7 @@ void render_player_creature_battle_result_ui(const LWCONTEXT* pLwc, const LWBATT
 	text_block.text_block_width = DEFAULT_TEXT_BLOCK_WIDTH;
 	text_block.text_block_line_height = DEFAULT_TEXT_BLOCK_LINE_HEIGHT_E;
 	text_block.size = DEFAULT_TEXT_BLOCK_SIZE_E;
+	text_block.multiline = 1;
 	SET_COLOR_RGBA_FLOAT(text_block.color_normal_glyph, 1, 1, 1, 1);
 	SET_COLOR_RGBA_FLOAT(text_block.color_normal_outline, 0, 0, 0, 1);
 	SET_COLOR_RGBA_FLOAT(text_block.color_emp_glyph, 1, 1, 0, 1);
@@ -163,6 +164,7 @@ void render_header(const struct _LWCONTEXT* pLwc) {
 	text_block.end_index = text_block.text_bytelen;
 	text_block.text_block_x = 0;
 	text_block.text_block_y = header_y_center;
+	text_block.multiline = 1;
 	render_text_block(pLwc, &text_block);
 }
 
@@ -200,6 +202,7 @@ void render_next_button(const struct _LWCONTEXT* pLwc) {
 	text_block.end_index = text_block.text_bytelen;
 	text_block.text_block_x = 0;
 	text_block.text_block_y = footer_y_center;
+	text_block.multiline = 1;
 	render_text_block(pLwc, &text_block);
 }
 

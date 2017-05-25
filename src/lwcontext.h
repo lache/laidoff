@@ -11,7 +11,6 @@
 #include "lwmacro.h"
 #include "lwatlasenum.h"
 #include "lwbuttoncommand.h"
-#include "lwtimepoint.h"
 #include "lwprogrammedtex.h"
 #include "lwbattlestate.h"
 #include "lwgamescene.h"
@@ -23,6 +22,7 @@
 #include "lwtrail.h"
 #include "armature.h"
 #include "playersm.h"
+#include "lwdeltatime.h"
 
 typedef enum _LW_SHADER_TYPE {
 	LWST_DEFAULT,
@@ -96,10 +96,8 @@ typedef struct _LWCONTEXT {
 	int rotate;
 	mat4x4 mvp;
 
-	LWTIMEPOINT last_time;
-	double delta_time;
-	double delta_time_history[MAX_DELTA_TIME_HISTORY];
-	int delta_time_history_index;
+	LWDELTATIME* update_dt;
+	LWDELTATIME* render_dt;
 
 	mat4x4 proj;
 	
@@ -228,3 +226,11 @@ typedef struct _LWCONTEXT {
 	int server_index;
 	int ray_test;
 } LWCONTEXT;
+
+#ifdef __cplusplus
+extern "C" {;
+#endif
+double lwcontext_delta_time(const LWCONTEXT* pLwc);
+#ifdef __cplusplus
+};
+#endif

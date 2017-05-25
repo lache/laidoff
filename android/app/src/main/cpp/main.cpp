@@ -3,20 +3,18 @@
 #include <jni.h>
 #include <errno.h>
 #include <cassert>
-
 #include <EGL/egl.h>
 #include <GLES2/gl2.h>
 #include <GLES2/gl2ext.h>
-
 #include <android/sensor.h>
 #include <android/log.h>
 #include <android_native_app_glue.h>
 #include <unistd.h>
 #include <android/input.h>
 #include <stdlib.h>
-
 #include "laidoff.h"
 #include "lwlog.h"
+#include "czmq.h"
 
 /**
  * Our saved state data.
@@ -353,7 +351,7 @@ static void engine_draw_frame(struct engine* engine) {
 
     if (engine->pLwc)
     {
-        //lwc_render_battle(engine->pLwc);
+		deltatime_tick(engine->pLwc->render_dt);
         lwc_render(engine->pLwc);
     }
 
@@ -618,6 +616,16 @@ static void engine_handle_cmd(struct android_app* app, int32_t cmd) {
     }
 }
 
+static void s_logic_worker(zsock_t* pipe, void* args) {
+	LWCONTEXT* pLwc = (LWCONTEXT*)args;
+
+	zsock_signal(pipe, 0);
+
+	while (true) {
+		lwc_update(pLwc, 1.0 / 60);
+	}
+}
+
 /**
  * This is the main entry point of a native application that is using
  * android_native_app_glue.  It runs in its own thread, with its own
@@ -672,7 +680,7 @@ void android_main(struct android_app* state) {
     // loop waiting for stuff to do.
     long loop_tick = 0;
 
-    while (1) {
+	while (1) {
         struct timespec loop_begin;
         clock_gettime(CLOCK_MONOTONIC, &loop_begin);
 
@@ -693,7 +701,9 @@ void android_main(struct android_app* state) {
             engine.pLwc = lw_init();
             lw_set_size(engine.pLwc, engine.width, engine.height);
             engine.inited = true;
-        }
+			// Start a logic thread
+			zactor_new(s_logic_worker, engine.pLwc);
+		}
 
         // Read all pending events.
         int ident;
@@ -752,13 +762,13 @@ void android_main(struct android_app* state) {
 
         if (engine.pLwc)
         {
-            lwc_update(engine.pLwc, 1.0/60);
+            //lwc_update(engine.pLwc, 1.0/60);
 
             const int uc = lw_get_update_count(engine.pLwc);
             const int rc = lw_get_render_count(engine.pLwc);
-            const long lt_sec = lw_get_last_time_sec(engine.pLwc);
-            const long lt_nsec = lw_get_last_time_nsec(engine.pLwc);
-            const double dt = lw_get_delta_time(engine.pLwc);
+            const long lt_sec = deltatime_last_time_sec(engine.pLwc->update_dt);
+            const long lt_nsec = deltatime_last_time_nsec(engine.pLwc->update_dt);
+            const double dt = lwcontext_delta_time(engine.pLwc);
             const double throttle_time = 1/60.0 - dt;
 
             //LOGI("U# %6d / R# %6d / Last time sec: %ld, nsec: %ld / Delta time: %.4f / FPS: %.4f fps", uc, rc, lt_sec, lt_nsec, dt, 1.0/dt);

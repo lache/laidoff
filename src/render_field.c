@@ -374,6 +374,7 @@ void lwc_render_field(const LWCONTEXT* pLwc) {
 
 	render_player_model(pLwc, perspective, view, player_x, player_y, player_z, pLwc->player_state_data.rot_z, pLwc->player_action, pLwc->player_state_data.skin_time, pLwc->player_action_loop);
 
+	mq_lock_mutex(pLwc->mq);
 	LWPOSSYNCMSG* value = mq_possync_first(pLwc->mq);
 	while (value) {
 		const char* cursor = mq_possync_cursor(pLwc->mq);
@@ -383,6 +384,7 @@ void lwc_render_field(const LWCONTEXT* pLwc) {
 		}
 		value = mq_possync_next(pLwc->mq);
 	}
+	mq_unlock_mutex(pLwc->mq);
 
 	render_path_query_test_player(pLwc, perspective, view);
 

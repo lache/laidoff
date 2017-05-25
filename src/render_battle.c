@@ -469,6 +469,7 @@ void render_player_creature_ui(const LWCONTEXT* pLwc, const LWBATTLECREATURE* c,
 	text_block.text_block_width = DEFAULT_TEXT_BLOCK_WIDTH;
 	text_block.text_block_line_height = DEFAULT_TEXT_BLOCK_LINE_HEIGHT_E;
 	text_block.size = DEFAULT_TEXT_BLOCK_SIZE_E;
+	text_block.multiline = 1;
 	SET_COLOR_RGBA_FLOAT(text_block.color_normal_glyph, 1, 1, 1, 1);
 	SET_COLOR_RGBA_FLOAT(text_block.color_normal_outline, 0, 0, 0, 1);
 	SET_COLOR_RGBA_FLOAT(text_block.color_emp_glyph, 1, 1, 0, 1);
@@ -582,6 +583,7 @@ void render_player_creature_ui(const LWCONTEXT* pLwc, const LWBATTLECREATURE* c,
 		turn_token_text_block.text_block_width = DEFAULT_TEXT_BLOCK_WIDTH;
 		turn_token_text_block.text_block_x = left_top_x + area_width - block_x_margin - turn_token_size + turn_token_size / 2;
 		turn_token_text_block.text_block_y = left_top_y - block_y_margin;
+		turn_token_text_block.multiline = 1;
 		SET_COLOR_RGBA_FLOAT(turn_token_text_block.color_normal_glyph, 0, 0, 0, 1);
 		SET_COLOR_RGBA_FLOAT(turn_token_text_block.color_normal_outline, 0, 0, 0, 0);
 		SET_COLOR_RGBA_FLOAT(turn_token_text_block.color_emp_glyph, 1, 1, 0, 1);
@@ -613,7 +615,7 @@ void render_player_creature_ui(const LWCONTEXT* pLwc, const LWBATTLECREATURE* c,
 		hp_text_block.end_index = hp_text_block.text_bytelen;
 		hp_text_block.text_block_x += shake_diff_pos[0];
 		hp_text_block.text_block_y += shake_diff_pos[1];
-
+		hp_text_block.multiline = 1;
 		render_text_block(pLwc, &hp_text_block);
 	}
 
@@ -746,6 +748,7 @@ static void render_command_banner(const LWCONTEXT* pLwc) {
 		text_block.text_block_x = x;
 		text_block.text_block_y = y;
 		text_block.align = LTBA_CENTER_CENTER;
+		text_block.multiline = 1;
 		render_text_block(pLwc, &text_block);
 	}
 }
@@ -804,6 +807,7 @@ static void render_command_palette(const LWCONTEXT* pLwc) {
 		desc_text_block.text_bytelen = (int)strlen(desc_text_block.text);
 		desc_text_block.begin_index = 0;
 		desc_text_block.end_index = desc_text_block.text_bytelen;
+		desc_text_block.multiline = 1;
 		render_text_block(pLwc, &desc_text_block);
 	}
 
@@ -817,7 +821,7 @@ static void render_command_palette(const LWCONTEXT* pLwc) {
 	SET_COLOR_RGBA_FLOAT(cmd_text_block.color_emp_outline, 0, 0, 0, 1);
 	cmd_text_block.text_block_y = -command_slot_height;
 	cmd_text_block.align = LTBA_LEFT_TOP;
-
+	cmd_text_block.multiline = 1;
 	// command list
 	for (int i = 0; i < max_command_in_palette; i++) {
 

@@ -146,7 +146,12 @@ void render_text_block(const struct _LWCONTEXT *pLwc, const struct _LWTEXTBLOCK*
 	
 	for (size_t i = 0; i < unicode_strlen; i++) {
 		if (unicode_str[i] == '\n') {
-			break;
+			if (text_block->multiline) {
+				size_scaled_xadvance_accum = 0;
+				line++;
+			} else {
+				break;
+			}
 		}
 
 		const BMF_CHAR* bci = bc[i];

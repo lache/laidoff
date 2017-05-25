@@ -1,10 +1,10 @@
+#include <stdlib.h>
+#include <string.h>
 #include "sysmsg.h"
 #include "lwmacro.h"
 #include "lwcontext.h"
 #include "render_solid.h"
 #include "render_text_block.h"
-#include <stdlib.h>
-#include <string.h>
 
 #define LW_SYS_MSG_MAX_LEN (256)
 
@@ -62,6 +62,7 @@ static void s_render(const struct _LWCONTEXT* pLwc, const char* msg) {
 	text_block.end_index = text_block.text_bytelen;
 	text_block.text_block_x = 0;
 	text_block.text_block_y = -header_y_center;
+	text_block.multiline = 1;
 	render_text_block(pLwc, &text_block);
 }
 

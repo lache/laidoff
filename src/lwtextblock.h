@@ -1,8 +1,7 @@
 #pragma once
 #include "lwuialign.h"
 
-typedef struct _LWTEXTBLOCK
-{
+typedef struct _LWTEXTBLOCK {
 	const char* text;
 	int text_bytelen;
 	int begin_index;
@@ -17,6 +16,7 @@ typedef struct _LWTEXTBLOCK
 	float color_emp_glyph[4];
 	float color_emp_outline[4];
 	LW_UI_ALIGN align;
+	int multiline;
 } LWTEXTBLOCK;
 
 

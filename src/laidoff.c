@@ -72,6 +72,7 @@ LwStaticAssert(sizeof(LWFANVERTEX) == (GLsizei)(sizeof(float) * 3), "LWFANVERTEX
 
 
 #if LW_PLATFORM_ANDROID || LW_PLATFORM_IOS || LW_PLATFORM_IOS_SIMULATOR
+#include "lwtimepoint.h"
 double glfwGetTime() {
     LWTIMEPOINT tp;
     lwtimepoint_now(&tp);
@@ -126,7 +127,6 @@ void update_attack_trail(LWCONTEXT *pLwc);
 float get_battle_enemy_x_center(int enemy_slot_index);
 void update_damage_text(LWCONTEXT *pLwc);
 static void reinit_mq(LWCONTEXT *pLwc);
-static double s_get_delta_time_history_avg(const LWCONTEXT* pLwc);
 
 typedef struct {
 	GLuint vb;
@@ -952,7 +952,9 @@ void update_anim(LWCONTEXT *pLwc) {
 			continue;
 		}
 
-		anim->elapsed += (float)pLwc->delta_time;
+		const float delta_time = (float)deltatime_delta_time(pLwc->update_dt);
+
+		anim->elapsed += delta_time;
 
 		const float elapsed_frame = anim->elapsed * anim->fps;
 
@@ -1060,13 +1062,16 @@ void render_stat(const LWCONTEXT* pLwc) {
 	SET_COLOR_RGBA_FLOAT(text_block.color_emp_glyph, 1, 1, 0, 1);
 	SET_COLOR_RGBA_FLOAT(text_block.color_emp_outline, 0, 0, 0, 1);
 	char msg[32];
-	sprintf(msg, "%.1f FPS", (float)(1.0 / s_get_delta_time_history_avg(pLwc)));
+	sprintf(msg, "L %.1f FPS\nR %.1f FPS",
+		(float)(1.0 / deltatime_history_avg(pLwc->update_dt)),
+		(float)(1.0 / deltatime_history_avg(pLwc->render_dt)));
 	text_block.text = msg;
 	text_block.text_bytelen = (int)strlen(text_block.text);
 	text_block.begin_index = 0;
 	text_block.end_index = text_block.text_bytelen;
 	text_block.text_block_x = -aspect_ratio;
 	text_block.text_block_y = 1.0f;
+	text_block.multiline = 1;
 	render_text_block(pLwc, &text_block);
 }
 
@@ -1095,31 +1100,17 @@ void lwc_render(const LWCONTEXT *pLwc) {
 }
 
 static void update_battle_wall(LWCONTEXT* pLwc) {
-	pLwc->battle_wall_tex_v += (float)(pLwc->delta_time / 34);
+	const float delta_time = (float)deltatime_delta_time(pLwc->update_dt);
+
+	pLwc->battle_wall_tex_v += delta_time / 34;
 	pLwc->battle_wall_tex_v = fmodf(pLwc->battle_wall_tex_v, 1.0f);
 }
 
-static double s_get_delta_time_history_avg(const LWCONTEXT* pLwc) {
-	double delta_time_sum = 0;
-	const int cnt = LWMIN(pLwc->delta_time_history_index, MAX_DELTA_TIME_HISTORY);
-	for (int i = 0; i < cnt; i++) {
-		delta_time_sum += pLwc->delta_time_history[i];
-	}
-	if (cnt > 0) {
-		return delta_time_sum / cnt;
-	} else {
-		return 0;
-	}
-}
+void lwc_update(LWCONTEXT *pLwc, double delta_time_unused) {
 
-void lwc_update(LWCONTEXT *pLwc, double delta_time) {
+	deltatime_tick(pLwc->update_dt);
 
-	LWTIMEPOINT cur_time;
-	lwtimepoint_now(&cur_time);
-
-	pLwc->delta_time = lwtimepoint_diff(&cur_time, &pLwc->last_time);
-	pLwc->delta_time_history[(pLwc->delta_time_history_index++) % MAX_DELTA_TIME_HISTORY] = pLwc->delta_time;
-	pLwc->last_time = cur_time;
+	const float delta_time = (float)deltatime_delta_time(pLwc->update_dt);
 
 	if (pLwc->next_game_scene == LGS_INVALID && pLwc->game_scene == LGS_INVALID) {
 		// Default game scene
@@ -1138,8 +1129,8 @@ void lwc_update(LWCONTEXT *pLwc, double delta_time) {
 	}
 
 	// accumulate time since app startup
-	pLwc->app_time += pLwc->delta_time;
-	pLwc->scene_time += pLwc->delta_time;
+	pLwc->app_time += delta_time;
+	pLwc->scene_time += delta_time;
 
 	mq_poll(pLwc, pLwc->def_sys_msg, pLwc->mq, pLwc->field);
 
@@ -1147,7 +1138,7 @@ void lwc_update(LWCONTEXT *pLwc, double delta_time) {
 
 	//****//
 	// fix delta time
-	//pLwc->delta_time = 1.0f / 60;
+	//lwcontext_delta_time(pLwc) = 1.0f / 60;
 	//****//
 
 	float ratio = pLwc->width / (float)pLwc->height;
@@ -1172,7 +1163,7 @@ void lwc_update(LWCONTEXT *pLwc, double delta_time) {
 
 	update_battle_wall(pLwc);
 
-	update_sys_msg(pLwc->def_sys_msg, (float)pLwc->delta_time);
+	update_sys_msg(pLwc->def_sys_msg, delta_time);
 
 	if (pLwc->font_fbo.dirty) {
 		lwc_render_font_test_fbo(pLwc);
@@ -1433,7 +1424,13 @@ LWCONTEXT *lw_init(void) {
 
 	pLwc->def_sys_msg = init_sys_msg();
 
-	lwtimepoint_now(&pLwc->last_time);
+	pLwc->update_dt = deltatime_new();
+
+	deltatime_set_to_now(pLwc->update_dt);
+
+	pLwc->render_dt = deltatime_new();
+
+	deltatime_set_to_now(pLwc->render_dt);
 
 	init_net(pLwc);
 
@@ -1490,6 +1487,8 @@ void lw_deinit(LWCONTEXT *pLwc) {
 	deinit_sys_msg(pLwc->def_sys_msg);
 
 	deinit_mq(pLwc->mq);
+
+	deltatime_destroy(&pLwc->update_dt);
 
 	free(pLwc);
 }
@@ -1629,18 +1628,6 @@ void toggle_ray_test(LWCONTEXT *pLwc) {
 	field_enable_ray_test(pLwc->field, pLwc->ray_test);
 }
 
-long lw_get_last_time_sec(LWCONTEXT *pLwc) {
-	return lwtimepoint_get_second_portion(&pLwc->last_time);
-}
-
-long lw_get_last_time_nsec(LWCONTEXT *pLwc) {
-	return lwtimepoint_get_nanosecond_portion(&pLwc->last_time);
-}
-
-double lw_get_delta_time(LWCONTEXT *pLwc) {
-	return pLwc->delta_time;
-}
-
 int lw_get_update_count(LWCONTEXT *pLwc) {
 	return pLwc->update_count;
 }
@@ -1659,4 +1646,8 @@ void lw_on_destroy(LWCONTEXT *pLwc) {
 
 void lw_set_kp(LWCONTEXT *pLwc, int kp) {
 	pLwc->kp = kp;
+}
+
+double lwcontext_delta_time(const LWCONTEXT* pLwc) {
+	return deltatime_delta_time(pLwc->update_dt);
 }

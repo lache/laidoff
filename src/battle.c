@@ -108,8 +108,8 @@ void revert_battle_cam_and_update_player_turn(LWCONTEXT* pLwc) {
 void update_attack_trail(LWCONTEXT *pLwc) {
 	for (int i = 0; i < MAX_TRAIL; i++) {
 		if (pLwc->trail[i].valid) {
-			pLwc->trail[i].age += (float)pLwc->delta_time;
-			pLwc->trail[i].tex_coord += (float)(pLwc->trail[i].tex_coord_speed * pLwc->delta_time);
+			pLwc->trail[i].age += (float)lwcontext_delta_time(pLwc);
+			pLwc->trail[i].tex_coord += (float)(pLwc->trail[i].tex_coord_speed * lwcontext_delta_time(pLwc));
 
 			if (pLwc->trail[i].age >= pLwc->trail[i].max_age) {
 
@@ -174,11 +174,11 @@ int spawn_exp_text(LWCONTEXT *pLwc, float x, float y, float z, const char *text,
 void update_damage_text(LWCONTEXT *pLwc) {
 	for (int i = 0; i < MAX_TRAIL; i++) {
 		if (pLwc->damage_text[i].valid) {
-			pLwc->damage_text[i].age += (float)pLwc->delta_time;
+			pLwc->damage_text[i].age += (float)lwcontext_delta_time(pLwc);
 
-			//pLwc->damage_text[i].text_block.text_block_x += (float)(0.2 * cos(LWDEG2RAD(60)) * pLwc->delta_time);
+			//pLwc->damage_text[i].text_block.text_block_x += (float)(0.2 * cos(LWDEG2RAD(60)) * lwcontext_delta_time(pLwc));
 			pLwc->damage_text[i].text_block.text_block_y += (float)(0.2 * sin(LWDEG2RAD(60)) *
-				pLwc->delta_time);
+				lwcontext_delta_time(pLwc));
 
 			const float t = pLwc->damage_text[i].age;
 			const float expand_time = 0.15f;
@@ -378,7 +378,7 @@ void update_enemy_turn(struct _LWCONTEXT* pLwc) {
 
 	if (pLwc->battle_state == LBS_ENEMY_TURN_WAIT) {
 		if (pLwc->enemy_turn_command_wait_time > 0) {
-			pLwc->enemy_turn_command_wait_time -= (float)pLwc->delta_time;
+			pLwc->enemy_turn_command_wait_time -= (float)lwcontext_delta_time(pLwc);
 		} else {
 			pLwc->enemy_turn_command_wait_time = 0;
 
@@ -535,7 +535,7 @@ void update_battle(struct _LWCONTEXT* pLwc) {
 	vec3 up = { 0, 0, 1 };
 	mat4x4_look_at(pLwc->battle_view, eye, center, up);
 
-	pLwc->command_banner_anim.t = (float)LWMAX(0, pLwc->command_banner_anim.t - (float)pLwc->delta_time);
+	pLwc->command_banner_anim.t = (float)LWMAX(0, pLwc->command_banner_anim.t - (float)lwcontext_delta_time(pLwc));
 
 	update_enemy_turn(pLwc);
 
@@ -549,5 +549,5 @@ void update_battle(struct _LWCONTEXT* pLwc) {
 	}
 	ARRAY_ITERATE_VALID_END();
 
-	pLwc->center_image_anim.t = (float)LWMAX(0, pLwc->center_image_anim.t - (float)pLwc->delta_time);
+	pLwc->center_image_anim.t = (float)LWMAX(0, pLwc->center_image_anim.t - (float)lwcontext_delta_time(pLwc));
 }

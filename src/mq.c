@@ -8,6 +8,21 @@
 #include "lwcontext.h"
 #include "extrapolator.h"
 
+//  Mutex macros
+#if defined (__UNIX__)
+typedef pthread_mutex_t zsys_mutex_t;
+#   define ZMUTEX_INIT(m)    pthread_mutex_init (&m, NULL);
+#   define ZMUTEX_LOCK(m)    pthread_mutex_lock (&m);
+#   define ZMUTEX_UNLOCK(m)  pthread_mutex_unlock (&m);
+#   define ZMUTEX_DESTROY(m) pthread_mutex_destroy (&m);
+#elif defined (__WINDOWS__)
+typedef CRITICAL_SECTION zsys_mutex_t;
+#   define ZMUTEX_INIT(m)    InitializeCriticalSection (&m);
+#   define ZMUTEX_LOCK(m)    EnterCriticalSection (&m);
+#   define ZMUTEX_UNLOCK(m)  LeaveCriticalSection (&m);
+#   define ZMUTEX_DESTROY(m) DeleteCriticalSection (&m);
+#endif
+
 typedef enum _LW_MESSAGE_QUEUE_STATE {
 	LMQS_INIT,
 	LMQS_TIME,
@@ -33,6 +48,7 @@ typedef struct _LWMESSAGEQUEUE {
 	double* deltasamples;
 	int deltasequence;
 	int64_t start_req_time_mono;
+	zsys_mutex_t mutex;
 } LWMESSAGEQUEUE;
 
 #define DELTA_REQ_COUNT (15)
@@ -73,6 +89,8 @@ void* init_mq(const char* addr, void* sm) {
 	// First we request a time sync:
 	mq->start_req_time_mono = zclock_mono();
 	s_req_time(mq);
+
+	ZMUTEX_INIT(mq->mutex);
 
 	return mq;
 }
@@ -241,7 +259,9 @@ static void s_mq_poll_snapshot(void* _mq, void* sm) {
 			return;
 		}
 		show_sys_msg(sm, LWU("Receiving snapshot"));
+		mq_lock_mutex(mq);
 		s_kvmsg_store_posmap_noown(&kvmsg, mq->posmap, mq_sync_mono_clock(mq), mq);
+		mq_unlock_mutex(mq);
 		kvmsg_store(&kvmsg, mq->kvmap);
 	}
 }
@@ -302,6 +322,7 @@ static void s_mq_poll_ready(void* _pLwc, void* _mq, void* sm, void* field) {
 	LWMESSAGEQUEUE* mq = (LWMESSAGEQUEUE*)_mq;
 	LWCONTEXT* pLwc = (LWCONTEXT*)_pLwc;
 	zmq_pollitem_t items[] = { { zsock_resolve(mq->subscriber), 0, ZMQ_POLLIN, 0 } };
+	double t0 = zclock_mono() / 1e3;
 	// Process all queued messages at once
 	while (zmq_poll(items, 1, 0) > 0) {
 		// Polling subscriber socket to get update
@@ -347,8 +368,9 @@ static void s_mq_poll_ready(void* _pLwc, void* _mq, void* sm, void* field) {
 					if (mq->verbose) {
 						LOGI("Update: %"PRId64" key:%s, bodylen:%zd\n", mq->sequence, kvmsg_key(kvmsg), kvmsg_size(kvmsg));
 					}
-
+					mq_lock_mutex(mq);
 					s_kvmsg_store_posmap_noown(&kvmsg, mq->posmap, mq_sync_mono_clock(mq), mq);
+					mq_unlock_mutex(mq);
 					kvmsg_store(&kvmsg, mq->kvmap);
 				} else {
 					kvmsg_destroy(&kvmsg);
@@ -356,6 +378,8 @@ static void s_mq_poll_ready(void* _pLwc, void* _mq, void* sm, void* field) {
 			}
 		}
 	}
+	double t1 = zclock_mono() / 1e3 - t0;
+	//printf("%.3f sec\n", t1);
 
 	if (zclock_time() >= mq->alarm) {
 		s_send_pos(pLwc, mq, 0);
@@ -448,6 +472,7 @@ void deinit_mq(void* _mq) {
 	zsock_destroy(&mq->snapshot);
 	zsock_destroy(&mq->subscriber);
 	zuuid_destroy(&mq->uuid);
+	ZMUTEX_DESTROY(mq->mutex);
 	mq->state = LMQS_TERM;
 	free(mq);
 }
@@ -479,4 +504,14 @@ int mq_cursor_player(void* _mq, const char* cursor) {
 void mq_interrupt() {
 	zsys_interrupted = 1;
 	zctx_interrupted = 1;
+}
+
+void mq_lock_mutex(void* _mq) {
+	LWMESSAGEQUEUE* mq = (LWMESSAGEQUEUE*)_mq;
+	ZMUTEX_LOCK(mq->mutex);
+}
+
+void mq_unlock_mutex(void* _mq) {
+	LWMESSAGEQUEUE* mq = (LWMESSAGEQUEUE*)_mq;
+	ZMUTEX_UNLOCK(mq->mutex);
 }

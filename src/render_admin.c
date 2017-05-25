@@ -81,6 +81,7 @@ void lwc_render_admin(const struct _LWCONTEXT* pLwc) {
 			text_block.end_index = text_block.text_bytelen;
 			text_block.text_block_x = but_pos[0];
 			text_block.text_block_y = but_pos[1];
+			text_block.multiline = 1;
 			render_text_block(pLwc, &text_block);
 
 			i++;

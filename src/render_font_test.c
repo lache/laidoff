@@ -27,6 +27,7 @@ void lwc_render_font_test_fbo(const struct _LWCONTEXT* pLwc) {
 	test_text_block.text_bytelen = (int)strlen(test_text_block.text);
 	test_text_block.begin_index = 0;
 	test_text_block.end_index = test_text_block.text_bytelen;
+	test_text_block.multiline = 1;
 
 	// The first column (left aligned)
 
