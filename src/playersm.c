@@ -208,7 +208,7 @@ static void s_fire_bullet(LWPLAYERSTATEDATA* data) {
 	const float aimed_rot_z = (float)(data->rot_z - data->aim_theta / 2 + data->aim_theta * field_random_double(data->field));
 	
 	float vel[3] = { speed * cosf(aimed_rot_z), speed * sinf(aimed_rot_z), 0 };
-	//field_spawn_sphere(data->field, pos, vel);
+	field_spawn_sphere(data->field, pos, vel);
 
-	mq_send_fire(data->mq, pos, vel);
+	//mq_send_fire(data->mq, pos, vel);
 }

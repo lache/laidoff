@@ -392,9 +392,11 @@ void lwc_render_field(const LWCONTEXT* pLwc) {
 
 	float rscale[FAN_VERTEX_COUNT_PER_ARRAY];
 	rscale[0] = 0; // center vertex has no meaningful rscale
+	mq_lock_mutex(pLwc->mq);
 	for (int i = 1; i < FAN_VERTEX_COUNT_PER_ARRAY; i++) {
 		rscale[i] = (float)field_ray_nearest_depth(pLwc->field, LRI_AIM_SECTOR_FIRST_INCLUSIVE + i - 1);
 	}
+	mq_unlock_mutex(pLwc->mq);
 
 	if (pLwc->player_state_data.state == LPS_AIM || pLwc->player_state_data.state == LPS_FIRE) {
 		render_fan(pLwc, perspective, view,

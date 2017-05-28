@@ -149,7 +149,7 @@ static void resolve_collision_one_fixed(LWCONTEXT* pLwc, const LWBOX2DCOLLIDER *
 
 	if (dx) {
 		const float dy = resolve_collision_one_fixed_axis(fixed->y, fixed->h, movable->y,
-		                                                  movable->h);
+			movable->h);
 
 		if (dy) {
 
@@ -435,9 +435,9 @@ void move_player_geom_by_input(LWFIELD* field) {
 	dGeomSetPosition(field->ray[LRI_PLAYER_CENTER], field->player_pos[0], field->player_pos[1], field->player_pos[2]);
 	const dReal* player_contact_ray_pos = dGeomGetPosition(field->ray[LRI_PLAYER_CONTACT]);
 	dGeomSetPosition(field->ray[LRI_PLAYER_CONTACT],
-	                 player_contact_ray_pos[0] + geom_pos_delta_rotated[0],
-	                 player_contact_ray_pos[1] + geom_pos_delta_rotated[1],
-	                 player_contact_ray_pos[2] + geom_pos_delta_rotated[2]);
+		player_contact_ray_pos[0] + geom_pos_delta_rotated[0],
+		player_contact_ray_pos[1] + geom_pos_delta_rotated[1],
+		player_contact_ray_pos[2] + geom_pos_delta_rotated[2]);
 }
 
 void move_player_to_ground(LWFIELD* field) {
@@ -469,9 +469,9 @@ void move_player_to_ground(LWFIELD* field) {
 	dGeomSetPosition(field->ray[LRI_PLAYER_CENTER], field->player_pos[0], field->player_pos[1], field->player_pos[2]);
 	if (center_nearest_ray_index >= 0) {
 		dGeomSetPosition(field->ray[LRI_PLAYER_CONTACT],
-		                 field->player_pos[0] - field->player_radius * field->ray_result[LRI_PLAYER_CENTER][center_nearest_ray_index].geom.normal[0],
-		                 field->player_pos[1] - field->player_radius * field->ray_result[LRI_PLAYER_CENTER][center_nearest_ray_index].geom.normal[1],
-		                 field->player_pos[2]);
+			field->player_pos[0] - field->player_radius * field->ray_result[LRI_PLAYER_CENTER][center_nearest_ray_index].geom.normal[0],
+			field->player_pos[1] - field->player_radius * field->ray_result[LRI_PLAYER_CENTER][center_nearest_ray_index].geom.normal[1],
+			field->player_pos[2]);
 
 	} else {
 		dGeomSetPosition(field->ray[LRI_PLAYER_CONTACT], field->player_pos[0], field->player_pos[1], field->player_pos[2]);
@@ -559,8 +559,6 @@ void update_field(LWCONTEXT* pLwc, LWFIELD* field) {
 		LOGE("update_field: field null");
 		return;
 	}
-	// Clear ray result from the previous frame
-	reset_ray_result(field);
 	// Get player position before integration (for calculating player velocity)
 	dVector3 player_pos_0;
 	dCopyVector3(player_pos_0, field->player_pos);
@@ -570,18 +568,26 @@ void update_field(LWCONTEXT* pLwc, LWFIELD* field) {
 	move_player_geom_by_input(field);
 	// Move aim (sector) rays accordingly.
 	move_aim_ray(field, pLwc->player_state_data.aim_theta, pLwc->player_state_data.rot_z);
-	// Resolve collision
+	// Ray result mutex
+	mq_lock_mutex(pLwc->mq);
+	{
+		// Clear ray result from the previous frame
+		reset_ray_result(field);
+		// Resolve collision (ray-world)
+		collide_between_spaces(field, field->space_group[LSG_WORLD], field->space_group[LSG_RAY], field_world_ray_near);
+		// Gather ray result reported by collision report.
+		// Specifically, get minimum ray length collision point.
+		gather_ray_result(field);
+	}
+	mq_unlock_mutex(pLwc->mq);
+	// Resolve collision (other than ray-world)
 	collide_between_spaces(field, field->space_group[LSG_PLAYER], field->space_group[LSG_WORLD], field_player_world_near);
 	collide_between_spaces(field, field->space_group[LSG_PLAYER], field->space_group[LSG_BULLET], field_player_bullet_near);
-	collide_between_spaces(field, field->space_group[LSG_WORLD], field->space_group[LSG_RAY], field_world_ray_near);
 	collide_between_spaces(field, field->space_group[LSG_WORLD], field->space_group[LSG_BULLET], field_world_bullet_near);
-	// Stepping the physics world
-    if (lwcontext_delta_time(pLwc) > 0) {
-        dWorldStep(field->world, lwcontext_delta_time(pLwc));
-    }
-	// Gather ray result reported by collision report.
-	// Specifically, get minimum ray length collision point.
-	gather_ray_result(field);
+	// Stepping the physics world (bullet-world)
+	if (lwcontext_delta_time(pLwc) > 0) {
+		dWorldStep(field->world, lwcontext_delta_time(pLwc));
+	}
 	// maybe-overlapped player geom's collision is resolved.
 	// Bring the player straight to the ground.
 	move_player_to_ground(field);
@@ -623,7 +629,7 @@ void update_field(LWCONTEXT* pLwc, LWFIELD* field) {
 		// path query result's coordinates is different from world coordinates.
 		const vec3 pvec = { p[0], -p[2], p[1] };
 		memcpy(pLwc->field->path_query_test_player_pos, pvec, sizeof(vec3));
-		
+
 		if (idx < pLwc->field->path_query.n_smooth_path - 1) {
 			const float* p2 = &pLwc->field->path_query.smooth_path[3 * (idx + 1)];
 			// path query result's coordinates is different from world coordinates.
@@ -638,34 +644,37 @@ void update_field(LWCONTEXT* pLwc, LWFIELD* field) {
 			pLwc->field->path_query_time = 0;
 		}
 	}
-	// Update remote players' position and orientation, anim action:
+	// Remote player update mutex
 	mq_lock_mutex(pLwc->mq);
-	LWPOSSYNCMSG* value = mq_possync_first(pLwc->mq);
-	while (value) {
-		const char* cursor = mq_possync_cursor(pLwc->mq);
-		// Exclude the player
-		if (!mq_cursor_player(pLwc->mq, cursor)) {
-			float dx = 0, dy = 0;
-			vec4_extrapolator_read(value->extrapolator, mq_sync_mono_clock(pLwc->mq), &value->x, &value->y, &value->z, &dx, &dy);
-			
-			//LOGI("READ: POS (%.2f, %.2f, %.2f) DXY (%.2f, %.2f)", value->x, value->y, value->z, dx, dy);
+	{
+		// Update remote players' position and orientation, anim action:
+		LWPOSSYNCMSG* value = mq_possync_first(pLwc->mq);
+		while (value) {
+			const char* cursor = mq_possync_cursor(pLwc->mq);
+			// Exclude the player
+			if (!mq_cursor_player(pLwc->mq, cursor)) {
+				float dx = 0, dy = 0;
+				vec4_extrapolator_read(value->extrapolator, mq_sync_mono_clock(pLwc->mq), &value->x, &value->y, &value->z, &dx, &dy);
 
-			value->a = atan2f(dy, dx);
-			if (value->action >= 0 && value->action < LWAC_COUNT) {
-				value->anim_action = &pLwc->action[(LW_ACTION)value->action];
-			} else {
-				LOGE("Unknown action enum detected on remote player. Has message structure been changed?");
-				value->anim_action = &pLwc->action[LWAC_HUMANACTION_IDLE];
+				//LOGI("READ: POS (%.2f, %.2f, %.2f) DXY (%.2f, %.2f)", value->x, value->y, value->z, dx, dy);
+
+				value->a = atan2f(dy, dx);
+				if (value->action >= 0 && value->action < LWAC_COUNT) {
+					value->anim_action = &pLwc->action[(LW_ACTION)value->action];
+				} else {
+					LOGE("Unknown action enum detected on remote player. Has message structure been changed?");
+					value->anim_action = &pLwc->action[LWAC_HUMANACTION_IDLE];
+				}
+
 			}
-			
+			value = mq_possync_next(pLwc->mq);
 		}
-		value = mq_possync_next(pLwc->mq);
 	}
 	mq_unlock_mutex(pLwc->mq);
 	s_deactivate_out_of_domain_sphere(field, (float)lwcontext_delta_time(pLwc));
 }
 
-void unload_field(LWFIELD* field) 	{
+void unload_field(LWFIELD* field) {
 	if (field->nav) {
 		unload_nav(field->nav);
 	}
