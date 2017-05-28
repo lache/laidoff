@@ -1,4 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">용사는 휴직중</string>
+    <string name="no_conn">인터넷 연결 확인 오네가이</string>
+    <string name="error">에러</string>
+    <string name="exit">종료</string>
 </resources>

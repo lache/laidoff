@@ -1,7 +1,9 @@
 package com.popsongremix.laidoff;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.app.ProgressDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
@@ -12,6 +14,7 @@ import android.widget.Toast;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.concurrent.atomic.AtomicLong;
 
@@ -54,6 +57,24 @@ class UpdateResTask extends AsyncTask<UpdateResTaskParam, Void, File> {
             updateAssetOneByOneSync();
 
             return listGfr.file;
+        } catch (UnknownHostException e) {
+            activity.runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    AlertDialog.Builder dlgAlert  = new AlertDialog.Builder(activity);
+                    dlgAlert.setMessage(R.string.no_conn);
+                    dlgAlert.setTitle(R.string.error);
+                    dlgAlert.setPositiveButton(R.string.exit, new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialogInterface, int i) {
+                            activity.finish();
+                        }
+                    });
+                    //dlgAlert.setCancelable(true);
+                    dlgAlert.create().show();
+                    //Toast.makeText(activity.getApplicationContext(), R.string.no_conn, Toast.LENGTH_LONG).show();
+                }
+            });
         } catch (Exception e) {
             e.printStackTrace();
         }

@@ -21,13 +21,20 @@ void deltatime_destroy(LWDELTATIME** p_self) {
 	*p_self = 0;
 }
 
-void deltatime_tick(LWDELTATIME* self) {
+void deltatime_tick_delta(LWDELTATIME* self, double delta_time) {
 	LWTIMEPOINT cur_time;
 	lwtimepoint_now(&cur_time);
 
-	self->delta_time = lwtimepoint_diff(&cur_time, &self->last_time);
+	self->delta_time = delta_time;
 	self->delta_time_history[(self->delta_time_history_index++) % MAX_DELTA_TIME_HISTORY] = self->delta_time;
 	self->last_time = cur_time;
+}
+
+void deltatime_tick(LWDELTATIME* self) {
+	LWTIMEPOINT cur_time;
+	lwtimepoint_now(&cur_time);
+	double delta_time = lwtimepoint_diff(&cur_time, &self->last_time);
+	deltatime_tick_delta(self, delta_time);
 }
 
 double deltatime_history_avg(const LWDELTATIME* self) {

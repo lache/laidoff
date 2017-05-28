@@ -85,6 +85,10 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
 		
 	}
 
+	if (key == GLFW_KEY_U && (action == GLFW_PRESS || action == GLFW_REPEAT)) {
+		lwc_update(pLwc, 1.0 / 60);
+	}
+
 	if (key == GLFW_KEY_P && action == GLFW_PRESS) {
 		lw_trigger_play_sound(pLwc);
 	}

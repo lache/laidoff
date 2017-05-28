@@ -1106,11 +1106,11 @@ static void update_battle_wall(LWCONTEXT* pLwc) {
 	pLwc->battle_wall_tex_v = fmodf(pLwc->battle_wall_tex_v, 1.0f);
 }
 
-void lwc_update(LWCONTEXT *pLwc, double delta_time_unused) {
+void lwc_update(LWCONTEXT *pLwc, double delta_time) {
 
-	deltatime_tick(pLwc->update_dt);
+	deltatime_tick_delta(pLwc->update_dt, delta_time);
 
-	const float delta_time = (float)deltatime_delta_time(pLwc->update_dt);
+	//const float delta_time = (float)deltatime_delta_time(pLwc->update_dt);
 
 	if (pLwc->next_game_scene == LGS_INVALID && pLwc->game_scene == LGS_INVALID) {
 		// Default game scene
@@ -1132,7 +1132,7 @@ void lwc_update(LWCONTEXT *pLwc, double delta_time_unused) {
 	pLwc->app_time += delta_time;
 	pLwc->scene_time += delta_time;
 
-	mq_poll(pLwc, pLwc->def_sys_msg, pLwc->mq, pLwc->field);
+	//mq_poll(pLwc, pLwc->def_sys_msg, pLwc->mq, pLwc->field);
 
 	update_dialog(pLwc);
 

@@ -12,6 +12,7 @@
 #include <unistd.h>
 #include <android/input.h>
 #include <stdlib.h>
+#include <lwtimepoint.h>
 #include "laidoff.h"
 #include "lwlog.h"
 #include "czmq.h"
@@ -618,11 +619,21 @@ static void engine_handle_cmd(struct android_app* app, int32_t cmd) {
 
 static void s_logic_worker(zsock_t* pipe, void* args) {
 	LWCONTEXT* pLwc = (LWCONTEXT*)args;
-
 	zsock_signal(pipe, 0);
-
+	LWTIMEPOINT last_time;
+	lwtimepoint_now(&last_time);
+	double delta_time_accum = 0;
 	while (true) {
-		lwc_update(pLwc, 1.0 / 60);
+		LWTIMEPOINT cur_time;
+		lwtimepoint_now(&cur_time);
+		const double delta_time = lwtimepoint_diff(&cur_time, &last_time);
+		delta_time_accum += delta_time;
+		while (delta_time_accum > 0.005) {
+			lwc_update(pLwc, 0.005);
+			delta_time_accum -= 0.005;
+		}
+		last_time = cur_time;
+		zclock_sleep(1);
 	}
 }
 
