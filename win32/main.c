@@ -4,6 +4,7 @@
 #include "czmq.h"
 #include "lwdeltatime.h"
 #include "lwtimepoint.h"
+#include "lwlog.h"
 
 #ifndef BOOL
 #define BOOL int
@@ -67,7 +68,7 @@ static GLFWwindow* create_glfw_window()
 
 int main(void)
 {
-	printf(LWU("용사는 휴직중 LAID OFF v0.1\n"));
+	LOGI("LAIDOFF: Greetings.");
     
     while (!directory_exists("assets") && LwChangeDirectory(".."))
 	{
@@ -179,7 +180,7 @@ int main(void)
 
 	lw_on_destroy(pLwc);
 	
-    printf(LWU("용사는 휴직중 종료\n"));
+	LOGI("LAIDOFF: Goodbye.");
 
 	exit(EXIT_SUCCESS);
 }

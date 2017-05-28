@@ -1642,6 +1642,7 @@ void lw_on_destroy(LWCONTEXT *pLwc) {
 	release_font(pLwc->pFnt);
 	release_string(pLwc->dialog);
 	deinit_net(pLwc);
+	zactor_destroy((zactor_t**)&pLwc->logic_actor);
 	lw_deinit(pLwc);
 	mq_shutdown();
 }
