@@ -1660,18 +1660,19 @@ static void s_logic_worker(zsock_t *pipe, void *args) {
 	LWTIMEPOINT last_time;
 	lwtimepoint_now(&last_time);
 	double delta_time_accum = 0;
+    const double update_interval = 0.02; // seconds
 	while (!pLwc->quit_request) {
 		LWTIMEPOINT cur_time;
 		lwtimepoint_now(&cur_time);
 		const double delta_time = lwtimepoint_diff(&cur_time, &last_time);
 		delta_time_accum += delta_time;
-		while (delta_time_accum > 0.005) {
-			lwc_update(pLwc, 0.005);
-			delta_time_accum -= 0.005;
+		while (delta_time_accum > update_interval) {
+			lwc_update(pLwc, update_interval);
+			delta_time_accum -= update_interval;
 		}
 		last_time = cur_time;
-		if (delta_time_accum < 0.005) {
-			zclock_sleep(1);
+		if (delta_time_accum < update_interval) {
+			zclock_sleep((update_interval - delta_time_accum) * 1000);
 		}
 	}
 }
