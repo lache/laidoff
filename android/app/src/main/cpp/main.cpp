@@ -352,7 +352,6 @@ static void engine_draw_frame(struct engine* engine) {
 
     if (engine->pLwc)
     {
-		deltatime_tick(engine->pLwc->render_dt);
         lwc_render(engine->pLwc);
     }
 
@@ -617,26 +616,6 @@ static void engine_handle_cmd(struct android_app* app, int32_t cmd) {
     }
 }
 
-static void s_logic_worker(zsock_t* pipe, void* args) {
-	LWCONTEXT* pLwc = (LWCONTEXT*)args;
-	zsock_signal(pipe, 0);
-	LWTIMEPOINT last_time;
-	lwtimepoint_now(&last_time);
-	double delta_time_accum = 0;
-	while (true) {
-		LWTIMEPOINT cur_time;
-		lwtimepoint_now(&cur_time);
-		const double delta_time = lwtimepoint_diff(&cur_time, &last_time);
-		delta_time_accum += delta_time;
-		while (delta_time_accum > 0.005) {
-			lwc_update(pLwc, 0.005);
-			delta_time_accum -= 0.005;
-		}
-		last_time = cur_time;
-		zclock_sleep(1);
-	}
-}
-
 /**
  * This is the main entry point of a native application that is using
  * android_native_app_glue.  It runs in its own thread, with its own
@@ -712,8 +691,7 @@ void android_main(struct android_app* state) {
             engine.pLwc = lw_init();
             lw_set_size(engine.pLwc, engine.width, engine.height);
             engine.inited = true;
-			// Start a logic thread
-			zactor_new(s_logic_worker, engine.pLwc);
+            lwc_start_logic_thread(engine.pLwc);
 		}
 
         // Read all pending events.

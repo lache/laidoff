@@ -160,12 +160,7 @@ int main(void)
 
 	while (!glfwWindowShouldClose(window))
 	{
-		deltatime_tick(pLwc->render_dt);
-
-		//lwc_update(pLwc, lwcontext_delta_time(pLwc));
-
 		lwc_render(pLwc);
-
 		glfwSwapBuffers(window);
 		glfwPollEvents();
 	}

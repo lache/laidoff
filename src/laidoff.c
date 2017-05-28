@@ -1077,6 +1077,7 @@ void render_stat(const LWCONTEXT* pLwc) {
 }
 
 void lwc_render(const LWCONTEXT *pLwc) {
+	deltatime_tick(pLwc->render_dt);
 	if (pLwc->game_scene == LGS_BATTLE) {
 		lwc_render_battle(pLwc);
 	} else if (pLwc->game_scene == LGS_DIALOG) {
