@@ -576,7 +576,9 @@ void update_field(LWCONTEXT* pLwc, LWFIELD* field) {
 	collide_between_spaces(field, field->space_group[LSG_WORLD], field->space_group[LSG_RAY], field_world_ray_near);
 	collide_between_spaces(field, field->space_group[LSG_WORLD], field->space_group[LSG_BULLET], field_world_bullet_near);
 	// Stepping the physics world
-	dWorldStep(field->world, lwcontext_delta_time(pLwc));
+    if (lwcontext_delta_time(pLwc) > 0) {
+        dWorldStep(field->world, lwcontext_delta_time(pLwc));
+    }
 	// Gather ray result reported by collision report.
 	// Specifically, get minimum ray length collision point.
 	gather_ray_result(field);

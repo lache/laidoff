@@ -1,4 +1,4 @@
-#include <malloc.h>
+#include <stdlib.h>
 #include "lwdeltatime.h"
 #include "lwtimepoint.h"
 #include "lwmacro.h"

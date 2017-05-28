@@ -97,7 +97,7 @@
 
 - (void)update
 {
-    lwc_update(self.pLwc, self.timeSinceLastUpdate);
+    //lwc_update(self.pLwc, self.timeSinceLastUpdate);
 }
 
 static CGPoint getNormalizedPoint(UIView* view, CGPoint locationInView)
