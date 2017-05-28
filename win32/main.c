@@ -65,27 +65,6 @@ static GLFWwindow* create_glfw_window()
 	return glfwCreateWindow(INITIAL_SCREEN_RESOLUTION_X, INITIAL_SCREEN_RESOLUTION_Y, "LAID OFF", NULL, NULL);
 }
 
-static void s_logic_worker(zsock_t *pipe, void *args) {
-	GLFWwindow* window = args;
-	LWCONTEXT* pLwc = glfwGetWindowUserPointer(window);
-	zsock_signal(pipe, 0);
-	LWTIMEPOINT last_time;
-	lwtimepoint_now(&last_time);
-	double delta_time_accum = 0;
-	while (!glfwWindowShouldClose(window)) {
-		LWTIMEPOINT cur_time;
-		lwtimepoint_now(&cur_time);
-		const double delta_time = lwtimepoint_diff(&cur_time, &last_time);
-		delta_time_accum += delta_time;
-		while (delta_time_accum > 0.005) {
-			lwc_update(pLwc, 0.005);
-			delta_time_accum -= 0.005;
-		}
-		last_time = cur_time;
-		zclock_sleep(1);
-	}
-}
-
 int main(void)
 {
 	printf(LWU("용사는 휴직중 LAID OFF v0.1\n"));
@@ -176,9 +155,9 @@ int main(void)
 	lw_set_size(pLwc, width, height);
 
 	glfwSetWindowUserPointer(window, pLwc);
-	// Start a logic thread
-	zactor_new(s_logic_worker, window);
-	
+
+	lwc_start_logic_thread(pLwc);
+
 	while (!glfwWindowShouldClose(window))
 	{
 		deltatime_tick(pLwc->render_dt);
@@ -204,8 +183,9 @@ int main(void)
 	exit(EXIT_SUCCESS);
 }
 
-void lw_app_quit(const LWCONTEXT* pLwc)
+void lw_app_quit(LWCONTEXT* pLwc)
 {
+	pLwc->quit_request = 1;
 	glfwSetWindowShouldClose(lw_get_window(pLwc), GLFW_TRUE);
 }
 

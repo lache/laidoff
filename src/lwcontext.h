@@ -225,6 +225,8 @@ typedef struct _LWCONTEXT {
 
 	int server_index;
 	int ray_test;
+
+	int quit_request;
 } LWCONTEXT;
 
 #ifdef __cplusplus

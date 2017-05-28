@@ -856,7 +856,7 @@ extern "C" JNIEXPORT jstring JNICALL Java_com_popsongremix_laidoff_LaidOffNative
     return env->NewStringUTF(hello.c_str());
 }
 
-extern "C" void lw_app_quit(const struct _LWCONTEXT* pLwc)
+extern "C" void lw_app_quit(struct _LWCONTEXT* pLwc)
 {
     exit(0);
 }

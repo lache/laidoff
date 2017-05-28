@@ -2,7 +2,6 @@
 #include <stdio.h>
 #include <locale.h>
 #include <string.h>
-
 #include "lwgl.h"
 #include "laidoff.h"
 #include "lwbitmapcontext.h"
@@ -37,6 +36,8 @@
 #include "mq.h"
 #include "sysmsg.h"
 #include "render_text_block.h"
+#include "czmq.h"
+#include "lwtimepoint.h"
 
 #define INCREASE_RENDER_SCORE (20)
 #define RENDER_SCORE_INITIAL (-5)
@@ -1163,7 +1164,7 @@ void lwc_update(LWCONTEXT *pLwc, double delta_time) {
 
 	update_battle_wall(pLwc);
 
-	update_sys_msg(pLwc->def_sys_msg, delta_time);
+	update_sys_msg(pLwc->def_sys_msg, (float)delta_time);
 
 	if (pLwc->font_fbo.dirty) {
 		lwc_render_font_test_fbo(pLwc);
@@ -1650,4 +1651,30 @@ void lw_set_kp(LWCONTEXT *pLwc, int kp) {
 
 double lwcontext_delta_time(const LWCONTEXT* pLwc) {
 	return deltatime_delta_time(pLwc->update_dt);
+}
+
+static void s_logic_worker(zsock_t *pipe, void *args) {
+	LWCONTEXT* pLwc = args;
+	zsock_signal(pipe, 0);
+	LWTIMEPOINT last_time;
+	lwtimepoint_now(&last_time);
+	double delta_time_accum = 0;
+	while (!pLwc->quit_request) {
+		LWTIMEPOINT cur_time;
+		lwtimepoint_now(&cur_time);
+		const double delta_time = lwtimepoint_diff(&cur_time, &last_time);
+		delta_time_accum += delta_time;
+		while (delta_time_accum > 0.005) {
+			lwc_update(pLwc, 0.005);
+			delta_time_accum -= 0.005;
+		}
+		last_time = cur_time;
+		if (delta_time_accum < 0.005) {
+			zclock_sleep(1);
+		}
+	}
+}
+
+void lwc_start_logic_thread(LWCONTEXT* pLwc) {
+	zactor_new(s_logic_worker, pLwc);
 }
