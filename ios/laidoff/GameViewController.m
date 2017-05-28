@@ -50,6 +50,7 @@
     
     self.pLwc = lw_init();
     lw_set_size(self.pLwc, (int)screenWidth, (int)screenHeight);
+    lwc_start_logic_thread(self.pLwc);
 }
 
 - (void)dealloc
