@@ -41,7 +41,8 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
 	LWCONTEXT* pLwc = (LWCONTEXT*)glfwGetWindowUserPointer(window);
 
 	if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS) {
-		glfwSetWindowShouldClose(window, GLFW_TRUE);
+		lw_app_quit(pLwc);
+		return;
 	}
 
 	if (key == GLFW_KEY_T && action == GLFW_PRESS) {

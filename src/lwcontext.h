@@ -227,6 +227,7 @@ typedef struct _LWCONTEXT {
 	int ray_test;
 
 	int quit_request;
+	void* logic_actor;
 } LWCONTEXT;
 
 #ifdef __cplusplus

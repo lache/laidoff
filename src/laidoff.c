@@ -1672,11 +1672,12 @@ static void s_logic_worker(zsock_t *pipe, void *args) {
 		}
 		last_time = cur_time;
 		if (delta_time_accum < update_interval) {
-			zclock_sleep((update_interval - delta_time_accum) * 1000);
+			zclock_sleep((int)((update_interval - delta_time_accum) * 1000));
 		}
 	}
+	zsock_signal(pipe, 0);
 }
 
 void lwc_start_logic_thread(LWCONTEXT* pLwc) {
-	zactor_new(s_logic_worker, pLwc);
+	pLwc->logic_actor = zactor_new(s_logic_worker, pLwc);
 }

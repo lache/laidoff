@@ -164,6 +164,12 @@ int main(void)
 		glfwSwapBuffers(window);
 		glfwPollEvents();
 	}
+	// If glfw loop is terminated without calling 'lw_app_quit'
+	// (i.e., by clicking 'X' button on the window)
+	// call lw_app_quit to cleanup the logic thread.
+	if (!pLwc->quit_request) {
+		lw_app_quit(pLwc);
+	}
 
 	glfwDestroyWindow(window);
 
@@ -181,6 +187,7 @@ int main(void)
 void lw_app_quit(LWCONTEXT* pLwc)
 {
 	pLwc->quit_request = 1;
+	zsock_wait(pLwc->logic_actor);
 	glfwSetWindowShouldClose(lw_get_window(pLwc), GLFW_TRUE);
 }
 
