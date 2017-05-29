@@ -1063,7 +1063,7 @@ void render_stat(const LWCONTEXT* pLwc) {
 	SET_COLOR_RGBA_FLOAT(text_block.color_emp_glyph, 1, 1, 0, 1);
 	SET_COLOR_RGBA_FLOAT(text_block.color_emp_outline, 0, 0, 0, 1);
 	char msg[32];
-	sprintf(msg, "L %.1f FPS\nR %.1f FPS",
+	sprintf(msg, "L:%.1f\nR:%.1f",
 		(float)(1.0 / deltatime_history_avg(pLwc->update_dt)),
 		(float)(1.0 / deltatime_history_avg(pLwc->render_dt)));
 	text_block.text = msg;

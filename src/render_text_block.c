@@ -149,6 +149,7 @@ void render_text_block(const struct _LWCONTEXT *pLwc, const struct _LWTEXTBLOCK*
 			if (text_block->multiline) {
 				size_scaled_xadvance_accum = 0;
 				line++;
+				continue;
 			} else {
 				break;
 			}
