@@ -233,8 +233,12 @@ static void s_render_field_sphere(const LWCONTEXT* pLwc, struct _LWFIELD* const 
 			vec3 xaxis = { 1, 0, 0 };
 			vec3 vel, vel_norm;
 			field_sphere_vel(field, i, vel);
-			vec3_norm(vel_norm, vel);
-			rotation_matrix_from_vectors(rot, xaxis, vel_norm);
+			if (vec3_len(vel)) {
+				vec3_norm(vel_norm, vel);
+				rotation_matrix_from_vectors(rot, xaxis, vel_norm);
+			} else {
+				mat4x4_identity(rot);
+			}
 			render_field_object_rot(
 				pLwc,
 				LVT_BEAM,
