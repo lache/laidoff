@@ -355,6 +355,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		2601AFFC1EE1549700989AA6 /* platform.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = platform.h; path = ../build/include/platform.h; sourceTree = "<group>"; };
 		562DAF5E1ED1920300208E62 /* playersm.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = playersm.c; sourceTree = "<group>"; };
 		562DAF5F1ED1920300208E62 /* playersm.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = playersm.h; sourceTree = "<group>"; };
 		5633AC301EADDF62003F1549 /* sound.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = sound.h; sourceTree = "<group>"; };
@@ -1020,7 +1021,6 @@
 		56F1897D1EC751950019312F /* ztimerset.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = ztimerset.c; sourceTree = "<group>"; };
 		56F1897E1EC751950019312F /* ztrie.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = ztrie.c; sourceTree = "<group>"; };
 		56F1897F1EC751950019312F /* zuuid.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = zuuid.c; sourceTree = "<group>"; };
-		56F189BD1EC75E290019312F /* platform.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = platform.h; sourceTree = "<group>"; };
 		6CA16CD31EA20B5600DB7AF0 /* laidoff.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = laidoff.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		6CA16CD71EA20B5600DB7AF0 /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
 		6CA16CD91EA20B5600DB7AF0 /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
@@ -1762,7 +1762,7 @@
 		56F1893A1EC751950019312F /* src */ = {
 			isa = PBXGroup;
 			children = (
-				56F189BD1EC75E290019312F /* platform.h */,
+				2601AFFC1EE1549700989AA6 /* platform.h */,
 				56F1893B1EC751950019312F /* .gitignore */,
 				56F1893C1EC751950019312F /* .valgrind.supp */,
 				56F1893D1EC751950019312F /* CMakeLists-local.txt */,
@@ -1865,9 +1865,9 @@
 			isa = PBXGroup;
 			children = (
 				567F39BD1EA29BC90081EB67 /* assets */,
+				567F39C31EA2A7500081EB67 /* Frameworks */,
 				6CA16CD51EA20B5600DB7AF0 /* laidoff */,
 				6CA16CD41EA20B5600DB7AF0 /* Products */,
-				567F39C31EA2A7500081EB67 /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
@@ -1882,27 +1882,27 @@
 		6CA16CD51EA20B5600DB7AF0 /* laidoff */ = {
 			isa = PBXGroup;
 			children = (
-				56F189111EC751750019312F /* czmq */,
-				56F187C01EC74DA60019312F /* libzmq */,
-				56ED77A21EBB9C1C00FABA64 /* recastnavigation */,
-				566372621EBA52D3001DA3F4 /* ode */,
-				567F39C11EA2A4600081EB67 /* etc1.cpp */,
-				567F39BF1EA2A2F70081EB67 /* image.cpp */,
-				6CA16D421EA210BB00DB7AF0 /* lua-5.3.4 */,
-				6CA16CF41EA20CA700DB7AF0 /* src */,
 				6CA16CD91EA20B5600DB7AF0 /* AppDelegate.h */,
 				6CA16CDA1EA20B5600DB7AF0 /* AppDelegate.m */,
-				6CA16CDC1EA20B5600DB7AF0 /* Shader.fsh */,
-				6CA16CDE1EA20B5600DB7AF0 /* Shader.vsh */,
+				6CA16CE61EA20B5600DB7AF0 /* Assets.xcassets */,
+				56F189111EC751750019312F /* czmq */,
+				567F39C11EA2A4600081EB67 /* etc1.cpp */,
 				6CA16CE01EA20B5600DB7AF0 /* GameViewController.h */,
 				6CA16CE11EA20B5600DB7AF0 /* GameViewController.m */,
-				6CA16CE31EA20B5600DB7AF0 /* Main.storyboard */,
-				6CA16CE61EA20B5600DB7AF0 /* Assets.xcassets */,
-				6CA16CE81EA20B5600DB7AF0 /* LaunchScreen.storyboard */,
+				567F39BF1EA2A2F70081EB67 /* image.cpp */,
 				6CA16CEB1EA20B5600DB7AF0 /* Info.plist */,
-				6CA16CD61EA20B5600DB7AF0 /* Supporting Files */,
+				6CA16CE81EA20B5600DB7AF0 /* LaunchScreen.storyboard */,
+				56F187C01EC74DA60019312F /* libzmq */,
+				6CA16D421EA210BB00DB7AF0 /* lua-5.3.4 */,
 				6CA16DA31EA2110E00DB7AF0 /* lwios.m */,
+				6CA16CE31EA20B5600DB7AF0 /* Main.storyboard */,
 				5633AC311EADDF98003F1549 /* net.c */,
+				566372621EBA52D3001DA3F4 /* ode */,
+				56ED77A21EBB9C1C00FABA64 /* recastnavigation */,
+				6CA16CDC1EA20B5600DB7AF0 /* Shader.fsh */,
+				6CA16CDE1EA20B5600DB7AF0 /* Shader.vsh */,
+				6CA16CF41EA20CA700DB7AF0 /* src */,
+				6CA16CD61EA20B5600DB7AF0 /* Supporting Files */,
 			);
 			path = laidoff;
 			sourceTree = "<group>";
@@ -1918,43 +1918,10 @@
 		6CA16CF41EA20CA700DB7AF0 /* src */ = {
 			isa = PBXGroup;
 			children = (
-				564CA1BF1EDB10550082B778 /* lwdeltatime.c */,
-				564CA1C01EDB10550082B778 /* lwdeltatime.h */,
-				564B9F341ED1F51000718993 /* pcg_basic.c */,
-				564B9F351ED1F51000718993 /* pcg_basic.h */,
-				562DAF5E1ED1920300208E62 /* playersm.c */,
-				562DAF5F1ED1920300208E62 /* playersm.h */,
-				565DD43E1ECF58A8002C4493 /* render_fan.c */,
-				565DD43F1ECF58A8002C4493 /* render_fan.h */,
-				564D11941ECA511E002CCCAE /* extrapolator.cpp */,
-				564D11951ECA511E002CCCAE /* extrapolator.h */,
-				564D11911ECA2812002CCCAE /* kvmsg.c */,
-				564D11921ECA2812002CCCAE /* kvmsg.h */,
-				56F1866D1EC74D430019312F /* mq.c */,
-				56F1866E1EC74D430019312F /* mq.h */,
-				56F1866F1EC74D430019312F /* sysmsg.c */,
-				56F186701EC74D430019312F /* sysmsg.h */,
-				56F186711EC74D430019312F /* zhelpers.h */,
-				56ED779F1EBB9C0900FABA64 /* nav.cpp */,
-				56ED77A01EBB9C0900FABA64 /* nav.h */,
-				566373811EBA52FB001DA3F4 /* render_physics.c */,
-				566373821EBA52FB001DA3F4 /* render_physics.h */,
-				565676AB1EB0E96100FF64B3 /* lwanim.c */,
 				565676A51EAFB4F800FF64B3 /* armature.c */,
 				565676A61EAFB4F800FF64B3 /* armature.h */,
-				565676A71EAFB4F800FF64B3 /* render_skin.c */,
-				565676A81EAFB4F800FF64B3 /* render_skin.h */,
-				5633AC341EADE025003F1549 /* lwlog.h */,
-				5633AC331EADDFC7003F1549 /* net.h */,
-				5633AC301EADDF62003F1549 /* sound.h */,
 				5644E9FB1EA91D9E00EAA658 /* battle_result.c */,
 				5644E9FC1EA91D9E00EAA658 /* battle_result.h */,
-				5644E9FD1EA91D9E00EAA658 /* lwuialign.c */,
-				5644E9FE1EA91D9E00EAA658 /* lwuialign.h */,
-				5644E9FF1EA91D9E00EAA658 /* lwuidim.c */,
-				5644EA001EA91D9E00EAA658 /* lwuidim.h */,
-				5644EA011EA91D9E00EAA658 /* render_battle_result.c */,
-				5644EA021EA91D9E00EAA658 /* render_battle_result.h */,
 				5644E98F1EA8B69000EAA658 /* battle.c */,
 				5644E9901EA8B69000EAA658 /* battle.h */,
 				5644E9911EA8B69000EAA658 /* battlelogic.c */,
@@ -1963,6 +1930,8 @@
 				5644E9941EA8B69000EAA658 /* dialog.c */,
 				5644E9951EA8B69000EAA658 /* dialog.h */,
 				5644E9961EA8B69000EAA658 /* etc1.h */,
+				564D11941ECA511E002CCCAE /* extrapolator.cpp */,
+				564D11951ECA511E002CCCAE /* extrapolator.h */,
 				5644E9971EA8B69000EAA658 /* field.c */,
 				5644E9981EA8B69000EAA658 /* field.h */,
 				5644E9991EA8B69000EAA658 /* file.h */,
@@ -1973,9 +1942,12 @@
 				5644E99E1EA8B69000EAA658 /* input.h */,
 				5644E99F1EA8B69000EAA658 /* ktx.c */,
 				5644E9A01EA8B69000EAA658 /* ktx.h */,
+				564D11911ECA2812002CCCAE /* kvmsg.c */,
+				564D11921ECA2812002CCCAE /* kvmsg.h */,
 				5644E9A11EA8B69000EAA658 /* laidoff.c */,
 				5644E9A21EA8B69000EAA658 /* laidoff.h */,
 				5644E9A31EA8B69000EAA658 /* loadobj.c */,
+				565676AB1EB0E96100FF64B3 /* lwanim.c */,
 				5644E9A41EA8B69000EAA658 /* lwanim.h */,
 				5644E9A51EA8B69000EAA658 /* lwatlasenum.h */,
 				5644E9A61EA8B69000EAA658 /* lwatlassprite.h */,
@@ -1990,6 +1962,8 @@
 				5644E9AF1EA8B69000EAA658 /* lwbuttoncommand.h */,
 				5644E9B01EA8B69000EAA658 /* lwcontext.h */,
 				5644E9B11EA8B69000EAA658 /* lwdamagetext.h */,
+				564CA1BF1EDB10550082B778 /* lwdeltatime.c */,
+				564CA1C01EDB10550082B778 /* lwdeltatime.h */,
 				5644E9B21EA8B69000EAA658 /* lwenemy.c */,
 				5644E9B31EA8B69000EAA658 /* lwenemy.h */,
 				5644E9B41EA8B69000EAA658 /* lwfbo.h */,
@@ -1997,7 +1971,7 @@
 				5644E9B61EA8B69000EAA658 /* lwgamescene.h */,
 				5644E9B71EA8B69000EAA658 /* lwgl.h */,
 				5644E9B81EA8B69000EAA658 /* lwkeyframe.h */,
-				5644E9B91EA8B69000EAA658 /* lwlog.h */,
+				5633AC341EADE025003F1549 /* lwlog.h */,
 				5644E9BA1EA8B69000EAA658 /* lwmacro.h */,
 				5644E9BB1EA8B69000EAA658 /* lwpkm.h */,
 				5644E9BC1EA8B69000EAA658 /* lwprogrammedtex.h */,
@@ -2011,19 +1985,40 @@
 				5644E9C41EA8B69000EAA658 /* lwtimepoint.h */,
 				5644E9C51EA8B69000EAA658 /* lwtouchproc.h */,
 				5644E9C61EA8B69000EAA658 /* lwtrail.h */,
+				5644E9FD1EA91D9E00EAA658 /* lwuialign.c */,
+				5644E9FE1EA91D9E00EAA658 /* lwuialign.h */,
+				5644E9FF1EA91D9E00EAA658 /* lwuidim.c */,
+				5644EA001EA91D9E00EAA658 /* lwuidim.h */,
 				5644E9C71EA8B69000EAA658 /* lwvbo.h */,
 				5644E9C81EA8B69000EAA658 /* lwvbotype.h */,
+				56F1866D1EC74D430019312F /* mq.c */,
+				56F1866E1EC74D430019312F /* mq.h */,
+				56ED779F1EBB9C0900FABA64 /* nav.cpp */,
+				56ED77A01EBB9C0900FABA64 /* nav.h */,
+				5633AC331EADDFC7003F1549 /* net.h */,
+				564B9F341ED1F51000718993 /* pcg_basic.c */,
+				564B9F351ED1F51000718993 /* pcg_basic.h */,
 				5644E9C91EA8B69000EAA658 /* platform_detection.h */,
+				562DAF5E1ED1920300208E62 /* playersm.c */,
+				562DAF5F1ED1920300208E62 /* playersm.h */,
 				5644E9CA1EA8B69000EAA658 /* render_admin.c */,
 				5644E9CB1EA8B69000EAA658 /* render_admin.h */,
+				5644EA011EA91D9E00EAA658 /* render_battle_result.c */,
+				5644EA021EA91D9E00EAA658 /* render_battle_result.h */,
 				5644E9CC1EA8B69000EAA658 /* render_battle.c */,
 				5644E9CD1EA8B69000EAA658 /* render_battle.h */,
 				5644E9CE1EA8B69000EAA658 /* render_dialog.c */,
 				5644E9CF1EA8B69000EAA658 /* render_dialog.h */,
+				565DD43E1ECF58A8002C4493 /* render_fan.c */,
+				565DD43F1ECF58A8002C4493 /* render_fan.h */,
 				5644E9D01EA8B69000EAA658 /* render_field.c */,
 				5644E9D11EA8B69000EAA658 /* render_field.h */,
 				5644E9D21EA8B69000EAA658 /* render_font_test.c */,
 				5644E9D31EA8B69000EAA658 /* render_font_test.h */,
+				566373811EBA52FB001DA3F4 /* render_physics.c */,
+				566373821EBA52FB001DA3F4 /* render_physics.h */,
+				565676A71EAFB4F800FF64B3 /* render_skin.c */,
+				565676A81EAFB4F800FF64B3 /* render_skin.h */,
 				5644E9D41EA8B69000EAA658 /* render_solid.c */,
 				5644E9D51EA8B69000EAA658 /* render_solid.h */,
 				5644E9D61EA8B69000EAA658 /* render_text_block.c */,
@@ -2031,14 +2026,19 @@
 				5644E9D81EA8B69000EAA658 /* script.c */,
 				5644E9D91EA8B69000EAA658 /* script.h */,
 				5644E9DA1EA8B69000EAA658 /* skill.c */,
+				5633AC301EADDF62003F1549 /* sound.h */,
 				5644E9DB1EA8B69000EAA658 /* sprite_data.h */,
 				5644E9DC1EA8B69000EAA658 /* sprite.h */,
+				56F1866F1EC74D430019312F /* sysmsg.c */,
+				56F186701EC74D430019312F /* sysmsg.h */,
 				5644E9DD1EA8B69000EAA658 /* tex.c */,
 				5644E9DE1EA8B69000EAA658 /* tex.h */,
 				5644E9DF1EA8B69000EAA658 /* tinyobj_loader_c.h */,
 				5644E9E01EA8B69000EAA658 /* unicode.c */,
 				5644E9E11EA8B69000EAA658 /* unicode.h */,
 				5644E9E21EA8B69000EAA658 /* vertices.h */,
+				56F186711EC74D430019312F /* zhelpers.h */,
+				5644E9B91EA8B69000EAA658 /* lwlog.h */,
 			);
 			name = src;
 			path = ../../src;
