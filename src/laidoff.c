@@ -1667,9 +1667,14 @@ static void s_logic_worker(zsock_t *pipe, void *args) {
 		lwtimepoint_now(&cur_time);
 		const double delta_time = lwtimepoint_diff(&cur_time, &last_time);
 		delta_time_accum += delta_time;
-		while (delta_time_accum > update_interval) {
-			lwc_update(pLwc, update_interval);
-			delta_time_accum -= update_interval;
+		// Flush out all over-delayed update delta
+		if (delta_time_accum > update_interval * 60) {
+			delta_time_accum = 0;
+		} else {
+			while (delta_time_accum > update_interval) {
+				lwc_update(pLwc, update_interval);
+				delta_time_accum -= update_interval;
+			}
 		}
 		last_time = cur_time;
 		if (delta_time_accum < update_interval) {
