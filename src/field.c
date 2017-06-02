@@ -31,6 +31,7 @@ typedef enum _LW_SPACE_GROUP {
 	LSG_WORLD,
 	LSG_RAY,
 	LSG_BULLET,
+	LSG_TEST_PLAYER,
 
 	LSG_COUNT,
 } LW_SPACE_GROUP;
@@ -43,6 +44,7 @@ typedef struct _LWFIELD {
 	dGeomID box_geom[MAX_BOX_GEOM];
 	int box_geom_count;
 	dGeomID player_geom;
+	dGeomID test_player_geom;
 	dReal player_radius;
 	dReal player_length;
 
@@ -78,6 +80,8 @@ typedef struct _LWFIELD {
 	int follow_cam;
 
 	pcg32_random_t rng;
+
+	float test_player_flash;
 } LWFIELD;
 
 static void s_rotation_matrix_from_vectors(dMatrix3 r, const dReal* vec_a, const dReal* vec_b);
@@ -213,6 +217,8 @@ LWFIELD* load_field(const char* filename) {
 	field->player_pos[2] = 10;
 	field->player_geom = dCreateCapsule(field->space_group[LSG_PLAYER], field->player_radius, field->player_length);
 	dGeomSetPosition(field->player_geom, field->player_pos[0], field->player_pos[1], field->player_pos[2]);
+	// Create test player geom
+	field->test_player_geom = dCreateCapsule(field->space_group[LSG_TEST_PLAYER], field->player_radius, field->player_length);
 	// Create ray geoms (see LW_RAY_ID enum for usage)
 	field->ray_max_length = 50;
 	for (int i = 0; i < LRI_COUNT; i++) {
@@ -344,6 +350,24 @@ static void field_world_bullet_near(void *data, dGeomID o1, dGeomID o2) {
 			contact[0].geom.pos[1],
 			contact[0].geom.pos[2]);*/
 		dGeomDisable(o2);
+	}
+}
+
+static void field_test_player_bullet_near(void *data, dGeomID o1, dGeomID o2) {
+	LWFIELD* field = (LWFIELD*)data;
+	assert(dGeomGetSpace(o1) == field->space_group[LSG_TEST_PLAYER]);
+	assert(dGeomGetSpace(o2) == field->space_group[LSG_BULLET]);
+
+	dContact contact[1];
+	int n = dCollide(o1, o2, 1, &contact[0].geom, sizeof(dContact));
+	if (n > 0) {
+		LOGI("Bullet HIT at %f,%f,%f",
+		contact[0].geom.pos[0],
+		contact[0].geom.pos[1],
+		contact[0].geom.pos[2]);
+		dGeomDisable(o2);
+
+		field->test_player_flash = 1.0f;
 	}
 }
 
@@ -580,11 +604,15 @@ void update_field(LWCONTEXT* pLwc, LWFIELD* field) {
 		gather_ray_result(field);
 	}
 	mq_unlock_mutex(pLwc->mq);
-	// Resolve collision (other than ray-world)
+	// Resolve collision (player-world collision)
 	collide_between_spaces(field, field->space_group[LSG_PLAYER], field->space_group[LSG_WORLD], field_player_world_near);
+	// Resolve collision (player-bullet collision)
 	collide_between_spaces(field, field->space_group[LSG_PLAYER], field->space_group[LSG_BULLET], field_player_bullet_near);
+	// Resolve collision (world-bullet collision)
 	collide_between_spaces(field, field->space_group[LSG_WORLD], field->space_group[LSG_BULLET], field_world_bullet_near);
-	// Stepping the physics world (bullet-world)
+	// Resolve collision (test player-bullet collision)
+	collide_between_spaces(field, field->space_group[LSG_TEST_PLAYER], field->space_group[LSG_BULLET], field_test_player_bullet_near);
+	// Stepping the physics world (bullet movement update)
 	if (lwcontext_delta_time(pLwc) > 0) {
 		dWorldStep(field->world, lwcontext_delta_time(pLwc));
 	}
@@ -650,7 +678,11 @@ void update_field(LWCONTEXT* pLwc, LWFIELD* field) {
 		} else {
 			memcpy(pLwc->field->path_query_test_player_pos, p1vec, sizeof(vec3));
 		}
-
+		// Update test player collider geom
+		dGeomSetPosition(field->test_player_geom,
+			pLwc->field->path_query_test_player_pos[0],
+			pLwc->field->path_query_test_player_pos[1],
+			pLwc->field->path_query_test_player_pos[2]);
 		// query other random path
 		if (idx >= pLwc->field->path_query.n_smooth_path - 1) {
 			set_random_start_end_pos(pLwc->field->nav, &pLwc->field->path_query);
@@ -686,6 +718,8 @@ void update_field(LWCONTEXT* pLwc, LWFIELD* field) {
 	}
 	mq_unlock_mutex(pLwc->mq);
 	s_deactivate_out_of_domain_sphere(field, (float)lwcontext_delta_time(pLwc));
+
+	field->test_player_flash = LWMAX(0, field->test_player_flash - (float)lwcontext_delta_time(pLwc) * 4);
 }
 
 void unload_field(LWFIELD* field) {
@@ -697,6 +731,7 @@ void unload_field(LWFIELD* field) {
 
 	dGeomDestroy(field->ground);
 	dGeomDestroy(field->player_geom);
+	dGeomDestroy(field->test_player_geom);
 	for (int i = 0; i < LRI_COUNT; i++) {
 		dGeomDestroy(field->ray[i]);
 	}
@@ -860,4 +895,8 @@ unsigned int field_random_unsigned_int(LWFIELD* field, unsigned int bound) {
 // return [0, 1) double
 double field_random_double(LWFIELD* field) {
 	return ldexp(pcg32_random_r(&field->rng), -32);
+}
+
+float field_test_player_flash(const LWFIELD* field) {
+	return field->test_player_flash;
 }

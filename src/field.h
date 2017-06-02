@@ -51,3 +51,4 @@ unsigned int field_random_unsigned_int(LWFIELD* field, unsigned int bound);
 double field_random_double(LWFIELD* field);
 void get_field_player_geom_position(const LWFIELD* field, float* x, float* y, float* z);
 void rotation_matrix_from_vectors(mat4x4 m, const vec3 a, const vec3 b);
+float field_test_player_flash(const LWFIELD* field);
