@@ -138,8 +138,12 @@ s_kvmsg_store_posmap_noown(kvmsg_t** self_p, zhash_t* hash, double sync_time, LW
 			} else {
 				// Create a new extrapolator
 				possyncmsg = (LWPOSSYNCMSG*)malloc(sizeof(LWPOSSYNCMSG));
+				possyncmsg->x = msg->x;
+				possyncmsg->y = msg->y;
+				possyncmsg->z = msg->z;
 				possyncmsg->a = 0;
 				possyncmsg->extrapolator = vec4_extrapolator_new();
+				possyncmsg->anim_action = 0;
 				vec4_extrapolator_reset(possyncmsg->extrapolator, LWMIN(msg->t, sync_time) /* avoid assertion in extrapolator*/,
 					sync_time, msg->x, msg->y, msg->z, msg->dx, msg->dy);
 				zhash_update(hash, kvmsg_key(self), possyncmsg);
@@ -390,11 +394,6 @@ static void s_mq_poll_ready(void* _pLwc, void* _mq, void* sm, void* field) {
 void* mq_kvmap(void* _mq) {
 	LWMESSAGEQUEUE* mq = (LWMESSAGEQUEUE*)_mq;
 	return mq->kvmap;
-}
-
-void* mq_posmap(void* _mq) {
-	LWMESSAGEQUEUE* mq = (LWMESSAGEQUEUE*)_mq;
-	return mq->posmap;
 }
 
 const LWMQMSG* mq_sync_first(void* _mq) {

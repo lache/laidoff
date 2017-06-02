@@ -64,6 +64,7 @@ void load_field_2_init_runtime_data(LWCONTEXT *pLwc);
 void connect_to_server_0(LWCONTEXT *pLwc);
 void connect_to_server_1(LWCONTEXT *pLwc);
 void toggle_ray_test(LWCONTEXT *pLwc);
+void toggle_network(LWCONTEXT *pLwc);
 
 void lw_clear_color();
 

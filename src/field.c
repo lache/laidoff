@@ -616,25 +616,39 @@ void update_field(LWCONTEXT* pLwc, LWFIELD* field) {
 	// Get updated player anim action
 	LW_ACTION player_anim_1 = get_anim_by_state(pLwc->player_state_data.state, &pLwc->player_action_loop);
 	pLwc->player_action = &pLwc->action[player_anim_1];
+	// Test player move speed
+	const float move_speed = 10.0f;
+	const float anim_speed = move_speed / 30.0f;
 	// Update skin time
 	pLwc->player_skin_time += (float)lwcontext_delta_time(pLwc);
-	pLwc->test_player_skin_time += (float)lwcontext_delta_time(pLwc);
+	pLwc->test_player_skin_time += (float)lwcontext_delta_time(pLwc) * anim_speed;
 	// Read pathfinding result and set the test player's position
 	if (pLwc->field->path_query.n_smooth_path) {
 
 		pLwc->field->path_query_time += (float)lwcontext_delta_time(pLwc);
-		const float move_speed = 30.0f;
-		int idx = (int)fmodf((float)(pLwc->field->path_query_time * move_speed), (float)pLwc->field->path_query.n_smooth_path);
-		const float* p = &pLwc->field->path_query.smooth_path[3 * idx];
+		
+		const float idx_f = fmodf((float)(pLwc->field->path_query_time * move_speed), (float)pLwc->field->path_query.n_smooth_path);
+		const int idx = (int)idx_f;
+		const float* p1 = &pLwc->field->path_query.smooth_path[3 * idx];
 		// path query result's coordinates is different from world coordinates.
-		const vec3 pvec = { p[0], -p[2], p[1] };
-		memcpy(pLwc->field->path_query_test_player_pos, pvec, sizeof(vec3));
-
+		const vec3 p1vec = { p1[0], -p1[2], p1[1] };
 		if (idx < pLwc->field->path_query.n_smooth_path - 1) {
 			const float* p2 = &pLwc->field->path_query.smooth_path[3 * (idx + 1)];
 			// path query result's coordinates is different from world coordinates.
 			const vec3 p2vec = { p2[0], -p2[2], p2[1] };
-			pLwc->field->path_query_test_player_rot = atan2f(p2vec[1] - pvec[1], p2vec[0] - pvec[0]);
+			// Calculate a midpoint between p1 and p2 to get interpolated position according to idx_f value
+			const float p2coeff = idx_f - idx;
+			const float p1coeff = 1.0f - p2coeff;
+			const vec3 p1p2midvec = {
+				p1vec[0] * p1coeff + p2vec[0] * p2coeff,
+				p1vec[1] * p1coeff + p2vec[1] * p2coeff,
+				p1vec[2] * p1coeff + p2vec[2] * p2coeff,
+			};
+			memcpy(pLwc->field->path_query_test_player_pos, p1p2midvec, sizeof(vec3));
+			// Set orientation
+			pLwc->field->path_query_test_player_rot = atan2f(p2vec[1] - p1vec[1], p2vec[0] - p1vec[0]);
+		} else {
+			memcpy(pLwc->field->path_query_test_player_pos, p1vec, sizeof(vec3));
 		}
 
 		// query other random path
