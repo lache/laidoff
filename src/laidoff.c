@@ -842,7 +842,7 @@ void reset_runtime_context(LWCONTEXT* pLwc) {
 	pLwc->admin_button_command[12].name = LWU("레이테스트토글");
 	pLwc->admin_button_command[12].command_handler = toggle_ray_test;
 	pLwc->admin_button_command[13].name = LWU("네트워크토글");
-	pLwc->admin_button_command[13].command_handler = toggle_network;
+	pLwc->admin_button_command[13].command_handler = toggle_network_poll;
 }
 
 void delete_font_fbo(LWCONTEXT* pLwc) {
@@ -1136,7 +1136,7 @@ void lwc_update(LWCONTEXT *pLwc, double delta_time) {
 	pLwc->app_time += delta_time;
 	pLwc->scene_time += delta_time;
 
-	if (pLwc->enable_mq_poll) {
+	if (field_network_poll(pLwc->field)) {
 		mq_poll(pLwc, pLwc->def_sys_msg, pLwc->mq, pLwc->field);
 	}
 
@@ -1634,8 +1634,8 @@ void toggle_ray_test(LWCONTEXT *pLwc) {
 	field_enable_ray_test(pLwc->field, pLwc->ray_test);
 }
 
-void toggle_network(LWCONTEXT *pLwc) {
-	pLwc->enable_mq_poll = !pLwc->enable_mq_poll;
+void toggle_network_poll(LWCONTEXT *pLwc) {
+	field_set_network_poll(pLwc->field, !field_network_poll(pLwc->field));
 }
 
 int lw_get_update_count(LWCONTEXT *pLwc) {

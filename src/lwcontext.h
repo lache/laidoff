@@ -228,8 +228,6 @@ typedef struct _LWCONTEXT {
 
 	int quit_request;
 	void* logic_actor;
-
-	int enable_mq_poll;
 } LWCONTEXT;
 
 #ifdef __cplusplus

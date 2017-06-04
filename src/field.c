@@ -31,7 +31,7 @@ typedef enum _LW_SPACE_GROUP {
 	LSG_WORLD,
 	LSG_RAY,
 	LSG_BULLET,
-	LSG_TEST_PLAYER,
+	LSG_ENEMY,
 
 	LSG_COUNT,
 } LW_SPACE_GROUP;
@@ -82,6 +82,8 @@ typedef struct _LWFIELD {
 	pcg32_random_t rng;
 
 	float test_player_flash;
+
+	int network_poll;
 } LWFIELD;
 
 static void s_rotation_matrix_from_vectors(dMatrix3 r, const dReal* vec_a, const dReal* vec_b);
@@ -218,7 +220,7 @@ LWFIELD* load_field(const char* filename) {
 	field->player_geom = dCreateCapsule(field->space_group[LSG_PLAYER], field->player_radius, field->player_length);
 	dGeomSetPosition(field->player_geom, field->player_pos[0], field->player_pos[1], field->player_pos[2]);
 	// Create test player geom
-	field->test_player_geom = dCreateCapsule(field->space_group[LSG_TEST_PLAYER], field->player_radius, field->player_length);
+	field->test_player_geom = dCreateCapsule(field->space_group[LSG_ENEMY], field->player_radius, field->player_length);
 	// Create ray geoms (see LW_RAY_ID enum for usage)
 	field->ray_max_length = 50;
 	for (int i = 0; i < LRI_COUNT; i++) {
@@ -355,7 +357,7 @@ static void field_world_bullet_near(void *data, dGeomID o1, dGeomID o2) {
 
 static void field_test_player_bullet_near(void *data, dGeomID o1, dGeomID o2) {
 	LWFIELD* field = (LWFIELD*)data;
-	assert(dGeomGetSpace(o1) == field->space_group[LSG_TEST_PLAYER]);
+	assert(dGeomGetSpace(o1) == field->space_group[LSG_ENEMY]);
 	assert(dGeomGetSpace(o2) == field->space_group[LSG_BULLET]);
 
 	dContact contact[1];
@@ -611,7 +613,7 @@ void update_field(LWCONTEXT* pLwc, LWFIELD* field) {
 	// Resolve collision (world-bullet collision)
 	collide_between_spaces(field, field->space_group[LSG_WORLD], field->space_group[LSG_BULLET], field_world_bullet_near);
 	// Resolve collision (test player-bullet collision)
-	collide_between_spaces(field, field->space_group[LSG_TEST_PLAYER], field->space_group[LSG_BULLET], field_test_player_bullet_near);
+	collide_between_spaces(field, field->space_group[LSG_ENEMY], field->space_group[LSG_BULLET], field_test_player_bullet_near);
 	// Stepping the physics world (bullet movement update)
 	if (lwcontext_delta_time(pLwc) > 0) {
 		dWorldStep(field->world, lwcontext_delta_time(pLwc));
@@ -899,4 +901,12 @@ double field_random_double(LWFIELD* field) {
 
 float field_test_player_flash(const LWFIELD* field) {
 	return field->test_player_flash;
+}
+
+int field_network_poll(const LWFIELD* field) {
+	return field->network_poll;
+}
+
+void field_set_network_poll(LWFIELD* field, int network_poll) {
+	field->network_poll = network_poll;
 }

@@ -52,3 +52,5 @@ double field_random_double(LWFIELD* field);
 void get_field_player_geom_position(const LWFIELD* field, float* x, float* y, float* z);
 void rotation_matrix_from_vectors(mat4x4 m, const vec3 a, const vec3 b);
 float field_test_player_flash(const LWFIELD* field);
+int field_network_poll(const LWFIELD* field);
+void field_set_network_poll(LWFIELD* field, int enable_mq_poll);

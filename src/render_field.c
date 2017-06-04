@@ -226,9 +226,9 @@ static void s_render_field_sphere(const LWCONTEXT* pLwc, struct _LWFIELD* const 
 	for (int i = 0; i < MAX_FIELD_SPHERE_COUNT; i++) {
 		float pos[3];
 		if (field_sphere_pos(field, i, pos)) {
-			const float s_x = 4.0f;
-			const float s_y = 3.0f;
-			const float s_z = 3.0f;
+			const float s_x = 1.5f;
+			const float s_y = 4.0f;
+			const float s_z = 4.0f;
 			mat4x4 rot;
 			vec3 xaxis = { 1, 0, 0 };
 			vec3 vel, vel_norm;

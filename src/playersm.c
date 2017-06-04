@@ -202,13 +202,15 @@ static void s_on_enter_aim(LWPLAYERSTATEDATA* data) {
 static void s_fire_bullet(LWPLAYERSTATEDATA* data) {
 	float pos[3];
 	get_field_player_geom_position(data->field, pos + 0, pos + 1, pos + 2);
-	float speed = 100.0f;
+	float speed = 70.0f;
 	
 	// random range around rot_z: [rot_z - data->aim_theta / 2, rot_z + data->aim_theta / 2)
 	const float aimed_rot_z = (float)(data->rot_z - data->aim_theta / 2 + data->aim_theta * field_random_double(data->field));
 	
 	float vel[3] = { speed * cosf(aimed_rot_z), speed * sinf(aimed_rot_z), 0 };
-	field_spawn_sphere(data->field, pos, vel);
-
-	//mq_send_fire(data->mq, pos, vel);
+	if (field_network_poll(data->field)) {
+		mq_send_fire(data->mq, pos, vel);
+	} else {
+		field_spawn_sphere(data->field, pos, vel);
+	}
 }
