@@ -46,7 +46,7 @@ void field_nav_query(LWFIELD* field);
 void init_field(LWCONTEXT* pLwc, const char* field_filename, const char* nav_filename, LW_VBO_TYPE vbo, GLuint tex_id, int tex_mip, float skin_scale, int follow_cam);
 int field_sphere_pos(const LWFIELD* field, int i, float* pos);
 int field_sphere_vel(const LWFIELD* field, int i, float* vel);
-int field_spawn_user(LWFIELD* field, vec3 pos);
+int field_spawn_user(LWFIELD* field, vec3 pos, void* owner);
 void field_despawn_user(LWFIELD* field, int idx);
 //void field_set_user_pos(LWFIELD* field, int idx, vec3 pos);
 void field_spawn_sphere(LWFIELD* field, vec3 pos, vec3 vel);

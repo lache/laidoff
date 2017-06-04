@@ -223,7 +223,6 @@ LWFIELD* load_field(const char* filename) {
 	dGeomSetPosition(field->player_geom, field->player_pos[0], field->player_pos[1], field->player_pos[2]);
 	// Create test player geom
 	field->test_player_geom = dCreateCapsule(field->space_group[LSG_ENEMY], field->player_radius, field->player_length);
-	dGeomSetData(field->test_player_geom, (void*)0x12345678);
 	// Create ray geoms (see LW_RAY_ID enum for usage)
 	field->ray_max_length = 50;
 	for (int i = 0; i < LRI_COUNT; i++) {
@@ -271,9 +270,8 @@ LWFIELD* load_field(const char* filename) {
 	// Create user(enemy) geom pool
 	// which are initially disabled and enabled before they are used.
 	for (int i = 0; i < MAX_USER_GEOM; i++) {
-		field->user[i] = dCreateCapsule(field->space_group[LSG_ENEMY], field->player_radius, field->player_length);
+		field->user[i] = dCreateCapsule(field->space_group[LSG_ENEMY], field->player_radius * 2, field->player_length);
 		dGeomDisable(field->user[i]);
-		dGeomSetData(field->user[i], (void*)(0x7FFF0000 + i));
 	}
 	// Seed a random number generator
 	pcg32_srandom_r(&field->rng, 0x0DEEC2CBADF00D77, 0x15881588CA11DAC1);
@@ -381,8 +379,13 @@ static void field_test_player_bullet_near(void *data, dGeomID o1, dGeomID o2) {
 		contact[0].geom.pos[1],
 		contact[0].geom.pos[2]);
 		dGeomDisable(o2);
-
-		field->test_player_flash = 1.0f;
+		void* geom_data = dGeomGetData(o1);
+		if (geom_data) {
+			LWPOSSYNCMSG* possyncmsg = (LWPOSSYNCMSG*)geom_data;
+			possyncmsg->flash = 1.0f;
+		} else {
+			field->test_player_flash = 1.0f;
+		}
 	}
 }
 
@@ -737,13 +740,15 @@ void update_field(LWCONTEXT* pLwc, LWFIELD* field) {
 				} else {
 					LOGE("LWPOSSYNCMSG.field (%p) is inconsistent with the current field! (%p)", value->field, field);
 				}
+				// Hit flash reduction of enemy
+				value->flash = LWMAX(0, value->flash - (float)lwcontext_delta_time(pLwc) * 4);
 			}
 			value = mq_possync_next(pLwc->mq);
 		}
 	}
 	mq_unlock_mutex(pLwc->mq);
 	s_deactivate_out_of_domain_sphere(field, (float)lwcontext_delta_time(pLwc));
-
+	// Hit flash reduction of test player
 	field->test_player_flash = LWMAX(0, field->test_player_flash - (float)lwcontext_delta_time(pLwc) * 4);
 }
 
@@ -869,13 +874,14 @@ void init_field(LWCONTEXT* pLwc, const char* field_filename, const char* nav_fil
 	nav_query(pLwc->field->nav, &pLwc->field->path_query);
 }
 
-int field_spawn_user(LWFIELD* field, vec3 pos) {
+int field_spawn_user(LWFIELD* field, vec3 pos, void* owner) {
 	for (int i = 0; i < MAX_USER_GEOM; i++) {
 		if (dGeomIsEnabled(field->user[i])) {
 			continue;
 		}
 		dGeomSetPosition(field->user[i], pos[0], pos[1], pos[2]);
 		dGeomEnable(field->user[i]);
+		dGeomSetData(field->user[i], owner);
 		LOGI("user geom enabled index %d", i);
 		return i;
 	}

@@ -140,21 +140,16 @@ s_kvmsg_store_posmap_noown(kvmsg_t** self_p, zhash_t* hash, double sync_time, LW
 				// Do nothing
 			} else {
 				// Create a new extrapolator
-				possyncmsg = (LWPOSSYNCMSG*)malloc(sizeof(LWPOSSYNCMSG));
+				possyncmsg = (LWPOSSYNCMSG*)calloc(1, sizeof(LWPOSSYNCMSG));
 				possyncmsg->x = msg->x;
 				possyncmsg->y = msg->y;
 				possyncmsg->z = msg->z;
-				possyncmsg->a = 0;
 				possyncmsg->extrapolator = vec4_extrapolator_new();
-				possyncmsg->anim_action = 0;
 				// Create enemy collider if it is not the player
 				if (!mq_cursor_player(mq, kvmsg_key(self))) {
 					vec3 pos = { msg->x, msg->y, msg->z };
 					possyncmsg->field = field;
-					possyncmsg->geom_index = field_spawn_user(field, pos);
-				} else {
-					possyncmsg->field = 0;
-					possyncmsg->geom_index = -1;
+					possyncmsg->geom_index = field_spawn_user(field, pos, possyncmsg);
 				}
 				vec4_extrapolator_reset(possyncmsg->extrapolator, LWMIN(msg->t, sync_time) /* avoid assertion in extrapolator*/,
 					sync_time, msg->x, msg->y, msg->z, msg->dx, msg->dy);

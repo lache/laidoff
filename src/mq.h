@@ -47,6 +47,7 @@ typedef struct _LWPOSSYNCMSG {
 	const LWANIMACTION* anim_action;	// Last anim action
 	void* field;						// Reference to the current field instance
 	int geom_index;						// User geom index
+	float flash;						// Hit flash opacity (0~1)
 } LWPOSSYNCMSG;
 
 const LWMQMSG* mq_sync_first(void* _mq);

@@ -385,7 +385,7 @@ void lwc_render_field(const LWCONTEXT* pLwc) {
 		// Only render player model if anim_action is not null.
 		// Also, exclude the player itself.
 		if (value->anim_action && !mq_cursor_player(pLwc->mq, cursor)) {
-			render_player_model(pLwc, perspective, view, value->x, value->y, value->z, value->a, value->anim_action, pLwc->player_skin_time, 1, 0);
+			render_player_model(pLwc, perspective, view, value->x, value->y, value->z, value->a, value->anim_action, pLwc->player_skin_time, 1, value->flash);
 		}
 		value = mq_possync_next(pLwc->mq);
 	}
