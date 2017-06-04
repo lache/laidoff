@@ -22,6 +22,11 @@ float get_proportional_font_size(int height, float font_size) {
 
 void render_text_block(const struct _LWCONTEXT *pLwc, const struct _LWTEXTBLOCK* text_block)
 {
+	// Font data not ready
+	if (!pLwc->pFnt) {
+		return;
+	}
+
 	int shader_index = LWST_FONT;
 	const float screen_aspect_ratio = (float)pLwc->width / pLwc->height;
 

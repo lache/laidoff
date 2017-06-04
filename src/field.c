@@ -55,9 +55,10 @@ typedef struct _LWFIELD {
 	dReal ray_nearest_depth[LRI_COUNT];
 	int ray_nearest_index[LRI_COUNT];
 
-	dGeomID sphere[MAX_FIELD_SPHERE_COUNT];
-	vec3 sphere_vel[MAX_FIELD_SPHERE_COUNT];
-	dBodyID sphere_body[MAX_FIELD_SPHERE_COUNT];
+	dGeomID sphere[MAX_FIELD_SPHERE];
+	vec3 sphere_vel[MAX_FIELD_SPHERE];
+	dBodyID sphere_body[MAX_FIELD_SPHERE];
+	dGeomID user[MAX_USER_GEOM];
 
 	dVector3 player_pos;
 	dVector3 player_pos_delta;
@@ -87,6 +88,7 @@ typedef struct _LWFIELD {
 } LWFIELD;
 
 static void s_rotation_matrix_from_vectors(dMatrix3 r, const dReal* vec_a, const dReal* vec_b);
+static void field_set_user_pos(LWFIELD* field, int idx, const vec3 pos);
 
 dReal get_dreal_max() {
 #ifdef dDOUBLE
@@ -253,7 +255,7 @@ LWFIELD* load_field(const char* filename) {
 	}
 	// Create sphere geom pool for bullets, projectiles, ...
 	// which are initially disabled and enabled before they are used.
-	for (int i = 0; i < MAX_FIELD_SPHERE_COUNT; i++) {
+	for (int i = 0; i < MAX_FIELD_SPHERE; i++) {
 		field->sphere[i] = dCreateSphere(field->space_group[LSG_BULLET], 0.5f);
 		field->sphere_body[i] = dBodyCreate(field->world);
 		//dMassSetSphere(field->sphere_body[i], 1, 1);
@@ -262,6 +264,12 @@ LWFIELD* load_field(const char* filename) {
 		//dBodyDisable(field->sphere_body[i]);
 		dGeomSetBody(field->sphere[i], field->sphere_body[i]);
 		dGeomDisable(field->sphere[i]);
+	}
+	// Create user(enemy) geom pool
+	// which are initially disabled and enabled before they are used.
+	for (int i = 0; i < MAX_USER_GEOM; i++) {
+		field->user[i] = dCreateCapsule(field->space_group[LSG_ENEMY], field->player_radius, field->player_length);
+		dGeomDisable(field->user[i]);
 	}
 	// Seed a random number generator
 	pcg32_srandom_r(&field->rng, 0x0DEEC2CBADF00D77, 0x15881588CA11DAC1);
@@ -548,7 +556,7 @@ void field_enable_ray_test(LWFIELD* field, int enable) {
 }
 
 static void s_deactivate_out_of_domain_sphere(LWFIELD* field, float delta_time) {
-	for (int i = 0; i < MAX_FIELD_SPHERE_COUNT; i++) {
+	for (int i = 0; i < MAX_FIELD_SPHERE; i++) {
 		if (dGeomIsEnabled(field->sphere[i])) {
 			const dReal* pos = dGeomGetPosition(field->sphere[i]);
 
@@ -713,7 +721,17 @@ void update_field(LWCONTEXT* pLwc, LWFIELD* field) {
 					LOGE("Unknown action enum detected on remote player. Has message structure been changed?");
 					value->anim_action = &pLwc->action[LWAC_HUMANACTION_IDLE];
 				}
-
+				// Update(move) collider geom
+				if (value->field == field) {
+					if (value->geom_index >= 0) {
+						const vec3 pos = { value->x, value->y, value->z };
+						field_set_user_pos(field, value->geom_index, pos);
+					} else {
+						LOGE("Negative LWPOSSYNCMSG.geom_index! (%d)", value->geom_index);
+					}
+				} else {
+					LOGE("LWPOSSYNCMSG.field (%p) is inconsistent with the current field! (%p)", value->field, field);
+				}
 			}
 			value = mq_possync_next(pLwc->mq);
 		}
@@ -737,8 +755,11 @@ void unload_field(LWFIELD* field) {
 	for (int i = 0; i < LRI_COUNT; i++) {
 		dGeomDestroy(field->ray[i]);
 	}
-	for (int i = 0; i < MAX_FIELD_SPHERE_COUNT; i++) {
+	for (int i = 0; i < MAX_FIELD_SPHERE; i++) {
 		dGeomDestroy(field->sphere[i]);
+	}
+	for (int i = 0; i < MAX_USER_GEOM; i++) {
+		dGeomDestroy(field->user[i]);
 	}
 	for (int i = 0; i < field->box_geom_count; i++) {
 		dGeomDestroy(field->box_geom[i]);
@@ -843,8 +864,37 @@ void init_field(LWCONTEXT* pLwc, const char* field_filename, const char* nav_fil
 	nav_query(pLwc->field->nav, &pLwc->field->path_query);
 }
 
+int field_spawn_user(LWFIELD* field, vec3 pos) {
+	for (int i = 0; i < MAX_USER_GEOM; i++) {
+		if (dGeomIsEnabled(field->user[i])) {
+			continue;
+		}
+		dGeomSetPosition(field->user[i], pos[0], pos[1], pos[2]);
+		dGeomEnable(field->user[i]);
+		return i;
+	}
+	LOGE("%s: maximum spawn exceeded.", __func__);
+	return -1;
+}
+
+void field_despawn_user(LWFIELD* field, int idx) {
+	if (idx < 0 || idx >= MAX_USER_GEOM) {
+		LOGE("%s: idx out of range (%d)", __func__, idx);
+		return;
+	}
+	dGeomDisable(field->user[idx]);
+}
+
+static void field_set_user_pos(LWFIELD* field, int idx, const vec3 pos) {
+	if (idx < 0 || idx >= MAX_USER_GEOM) {
+		LOGE("%s: idx out of range (%d)", __func__, idx);
+		return;
+	}
+	dGeomSetPosition(field->user[idx], pos[0], pos[1], pos[2]);
+}
+
 void field_spawn_sphere(LWFIELD* field, vec3 pos, vec3 vel) {
-	for (int i = 0; i < MAX_FIELD_SPHERE_COUNT; i++) {
+	for (int i = 0; i < MAX_FIELD_SPHERE; i++) {
 		if (dGeomIsEnabled(field->sphere[i])) {
 			continue;
 		}

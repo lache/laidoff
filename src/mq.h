@@ -45,6 +45,8 @@ typedef struct _LWPOSSYNCMSG {
 	//int attacking;					// 1 if attacking, 0 if stopped
 	int action;							// LW_ACTION enum
 	const LWANIMACTION* anim_action;	// Last anim action
+	void* field;						// Reference to the current field instance
+	int geom_index;						// User geom index
 } LWPOSSYNCMSG;
 
 const LWMQMSG* mq_sync_first(void* _mq);

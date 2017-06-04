@@ -108,12 +108,15 @@ s_kvmsg_free_posmap(void* ptr) {
 	if (ptr) {
 		LWPOSSYNCMSG* possyncmsg = (LWPOSSYNCMSG*)ptr;
 		vec4_extrapolator_destroy(&possyncmsg->extrapolator);
+		if (possyncmsg->field && possyncmsg->geom_index >= 0) {
+			field_despawn_user(possyncmsg->field, possyncmsg->geom_index);
+		}
 		free(ptr);
 	}
 }
 
 static void
-s_kvmsg_store_posmap_noown(kvmsg_t** self_p, zhash_t* hash, double sync_time, LWMESSAGEQUEUE* mq) {
+s_kvmsg_store_posmap_noown(kvmsg_t** self_p, zhash_t* hash, double sync_time, LWMESSAGEQUEUE* mq, LWFIELD* field) {
 	assert(self_p);
 	if (*self_p) {
 		kvmsg_t* self = *self_p;
@@ -144,6 +147,15 @@ s_kvmsg_store_posmap_noown(kvmsg_t** self_p, zhash_t* hash, double sync_time, LW
 				possyncmsg->a = 0;
 				possyncmsg->extrapolator = vec4_extrapolator_new();
 				possyncmsg->anim_action = 0;
+				// Create enemy collider if it is not the player
+				if (!mq_cursor_player(mq, kvmsg_key(self))) {
+					vec3 pos = { msg->x, msg->y, msg->z };
+					possyncmsg->field = field;
+					possyncmsg->geom_index = field_spawn_user(field, pos);
+				} else {
+					possyncmsg->field = 0;
+					possyncmsg->geom_index = -1;
+				}
 				vec4_extrapolator_reset(possyncmsg->extrapolator, LWMIN(msg->t, sync_time) /* avoid assertion in extrapolator*/,
 					sync_time, msg->x, msg->y, msg->z, msg->dx, msg->dy);
 				zhash_update(hash, kvmsg_key(self), possyncmsg);
@@ -240,7 +252,7 @@ static void s_mq_poll_time(void* _mq, void* sm) {
 	}
 }
 
-static void s_mq_poll_snapshot(void* _mq, void* sm) {
+static void s_mq_poll_snapshot(void* _mq, void* sm, LWFIELD* field) {
 	LWMESSAGEQUEUE* mq = (LWMESSAGEQUEUE*)_mq;
 	zmq_pollitem_t items[] = { { zsock_resolve(mq->snapshot), 0, ZMQ_POLLIN, 0 } };
 	int rc = zmq_poll(items, 1, 0);
@@ -264,7 +276,7 @@ static void s_mq_poll_snapshot(void* _mq, void* sm) {
 		}
 		show_sys_msg(sm, LWU("Receiving snapshot"));
 		mq_lock_mutex(mq);
-		s_kvmsg_store_posmap_noown(&kvmsg, mq->posmap, mq_sync_mono_clock(mq), mq);
+		s_kvmsg_store_posmap_noown(&kvmsg, mq->posmap, mq_sync_mono_clock(mq), mq, field);
 		mq_unlock_mutex(mq);
 		kvmsg_store(&kvmsg, mq->kvmap);
 	}
@@ -373,7 +385,7 @@ static void s_mq_poll_ready(void* _pLwc, void* _mq, void* sm, void* field) {
 						LOGI("Update: %"PRId64" key:%s, bodylen:%zd\n", mq->sequence, kvmsg_key(kvmsg), kvmsg_size(kvmsg));
 					}
 					mq_lock_mutex(mq);
-					s_kvmsg_store_posmap_noown(&kvmsg, mq->posmap, mq_sync_mono_clock(mq), mq);
+					s_kvmsg_store_posmap_noown(&kvmsg, mq->posmap, mq_sync_mono_clock(mq), mq, field);
 					mq_unlock_mutex(mq);
 					kvmsg_store(&kvmsg, mq->kvmap);
 				} else {
@@ -453,7 +465,7 @@ void mq_poll(void* _pLwc, void* sm, void* _mq, void* field) {
 		s_mq_poll_time(mq, sm);
 		break;
 	case LMQS_SNAPSHOT:
-		s_mq_poll_snapshot(mq, sm);
+		s_mq_poll_snapshot(mq, sm, field);
 		break;
 	case LMQS_READY:
 		s_mq_poll_ready(_pLwc, mq, sm, field);

@@ -223,7 +223,7 @@ void render_player_model(const LWCONTEXT* pLwc, mat4x4 perspective, mat4x4 view,
 }
 
 static void s_render_field_sphere(const LWCONTEXT* pLwc, struct _LWFIELD* const field, const mat4x4 proj, const mat4x4 view) {
-	for (int i = 0; i < MAX_FIELD_SPHERE_COUNT; i++) {
+	for (int i = 0; i < MAX_FIELD_SPHERE; i++) {
 		float pos[3];
 		if (field_sphere_pos(field, i, pos)) {
 			const float s_x = 1.5f;
