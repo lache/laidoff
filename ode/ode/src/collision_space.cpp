@@ -829,33 +829,33 @@ void dSpaceCollide2 (dxGeom *g1, dxGeom *g2, void *data,
                 if (s1->count < s2->count) {
                     DataCallback dc = {data, callback};
                     for (dxGeom *g = s1->first; g; g=g->next) {
-                        s2->collide2 (&dc,g,swap_callback);
+						if (GEOM_ENABLED(g)) s2->collide2 (&dc,g,swap_callback);
                     }
                 }
                 else {
                     for (dxGeom *g = s2->first; g; g=g->next) {
-                        s1->collide2 (data,g,callback);
+						if (GEOM_ENABLED(g)) s1->collide2 (data,g,callback);
                     }
                 }
             }
         }
         else {
             // g1 is a space, g2 is a geom
-            s1->collide2 (data,g2,callback);
+			if (GEOM_ENABLED(g2)) s1->collide2 (data,g2,callback);
         }
     }
     else {
         if (s2) {
             // g1 is a geom, g2 is a space
             DataCallback dc = {data, callback};
-            s2->collide2 (&dc,g1,swap_callback);
+			if (GEOM_ENABLED(g1)) s2->collide2 (&dc,g1,swap_callback);
         }
         else {
             // g1 and g2 are geoms
             // make sure they have valid AABBs
             g1->recomputeAABB();
             g2->recomputeAABB();
-            collideAABBs(g1,g2, data, callback);
+			if (GEOM_ENABLED(g1) && GEOM_ENABLED(g2)) collideAABBs(g1,g2, data, callback);
         }
     }
 }
