@@ -15,7 +15,6 @@
 #include "file.h"
 
 void toggle_font_texture_test_mode(LWCONTEXT* pLwc);
-void init_font_fbo(LWCONTEXT* pLwc);
 
 static const char* server_addr[] = {
 	"s.popsongremix.com", // AWS Tokyo
@@ -354,6 +353,18 @@ static void update_battle_wall(LWCONTEXT* pLwc) {
 	pLwc->battle_wall_tex_v = fmodf(pLwc->battle_wall_tex_v, 1.0f);
 }
 
+void logic_udate_default_projection(LWCONTEXT* pLwc) {
+	float ratio = pLwc->width / (float)pLwc->height;
+
+	//LOGV("Update(): width: %d height: %d ratio: %f", pLwc->width, pLwc->height, ratio);
+
+	if (ratio > 1) {
+		mat4x4_ortho(pLwc->proj, -ratio, ratio, -1.f, 1.f, 1.f, -1.f);
+	} else {
+		mat4x4_ortho(pLwc->proj, -1.f, 1.f, -1 / ratio, 1 / ratio, 1.f, -1.f);
+	}
+}
+
 void lwc_update(LWCONTEXT *pLwc, double delta_time) {
 
 	deltatime_tick_delta(pLwc->update_dt, delta_time);
@@ -391,16 +402,6 @@ void lwc_update(LWCONTEXT *pLwc, double delta_time) {
 	//lwcontext_delta_time(pLwc) = 1.0f / 60;
 	//****//
 
-	float ratio = pLwc->width / (float)pLwc->height;
-
-	//LOGV("Update(): width: %d height: %d ratio: %f", pLwc->width, pLwc->height, ratio);
-
-	if (ratio > 1) {
-		mat4x4_ortho(pLwc->proj, -ratio, ratio, -1.f, 1.f, 1.f, -1.f);
-	} else {
-		mat4x4_ortho(pLwc->proj, -1.f, 1.f, -1 / ratio, 1 / ratio, 1.f, -1.f);
-	}
-
 	update_battle(pLwc);
 
 	move_player(pLwc);
@@ -414,11 +415,6 @@ void lwc_update(LWCONTEXT *pLwc, double delta_time) {
 	update_battle_wall(pLwc);
 
 	update_sys_msg(pLwc->def_sys_msg, (float)delta_time);
-
-	if (pLwc->font_fbo.dirty) {
-		lwc_render_font_test_fbo(pLwc);
-		pLwc->font_fbo.dirty = 0;
-	}
 
 	if (pLwc->battle_state == LBS_START_PLAYER_WIN || pLwc->battle_state == LBS_PLAYER_WIN_IN_PROGRESS) {
 		update_battle_result(pLwc);
@@ -434,15 +430,12 @@ void lwc_update(LWCONTEXT *pLwc, double delta_time) {
 }
 
 void init_lwc_runtime_data(LWCONTEXT *pLwc) {
-	init_font_fbo(pLwc);
-
 	init_lua(pLwc);
 
 	reset_runtime_context(pLwc);
 
 	//pLwc->pFnt = load_fnt(ASSETS_BASE_PATH "fnt" PATH_SEPARATOR "arita-semi-bold.fnt");
-	pLwc->pFnt = load_fnt(ASSETS_BASE_PATH "fnt" PATH_SEPARATOR "test6.fnt");
-
+	
 	pLwc->dialog = create_string_from_file(ASSETS_BASE_PATH "d" PATH_SEPARATOR "d1.txt");
 	if (pLwc->dialog) {
 		pLwc->dialog_bytelen = (int)strlen(pLwc->dialog);

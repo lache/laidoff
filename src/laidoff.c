@@ -115,6 +115,7 @@ void load_test_font(LWCONTEXT *pLwc);
 int LoadObjAndConvert(float bmin[3], float bmax[3], const char *filename);
 int spawn_attack_trail(LWCONTEXT *pLwc, float x, float y, float z);
 float get_battle_enemy_x_center(int enemy_slot_index);
+void init_font_fbo(LWCONTEXT* pLwc);
 
 typedef struct {
 	GLuint vb;
@@ -684,8 +685,6 @@ void init_font_fbo(LWCONTEXT* pLwc) {
 	}
 
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
-
-	pLwc->font_fbo.dirty = 1;
 }
 
 void set_sprite_mvp_with_scale(const LWCONTEXT *pLwc, enum _LW_ATLAS_SPRITE las, float x, float y,
@@ -1115,6 +1114,8 @@ LWCONTEXT *lw_init(void) {
 
 	init_load_textures(pLwc);
 
+	pLwc->pFnt = load_fnt(ASSETS_BASE_PATH "fnt" PATH_SEPARATOR "test6.fnt");
+
 	pLwc->def_sys_msg = init_sys_msg();
 
 	pLwc->update_dt = deltatime_new();
@@ -1139,7 +1140,13 @@ LWCONTEXT *lw_init(void) {
 void lw_set_size(LWCONTEXT *pLwc, int w, int h) {
 	pLwc->width = w;
 	pLwc->height = h;
-
+	// Update default projection matrix (pLwc->proj)
+	logic_udate_default_projection(pLwc);
+	// Initialize test font FBO
+	init_font_fbo(pLwc);
+	// Render font FBO using render-to-texture
+	lwc_render_font_test_fbo(pLwc);
+	// Reset dir pad input state
 	reset_dir_pad_position(pLwc);
 }
 

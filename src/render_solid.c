@@ -61,6 +61,7 @@ void render_solid_vb_ui_flip_y_uv(const LWCONTEXT* pLwc,
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, tex_index);
 	set_tex_filter(GL_LINEAR, GL_LINEAR);
+	//set_tex_filter(GL_NEAREST, GL_NEAREST);
 	glUniformMatrix4fv(pLwc->shader[shader_index].mvp_location, 1, GL_FALSE, (const GLfloat*)proj_view_model);
 	glDrawArrays(GL_TRIANGLES, 0, pLwc->vertex_buffer[lvt].vertex_count);
 }
