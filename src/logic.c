@@ -1,4 +1,4 @@
-#include "logic.h"
+ï»¿#include "logic.h"
 #include <czmq.h>
 #include "lwcontext.h"
 #include "lwtimepoint.h"
@@ -191,7 +191,7 @@ void reset_battle_context(LWCONTEXT* pLwc) {
 
 	set_creature_data(
 		&pLwc->player[0],
-		u8"ÁÖÀÎ°ø",
+		u8"ì£¼ì¸ê³µ",
 		1,
 		50,
 		50,
@@ -211,7 +211,7 @@ void reset_battle_context(LWCONTEXT* pLwc) {
 
 	set_creature_data(
 		&pLwc->player[1],
-		u8"±ØÀÛ°¡",
+		u8"ê·¹ìž‘ê°€",
 		2,
 		25,
 		50,
@@ -227,7 +227,7 @@ void reset_battle_context(LWCONTEXT* pLwc) {
 
 	set_creature_data(
 		&pLwc->player[2],
-		u8"¼ÕÅé±ðÀÌ",
+		u8"ì†í†±ê¹Žì´",
 		3,
 		46,
 		46,
@@ -243,7 +243,7 @@ void reset_battle_context(LWCONTEXT* pLwc) {
 
 	set_creature_data(
 		&pLwc->player[3],
-		u8"´ë¹®È£",
+		u8"ëŒ€ë¬¸í˜¸",
 		8,
 		105,
 		105,
@@ -297,7 +297,7 @@ void toggle_ray_test(LWCONTEXT *pLwc) {
 }
 
 void toggle_network_poll(LWCONTEXT *pLwc) {
-	field_set_network_poll(pLwc->field, !field_network_poll(pLwc->field));
+	field_set_network(pLwc->field, !field_network(pLwc->field));
 }
 
 void reset_runtime_context(LWCONTEXT* pLwc) {
@@ -316,33 +316,33 @@ void reset_runtime_context(LWCONTEXT* pLwc) {
 
 	pLwc->font_fbo.dirty = 1;
 
-	pLwc->admin_button_command[0].name = LWU("½Å:ÇÊµå");
+	pLwc->admin_button_command[0].name = LWU("ì‹ :í•„ë“œ");
 	pLwc->admin_button_command[0].command_handler = change_to_field;
-	pLwc->admin_button_command[1].name = LWU("½Å:´ëÈ­");
+	pLwc->admin_button_command[1].name = LWU("ì‹ :ëŒ€í™”");
 	pLwc->admin_button_command[1].command_handler = change_to_dialog;
-	pLwc->admin_button_command[2].name = LWU("½Å:ÀüÅõ");
+	pLwc->admin_button_command[2].name = LWU("ì‹ :ì „íˆ¬");
 	pLwc->admin_button_command[2].command_handler = change_to_battle;
-	pLwc->admin_button_command[3].name = LWU("½Å:±Û²Ã");
+	pLwc->admin_button_command[3].name = LWU("ì‹ :ê¸€ê¼´");
 	pLwc->admin_button_command[3].command_handler = change_to_font_test;
-	pLwc->admin_button_command[4].name = LWU("·±Å¸ÀÓ¸®¼Â");
+	pLwc->admin_button_command[4].name = LWU("ëŸ°íƒ€ìž„ë¦¬ì…‹");
 	pLwc->admin_button_command[4].command_handler = reset_runtime_context;
-	pLwc->admin_button_command[5].name = LWU("±Û²Ãµð¹ö±×");
+	pLwc->admin_button_command[5].name = LWU("ê¸€ê¼´ë””ë²„ê·¸");
 	pLwc->admin_button_command[5].command_handler = toggle_font_texture_test_mode;
 	pLwc->admin_button_command[6].name = LWU("UDP");
 	pLwc->admin_button_command[6].command_handler = net_rtt_test;
-	pLwc->admin_button_command[7].name = LWU("½Å:½ºÅ²");
+	pLwc->admin_button_command[7].name = LWU("ì‹ :ìŠ¤í‚¨");
 	pLwc->admin_button_command[7].command_handler = change_to_skin;
-	pLwc->admin_button_command[8].name = LWU("½Å:ÇÊµå1·Îµå");
+	pLwc->admin_button_command[8].name = LWU("ì‹ :í•„ë“œ1ë¡œë“œ");
 	pLwc->admin_button_command[8].command_handler = load_field_1_init_runtime_data;
-	pLwc->admin_button_command[9].name = LWU("½Å:ÇÊµå2·Îµå");
+	pLwc->admin_button_command[9].name = LWU("ì‹ :í•„ë“œ2ë¡œë“œ");
 	pLwc->admin_button_command[9].command_handler = load_field_2_init_runtime_data;
 	pLwc->admin_button_command[10].name = LWU("Server #0");
 	pLwc->admin_button_command[10].command_handler = connect_to_server_0;
 	pLwc->admin_button_command[11].name = LWU("Server #1");
 	pLwc->admin_button_command[11].command_handler = connect_to_server_1;
-	pLwc->admin_button_command[12].name = LWU("·¹ÀÌÅ×½ºÆ®Åä±Û");
+	pLwc->admin_button_command[12].name = LWU("ë ˆì´í…ŒìŠ¤íŠ¸í† ê¸€");
 	pLwc->admin_button_command[12].command_handler = toggle_ray_test;
-	pLwc->admin_button_command[13].name = LWU("³×Æ®¿öÅ©Åä±Û");
+	pLwc->admin_button_command[13].name = LWU("ë„¤íŠ¸ì›Œí¬í† ê¸€");
 	pLwc->admin_button_command[13].command_handler = toggle_network_poll;
 }
 
@@ -391,7 +391,7 @@ void lwc_update(LWCONTEXT *pLwc, double delta_time) {
 	pLwc->app_time += delta_time;
 	pLwc->scene_time += delta_time;
 
-	if (field_network_poll(pLwc->field)) {
+	if (field_network(pLwc->field)) {
 		mq_poll(pLwc, pLwc->def_sys_msg, pLwc->mq, pLwc->field);
 	}
 
@@ -451,7 +451,7 @@ static void s_logic_worker(zsock_t *pipe, void *args) {
 	LWTIMEPOINT last_time;
 	lwtimepoint_now(&last_time);
 	double delta_time_accum = 0;
-	const double update_interval = 0.02; // seconds
+	const double update_interval = 1 / 120.0;// 0.02; // seconds
 
 	while (!pLwc->quit_request) {
 		LWTIMEPOINT cur_time;
@@ -516,4 +516,8 @@ void lwc_start_logic_thread(LWCONTEXT* pLwc) {
 
 const char* logic_server_addr(int idx) {
 	return server_addr[idx];
+}
+
+void toggle_font_texture_test_mode(LWCONTEXT *pLwc) {
+	pLwc->font_texture_texture_mode = !pLwc->font_texture_texture_mode;
 }

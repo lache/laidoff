@@ -90,6 +90,8 @@ static STATE_FUNC* const s_state[LPS_COUNT] = {
 };
 
 static void s_on_enter_aim(LWPLAYERSTATEDATA* data);
+static void s_on_exit_aim(LWPLAYERSTATEDATA* data);
+static void s_on_enter_idle(LWPLAYERSTATEDATA* data);
 
 static void s_do_idle_to_move(LWPLAYERSTATEDATA* data) {
 	if (s_verbose) { LOGI("s_do_idle_to_move"); }
@@ -99,6 +101,7 @@ static void s_do_idle_to_move(LWPLAYERSTATEDATA* data) {
 static void s_do_move_to_idle(LWPLAYERSTATEDATA* data) {
 	if (s_verbose) { LOGI("s_do_move_to_idle"); }
 	data->skin_time = 0;
+	s_on_enter_idle(data);
 }
 
 static void s_do_move_to_aim(LWPLAYERSTATEDATA* data) {
@@ -116,6 +119,8 @@ static void s_do_idle_to_aim(LWPLAYERSTATEDATA* data) {
 static void s_do_aim_to_idle(LWPLAYERSTATEDATA* data) {
 	if (s_verbose) { LOGI("s_do_aim_to_idle"); }
 	data->skin_time = 0;
+	s_on_exit_aim(data);
+	s_on_enter_idle(data);
 }
 
 static void s_do_aim_to_fire(LWPLAYERSTATEDATA* data) {
@@ -123,6 +128,7 @@ static void s_do_aim_to_fire(LWPLAYERSTATEDATA* data) {
 	data->skin_time = 0;
 	if (s_verbose) { LOGI("Fire!"); }
 	s_fire_bullet(data);
+	s_on_exit_aim(data);
 }
 
 static void s_do_fire_to_unaim(LWPLAYERSTATEDATA* data) {
@@ -144,6 +150,7 @@ static void s_do_fire_to_aim(LWPLAYERSTATEDATA* data) {
 static void s_do_unaim_to_idle(LWPLAYERSTATEDATA* data) {
 	if (s_verbose) { LOGI("s_do_unaim_to_idle"); }
 	data->skin_time = 0;
+	s_on_enter_idle(data);
 }
 
 static void s_do_unaim_to_aim(LWPLAYERSTATEDATA* data) {
@@ -194,9 +201,16 @@ LW_ACTION get_anim_by_state(LW_PLAYER_STATE cur_state, int* loop) {
 }
 
 static void s_on_enter_aim(LWPLAYERSTATEDATA* data) {
-	// Set start aim theta
+	field_set_aim_sector_ray(data->field, 1);
 	data->aim_theta = (float)(M_PI / 4);
 	data->aim_theta_speed = -(float)LWDEG2RAD(90);
+}
+
+static void s_on_exit_aim(LWPLAYERSTATEDATA* data) {
+}
+
+static void s_on_enter_idle(LWPLAYERSTATEDATA* data) {
+	field_set_aim_sector_ray(data->field, 0);
 }
 
 static void s_fire_bullet(LWPLAYERSTATEDATA* data) {
@@ -208,7 +222,7 @@ static void s_fire_bullet(LWPLAYERSTATEDATA* data) {
 	const float aimed_rot_z = (float)(data->rot_z - data->aim_theta / 2 + data->aim_theta * field_random_double(data->field));
 	
 	float vel[3] = { speed * cosf(aimed_rot_z), speed * sinf(aimed_rot_z), 0 };
-	if (field_network_poll(data->field)) {
+	if (field_network(data->field)) {
 		mq_send_fire(data->mq, pos, vel);
 	} else {
 		field_spawn_sphere(data->field, pos, vel);

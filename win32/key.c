@@ -2,6 +2,9 @@
 #include "sound.h"
 #include "field.h"
 #include "lwlog.h"
+#include "render_text_block.h"
+
+void toggle_font_texture_test_mode(LWCONTEXT *pLwc);
 
 static void handle_move_key_press_release(LWCONTEXT* pLwc, int key, int action) {
 	if (key == GLFW_KEY_RIGHT && action == GLFW_PRESS) {

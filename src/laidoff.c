@@ -1234,11 +1234,11 @@ void lw_deinit(LWCONTEXT *pLwc) {
 		unload_armature(&pLwc->armature[i]);
 	}
 
+	deinit_mq(pLwc->mq);
+
 	unload_field(pLwc->field);
 
 	deinit_sys_msg(pLwc->def_sys_msg);
-
-	deinit_mq(pLwc->mq);
 
 	deltatime_destroy(&pLwc->update_dt);
 

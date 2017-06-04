@@ -84,7 +84,7 @@ typedef struct _LWFIELD {
 
 	float test_player_flash;
 
-	int network_poll;
+	int network;
 } LWFIELD;
 
 static void s_rotation_matrix_from_vectors(dMatrix3 r, const dReal* vec_a, const dReal* vec_b);
@@ -223,6 +223,7 @@ LWFIELD* load_field(const char* filename) {
 	dGeomSetPosition(field->player_geom, field->player_pos[0], field->player_pos[1], field->player_pos[2]);
 	// Create test player geom
 	field->test_player_geom = dCreateCapsule(field->space_group[LSG_ENEMY], field->player_radius, field->player_length);
+	dGeomSetData(field->test_player_geom, (void*)0x12345678);
 	// Create ray geoms (see LW_RAY_ID enum for usage)
 	field->ray_max_length = 50;
 	for (int i = 0; i < LRI_COUNT; i++) {
@@ -233,6 +234,8 @@ LWFIELD* load_field(const char* filename) {
 		dRFromAxisAndAngle(r, 1, 0, 0, M_PI); // Make ray direction downward (-Z axis)
 		dGeomSetRotation(field->ray[i], r);
 	}
+	// Aim sector rays are disabled from start (will be enabled just after aiming has started)
+	field_set_aim_sector_ray(field, 0);
 	// Set initial ground normal as +Z axis
 	dAssignVector3(field->ground_normal, 0, 0, 1);
 	// Load field cube objects (field colliders) from specified file
@@ -270,6 +273,7 @@ LWFIELD* load_field(const char* filename) {
 	for (int i = 0; i < MAX_USER_GEOM; i++) {
 		field->user[i] = dCreateCapsule(field->space_group[LSG_ENEMY], field->player_radius, field->player_length);
 		dGeomDisable(field->user[i]);
+		dGeomSetData(field->user[i], (void*)(0x7FFF0000 + i));
 	}
 	// Seed a random number generator
 	pcg32_srandom_r(&field->rng, 0x0DEEC2CBADF00D77, 0x15881588CA11DAC1);
@@ -300,6 +304,7 @@ static void field_world_ray_near(void *data, dGeomID o1, dGeomID o2) {
 	int n = dCollide(o1, o2, MAX_FIELD_CONTACT, &contact[0].geom, sizeof(dContact));
 	for (int i = 0; i < n; i++) {
 		// Get ray index from custom data
+		// Note that the return value of dGeomGetData is coerced to integer since LW_RAY_ID is a sparse enum
 		const LW_RAY_ID lri = (int)dGeomGetData(o2);
 		// Negate normal direction of contact result data
 		dNegateVector3(contact[i].geom.normal);
@@ -871,6 +876,7 @@ int field_spawn_user(LWFIELD* field, vec3 pos) {
 		}
 		dGeomSetPosition(field->user[i], pos[0], pos[1], pos[2]);
 		dGeomEnable(field->user[i]);
+		LOGI("user geom enabled index %d", i);
 		return i;
 	}
 	LOGE("%s: maximum spawn exceeded.", __func__);
@@ -883,6 +889,7 @@ void field_despawn_user(LWFIELD* field, int idx) {
 		return;
 	}
 	dGeomDisable(field->user[idx]);
+	LOGI("user geom disabled index %d", idx);
 }
 
 static void field_set_user_pos(LWFIELD* field, int idx, const vec3 pos) {
@@ -953,10 +960,16 @@ float field_test_player_flash(const LWFIELD* field) {
 	return field->test_player_flash;
 }
 
-int field_network_poll(const LWFIELD* field) {
-	return field->network_poll;
+int field_network(const LWFIELD* field) {
+	return field->network;
 }
 
-void field_set_network_poll(LWFIELD* field, int network_poll) {
-	field->network_poll = network_poll;
+void field_set_network(LWFIELD* field, int network_poll) {
+	field->network = network_poll;
+}
+
+void field_set_aim_sector_ray(LWFIELD* field, int enable) {
+	for (int i = LRI_AIM_SECTOR_FIRST_INCLUSIVE; i <= LRI_AIM_SECTOR_LAST_INCLUSIVE; i++) {
+		(enable ? dGeomEnable : dGeomDisable)(field->ray[i]);
+	}
 }
