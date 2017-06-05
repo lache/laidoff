@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		264553421EE4815A004064D0 /* logic.c in Sources */ = {isa = PBXBuildFile; fileRef = 264553401EE4815A004064D0 /* logic.c */; };
 		562DAF601ED1920300208E62 /* playersm.c in Sources */ = {isa = PBXBuildFile; fileRef = 562DAF5E1ED1920300208E62 /* playersm.c */; };
 		5633AC321EADDF98003F1549 /* net.c in Sources */ = {isa = PBXBuildFile; fileRef = 5633AC311EADDF98003F1549 /* net.c */; };
 		5644E9E31EA8B69000EAA658 /* battle.c in Sources */ = {isa = PBXBuildFile; fileRef = 5644E98F1EA8B69000EAA658 /* battle.c */; };
@@ -356,6 +357,8 @@
 
 /* Begin PBXFileReference section */
 		2601AFFC1EE1549700989AA6 /* platform.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = platform.h; path = ../build/include/platform.h; sourceTree = "<group>"; };
+		264553401EE4815A004064D0 /* logic.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = logic.c; sourceTree = "<group>"; };
+		264553411EE4815A004064D0 /* logic.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = logic.h; sourceTree = "<group>"; };
 		562DAF5E1ED1920300208E62 /* playersm.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = playersm.c; sourceTree = "<group>"; };
 		562DAF5F1ED1920300208E62 /* playersm.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = playersm.h; sourceTree = "<group>"; };
 		5633AC301EADDF62003F1549 /* sound.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = sound.h; sourceTree = "<group>"; };
@@ -1918,6 +1921,8 @@
 		6CA16CF41EA20CA700DB7AF0 /* src */ = {
 			isa = PBXGroup;
 			children = (
+				264553401EE4815A004064D0 /* logic.c */,
+				264553411EE4815A004064D0 /* logic.h */,
 				565676A51EAFB4F800FF64B3 /* armature.c */,
 				565676A61EAFB4F800FF64B3 /* armature.h */,
 				5644E9FB1EA91D9E00EAA658 /* battle_result.c */,
@@ -2369,6 +2374,7 @@
 				564CA1C11EDB10550082B778 /* lwdeltatime.c in Sources */,
 				56F189B91EC751950019312F /* zsys.c in Sources */,
 				5644E9E51EA8B69000EAA658 /* dialog.c in Sources */,
+				264553421EE4815A004064D0 /* logic.c in Sources */,
 				565676A91EAFB4F800FF64B3 /* armature.c in Sources */,
 				6CA16D841EA210BB00DB7AF0 /* lcode.c in Sources */,
 				56F188FB1EC74DB60019312F /* tipc_listener.cpp in Sources */,
