@@ -935,7 +935,7 @@ void field_spawn_sphere(LWFIELD* field, vec3 pos, vec3 vel) {
 }
 
 int field_sphere_pos(const LWFIELD* field, int i, float* pos) {
-	if (!dGeomIsEnabled(field->sphere[i])) {
+	if (!field->sphere[i] || !dGeomIsEnabled(field->sphere[i])) {
 		return 0;
 	}
 	const dReal* p = dGeomGetPosition(field->sphere[i]);
@@ -946,7 +946,7 @@ int field_sphere_pos(const LWFIELD* field, int i, float* pos) {
 }
 
 int field_sphere_vel(const LWFIELD* field, int i, float* vel) {
-	if (!dGeomIsEnabled(field->sphere[i])) {
+	if (!field->sphere[i] || !dGeomIsEnabled(field->sphere[i])) {
 		return 0;
 	}
 	vel[0] = (float)field->sphere_vel[i][0];
@@ -957,7 +957,7 @@ int field_sphere_vel(const LWFIELD* field, int i, float* vel) {
 
 
 float field_sphere_radius(const LWFIELD* field, int i) {
-	if (!dGeomIsEnabled(field->sphere[i])) {
+	if (!field->sphere[i] || !dGeomIsEnabled(field->sphere[i])) {
 		return 0;
 	}
 	return (float)dGeomSphereGetRadius(field->sphere[i]);
