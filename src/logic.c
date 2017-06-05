@@ -495,7 +495,7 @@ static void s_logic_worker(zsock_t *pipe, void *args) {
 	zloop_timer(loop, (size_t)(update_interval * 1000), 0, loop_logic_update, pLwc);
 	zloop_reader(loop, pipe, loop_pipe_reader, pLwc);
 	// Start the reactor loop
-	zloop_start(loop);
+	zloop_start_noalloc(loop);
 	// Reactor loop finished.
 	// Send 'worker finished' signal to parent thread
 	zsock_signal(pipe, 0);

@@ -903,7 +903,9 @@ void field_despawn_user(LWFIELD* field, int idx) {
 		LOGE("%s: idx out of range (%d)", __func__, idx);
 		return;
 	}
-	dGeomDisable(field->user[idx]);
+	if (field->user[idx]) {
+		dGeomDisable(field->user[idx]);
+	}
 	LOGI("user geom disabled index %d", idx);
 }
 

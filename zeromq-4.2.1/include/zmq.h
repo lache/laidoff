@@ -458,7 +458,13 @@ typedef struct zmq_pollitem_t
 
 #define ZMQ_POLLITEMS_DFLT 16
 
+typedef struct zmq_poller_event_t zmq_poller_event_t;
+
 ZMQ_EXPORT int  zmq_poll (zmq_pollitem_t *items, int nitems, long timeout);
+ZMQ_EXPORT int  zmq_poll_noalloc (zmq_pollitem_t *items, int nitems, long timeout, zmq_poller_event_t *events, void *poller);
+ZMQ_EXPORT void zmq_poll_noalloc_prep (int nitems, zmq_poller_event_t **p_events, void **p_poller);
+ZMQ_EXPORT void zmq_poll_noalloc_unprep (zmq_poller_event_t **p_events, void **p_poller);
+ZMQ_EXPORT int  zmq_poller_prep (zmq_pollitem_t *items_, int nitems_, void *poller);
 
 /******************************************************************************/
 /*  Message proxying                                                          */

@@ -334,8 +334,14 @@ static void s_mq_poll_ready(void* _pLwc, void* _mq, void* sm, void* field) {
 	LWCONTEXT* pLwc = (LWCONTEXT*)_pLwc;
 	zmq_pollitem_t items[] = { { zsock_resolve(mq->subscriber), 0, ZMQ_POLLIN, 0 } };
 	double t0 = zclock_mono() / 1e3;
+	
+	zmq_poller_event_t *events;
+	void *poller;
+	zmq_poll_noalloc_prep(1, &events, &poller);
+	zmq_poller_prep(items, 1, poller);
+
 	// Process all queued messages at once
-	while (zmq_poll(items, 1, 0) > 0) {
+	while (zmq_poll_noalloc(items, 1, 0, events, poller) > 0) {
 		// Polling subscriber socket to get update
 		if (items[0].revents & ZMQ_POLLIN) {
 			kvmsg_t* kvmsg = kvmsg_recv(zsock_resolve(mq->subscriber));
@@ -389,6 +395,7 @@ static void s_mq_poll_ready(void* _pLwc, void* _mq, void* sm, void* field) {
 			}
 		}
 	}
+	zmq_poll_noalloc_unprep(&events, &poller);
 	double t1 = zclock_mono() / 1e3 - t0;
 	//printf("%.3f sec\n", t1);
 

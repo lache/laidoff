@@ -752,6 +752,120 @@ const char *zmq_msg_gets (zmq_msg_t *msg_, const char *property_)
 // Polling.
 
 #if defined ZMQ_HAVE_POLLER
+int zmq_poller_prep(zmq_pollitem_t *items_, int nitems_, void *poller)
+{
+	int rc = 0;
+	bool repeat_items = false;
+	//  Register sockets with poller
+	for (int i = 0; i < nitems_; i++) {
+		items_[i].revents = 0;
+
+		bool modify = false;
+		short e = items_[i].events;
+		if (items_[i].socket) {
+			//  Poll item is a 0MQ socket.
+			for (int j = 0; j < i; ++j) {
+				// Check for repeat entries
+				if (items_[j].socket == items_[i].socket) {
+					repeat_items = true;
+					modify = true;
+					e |= items_[j].events;
+				}
+			}
+			if (modify) {
+				rc = zmq_poller_modify(poller, items_[i].socket, e);
+			} else {
+				rc = zmq_poller_add(poller, items_[i].socket, NULL, e);
+			}
+			if (rc < 0) {
+				//zmq_poller_destroy(&poller);
+				//delete[] events;
+				return rc;
+			}
+		} else {
+			//  Poll item is a raw file descriptor.
+			for (int j = 0; j < i; ++j) {
+				// Check for repeat entries
+				if (!items_[j].socket && items_[j].fd == items_[i].fd) {
+					repeat_items = true;
+					modify = true;
+					e |= items_[j].events;
+				}
+			}
+			if (modify) {
+				rc = zmq_poller_modify_fd(poller, items_[i].fd, e);
+			} else {
+				rc = zmq_poller_add_fd(poller, items_[i].fd, NULL, e);
+			}
+			if (rc < 0) {
+				//zmq_poller_destroy(&poller);
+				//delete[] events;
+				return rc;
+			}
+		}
+	}
+	return rc;
+}
+
+inline int zmq_poller_poll_noalloc(zmq_pollitem_t *items_, int nitems_, long timeout_, zmq_poller_event_t *events, void *poller) {
+	// implement zmq_poll on top of zmq_poller
+	int rc;
+	//zmq_poller_event_t *events;
+	//events = new zmq_poller_event_t[nitems_];
+	//alloc_assert(events);
+	//void *poller = zmq_poller_new();
+	//alloc_assert(poller);
+
+	bool repeat_items = false;
+
+	for (int i = 0; i < nitems_; i++) {
+		items_[i].revents = 0;
+	}
+	
+	//  Wait for events
+	rc = zmq_poller_wait_all(poller, events, nitems_, timeout_);
+	if (rc < 0) {
+		//zmq_poller_destroy(&poller);
+		//delete[] events;
+		if (zmq_errno() == ETIMEDOUT) {
+			return 0;
+		}
+		return rc;
+	}
+
+	//  Transform poller events into zmq_pollitem events.
+	//  items_ contains all items, while events only contains fired events.
+	//  If no sockets are repeated (likely), the two are still co-ordered, so step through the items
+	//  checking for matches only on the first event.
+	//  If there are repeat items, they cannot be assumed to be co-ordered,
+	//  so each pollitem must check fired events from the beginning.
+	int j_start = 0, found_events = rc;
+	for (int i = 0; i < nitems_; i++) {
+		for (int j = j_start; j < found_events; ++j) {
+			if (
+				(items_[i].socket && items_[i].socket == events[j].socket) ||
+				(!(items_[i].socket || events[j].socket) && items_[i].fd == events[j].fd)
+				) {
+				items_[i].revents = events[j].events & items_[i].events;
+				if (!repeat_items) {
+					// no repeats, we can ignore events we've already seen
+					j_start++;
+				}
+				break;
+			}
+			if (!repeat_items) {
+				// no repeats, never have to look at j > j_start
+				break;
+			}
+		}
+	}
+
+	//  Cleanup
+	//zmq_poller_destroy(&poller);
+	//delete[] events;
+	return rc;
+}
+
 inline int zmq_poller_poll (zmq_pollitem_t *items_, int nitems_, long timeout_)
 {
     // implement zmq_poll on top of zmq_poller
@@ -856,6 +970,38 @@ inline int zmq_poller_poll (zmq_pollitem_t *items_, int nitems_, long timeout_)
     return rc;
 }
 #endif // ZMQ_HAVE_POLLER
+
+void zmq_poll_noalloc_prep (int nitems, zmq_poller_event_t **p_events, void **p_poller)
+{
+	zmq_poller_event_t *events;
+	events = new zmq_poller_event_t[nitems];
+	alloc_assert(events);
+	void *poller = zmq_poller_new();
+	alloc_assert(poller);
+	
+	*p_events = events;
+	*p_poller = poller;
+}
+
+void zmq_poll_noalloc_unprep (zmq_poller_event_t **p_events, void **p_poller)
+{
+	delete[] * p_events;
+	*p_events = 0;
+	zmq_poller_destroy(p_poller);
+}
+
+int zmq_poll_noalloc (zmq_pollitem_t *items_, int nitems_, long timeout_, zmq_poller_event_t *events, void *poller)
+{
+	//  TODO: the function implementation can just call zmq_pollfd_poll with
+	//  pollfd as NULL, however pollfd is not yet stable.
+#if defined ZMQ_HAVE_POLLER
+	// if poller is present, use that.
+	return zmq_poller_poll_noalloc(items_, nitems_, timeout_, events, poller);
+#else
+	// Not implemented
+	return EINVAL;
+#endif
+}
 
 int zmq_poll (zmq_pollitem_t *items_, int nitems_, long timeout_)
 {

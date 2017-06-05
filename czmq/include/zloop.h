@@ -145,6 +145,8 @@ CZMQ_EXPORT void
 //  cancel sockets. Returns 0 if interrupted, -1 if canceled by a handler.   
 CZMQ_EXPORT int
     zloop_start (zloop_t *self);
+CZMQ_EXPORT int
+	zloop_start_noalloc (zloop_t *self);
 
 //  Self test of this class.
 CZMQ_EXPORT void

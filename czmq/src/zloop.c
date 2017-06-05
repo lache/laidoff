@@ -697,6 +697,153 @@ zloop_set_max_timers (zloop_t *self, size_t max_timers)
 }
 
 
+int
+zloop_start_noalloc (zloop_t *self) {
+	assert(self);
+	int rc = 0;
+
+	zmq_poller_event_t *events;
+	void *poller;
+	
+	//  Main reactor loop
+	while (!zsys_interrupted || self->nonstop) {
+		if (self->need_rebuild) {
+			//  If s_rebuild_pollset() fails, break out of the loop and
+			//  return its error
+			rc = s_rebuild_pollset(self);
+			if (rc)
+				break;
+			zmq_poll_noalloc_prep(self->poll_size, &events, &poller);
+			zmq_poller_prep(self->pollset, (int)self->poll_size, poller);
+		}
+		rc = zmq_poll_noalloc(self->pollset, (int)self->poll_size, s_tickless(self), events, poller);
+		if (rc == -1 || (zsys_interrupted && !self->nonstop)) {
+			if (self->verbose)
+				zsys_debug("zloop: interrupted");
+			rc = 0;
+			break;              //  Context has been shut down
+		}
+
+		//  Handle any timers that have now expired
+		int64_t time_now = zclock_mono();
+		s_timer_t *timer = (s_timer_t *)zlistx_first(self->timers);
+		while (timer) {
+			if (time_now >= timer->when) {
+				if (self->verbose)
+					zsys_debug("zloop: call timer handler id=%d", timer->timer_id);
+				rc = timer->handler(self, timer->timer_id, timer->arg);
+				if (rc == -1)
+					break;      //  Timer handler signaled break
+				if (timer->times && --timer->times == 0)
+					zlistx_delete(self->timers, timer->list_handle);
+				else
+					timer->when += timer->delay;
+			}
+			timer = (s_timer_t *)zlistx_next(self->timers);
+		}
+
+		//  Handle any tickets that have now expired
+		s_ticket_t *ticket = (s_ticket_t *)zlistx_first(self->tickets);
+		while (ticket && time_now >= ticket->when) {
+			if (self->verbose)
+				zsys_debug("zloop: call ticket handler");
+			if (!ticket->deleted
+				&& ticket->handler(self, 0, ticket->arg) == -1) {
+				rc = -1;    //  Trigger exit from zloop_start
+				break;      //  Ticket handler signaled break
+			}
+			zlistx_delete(self->tickets, ticket->list_handle);
+			ticket = (s_ticket_t *)zlistx_next(self->tickets);
+		}
+
+		//  Handle any tickets that were flagged for deletion
+		ticket = (s_ticket_t *)zlistx_last(self->tickets);
+		while (ticket && ticket->deleted) {
+			zlistx_delete(self->tickets, ticket->list_handle);
+			ticket = (s_ticket_t *)zlistx_last(self->tickets);
+		}
+
+		//  Check if timers changed pollset
+		if (self->need_rebuild)
+			continue;
+
+		//  Handle any readers and pollers that are ready
+		size_t item_nbr;
+		for (item_nbr = 0; item_nbr < self->poll_size && rc >= 0; item_nbr++) {
+			s_reader_t *reader = &self->readact[item_nbr];
+			if (reader->handler) {
+				if ((self->pollset[item_nbr].revents & ZMQ_POLLERR)
+					&& !reader->tolerant) {
+					if (self->verbose)
+						zsys_warning("zloop: can't read %s socket: %s",
+							zsock_type_str(reader->sock),
+							zmq_strerror(zmq_errno()));
+					//  Give handler one chance to handle error, then kill
+					//  reader because it'll disrupt the reactor otherwise.
+					if (reader->errors++) {
+						zloop_reader_end(self, reader->sock);
+						self->pollset[item_nbr].revents = 0;
+					}
+				} else
+					reader->errors = 0;     //  A non-error happened
+
+				if (self->pollset[item_nbr].revents) {
+					if (self->verbose)
+						zsys_debug("zloop: call %s socket handler",
+							zsock_type_str(reader->sock));
+					rc = reader->handler(self, reader->sock, reader->arg);
+					if (rc == -1 || self->need_rebuild)
+						break;
+				}
+			} else {
+				s_poller_t *poller = &self->pollact[item_nbr];
+				assert(self->pollset[item_nbr].socket == poller->item.socket);
+
+				if ((self->pollset[item_nbr].revents & ZMQ_POLLERR)
+					&& !poller->tolerant) {
+					if (self->verbose)
+						zsys_warning("zloop: can't poll %s socket (%p, %d): %s",
+							poller->item.socket ?
+							zsys_sockname(zsock_type(poller->item.socket)) : "FD",
+							poller->item.socket, poller->item.fd,
+							zmq_strerror(zmq_errno()));
+					//  Give handler one chance to handle error, then kill
+					//  poller because it'll disrupt the reactor otherwise.
+					if (poller->errors++) {
+						zloop_poller_end(self, &poller->item);
+						self->pollset[item_nbr].revents = 0;
+					}
+				} else
+					poller->errors = 0;     //  A non-error happened
+
+				if (self->pollset[item_nbr].revents) {
+					if (self->verbose)
+						zsys_debug("zloop: call %s socket handler (%p, %d)",
+							poller->item.socket ?
+							zsys_sockname(zsock_type(poller->item.socket)) : "FD",
+							poller->item.socket, poller->item.fd);
+					rc = poller->handler(self, &self->pollset[item_nbr], poller->arg);
+					if (rc == -1 || self->need_rebuild)
+						break;
+				}
+			}
+		}
+		//  Now handle any timer zombies
+		//  This is going to be slow if we have many timers; we might use
+		//  a faster lookup on the timer list.
+		while (zlistx_first(self->zombies)) {
+			//  Get timer_id back from pointer
+			ptrdiff_t timer_id = (byte *)zlistx_detach(self->zombies, NULL) - (byte *)NULL;
+			s_timer_remove(self, (int)timer_id);
+		}
+		if (rc == -1)
+			break;
+	}
+	zmq_poll_noalloc_unprep(&events, &poller);
+	self->terminated = true;
+	return rc;
+}
+
 //  --------------------------------------------------------------------------
 //  Start the reactor. Takes control of the thread and returns when the 0MQ
 //  context is terminated or the process is interrupted, or any event handler
