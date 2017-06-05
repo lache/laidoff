@@ -857,7 +857,9 @@ void lwc_render(const LWCONTEXT *pLwc) {
 	} else if (pLwc->game_scene == LGS_DIALOG) {
 		lwc_render_dialog(pLwc);
 	} else if (pLwc->game_scene == LGS_FIELD) {
-		lwc_render_field(pLwc);
+		if (pLwc->field) {
+			lwc_render_field(pLwc);
+		}
 	} else if (pLwc->game_scene == LGS_FONT_TEST) {
 		lwc_render_font_test(pLwc);
 	} else if (pLwc->game_scene == LGS_ADMIN) {

@@ -47,6 +47,8 @@ typedef struct _LWFIELD {
 	dGeomID test_player_geom;
 	dReal player_radius;
 	dReal player_length;
+	dReal user_radius;
+	dReal user_length;
 
 	dReal ray_max_length;
 	dGeomID ray[LRI_COUNT];
@@ -213,12 +215,16 @@ LWFIELD* load_field(const char* filename) {
 	}
 	// Create ground infinite plane geom
 	field->ground = dCreatePlane(field->space_group[LSG_WORLD], 0, 0, 1, 0);
-	// Create player geom
+	// Set player geom constants
 	field->player_radius = (dReal)0.75;
 	field->player_length = (dReal)3.0;
 	field->player_pos[0] = 0;
 	field->player_pos[1] = 0;
 	field->player_pos[2] = 10;
+	// Set user geom constants
+	field->user_radius = field->player_radius * 2;
+	field->user_length = field->player_length;
+	// Create player geom
 	field->player_geom = dCreateCapsule(field->space_group[LSG_PLAYER], field->player_radius, field->player_length);
 	dGeomSetPosition(field->player_geom, field->player_pos[0], field->player_pos[1], field->player_pos[2]);
 	// Create test player geom
@@ -270,7 +276,7 @@ LWFIELD* load_field(const char* filename) {
 	// Create user(enemy) geom pool
 	// which are initially disabled and enabled before they are used.
 	for (int i = 0; i < MAX_USER_GEOM; i++) {
-		field->user[i] = dCreateCapsule(field->space_group[LSG_ENEMY], field->player_radius * 2, field->player_length);
+		field->user[i] = dCreateCapsule(field->space_group[LSG_ENEMY], field->user_radius, field->user_length);
 		dGeomDisable(field->user[i]);
 	}
 	// Seed a random number generator
@@ -594,11 +600,11 @@ static void s_deactivate_out_of_domain_sphere(LWFIELD* field, float delta_time) 
 void update_field(LWCONTEXT* pLwc, LWFIELD* field) {
 	// Check for invalid input
 	if (!pLwc) {
-		LOGE("update_field: context null");
+		//LOGE("%s: context null", __func__);
 		return;
 	}
 	if (!field) {
-		LOGE("update_field: field null");
+		//LOGE("%s: field null", __func__);
 		return;
 	}
 	// Get player position before integration (for calculating player velocity)
@@ -753,6 +759,9 @@ void update_field(LWCONTEXT* pLwc, LWFIELD* field) {
 }
 
 void unload_field(LWFIELD* field) {
+	if (!field) {
+		return;
+	}
 	if (field->nav) {
 		unload_nav(field->nav);
 	}
@@ -967,11 +976,13 @@ float field_test_player_flash(const LWFIELD* field) {
 }
 
 int field_network(const LWFIELD* field) {
-	return field->network;
+	return field ? field->network : 0;
 }
 
 void field_set_network(LWFIELD* field, int network_poll) {
-	field->network = network_poll;
+	if (field) {
+		field->network = network_poll;
+	}
 }
 
 void field_set_aim_sector_ray(LWFIELD* field, int enable) {

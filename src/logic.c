@@ -391,7 +391,7 @@ void lwc_update(LWCONTEXT *pLwc, double delta_time) {
 	pLwc->app_time += delta_time;
 	pLwc->scene_time += delta_time;
 
-	if (field_network(pLwc->field)) {
+	if (pLwc->field && field_network(pLwc->field)) {
 		mq_poll(pLwc, pLwc->def_sys_msg, pLwc->mq, pLwc->field);
 	}
 
@@ -444,6 +444,44 @@ void init_lwc_runtime_data(LWCONTEXT *pLwc) {
 	}
 }
 
+static int loop_logic_update(zloop_t* loop, int timer_id, void* args) {
+	LWCONTEXT* pLwc = args;
+	if (pLwc->quit_request) {
+		//zloop_timer_end(loop, timer_id);
+		// End the reactor
+		return -1;
+	}
+	lwc_update(pLwc, 0.008);
+	return 0;
+}
+
+static int loop_pipe_reader(zloop_t* loop, zsock_t* pipe, void* args) {
+	LWCONTEXT* pLwc = args;
+	zmsg_t* msg = zmsg_recv(pipe);
+	LOGI(LWLOGPOS "Message received through pipe");
+	zframe_t* f = zmsg_first(msg);
+	while (f) {
+		byte* d = zframe_data(f);
+		size_t s = zframe_size(f);
+		if (d && s == sizeof(LWMSGINITFIELD) && *(int*)d == LM_LWMSGINITFIELD) {
+			LWMSGINITFIELD* m = (LWMSGINITFIELD*)d;
+			init_field(pLwc,
+				m->field_filename,
+				m->nav_filename,
+				m->vbo,
+				m->tex_id,
+				m->tex_mip,
+				m->skin_scale,
+				m->follow_cam);
+
+			init_lwc_runtime_data(pLwc);
+		}
+		f = zmsg_next(msg);
+	}
+	zmsg_destroy(&msg);
+	return 0;
+}
+
 static void s_logic_worker(zsock_t *pipe, void *args) {
 	LWCONTEXT* pLwc = args;
 	// Send 'worker ready' signal to parent thread
@@ -453,56 +491,60 @@ static void s_logic_worker(zsock_t *pipe, void *args) {
 	double delta_time_accum = 0;
 	const double update_interval = 1 / 120.0;// 0.02; // seconds
 
-	while (!pLwc->quit_request) {
-		LWTIMEPOINT cur_time;
-		lwtimepoint_now(&cur_time);
-		const double delta_time = lwtimepoint_diff(&cur_time, &last_time);
-		delta_time_accum += delta_time;
-		// Flush out all over-delayed update delta
-		if (delta_time_accum > update_interval * 60) {
-			delta_time_accum = 0;
-		} else {
-			while (delta_time_accum > update_interval) {
-				lwc_update(pLwc, update_interval);
-				delta_time_accum -= update_interval;
-			}
-		}
-		last_time = cur_time;
-		if (delta_time_accum < update_interval) {
-			zclock_sleep((int)((update_interval - delta_time_accum) * 1000));
-		}
+	zloop_t* loop = zloop_new();
+	zloop_timer(loop, (size_t)(update_interval * 1000), 0, loop_logic_update, pLwc);
+	zloop_reader(loop, pipe, loop_pipe_reader, pLwc);
+	zloop_start(loop);
+	//while (!pLwc->quit_request) {
+	//	LWTIMEPOINT cur_time;
+	//	lwtimepoint_now(&cur_time);
+	//	const double delta_time = lwtimepoint_diff(&cur_time, &last_time);
+	//	delta_time_accum += delta_time;
+	//	// Flush out all over-delayed update delta
+	//	if (delta_time_accum > update_interval * 60) {
+	//		delta_time_accum = 0;
+	//	} else {
+	//		while (delta_time_accum > update_interval) {
+	//			lwc_update(pLwc, update_interval);
+	//			delta_time_accum -= update_interval;
+	//		}
+	//	}
+	//	last_time = cur_time;
+	//	if (delta_time_accum < update_interval) {
+	//		zclock_sleep((int)((update_interval - delta_time_accum) * 1000));
+	//	}
 
-		zmq_pollitem_t items[] = { { zsock_resolve(pipe), 0, ZMQ_POLLIN, 0 } };
-		int rc = zmq_poll(items, 1, 0);
-		if (rc == -1) {
-			break;
-		}
+	//	zmq_pollitem_t items[] = { { zsock_resolve(pipe), 0, ZMQ_POLLIN, 0 } };
+	//	int rc = zmq_poll(items, 1, 0);
+	//	if (rc == -1) {
+	//		break;
+	//	}
 
-		if (items[0].revents & ZMQ_POLLIN) {
-			zmsg_t* msg = zmsg_recv(pipe);
-			LOGI("Message received from %s", __func__);
-			zframe_t* f = zmsg_first(msg);
-			while (f) {
-				byte* d = zframe_data(f);
-				size_t s = zframe_size(f);
-				if (d && s == sizeof(LWMSGINITFIELD) && *(int*)d == LM_LWMSGINITFIELD) {
-					LWMSGINITFIELD* m = (LWMSGINITFIELD*)d;
-					init_field(pLwc,
-						m->field_filename,
-						m->nav_filename,
-						m->vbo,
-						m->tex_id,
-						m->tex_mip,
-						m->skin_scale,
-						m->follow_cam);
+	//	if (items[0].revents & ZMQ_POLLIN) {
+	//		zmsg_t* msg = zmsg_recv(pipe);
+	//		LOGI("Message received from %s", __func__);
+	//		zframe_t* f = zmsg_first(msg);
+	//		while (f) {
+	//			byte* d = zframe_data(f);
+	//			size_t s = zframe_size(f);
+	//			if (d && s == sizeof(LWMSGINITFIELD) && *(int*)d == LM_LWMSGINITFIELD) {
+	//				LWMSGINITFIELD* m = (LWMSGINITFIELD*)d;
+	//				init_field(pLwc,
+	//					m->field_filename,
+	//					m->nav_filename,
+	//					m->vbo,
+	//					m->tex_id,
+	//					m->tex_mip,
+	//					m->skin_scale,
+	//					m->follow_cam);
 
-					init_lwc_runtime_data(pLwc);
-				}
-				f = zmsg_next(msg);
-			}
-			zmsg_destroy(&msg);
-		}
-	}
+	//				init_lwc_runtime_data(pLwc);
+	//			}
+	//			f = zmsg_next(msg);
+	//		}
+	//		zmsg_destroy(&msg);
+	//	}
+	//}
 	// Send 'worker finished' signal to parent thread
 	zsock_signal(pipe, 0);
 }
