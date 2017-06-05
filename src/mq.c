@@ -401,7 +401,7 @@ static void s_mq_poll_ready(void* _pLwc, void* _mq, void* sm, void* field) {
 
 	if (zclock_time() >= mq->alarm) {
 		s_send_pos(pLwc, mq, 0);
-		mq->alarm = zclock_time() + 100;
+		mq->alarm = zclock_time() + 200;
 	}
 }
 
