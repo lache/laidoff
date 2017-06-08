@@ -223,6 +223,7 @@ void render_player_model(const LWCONTEXT* pLwc, mat4x4 perspective, mat4x4 view,
 }
 
 static void s_render_field_sphere(const LWCONTEXT* pLwc, struct _LWFIELD* const field, const mat4x4 proj, const mat4x4 view) {
+	// Render player-spawned field spheres
 	for (int i = 0; i < MAX_FIELD_SPHERE; i++) {
 		float pos[3];
 		if (field_sphere_pos(field, i, pos)) {
@@ -255,15 +256,41 @@ static void s_render_field_sphere(const LWCONTEXT* pLwc, struct _LWFIELD* const 
 				0,
 				rot
 			);
-
-			/*render_debug_sphere(pLwc,
-				pLwc->tex_programmed[LPT_SOLID_GREEN],
-				proj,
+		}
+	}
+	// Render remote-spawned field spheres
+	for (int i = 0; i < MAX_FIELD_REMOTE_SPHERE; i++) {
+		float pos[3];
+		if (field_remote_sphere_pos(field, i, pos)) {
+			const float s_x = 1.5f;
+			const float s_y = 4.0f;
+			const float s_z = 4.0f;
+			mat4x4 rot;
+			vec3 xaxis = { 1, 0, 0 };
+			vec3 vel, vel_norm;
+			field_remote_sphere_vel(field, i, vel);
+			if (vec3_len(vel)) {
+				vec3_norm(vel_norm, vel);
+				rotation_matrix_from_vectors(rot, xaxis, vel_norm);
+			} else {
+				mat4x4_identity(rot);
+			}
+			render_field_object_rot(
+				pLwc,
+				LVT_BEAM,
+				pLwc->tex_atlas[LAE_BEAM_KTX],
 				view,
+				proj,
 				pos[0],
 				pos[1],
 				pos[2],
-				field_sphere_radius(field, i));*/
+				s_x,
+				s_y,
+				s_z,
+				1,
+				0,
+				rot
+			);
 		}
 	}
 }
@@ -376,7 +403,7 @@ void lwc_render_field(const LWCONTEXT* pLwc) {
 		}
 	}
 
-	render_player_model(pLwc, perspective, view, player_x, player_y, player_z, pLwc->player_state_data.rot_z, pLwc->player_action, pLwc->player_state_data.skin_time, pLwc->player_action_loop, 0);
+	render_player_model(pLwc, perspective, view, player_x, player_y, player_z, pLwc->player_state_data.rot_z, pLwc->player_action, pLwc->player_state_data.skin_time, pLwc->player_action_loop, field_player_flash(pLwc->field));
 
 	mq_lock_mutex(pLwc->mq);
 	LWPOSSYNCMSG* value = mq_possync_first(pLwc->mq);

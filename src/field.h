@@ -6,6 +6,7 @@
 
 #define MAX_AIM_SECTOR_RAY (FAN_SECTOR_COUNT_PER_ARRAY + 1) // 1 for the end vertex
 #define MAX_FIELD_SPHERE (50)
+#define MAX_FIELD_REMOTE_SPHERE (50)
 #define MAX_USER_GEOM (16)
 
 typedef enum _LW_RAY_ID {
@@ -49,13 +50,19 @@ int field_sphere_vel(const LWFIELD* field, int i, float* vel);
 int field_spawn_user(LWFIELD* field, vec3 pos, void* owner);
 void field_despawn_user(LWFIELD* field, int idx);
 //void field_set_user_pos(LWFIELD* field, int idx, vec3 pos);
-void field_spawn_sphere(LWFIELD* field, vec3 pos, vec3 vel);
+void field_spawn_sphere(LWFIELD* field, vec3 pos, vec3 vel, int bullet_id);
 float field_sphere_radius(const LWFIELD* field, int i);
 unsigned int field_random_unsigned_int(LWFIELD* field, unsigned int bound);
 double field_random_double(LWFIELD* field);
 void get_field_player_geom_position(const LWFIELD* field, float* x, float* y, float* z);
 void rotation_matrix_from_vectors(mat4x4 m, const vec3 a, const vec3 b);
 float field_test_player_flash(const LWFIELD* field);
+float field_player_flash(const LWFIELD* field);
 int field_network(const LWFIELD* field);
 void field_set_network(LWFIELD* field, int enable_mq_poll);
 void field_set_aim_sector_ray(LWFIELD* field, int enable);
+void field_spawn_remote_sphere(LWFIELD* field, vec3 pos, vec3 vel, int bulelt_id, const char* owner_key);
+int field_remote_sphere_pos(const LWFIELD* field, int i, float* pos);
+int field_remote_sphere_vel(const LWFIELD* field, int i, float* vel);
+void field_hit_player(LWFIELD* field);
+void field_despawn_remote_sphere(LWFIELD* field, int bullet_id, const char* owner_key);

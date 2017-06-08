@@ -59,8 +59,14 @@ typedef struct _LWFIELD {
 
 	dGeomID sphere[MAX_FIELD_SPHERE];
 	vec3 sphere_vel[MAX_FIELD_SPHERE];
+	int sphere_bullet_id[MAX_FIELD_SPHERE];
 	dBodyID sphere_body[MAX_FIELD_SPHERE];
 	dGeomID user[MAX_USER_GEOM];
+	vec3 remote_sphere_pos[MAX_FIELD_REMOTE_SPHERE];
+	vec3 remote_sphere_vel[MAX_FIELD_REMOTE_SPHERE];
+	int remote_sphere_valid[MAX_FIELD_REMOTE_SPHERE];
+	int remote_sphere_bullet_id[MAX_FIELD_REMOTE_SPHERE];
+	char remote_sphere_owner_key[MAX_FIELD_REMOTE_SPHERE][LW_KVMSG_KEY_MAX];
 
 	dVector3 player_pos;
 	dVector3 player_pos_delta;
@@ -85,8 +91,10 @@ typedef struct _LWFIELD {
 	pcg32_random_t rng;
 
 	float test_player_flash;
+	float player_flash;
 
 	int network;
+	void* mq;
 } LWFIELD;
 
 static void s_rotation_matrix_from_vectors(dMatrix3 r, const dReal* vec_a, const dReal* vec_b);
@@ -364,12 +372,18 @@ static void field_world_bullet_near(void *data, dGeomID o1, dGeomID o2) {
 	dContact contact[1];
 	int n = dCollide(o1, o2, 1, &contact[0].geom, sizeof(dContact));
 	if (n > 0) {
-		/*LOGI("Bullet boom!!! at %f,%f,%f",
+		LOGI("Bullet at %f,%f,%f (wall)",
 			contact[0].geom.pos[0],
 			contact[0].geom.pos[1],
-			contact[0].geom.pos[2]);*/
+			contact[0].geom.pos[2]);
 		dGeomDisable(o2);
+		int idx = (int)dGeomGetData(o2);
+		mq_send_despawn_bullet(field->mq, field->sphere_bullet_id[idx]);
 	}
+}
+
+void field_send_hit(LWFIELD* field, LWPOSSYNCMSG* possyncmsg) {
+	mq_send_hit(field->mq, possyncmsg);
 }
 
 static void field_test_player_bullet_near(void *data, dGeomID o1, dGeomID o2) {
@@ -380,15 +394,21 @@ static void field_test_player_bullet_near(void *data, dGeomID o1, dGeomID o2) {
 	dContact contact[1];
 	int n = dCollide(o1, o2, 1, &contact[0].geom, sizeof(dContact));
 	if (n > 0) {
-		LOGI("Bullet HIT at %f,%f,%f",
-		contact[0].geom.pos[0],
-		contact[0].geom.pos[1],
-		contact[0].geom.pos[2]);
+		LOGI("Bullet HIT at %f,%f,%f (enemy)",
+			contact[0].geom.pos[0],
+			contact[0].geom.pos[1],
+			contact[0].geom.pos[2]);
 		dGeomDisable(o2);
 		void* geom_data = dGeomGetData(o1);
 		if (geom_data) {
+			// Player hit enemy
 			LWPOSSYNCMSG* possyncmsg = (LWPOSSYNCMSG*)geom_data;
 			possyncmsg->flash = 1.0f;
+			if (field->network) {
+				field_send_hit(field, possyncmsg);
+			}
+			int idx = (int)dGeomGetData(o2);
+			mq_send_despawn_bullet(field->mq, field->sphere_bullet_id[idx]);
 		} else {
 			field->test_player_flash = 1.0f;
 		}
@@ -586,13 +606,36 @@ static void s_deactivate_out_of_domain_sphere(LWFIELD* field, float delta_time) 
 				// Out-of-domain geom should be disabled.
 				LOGI("Field sphere[%d] out-of-bound. It will be disabled.", i);
 				dGeomDisable(field->sphere[i]);
-			} else {
-				/*dGeomSetPosition(
-					field->sphere[i],
-					pos[0] + delta_time * field->sphere_vel[i][0],
-					pos[1] + delta_time * field->sphere_vel[i][1],
-					pos[2] + delta_time * field->sphere_vel[i][2]);*/
 			}
+		}
+	}
+
+	for (int i = 0; i < MAX_FIELD_REMOTE_SPHERE; i++) {
+		if (field->remote_sphere_valid[i]) {
+			const float x = field->remote_sphere_pos[i][0];
+			const float y = field->remote_sphere_pos[i][1];
+			const float z = field->remote_sphere_pos[i][2];
+
+			const dReal domain_size = 100.0f;
+
+			if (x > domain_size || x < -domain_size
+				|| y > domain_size || y < -domain_size
+				|| z > domain_size || z < -domain_size) {
+				// Out-of-domain geom should be disabled.
+				LOGI("Field remote sphere[%d] out-of-bound. It will be disabled.", i);
+				field->remote_sphere_valid[i] = 0;
+			}
+		}
+	}
+}
+
+static void s_step_remote_sphere(LWFIELD* field, double delta_time) {
+	for (int i = 0; i < MAX_FIELD_REMOTE_SPHERE; i++) {
+		if (!field->remote_sphere_valid[i]) {
+			continue;
+		}
+		for (int j = 0; j < 3; j++) {
+			field->remote_sphere_pos[i][j] += (float)(delta_time * field->remote_sphere_vel[i][j]);
 		}
 	}
 }
@@ -636,10 +679,12 @@ void update_field(LWCONTEXT* pLwc, LWFIELD* field) {
 	collide_between_spaces(field, field->space_group[LSG_WORLD], field->space_group[LSG_BULLET], field_world_bullet_near);
 	// Resolve collision (test player-bullet collision)
 	collide_between_spaces(field, field->space_group[LSG_ENEMY], field->space_group[LSG_BULLET], field_test_player_bullet_near);
-	// Stepping the physics world (bullet movement update)
+	// Stepping the physics world (player-spawned bullet movement update)
 	if (lwcontext_delta_time(pLwc) > 0) {
 		dWorldStep(field->world, lwcontext_delta_time(pLwc));
 	}
+	// Remote-spawned movement update
+	s_step_remote_sphere(field, lwcontext_delta_time(pLwc));
 	// maybe-overlapped player geom's collision is resolved.
 	// Bring the player straight to the ground.
 	move_player_to_ground(field);
@@ -678,7 +723,7 @@ void update_field(LWCONTEXT* pLwc, LWFIELD* field) {
 	if (pLwc->field->path_query.n_smooth_path) {
 
 		pLwc->field->path_query_time += (float)lwcontext_delta_time(pLwc);
-		
+
 		const float idx_f = fmodf((float)(pLwc->field->path_query_time * move_speed), (float)pLwc->field->path_query.n_smooth_path);
 		const int idx = (int)idx_f;
 		const float* p1 = &pLwc->field->path_query.smooth_path[3 * idx];
@@ -756,6 +801,7 @@ void update_field(LWCONTEXT* pLwc, LWFIELD* field) {
 	s_deactivate_out_of_domain_sphere(field, (float)lwcontext_delta_time(pLwc));
 	// Hit flash reduction of test player
 	field->test_player_flash = LWMAX(0, field->test_player_flash - (float)lwcontext_delta_time(pLwc) * 4);
+	field->player_flash = LWMAX(0, field->player_flash - (float)lwcontext_delta_time(pLwc) * 4);
 }
 
 void unload_field(LWFIELD* field) {
@@ -878,6 +924,7 @@ void init_field(LWCONTEXT* pLwc, const char* field_filename, const char* nav_fil
 	pLwc->field->field_tex_mip = tex_mip;
 	pLwc->field->skin_scale = skin_scale;
 	pLwc->field->follow_cam = follow_cam;
+	pLwc->field->mq = pLwc->mq;
 
 	set_random_start_end_pos(pLwc->field->nav, &pLwc->field->path_query);
 	nav_query(pLwc->field->nav, &pLwc->field->path_query);
@@ -917,7 +964,21 @@ static void field_set_user_pos(LWFIELD* field, int idx, const vec3 pos) {
 	dGeomSetPosition(field->user[idx], pos[0], pos[1], pos[2]);
 }
 
-void field_spawn_sphere(LWFIELD* field, vec3 pos, vec3 vel) {
+void field_spawn_remote_sphere(LWFIELD* field, vec3 pos, vec3 vel, int bullet_id, const char* owner_key) {
+	for (int i = 0; i < MAX_FIELD_REMOTE_SPHERE; i++) {
+		if (field->remote_sphere_valid[i]) {
+			continue;
+		}
+		field->remote_sphere_valid[i] = 1;
+		memcpy(field->remote_sphere_pos[i], pos, sizeof(vec3));
+		memcpy(field->remote_sphere_vel[i], vel, sizeof(vec3));
+		field->remote_sphere_bullet_id[i] = bullet_id;
+		strcpy(field->remote_sphere_owner_key[i], owner_key);
+		break;
+	}
+}
+
+void field_spawn_sphere(LWFIELD* field, vec3 pos, vec3 vel, int bullet_id) {
 	for (int i = 0; i < MAX_FIELD_SPHERE; i++) {
 		if (dGeomIsEnabled(field->sphere[i])) {
 			continue;
@@ -927,6 +988,8 @@ void field_spawn_sphere(LWFIELD* field, vec3 pos, vec3 vel) {
 		dBodySetLinearVel(field->sphere_body[i], vel[0], vel[1], vel[2]);
 		dGeomSphereSetRadius(field->sphere[i], 0.1f);
 		dGeomEnable(field->sphere[i]);
+		dGeomSetData(field->sphere[i], (void*)i);
+		field->sphere_bullet_id[i] = bullet_id;
 		field->sphere_vel[i][0] = vel[0];
 		field->sphere_vel[i][1] = vel[1];
 		field->sphere_vel[i][2] = vel[2];
@@ -955,6 +1018,21 @@ int field_sphere_vel(const LWFIELD* field, int i, float* vel) {
 	return 1;
 }
 
+int field_remote_sphere_pos(const LWFIELD* field, int i, float* pos) {
+	if (!field->remote_sphere_valid[i]) {
+		return 0;
+	}
+	memcpy(pos, field->remote_sphere_pos + i, sizeof(vec3));
+	return 1;
+}
+
+int field_remote_sphere_vel(const LWFIELD* field, int i, float* vel) {
+	if (!field->remote_sphere_valid[i]) {
+		return 0;
+	}
+	memcpy(vel, field->remote_sphere_vel + i, sizeof(vec3));
+	return 1;
+}
 
 float field_sphere_radius(const LWFIELD* field, int i) {
 	if (!field->sphere[i] || !dGeomIsEnabled(field->sphere[i])) {
@@ -977,6 +1055,10 @@ float field_test_player_flash(const LWFIELD* field) {
 	return field->test_player_flash;
 }
 
+float field_player_flash(const LWFIELD* field) {
+	return field->player_flash;
+}
+
 int field_network(const LWFIELD* field) {
 	return field ? field->network : 0;
 }
@@ -990,5 +1072,21 @@ void field_set_network(LWFIELD* field, int network_poll) {
 void field_set_aim_sector_ray(LWFIELD* field, int enable) {
 	for (int i = LRI_AIM_SECTOR_FIRST_INCLUSIVE; i <= LRI_AIM_SECTOR_LAST_INCLUSIVE; i++) {
 		(enable ? dGeomEnable : dGeomDisable)(field->ray[i]);
+	}
+}
+
+void field_hit_player(LWFIELD* field) {
+	field->player_flash = 1.0f;
+}
+
+void field_despawn_remote_sphere(LWFIELD* field, int bullet_id, const char* owner_key) {
+	for (int i = 0; i < MAX_FIELD_REMOTE_SPHERE; i++) {
+		if (!field->remote_sphere_valid[i]) {
+			continue;
+		}
+		if (field->remote_sphere_bullet_id[i] == bullet_id && strcmp(field->remote_sphere_owner_key[i], owner_key) == 0) {
+			field->remote_sphere_valid[i] = 0;
+			break;
+		}
 	}
 }

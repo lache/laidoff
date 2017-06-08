@@ -49,6 +49,7 @@ typedef struct _LWMESSAGEQUEUE {
 	int deltasequence;
 	int64_t start_req_time_mono;
 	zsys_mutex_t mutex;
+	void* bullet_counter;
 } LWMESSAGEQUEUE;
 
 #define DELTA_REQ_COUNT (15)
@@ -81,6 +82,8 @@ void* init_mq(const char* addr, void* sm) {
 	mq->deltasequence = 0;
 	mq->delta = 0;
 	mq->deltasamples = (double*)malloc(sizeof(double) * DELTA_REQ_COUNT);
+
+	mq->bullet_counter = zmq_atomic_counter_new();
 
 	char sys_msg[128];
 	sprintf(sys_msg, LWU("Connecting %s"), addr);
@@ -141,6 +144,7 @@ s_kvmsg_store_posmap_noown(kvmsg_t** self_p, zhash_t* hash, double sync_time, LW
 			} else {
 				// Create a new extrapolator
 				possyncmsg = (LWPOSSYNCMSG*)calloc(1, sizeof(LWPOSSYNCMSG));
+				strcpy(possyncmsg->key, kvmsg_key(self));
 				possyncmsg->x = msg->x;
 				possyncmsg->y = msg->y;
 				possyncmsg->z = msg->z;
@@ -299,6 +303,10 @@ static void s_send_pos(const LWCONTEXT* pLwc, LWMESSAGEQUEUE* mq, int stop) {
 	}
 }
 
+int mq_bullet_counter(LWMESSAGEQUEUE* mq) {
+	return zmq_atomic_counter_inc(mq->bullet_counter);
+}
+
 void mq_send_fire(LWMESSAGEQUEUE* mq, const float* pos, const float* vel) {
 	kvmsg_t* kvmsg = kvmsg_new(0);
 	kvmsg_fmt_key(kvmsg, "%s%s/%s/tznt", mq->subtree, zuuid_str(mq->uuid), "fire");
@@ -307,6 +315,8 @@ void mq_send_fire(LWMESSAGEQUEUE* mq, const float* pos, const float* vel) {
 	msg.type = 0x01;
 	memcpy(msg.pos, pos, sizeof(msg.pos));
 	memcpy(msg.vel, vel, sizeof(msg.vel));
+	strcpy(msg.owner_key, zuuid_str(mq->uuid));
+	msg.bullet_id = mq_bullet_counter(mq);
 	kvmsg_set_body(kvmsg, (byte*)&msg, sizeof(msg));
 	kvmsg_send(kvmsg, zsock_resolve(mq->publisher));
 	kvmsg_destroy(&kvmsg);
@@ -339,6 +349,9 @@ static void s_mq_poll_ready(void* _pLwc, void* _mq, void* sm, void* field) {
 	void *poller;
 	zmq_poll_noalloc_prep(1, &events, &poller);
 	zmq_poller_prep(items, 1, poller);
+	const char* player_uuid = zuuid_str(mq->uuid);
+
+	const size_t subtree_len = strlen(SUBTREE);
 
 	// Process all queued messages at once
 	while (zmq_poll_noalloc(items, 1, 0, events, poller) > 0) {
@@ -353,22 +366,61 @@ static void s_mq_poll_ready(void* _pLwc, void* _mq, void* sm, void* field) {
 			const static char* TRANSIENT = "/tznt";
 			size_t transient_postfix_len = strlen(TRANSIENT);
 
+			size_t msg_size = kvmsg_size(kvmsg);
+			void* msg_unaligned = kvmsg_body(kvmsg);
+			char msg_aligned[2048];
+			if (msg_size > sizeof(msg_aligned)) {
+				LOGE(LWLOGPOS "msg_size exceeded (%d) maximum (%d)", msg_size, sizeof(msg_aligned));
+			}
+			// Should not use 'memcpy'. It is not supported on unaligned addresses.
+			for (size_t i = 0; i < msg_size; i++) {
+				msg_aligned[i] = ((char*)msg_unaligned)[i];
+			}
+
 			if (streq(kvmsg_key(kvmsg), SUBTREE "announce")) {
-				show_sys_msg(sm, (char*)kvmsg_body(kvmsg)); // kvmsg body is assumed to be a null terminated string.
+				show_sys_msg(sm, (char*)msg_aligned); // kvmsg body is assumed to be a null terminated string.
 				kvmsg_destroy(&kvmsg);
 			} else if (key_len > transient_postfix_len && streq(kvmsg_key(kvmsg) + (key_len - transient_postfix_len), TRANSIENT)) {
 				int type = *(int*)kvmsg_body(kvmsg);
 				switch (type) {
-				case 1:
+				case 0x01:
 				{
-					LWFIREMSG* msg = (LWFIREMSG*)kvmsg_body(kvmsg);
-					field_spawn_sphere(field, msg->pos, msg->vel);
+					LWFIREMSG* msg = (LWFIREMSG*)msg_aligned;
+					if (strcmp(msg->owner_key, player_uuid) == 0) {
+						// My(player) bullet
+						field_spawn_sphere(field, msg->pos, msg->vel, msg->bullet_id);
+					} else {
+						// Enemy bullet
+						field_spawn_remote_sphere(field, msg->pos, msg->vel, msg->bullet_id, msg->owner_key);
+					}
 					break;
 				}
-				case 2:
+				case 0x02:
 				{
-					LWACTIONMSG* msg = (LWACTIONMSG*)kvmsg_body(kvmsg);
+					LWACTIONMSG* msg = (LWACTIONMSG*)msg_aligned;
 					// TODO Update action field only
+					break;
+				}
+				case 0x03:
+				{
+					LWHITMSG* msg = (LWHITMSG*)msg_aligned;
+					
+					if (strcmp(msg->target_key + subtree_len, player_uuid) == 0) {
+						// Enemy bullet hitting me
+						field_hit_player(field);
+					} else {
+						// Enemy bullet hitting other enemy
+						LWPOSSYNCMSG* possyncmsg = zhash_lookup(mq->posmap, msg->target_key);
+						if (possyncmsg) {
+							possyncmsg->flash = 1.0f;
+						}
+					}
+					break;
+				}
+				case 0x04:
+				{
+					LWDESPAWNBULLETMSG* msg = (LWDESPAWNBULLETMSG*)msg_aligned;
+					field_despawn_remote_sphere(field, msg->bullet_id, msg->owner_key);
 					break;
 				}
 				default:
@@ -486,6 +538,7 @@ void deinit_mq(void* _mq) {
 	zsock_destroy(&mq->subscriber);
 	zuuid_destroy(&mq->uuid);
 	ZMUTEX_DESTROY(mq->mutex);
+	zmq_atomic_counter_destroy(&mq->bullet_counter);
 	mq->state = LMQS_TERM;
 	free(mq);
 }
@@ -527,4 +580,37 @@ void mq_lock_mutex(void* _mq) {
 void mq_unlock_mutex(void* _mq) {
 	LWMESSAGEQUEUE* mq = (LWMESSAGEQUEUE*)_mq;
 	ZMUTEX_UNLOCK(mq->mutex);
+}
+
+void mq_send_hit(void* _mq, LWPOSSYNCMSG* possyncmsg) {
+	LWMESSAGEQUEUE* mq = (LWMESSAGEQUEUE*)_mq;
+	kvmsg_t* kvmsg = kvmsg_new(0);
+	kvmsg_fmt_key(kvmsg, "%s%s/%s/tznt", mq->subtree, zuuid_str(mq->uuid), "hit");
+	LWHITMSG msg;
+	memset(&msg, 0, sizeof(LWHITMSG));
+	msg.type = 0x03;
+	strcpy(msg.target_key, possyncmsg->key);
+	kvmsg_set_body(kvmsg, (byte*)&msg, sizeof(msg));
+	kvmsg_send(kvmsg, zsock_resolve(mq->publisher));
+	kvmsg_destroy(&kvmsg);
+	if (mq->verbose) {
+		LOGI(__func__);
+	}
+}
+
+void mq_send_despawn_bullet(void* _mq, int bullet_id) {
+	LWMESSAGEQUEUE* mq = (LWMESSAGEQUEUE*)_mq;
+	kvmsg_t* kvmsg = kvmsg_new(0);
+	kvmsg_fmt_key(kvmsg, "%s%s/%s/tznt", mq->subtree, zuuid_str(mq->uuid), "despawnbullet");
+	LWDESPAWNBULLETMSG msg;
+	memset(&msg, 0, sizeof(LWDESPAWNBULLETMSG));
+	msg.type = 0x04;
+	msg.bullet_id = bullet_id;
+	strcpy(msg.owner_key, zuuid_str(mq->uuid));
+	kvmsg_set_body(kvmsg, (byte*)&msg, sizeof(msg));
+	kvmsg_send(kvmsg, zsock_resolve(mq->publisher));
+	kvmsg_destroy(&kvmsg);
+	if (mq->verbose) {
+		LOGI(__func__);
+	}
 }

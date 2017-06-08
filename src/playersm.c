@@ -225,6 +225,6 @@ static void s_fire_bullet(LWPLAYERSTATEDATA* data) {
 	if (field_network(data->field)) {
 		mq_send_fire(data->mq, pos, vel);
 	} else {
-		field_spawn_sphere(data->field, pos, vel);
+		field_spawn_sphere(data->field, pos, vel, mq_bullet_counter(data->mq));
 	}
 }
