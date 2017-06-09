@@ -12,8 +12,8 @@ varying vec3 vShade;
 
 void main()
 {
-	float x = uTime * cos(uK*aTheta) * sin(aTheta);
-	float y = uTime * cos(uK*aTheta) * cos(aTheta);
+	float x = uTime * 1;//cos(uK*aTheta) * sin(aTheta);
+	float y = uTime * 1;//cos(uK*aTheta) * cos(aTheta);
 	
 	gl_Position = uProjectionMatrix * vec4(x, y, 0.0, 1.0);
 	gl_PointSize = 16.0;
