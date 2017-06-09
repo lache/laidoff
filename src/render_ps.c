@@ -4,6 +4,7 @@
 #include "ps.h"
 #include "laidoff.h"
 #include "platform_detection.h"
+#include "lwmacro.h"
 extern LWEMITTER emitter;
 
 void lwc_render_ps(const LWCONTEXT* pLwc) {
@@ -18,7 +19,7 @@ void lwc_render_ps(const LWCONTEXT* pLwc) {
 	glUniformMatrix4fv(pLwc->shader[shader_index].projection_matrix_location, 1, 0, (const GLfloat*)identity);
 	glUniform1f(pLwc->shader[shader_index].k_location, emitter.k);
 	glEnableVertexAttribArray(pLwc->shader[shader_index].theta_location);
-	glVertexAttribPointer(pLwc->shader[shader_index].theta_location, 1, GL_FLOAT, GL_FALSE, sizeof(LWPARTICLE), (void*)offsetof(LWPARTICLE, theta));
+	glVertexAttribPointer(pLwc->shader[shader_index].theta_location, 1, GL_FLOAT, GL_FALSE, sizeof(LWPARTICLE), (void*)LWOFFSETOF(LWPARTICLE, theta));
 #if LW_PLATFORM_WIN32
 	//glEnable(GL_POINT_SPRITE);
 	glEnable(GL_VERTEX_PROGRAM_POINT_SIZE);

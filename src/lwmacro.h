@@ -75,3 +75,5 @@
 #define LW_STRINGIFY(x) LW_STRINGIFY_(x)
 #define __LW_STRING_LINE__ LW_STRINGIFY(__LINE__)
 #define LWLOGPOS __FILE__ "(" __LW_STRING_LINE__ "): "
+
+#define LWOFFSETOF(s,m) ((size_t)&(((s*)0)->m))
