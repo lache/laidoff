@@ -13,6 +13,7 @@
 #include "battle_result.h"
 #include "font.h"
 #include "file.h"
+#include "ps.h"
 
 void toggle_font_texture_test_mode(LWCONTEXT* pLwc);
 
@@ -430,6 +431,10 @@ void lwc_update(LWCONTEXT *pLwc, double delta_time) {
 
 	if (pLwc->game_scene == LGS_FIELD) {
 		update_field(pLwc, pLwc->field);
+	}
+
+	if (pLwc->game_scene == LGS_PARTICLE_SYSTEM) {
+		ps_update(pLwc);
 	}
 
 	((LWCONTEXT *)pLwc)->update_count++;

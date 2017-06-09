@@ -1,8 +1,17 @@
 #version 100
-precision mediump float;
+precision highp float;
+// Uniforms
+uniform vec3 uColor;
+uniform sampler2D uTexture;
+// Inputs from vertex shader
+varying vec3 vShade;
+// Outputs
 //out vec4 fragColor;
 
 void main()
 {
-	gl_FragColor = vec4(1.0, 0.0, 0.0, 1.0);
+	vec4 texture = texture2D(uTexture, gl_PointCoord);
+	vec4 color = vec4(uColor + vShade, 1.0);
+	color.rgb = clamp(color.rgb, vec3(0.0), vec3(1.0));
+	gl_FragColor = texture * color;
 }

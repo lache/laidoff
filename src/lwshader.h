@@ -18,6 +18,7 @@ typedef struct _LWSHADER
 	GLint vbweight_location;
 	GLint vbmat_location;
 	GLint theta_location;
+	GLint shade_location;
 
 	// Uniforms
 	GLint mvp_location;
@@ -36,5 +37,8 @@ typedef struct _LWSHADER
 	GLint thetascale_location;
 	GLint projection_matrix_location;
 	GLint k_location;
+	GLint color_location;
+	GLint time_location;
+	GLint texture_location;
 
 } LWSHADER;

@@ -291,6 +291,9 @@ create_shader(const char *shader_name, LWSHADER *pShader, const GLchar *vst, con
 	pShader->thetascale_location = glGetUniformLocation(pShader->program, "thetascale");
 	pShader->projection_matrix_location = glGetUniformLocation(pShader->program, "uProjectionMatrix");
 	pShader->k_location = glGetUniformLocation(pShader->program, "uK");
+	pShader->color_location = glGetUniformLocation(pShader->program, "uColor");
+	pShader->time_location = glGetUniformLocation(pShader->program, "uTime");
+	pShader->texture_location = glGetUniformLocation(pShader->program, "uTexture");
 
 	// Attribs
 	pShader->vpos_location = glGetAttribLocation(pShader->program, "vPos");
@@ -300,6 +303,7 @@ create_shader(const char *shader_name, LWSHADER *pShader, const GLchar *vst, con
 	pShader->vbweight_location = glGetAttribLocation(pShader->program, "vBw");
 	pShader->vbmat_location = glGetAttribLocation(pShader->program, "vBm");
 	pShader->theta_location = glGetAttribLocation(pShader->program, "aTheta");
+	pShader->shade_location = glGetAttribLocation(pShader->program, "aShade");
 
 	pShader->valid = 1;
 }
