@@ -464,7 +464,7 @@ static int loop_logic_update(zloop_t* loop, int timer_id, void* args) {
 		// End the reactor
 		return -1;
 	}
-	lwc_update(pLwc, 0.008);
+	lwc_update(pLwc, pLwc->update_interval);
 	return 0;
 }
 
@@ -502,10 +502,10 @@ static void s_logic_worker(zsock_t *pipe, void *args) {
 	LWTIMEPOINT last_time;
 	lwtimepoint_now(&last_time);
 	double delta_time_accum = 0;
-	const double update_interval = 1 / 120.0;// 0.02; // seconds
+	pLwc->update_interval = 1 / 125.0;// 1 / 120.0;// 0.02; // seconds
 
 	zloop_t* loop = zloop_new();
-	zloop_timer(loop, (size_t)(update_interval * 1000), 0, loop_logic_update, pLwc);
+	zloop_timer(loop, (size_t)(pLwc->update_interval * 1000), 0, loop_logic_update, pLwc);
 	zloop_reader(loop, pipe, loop_pipe_reader, pLwc);
 	// Start the reactor loop
 	zloop_start_noalloc(loop);

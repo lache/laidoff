@@ -9,7 +9,7 @@
 extern LWEMITTER emitter;
 extern float time_current;
 extern float time_max;
-
+static int first;
 void lwc_render_ps(const LWCONTEXT* pLwc) {
 	glViewport(0, 0, pLwc->width, pLwc->height);
 	lw_clear_color();
@@ -17,8 +17,9 @@ void lwc_render_ps(const LWCONTEXT* pLwc) {
 	int shader_index = LWST_EMITTER;
 	glUseProgram(pLwc->shader[shader_index].program);
 	glBindBuffer(GL_ARRAY_BUFFER, pLwc->particle_buffer);
-	//glEnable(GL_BLEND);
-	//glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
 	mat4x4 identity;
 	mat4x4_identity(identity);
 	glUniformMatrix4fv(pLwc->shader[shader_index].projection_matrix_location, 1, 0, (const GLfloat*)identity);

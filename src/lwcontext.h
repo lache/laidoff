@@ -231,6 +231,7 @@ typedef struct _LWCONTEXT {
 	void* logic_actor;
 
 	GLuint particle_buffer;
+	double update_interval;
 } LWCONTEXT;
 
 #ifdef __cplusplus
