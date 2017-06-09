@@ -4,7 +4,7 @@ precision mediump float;
 uniform mat4 uProjectionMatrix;
 uniform float uK;
 // Attributes
-varying float aTheta;
+attribute float aTheta;
 
 void main()
 {
