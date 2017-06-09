@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		263F9BF41EEAEFEA00991437 /* ps.c in Sources */ = {isa = PBXBuildFile; fileRef = 263F9BF01EEAEFEA00991437 /* ps.c */; };
+		263F9BF51EEAEFEA00991437 /* render_ps.c in Sources */ = {isa = PBXBuildFile; fileRef = 263F9BF21EEAEFEA00991437 /* render_ps.c */; };
 		264553421EE4815A004064D0 /* logic.c in Sources */ = {isa = PBXBuildFile; fileRef = 264553401EE4815A004064D0 /* logic.c */; };
 		562DAF601ED1920300208E62 /* playersm.c in Sources */ = {isa = PBXBuildFile; fileRef = 562DAF5E1ED1920300208E62 /* playersm.c */; };
 		5633AC321EADDF98003F1549 /* net.c in Sources */ = {isa = PBXBuildFile; fileRef = 5633AC311EADDF98003F1549 /* net.c */; };
@@ -357,6 +359,10 @@
 
 /* Begin PBXFileReference section */
 		2601AFFC1EE1549700989AA6 /* platform.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = platform.h; path = ../build/include/platform.h; sourceTree = "<group>"; };
+		263F9BF01EEAEFEA00991437 /* ps.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = ps.c; sourceTree = "<group>"; };
+		263F9BF11EEAEFEA00991437 /* ps.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ps.h; sourceTree = "<group>"; };
+		263F9BF21EEAEFEA00991437 /* render_ps.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = render_ps.c; sourceTree = "<group>"; };
+		263F9BF31EEAEFEA00991437 /* render_ps.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = render_ps.h; sourceTree = "<group>"; };
 		264553401EE4815A004064D0 /* logic.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = logic.c; sourceTree = "<group>"; };
 		264553411EE4815A004064D0 /* logic.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = logic.h; sourceTree = "<group>"; };
 		562DAF5E1ED1920300208E62 /* playersm.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = playersm.c; sourceTree = "<group>"; };
@@ -1921,6 +1927,10 @@
 		6CA16CF41EA20CA700DB7AF0 /* src */ = {
 			isa = PBXGroup;
 			children = (
+				263F9BF01EEAEFEA00991437 /* ps.c */,
+				263F9BF11EEAEFEA00991437 /* ps.h */,
+				263F9BF21EEAEFEA00991437 /* render_ps.c */,
+				263F9BF31EEAEFEA00991437 /* render_ps.h */,
 				264553401EE4815A004064D0 /* logic.c */,
 				264553411EE4815A004064D0 /* logic.h */,
 				565676A51EAFB4F800FF64B3 /* armature.c */,
@@ -2331,6 +2341,7 @@
 				5663735C1EBA52D4001DA3F4 /* pr.cpp in Sources */,
 				5663736D1EBA52D4001DA3F4 /* odemath.cpp in Sources */,
 				566373321EBA52D3001DA3F4 /* collision_cylinder_sphere.cpp in Sources */,
+				263F9BF41EEAEFEA00991437 /* ps.c in Sources */,
 				6CA16D8F1EA210BB00DB7AF0 /* llex.c in Sources */,
 				566373631EBA52D4001DA3F4 /* mass.cpp in Sources */,
 				56F189021EC74DB60019312F /* v2_decoder.cpp in Sources */,
@@ -2422,6 +2433,7 @@
 				6CA16D961EA210BB00DB7AF0 /* lparser.c in Sources */,
 				566373801EBA52D4001DA3F4 /* threadlocalstorage.cpp in Sources */,
 				56F188E51EC74DB60019312F /* req.cpp in Sources */,
+				263F9BF51EEAEFEA00991437 /* render_ps.c in Sources */,
 				56F189B61EC751950019312F /* zsock_option.inc in Sources */,
 				56F189051EC74DB60019312F /* vmci.cpp in Sources */,
 				56ED77B91EBB9C1C00FABA64 /* DetourNavMesh.cpp in Sources */,
