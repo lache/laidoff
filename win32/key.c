@@ -143,6 +143,10 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
 		change_to_physics(pLwc);
 	}
 
+	if (key == GLFW_KEY_F9 && action == GLFW_PRESS) {
+		change_to_particle_system(pLwc);
+	}
+
 	if (key == GLFW_KEY_F11 && action == GLFW_PRESS) {
 		toggle_font_texture_test_mode(pLwc);
 	}

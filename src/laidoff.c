@@ -33,6 +33,8 @@
 #include "render_text_block.h"
 #include <czmq.h>
 #include "logic.h"
+#include "ps.h"
+#include "render_ps.h"
 
 #define INCREASE_RENDER_SCORE (20)
 #define RENDER_SCORE_INITIAL (-5)
@@ -287,6 +289,8 @@ create_shader(const char *shader_name, LWSHADER *pShader, const GLchar *vst, con
 	pShader->bone_location = glGetUniformLocation(pShader->program, "bone");
 	pShader->rscale_location = glGetUniformLocation(pShader->program, "rscale");
 	pShader->thetascale_location = glGetUniformLocation(pShader->program, "thetascale");
+	pShader->projection_matrix_location = glGetUniformLocation(pShader->program, "uProjectionMatrix");
+	pShader->k_location = glGetUniformLocation(pShader->program, "uK");
 
 	// Attribs
 	pShader->vpos_location = glGetAttribLocation(pShader->program, "vPos");
@@ -295,6 +299,7 @@ create_shader(const char *shader_name, LWSHADER *pShader, const GLchar *vst, con
 	pShader->vs9_location = glGetAttribLocation(pShader->program, "vS9");
 	pShader->vbweight_location = glGetAttribLocation(pShader->program, "vBw");
 	pShader->vbmat_location = glGetAttribLocation(pShader->program, "vBm");
+	pShader->theta_location = glGetAttribLocation(pShader->program, "aTheta");
 
 	pShader->valid = 1;
 }
@@ -314,6 +319,8 @@ void init_gl_shaders(LWCONTEXT *pLwc) {
 		GLSL_DIR_NAME PATH_SEPARATOR "skin-vert.glsl");
 	char *fan_vert_glsl = create_string_from_file(ASSETS_BASE_PATH
 		GLSL_DIR_NAME PATH_SEPARATOR "fan-vert.glsl");
+	char *emitter_vert_glsl = create_string_from_file(ASSETS_BASE_PATH
+		GLSL_DIR_NAME PATH_SEPARATOR "emitter-vert.glsl");
 
 	// Fragment Shader
 	char *default_frag_glsl = create_string_from_file(ASSETS_BASE_PATH
@@ -324,6 +331,8 @@ void init_gl_shaders(LWCONTEXT *pLwc) {
 		GLSL_DIR_NAME PATH_SEPARATOR "etc1-frag.glsl");
 	char *fan_frag_glsl = create_string_from_file(ASSETS_BASE_PATH
 		GLSL_DIR_NAME PATH_SEPARATOR "fan-frag.glsl");
+	char *emitter_frag_glsl = create_string_from_file(ASSETS_BASE_PATH
+		GLSL_DIR_NAME PATH_SEPARATOR "emitter-frag.glsl");
 
 	if (!default_vert_glsl) {
 		LOGE("init_gl_shaders: default-vert.glsl not loaded. Abort...");
@@ -337,6 +346,11 @@ void init_gl_shaders(LWCONTEXT *pLwc) {
 
 	if (!fan_vert_glsl) {
 		LOGE("init_gl_shaders: fan-vert.glsl not loaded. Abort...");
+		return;
+	}
+
+	if (!emitter_vert_glsl) {
+		LOGE("init_gl_shaders: emitter-vert.glsl not loaded. Abort...");
 		return;
 	}
 
@@ -360,19 +374,27 @@ void init_gl_shaders(LWCONTEXT *pLwc) {
 		return;
 	}
 
+	if (!emitter_frag_glsl) {
+		LOGE("init_gl_shaders: emitter-frag.glsl not loaded. Abort...");
+		return;
+	}
+
 	create_shader("Default Shader", &pLwc->shader[LWST_DEFAULT], default_vert_glsl, default_frag_glsl);
 	create_shader("Font Shader", &pLwc->shader[LWST_FONT], default_vert_glsl, font_frag_glsl);
 	create_shader("ETC1 with Alpha Shader", &pLwc->shader[LWST_ETC1], default_vert_glsl, etc1_frag_glsl);
 	create_shader("Skin Shader", &pLwc->shader[LWST_SKIN], skin_vert_glsl, default_frag_glsl);
 	create_shader("Fan Shader", &pLwc->shader[LWST_FAN], fan_vert_glsl, fan_frag_glsl);
+	create_shader("Emitter Shader", &pLwc->shader[LWST_EMITTER], emitter_vert_glsl, emitter_frag_glsl);
 
 	release_string(default_vert_glsl);
 	release_string(skin_vert_glsl);
 	release_string(fan_vert_glsl);
+	release_string(emitter_vert_glsl);
 	release_string(default_frag_glsl);
 	release_string(font_frag_glsl);
 	release_string(etc1_frag_glsl);
 	release_string(fan_frag_glsl);
+	release_string(emitter_frag_glsl);
 }
 
 static void load_vbo(LWCONTEXT *pLwc, const char *filename, LWVBO *pVbo) {
@@ -870,6 +892,8 @@ void lwc_render(const LWCONTEXT *pLwc) {
 		lwc_render_skin(pLwc);
 	} else if (pLwc->game_scene == LGS_PHYSICS) {
 		lwc_render_physics(pLwc);
+	} else if (pLwc->game_scene == LGS_PARTICLE_SYSTEM) {
+		lwc_render_ps(pLwc);
 	}
 
 	render_sys_msg(pLwc, pLwc->def_sys_msg);
@@ -1100,6 +1124,11 @@ void init_action(LWCONTEXT* pLwc) {
 	}
 }
 
+void init_ps(LWCONTEXT* pLwc) {
+	ps_load_particles(pLwc);
+	ps_load_emitter(pLwc);
+}
+
 LWCONTEXT *lw_init(void) {
 
 	init_ext_image_lib();
@@ -1135,6 +1164,8 @@ LWCONTEXT *lw_init(void) {
 	init_armature(pLwc);
 
 	init_action(pLwc);
+
+	init_ps(pLwc);
 
 	return pLwc;
 }

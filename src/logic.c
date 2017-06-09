@@ -55,6 +55,10 @@ void change_to_physics(LWCONTEXT *pLwc) {
 	pLwc->next_game_scene = LGS_PHYSICS;
 }
 
+void change_to_particle_system(LWCONTEXT *pLwc) {
+	pLwc->next_game_scene = LGS_PARTICLE_SYSTEM;
+}
+
 typedef enum _LW_MSG {
 	LM_ZERO,
 	LM_LWMSGINITFIELD,
@@ -332,18 +336,22 @@ void reset_runtime_context(LWCONTEXT* pLwc) {
 	pLwc->admin_button_command[6].command_handler = net_rtt_test;
 	pLwc->admin_button_command[7].name = LWU("신:스킨");
 	pLwc->admin_button_command[7].command_handler = change_to_skin;
-	pLwc->admin_button_command[8].name = LWU("신:필드1로드");
-	pLwc->admin_button_command[8].command_handler = load_field_1_init_runtime_data;
-	pLwc->admin_button_command[9].name = LWU("신:필드2로드");
-	pLwc->admin_button_command[9].command_handler = load_field_2_init_runtime_data;
-	pLwc->admin_button_command[10].name = LWU("Server #0");
-	pLwc->admin_button_command[10].command_handler = connect_to_server_0;
-	pLwc->admin_button_command[11].name = LWU("Server #1");
-	pLwc->admin_button_command[11].command_handler = connect_to_server_1;
-	pLwc->admin_button_command[12].name = LWU("레이테스트토글");
-	pLwc->admin_button_command[12].command_handler = toggle_ray_test;
-	pLwc->admin_button_command[13].name = LWU("네트워크토글");
-	pLwc->admin_button_command[13].command_handler = toggle_network_poll;
+	pLwc->admin_button_command[8].name = LWU("신:물리");
+	pLwc->admin_button_command[8].command_handler = change_to_physics;
+	pLwc->admin_button_command[9].name = LWU("신:파티클");
+	pLwc->admin_button_command[9].command_handler = change_to_particle_system;
+	pLwc->admin_button_command[10].name = LWU("신:필드1로드");
+	pLwc->admin_button_command[10].command_handler = load_field_1_init_runtime_data;
+	pLwc->admin_button_command[11].name = LWU("신:필드2로드");
+	pLwc->admin_button_command[11].command_handler = load_field_2_init_runtime_data;
+	pLwc->admin_button_command[12].name = LWU("Server #0");
+	pLwc->admin_button_command[12].command_handler = connect_to_server_0;
+	pLwc->admin_button_command[13].name = LWU("Server #1");
+	pLwc->admin_button_command[13].command_handler = connect_to_server_1;
+	pLwc->admin_button_command[14].name = LWU("레이테스트토글");
+	pLwc->admin_button_command[14].command_handler = toggle_ray_test;
+	pLwc->admin_button_command[15].name = LWU("네트워크토글");
+	pLwc->admin_button_command[15].command_handler = toggle_network_poll;
 }
 
 static void update_battle_wall(LWCONTEXT* pLwc) {

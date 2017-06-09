@@ -30,6 +30,7 @@ typedef enum _LW_SHADER_TYPE {
 	LWST_ETC1,
 	LWST_SKIN,
 	LWST_FAN,
+	LWST_EMITTER,
 
 	LWST_COUNT,
 } LW_SHADER_TYPE;
@@ -228,6 +229,8 @@ typedef struct _LWCONTEXT {
 
 	int quit_request;
 	void* logic_actor;
+
+	GLuint particle_buffer;
 } LWCONTEXT;
 
 #ifdef __cplusplus
