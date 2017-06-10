@@ -3,6 +3,7 @@
 #include "lwcontext.h"
 #include "lwgl.h"
 #include "pcg_basic.h"
+#include <stdlib.h>
 
 #define NUM_PS_INSTANCE (16)
 

@@ -63,7 +63,7 @@ void ps_render_explosion(const LWCONTEXT* pLwc, const LWEMITTER2OBJECT* emit_obj
 	glUniform1i(pLwc->shader[shader_index].u_TextureAlpha, 1);
 	set_tex_filter(GL_LINEAR, GL_LINEAR);
 
-	//glBindBuffer(GL_ARRAY_BUFFER, pLwc->particle_buffer2);
+	glBindBuffer(GL_ARRAY_BUFFER, pLwc->particle_buffer2);
 
 	// Attributes
 	/*glEnableVertexAttribArray(pLwc->shader[shader_index].a_pID);
@@ -84,6 +84,7 @@ void ps_render_explosion(const LWCONTEXT* pLwc, const LWEMITTER2OBJECT* emit_obj
 
 	// Draw particles
 	glDrawArrays(GL_POINTS, 0, NUM_PARTICLES2);
+    
 	/*glDisableVertexAttribArray(pLwc->shader[shader_index].a_pID);
 	glDisableVertexAttribArray(pLwc->shader[shader_index].a_pRadiusOffset);
 	glDisableVertexAttribArray(pLwc->shader[shader_index].a_pVelocityOffset);
