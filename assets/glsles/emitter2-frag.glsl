@@ -3,7 +3,7 @@
 #define fragColor gl_FragColor
 #define FRAG_COLOR_OUTPUT_DECL
 #else
-#define FRAG_COLOR_OUTPUT_DECL out vec4 fragColor
+#define FRAG_COLOR_OUTPUT_DECL out vec4 fragColor;
 #define varying in
 #endif
 
@@ -14,7 +14,7 @@ varying highp vec3      v_pColorOffset;
 uniform highp float     u_Time;
 uniform highp vec3      u_eColor;
 // Outputs
-FRAG_COLOR_OUTPUT_DECL;
+FRAG_COLOR_OUTPUT_DECL
 
 void main()
 {
