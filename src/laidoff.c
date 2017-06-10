@@ -1076,7 +1076,6 @@ void init_action(LWCONTEXT* pLwc) {
 void init_ps(LWCONTEXT* pLwc) {
 	ps_load_emitter(pLwc);
 	ps_load_particles(pLwc);
-	
 }
 
 LWCONTEXT *lw_init(void) {
@@ -1116,6 +1115,8 @@ LWCONTEXT *lw_init(void) {
 	init_action(pLwc);
 
 	init_ps(pLwc);
+
+	pLwc->ps = ps_new();
 
 	return pLwc;
 }
@@ -1224,6 +1225,8 @@ void lw_deinit(LWCONTEXT *pLwc) {
 	deinit_sys_msg(pLwc->def_sys_msg);
 
 	deltatime_destroy(&pLwc->update_dt);
+
+	ps_destroy((LWPS**)&pLwc->ps);
 
 	free(pLwc);
 }
