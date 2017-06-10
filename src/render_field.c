@@ -104,14 +104,14 @@ static void render_ui(const LWCONTEXT* pLwc) {
 	mat4x4 proj_view_model;
 	mat4x4_identity(proj_view_model);
 	mat4x4_mul(proj_view_model, pLwc->proj, view_model);
-
 	glUseProgram(pLwc->shader[shader_index].program);
-	bind_all_vertex_attrib(pLwc, vbo_index);
-	glBindBuffer(GL_ARRAY_BUFFER, pLwc->vertex_buffer[vbo_index].vertex_buffer);
+    glBindBuffer(GL_ARRAY_BUFFER, pLwc->vertex_buffer[vbo_index].vertex_buffer);
+    bind_all_vertex_attrib(pLwc, vbo_index);
 	glUniformMatrix4fv(pLwc->shader[shader_index].mvp_location, 1, GL_FALSE, (const GLfloat*)proj_view_model);
 	glActiveTexture(GL_TEXTURE0);
+    glUniform1i(pLwc->shader[shader_index].diffuse_location, 0); // 0 means GL_TEXTURE0
 	glBindTexture(GL_TEXTURE_2D, pLwc->tex_programmed[LPT_DIR_PAD]);
-	set_tex_filter(GL_LINEAR_MIPMAP_LINEAR, GL_LINEAR);
+	set_tex_filter(GL_LINEAR, GL_LINEAR);
 	glDrawArrays(GL_TRIANGLES, 0, pLwc->vertex_buffer[vbo_index].vertex_count);
 
 	const float aspect_ratio = (float)pLwc->width / pLwc->height;
