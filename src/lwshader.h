@@ -2,8 +2,7 @@
 
 #include "lwgl.h"
 
-typedef struct _LWSHADER
-{
+typedef struct _LWSHADER {
 	int valid;
 
 	GLuint vertex_shader;
@@ -19,6 +18,12 @@ typedef struct _LWSHADER
 	GLint vbmat_location;
 	GLint theta_location;
 	GLint shade_location;
+	GLint     a_pID;
+	GLint     a_pRadiusOffset;
+	GLint     a_pVelocityOffset;
+	GLint     a_pDecayOffset;
+	GLint     a_pSizeOffset;
+	GLint     a_pColorOffset;
 
 	// Uniforms
 	GLint mvp_location;
@@ -40,5 +45,13 @@ typedef struct _LWSHADER
 	GLint color_location;
 	GLint time_location;
 	GLint texture_location;
+	GLint    u_ProjectionMatrix;
+	GLint     u_Gravity;
+	GLint     u_Time;
+	GLint     u_eRadius;
+	GLint     u_eVelocity;
+	GLint     u_eDecay;
+	GLint     u_eSize;
+	GLint     u_eColor;
 
 } LWSHADER;

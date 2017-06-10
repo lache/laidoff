@@ -294,6 +294,14 @@ create_shader(const char *shader_name, LWSHADER *pShader, const GLchar *vst, con
 	pShader->color_location = glGetUniformLocation(pShader->program, "uColor");
 	pShader->time_location = glGetUniformLocation(pShader->program, "uTime");
 	pShader->texture_location = glGetUniformLocation(pShader->program, "uTexture");
+	pShader->u_ProjectionMatrix = glGetUniformLocation(pShader->program, "u_ProjectionMatrix");
+	pShader->u_Gravity = glGetUniformLocation(pShader->program, "u_Gravity");
+	pShader->u_Time = glGetUniformLocation(pShader->program, "u_Time");
+	pShader->u_eRadius = glGetUniformLocation(pShader->program, "u_eRadius");
+	pShader->u_eVelocity = glGetUniformLocation(pShader->program, "u_eVelocity");
+	pShader->u_eDecay = glGetUniformLocation(pShader->program, "u_eDecay");
+	pShader->u_eSize = glGetUniformLocation(pShader->program, "u_eSize");
+	pShader->u_eColor = glGetUniformLocation(pShader->program, "u_eColor");
 
 	// Attribs
 	pShader->vpos_location = glGetAttribLocation(pShader->program, "vPos");
@@ -304,6 +312,12 @@ create_shader(const char *shader_name, LWSHADER *pShader, const GLchar *vst, con
 	pShader->vbmat_location = glGetAttribLocation(pShader->program, "vBm");
 	pShader->theta_location = glGetAttribLocation(pShader->program, "aTheta");
 	pShader->shade_location = glGetAttribLocation(pShader->program, "aShade");
+	pShader->a_pID = glGetAttribLocation(pShader->program, "a_pID");
+	pShader->a_pRadiusOffset = glGetAttribLocation(pShader->program, "a_pRadiusOffset");
+	pShader->a_pVelocityOffset = glGetAttribLocation(pShader->program, "a_pVelocityOffset");
+	pShader->a_pDecayOffset = glGetAttribLocation(pShader->program, "a_pDecayOffset");
+	pShader->a_pSizeOffset = glGetAttribLocation(pShader->program, "a_pSizeOffset");
+	pShader->a_pColorOffset = glGetAttribLocation(pShader->program, "a_pColorOffset");
 
 	pShader->valid = 1;
 }
@@ -325,6 +339,8 @@ void init_gl_shaders(LWCONTEXT *pLwc) {
 		GLSL_DIR_NAME PATH_SEPARATOR "fan-vert.glsl");
 	char *emitter_vert_glsl = create_string_from_file(ASSETS_BASE_PATH
 		GLSL_DIR_NAME PATH_SEPARATOR "emitter-vert.glsl");
+	char *emitter2_vert_glsl = create_string_from_file(ASSETS_BASE_PATH
+		GLSL_DIR_NAME PATH_SEPARATOR "emitter2-vert.glsl");
 
 	// Fragment Shader
 	char *default_frag_glsl = create_string_from_file(ASSETS_BASE_PATH
@@ -337,6 +353,8 @@ void init_gl_shaders(LWCONTEXT *pLwc) {
 		GLSL_DIR_NAME PATH_SEPARATOR "fan-frag.glsl");
 	char *emitter_frag_glsl = create_string_from_file(ASSETS_BASE_PATH
 		GLSL_DIR_NAME PATH_SEPARATOR "emitter-frag.glsl");
+	char *emitter2_frag_glsl = create_string_from_file(ASSETS_BASE_PATH
+		GLSL_DIR_NAME PATH_SEPARATOR "emitter2-frag.glsl");
 
 	if (!default_vert_glsl) {
 		LOGE("init_gl_shaders: default-vert.glsl not loaded. Abort...");
@@ -355,6 +373,11 @@ void init_gl_shaders(LWCONTEXT *pLwc) {
 
 	if (!emitter_vert_glsl) {
 		LOGE("init_gl_shaders: emitter-vert.glsl not loaded. Abort...");
+		return;
+	}
+
+	if (!emitter2_vert_glsl) {
+		LOGE("init_gl_shaders: emitter2-vert.glsl not loaded. Abort...");
 		return;
 	}
 
@@ -383,22 +406,30 @@ void init_gl_shaders(LWCONTEXT *pLwc) {
 		return;
 	}
 
+	if (!emitter2_frag_glsl) {
+		LOGE("init_gl_shaders: emitter2-frag.glsl not loaded. Abort...");
+		return;
+	}
+
 	create_shader("Default Shader", &pLwc->shader[LWST_DEFAULT], default_vert_glsl, default_frag_glsl);
 	create_shader("Font Shader", &pLwc->shader[LWST_FONT], default_vert_glsl, font_frag_glsl);
 	create_shader("ETC1 with Alpha Shader", &pLwc->shader[LWST_ETC1], default_vert_glsl, etc1_frag_glsl);
 	create_shader("Skin Shader", &pLwc->shader[LWST_SKIN], skin_vert_glsl, default_frag_glsl);
 	create_shader("Fan Shader", &pLwc->shader[LWST_FAN], fan_vert_glsl, fan_frag_glsl);
 	create_shader("Emitter Shader", &pLwc->shader[LWST_EMITTER], emitter_vert_glsl, emitter_frag_glsl);
+	create_shader("Emitter2 Shader", &pLwc->shader[LWST_EMITTER2], emitter2_vert_glsl, emitter2_frag_glsl);
 
 	release_string(default_vert_glsl);
 	release_string(skin_vert_glsl);
 	release_string(fan_vert_glsl);
 	release_string(emitter_vert_glsl);
+	release_string(emitter2_vert_glsl);
 	release_string(default_frag_glsl);
 	release_string(font_frag_glsl);
 	release_string(etc1_frag_glsl);
 	release_string(fan_frag_glsl);
 	release_string(emitter_frag_glsl);
+	release_string(emitter2_frag_glsl);
 }
 
 static void load_vbo(LWCONTEXT *pLwc, const char *filename, LWVBO *pVbo) {
@@ -1129,8 +1160,9 @@ void init_action(LWCONTEXT* pLwc) {
 }
 
 void init_ps(LWCONTEXT* pLwc) {
-	ps_load_particles(pLwc);
 	ps_load_emitter(pLwc);
+	ps_load_particles(pLwc);
+	
 }
 
 LWCONTEXT *lw_init(void) {
