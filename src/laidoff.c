@@ -613,6 +613,22 @@ void set_fan_vertex_attrib_pointer(const LWCONTEXT* pLwc, int shader_index) {
 		fan_stride_in_bytes, (void *)0);
 }
 
+void set_ps_vertex_attrib_pointer(const LWCONTEXT* pLwc, int shader_index) {
+	glEnableVertexAttribArray(pLwc->shader[shader_index].a_pID);
+	glEnableVertexAttribArray(pLwc->shader[shader_index].a_pRadiusOffset);
+	glEnableVertexAttribArray(pLwc->shader[shader_index].a_pVelocityOffset);
+	glEnableVertexAttribArray(pLwc->shader[shader_index].a_pDecayOffset);
+	glEnableVertexAttribArray(pLwc->shader[shader_index].a_pSizeOffset);
+	glEnableVertexAttribArray(pLwc->shader[shader_index].a_pColorOffset);
+
+	glVertexAttribPointer(pLwc->shader[shader_index].a_pID, 1, GL_FLOAT, GL_FALSE, sizeof(LWPARTICLE2), (void*)(LWOFFSETOF(LWPARTICLE2, pId)));
+	glVertexAttribPointer(pLwc->shader[shader_index].a_pRadiusOffset, 1, GL_FLOAT, GL_FALSE, sizeof(LWPARTICLE2), (void*)(LWOFFSETOF(LWPARTICLE2, pRadiusOffset)));
+	glVertexAttribPointer(pLwc->shader[shader_index].a_pVelocityOffset, 1, GL_FLOAT, GL_FALSE, sizeof(LWPARTICLE2), (void*)(LWOFFSETOF(LWPARTICLE2, pVelocityOffset)));
+	glVertexAttribPointer(pLwc->shader[shader_index].a_pDecayOffset, 1, GL_FLOAT, GL_FALSE, sizeof(LWPARTICLE2), (void*)(LWOFFSETOF(LWPARTICLE2, pDecayOffset)));
+	glVertexAttribPointer(pLwc->shader[shader_index].a_pSizeOffset, 1, GL_FLOAT, GL_FALSE, sizeof(LWPARTICLE2), (void*)(LWOFFSETOF(LWPARTICLE2, pSizeOffset)));
+	glVertexAttribPointer(pLwc->shader[shader_index].a_pColorOffset, 3, GL_FLOAT, GL_FALSE, sizeof(LWPARTICLE2), (void*)(LWOFFSETOF(LWPARTICLE2, pColorOffset)));
+}
+
 static void init_vao(LWCONTEXT *pLwc, int shader_index) {
 	// Vertex Array Objects
 #if LW_SUPPORT_VAO
@@ -658,21 +674,45 @@ static void init_fan_vao(LWCONTEXT *pLwc, int shader_index) {
 #endif
 }
 
+static void init_ps_vao(LWCONTEXT *pLwc, int shader_index) {
+	// Particle System Vertex Array Objects
+#if LW_SUPPORT_VAO
+	glGenVertexArrays(PS_VERTEX_BUFFER_COUNT, pLwc->ps_vao);
+	for (int i = 0; i < PS_VERTEX_BUFFER_COUNT; i++) {
+		glBindVertexArray(pLwc->ps_vao[i]);
+		glBindBuffer(GL_ARRAY_BUFFER, pLwc->particle_buffer2);
+		set_ps_vertex_attrib_pointer(pLwc, shader_index);
+	}
+
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
+	glBindVertexArray(0);
+#endif
+}
+
 void lw_clear_color() {
 	// Alpha component should be 1 in RPI platform.
 	glClearColor(90 / 255.f, 173 / 255.f, 255 / 255.f, 1);
+}
+
+void init_ps(LWCONTEXT* pLwc) {
+	ps_load_emitter(pLwc);
+	ps_load_particles(pLwc);
 }
 
 static void init_gl_context(LWCONTEXT *pLwc) {
 	init_gl_shaders(pLwc);
 
 	init_vbo(pLwc);
+	// Particle system's VAOs are configured here. Should be called before setting VAOs.
+	init_ps(pLwc);
 
 	init_vao(pLwc, 0/* ??? */);
 
 	init_skin_vao(pLwc, LWST_SKIN);
 
 	init_fan_vao(pLwc, LWST_FAN);
+
+	init_ps_vao(pLwc, LWST_EMITTER2);
 
 	// Enable culling (CCW is default)
 	glEnable(GL_CULL_FACE);
@@ -874,6 +914,14 @@ static void bind_all_fan_vertex_attrib_shader(const LWCONTEXT *pLwc, int shader_
 #endif
 }
 
+static void bind_all_ps_vertex_attrib_shader(const LWCONTEXT *pLwc, int shader_index, int vbo_index) {
+#if LW_PLATFORM_WIN32 || LW_PLATFORM_OSX
+	glBindVertexArray(pLwc->ps_vao[vbo_index]);
+#else
+	set_ps_vertex_attrib_pointer(pLwc, shader_index);
+#endif
+}
+
 void bind_all_vertex_attrib(const LWCONTEXT *pLwc, int vbo_index) {
 	bind_all_vertex_attrib_shader(pLwc, LWST_DEFAULT, vbo_index);
 }
@@ -892,6 +940,10 @@ void bind_all_skin_vertex_attrib(const LWCONTEXT *pLwc, int vbo_index) {
 
 void bind_all_fan_vertex_attrib(const LWCONTEXT *pLwc, int vbo_index) {
 	bind_all_fan_vertex_attrib_shader(pLwc, LWST_FAN, vbo_index);
+}
+
+void bind_all_ps_vertex_attrib(const LWCONTEXT *pLwc, int vbo_index) {
+	bind_all_ps_vertex_attrib_shader(pLwc, LWST_EMITTER2, vbo_index);
 }
 
 static void load_pkm_hw_decoding(const char *tex_atlas_filename) {
@@ -1073,11 +1125,6 @@ void init_action(LWCONTEXT* pLwc) {
 	}
 }
 
-void init_ps(LWCONTEXT* pLwc) {
-	ps_load_emitter(pLwc);
-	ps_load_particles(pLwc);
-}
-
 LWCONTEXT *lw_init(void) {
 
 	init_ext_image_lib();
@@ -1113,10 +1160,6 @@ LWCONTEXT *lw_init(void) {
 	init_armature(pLwc);
 
 	init_action(pLwc);
-
-	init_ps(pLwc);
-
-	pLwc->ps = ps_new();
 
 	return pLwc;
 }
@@ -1204,6 +1247,7 @@ void lw_deinit(LWCONTEXT *pLwc) {
 	glDeleteVertexArrays(VERTEX_BUFFER_COUNT, pLwc->vao);
 	glDeleteVertexArrays(SKIN_VERTEX_BUFFER_COUNT, pLwc->skin_vao);
 	glDeleteVertexArrays(FAN_VERTEX_BUFFER_COUNT, pLwc->fan_vao);
+	glDeleteVertexArrays(PS_VERTEX_BUFFER_COUNT, pLwc->ps_vao);
 #endif
 
 	for (int i = 0; i < LWST_COUNT; i++) {
@@ -1225,8 +1269,6 @@ void lw_deinit(LWCONTEXT *pLwc) {
 	deinit_sys_msg(pLwc->def_sys_msg);
 
 	deltatime_destroy(&pLwc->update_dt);
-
-	ps_destroy((LWPS**)&pLwc->ps);
 
 	free(pLwc);
 }

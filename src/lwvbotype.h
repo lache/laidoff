@@ -34,3 +34,9 @@ typedef enum _LW_FAN_VBO_TYPE {
 
 	LFVT_COUNT,
 } LW_FAN_VBO_TYPE;
+
+typedef enum _LW_PS_VBO_TYPE {
+	LPVT_DEFAULT,
+
+	LPVT_COUNT,
+} LW_PS_VBO_TYPE;

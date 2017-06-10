@@ -8,6 +8,8 @@
 #include "field.h"
 #include "mq.h"
 #include "render_fan.h"
+#include "ps.h"
+#include "render_ps.h"
 
 static void render_field_object_rot(const LWCONTEXT* pLwc, int vbo_index, GLuint tex_id, const mat4x4 view, const mat4x4 proj, float x, float y, float z, float sx, float sy, float sz, float alpha_multiplier, int mipmap, const mat4x4 rot) {
 	int shader_index = LWST_DEFAULT;
@@ -104,10 +106,12 @@ static void render_ui(const LWCONTEXT* pLwc) {
 	mat4x4_mul(proj_view_model, pLwc->proj, view_model);
 
 	glUseProgram(pLwc->shader[shader_index].program);
-	glBindBuffer(GL_ARRAY_BUFFER, pLwc->vertex_buffer[vbo_index].vertex_buffer);
 	bind_all_vertex_attrib(pLwc, vbo_index);
+	glBindBuffer(GL_ARRAY_BUFFER, pLwc->vertex_buffer[vbo_index].vertex_buffer);
 	glUniformMatrix4fv(pLwc->shader[shader_index].mvp_location, 1, GL_FALSE, (const GLfloat*)proj_view_model);
+	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, pLwc->tex_programmed[LPT_DIR_PAD]);
+	set_tex_filter(GL_LINEAR_MIPMAP_LINEAR, GL_LINEAR);
 	glDrawArrays(GL_TRIANGLES, 0, pLwc->vertex_buffer[vbo_index].vertex_count);
 
 	const float aspect_ratio = (float)pLwc->width / pLwc->height;
@@ -433,6 +437,16 @@ void lwc_render_field(const LWCONTEXT* pLwc) {
 	if (pLwc->player_state_data.state == LPS_AIM || pLwc->player_state_data.state == LPS_FIRE) {
 		render_fan(pLwc, perspective, view,
 			player_x, player_y, player_z, pLwc->player_state_data.rot_z, pLwc->player_state_data.aim_theta, rscale);
+	}
+
+	// For gl_PointSize support on vertex shader
+#if LW_PLATFORM_WIN32
+	glEnable(GL_VERTEX_PROGRAM_POINT_SIZE);
+#endif
+	LWEMITTER2OBJECT* emit_object = ps_emit_object_begin(field_ps(pLwc->field));
+	while (emit_object) {
+		ps_render_explosion(pLwc, emit_object);
+		emit_object = ps_emit_object_next(field_ps(pLwc->field), emit_object);
 	}
 
 	render_ui(pLwc);

@@ -4,7 +4,6 @@ typedef struct _LWCONTEXT LWCONTEXT;
 
 #define NUM_PARTICLES (360)
 #define NUM_PARTICLES2 (180)
-#define NUM_PS_INSTANCE (16)
 
 typedef struct _LWPARTICLE {
 	float theta;
@@ -51,3 +50,6 @@ void ps_test_update(LWCONTEXT* pLwc);
 void* ps_new();
 void ps_update(LWPS* ps, double delta_time);
 void ps_destroy(LWPS** ps);
+LWEMITTER2OBJECT* ps_emit_object_begin(LWPS* ps);
+LWEMITTER2OBJECT* ps_emit_object_next(LWPS* ps, LWEMITTER2OBJECT* cursor);
+void ps_play_new(LWPS* ps);

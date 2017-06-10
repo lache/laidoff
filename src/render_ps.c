@@ -35,10 +35,9 @@ static void s_render_rose(const LWCONTEXT* pLwc) {
 	glDisableVertexAttribArray(pLwc->shader[shader_index].shade_location);
 }
 
-static void s_render_explosion(const LWCONTEXT* pLwc, const LWEMITTER2OBJECT* emit_object) {
+void ps_render_explosion(const LWCONTEXT* pLwc, const LWEMITTER2OBJECT* emit_object) {
 	int shader_index = LWST_EMITTER2;
 	glUseProgram(pLwc->shader[shader_index].program);
-	glBindBuffer(GL_ARRAY_BUFFER, pLwc->particle_buffer2);
 	mat4x4 identity;
 	mat4x4_identity(identity);
 	// Uniforms
@@ -64,8 +63,10 @@ static void s_render_explosion(const LWCONTEXT* pLwc, const LWEMITTER2OBJECT* em
 	glUniform1i(pLwc->shader[shader_index].u_TextureAlpha, 1);
 	set_tex_filter(GL_LINEAR, GL_LINEAR);
 
+	//glBindBuffer(GL_ARRAY_BUFFER, pLwc->particle_buffer2);
+
 	// Attributes
-	glEnableVertexAttribArray(pLwc->shader[shader_index].a_pID);
+	/*glEnableVertexAttribArray(pLwc->shader[shader_index].a_pID);
 	glEnableVertexAttribArray(pLwc->shader[shader_index].a_pRadiusOffset);
 	glEnableVertexAttribArray(pLwc->shader[shader_index].a_pVelocityOffset);
 	glEnableVertexAttribArray(pLwc->shader[shader_index].a_pDecayOffset);
@@ -78,19 +79,20 @@ static void s_render_explosion(const LWCONTEXT* pLwc, const LWEMITTER2OBJECT* em
 	glVertexAttribPointer(pLwc->shader[shader_index].a_pDecayOffset, 1, GL_FLOAT, GL_FALSE, sizeof(LWPARTICLE2), (void*)(LWOFFSETOF(LWPARTICLE2, pDecayOffset)));
 	glVertexAttribPointer(pLwc->shader[shader_index].a_pSizeOffset, 1, GL_FLOAT, GL_FALSE, sizeof(LWPARTICLE2), (void*)(LWOFFSETOF(LWPARTICLE2, pSizeOffset)));
 	glVertexAttribPointer(pLwc->shader[shader_index].a_pColorOffset, 3, GL_FLOAT, GL_FALSE, sizeof(LWPARTICLE2), (void*)(LWOFFSETOF(LWPARTICLE2, pColorOffset)));
+*/
+	bind_all_ps_vertex_attrib(pLwc, LPVT_DEFAULT);
 
 	// Draw particles
 	glDrawArrays(GL_POINTS, 0, NUM_PARTICLES2);
-	glDisableVertexAttribArray(pLwc->shader[shader_index].a_pID);
+	/*glDisableVertexAttribArray(pLwc->shader[shader_index].a_pID);
 	glDisableVertexAttribArray(pLwc->shader[shader_index].a_pRadiusOffset);
 	glDisableVertexAttribArray(pLwc->shader[shader_index].a_pVelocityOffset);
 	glDisableVertexAttribArray(pLwc->shader[shader_index].a_pDecayOffset);
 	glDisableVertexAttribArray(pLwc->shader[shader_index].a_pSizeOffset);
-	glDisableVertexAttribArray(pLwc->shader[shader_index].a_pColorOffset);
+	glDisableVertexAttribArray(pLwc->shader[shader_index].a_pColorOffset);*/
 }
 
 void lwc_render_ps(const LWCONTEXT* pLwc) {
-
 	glViewport(0, 0, pLwc->width, pLwc->height);
 	lw_clear_color();
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -103,7 +105,7 @@ void lwc_render_ps(const LWCONTEXT* pLwc) {
 	// Test render rose
 	s_render_rose(pLwc);
 	// Test render explosion
-	s_render_explosion(pLwc, &emitter2_object);
+	ps_render_explosion(pLwc, &emitter2_object);
 }
 
 void ps_render_with_projection(const LWCONTEXT* pLwc, const LWEMITTER2OBJECT* emit, const float* proj) {

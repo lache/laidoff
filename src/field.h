@@ -66,3 +66,4 @@ int field_remote_sphere_pos(const LWFIELD* field, int i, float* pos);
 int field_remote_sphere_vel(const LWFIELD* field, int i, float* vel);
 void field_hit_player(LWFIELD* field);
 void field_despawn_remote_sphere(LWFIELD* field, int bullet_id, const char* owner_key);
+void* field_ps(LWFIELD* field);

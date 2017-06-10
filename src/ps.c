@@ -4,6 +4,8 @@
 #include "lwgl.h"
 #include "pcg_basic.h"
 
+#define NUM_PS_INSTANCE (16)
+
 LWEMITTER emitter = { 0 };
 pcg32_random_t rng;
 float time_current;
@@ -171,4 +173,25 @@ void ps_play_new(LWPS* ps) {
 		ps->inst[i].emit_object.time = 0;
 		break;
 	}
+}
+
+static LWEMITTER2OBJECT* s_ps_emit_object_find_first_valid(LWPS* ps, int start_index) {
+	if (!ps) {
+		return 0;
+	}
+	for (int i = start_index; i < NUM_PS_INSTANCE; i++) {
+		if (ps->inst[i].valid) {
+			return &ps->inst[i].emit_object;
+		}
+	}
+	return 0;
+}
+
+LWEMITTER2OBJECT* ps_emit_object_begin(LWPS* ps) {
+	return s_ps_emit_object_find_first_valid(ps, 0);
+}
+
+LWEMITTER2OBJECT* ps_emit_object_next(LWPS* ps, LWEMITTER2OBJECT* cursor) {
+	int start_index = ((char*)cursor - (char*)&ps->inst[0].emit_object) / sizeof(LWPSINST);
+	return s_ps_emit_object_find_first_valid(ps, start_index + 1);
 }

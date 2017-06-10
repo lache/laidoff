@@ -15,6 +15,7 @@
 #include "extrapolator.h"
 #include "playersm.h"
 #include "pcg_basic.h"
+#include "ps.h"
 
 #define MAX_BOX_GEOM (100)
 #define MAX_RAY_RESULT_COUNT (10)
@@ -37,64 +38,108 @@ typedef enum _LW_SPACE_GROUP {
 } LW_SPACE_GROUP;
 
 typedef struct _LWFIELD {
+	// ODE world instance
 	dWorldID world;
-	dSpaceID space; // root space
+	// Root space
+	dSpaceID space;
+	// Space array
 	dSpaceID space_group[LSG_COUNT];
+	// Worldwide ground geom
 	dGeomID ground;
+	// Box(world collider) geom array
 	dGeomID box_geom[MAX_BOX_GEOM];
+	// Box(world collider) geom count
 	int box_geom_count;
+	// Player geom
 	dGeomID player_geom;
+	// Test player geom
 	dGeomID test_player_geom;
+	// Player collision capsule radius
 	dReal player_radius;
+	// Player collision capsule length
 	dReal player_length;
+	// User(remote player) collision capsule radius
 	dReal user_radius;
+	// User(remote player) collision capsule length
 	dReal user_length;
-
+	// Ray test max length
 	dReal ray_max_length;
+	// Ray geom array
 	dGeomID ray[LRI_COUNT];
+	// Ray result array
 	dContact ray_result[LRI_COUNT][MAX_RAY_RESULT_COUNT];
+	// Ray result count
 	int ray_result_count[LRI_COUNT];
+	// Nearest ray depth value
 	dReal ray_nearest_depth[LRI_COUNT];
+	// Nearest ray result index
 	int ray_nearest_index[LRI_COUNT];
-
+	// Sphere(bullet) geom (this bullet is fired by player)
 	dGeomID sphere[MAX_FIELD_SPHERE];
+	// Sphere(bullet) constant velocity (this bullet is fired by player)
 	vec3 sphere_vel[MAX_FIELD_SPHERE];
+	// Sphere(bullet) ID (this bullet is fired by player)
 	int sphere_bullet_id[MAX_FIELD_SPHERE];
+	// Sphere(bullet) body (this bullet is fired by player)
 	dBodyID sphere_body[MAX_FIELD_SPHERE];
+	// User(remote player) geom array
 	dGeomID user[MAX_USER_GEOM];
+	// Remote sphere(bullet) world position
 	vec3 remote_sphere_pos[MAX_FIELD_REMOTE_SPHERE];
+	// Remote sphere(bullet) constant velocity
 	vec3 remote_sphere_vel[MAX_FIELD_REMOTE_SPHERE];
+	// Remote sphere(bullet) valid flag
 	int remote_sphere_valid[MAX_FIELD_REMOTE_SPHERE];
+	// Remote sphere(bullet) ID
 	int remote_sphere_bullet_id[MAX_FIELD_REMOTE_SPHERE];
+	// Remote sphere(bullet) owner key (string) array
 	char remote_sphere_owner_key[MAX_FIELD_REMOTE_SPHERE][LW_KVMSG_KEY_MAX];
-
+	// Current player position
 	dVector3 player_pos;
+	// Player position delta since last tick
 	dVector3 player_pos_delta;
+	// Ground normal at player standing
 	dVector3 ground_normal;
+	// Player velocity
 	dVector3 player_vel;
+	// Field cube object array
 	LWFIELDCUBEOBJECT* field_cube_object;
+	// Field cube object count
 	int field_cube_object_count;
-	char* d;
-
+	// Field raw file data
+	char* field_raw_data;
+	// Navigation data instance
 	void* nav;
+	// Path query instance
 	LWPATHQUERY path_query;
+	// Abstract time for test player movement
 	float path_query_time;
+	// Test player position
 	vec3 path_query_test_player_pos;
+	// Test player orientation
 	float path_query_test_player_rot;
-
+	// Field VBO
 	LW_VBO_TYPE field_vbo;
+	// Field texture ID
 	GLuint field_tex_id;
+	// 1 if field texture is mipmapped, 0 if otherwise
 	int field_tex_mip;
+	// Player skinned mesh scale
 	float skin_scale;
-	int follow_cam;
-
+	// Field world camera mode (0 or 1)
+	int field_camera_mode;
+	// Random number generator instance
 	pcg32_random_t rng;
-
+	// Test player flash effect opacity (0 ~ 1)
 	float test_player_flash;
+	// Player flash effect opacity (0 ~ 1)
 	float player_flash;
-
+	// 1 if network is enabled, 0 if otherwise
 	int network;
+	// Message queue instance (copied from context)
 	void* mq;
+	// Particle system manager instance
+	void* ps;
 } LWFIELD;
 
 static void s_rotation_matrix_from_vectors(dMatrix3 r, const dReal* vec_a, const dReal* vec_b);
@@ -254,7 +299,7 @@ LWFIELD* load_field(const char* filename) {
 	// Load field cube objects (field colliders) from specified file
 	size_t size;
 	char* d = create_binary_from_file(filename, &size);
-	field->d = d;
+	field->field_raw_data = d;
 	field->field_cube_object = (LWFIELDCUBEOBJECT*)d;
 	field->field_cube_object_count = size / sizeof(LWFIELDCUBEOBJECT);
 	// Create geoms for field cube objects
@@ -289,6 +334,8 @@ LWFIELD* load_field(const char* filename) {
 	}
 	// Seed a random number generator
 	pcg32_srandom_r(&field->rng, 0x0DEEC2CBADF00D77, 0x15881588CA11DAC1);
+	// Particle system
+	field->ps = ps_new();
 	// Here it is. A brand new field instance just out of the oven!
 	return field;
 }
@@ -379,6 +426,7 @@ static void field_world_bullet_near(void *data, dGeomID o1, dGeomID o2) {
 		dGeomDisable(o2);
 		int idx = (int)dGeomGetData(o2);
 		mq_send_despawn_bullet(field->mq, field->sphere_bullet_id[idx]);
+		ps_play_new(field->ps);
 	}
 }
 
@@ -802,6 +850,8 @@ void update_field(LWCONTEXT* pLwc, LWFIELD* field) {
 	// Hit flash reduction of test player
 	field->test_player_flash = LWMAX(0, field->test_player_flash - (float)lwcontext_delta_time(pLwc) * 4);
 	field->player_flash = LWMAX(0, field->player_flash - (float)lwcontext_delta_time(pLwc) * 4);
+	// Update particle system
+	ps_update(field->ps, lwcontext_delta_time(pLwc));
 }
 
 void unload_field(LWFIELD* field) {
@@ -812,7 +862,7 @@ void unload_field(LWFIELD* field) {
 		unload_nav(field->nav);
 	}
 
-	release_binary(field->d);
+	release_binary(field->field_raw_data);
 
 	dGeomDestroy(field->ground);
 	dGeomDestroy(field->player_geom);
@@ -836,6 +886,8 @@ void unload_field(LWFIELD* field) {
 	dWorldDestroy(field->world);
 
 	dCloseODE();
+
+	ps_destroy((LWPS**)&field->ps);
 
 	memset(field, 0, sizeof(LWFIELD));
 }
@@ -889,7 +941,7 @@ float field_skin_scale(const LWFIELD* field) {
 }
 
 int field_follow_cam(const LWFIELD* field) {
-	return field->follow_cam;
+	return field->field_camera_mode;
 }
 
 LW_VBO_TYPE field_field_vbo(const LWFIELD* field) {
@@ -923,8 +975,8 @@ void init_field(LWCONTEXT* pLwc, const char* field_filename, const char* nav_fil
 	pLwc->field->field_tex_id = tex_id;
 	pLwc->field->field_tex_mip = tex_mip;
 	pLwc->field->skin_scale = skin_scale;
-	pLwc->field->follow_cam = follow_cam;
-	pLwc->field->mq = pLwc->mq;
+	pLwc->field->field_camera_mode = follow_cam;
+	pLwc->field->mq = pLwc->mq;	
 
 	set_random_start_end_pos(pLwc->field->nav, &pLwc->field->path_query);
 	nav_query(pLwc->field->nav, &pLwc->field->path_query);
@@ -1089,4 +1141,8 @@ void field_despawn_remote_sphere(LWFIELD* field, int bullet_id, const char* owne
 			break;
 		}
 	}
+}
+
+void* field_ps(LWFIELD* field) {
+	return field->ps;
 }

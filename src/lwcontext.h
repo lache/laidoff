@@ -72,6 +72,7 @@ static const char* tex_font_atlas_filename[] = {
 #define VERTEX_BUFFER_COUNT LVT_COUNT
 #define SKIN_VERTEX_BUFFER_COUNT LSVT_COUNT
 #define FAN_VERTEX_BUFFER_COUNT LFVT_COUNT
+#define PS_VERTEX_BUFFER_COUNT LPVT_COUNT
 #define MAX_DELTA_TIME_HISTORY (60)
 
 typedef struct _LWCONTEXT {
@@ -95,6 +96,8 @@ typedef struct _LWCONTEXT {
 	GLuint skin_vao[SKIN_VERTEX_BUFFER_COUNT];
 	// Aim sector(fan) VAO
 	GLuint fan_vao[FAN_VERTEX_BUFFER_COUNT];
+	// Particle system VAO
+	GLuint ps_vao[PS_VERTEX_BUFFER_COUNT];
 	// General texture atlas
 	GLuint tex_atlas[MAX_TEX_ATLAS];
 	// Width for text atlas array
@@ -273,8 +276,6 @@ typedef struct _LWCONTEXT {
 	GLuint particle_buffer2;
 	// Logic update interval (in seconds)
 	double update_interval;
-	// Particle system manager instance
-	void* ps;
 } LWCONTEXT;
 
 #ifdef __cplusplus
