@@ -30,8 +30,10 @@ typedef struct _LWEMITTER2 {
 	float       eRadius;
 	float       eVelocity;
 	float       eDecay;
-	float       eSize;
-	float		eColor[3];
+	float       eSizeStart;
+	float       eSizeEnd;
+	float		eColorStart[3];
+	float		eColorEnd[3];
 } LWEMITTER2;
 
 typedef struct _LWEMITTER2OBJECT {

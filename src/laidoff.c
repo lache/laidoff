@@ -300,8 +300,12 @@ create_shader(const char *shader_name, LWSHADER *pShader, const GLchar *vst, con
 	pShader->u_eRadius = glGetUniformLocation(pShader->program, "u_eRadius");
 	pShader->u_eVelocity = glGetUniformLocation(pShader->program, "u_eVelocity");
 	pShader->u_eDecay = glGetUniformLocation(pShader->program, "u_eDecay");
-	pShader->u_eSize = glGetUniformLocation(pShader->program, "u_eSize");
-	pShader->u_eColor = glGetUniformLocation(pShader->program, "u_eColor");
+	pShader->u_eSizeStart = glGetUniformLocation(pShader->program, "u_eSizeStart");
+	pShader->u_eSizeEnd = glGetUniformLocation(pShader->program, "u_eSizeEnd");
+	pShader->u_eColorStart = glGetUniformLocation(pShader->program, "u_eColorStart");
+	pShader->u_eColorEnd = glGetUniformLocation(pShader->program, "u_eColorEnd");
+	pShader->u_Texture = glGetUniformLocation(pShader->program, "u_Texture");
+	pShader->u_TextureAlpha = glGetUniformLocation(pShader->program, "u_TextureAlpha");
 
 	// Attribs
 	pShader->vpos_location = glGetAttribLocation(pShader->program, "vPos");
@@ -857,6 +861,7 @@ void render_anim(const LWCONTEXT *pLwc) {
 				(GLvoid *)((char *)NULL));
 		}
 	}
+
 }
 
 // http://www.cse.yorku.ca/~oz/hash.html

@@ -55,10 +55,14 @@ void load_emitter2(LWCONTEXT* pLwc) {
 	emitter2.eRadius = 0.75f;                                     // Blast radius
 	emitter2.eVelocity = 3.00f;                                   // Explosion velocity
 	emitter2.eDecay = 2.00f;                                      // Explosion decay
-	emitter2.eSize = 32.00f;                                      // Fragment size
-	emitter2.eColor[0] = 1.0f;
-	emitter2.eColor[1] = 0.5f;
-	emitter2.eColor[2] = 0.0f;
+	emitter2.eSizeStart = 32.00f;                                 // Fragment size
+	emitter2.eSizeEnd = 8.00f;                                 // Fragment size
+	emitter2.eColorStart[0] = 1.0f;
+	emitter2.eColorStart[1] = 0.5f;
+	emitter2.eColorStart[2] = 0.0f;
+	emitter2.eColorEnd[0] = 0.25f;
+	emitter2.eColorEnd[1] = 0.0f;
+	emitter2.eColorEnd[2] = 0.0f;
 																// Set global factors
 	float growth = emitter2.eRadius / emitter2.eVelocity;       // Growth time
 	emitter2_object.life = growth + emitter2.eDecay + oDecay;                    // Simulation lifetime

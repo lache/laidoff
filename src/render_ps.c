@@ -48,9 +48,18 @@ static void s_render_explosion(const LWCONTEXT* pLwc) {
 	glUniform1f(pLwc->shader[shader_index].u_eRadius, emitter2.eRadius);
 	glUniform1f(pLwc->shader[shader_index].u_eVelocity, emitter2.eVelocity);
 	glUniform1f(pLwc->shader[shader_index].u_eDecay, emitter2.eDecay);
-	glUniform1f(pLwc->shader[shader_index].u_eSize, emitter2.eSize);
-	glUniform3f(pLwc->shader[shader_index].u_eColor, emitter2.eColor[0], emitter2.eColor[1], emitter2.eColor[2]);
+	glUniform1f(pLwc->shader[shader_index].u_eSizeStart, emitter2.eSizeStart);
+	glUniform1f(pLwc->shader[shader_index].u_eSizeEnd, emitter2.eSizeEnd);
+	glUniform3fv(pLwc->shader[shader_index].u_eColorStart, 1, emitter2.eColorStart);
+	glUniform3fv(pLwc->shader[shader_index].u_eColorEnd, 1, emitter2.eColorEnd);
 
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, pLwc->tex_atlas[LAE_U_GLOW]);
+	glUniform1i(pLwc->shader[shader_index].u_Texture, 0);
+	glActiveTexture(GL_TEXTURE1);
+	glBindTexture(GL_TEXTURE_2D, pLwc->tex_atlas[LAE_U_GLOW_ALPHA]);
+	glUniform1i(pLwc->shader[shader_index].u_TextureAlpha, 1);
+	
 	// Attributes
 	glEnableVertexAttribArray(pLwc->shader[shader_index].a_pID);
 	glEnableVertexAttribArray(pLwc->shader[shader_index].a_pRadiusOffset);
