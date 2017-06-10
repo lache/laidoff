@@ -4,7 +4,7 @@
 #define attribute in
 #define varying out
 #endif
-precision mediump float;
+precision highp float;
 // Uniforms
 uniform mat4        u_ProjectionMatrix;
 uniform vec2        u_Gravity;
