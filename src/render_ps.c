@@ -35,7 +35,7 @@ static void s_render_rose(const LWCONTEXT* pLwc) {
 	glDisableVertexAttribArray(pLwc->shader[shader_index].shade_location);
 }
 
-static void s_render_explosion(const LWCONTEXT* pLwc) {
+static void s_render_explosion(const LWCONTEXT* pLwc, const LWEMITTER2OBJECT* emit_object) {
 	int shader_index = LWST_EMITTER2;
 	glUseProgram(pLwc->shader[shader_index].program);
 	glBindBuffer(GL_ARRAY_BUFFER, pLwc->particle_buffer2);
@@ -43,8 +43,8 @@ static void s_render_explosion(const LWCONTEXT* pLwc) {
 	mat4x4_identity(identity);
 	// Uniforms
 	glUniformMatrix4fv(pLwc->shader[shader_index].u_ProjectionMatrix, 1, 0, (const GLfloat*)identity);
-	glUniform2f(pLwc->shader[shader_index].u_Gravity, emitter2_object.gravity[0], emitter2_object.gravity[1]);
-	glUniform1f(pLwc->shader[shader_index].u_Time, emitter2_object.time);
+	glUniform2f(pLwc->shader[shader_index].u_Gravity, emit_object->gravity[0], emit_object->gravity[1]);
+	glUniform1f(pLwc->shader[shader_index].u_Time, emit_object->time);
 	glUniform1f(pLwc->shader[shader_index].u_eRadius, emitter2.eRadius);
 	glUniform1f(pLwc->shader[shader_index].u_eVelocity, emitter2.eVelocity);
 	glUniform1f(pLwc->shader[shader_index].u_eDecay, emitter2.eDecay);
@@ -100,9 +100,10 @@ void lwc_render_ps(const LWCONTEXT* pLwc) {
 	//glEnable(GL_POINT_SPRITE);
 	glEnable(GL_VERTEX_PROGRAM_POINT_SIZE);
 #endif
-
+	// Test render rose
 	s_render_rose(pLwc);
-	s_render_explosion(pLwc);
+	// Test render explosion
+	s_render_explosion(pLwc, &emitter2_object);
 }
 
 void ps_render_with_projection(const LWCONTEXT* pLwc, const LWEMITTER2OBJECT* emit, const float* proj) {

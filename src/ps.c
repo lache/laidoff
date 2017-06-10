@@ -12,6 +12,17 @@ int time_direction;
 LWEMITTER2OBJECT emitter2_object = { 0 };
 LWEMITTER2 emitter2 = { 0 };
 
+typedef struct _LWPSINST {
+	int valid;
+	LWEMITTER2OBJECT emit_object;
+} LWPSINST;
+
+typedef struct _LWPS {
+	LWPSINST inst[NUM_PS_INSTANCE];
+} LWPS;
+
+float oDecay = 0.25f;       // Time
+
 // return [0, 1) double
 double random_double() {
 	return ldexp(pcg32_random_r(&rng), -32);
@@ -27,7 +38,7 @@ void load_emitter2(LWCONTEXT* pLwc) {
 	// Offset bounds
 	float oRadius = 0.10f;      // 0.0 = circle; 1.0 = ring
 	float oVelocity = 0.50f;    // Speed
-	float oDecay = 0.25f;       // Time
+	
 	float oSize = 8.00f;        // Pixels
 	float oColor = 0.25f;       // 0.5 = 50% shade offset
 
@@ -108,7 +119,7 @@ void ps_load_emitter(LWCONTEXT* pLwc) {
 	emitter2_object.time = 0;
 }
 
-void ps_update(LWCONTEXT* pLwc) {
+void ps_test_update(LWCONTEXT* pLwc) {
 	if (time_current > time_max) {
 		time_direction = -1;
 	} else if (time_current < 0.0f) {
@@ -123,6 +134,41 @@ void ps_update(LWCONTEXT* pLwc) {
 	}
 }
 
-void ps_update_lifecycle(LWEMITTER2OBJECT* emit, double delta_time) {
-	
+void ps_update(LWPS* ps, double delta_time) {
+	for (int i = 0; i < NUM_PS_INSTANCE; i++) {
+		if (!ps->inst[i].valid) {
+			continue;
+		}
+		ps->inst[i].emit_object.time += (float)delta_time;
+		if (ps->inst[i].emit_object.time > ps->inst[i].emit_object.life) {
+			ps->inst[i].valid = 0;
+		}
+	}
+}
+
+void* ps_new() {
+	return calloc(1, sizeof(LWPS));
+}
+
+void ps_destroy(LWPS** ps) {
+	free(*ps);
+	*ps = 0;
+}
+
+void ps_play_new(LWPS* ps) {
+	for (int i = 0; i < NUM_PS_INSTANCE; i++) {
+		if (ps->inst[i].valid) {
+			continue;
+		}
+		ps->inst[i].valid = 1;
+
+		float growth = emitter2.eRadius / emitter2.eVelocity;
+		ps->inst[i].emit_object.life = growth + emitter2.eDecay + oDecay;
+
+		float drag = 10.00f;
+		ps->inst[i].emit_object.gravity[0] = 0;
+		ps->inst[i].emit_object.gravity[1] = -9.81f * (1.0f / drag);
+		ps->inst[i].emit_object.time = 0;
+		break;
+	}
 }

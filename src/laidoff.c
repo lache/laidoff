@@ -136,12 +136,6 @@ void set_tex_filter(int min_filter, int mag_filter) {
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, mag_filter);
 }
 
-static void invalidate_all_touch_proc(LWCONTEXT *pLwc) {
-	for (int i = 0; i < MAX_TOUCHPROC_COUNT; i++) {
-		pLwc->touch_proc[i].valid = 0;
-	}
-}
-
 //------------------------------------------------------------------------
 unsigned short swap_bytes(unsigned short aData) {
 	return (unsigned short)((aData & 0x00FF) << 8) | ((aData & 0xFF00) >> 8);
@@ -695,7 +689,6 @@ static void init_gl_context(LWCONTEXT *pLwc) {
 	glEnable(GL_DEPTH_TEST);
 	glDepthFunc(GL_LEQUAL);
 	//glDepthMask(GL_TRUE);
-	mat4x4_identity(pLwc->mvp);
 }
 
 void delete_font_fbo(LWCONTEXT* pLwc) {
@@ -778,90 +771,6 @@ void set_sprite_mvp(const LWCONTEXT *pLwc, enum _LW_ATLAS_SPRITE las, float x, f
 
 	mat4x4_mul(kiwi_mv, kiwi_trans, kiwi_scale_rotate);
 	mat4x4_mul(result, p, kiwi_mv);
-}
-
-void update_anim(LWCONTEXT *pLwc) {
-	for (int i = 0; i < ARRAY_SIZE(pLwc->anim); i++) {
-		LWANIM *anim = &pLwc->anim[i];
-
-		if (!anim->valid) {
-			continue;
-		}
-
-		const float delta_time = (float)deltatime_delta_time(pLwc->update_dt);
-
-		anim->elapsed += delta_time;
-
-		const float elapsed_frame = anim->elapsed * anim->fps;
-
-		int current_animdata_index = -1;
-
-		for (int j = anim->animdata_length - 1; j >= 0; j--) {
-			if (elapsed_frame >= anim->animdata[j].frame) {
-				current_animdata_index = j;
-				break;
-			}
-		}
-
-		//printf("cai=%d, cf=%f\n", current_animdata_index, elapsed_frame);
-
-		// final frames already presented
-		if (current_animdata_index >= anim->animdata_length - 1) {
-			anim->x = anim->animdata[anim->animdata_length - 1].x;
-			anim->y = anim->animdata[anim->animdata_length - 1].y;
-			anim->alpha = anim->animdata[anim->animdata_length - 1].alpha;
-
-			if (!anim->finalized) {
-				anim->finalized = 1;
-
-				if (anim->anim_finalized_proc_callback) {
-					anim->anim_finalized_proc_callback(pLwc);
-				}
-			}
-		} else {
-			// not started
-			if (current_animdata_index == -1) {
-				anim->x = 0;
-				anim->y = 0;
-				anim->alpha = 0;
-			} else {
-				const LWKEYFRAME *f1 = &anim->animdata[current_animdata_index];
-				const LWKEYFRAME *f2 = &anim->animdata[current_animdata_index + 1];
-
-				const int frame_count = f2->frame - f1->frame;
-				const float frame_distance = elapsed_frame - f1->frame;
-				const float r = frame_distance / frame_count;
-
-				anim->x = f1->x + r * (f2->x - f1->x);
-				anim->y = f1->y + r * (f2->y - f1->y);
-				anim->alpha = f1->alpha + r * (f2->alpha - f1->alpha);
-			}
-		}
-
-		set_sprite_mvp(pLwc, anim->las, anim->x, anim->y, 0, pLwc->proj, anim->mvp);
-	}
-}
-
-void render_anim(const LWCONTEXT *pLwc) {
-	for (int i = 0; i < ARRAY_SIZE(pLwc->anim); i++) {
-		const LWANIM *anim = &pLwc->anim[i];
-
-		if (!anim->valid) {
-			continue;
-		}
-
-		if (anim->custom_render_proc_callback) {
-			anim->custom_render_proc_callback(pLwc, anim->x, anim->y, anim->alpha);
-		} else {
-			set_texture_parameter(pLwc, LAE_C2_PNG, anim->las);
-			glUniformMatrix4fv(pLwc->shader[0].mvp_location, 1, GL_FALSE,
-				(const GLfloat *)anim->mvp);
-			glUniform1f(pLwc->shader[0].alpha_multiplier_location, anim->alpha);
-			glDrawElements(GL_TRIANGLES, VERTEX_COUNT_PER_ARRAY, GL_UNSIGNED_SHORT,
-				(GLvoid *)((char *)NULL));
-		}
-	}
-
 }
 
 // http://www.cse.yorku.ca/~oz/hash.html

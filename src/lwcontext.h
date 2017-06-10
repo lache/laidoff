@@ -75,165 +75,206 @@ static const char* tex_font_atlas_filename[] = {
 #define MAX_DELTA_TIME_HISTORY (60)
 
 typedef struct _LWCONTEXT {
+	// Window instance
 	struct GLFWwindow* window;
+	// Screen width
 	int width;
+	// Screen height
 	int height;
-
+	// Shader array
 	LWSHADER shader[MAX_SHADER];
+	// General VBO
 	LWVBO vertex_buffer[VERTEX_BUFFER_COUNT];
+	// Skinned mesh VBO
 	LWVBO skin_vertex_buffer[SKIN_VERTEX_BUFFER_COUNT];
+	// Aim sector(fan) VBO
 	LWVBO fan_vertex_buffer[FAN_VERTEX_BUFFER_COUNT];
-	//GLuint index_buffer;
+	// General mesh VAO
 	GLuint vao[VERTEX_BUFFER_COUNT];
+	// Skinned mesh VAO
 	GLuint skin_vao[SKIN_VERTEX_BUFFER_COUNT];
-	GLuint fan_vao[SKIN_VERTEX_BUFFER_COUNT];
-
+	// Aim sector(fan) VAO
+	GLuint fan_vao[FAN_VERTEX_BUFFER_COUNT];
+	// General texture atlas
 	GLuint tex_atlas[MAX_TEX_ATLAS];
+	// Width for text atlas array
 	int tex_atlas_width[MAX_TEX_ATLAS];
+	// Height for text atlas array
 	int tex_atlas_height[MAX_TEX_ATLAS];
+	// Font texture atlas
 	GLuint tex_font_atlas[MAX_TEX_FONT_ATLAS];
+	// Hashes for tex atlas resource
 	unsigned long tex_atlas_hash[MAX_TEX_ATLAS];
+	// Textures created from code during runtime
 	GLuint tex_programmed[MAX_TEX_PROGRAMMED];
-
-	int rotate;
-	mat4x4 mvp;
-
+	// Delta time tracker for logic update loop
 	LWDELTATIME* update_dt;
+	// Delta time tracker for rendering loop
 	LWDELTATIME* render_dt;
-
+	// Default projection matrix for UI
 	mat4x4 proj;
-	
+	// Current scene
 	LW_GAME_SCENE game_scene;
+	// The scene going to be visible at the next tick
 	LW_GAME_SCENE next_game_scene;
-
-	LWANIM anim[MAX_ANIM_COUNT];
-	LWTOUCHPROC touch_proc[MAX_TOUCHPROC_COUNT];
-
+	// Logic updated count since app started
 	int update_count;
+	// Rendered count since app started
 	int render_count;
-
-	int kp; // last keypad number (debug)
-
+	// last keypad number (debug)
+	int kp;
+	// Elapsed time since app started
 	double app_time;
+	// Elapsed time since enter the current scene
 	double scene_time;
-
+	// ???
 	int tex_atlas_index;
+	// ???
 	LWSPRITE* sprite_data;
-
-	
+	// Font instance
 	void* pFnt;
-
-	// Dialog Mode Components
+	// Dialog text data
 	char* dialog;
+	// Total dialog text data's length in bytes
 	int dialog_bytelen;
+	// Current page's current character index of dialog text
 	int render_char;
+	// Last time when the last character of dialog text is rendered
 	double last_render_char_incr_time;
-	int dialog_line;
+	// Current page's start index of dialog text
 	int dialog_start_index;
-	int dialog_next_index;
+	// 1 if next dialog input received, 0 if otherwise
 	int dialog_move_next;
+	// Dialog background image index
 	int dialog_bg_tex_index;
+	// Dialog portrait image index
 	int dialog_portrait_tex_index;
-
-	// Field Mode Components
+	// 1 if player move left key is down, 0 if otherwise
 	int player_move_left;
+	// 1 if player move right key is down, 0 if otherwise
 	int player_move_right;
+	// 1 if player move up key is down, 0 if otherwise
 	int player_move_up;
+	// 1 if player move down key is down, 0 if otherwise
 	int player_move_down;
-
+	// Current player x coordinate
 	float player_pos_x;
+	// Current player y coordinate
 	float player_pos_y;
+	// Last valid player x coordinate move delta (value when the dir pad is released)
 	float player_pos_last_moved_dx;
+	// Last valid player y coordinate move delta (value when the dir pad is released)
 	float player_pos_last_moved_dy;
-	//int player_moving; // Player is moving
-	//int player_attacking; // Player is attacking with its fist
-	//int player_aiming; // Player is aiming with its pistol
+	// Current player action
 	const LWANIMACTION* player_action;
 	//float player_aim_theta;
 	LWPLAYERSTATEDATA player_state_data;
-
+	// Field collider instance array
 	LWBOX2DCOLLIDER box_collider[MAX_BOX_COLLIDER];
+	// Field object instance array
 	LWFIELDOBJECT field_object[MAX_FIELD_OBJECT];
-
+	// Current Dir pad x coordinate (screen coordinate)
 	float dir_pad_x;
+	// Current Dir pad y coordinate (screen coordinate)
 	float dir_pad_y;
+	// 1 if dir pad (left button) is dragged, 0 if otherwise
 	int dir_pad_dragging;
+	// 1 if attack pad (right button) is dragged, 0 if otherwise
 	int atk_pad_dragging;
-
+	// Current field event ID
 	int field_event_id;
-
-	// Battle Mode Components
-
+	// Battle: Normal attack effect instance array
 	LWTRAIL trail[MAX_TRAIL];
+	// Battle: Current FOV
 	float battle_fov_deg;
+	// Battle: FOV when normal state
 	float battle_fov_deg_0;
+	// Battle: FOV when camera is zoomed(magnified)
 	float battle_fov_mag_deg_0;
+	// Battle: Camera zooming x coordinate
 	float battle_cam_center_x;
-
+	// Battle: Current command slot index
 	int selected_command_slot;
+	// Battle: Current enemy slot index
 	int selected_enemy_slot;
+	// Battle: State
 	LW_BATTLE_STATE battle_state;
+	// Battle: Command banner
 	LWANIM1D command_banner_anim;
+	// Battle: Damage text instance array
 	LWDAMAGETEXT damage_text[MAX_DAMAGE_TEXT];
+	// Battle: Player slots
 	LWBATTLECREATURE player[MAX_PLAYER_SLOT];
+	// Battle: Enemy slots
 	LWENEMY enemy[MAX_ENEMY_SLOT];
+	// Battle: Current player turn
 	int player_turn_creature_index;
+	// Battle: Current enemy turn
 	int enemy_turn_creature_index;
+	// Battle: Delay before executing the enemy action (mimics thinking time of human)
 	float enemy_turn_command_wait_time;
+	// Battle: Wall UV animation (v coordinate)
 	float battle_wall_tex_v;
+	// Battle: Projection amtrix
 	mat4x4 battle_proj;
+	// Battle: View matrix
 	mat4x4 battle_view;
+	// Battle: Turn change UI animator
 	LWANIM1D center_image_anim;
+	// Battle: Turn change UI image
 	LW_ATLAS_ENUM center_image;
-
-	// Font
-
+	// Font: Render font debug UI
 	int font_texture_texture_mode;
-
+	// Test font FBO
 	LWFBO font_fbo;
-
-	// Input
-
+	// Input: Last mouse press x coordinate
 	float last_mouse_press_x;
+	// Input: Last mouse press y coordinate
 	float last_mouse_press_y;
+	// Input: Last mouse move x coordinate
 	float last_mouse_move_x;
+	// Input: Last mouse move y coordinate
 	float last_mouse_move_y;
-
-	// Admin
-
+	// Admin button command handler array
 	LWBUTTONCOMMAND admin_button_command[6 * 5];
-
-	// Script
-
-	void* L; // lua VM
-
-	// Skin
-
+	// lua VM instance
+	void* L; 
+	// Skin: Armature data
 	LWARMATURE armature[LWAR_COUNT];
+	// Skin: Anim action data
 	LWANIMACTION action[LWAC_COUNT];
+	// Abstract time for player animation
 	float player_skin_time;
+	// Abstract time for test player animation
 	float test_player_skin_time;
+	// 1 if player animation action is looped, 0 if otherwise
 	int player_action_loop;
-
-	// Field
-
+	// Field instance
 	struct _LWFIELD* field;
-
+	// 1 if FPS camera mode enabled, 0 if otherwise
 	int fps_mode;
+	// 1 if field mesh hidden, 0 if otherwise
 	int hide_field;
-
+	// Default system message instance
 	void* def_sys_msg;
+	// Message queue instance
 	void* mq;
-
+	// Server index for online play
 	int server_index;
+	// 1 if aim sector ray test is executed for every logic frame, 0 if ray test disabled
 	int ray_test;
-
+	// 1 if application quit is requested
 	int quit_request;
+	// CZMQ actor for logic thread
 	void* logic_actor;
-
+	// Particle system buffer (rose)
 	GLuint particle_buffer;
+	// Particle system buffer (explosion)
 	GLuint particle_buffer2;
+	// Logic update interval (in seconds)
 	double update_interval;
+	// Particle system manager instance
+	void* ps;
 } LWCONTEXT;
 
 #ifdef __cplusplus

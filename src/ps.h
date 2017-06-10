@@ -4,6 +4,7 @@ typedef struct _LWCONTEXT LWCONTEXT;
 
 #define NUM_PARTICLES (360)
 #define NUM_PARTICLES2 (180)
+#define NUM_PS_INSTANCE (16)
 
 typedef struct _LWPARTICLE {
 	float theta;
@@ -42,6 +43,11 @@ typedef struct _LWEMITTER2OBJECT {
 	float time;
 } LWEMITTER2OBJECT;
 
+typedef struct _LWPS LWPS;
+
 void ps_load_particles(LWCONTEXT* pLwc);
 void ps_load_emitter(LWCONTEXT* pLwc);
-void ps_update(LWCONTEXT* pLwc);
+void ps_test_update(LWCONTEXT* pLwc);
+void* ps_new();
+void ps_update(LWPS* ps, double delta_time);
+void ps_destroy(LWPS** ps);

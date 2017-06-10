@@ -434,7 +434,8 @@ void lwc_update(LWCONTEXT *pLwc, double delta_time) {
 	}
 
 	if (pLwc->game_scene == LGS_PARTICLE_SYSTEM) {
-		ps_update(pLwc);
+		ps_test_update(pLwc);
+		ps_update(pLwc->ps, lwcontext_delta_time(pLwc));
 	}
 
 	((LWCONTEXT *)pLwc)->update_count++;
