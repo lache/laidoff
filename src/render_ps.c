@@ -53,13 +53,17 @@ static void s_render_explosion(const LWCONTEXT* pLwc) {
 	glUniform3fv(pLwc->shader[shader_index].u_eColorStart, 1, emitter2.eColorStart);
 	glUniform3fv(pLwc->shader[shader_index].u_eColorEnd, 1, emitter2.eColorEnd);
 
+
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, pLwc->tex_atlas[LAE_U_GLOW]);
 	glUniform1i(pLwc->shader[shader_index].u_Texture, 0);
+	set_tex_filter(GL_LINEAR, GL_LINEAR);
+
 	glActiveTexture(GL_TEXTURE1);
 	glBindTexture(GL_TEXTURE_2D, pLwc->tex_atlas[LAE_U_GLOW_ALPHA]);
 	glUniform1i(pLwc->shader[shader_index].u_TextureAlpha, 1);
-	
+	set_tex_filter(GL_LINEAR, GL_LINEAR);
+
 	// Attributes
 	glEnableVertexAttribArray(pLwc->shader[shader_index].a_pID);
 	glEnableVertexAttribArray(pLwc->shader[shader_index].a_pRadiusOffset);
