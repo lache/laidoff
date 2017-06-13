@@ -182,7 +182,7 @@ s_kvmsg_store_posmap_noown(kvmsg_t** self_p, zhash_t* hash, double sync_time, LW
 			//LOGI("New possyncmsg entry with key %s updated.", kvmsg_key(self));
 
 
-			if (/*mq->verbose &&*/ !mq_cursor_player(mq, kvmsg_key(self))) {
+			if (mq->verbose && !mq_cursor_player(mq, kvmsg_key(self))) {
 				float test_x, test_y, test_z, test_dx, test_dy;
 				vec4_extrapolator_read(possyncmsg->extrapolator, sync_time,
 					&test_x, &test_y, &test_z, &test_dx, &test_dy);
