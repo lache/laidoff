@@ -164,22 +164,31 @@ s_kvmsg_store_posmap_noown(kvmsg_t** self_p, zhash_t* hash, double sync_time, LW
 				}
 			}
 
-			if (mq->verbose && !mq_cursor_player(mq, kvmsg_key(self))) {
-				LOGI("UPDATE: t %.2f POS (%.2f, %.2f, %.2f) DXY (%.2f, %.2f)", msg->t, msg->x,
-					msg->y, msg->z, msg->dx, msg->dy);
+			if (/*mq->verbose &&*/ !mq_cursor_player(mq, kvmsg_key(self))) {
+				LOGI("UPDATE: msg t %.2f sync_time %.2f, POS (%.2f, %.2f, %.2f) DXY (%.2f, %.2f)",
+					msg->t, sync_time, msg->x, msg->y, msg->z, msg->dx, msg->dy);
 			}
 
 			//possyncmsg->attacking = msg->attacking;
 			//possyncmsg->moving = msg->moving;
 			possyncmsg->action = msg->action;
 			if (msg->stop) {
-				vec4_extrapolator_add_stop(possyncmsg->extrapolator, msg->t, sync_time, msg->x,
+				vec4_extrapolator_add_stop(possyncmsg->extrapolator, LWMIN(msg->t, sync_time), sync_time, msg->x,
 					msg->y, msg->z, msg->dx, msg->dy);
 			} else {
-				vec4_extrapolator_add(possyncmsg->extrapolator, msg->t, sync_time, msg->x,
+				vec4_extrapolator_add(possyncmsg->extrapolator, LWMIN(msg->t, sync_time), sync_time, msg->x,
 					msg->y, msg->z, msg->dx, msg->dy);
 			}
 			//LOGI("New possyncmsg entry with key %s updated.", kvmsg_key(self));
+
+
+			if (/*mq->verbose &&*/ !mq_cursor_player(mq, kvmsg_key(self))) {
+				float test_x, test_y, test_z, test_dx, test_dy;
+				vec4_extrapolator_read(possyncmsg->extrapolator, sync_time,
+					&test_x, &test_y, &test_z, &test_dx, &test_dy);
+				LOGI("UPDATE-SAMPLED: t POS (%.2f, %.2f, %.2f) DXY (%.2f, %.2f)",
+					test_x, test_y, test_z, test_dx, test_dy);
+			}
 
 		} else {
 			zhash_delete(hash, kvmsg_key(self));
@@ -266,7 +275,7 @@ static void s_mq_poll_snapshot(void* _mq, void* sm, LWFIELD* field) {
 		}
 		if (streq(kvmsg_key(kvmsg), "KTHXBAI")) {
 			mq->sequence = kvmsg_sequence(kvmsg);
-			LOGI("received snapshot=%"PRId64, mq->sequence);
+			LOGI("received snapshot sequence %"PRId64, mq->sequence);
 			kvmsg_destroy(&kvmsg);
 			mq->state = LMQS_READY;
 			mq->alarm = zclock_time() + 100;
@@ -282,6 +291,11 @@ static void s_mq_poll_snapshot(void* _mq, void* sm, LWFIELD* field) {
 }
 
 static void s_send_pos(const LWCONTEXT* pLwc, LWMESSAGEQUEUE* mq, int stop) {
+	// Should not send position before timesync is completed.
+	if (mq->state != LMQS_READY) {
+		return;
+	}
+
 	kvmsg_t* kvmsg = kvmsg_new(0);
 	kvmsg_fmt_key(kvmsg, "%s%s", mq->subtree, zuuid_str(mq->uuid));
 	LWMQMSG msg;
