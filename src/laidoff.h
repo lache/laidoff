@@ -62,6 +62,7 @@ void change_to_physics(LWCONTEXT *pLwc);
 void change_to_particle_system(LWCONTEXT *pLwc);
 void load_field_1_init_runtime_data(LWCONTEXT *pLwc);
 void load_field_2_init_runtime_data(LWCONTEXT *pLwc);
+void load_field_3_init_runtime_data(LWCONTEXT *pLwc);
 void connect_to_server_0(LWCONTEXT *pLwc);
 void connect_to_server_1(LWCONTEXT *pLwc);
 

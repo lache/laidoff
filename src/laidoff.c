@@ -516,6 +516,10 @@ static void init_vbo(LWCONTEXT *pLwc) {
 	load_vbo(pLwc, ASSETS_BASE_PATH "vbo" PATH_SEPARATOR "Floor.vbo",
 		&pLwc->vertex_buffer[LVT_FLOOR]);
 
+	// LVT_FLOOR2
+	load_vbo(pLwc, ASSETS_BASE_PATH "vbo" PATH_SEPARATOR "Floor2.vbo",
+		&pLwc->vertex_buffer[LVT_FLOOR2]);
+
 	// LVT_SPHERE
 	load_vbo(pLwc, ASSETS_BASE_PATH "vbo" PATH_SEPARATOR "Sphere.vbo",
 		&pLwc->vertex_buffer[LVT_SPHERE]);

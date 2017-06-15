@@ -124,6 +124,30 @@ void load_field_2_init_runtime_data(LWCONTEXT *pLwc) {
 	load_field_2_init_runtime_data_async(pLwc, pLwc->logic_actor);
 }
 
+void load_field_3_init_runtime_data_async(LWCONTEXT *pLwc, zactor_t* actor) {
+	pLwc->next_game_scene = LGS_FIELD;
+	zmsg_t* msg = zmsg_new();
+	LWMSGINITFIELD m = {
+		LM_LWMSGINITFIELD,
+		ASSETS_BASE_PATH "field" PATH_SEPARATOR "testfield2.field",
+		ASSETS_BASE_PATH "nav" PATH_SEPARATOR "test2.nav",
+		LVT_FLOOR2,
+		pLwc->tex_atlas[LAE_3D_FLOOR2_TEX_KTX],
+		0,
+		0.5f,
+		1,
+	};
+	zmsg_addmem(msg, &m, sizeof(LWMSGINITFIELD));
+	if (zactor_send(actor, &msg) < 0) {
+		zmsg_destroy(&msg);
+		LOGE("Send message to logic worker failed!");
+	}
+}
+
+void load_field_3_init_runtime_data(LWCONTEXT *pLwc) {
+	load_field_3_init_runtime_data_async(pLwc, pLwc->logic_actor);
+}
+
 static void reinit_mq(LWCONTEXT *pLwc) {
 
 	//mq_interrupt();
@@ -345,14 +369,16 @@ void reset_runtime_context(LWCONTEXT* pLwc) {
 	pLwc->admin_button_command[10].command_handler = load_field_1_init_runtime_data;
 	pLwc->admin_button_command[11].name = LWU("신:필드2로드");
 	pLwc->admin_button_command[11].command_handler = load_field_2_init_runtime_data;
-	pLwc->admin_button_command[12].name = LWU("Server #0");
-	pLwc->admin_button_command[12].command_handler = connect_to_server_0;
-	pLwc->admin_button_command[13].name = LWU("Server #1");
-	pLwc->admin_button_command[13].command_handler = connect_to_server_1;
-	pLwc->admin_button_command[14].name = LWU("레이테스트토글");
-	pLwc->admin_button_command[14].command_handler = toggle_ray_test;
-	pLwc->admin_button_command[15].name = LWU("네트워크토글");
-	pLwc->admin_button_command[15].command_handler = toggle_network_poll;
+	pLwc->admin_button_command[12].name = LWU("신:필드3로드");
+	pLwc->admin_button_command[12].command_handler = load_field_3_init_runtime_data;
+	pLwc->admin_button_command[13].name = LWU("Server #0");
+	pLwc->admin_button_command[13].command_handler = connect_to_server_0;
+	pLwc->admin_button_command[14].name = LWU("Server #1");
+	pLwc->admin_button_command[14].command_handler = connect_to_server_1;
+	pLwc->admin_button_command[15].name = LWU("레이테스트토글");
+	pLwc->admin_button_command[15].command_handler = toggle_ray_test;
+	pLwc->admin_button_command[16].name = LWU("네트워크토글");
+	pLwc->admin_button_command[16].command_handler = toggle_network_poll;
 }
 
 static void update_battle_wall(LWCONTEXT* pLwc) {
