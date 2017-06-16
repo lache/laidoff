@@ -50,6 +50,7 @@ double lw_get_delta_time(LWCONTEXT* pLwc);
 void lw_on_destroy(LWCONTEXT* pLwc);
 
 void get_dir_pad_center(float aspect_ratio, float* x, float* y);
+float get_dir_size_radius();
 
 void change_to_field(LWCONTEXT* pLwc);
 void change_to_dialog(LWCONTEXT* pLwc);

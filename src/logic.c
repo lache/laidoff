@@ -544,7 +544,7 @@ void lwc_start_logic_thread(LWCONTEXT* pLwc) {
 	// Start logic thread
 	pLwc->logic_actor = zactor_new(s_logic_worker, pLwc);
 	// Load initial stage
-	load_field_2_init_runtime_data_async(pLwc, pLwc->logic_actor);
+	load_field_3_init_runtime_data_async(pLwc, pLwc->logic_actor);
 }
 
 const char* logic_server_addr(int idx) {
