@@ -756,6 +756,7 @@ void update_field(LWCONTEXT* pLwc, LWFIELD* field) {
 	pLwc->player_state_data.aim_last_skin_time = pLwc->action[LWAC_HUMANACTION_STAND_AIM].last_key_f / pLwc->action[LWAC_HUMANACTION_STAND_AIM].fps;
 	pLwc->player_state_data.field = field;
 	pLwc->player_state_data.mq = pLwc->mq;
+	pLwc->player_state_data.pLwc = pLwc;
 	// (2) Get outputs - which is a new state
 	pLwc->player_state_data.state = run_state(pLwc->player_state_data.state, &pLwc->player_state_data);
 	// Get updated player anim action

@@ -44,6 +44,18 @@ int l_spawn_red_cube_wall(lua_State* L) {
 	return 1;
 }
 
+int l_spawn_pump(lua_State* L) {
+	if (lua_gettop(L) >= 4) {
+		LWCONTEXT* pLwc = lua_touserdata(L, 1);
+		float x = (float)lua_tonumber(L, 2);
+		float y = (float)lua_tonumber(L, 3);
+		int field_event_id = (int)lua_tonumber(L, 4);
+		int r = spawn_field_object(pLwc, x, y, 1, 1, LVT_PUMP, pLwc->tex_programmed[LPT_SOLID_RED], 1, 1, 0.5f, field_event_id);
+		lua_pushinteger(L, r);
+	}
+	return 1;
+}
+
 void init_lua(LWCONTEXT* pLwc)
 {
 	lua_State* L = luaL_newstate();
@@ -54,6 +66,8 @@ void init_lua(LWCONTEXT* pLwc)
 	lua_setglobal(L, "spawn_blue_cube_wall");
 	lua_pushcfunction(L, l_spawn_red_cube_wall);
 	lua_setglobal(L, "spawn_red_cube_wall");
+	lua_pushcfunction(L, l_spawn_pump);
+	lua_setglobal(L, "spawn_pump");
 	lua_pushlightuserdata(L, pLwc);
 	lua_setglobal(L, "pLwc");
 

@@ -53,7 +53,7 @@ static const char* tex_font_atlas_filename[] = {
 #define MAX_TEX_FONT_ATLAS (ARRAY_SIZE(tex_font_atlas_filename))
 
 
-#define MAX_FIELD_OBJECT (32)
+#define MAX_FIELD_OBJECT (128)
 #define MAX_BOX_COLLIDER MAX_FIELD_OBJECT
 #define MAX_TRAIL (16)
 #define SET_COLOR_RGBA_FLOAT(v, r, g, b, a) \

@@ -21,5 +21,7 @@ spawn_red_cube_wall(pLwc,15, -7, 5)
 
 spawn_red_cube_wall(pLwc, -3, -7, 6)
 
+spawn_pump(pLwc, -5, -5, 6)
+
 
 return ink(15)

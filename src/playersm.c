@@ -3,6 +3,7 @@
 #include "lwlog.h"
 #include "field.h"
 #include "mq.h"
+#include "laidoff.h"
 
 static int s_verbose = 0;
 
@@ -226,5 +227,8 @@ static void s_fire_bullet(LWPLAYERSTATEDATA* data) {
 		mq_send_fire(data->mq, pos, vel);
 	} else {
 		field_spawn_sphere(data->field, pos, vel, mq_bullet_counter(data->mq));
+
+		spawn_field_object(data->pLwc, pos[0], pos[1], 1, 1, LVT_PUMP, data->pLwc->tex_programmed[LPT_SOLID_RED],
+			1, 1, 0.5f, 0);
 	}
 }

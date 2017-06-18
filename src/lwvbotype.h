@@ -17,6 +17,7 @@ typedef enum _LW_VBO_TYPE
 	LVT_SPHERE,
 	LVT_APT,
 	LVT_BEAM,
+	LVT_PUMP,
 
 	LVT_COUNT,
 } LW_VBO_TYPE;

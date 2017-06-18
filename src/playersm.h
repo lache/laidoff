@@ -29,6 +29,7 @@ typedef struct _LWPLAYERSTATEDATA {
 	float rot_z;
 	LWFIELD* field;
 	LWMESSAGEQUEUE* mq;
+	LWCONTEXT* pLwc;
 } LWPLAYERSTATEDATA;
 
 LW_PLAYER_STATE run_state(LW_PLAYER_STATE cur_state, LWPLAYERSTATEDATA* data);
