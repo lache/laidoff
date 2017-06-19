@@ -18,6 +18,7 @@ typedef enum _LW_VBO_TYPE
 	LVT_APT,
 	LVT_BEAM,
 	LVT_PUMP,
+	LVT_OIL_TRUCK,
 
 	LVT_COUNT,
 } LW_VBO_TYPE;

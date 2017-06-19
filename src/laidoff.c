@@ -536,6 +536,10 @@ static void init_vbo(LWCONTEXT *pLwc) {
 	load_vbo(pLwc, ASSETS_BASE_PATH "vbo" PATH_SEPARATOR "Pump.vbo",
 		&pLwc->vertex_buffer[LVT_PUMP]);
 
+	// LVT_OIL_TRUCK
+	load_vbo(pLwc, ASSETS_BASE_PATH "vbo" PATH_SEPARATOR "OilTruck.vbo",
+		&pLwc->vertex_buffer[LVT_OIL_TRUCK]);
+
 	// LVT_LEFT_TOP_ANCHORED_SQUARE ~ LVT_RIGHT_BOTTOM_ANCHORED_SQUARE
 	// 9 anchored squares...
 	const float anchored_square_offset[][2] = {

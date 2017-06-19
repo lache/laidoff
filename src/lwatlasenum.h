@@ -60,6 +60,7 @@ typedef enum _LW_ATLAS_ENUM
 	LAE_3D_FLOOR_TEX_KTX,
 	LAE_3D_FLOOR2_TEX_KTX,
 	LAE_3D_APT_TEX_MIP_KTX,
+	LAE_3D_OIL_TRUCK_TEX_KTX,
 
 	LAE_BEAM_KTX,
     
@@ -123,6 +124,7 @@ static const char *tex_atlas_filename[] = {
 	ASSETS_BASE_PATH "ktx" PATH_SEPARATOR "3d-floor-tex.ktx",
 	ASSETS_BASE_PATH "ktx" PATH_SEPARATOR "3d-floor2-tex.ktx",
 	ASSETS_BASE_PATH "ktx" PATH_SEPARATOR "3d-apt-tex-mip.ktx",
+	ASSETS_BASE_PATH "ktx" PATH_SEPARATOR "3d-oil-truck-tex.ktx",
 
 	ASSETS_BASE_PATH "ktx" PATH_SEPARATOR "fx-beam.ktx",
 };

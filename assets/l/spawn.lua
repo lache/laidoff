@@ -23,5 +23,7 @@ spawn_red_cube_wall(pLwc, -3, -7, 6)
 
 spawn_pump(pLwc, -5, -5, 6)
 
+spawn_oil_truck(pLwc, -8, -8, 6)
+
 
 return ink(15)

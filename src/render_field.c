@@ -402,7 +402,7 @@ void lwc_render_field(const LWCONTEXT* pLwc) {
 				pLwc->field_object[i].sy,
 				1.0f,
 				pLwc->field_object[i].alpha_multiplier,
-				1
+				0
 			);
 		}
 	}
