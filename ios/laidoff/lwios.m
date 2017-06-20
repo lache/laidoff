@@ -14,6 +14,8 @@
 #include "constants.h"
 #include "lwmacro.h"
 #include "sound.h"
+#include "lwcontext.h"
+#include <czmq.h>
 
 char * create_string_from_file(const char * filename) {
     
@@ -118,4 +120,11 @@ const unsigned char* load_png_ios(const char* filename, LWBITMAPCONTEXT* pBitmap
 void unload_png_ios(LWBITMAPCONTEXT* pBitmapContext) {
     free(pBitmapContext->data);
     pBitmapContext->data = 0;
+}
+
+void lw_app_quit(LWCONTEXT* pLwc)
+{
+    pLwc->quit_request = 1;
+    zsock_wait(pLwc->logic_actor);
+    //glfwSetWindowShouldClose(lw_get_window(pLwc), GLFW_TRUE);
 }
