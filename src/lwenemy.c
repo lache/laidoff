@@ -4,6 +4,18 @@
 #include "lwcontext.h"
 #include "lwsimpleanim.h"
 
+const LWENEMY ENEMY_DATA_LIST[LET_COUNT] = {
+	ENEMY_ICECREAM,
+	ENEMY_HANNIBAL,
+	ENEMY_KEYBOARD,
+	ENEMY_FISH,
+	ENEMY_ANIMAL,
+	ENEMY_TEST_PLAYER_1,
+	ENEMY_TEST_PLAYER_2,
+	ENEMY_TEST_PLAYER_3,
+	ENEMY_TEST_PLAYER_4,
+};
+
 float get_battle_enemy_x_center(int enemy_slot_index)
 {
 	return -1.6f + 0.8f * enemy_slot_index;

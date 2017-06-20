@@ -14,6 +14,7 @@
 #include "font.h"
 #include "file.h"
 #include "ps.h"
+#include "script.h"
 
 void toggle_font_texture_test_mode(LWCONTEXT* pLwc);
 
@@ -379,6 +380,8 @@ void reset_runtime_context(LWCONTEXT* pLwc) {
 	pLwc->admin_button_command[15].command_handler = toggle_ray_test;
 	pLwc->admin_button_command[16].name = LWU("네트워크토글");
 	pLwc->admin_button_command[16].command_handler = toggle_network_poll;
+
+	script_run_file(pLwc, ASSETS_BASE_PATH "l" PATH_SEPARATOR "post_init.lua");
 }
 
 static void update_battle_wall(LWCONTEXT* pLwc) {

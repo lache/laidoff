@@ -41,14 +41,8 @@ typedef enum _LW_SHADER_TYPE {
 #define ANIM_FPS (60)
 #define MAX_TOUCHPROC_COUNT (10)
 
-const static vec4 EXP_COLOR = { 90 / 255.0f, 173 / 255.0f, 255 / 255.0f, 1 };
-
-static const char* tex_font_atlas_filename[] = {
-	//ASSETS_BASE_PATH "fnt" PATH_SEPARATOR "arita-semi-bold_0.tga",
-	//ASSETS_BASE_PATH "fnt" PATH_SEPARATOR "arita-semi-bold_1.tga",
-	ASSETS_BASE_PATH "fnt" PATH_SEPARATOR "test6_0.tga",
-	ASSETS_BASE_PATH "fnt" PATH_SEPARATOR "test6_1.tga",
-};
+extern const vec4 EXP_COLOR;
+extern const char* tex_font_atlas_filename[2];
 
 #define MAX_TEX_FONT_ATLAS (ARRAY_SIZE(tex_font_atlas_filename))
 

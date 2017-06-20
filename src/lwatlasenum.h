@@ -129,6 +129,6 @@ static const char *tex_atlas_filename[] = {
 	ASSETS_BASE_PATH "ktx" PATH_SEPARATOR "fx-beam.ktx",
 };
 
-#define MAX_TEX_ATLAS (ARRAY_SIZE(tex_atlas_filename))
+#define MAX_TEX_ATLAS LAE_COUNT
 
 LwStaticAssert(ARRAY_SIZE(tex_atlas_filename) == LAE_COUNT, "LAE_COUNT error");

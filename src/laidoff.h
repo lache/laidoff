@@ -43,14 +43,10 @@ void lw_release_key_down(LWCONTEXT* pLwc);
 
 int lw_get_update_count(LWCONTEXT* pLwc);
 int lw_get_render_count(LWCONTEXT* pLwc);
-long lw_get_last_time_sec(LWCONTEXT* pLwc);
-long lw_get_last_time_nsec(LWCONTEXT* pLwc);
-double lw_get_delta_time(LWCONTEXT* pLwc);
 
 void lw_on_destroy(LWCONTEXT* pLwc);
 
 void get_dir_pad_center(float aspect_ratio, float* x, float* y);
-float get_dir_size_radius();
 
 void change_to_field(LWCONTEXT* pLwc);
 void change_to_dialog(LWCONTEXT* pLwc);
@@ -101,9 +97,9 @@ unsigned long hash(const unsigned char *str);
 void reset_battle_context(LWCONTEXT* pLwc);
 void lwc_start_logic_thread(LWCONTEXT* pLwc);
 
-const static float default_uv_offset[2] = { 0, 0 };
-const static float default_uv_scale[2] = { 1, 1 };
-const static float default_flip_y_uv_scale[2] = { 1, -1 };
+extern const float default_uv_offset[2];
+extern const float default_uv_scale[2];
+extern const float default_flip_y_uv_scale[2];
 
 #ifdef __cplusplus
 };

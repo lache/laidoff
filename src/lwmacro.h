@@ -10,7 +10,12 @@
 #define __WIDEN_TEXT(quote) L##quote
 #define WIDEN_TEXT(quote) __WIDEN_TEXT(quote)   // r_winnt
 
-#ifdef LW_PLATFORM_WIN32
+#ifdef SWIG
+#   define PATH_SEPARATOR "\\"
+#   define ASSETS_BASE_PATH "assets" PATH_SEPARATOR
+#   define LwStaticAssert(x,y)
+#   define ARRAY_SIZE(arr) 0 // Swig has no support of compile time arithmetic
+#elif LW_PLATFORM_WIN32
 #include <stdlib.h>
 #   define PATH_SEPARATOR "\\"
 #   define ASSETS_BASE_PATH "assets" PATH_SEPARATOR

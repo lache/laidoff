@@ -53,6 +53,10 @@
 #define LW_SUPPORT_ETC1_HARDWARE_DECODING LW_PLATFORM_ANDROID
 #define LW_SUPPORT_VAO (LW_PLATFORM_WIN32 || LW_PLATFORM_OSX)
 
+const float default_uv_offset[2] = { 0, 0 };
+const float default_uv_scale[2] = { 1, 1 };
+const float default_flip_y_uv_scale[2] = { 1, -1 };
+
 // Vertex attributes: Coordinates (3xf) + Normal (3xf) + UV (2xf) + S9 (2xf)
 // See Also: LWVERTEX
 const static GLsizei stride_in_bytes = (GLsizei)(sizeof(float) * (3 + 3 + 2 + 2));
