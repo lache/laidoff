@@ -6648,51 +6648,6 @@ fail:
 }
 
 
-static int _wrap_load_software_decode_etc1_rgb(lua_State* L) {
-  int SWIG_arg = 0;
-  short arg1 ;
-  short arg2 ;
-  char *arg3 = (char *) 0 ;
-  char *result = 0 ;
-  
-  SWIG_check_num_args("load_software_decode_etc1_rgb",3,3)
-  if(!lua_isnumber(L,1)) SWIG_fail_arg("load_software_decode_etc1_rgb",1,"short");
-  if(!lua_isnumber(L,2)) SWIG_fail_arg("load_software_decode_etc1_rgb",2,"short");
-  if(!SWIG_lua_isnilstring(L,3)) SWIG_fail_arg("load_software_decode_etc1_rgb",3,"char const *");
-  arg1 = (short)lua_tonumber(L, 1);
-  arg2 = (short)lua_tonumber(L, 2);
-  arg3 = (char *)lua_tostring(L, 3);
-  result = (char *)load_software_decode_etc1_rgb(arg1,arg2,(char const *)arg3);
-  lua_pushstring(L,(const char *)result); SWIG_arg++;
-  return SWIG_arg;
-  
-  if(0) SWIG_fail;
-  
-fail:
-  lua_error(L);
-  return SWIG_arg;
-}
-
-
-static int _wrap_release_software_decode_etc1_rgb(lua_State* L) {
-  int SWIG_arg = 0;
-  char *arg1 = (char *) 0 ;
-  
-  SWIG_check_num_args("release_software_decode_etc1_rgb",1,1)
-  if(!SWIG_lua_isnilstring(L,1)) SWIG_fail_arg("release_software_decode_etc1_rgb",1,"char *");
-  arg1 = (char *)lua_tostring(L, 1);
-  release_software_decode_etc1_rgb(arg1);
-  
-  return SWIG_arg;
-  
-  if(0) SWIG_fail;
-  
-fail:
-  lua_error(L);
-  return SWIG_arg;
-}
-
-
 static int _wrap_lw_get_normalized_dir_pad_input(lua_State* L) {
   int SWIG_arg = 0;
   LWCONTEXT *arg1 = (LWCONTEXT *) 0 ;
@@ -43078,8 +43033,6 @@ static swig_lua_method swig_SwigModule_methods[]= {
     { "font_get_base", _wrap_font_get_base},
     { "font_get_line_height", _wrap_font_get_line_height},
     { "release_font", _wrap_release_font},
-    { "load_software_decode_etc1_rgb", _wrap_load_software_decode_etc1_rgb},
-    { "release_software_decode_etc1_rgb", _wrap_release_software_decode_etc1_rgb},
     { "lw_get_normalized_dir_pad_input", _wrap_lw_get_normalized_dir_pad_input},
     { "reset_dir_pad_position", _wrap_reset_dir_pad_position},
     { "load_ktx_hw_or_sw", _wrap_load_ktx_hw_or_sw},

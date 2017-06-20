@@ -98,7 +98,6 @@
 %include "field.h"
 %include "file.h"
 %include "font.h"
-%include "image.h"
 %include "input.h"
 %include "ktx.h"
 %include "kvmsg.h"
