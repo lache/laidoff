@@ -94,7 +94,6 @@
 %include "lwmacro.h"
 %include "constants.h"
 %include "dialog.h"
-%include "etc1.h"
 %include "extrapolator.h"
 %include "field.h"
 %include "file.h"

@@ -2779,7 +2779,6 @@ static swig_module_info swig_module = {swig_types, 115, 0, 0, 0, 0};
 
 #define SWIG_LUACODE   luaopen_lo_luacode
 
-// ReSharper disable All 
 #include "constants.h"
 #include "dialog.h"
 #include "etc1.h"
@@ -2881,9 +2880,6 @@ typedef struct {
   unsigned int god : 2;
   unsigned int evl : 2;
 } LWATTRIBVALUE_bits;
-
-
-// ReSharper restore All
 
 #ifdef __cplusplus
 extern "C" {
@@ -4852,292 +4848,6 @@ static int _wrap_update_dialog(lua_State* L) {
   
   update_dialog(arg1);
   
-  return SWIG_arg;
-  
-  if(0) SWIG_fail;
-  
-fail:
-  lua_error(L);
-  return SWIG_arg;
-}
-
-
-static int _wrap_etc1_encode_block(lua_State* L) {
-  int SWIG_arg = 0;
-  etc1_byte *arg1 = (etc1_byte *) 0 ;
-  etc1_uint32 arg2 ;
-  etc1_byte *arg3 = (etc1_byte *) 0 ;
-  
-  SWIG_check_num_args("etc1_encode_block",3,3)
-  if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("etc1_encode_block",1,"etc1_byte const *");
-  if(!lua_isnumber(L,2)) SWIG_fail_arg("etc1_encode_block",2,"etc1_uint32");
-  if(!SWIG_isptrtype(L,3)) SWIG_fail_arg("etc1_encode_block",3,"etc1_byte *");
-  
-  if (!SWIG_IsOK(SWIG_ConvertPtr(L,1,(void**)&arg1,SWIGTYPE_p_unsigned_char,0))){
-    SWIG_fail_ptr("etc1_encode_block",1,SWIGTYPE_p_unsigned_char);
-  }
-  
-  SWIG_contract_assert((lua_tonumber(L,2)>=0),"number must not be negative")
-  arg2 = (etc1_uint32)lua_tonumber(L, 2);
-  
-  if (!SWIG_IsOK(SWIG_ConvertPtr(L,3,(void**)&arg3,SWIGTYPE_p_unsigned_char,0))){
-    SWIG_fail_ptr("etc1_encode_block",3,SWIGTYPE_p_unsigned_char);
-  }
-  
-  etc1_encode_block((unsigned char const *)arg1,arg2,arg3);
-  
-  return SWIG_arg;
-  
-  if(0) SWIG_fail;
-  
-fail:
-  lua_error(L);
-  return SWIG_arg;
-}
-
-
-static int _wrap_etc1_decode_block(lua_State* L) {
-  int SWIG_arg = 0;
-  etc1_byte *arg1 = (etc1_byte *) 0 ;
-  etc1_byte *arg2 = (etc1_byte *) 0 ;
-  
-  SWIG_check_num_args("etc1_decode_block",2,2)
-  if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("etc1_decode_block",1,"etc1_byte const *");
-  if(!SWIG_isptrtype(L,2)) SWIG_fail_arg("etc1_decode_block",2,"etc1_byte *");
-  
-  if (!SWIG_IsOK(SWIG_ConvertPtr(L,1,(void**)&arg1,SWIGTYPE_p_unsigned_char,0))){
-    SWIG_fail_ptr("etc1_decode_block",1,SWIGTYPE_p_unsigned_char);
-  }
-  
-  
-  if (!SWIG_IsOK(SWIG_ConvertPtr(L,2,(void**)&arg2,SWIGTYPE_p_unsigned_char,0))){
-    SWIG_fail_ptr("etc1_decode_block",2,SWIGTYPE_p_unsigned_char);
-  }
-  
-  etc1_decode_block((unsigned char const *)arg1,arg2);
-  
-  return SWIG_arg;
-  
-  if(0) SWIG_fail;
-  
-fail:
-  lua_error(L);
-  return SWIG_arg;
-}
-
-
-static int _wrap_etc1_get_encoded_data_size(lua_State* L) {
-  int SWIG_arg = 0;
-  etc1_uint32 arg1 ;
-  etc1_uint32 arg2 ;
-  etc1_uint32 result;
-  
-  SWIG_check_num_args("etc1_get_encoded_data_size",2,2)
-  if(!lua_isnumber(L,1)) SWIG_fail_arg("etc1_get_encoded_data_size",1,"etc1_uint32");
-  if(!lua_isnumber(L,2)) SWIG_fail_arg("etc1_get_encoded_data_size",2,"etc1_uint32");
-  SWIG_contract_assert((lua_tonumber(L,1)>=0),"number must not be negative")
-  arg1 = (etc1_uint32)lua_tonumber(L, 1);
-  SWIG_contract_assert((lua_tonumber(L,2)>=0),"number must not be negative")
-  arg2 = (etc1_uint32)lua_tonumber(L, 2);
-  result = (etc1_uint32)etc1_get_encoded_data_size(arg1,arg2);
-  lua_pushnumber(L, (lua_Number) result); SWIG_arg++;
-  return SWIG_arg;
-  
-  if(0) SWIG_fail;
-  
-fail:
-  lua_error(L);
-  return SWIG_arg;
-}
-
-
-static int _wrap_etc1_encode_image(lua_State* L) {
-  int SWIG_arg = 0;
-  etc1_byte *arg1 = (etc1_byte *) 0 ;
-  etc1_uint32 arg2 ;
-  etc1_uint32 arg3 ;
-  etc1_uint32 arg4 ;
-  etc1_uint32 arg5 ;
-  etc1_byte *arg6 = (etc1_byte *) 0 ;
-  int result;
-  
-  SWIG_check_num_args("etc1_encode_image",6,6)
-  if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("etc1_encode_image",1,"etc1_byte const *");
-  if(!lua_isnumber(L,2)) SWIG_fail_arg("etc1_encode_image",2,"etc1_uint32");
-  if(!lua_isnumber(L,3)) SWIG_fail_arg("etc1_encode_image",3,"etc1_uint32");
-  if(!lua_isnumber(L,4)) SWIG_fail_arg("etc1_encode_image",4,"etc1_uint32");
-  if(!lua_isnumber(L,5)) SWIG_fail_arg("etc1_encode_image",5,"etc1_uint32");
-  if(!SWIG_isptrtype(L,6)) SWIG_fail_arg("etc1_encode_image",6,"etc1_byte *");
-  
-  if (!SWIG_IsOK(SWIG_ConvertPtr(L,1,(void**)&arg1,SWIGTYPE_p_unsigned_char,0))){
-    SWIG_fail_ptr("etc1_encode_image",1,SWIGTYPE_p_unsigned_char);
-  }
-  
-  SWIG_contract_assert((lua_tonumber(L,2)>=0),"number must not be negative")
-  arg2 = (etc1_uint32)lua_tonumber(L, 2);
-  SWIG_contract_assert((lua_tonumber(L,3)>=0),"number must not be negative")
-  arg3 = (etc1_uint32)lua_tonumber(L, 3);
-  SWIG_contract_assert((lua_tonumber(L,4)>=0),"number must not be negative")
-  arg4 = (etc1_uint32)lua_tonumber(L, 4);
-  SWIG_contract_assert((lua_tonumber(L,5)>=0),"number must not be negative")
-  arg5 = (etc1_uint32)lua_tonumber(L, 5);
-  
-  if (!SWIG_IsOK(SWIG_ConvertPtr(L,6,(void**)&arg6,SWIGTYPE_p_unsigned_char,0))){
-    SWIG_fail_ptr("etc1_encode_image",6,SWIGTYPE_p_unsigned_char);
-  }
-  
-  result = (int)etc1_encode_image((unsigned char const *)arg1,arg2,arg3,arg4,arg5,arg6);
-  lua_pushnumber(L, (lua_Number) result); SWIG_arg++;
-  return SWIG_arg;
-  
-  if(0) SWIG_fail;
-  
-fail:
-  lua_error(L);
-  return SWIG_arg;
-}
-
-
-static int _wrap_etc1_decode_image(lua_State* L) {
-  int SWIG_arg = 0;
-  etc1_byte *arg1 = (etc1_byte *) 0 ;
-  etc1_byte *arg2 = (etc1_byte *) 0 ;
-  etc1_uint32 arg3 ;
-  etc1_uint32 arg4 ;
-  etc1_uint32 arg5 ;
-  etc1_uint32 arg6 ;
-  int result;
-  
-  SWIG_check_num_args("etc1_decode_image",6,6)
-  if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("etc1_decode_image",1,"etc1_byte const *");
-  if(!SWIG_isptrtype(L,2)) SWIG_fail_arg("etc1_decode_image",2,"etc1_byte *");
-  if(!lua_isnumber(L,3)) SWIG_fail_arg("etc1_decode_image",3,"etc1_uint32");
-  if(!lua_isnumber(L,4)) SWIG_fail_arg("etc1_decode_image",4,"etc1_uint32");
-  if(!lua_isnumber(L,5)) SWIG_fail_arg("etc1_decode_image",5,"etc1_uint32");
-  if(!lua_isnumber(L,6)) SWIG_fail_arg("etc1_decode_image",6,"etc1_uint32");
-  
-  if (!SWIG_IsOK(SWIG_ConvertPtr(L,1,(void**)&arg1,SWIGTYPE_p_unsigned_char,0))){
-    SWIG_fail_ptr("etc1_decode_image",1,SWIGTYPE_p_unsigned_char);
-  }
-  
-  
-  if (!SWIG_IsOK(SWIG_ConvertPtr(L,2,(void**)&arg2,SWIGTYPE_p_unsigned_char,0))){
-    SWIG_fail_ptr("etc1_decode_image",2,SWIGTYPE_p_unsigned_char);
-  }
-  
-  SWIG_contract_assert((lua_tonumber(L,3)>=0),"number must not be negative")
-  arg3 = (etc1_uint32)lua_tonumber(L, 3);
-  SWIG_contract_assert((lua_tonumber(L,4)>=0),"number must not be negative")
-  arg4 = (etc1_uint32)lua_tonumber(L, 4);
-  SWIG_contract_assert((lua_tonumber(L,5)>=0),"number must not be negative")
-  arg5 = (etc1_uint32)lua_tonumber(L, 5);
-  SWIG_contract_assert((lua_tonumber(L,6)>=0),"number must not be negative")
-  arg6 = (etc1_uint32)lua_tonumber(L, 6);
-  result = (int)etc1_decode_image((unsigned char const *)arg1,arg2,arg3,arg4,arg5,arg6);
-  lua_pushnumber(L, (lua_Number) result); SWIG_arg++;
-  return SWIG_arg;
-  
-  if(0) SWIG_fail;
-  
-fail:
-  lua_error(L);
-  return SWIG_arg;
-}
-
-
-static int _wrap_etc1_pkm_format_header(lua_State* L) {
-  int SWIG_arg = 0;
-  etc1_byte *arg1 = (etc1_byte *) 0 ;
-  etc1_uint32 arg2 ;
-  etc1_uint32 arg3 ;
-  
-  SWIG_check_num_args("etc1_pkm_format_header",3,3)
-  if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("etc1_pkm_format_header",1,"etc1_byte *");
-  if(!lua_isnumber(L,2)) SWIG_fail_arg("etc1_pkm_format_header",2,"etc1_uint32");
-  if(!lua_isnumber(L,3)) SWIG_fail_arg("etc1_pkm_format_header",3,"etc1_uint32");
-  
-  if (!SWIG_IsOK(SWIG_ConvertPtr(L,1,(void**)&arg1,SWIGTYPE_p_unsigned_char,0))){
-    SWIG_fail_ptr("etc1_pkm_format_header",1,SWIGTYPE_p_unsigned_char);
-  }
-  
-  SWIG_contract_assert((lua_tonumber(L,2)>=0),"number must not be negative")
-  arg2 = (etc1_uint32)lua_tonumber(L, 2);
-  SWIG_contract_assert((lua_tonumber(L,3)>=0),"number must not be negative")
-  arg3 = (etc1_uint32)lua_tonumber(L, 3);
-  etc1_pkm_format_header(arg1,arg2,arg3);
-  
-  return SWIG_arg;
-  
-  if(0) SWIG_fail;
-  
-fail:
-  lua_error(L);
-  return SWIG_arg;
-}
-
-
-static int _wrap_etc1_pkm_is_valid(lua_State* L) {
-  int SWIG_arg = 0;
-  etc1_byte *arg1 = (etc1_byte *) 0 ;
-  etc1_bool result;
-  
-  SWIG_check_num_args("etc1_pkm_is_valid",1,1)
-  if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("etc1_pkm_is_valid",1,"etc1_byte const *");
-  
-  if (!SWIG_IsOK(SWIG_ConvertPtr(L,1,(void**)&arg1,SWIGTYPE_p_unsigned_char,0))){
-    SWIG_fail_ptr("etc1_pkm_is_valid",1,SWIGTYPE_p_unsigned_char);
-  }
-  
-  result = (etc1_bool)etc1_pkm_is_valid((unsigned char const *)arg1);
-  lua_pushnumber(L, (lua_Number) result); SWIG_arg++;
-  return SWIG_arg;
-  
-  if(0) SWIG_fail;
-  
-fail:
-  lua_error(L);
-  return SWIG_arg;
-}
-
-
-static int _wrap_etc1_pkm_get_width(lua_State* L) {
-  int SWIG_arg = 0;
-  etc1_byte *arg1 = (etc1_byte *) 0 ;
-  etc1_uint32 result;
-  
-  SWIG_check_num_args("etc1_pkm_get_width",1,1)
-  if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("etc1_pkm_get_width",1,"etc1_byte const *");
-  
-  if (!SWIG_IsOK(SWIG_ConvertPtr(L,1,(void**)&arg1,SWIGTYPE_p_unsigned_char,0))){
-    SWIG_fail_ptr("etc1_pkm_get_width",1,SWIGTYPE_p_unsigned_char);
-  }
-  
-  result = (etc1_uint32)etc1_pkm_get_width((unsigned char const *)arg1);
-  lua_pushnumber(L, (lua_Number) result); SWIG_arg++;
-  return SWIG_arg;
-  
-  if(0) SWIG_fail;
-  
-fail:
-  lua_error(L);
-  return SWIG_arg;
-}
-
-
-static int _wrap_etc1_pkm_get_height(lua_State* L) {
-  int SWIG_arg = 0;
-  etc1_byte *arg1 = (etc1_byte *) 0 ;
-  etc1_uint32 result;
-  
-  SWIG_check_num_args("etc1_pkm_get_height",1,1)
-  if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("etc1_pkm_get_height",1,"etc1_byte const *");
-  
-  if (!SWIG_IsOK(SWIG_ConvertPtr(L,1,(void**)&arg1,SWIGTYPE_p_unsigned_char,0))){
-    SWIG_fail_ptr("etc1_pkm_get_height",1,SWIGTYPE_p_unsigned_char);
-  }
-  
-  result = (etc1_uint32)etc1_pkm_get_height((unsigned char const *)arg1);
-  lua_pushnumber(L, (lua_Number) result); SWIG_arg++;
   return SWIG_arg;
   
   if(0) SWIG_fail;
@@ -42940,10 +42650,6 @@ static swig_lua_const_info swig_SwigModule_constants[]= {
     {SWIG_LUA_CONSTTAB_FLOAT("LWEPSILON", (1e-3))},
     {SWIG_LUA_CONSTTAB_STRING("__LW_STRING_LINE__", "81")},
     {SWIG_LUA_CONSTTAB_STRING("LWLOGPOS", "lwmacro.h(82): ")},
-    {SWIG_LUA_CONSTTAB_INT("ETC1_ENCODED_BLOCK_SIZE", 8)},
-    {SWIG_LUA_CONSTTAB_INT("ETC1_DECODED_BLOCK_SIZE", 48)},
-    {SWIG_LUA_CONSTTAB_INT("ETC1_RGB8_OES", 0x8D64)},
-    {SWIG_LUA_CONSTTAB_INT("ETC_PKM_HEADER_SIZE", 16)},
     {SWIG_LUA_CONSTTAB_INT("MAX_FIELD_SPHERE", (50))},
     {SWIG_LUA_CONSTTAB_INT("MAX_FIELD_REMOTE_SPHERE", (50))},
     {SWIG_LUA_CONSTTAB_INT("MAX_USER_GEOM", (16))},
@@ -43310,15 +43016,6 @@ static swig_lua_method swig_SwigModule_methods[]= {
     { "mat4x4o_mul_quat", _wrap_mat4x4o_mul_quat},
     { "quat_from_mat4x4", _wrap_quat_from_mat4x4},
     { "update_dialog", _wrap_update_dialog},
-    { "etc1_encode_block", _wrap_etc1_encode_block},
-    { "etc1_decode_block", _wrap_etc1_decode_block},
-    { "etc1_get_encoded_data_size", _wrap_etc1_get_encoded_data_size},
-    { "etc1_encode_image", _wrap_etc1_encode_image},
-    { "etc1_decode_image", _wrap_etc1_decode_image},
-    { "etc1_pkm_format_header", _wrap_etc1_pkm_format_header},
-    { "etc1_pkm_is_valid", _wrap_etc1_pkm_is_valid},
-    { "etc1_pkm_get_width", _wrap_etc1_pkm_get_width},
-    { "etc1_pkm_get_height", _wrap_etc1_pkm_get_height},
     { "vec4_extrapolator_new", _wrap_vec4_extrapolator_new},
     { "vec4_extrapolator_destroy", _wrap_vec4_extrapolator_destroy},
     { "vec4_extrapolator_reset", _wrap_vec4_extrapolator_reset},
@@ -43776,7 +43473,7 @@ static swig_type_info _swigt__p_char = {"_p_char", "char *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_f_p_q_const__struct__LWCONTEXT_float_float_float__void = {"_p_f_p_q_const__struct__LWCONTEXT_float_float_float__void", "void (*)(struct _LWCONTEXT const *,float,float,float)|custom_render_proc", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_f_p_struct__LWCONTEXT__void = {"_p_f_p_struct__LWCONTEXT__void", "LW_BUTTON_COMMAND_HANDLER|anim_finalized_proc|void (*)(struct _LWCONTEXT *)", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_float = {"_p_float", "float *", 0, 0, (void*)0, 0};
-static swig_type_info _swigt__p_int = {"_p_int", "etc1_bool *|int *", 0, 0, (void*)0, 0};
+static swig_type_info _swigt__p_int = {"_p_int", "int *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_int64_t = {"_p_int64_t", "int64_t *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_p__LWDELTATIME = {"_p_p__LWDELTATIME", "struct _LWDELTATIME **|LWDELTATIME **", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_p__LWPS = {"_p_p__LWPS", "struct _LWPS **|LWPS **", 0, 0, (void*)0, 0};
@@ -43795,8 +43492,8 @@ static swig_type_info _swigt__p_tinyobj_shape_t = {"_p_tinyobj_shape_t", "tinyob
 static swig_type_info _swigt__p_tinyobj_vertex_index_t = {"_p_tinyobj_vertex_index_t", "tinyobj_vertex_index_t *", 0, 0, (void*)&_wrap_class_tinyobj_vertex_index_t, 0};
 static swig_type_info _swigt__p_uint32_t = {"_p_uint32_t", "uint32_t *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_uint64_t = {"_p_uint64_t", "uint64_t *", 0, 0, (void*)0, 0};
-static swig_type_info _swigt__p_unsigned_char = {"_p_unsigned_char", "u8 *|unsigned char *|etc1_byte *", 0, 0, (void*)0, 0};
-static swig_type_info _swigt__p_unsigned_int = {"_p_unsigned_int", "etc1_uint32 *|unsigned int *|u32 *", 0, 0, (void*)0, 0};
+static swig_type_info _swigt__p_unsigned_char = {"_p_unsigned_char", "u8 *|unsigned char *", 0, 0, (void*)0, 0};
+static swig_type_info _swigt__p_unsigned_int = {"_p_unsigned_int", "unsigned int *|u32 *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_unsigned_long = {"_p_unsigned_long", "unsigned long *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_unsigned_short = {"_p_unsigned_short", "unsigned short *|u16 *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_void = {"_p_void", "void *", 0, 0, (void*)0, 0};
