@@ -9,6 +9,8 @@ spawn_blue_cube_wall(pLwc, -3, -3)
 spawn_blue_cube_wall(pLwc, 6, 6)
 ]]--
 
+spawn_blue_cube_wall_2(9, 9, 1)
+
 spawn_red_cube_wall(pLwc, 3, -7, 1)
 
 spawn_red_cube_wall(pLwc, 6, -7, 2)

@@ -8,3 +8,4 @@ void script_run_file(LWCONTEXT* pLwc, const char* filename);
 void script_set_context(LWCONTEXT* pLwc);
 LWCONTEXT* script_context();
 const char* script_prefix_path();
+void script_update(LWCONTEXT* pLwc);

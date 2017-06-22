@@ -235,7 +235,8 @@ typedef struct _LWCONTEXT {
 	// Admin button command handler array
 	LWBUTTONCOMMAND admin_button_command[6 * 5];
 	// lua VM instance
-	void* L; 
+	void* L;
+	void* script;
 	// Skin: Armature data
 	LWARMATURE armature[LWAR_COUNT];
 	// Skin: Anim action data
