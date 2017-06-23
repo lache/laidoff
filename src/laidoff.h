@@ -92,6 +92,7 @@ int get_tex_index_by_hash_key(const LWCONTEXT* pLwc, const char* hash_key);
 void set_texture_parameter(const LWCONTEXT *pLwc, LWENUM _LW_ATLAS_ENUM lae, LWENUM _LW_ATLAS_SPRITE las);
 
 int spawn_field_object(struct _LWCONTEXT* pLwc, float x, float y, float w, float h, enum _LW_VBO_TYPE lvt, unsigned int tex_id, float sx, float sy, float alpha_multiplier, int field_event_id);
+int despawn_field_object(struct _LWCONTEXT *pLwc, int idx);
 void lw_app_quit(LWCONTEXT *pLwc);
 unsigned long hash(const unsigned char *str);
 void reset_battle_context(LWCONTEXT* pLwc);

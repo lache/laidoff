@@ -49,4 +49,20 @@ start_coro(function ()
     lo.show_sys_msg(c.def_sys_msg, 'hello x 3')
 end)
 
+start_coro(function ()
+    --while true do
+      cw1 = spawn_blue_cube_wall_2(10, 10, 1)
+      yield_wait_ms(1000)
+      lo.despawn_field_object(c, cw1)
+      cw2 = spawn_blue_cube_wall_2(11, 11, 1)
+      yield_wait_ms(1000)
+      lo.despawn_field_object(c, cw2)
+      cw3 = spawn_blue_cube_wall_2(12, 12, 1)
+      yield_wait_ms(1000)
+      lo.despawn_field_object(c, cw3)
+      yield_wait_ms(1000)
+    --end
+end)
+
+
 return 1

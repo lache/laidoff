@@ -8722,6 +8722,33 @@ fail:
 }
 
 
+static int _wrap_despawn_field_object(lua_State* L) {
+  int SWIG_arg = 0;
+  struct _LWCONTEXT *arg1 = (struct _LWCONTEXT *) 0 ;
+  int arg2 ;
+  int result;
+  
+  SWIG_check_num_args("despawn_field_object",2,2)
+  if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("despawn_field_object",1,"struct _LWCONTEXT *");
+  if(!lua_isnumber(L,2)) SWIG_fail_arg("despawn_field_object",2,"int");
+  
+  if (!SWIG_IsOK(SWIG_ConvertPtr(L,1,(void**)&arg1,SWIGTYPE_p__LWCONTEXT,0))){
+    SWIG_fail_ptr("despawn_field_object",1,SWIGTYPE_p__LWCONTEXT);
+  }
+  
+  arg2 = (int)lua_tonumber(L, 2);
+  result = (int)despawn_field_object(arg1,arg2);
+  lua_pushnumber(L, (lua_Number) result); SWIG_arg++;
+  return SWIG_arg;
+  
+  if(0) SWIG_fail;
+  
+fail:
+  lua_error(L);
+  return SWIG_arg;
+}
+
+
 static int _wrap_lw_app_quit(lua_State* L) {
   int SWIG_arg = 0;
   LWCONTEXT *arg1 = (LWCONTEXT *) 0 ;
@@ -43197,6 +43224,7 @@ static swig_lua_method swig_SwigModule_methods[]= {
     { "get_tex_index_by_hash_key", _wrap_get_tex_index_by_hash_key},
     { "set_texture_parameter", _wrap_set_texture_parameter},
     { "spawn_field_object", _wrap_spawn_field_object},
+    { "despawn_field_object", _wrap_despawn_field_object},
     { "lw_app_quit", _wrap_lw_app_quit},
     { "hash", _wrap_hash},
     { "reset_battle_context", _wrap_reset_battle_context},

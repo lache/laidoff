@@ -7,10 +7,16 @@ extern "C" {;
 #define MAX_PATHQUERY_SMOOTH (2048)
 
 typedef struct _LWPATHQUERY {
+	// Start position
 	float spos[3];
+	// End position
 	float epos[3];
+	// Smooth path points
 	float smooth_path[MAX_PATHQUERY_SMOOTH * 3];
+	// Total smooth path point count
 	int n_smooth_path;
+	// Abstract time for test player movement
+	float path_t;
 } LWPATHQUERY;
 
 void* load_nav(const char* filename);

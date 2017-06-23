@@ -1232,6 +1232,19 @@ int spawn_field_object(struct _LWCONTEXT *pLwc, float x, float y, float w, float
 	return -1;
 }
 
+int despawn_field_object(struct _LWCONTEXT *pLwc, int idx) {
+	if (idx < 0 || idx >= MAX_FIELD_OBJECT) {
+		LOGE(LWLOGPOS "index error");
+		return -1;
+	}
+	if (!pLwc->field_object[idx].valid) {
+		LOGE(LWLOGPOS "not valid entry error");
+		return -1;
+	}
+	pLwc->field_object[idx].valid = 0;
+	return 0;
+}
+
 int lw_get_update_count(LWCONTEXT *pLwc) {
 	return pLwc->update_count;
 }

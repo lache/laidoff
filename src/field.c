@@ -110,10 +110,8 @@ typedef struct _LWFIELD {
 	char* field_raw_data;
 	// Navigation data instance
 	void* nav;
-	// Path query instance
-	LWPATHQUERY path_query;
-	// Abstract time for test player movement
-	float path_query_time;
+	// Path query result for testing
+	LWPATHQUERY path_query_test;
 	// Test player position
 	vec3 path_query_test_player_pos;
 	// Test player orientation
@@ -689,6 +687,54 @@ static void s_step_remote_sphere(LWFIELD* field, double delta_time) {
 	}
 }
 
+void start_new_path_query_test(void* nav, LWPATHQUERY* pq) {
+	set_random_start_end_pos(nav, pq);
+	nav_query(nav, pq);
+	pq->path_t = 0;
+}
+
+void update_path_query_test(void* nav, LWPATHQUERY* pq, float move_speed, float delta_time, float* out_pos, float* out_rot, dGeomID geom) {
+	if (pq->n_smooth_path) {
+
+		pq->path_t += delta_time;
+
+		const float idx_f = fmodf((float)(pq->path_t * move_speed), (float)pq->n_smooth_path);
+		const int idx = (int)idx_f;
+		const float* p1 = &pq->smooth_path[3 * idx];
+		// path query result's coordinates is different from world coordinates.
+		const vec3 p1vec = { p1[0], -p1[2], p1[1] };
+		if (idx < pq->n_smooth_path - 1) {
+			const float* p2 = &pq->smooth_path[3 * (idx + 1)];
+			// path query result's coordinates is different from world coordinates.
+			const vec3 p2vec = { p2[0], -p2[2], p2[1] };
+			// Calculate a midpoint between p1 and p2 to get interpolated position according to idx_f value
+			const float p2coeff = idx_f - idx;
+			const float p1coeff = 1.0f - p2coeff;
+			const vec3 p1p2midvec = {
+				p1vec[0] * p1coeff + p2vec[0] * p2coeff,
+				p1vec[1] * p1coeff + p2vec[1] * p2coeff,
+				p1vec[2] * p1coeff + p2vec[2] * p2coeff,
+			};
+			memcpy(out_pos, p1p2midvec, sizeof(vec3));
+			// Set orientation
+			*out_rot = atan2f(p2vec[1] - p1vec[1], p2vec[0] - p1vec[0]);
+		} else {
+			memcpy(out_pos, p1vec, sizeof(vec3));
+		}
+		// Update test player collider geom
+		if (geom) {
+			dGeomSetPosition(geom,
+				out_pos[0],
+				out_pos[1],
+				out_pos[2]);
+		}
+		// Start querying another random path after the current pathfinding is completed
+		if (idx >= pq->n_smooth_path - 1) {
+			start_new_path_query_test(nav, pq);
+		}
+	}
+}
+
 void update_field(LWCONTEXT* pLwc, LWFIELD* field) {
 	// Check for invalid input
 	if (!pLwc) {
@@ -769,47 +815,10 @@ void update_field(LWCONTEXT* pLwc, LWFIELD* field) {
 	// Update skin time
 	pLwc->player_skin_time += (float)lwcontext_delta_time(pLwc);
 	pLwc->test_player_skin_time += (float)lwcontext_delta_time(pLwc) * anim_speed;
-	// Read pathfinding result and set the test player's position
-	if (pLwc->field->path_query.n_smooth_path) {
-
-		pLwc->field->path_query_time += (float)lwcontext_delta_time(pLwc);
-
-		const float idx_f = fmodf((float)(pLwc->field->path_query_time * move_speed), (float)pLwc->field->path_query.n_smooth_path);
-		const int idx = (int)idx_f;
-		const float* p1 = &pLwc->field->path_query.smooth_path[3 * idx];
-		// path query result's coordinates is different from world coordinates.
-		const vec3 p1vec = { p1[0], -p1[2], p1[1] };
-		if (idx < pLwc->field->path_query.n_smooth_path - 1) {
-			const float* p2 = &pLwc->field->path_query.smooth_path[3 * (idx + 1)];
-			// path query result's coordinates is different from world coordinates.
-			const vec3 p2vec = { p2[0], -p2[2], p2[1] };
-			// Calculate a midpoint between p1 and p2 to get interpolated position according to idx_f value
-			const float p2coeff = idx_f - idx;
-			const float p1coeff = 1.0f - p2coeff;
-			const vec3 p1p2midvec = {
-				p1vec[0] * p1coeff + p2vec[0] * p2coeff,
-				p1vec[1] * p1coeff + p2vec[1] * p2coeff,
-				p1vec[2] * p1coeff + p2vec[2] * p2coeff,
-			};
-			memcpy(pLwc->field->path_query_test_player_pos, p1p2midvec, sizeof(vec3));
-			// Set orientation
-			pLwc->field->path_query_test_player_rot = atan2f(p2vec[1] - p1vec[1], p2vec[0] - p1vec[0]);
-		} else {
-			memcpy(pLwc->field->path_query_test_player_pos, p1vec, sizeof(vec3));
-		}
-		// Update test player collider geom
-		dGeomSetPosition(field->test_player_geom,
-			pLwc->field->path_query_test_player_pos[0],
-			pLwc->field->path_query_test_player_pos[1],
-			pLwc->field->path_query_test_player_pos[2]);
-		// query other random path
-		if (idx >= pLwc->field->path_query.n_smooth_path - 1) {
-			set_random_start_end_pos(pLwc->field->nav, &pLwc->field->path_query);
-			nav_query(pLwc->field->nav, &pLwc->field->path_query);
-			pLwc->field->path_query_time = 0;
-		}
-	}
-	// Remote player update mutex
+	// Update pathfinding result and set the test player's position
+	update_path_query_test(field->nav, &field->path_query_test, move_speed, (float)lwcontext_delta_time(pLwc),
+		field->path_query_test_player_pos, &field->path_query_test_player_rot, field->test_player_geom);
+	// Remote player update mutex begin
 	mq_lock_mutex(pLwc->mq);
 	{
 		// Update remote players' position and orientation, anim action:
@@ -848,6 +857,7 @@ void update_field(LWCONTEXT* pLwc, LWFIELD* field) {
 		}
 	}
 	mq_unlock_mutex(pLwc->mq);
+	// Remote player update mutex ended
 	s_deactivate_out_of_domain_sphere(field, (float)lwcontext_delta_time(pLwc));
 	// Hit flash reduction of test player
 	field->test_player_flash = LWMAX(0, field->test_player_flash - (float)lwcontext_delta_time(pLwc) * 4);
@@ -903,31 +913,31 @@ void field_attack(LWCONTEXT* pLwc) {
 }
 
 void field_path_query_spos(const LWFIELD* field, float* p) {
-	p[0] = field->path_query.spos[0];
-	p[1] = -field->path_query.spos[2];
-	p[2] = field->path_query.spos[1];
+	p[0] = field->path_query_test.spos[0];
+	p[1] = -field->path_query_test.spos[2];
+	p[2] = field->path_query_test.spos[1];
 }
 
 void field_path_query_epos(const LWFIELD* field, float* p) {
-	p[0] = field->path_query.epos[0];
-	p[1] = -field->path_query.epos[2];
-	p[2] = field->path_query.epos[1];
+	p[0] = field->path_query_test.epos[0];
+	p[1] = -field->path_query_test.epos[2];
+	p[2] = field->path_query_test.epos[1];
 }
 
 void field_set_path_query_spos(LWFIELD* field, float x, float y, float z) {
-	field->path_query.spos[0] = x;
-	field->path_query.spos[1] = z;
-	field->path_query.spos[2] = -y;
+	field->path_query_test.spos[0] = x;
+	field->path_query_test.spos[1] = z;
+	field->path_query_test.spos[2] = -y;
 }
 
 void field_set_path_query_epos(LWFIELD* field, float x, float y, float z) {
-	field->path_query.epos[0] = x;
-	field->path_query.epos[1] = z;
-	field->path_query.epos[2] = -y;
+	field->path_query_test.epos[0] = x;
+	field->path_query_test.epos[1] = z;
+	field->path_query_test.epos[2] = -y;
 }
 
 int field_path_query_n_smooth_path(const LWFIELD* field) {
-	return field->path_query.n_smooth_path;
+	return field->path_query_test.n_smooth_path;
 }
 
 const float* field_path_query_test_player_pos(const LWFIELD* field) {
@@ -963,7 +973,7 @@ double field_ray_nearest_depth(const LWFIELD* field, LW_RAY_ID lri) {
 }
 
 void field_nav_query(LWFIELD* field) {
-	nav_query(field->nav, &field->path_query);
+	nav_query(field->nav, &field->path_query_test);
 }
 
 void init_field(LWCONTEXT* pLwc, const char* field_filename, const char* nav_filename, LW_VBO_TYPE vbo, GLuint tex_id, int tex_mip, float skin_scale, int follow_cam) {
@@ -980,8 +990,7 @@ void init_field(LWCONTEXT* pLwc, const char* field_filename, const char* nav_fil
 	pLwc->field->field_camera_mode = follow_cam;
 	pLwc->field->mq = pLwc->mq;	
 
-	set_random_start_end_pos(pLwc->field->nav, &pLwc->field->path_query);
-	nav_query(pLwc->field->nav, &pLwc->field->path_query);
+	start_new_path_query_test(pLwc->field->nav, &pLwc->field->path_query_test);
 }
 
 int field_spawn_user(LWFIELD* field, vec3 pos, void* owner) {
