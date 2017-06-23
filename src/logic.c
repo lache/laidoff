@@ -301,23 +301,12 @@ void reset_battle_context(LWCONTEXT* pLwc) {
 }
 
 void reset_field_context(LWCONTEXT* pLwc) {
-
 	despawn_all_field_object(pLwc->field);
-
 	spawn_all_field_object(pLwc);
-
-	/*
-	spawn_field_object(pLwc, 0, 5, 2, 2, LVT_HOME, pLwc->tex_programmed[LPT_SOLID_GREEN], 1, 1, 1, 0);
-
-	spawn_field_object(pLwc, 0, -7, 1, 1, LVT_CUBE_WALL, pLwc->tex_programmed[LPT_SOLID_BLUE], 6,
-	1, 1, 0);
-	*/
-
-	set_field_player_position(pLwc->field, 0, 0, 10); // should fall from the sky (ray check...)
-
+	// should fall from the sky (ray check...)
+	set_field_player_position(pLwc->field, 0, 0, 10);
 	pLwc->player_pos_x = 0;
 	pLwc->player_pos_y = 0;
-	//pLwc->player_aim_theta = (float)(M_PI / 8);
 }
 
 void toggle_ray_test(LWCONTEXT *pLwc) {

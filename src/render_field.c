@@ -10,6 +10,7 @@
 #include "render_fan.h"
 #include "ps.h"
 #include "render_ps.h"
+#include "nav.h"
 
 static void render_field_object_rot(const LWCONTEXT* pLwc, int vbo_index, GLuint tex_id, const mat4x4 view, const mat4x4 proj, float x, float y, float z, float sx, float sy, float sz, float alpha_multiplier, int mipmap, const mat4x4 rot) {
 	int shader_index = LWST_DEFAULT;
@@ -45,10 +46,11 @@ static void render_field_object_rot(const LWCONTEXT* pLwc, int vbo_index, GLuint
 	glDrawArrays(GL_TRIANGLES, 0, pLwc->vertex_buffer[vbo_index].vertex_count);
 }
 
-static void render_field_object(const LWCONTEXT* pLwc, int vbo_index, GLuint tex_id, const mat4x4 view, const mat4x4 proj, float x, float y, float z, float sx, float sy, float sz, float alpha_multiplier, int mipmap) {
-	mat4x4 mat_iden;
+static void render_field_object(const LWCONTEXT* pLwc, int vbo_index, GLuint tex_id, const mat4x4 view, const mat4x4 proj, float x, float y, float z, float sx, float sy, float sz, float alpha_multiplier, int mipmap, float rot_z) {
+	mat4x4 mat_iden, mat_rot;
 	mat4x4_identity(mat_iden);
-	render_field_object_rot(pLwc, vbo_index, tex_id, view, proj, x, y, z, sx, sy, sz, alpha_multiplier, mipmap, mat_iden);
+	mat4x4_rotate_Z(mat_rot, mat_iden, rot_z);
+	render_field_object_rot(pLwc, vbo_index, tex_id, view, proj, x, y, z, sx, sy, sz, alpha_multiplier, mipmap, mat_rot);
 }
 
 static void render_ground(const LWCONTEXT* pLwc, const mat4x4 view, const mat4x4 proj) {
@@ -139,15 +141,16 @@ void render_debug_sphere(const LWCONTEXT* pLwc, GLuint tex_id, const mat4x4 pers
 		s,
 		s,
 		1,
-		1
+		1,
+		0
 	);
 }
 
 void render_path_query_test_player(const LWCONTEXT* pLwc, mat4x4 perspective, mat4x4 view) {
 
 	float spos[3], epos[3];
-	field_path_query_spos(pLwc->field, spos);
-	field_path_query_epos(pLwc->field, epos);
+	nav_path_query_spos(field_nav(pLwc->field), spos);
+	nav_path_query_epos(field_nav(pLwc->field), epos);
 
 	render_debug_sphere(pLwc,
 		pLwc->tex_programmed[LPT_SOLID_RED],
@@ -167,7 +170,7 @@ void render_path_query_test_player(const LWCONTEXT* pLwc, mat4x4 perspective, ma
 		epos[2],
 		1.0f);
 
-	if (!pLwc->fps_mode && field_path_query_n_smooth_path(pLwc->field)) {
+	if (!pLwc->fps_mode && nav_path_query_n_smooth_path(field_nav(pLwc->field))) {
 
 		const float* path_query_test_player_pos = field_path_query_test_player_pos(pLwc->field);
 		const float skin_scale_f = field_skin_scale(pLwc->field);
@@ -383,7 +386,8 @@ void lwc_render_field(const LWCONTEXT* pLwc) {
 			1,
 			1,
 			1,
-			field_field_tex_mip(pLwc->field)
+			field_field_tex_mip(pLwc->field),
+			0
 		);
 	}
 
@@ -399,12 +403,13 @@ void lwc_render_field(const LWCONTEXT* pLwc) {
 				perspective,
 				fo->x,
 				fo->y,
-				0,
+				fo->z,
 				fo->sx,
 				fo->sy,
 				1.0f,
 				fo->alpha_multiplier,
-				0
+				0,
+				fo->rot_z
 			);
 		}
 	}

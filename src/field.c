@@ -20,7 +20,6 @@
 #define MAX_BOX_GEOM (100)
 #define MAX_RAY_RESULT_COUNT (10)
 #define MAX_FIELD_CONTACT (10)
-#define MAX_PATH_QUERY (100)
 
 typedef struct _LWFIELDCUBEOBJECT {
 	float x, y, z;
@@ -110,12 +109,7 @@ typedef struct _LWFIELD {
 	// Field raw file data
 	char* field_raw_data;
 	// Navigation data instance
-	void* nav;
-	// Path query result for testing
-	LWPATHQUERY path_query_test;
-	// Path query result array
-	LWPATHQUERY path_query[MAX_PATH_QUERY];
-	float* path_query_output_location[MAX_PATH_QUERY];
+	LWNAV* nav;
 	// Test player position
 	vec3 path_query_test_player_pos;
 	// Test player orientation
@@ -695,57 +689,14 @@ static void s_step_remote_sphere(LWFIELD* field, double delta_time) {
 	}
 }
 
-void start_new_path_query_test(void* nav, LWPATHQUERY* pq) {
-	set_random_start_end_pos(nav, pq);
-	nav_query(nav, pq);
-	pq->path_t = 0;
-}
-
 void update_path_query_test(void* nav, LWPATHQUERY* pq, float move_speed, float delta_time, float* out_pos, float* out_rot, dGeomID geom) {
-	if (pq->n_smooth_path) {
-
-		pq->path_t += delta_time;
-
-		const float idx_f = fmodf((float)(pq->path_t * move_speed), (float)pq->n_smooth_path);
-		const int idx = (int)idx_f;
-		const float* p1 = &pq->smooth_path[3 * idx];
-		// path query result's coordinates is different from world coordinates.
-		const vec3 p1vec = { p1[0], -p1[2], p1[1] };
-		if (idx < pq->n_smooth_path - 1) {
-			const float* p2 = &pq->smooth_path[3 * (idx + 1)];
-			// path query result's coordinates is different from world coordinates.
-			const vec3 p2vec = { p2[0], -p2[2], p2[1] };
-			// Calculate a midpoint between p1 and p2 to get interpolated position according to idx_f value
-			const float p2coeff = idx_f - idx;
-			const float p1coeff = 1.0f - p2coeff;
-			const vec3 p1p2midvec = {
-				p1vec[0] * p1coeff + p2vec[0] * p2coeff,
-				p1vec[1] * p1coeff + p2vec[1] * p2coeff,
-				p1vec[2] * p1coeff + p2vec[2] * p2coeff,
-			};
-			// Update result position
-			if (out_pos) {
-				memcpy(out_pos, p1p2midvec, sizeof(vec3));
-			}
-			// Update result orientation
-			if (out_rot) {
-				*out_rot = atan2f(p2vec[1] - p1vec[1], p2vec[0] - p1vec[0]);
-			}
-		} else {
-			if (out_pos) {
-				memcpy(out_pos, p1vec, sizeof(vec3));
-			}
-		}
+	if (nav_update_path_query(nav, pq, move_speed, delta_time, out_pos, out_rot) == 0 && out_pos) {
 		// Update test player collider geom
 		if (geom) {
 			dGeomSetPosition(geom,
 				out_pos[0],
 				out_pos[1],
 				out_pos[2]);
-		}
-		// Start querying another random path after the current pathfinding is completed
-		if (idx >= pq->n_smooth_path - 1) {
-			start_new_path_query_test(nav, pq);
 		}
 	}
 }
@@ -831,15 +782,10 @@ void update_field(LWCONTEXT* pLwc, LWFIELD* field) {
 	pLwc->player_skin_time += (float)lwcontext_delta_time(pLwc);
 	pLwc->test_player_skin_time += (float)lwcontext_delta_time(pLwc) * anim_speed;
 	// Update pathfinding result and set the test player's position
-	update_path_query_test(field->nav, &field->path_query_test, move_speed, (float)lwcontext_delta_time(pLwc),
+	update_path_query_test(field->nav, nav_path_query_test(field->nav), move_speed, (float)lwcontext_delta_time(pLwc),
 		field->path_query_test_player_pos, &field->path_query_test_player_rot, field->test_player_geom);
 	// Update pathfinding
-	for (int i = 0; i < MAX_PATH_QUERY; i++) {
-		if (field->path_query[i].valid && field->path_query[i].update_output) {
-			update_path_query_test(field->nav, &field->path_query[i], move_speed, (float)lwcontext_delta_time(pLwc),
-				field->path_query_output_location[i], 0, 0);
-		}
-	}
+	nav_update(field->nav, move_speed, (float)lwcontext_delta_time(pLwc));
 	// Remote player update mutex begin
 	mq_lock_mutex(pLwc->mq);
 	{
@@ -934,34 +880,6 @@ void field_attack(LWCONTEXT* pLwc) {
 	//}
 }
 
-void field_path_query_spos(const LWFIELD* field, float* p) {
-	p[0] = field->path_query_test.spos[0];
-	p[1] = -field->path_query_test.spos[2];
-	p[2] = field->path_query_test.spos[1];
-}
-
-void field_path_query_epos(const LWFIELD* field, float* p) {
-	p[0] = field->path_query_test.epos[0];
-	p[1] = -field->path_query_test.epos[2];
-	p[2] = field->path_query_test.epos[1];
-}
-
-void field_set_path_query_spos(LWFIELD* field, float x, float y, float z) {
-	field->path_query_test.spos[0] = x;
-	field->path_query_test.spos[1] = z;
-	field->path_query_test.spos[2] = -y;
-}
-
-void field_set_path_query_epos(LWFIELD* field, float x, float y, float z) {
-	field->path_query_test.epos[0] = x;
-	field->path_query_test.epos[1] = z;
-	field->path_query_test.epos[2] = -y;
-}
-
-int field_path_query_n_smooth_path(const LWFIELD* field) {
-	return field->path_query_test.n_smooth_path;
-}
-
 const float* field_path_query_test_player_pos(const LWFIELD* field) {
 	return field->path_query_test_player_pos;
 }
@@ -995,7 +913,7 @@ double field_ray_nearest_depth(const LWFIELD* field, LW_RAY_ID lri) {
 }
 
 void field_nav_query(LWFIELD* field) {
-	nav_query(field->nav, &field->path_query_test);
+	nav_query(field->nav, nav_path_query_test(field->nav));
 }
 
 void init_field(LWCONTEXT* pLwc, const char* field_filename, const char* nav_filename, LW_VBO_TYPE vbo, GLuint tex_id, int tex_mip, float skin_scale, int follow_cam) {
@@ -1012,7 +930,7 @@ void init_field(LWCONTEXT* pLwc, const char* field_filename, const char* nav_fil
 	pLwc->field->field_camera_mode = follow_cam;
 	pLwc->field->mq = pLwc->mq;	
 
-	start_new_path_query_test(pLwc->field->nav, &pLwc->field->path_query_test);
+	start_new_path_query_test(pLwc->field->nav, nav_path_query_test(pLwc->field->nav));
 }
 
 int field_spawn_user(LWFIELD* field, vec3 pos, void* owner) {
@@ -1183,74 +1101,35 @@ void* field_ps(LWFIELD* field) {
 	return field->ps;
 }
 
-int field_new_path_query(LWFIELD* field) {
-	for (int i = 0; i < MAX_PATH_QUERY; i++) {
-		if (field->path_query[i].valid) {
-			continue;
-		}
-		field->path_query[i].valid = 1;
-		start_new_path_query_test(field->nav, &field->path_query[i]);
-		return i;
-	}
-	LOGE(LWLOGPOS "preallocated pool exceeded error");
-	return -1;
-}
-
-int field_update_output_path_query(LWFIELD* field, int idx, int val) {
-	if (idx < 0 || idx >= MAX_PATH_QUERY) {
-		LOGE(LWLOGPOS "index error");
-		return -1;
-	}
-	if (!field->path_query[idx].valid) {
-		LOGE(LWLOGPOS "invalid entry error");
-		return -1;
-	}
-	field->path_query[idx].update_output = val;
-	return 0;
-}
-
-int field_bind_path_query_output_location(LWFIELD* field, int idx, int field_object_idx) {
-	if (idx < 0 || idx >= MAX_PATH_QUERY) {
-		LOGE(LWLOGPOS "path query index error");
-		return -1;
-	}
-	if (field_object_idx < 0 || field_object_idx >= MAX_FIELD_OBJECT) {
-		LOGE(LWLOGPOS "field object index error");
-		return -1;
-	}
-	if (!field->path_query[idx].valid) {
-		LOGE(LWLOGPOS "invalid entry error");
-		return -1;
-	}
-	field->path_query_output_location[idx] = &field->field_object[field_object_idx].x;
-	return 0;
-}
-
-int spawn_field_object(struct _LWCONTEXT *pLwc, float x, float y, float w, float h, enum _LW_VBO_TYPE lvt,
+int spawn_field_object(LWFIELD* field, float x, float y, float w, float h, enum _LW_VBO_TYPE lvt,
 	unsigned int tex_id, float sx, float sy, float alpha_multiplier, int field_event_id) {
 	for (int i = 0; i < MAX_FIELD_OBJECT; i++) {
-		if (!pLwc->field->field_object[i].valid) {
-			pLwc->field->field_object[i].x = x;
-			pLwc->field->field_object[i].y = y;
-			pLwc->field->field_object[i].z = 0;
-			pLwc->field->field_object[i].sx = sx;
-			pLwc->field->field_object[i].sy = sy;
-			pLwc->field->field_object[i].lvt = lvt;
-			pLwc->field->field_object[i].tex_id = tex_id;
-			pLwc->field->field_object[i].alpha_multiplier = alpha_multiplier;
-			pLwc->field->field_object[i].valid = 1;
-
-			pLwc->field->box_collider[i].x = x;
-			pLwc->field->box_collider[i].y = y;
-			pLwc->field->box_collider[i].w = w * sx;
-			pLwc->field->box_collider[i].h = h * sy;
-			pLwc->field->box_collider[i].field_event_id = field_event_id;
-			pLwc->field->box_collider[i].valid = 1;
-
+		LWFIELDOBJECT* fo = &field->field_object[i];
+		LWBOX2DCOLLIDER* bc = &field->box_collider[i];
+		if (!fo->valid) {
+			// Field object fields
+			fo->x = x;
+			fo->y = y;
+			fo->z = 0;
+			fo->sx = sx;
+			fo->sy = sy;
+			fo->rot_z = 0;
+			fo->lvt = lvt;
+			fo->tex_id = tex_id;
+			fo->alpha_multiplier = alpha_multiplier;
+			fo->valid = 1;
+			// Box collider fields
+			bc->x = x;
+			bc->y = y;
+			bc->w = w * sx;
+			bc->h = h * sy;
+			bc->field_event_id = field_event_id;
+			bc->valid = 1;
+			// Return pool index
 			return i;
 		}
 	}
-
+	LOGE(LWLOGPOS "pool excceded");
 	return -1;
 }
 
@@ -1292,4 +1171,24 @@ LWFIELDOBJECT* field_object(LWFIELD* field, int idx) {
 		return 0;
 	}
 	return &field->field_object[idx];
+}
+
+float* field_field_object_location_rawptr(LWFIELD* field, int idx) {
+	if (idx < 0 || idx >= MAX_FIELD_OBJECT) {
+		LOGE(LWLOGPOS "index error");
+		return 0;
+	}
+	return &field->field_object[idx].x;
+}
+
+float* field_field_object_orientation_rawptr(LWFIELD* field, int idx) {
+	if (idx < 0 || idx >= MAX_FIELD_OBJECT) {
+		LOGE(LWLOGPOS "index error");
+		return 0;
+	}
+	return &field->field_object[idx].rot_z;
+}
+
+LWNAV* field_nav(LWFIELD* field) {
+	return field->nav;
 }

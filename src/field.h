@@ -9,6 +9,10 @@
 #define MAX_FIELD_REMOTE_SPHERE (50)
 #define MAX_USER_GEOM (16)
 
+#if defined __cplusplus
+extern "C" {;
+#endif  /* defined __cplusplus */
+
 typedef enum _LW_RAY_ID {
 	LRI_PLAYER_CENTER,
 	LRI_PLAYER_CONTACT,
@@ -20,6 +24,8 @@ typedef enum _LW_RAY_ID {
 
 typedef struct _LWFIELD LWFIELD;
 typedef struct _LWFIELDOBJECT LWFIELDOBJECT;
+typedef struct _LWPATHQUERY LWPATHQUERY;
+typedef struct _LWNAV LWNAV;
 
 void move_player(LWCONTEXT *pLwc);
 void resolve_player_collision(LWCONTEXT *pLwc);
@@ -31,11 +37,6 @@ void set_field_player_position(LWFIELD* field, float x, float y, float z);
 void get_field_player_position(const LWFIELD* field, float* x, float* y, float* z);
 void field_attack(LWCONTEXT* pLwc);
 void field_enable_ray_test(LWFIELD* field, int enable);
-void field_path_query_spos(const LWFIELD* field, float* p);
-void field_path_query_epos(const LWFIELD* field, float* p);
-void field_set_path_query_spos(LWFIELD* field, float x, float y, float z);
-void field_set_path_query_epos(LWFIELD* field, float x, float y, float z);
-int field_path_query_n_smooth_path(const LWFIELD* field);
 const float* field_path_query_test_player_pos(const LWFIELD* field);
 float field_path_query_test_player_rot(const LWFIELD* field);
 float field_skin_scale(const LWFIELD* field);
@@ -68,11 +69,15 @@ int field_remote_sphere_vel(const LWFIELD* field, int i, float* vel);
 void field_hit_player(LWFIELD* field);
 void field_despawn_remote_sphere(LWFIELD* field, int bullet_id, const char* owner_key);
 void* field_ps(LWFIELD* field);
-int field_new_path_query(LWFIELD* field);
-int field_update_output_path_query(LWFIELD* field, int idx, int val);
-int spawn_field_object(struct _LWCONTEXT* pLwc, float x, float y, float w, float h, enum _LW_VBO_TYPE lvt, unsigned int tex_id, float sx, float sy, float alpha_multiplier, int field_event_id);
+int spawn_field_object(LWFIELD* field, float x, float y, float w, float h, enum _LW_VBO_TYPE lvt, unsigned int tex_id, float sx, float sy, float alpha_multiplier, int field_event_id);
 int despawn_field_object(struct _LWCONTEXT *pLwc, int idx);
 void field_remove_field_object(LWFIELD* field, int field_event_id);
 void despawn_all_field_object(LWFIELD* field);
 LWFIELDOBJECT* field_object(LWFIELD* field, int idx);
-int field_bind_path_query_output_location(LWFIELD* field, int idx, int field_object_idx);
+float* field_field_object_location_rawptr(LWFIELD* field, int idx);
+float* field_field_object_orientation_rawptr(LWFIELD* field, int idx);
+LWNAV* field_nav(LWFIELD* field);
+
+#if defined __cplusplus
+}
+#endif  /* defined __cplusplus */
