@@ -1205,46 +1205,6 @@ int lw_get_game_scene(LWCONTEXT *pLwc) {
 	return pLwc->game_scene;
 }
 
-int spawn_field_object(struct _LWCONTEXT *pLwc, float x, float y, float w, float h, enum _LW_VBO_TYPE lvt,
-	unsigned int tex_id, float sx, float sy, float alpha_multiplier, int field_event_id) {
-	for (int i = 0; i < MAX_FIELD_OBJECT; i++) {
-		if (!pLwc->field_object[i].valid) {
-			pLwc->field_object[i].x = x;
-			pLwc->field_object[i].y = y;
-			pLwc->field_object[i].sx = sx;
-			pLwc->field_object[i].sy = sy;
-			pLwc->field_object[i].lvt = lvt;
-			pLwc->field_object[i].tex_id = tex_id;
-			pLwc->field_object[i].alpha_multiplier = alpha_multiplier;
-			pLwc->field_object[i].valid = 1;
-
-			pLwc->box_collider[i].x = x;
-			pLwc->box_collider[i].y = y;
-			pLwc->box_collider[i].w = w * sx;
-			pLwc->box_collider[i].h = h * sy;
-			pLwc->box_collider[i].field_event_id = field_event_id;
-			pLwc->box_collider[i].valid = 1;
-
-			return i;
-		}
-	}
-
-	return -1;
-}
-
-int despawn_field_object(struct _LWCONTEXT *pLwc, int idx) {
-	if (idx < 0 || idx >= MAX_FIELD_OBJECT) {
-		LOGE(LWLOGPOS "index error");
-		return -1;
-	}
-	if (!pLwc->field_object[idx].valid) {
-		LOGE(LWLOGPOS "not valid entry error");
-		return -1;
-	}
-	pLwc->field_object[idx].valid = 0;
-	return 0;
-}
-
 int lw_get_update_count(LWCONTEXT *pLwc) {
 	return pLwc->update_count;
 }

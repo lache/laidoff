@@ -7,6 +7,10 @@ extern "C" {;
 #define MAX_PATHQUERY_SMOOTH (2048)
 
 typedef struct _LWPATHQUERY {
+	// Valid flag
+	int valid;
+	// Update positon flag
+	int update_output;
 	// Start position
 	float spos[3];
 	// End position

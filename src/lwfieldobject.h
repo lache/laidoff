@@ -4,7 +4,7 @@
 
 typedef struct _LWFIELDOBJECT {
 	int valid;
-	float x, y;
+	float x, y, z;
 	float sx, sy;
 	enum _LW_VBO_TYPE lvt;
 	GLuint tex_id;

@@ -388,20 +388,22 @@ void lwc_render_field(const LWCONTEXT* pLwc) {
 	}
 
 	for (int i = 0; i < MAX_FIELD_OBJECT; i++) {
-		if (pLwc->field_object[i].valid) {
+		LWFIELDOBJECT* fo = field_object(pLwc->field, i);
+
+		if (fo->valid) {
 			render_field_object(
 				pLwc,
-				pLwc->field_object[i].lvt,
-				pLwc->field_object[i].tex_id,
+				fo->lvt,
+				fo->tex_id,
 				view,
 				perspective,
-				pLwc->field_object[i].x,
-				pLwc->field_object[i].y,
+				fo->x,
+				fo->y,
 				0,
-				pLwc->field_object[i].sx,
-				pLwc->field_object[i].sy,
+				fo->sx,
+				fo->sy,
 				1.0f,
-				pLwc->field_object[i].alpha_multiplier,
+				fo->alpha_multiplier,
 				0
 			);
 		}

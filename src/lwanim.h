@@ -94,19 +94,7 @@ typedef enum _LW_ACTION {
 	LWAC_COUNT,
 } LW_ACTION;
 
-static const char* action_filename[] = {
-	ASSETS_BASE_PATH "action" PATH_SEPARATOR "TriangleAction.act",
-	ASSETS_BASE_PATH "action" PATH_SEPARATOR "TreePlaneAction.act",
-	ASSETS_BASE_PATH "action" PATH_SEPARATOR "HumanAction_WalkPolish.act",
-	ASSETS_BASE_PATH "action" PATH_SEPARATOR "HumanAction_Idle.act",
-	ASSETS_BASE_PATH "action" PATH_SEPARATOR "HumanAction_Attack.act",
-	ASSETS_BASE_PATH "action" PATH_SEPARATOR "HumanAction_Stand_Aim.act",
-	ASSETS_BASE_PATH "action" PATH_SEPARATOR "HumanAction_Stand_Unaim.act",
-	ASSETS_BASE_PATH "action" PATH_SEPARATOR "HumanAction_Stand_Fire.act",
-	ASSETS_BASE_PATH "action" PATH_SEPARATOR "HumanAction_Death.act",
-	ASSETS_BASE_PATH "action" PATH_SEPARATOR "DetachPlaneAction.act",
-	ASSETS_BASE_PATH "action" PATH_SEPARATOR "DetachPlaneAction_ChildTrans.act",
-};
+extern const char* action_filename[LWAC_COUNT];
 
 void load_action(const char* filename, LWANIMACTION* action);
 void unload_action(LWANIMACTION* action);

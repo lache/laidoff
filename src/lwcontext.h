@@ -166,10 +166,6 @@ typedef struct _LWCONTEXT {
 	const LWANIMACTION* player_action;
 	//float player_aim_theta;
 	LWPLAYERSTATEDATA player_state_data;
-	// Field collider instance array
-	LWBOX2DCOLLIDER box_collider[MAX_BOX_COLLIDER];
-	// Field object instance array
-	LWFIELDOBJECT field_object[MAX_FIELD_OBJECT];
 	// Current Dir pad x coordinate (screen coordinate)
 	float dir_pad_x;
 	// Current Dir pad y coordinate (screen coordinate)

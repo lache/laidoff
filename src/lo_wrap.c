@@ -6469,6 +6469,248 @@ fail:
 }
 
 
+static int _wrap_field_new_path_query(lua_State* L) {
+  int SWIG_arg = 0;
+  LWFIELD *arg1 = (LWFIELD *) 0 ;
+  int result;
+  
+  SWIG_check_num_args("field_new_path_query",1,1)
+  if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("field_new_path_query",1,"LWFIELD *");
+  
+  if (!SWIG_IsOK(SWIG_ConvertPtr(L,1,(void**)&arg1,SWIGTYPE_p__LWFIELD,0))){
+    SWIG_fail_ptr("field_new_path_query",1,SWIGTYPE_p__LWFIELD);
+  }
+  
+  result = (int)field_new_path_query(arg1);
+  lua_pushnumber(L, (lua_Number) result); SWIG_arg++;
+  return SWIG_arg;
+  
+  if(0) SWIG_fail;
+  
+fail:
+  lua_error(L);
+  return SWIG_arg;
+}
+
+
+static int _wrap_field_update_output_path_query(lua_State* L) {
+  int SWIG_arg = 0;
+  LWFIELD *arg1 = (LWFIELD *) 0 ;
+  int arg2 ;
+  int arg3 ;
+  int result;
+  
+  SWIG_check_num_args("field_update_output_path_query",3,3)
+  if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("field_update_output_path_query",1,"LWFIELD *");
+  if(!lua_isnumber(L,2)) SWIG_fail_arg("field_update_output_path_query",2,"int");
+  if(!lua_isnumber(L,3)) SWIG_fail_arg("field_update_output_path_query",3,"int");
+  
+  if (!SWIG_IsOK(SWIG_ConvertPtr(L,1,(void**)&arg1,SWIGTYPE_p__LWFIELD,0))){
+    SWIG_fail_ptr("field_update_output_path_query",1,SWIGTYPE_p__LWFIELD);
+  }
+  
+  arg2 = (int)lua_tonumber(L, 2);
+  arg3 = (int)lua_tonumber(L, 3);
+  result = (int)field_update_output_path_query(arg1,arg2,arg3);
+  lua_pushnumber(L, (lua_Number) result); SWIG_arg++;
+  return SWIG_arg;
+  
+  if(0) SWIG_fail;
+  
+fail:
+  lua_error(L);
+  return SWIG_arg;
+}
+
+
+static int _wrap_spawn_field_object(lua_State* L) {
+  int SWIG_arg = 0;
+  struct _LWCONTEXT *arg1 = (struct _LWCONTEXT *) 0 ;
+  float arg2 ;
+  float arg3 ;
+  float arg4 ;
+  float arg5 ;
+  enum _LW_VBO_TYPE arg6 ;
+  unsigned int arg7 ;
+  float arg8 ;
+  float arg9 ;
+  float arg10 ;
+  int arg11 ;
+  int result;
+  
+  SWIG_check_num_args("spawn_field_object",11,11)
+  if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("spawn_field_object",1,"struct _LWCONTEXT *");
+  if(!lua_isnumber(L,2)) SWIG_fail_arg("spawn_field_object",2,"float");
+  if(!lua_isnumber(L,3)) SWIG_fail_arg("spawn_field_object",3,"float");
+  if(!lua_isnumber(L,4)) SWIG_fail_arg("spawn_field_object",4,"float");
+  if(!lua_isnumber(L,5)) SWIG_fail_arg("spawn_field_object",5,"float");
+  if(!lua_isnumber(L,6)) SWIG_fail_arg("spawn_field_object",6,"enum _LW_VBO_TYPE");
+  if(!lua_isnumber(L,7)) SWIG_fail_arg("spawn_field_object",7,"unsigned int");
+  if(!lua_isnumber(L,8)) SWIG_fail_arg("spawn_field_object",8,"float");
+  if(!lua_isnumber(L,9)) SWIG_fail_arg("spawn_field_object",9,"float");
+  if(!lua_isnumber(L,10)) SWIG_fail_arg("spawn_field_object",10,"float");
+  if(!lua_isnumber(L,11)) SWIG_fail_arg("spawn_field_object",11,"int");
+  
+  if (!SWIG_IsOK(SWIG_ConvertPtr(L,1,(void**)&arg1,SWIGTYPE_p__LWCONTEXT,0))){
+    SWIG_fail_ptr("spawn_field_object",1,SWIGTYPE_p__LWCONTEXT);
+  }
+  
+  arg2 = (float)lua_tonumber(L, 2);
+  arg3 = (float)lua_tonumber(L, 3);
+  arg4 = (float)lua_tonumber(L, 4);
+  arg5 = (float)lua_tonumber(L, 5);
+  arg6 = (enum _LW_VBO_TYPE)(int)lua_tonumber(L, 6);
+  SWIG_contract_assert((lua_tonumber(L,7)>=0),"number must not be negative")
+  arg7 = (unsigned int)lua_tonumber(L, 7);
+  arg8 = (float)lua_tonumber(L, 8);
+  arg9 = (float)lua_tonumber(L, 9);
+  arg10 = (float)lua_tonumber(L, 10);
+  arg11 = (int)lua_tonumber(L, 11);
+  result = (int)spawn_field_object(arg1,arg2,arg3,arg4,arg5,arg6,arg7,arg8,arg9,arg10,arg11);
+  lua_pushnumber(L, (lua_Number) result); SWIG_arg++;
+  return SWIG_arg;
+  
+  if(0) SWIG_fail;
+  
+fail:
+  lua_error(L);
+  return SWIG_arg;
+}
+
+
+static int _wrap_despawn_field_object(lua_State* L) {
+  int SWIG_arg = 0;
+  struct _LWCONTEXT *arg1 = (struct _LWCONTEXT *) 0 ;
+  int arg2 ;
+  int result;
+  
+  SWIG_check_num_args("despawn_field_object",2,2)
+  if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("despawn_field_object",1,"struct _LWCONTEXT *");
+  if(!lua_isnumber(L,2)) SWIG_fail_arg("despawn_field_object",2,"int");
+  
+  if (!SWIG_IsOK(SWIG_ConvertPtr(L,1,(void**)&arg1,SWIGTYPE_p__LWCONTEXT,0))){
+    SWIG_fail_ptr("despawn_field_object",1,SWIGTYPE_p__LWCONTEXT);
+  }
+  
+  arg2 = (int)lua_tonumber(L, 2);
+  result = (int)despawn_field_object(arg1,arg2);
+  lua_pushnumber(L, (lua_Number) result); SWIG_arg++;
+  return SWIG_arg;
+  
+  if(0) SWIG_fail;
+  
+fail:
+  lua_error(L);
+  return SWIG_arg;
+}
+
+
+static int _wrap_field_remove_field_object(lua_State* L) {
+  int SWIG_arg = 0;
+  LWFIELD *arg1 = (LWFIELD *) 0 ;
+  int arg2 ;
+  
+  SWIG_check_num_args("field_remove_field_object",2,2)
+  if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("field_remove_field_object",1,"LWFIELD *");
+  if(!lua_isnumber(L,2)) SWIG_fail_arg("field_remove_field_object",2,"int");
+  
+  if (!SWIG_IsOK(SWIG_ConvertPtr(L,1,(void**)&arg1,SWIGTYPE_p__LWFIELD,0))){
+    SWIG_fail_ptr("field_remove_field_object",1,SWIGTYPE_p__LWFIELD);
+  }
+  
+  arg2 = (int)lua_tonumber(L, 2);
+  field_remove_field_object(arg1,arg2);
+  
+  return SWIG_arg;
+  
+  if(0) SWIG_fail;
+  
+fail:
+  lua_error(L);
+  return SWIG_arg;
+}
+
+
+static int _wrap_despawn_all_field_object(lua_State* L) {
+  int SWIG_arg = 0;
+  LWFIELD *arg1 = (LWFIELD *) 0 ;
+  
+  SWIG_check_num_args("despawn_all_field_object",1,1)
+  if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("despawn_all_field_object",1,"LWFIELD *");
+  
+  if (!SWIG_IsOK(SWIG_ConvertPtr(L,1,(void**)&arg1,SWIGTYPE_p__LWFIELD,0))){
+    SWIG_fail_ptr("despawn_all_field_object",1,SWIGTYPE_p__LWFIELD);
+  }
+  
+  despawn_all_field_object(arg1);
+  
+  return SWIG_arg;
+  
+  if(0) SWIG_fail;
+  
+fail:
+  lua_error(L);
+  return SWIG_arg;
+}
+
+
+static int _wrap_field_object(lua_State* L) {
+  int SWIG_arg = 0;
+  LWFIELD *arg1 = (LWFIELD *) 0 ;
+  int arg2 ;
+  LWFIELDOBJECT *result = 0 ;
+  
+  SWIG_check_num_args("field_object",2,2)
+  if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("field_object",1,"LWFIELD *");
+  if(!lua_isnumber(L,2)) SWIG_fail_arg("field_object",2,"int");
+  
+  if (!SWIG_IsOK(SWIG_ConvertPtr(L,1,(void**)&arg1,SWIGTYPE_p__LWFIELD,0))){
+    SWIG_fail_ptr("field_object",1,SWIGTYPE_p__LWFIELD);
+  }
+  
+  arg2 = (int)lua_tonumber(L, 2);
+  result = (LWFIELDOBJECT *)field_object(arg1,arg2);
+  SWIG_NewPointerObj(L,result,SWIGTYPE_p__LWFIELDOBJECT,0); SWIG_arg++; 
+  return SWIG_arg;
+  
+  if(0) SWIG_fail;
+  
+fail:
+  lua_error(L);
+  return SWIG_arg;
+}
+
+
+static int _wrap_field_bind_path_query_output_location(lua_State* L) {
+  int SWIG_arg = 0;
+  LWFIELD *arg1 = (LWFIELD *) 0 ;
+  int arg2 ;
+  int arg3 ;
+  int result;
+  
+  SWIG_check_num_args("field_bind_path_query_output_location",3,3)
+  if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("field_bind_path_query_output_location",1,"LWFIELD *");
+  if(!lua_isnumber(L,2)) SWIG_fail_arg("field_bind_path_query_output_location",2,"int");
+  if(!lua_isnumber(L,3)) SWIG_fail_arg("field_bind_path_query_output_location",3,"int");
+  
+  if (!SWIG_IsOK(SWIG_ConvertPtr(L,1,(void**)&arg1,SWIGTYPE_p__LWFIELD,0))){
+    SWIG_fail_ptr("field_bind_path_query_output_location",1,SWIGTYPE_p__LWFIELD);
+  }
+  
+  arg2 = (int)lua_tonumber(L, 2);
+  arg3 = (int)lua_tonumber(L, 3);
+  result = (int)field_bind_path_query_output_location(arg1,arg2,arg3);
+  lua_pushnumber(L, (lua_Number) result); SWIG_arg++;
+  return SWIG_arg;
+  
+  if(0) SWIG_fail;
+  
+fail:
+  lua_error(L);
+  return SWIG_arg;
+}
+
+
 static int _wrap_create_string_from_file(lua_State* L) {
   int SWIG_arg = 0;
   char *arg1 = (char *) 0 ;
@@ -8657,88 +8899,6 @@ static int _wrap_set_texture_parameter(lua_State* L) {
   arg3 = (enum _LW_ATLAS_SPRITE)(int)lua_tonumber(L, 3);
   set_texture_parameter((struct _LWCONTEXT const *)arg1,arg2,arg3);
   
-  return SWIG_arg;
-  
-  if(0) SWIG_fail;
-  
-fail:
-  lua_error(L);
-  return SWIG_arg;
-}
-
-
-static int _wrap_spawn_field_object(lua_State* L) {
-  int SWIG_arg = 0;
-  struct _LWCONTEXT *arg1 = (struct _LWCONTEXT *) 0 ;
-  float arg2 ;
-  float arg3 ;
-  float arg4 ;
-  float arg5 ;
-  enum _LW_VBO_TYPE arg6 ;
-  unsigned int arg7 ;
-  float arg8 ;
-  float arg9 ;
-  float arg10 ;
-  int arg11 ;
-  int result;
-  
-  SWIG_check_num_args("spawn_field_object",11,11)
-  if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("spawn_field_object",1,"struct _LWCONTEXT *");
-  if(!lua_isnumber(L,2)) SWIG_fail_arg("spawn_field_object",2,"float");
-  if(!lua_isnumber(L,3)) SWIG_fail_arg("spawn_field_object",3,"float");
-  if(!lua_isnumber(L,4)) SWIG_fail_arg("spawn_field_object",4,"float");
-  if(!lua_isnumber(L,5)) SWIG_fail_arg("spawn_field_object",5,"float");
-  if(!lua_isnumber(L,6)) SWIG_fail_arg("spawn_field_object",6,"enum _LW_VBO_TYPE");
-  if(!lua_isnumber(L,7)) SWIG_fail_arg("spawn_field_object",7,"unsigned int");
-  if(!lua_isnumber(L,8)) SWIG_fail_arg("spawn_field_object",8,"float");
-  if(!lua_isnumber(L,9)) SWIG_fail_arg("spawn_field_object",9,"float");
-  if(!lua_isnumber(L,10)) SWIG_fail_arg("spawn_field_object",10,"float");
-  if(!lua_isnumber(L,11)) SWIG_fail_arg("spawn_field_object",11,"int");
-  
-  if (!SWIG_IsOK(SWIG_ConvertPtr(L,1,(void**)&arg1,SWIGTYPE_p__LWCONTEXT,0))){
-    SWIG_fail_ptr("spawn_field_object",1,SWIGTYPE_p__LWCONTEXT);
-  }
-  
-  arg2 = (float)lua_tonumber(L, 2);
-  arg3 = (float)lua_tonumber(L, 3);
-  arg4 = (float)lua_tonumber(L, 4);
-  arg5 = (float)lua_tonumber(L, 5);
-  arg6 = (enum _LW_VBO_TYPE)(int)lua_tonumber(L, 6);
-  SWIG_contract_assert((lua_tonumber(L,7)>=0),"number must not be negative")
-  arg7 = (unsigned int)lua_tonumber(L, 7);
-  arg8 = (float)lua_tonumber(L, 8);
-  arg9 = (float)lua_tonumber(L, 9);
-  arg10 = (float)lua_tonumber(L, 10);
-  arg11 = (int)lua_tonumber(L, 11);
-  result = (int)spawn_field_object(arg1,arg2,arg3,arg4,arg5,arg6,arg7,arg8,arg9,arg10,arg11);
-  lua_pushnumber(L, (lua_Number) result); SWIG_arg++;
-  return SWIG_arg;
-  
-  if(0) SWIG_fail;
-  
-fail:
-  lua_error(L);
-  return SWIG_arg;
-}
-
-
-static int _wrap_despawn_field_object(lua_State* L) {
-  int SWIG_arg = 0;
-  struct _LWCONTEXT *arg1 = (struct _LWCONTEXT *) 0 ;
-  int arg2 ;
-  int result;
-  
-  SWIG_check_num_args("despawn_field_object",2,2)
-  if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("despawn_field_object",1,"struct _LWCONTEXT *");
-  if(!lua_isnumber(L,2)) SWIG_fail_arg("despawn_field_object",2,"int");
-  
-  if (!SWIG_IsOK(SWIG_ConvertPtr(L,1,(void**)&arg1,SWIGTYPE_p__LWCONTEXT,0))){
-    SWIG_fail_ptr("despawn_field_object",1,SWIGTYPE_p__LWCONTEXT);
-  }
-  
-  arg2 = (int)lua_tonumber(L, 2);
-  result = (int)despawn_field_object(arg1,arg2);
-  lua_pushnumber(L, (lua_Number) result); SWIG_arg++;
   return SWIG_arg;
   
   if(0) SWIG_fail;
@@ -11372,6 +11532,33 @@ static swig_lua_namespace swig_LWANIMACTION_Sf_SwigStatic = {
 static swig_lua_class *swig_LWANIMACTION_bases[] = {0};
 static const char *swig_LWANIMACTION_base_names[] = {0};
 static swig_lua_class _wrap_class_LWANIMACTION = { "LWANIMACTION", "LWANIMACTION", &SWIGTYPE_p__LWANIMACTION,_proxy__wrap_new_LWANIMACTION, swig_delete_LWANIMACTION, swig_LWANIMACTION_methods, swig_LWANIMACTION_attributes, &swig_LWANIMACTION_Sf_SwigStatic, swig_LWANIMACTION_meta, swig_LWANIMACTION_bases, swig_LWANIMACTION_base_names };
+
+static int _wrap_action_filename_set(lua_State* L) {
+  int SWIG_arg = 0;
+  char **arg1 ;
+  
+  SWIG_check_num_args("action_filename",1,1)
+  if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("action_filename",1,"char const *[LWAC_COUNT]");
+  
+  if (!SWIG_IsOK(SWIG_ConvertPtr(L,1,(void**)&arg1,SWIGTYPE_p_p_char,0))){
+    SWIG_fail_ptr("action_filename_set",1,SWIGTYPE_p_p_char);
+  }
+  
+  {
+    size_t ii;
+    char const * *b = (char const * *) action_filename;
+    for (ii = 0; ii < (size_t)LWAC_COUNT; ii++) b[ii] = *((char const * *) arg1 + ii);
+  }
+  
+  return SWIG_arg;
+  
+  if(0) SWIG_fail;
+  
+fail:
+  lua_error(L);
+  return SWIG_arg;
+}
+
 
 static int _wrap_action_filename_get(lua_State* L) {
   int SWIG_arg = 0;
@@ -17604,122 +17791,6 @@ fail:
 }
 
 
-static int _wrap_LWCONTEXT_box_collider_set(lua_State* L) {
-  int SWIG_arg = 0;
-  struct _LWCONTEXT *arg1 = (struct _LWCONTEXT *) 0 ;
-  LWBOX2DCOLLIDER *arg2 ;
-  
-  SWIG_check_num_args("_LWCONTEXT::box_collider",2,2)
-  if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("_LWCONTEXT::box_collider",1,"struct _LWCONTEXT *");
-  if(!SWIG_isptrtype(L,2)) SWIG_fail_arg("_LWCONTEXT::box_collider",2,"LWBOX2DCOLLIDER [(128)]");
-  
-  if (!SWIG_IsOK(SWIG_ConvertPtr(L,1,(void**)&arg1,SWIGTYPE_p__LWCONTEXT,0))){
-    SWIG_fail_ptr("LWCONTEXT_box_collider_set",1,SWIGTYPE_p__LWCONTEXT);
-  }
-  
-  
-  if (!SWIG_IsOK(SWIG_ConvertPtr(L,2,(void**)&arg2,SWIGTYPE_p_LWBOX2DCOLLIDER,0))){
-    SWIG_fail_ptr("LWCONTEXT_box_collider_set",2,SWIGTYPE_p_LWBOX2DCOLLIDER);
-  }
-  
-  {
-    size_t ii;
-    LWBOX2DCOLLIDER *b = (LWBOX2DCOLLIDER *) arg1->box_collider;
-    for (ii = 0; ii < (size_t)(128); ii++) b[ii] = *((LWBOX2DCOLLIDER *) arg2 + ii);
-  }
-  
-  return SWIG_arg;
-  
-  if(0) SWIG_fail;
-  
-fail:
-  lua_error(L);
-  return SWIG_arg;
-}
-
-
-static int _wrap_LWCONTEXT_box_collider_get(lua_State* L) {
-  int SWIG_arg = 0;
-  struct _LWCONTEXT *arg1 = (struct _LWCONTEXT *) 0 ;
-  LWBOX2DCOLLIDER *result = 0 ;
-  
-  SWIG_check_num_args("_LWCONTEXT::box_collider",1,1)
-  if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("_LWCONTEXT::box_collider",1,"struct _LWCONTEXT *");
-  
-  if (!SWIG_IsOK(SWIG_ConvertPtr(L,1,(void**)&arg1,SWIGTYPE_p__LWCONTEXT,0))){
-    SWIG_fail_ptr("LWCONTEXT_box_collider_get",1,SWIGTYPE_p__LWCONTEXT);
-  }
-  
-  result = (LWBOX2DCOLLIDER *)(LWBOX2DCOLLIDER *) ((arg1)->box_collider);
-  SWIG_NewPointerObj(L,result,SWIGTYPE_p_LWBOX2DCOLLIDER,0); SWIG_arg++; 
-  return SWIG_arg;
-  
-  if(0) SWIG_fail;
-  
-fail:
-  lua_error(L);
-  return SWIG_arg;
-}
-
-
-static int _wrap_LWCONTEXT_field_object_set(lua_State* L) {
-  int SWIG_arg = 0;
-  struct _LWCONTEXT *arg1 = (struct _LWCONTEXT *) 0 ;
-  LWFIELDOBJECT *arg2 ;
-  
-  SWIG_check_num_args("_LWCONTEXT::field_object",2,2)
-  if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("_LWCONTEXT::field_object",1,"struct _LWCONTEXT *");
-  if(!SWIG_isptrtype(L,2)) SWIG_fail_arg("_LWCONTEXT::field_object",2,"LWFIELDOBJECT [(128)]");
-  
-  if (!SWIG_IsOK(SWIG_ConvertPtr(L,1,(void**)&arg1,SWIGTYPE_p__LWCONTEXT,0))){
-    SWIG_fail_ptr("LWCONTEXT_field_object_set",1,SWIGTYPE_p__LWCONTEXT);
-  }
-  
-  
-  if (!SWIG_IsOK(SWIG_ConvertPtr(L,2,(void**)&arg2,SWIGTYPE_p__LWFIELDOBJECT,0))){
-    SWIG_fail_ptr("LWCONTEXT_field_object_set",2,SWIGTYPE_p__LWFIELDOBJECT);
-  }
-  
-  {
-    size_t ii;
-    LWFIELDOBJECT *b = (LWFIELDOBJECT *) arg1->field_object;
-    for (ii = 0; ii < (size_t)(128); ii++) b[ii] = *((LWFIELDOBJECT *) arg2 + ii);
-  }
-  
-  return SWIG_arg;
-  
-  if(0) SWIG_fail;
-  
-fail:
-  lua_error(L);
-  return SWIG_arg;
-}
-
-
-static int _wrap_LWCONTEXT_field_object_get(lua_State* L) {
-  int SWIG_arg = 0;
-  struct _LWCONTEXT *arg1 = (struct _LWCONTEXT *) 0 ;
-  LWFIELDOBJECT *result = 0 ;
-  
-  SWIG_check_num_args("_LWCONTEXT::field_object",1,1)
-  if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("_LWCONTEXT::field_object",1,"struct _LWCONTEXT *");
-  
-  if (!SWIG_IsOK(SWIG_ConvertPtr(L,1,(void**)&arg1,SWIGTYPE_p__LWCONTEXT,0))){
-    SWIG_fail_ptr("LWCONTEXT_field_object_get",1,SWIGTYPE_p__LWCONTEXT);
-  }
-  
-  result = (LWFIELDOBJECT *)(LWFIELDOBJECT *) ((arg1)->field_object);
-  SWIG_NewPointerObj(L,result,SWIGTYPE_p__LWFIELDOBJECT,0); SWIG_arg++; 
-  return SWIG_arg;
-  
-  if(0) SWIG_fail;
-  
-fail:
-  lua_error(L);
-  return SWIG_arg;
-}
-
-
 static int _wrap_LWCONTEXT_dir_pad_x_set(lua_State* L) {
   int SWIG_arg = 0;
   struct _LWCONTEXT *arg1 = (struct _LWCONTEXT *) 0 ;
@@ -20470,8 +20541,6 @@ static swig_lua_attribute swig_LWCONTEXT_attributes[] = {
     { "player_pos_last_moved_dy", _wrap_LWCONTEXT_player_pos_last_moved_dy_get, _wrap_LWCONTEXT_player_pos_last_moved_dy_set },
     { "player_action", _wrap_LWCONTEXT_player_action_get, _wrap_LWCONTEXT_player_action_set },
     { "player_state_data", _wrap_LWCONTEXT_player_state_data_get, _wrap_LWCONTEXT_player_state_data_set },
-    { "box_collider", _wrap_LWCONTEXT_box_collider_get, _wrap_LWCONTEXT_box_collider_set },
-    { "field_object", _wrap_LWCONTEXT_field_object_get, _wrap_LWCONTEXT_field_object_set },
     { "dir_pad_x", _wrap_LWCONTEXT_dir_pad_x_get, _wrap_LWCONTEXT_dir_pad_x_set },
     { "dir_pad_y", _wrap_LWCONTEXT_dir_pad_y_get, _wrap_LWCONTEXT_dir_pad_y_set },
     { "dir_pad_dragging", _wrap_LWCONTEXT_dir_pad_dragging_get, _wrap_LWCONTEXT_dir_pad_dragging_set },
@@ -22647,6 +22716,56 @@ fail:
 }
 
 
+static int _wrap_LWFIELDOBJECT_z_set(lua_State* L) {
+  int SWIG_arg = 0;
+  struct _LWFIELDOBJECT *arg1 = (struct _LWFIELDOBJECT *) 0 ;
+  float arg2 ;
+  
+  SWIG_check_num_args("_LWFIELDOBJECT::z",2,2)
+  if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("_LWFIELDOBJECT::z",1,"struct _LWFIELDOBJECT *");
+  if(!lua_isnumber(L,2)) SWIG_fail_arg("_LWFIELDOBJECT::z",2,"float");
+  
+  if (!SWIG_IsOK(SWIG_ConvertPtr(L,1,(void**)&arg1,SWIGTYPE_p__LWFIELDOBJECT,0))){
+    SWIG_fail_ptr("LWFIELDOBJECT_z_set",1,SWIGTYPE_p__LWFIELDOBJECT);
+  }
+  
+  arg2 = (float)lua_tonumber(L, 2);
+  if (arg1) (arg1)->z = arg2;
+  
+  return SWIG_arg;
+  
+  if(0) SWIG_fail;
+  
+fail:
+  lua_error(L);
+  return SWIG_arg;
+}
+
+
+static int _wrap_LWFIELDOBJECT_z_get(lua_State* L) {
+  int SWIG_arg = 0;
+  struct _LWFIELDOBJECT *arg1 = (struct _LWFIELDOBJECT *) 0 ;
+  float result;
+  
+  SWIG_check_num_args("_LWFIELDOBJECT::z",1,1)
+  if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("_LWFIELDOBJECT::z",1,"struct _LWFIELDOBJECT *");
+  
+  if (!SWIG_IsOK(SWIG_ConvertPtr(L,1,(void**)&arg1,SWIGTYPE_p__LWFIELDOBJECT,0))){
+    SWIG_fail_ptr("LWFIELDOBJECT_z_get",1,SWIGTYPE_p__LWFIELDOBJECT);
+  }
+  
+  result = (float) ((arg1)->z);
+  lua_pushnumber(L, (lua_Number) result); SWIG_arg++;
+  return SWIG_arg;
+  
+  if(0) SWIG_fail;
+  
+fail:
+  lua_error(L);
+  return SWIG_arg;
+}
+
+
 static int _wrap_LWFIELDOBJECT_sx_set(lua_State* L) {
   int SWIG_arg = 0;
   struct _LWFIELDOBJECT *arg1 = (struct _LWFIELDOBJECT *) 0 ;
@@ -22941,6 +23060,7 @@ static swig_lua_attribute swig_LWFIELDOBJECT_attributes[] = {
     { "valid", _wrap_LWFIELDOBJECT_valid_get, _wrap_LWFIELDOBJECT_valid_set },
     { "x", _wrap_LWFIELDOBJECT_x_get, _wrap_LWFIELDOBJECT_x_set },
     { "y", _wrap_LWFIELDOBJECT_y_get, _wrap_LWFIELDOBJECT_y_set },
+    { "z", _wrap_LWFIELDOBJECT_z_get, _wrap_LWFIELDOBJECT_z_set },
     { "sx", _wrap_LWFIELDOBJECT_sx_get, _wrap_LWFIELDOBJECT_sx_set },
     { "sy", _wrap_LWFIELDOBJECT_sy_get, _wrap_LWFIELDOBJECT_sy_set },
     { "lvt", _wrap_LWFIELDOBJECT_lvt_get, _wrap_LWFIELDOBJECT_lvt_set },
@@ -32603,6 +32723,106 @@ fail:
 }
 
 
+static int _wrap_LWPATHQUERY_valid_set(lua_State* L) {
+  int SWIG_arg = 0;
+  struct _LWPATHQUERY *arg1 = (struct _LWPATHQUERY *) 0 ;
+  int arg2 ;
+  
+  SWIG_check_num_args("_LWPATHQUERY::valid",2,2)
+  if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("_LWPATHQUERY::valid",1,"struct _LWPATHQUERY *");
+  if(!lua_isnumber(L,2)) SWIG_fail_arg("_LWPATHQUERY::valid",2,"int");
+  
+  if (!SWIG_IsOK(SWIG_ConvertPtr(L,1,(void**)&arg1,SWIGTYPE_p__LWPATHQUERY,0))){
+    SWIG_fail_ptr("LWPATHQUERY_valid_set",1,SWIGTYPE_p__LWPATHQUERY);
+  }
+  
+  arg2 = (int)lua_tonumber(L, 2);
+  if (arg1) (arg1)->valid = arg2;
+  
+  return SWIG_arg;
+  
+  if(0) SWIG_fail;
+  
+fail:
+  lua_error(L);
+  return SWIG_arg;
+}
+
+
+static int _wrap_LWPATHQUERY_valid_get(lua_State* L) {
+  int SWIG_arg = 0;
+  struct _LWPATHQUERY *arg1 = (struct _LWPATHQUERY *) 0 ;
+  int result;
+  
+  SWIG_check_num_args("_LWPATHQUERY::valid",1,1)
+  if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("_LWPATHQUERY::valid",1,"struct _LWPATHQUERY *");
+  
+  if (!SWIG_IsOK(SWIG_ConvertPtr(L,1,(void**)&arg1,SWIGTYPE_p__LWPATHQUERY,0))){
+    SWIG_fail_ptr("LWPATHQUERY_valid_get",1,SWIGTYPE_p__LWPATHQUERY);
+  }
+  
+  result = (int) ((arg1)->valid);
+  lua_pushnumber(L, (lua_Number) result); SWIG_arg++;
+  return SWIG_arg;
+  
+  if(0) SWIG_fail;
+  
+fail:
+  lua_error(L);
+  return SWIG_arg;
+}
+
+
+static int _wrap_LWPATHQUERY_update_output_set(lua_State* L) {
+  int SWIG_arg = 0;
+  struct _LWPATHQUERY *arg1 = (struct _LWPATHQUERY *) 0 ;
+  int arg2 ;
+  
+  SWIG_check_num_args("_LWPATHQUERY::update_output",2,2)
+  if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("_LWPATHQUERY::update_output",1,"struct _LWPATHQUERY *");
+  if(!lua_isnumber(L,2)) SWIG_fail_arg("_LWPATHQUERY::update_output",2,"int");
+  
+  if (!SWIG_IsOK(SWIG_ConvertPtr(L,1,(void**)&arg1,SWIGTYPE_p__LWPATHQUERY,0))){
+    SWIG_fail_ptr("LWPATHQUERY_update_output_set",1,SWIGTYPE_p__LWPATHQUERY);
+  }
+  
+  arg2 = (int)lua_tonumber(L, 2);
+  if (arg1) (arg1)->update_output = arg2;
+  
+  return SWIG_arg;
+  
+  if(0) SWIG_fail;
+  
+fail:
+  lua_error(L);
+  return SWIG_arg;
+}
+
+
+static int _wrap_LWPATHQUERY_update_output_get(lua_State* L) {
+  int SWIG_arg = 0;
+  struct _LWPATHQUERY *arg1 = (struct _LWPATHQUERY *) 0 ;
+  int result;
+  
+  SWIG_check_num_args("_LWPATHQUERY::update_output",1,1)
+  if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("_LWPATHQUERY::update_output",1,"struct _LWPATHQUERY *");
+  
+  if (!SWIG_IsOK(SWIG_ConvertPtr(L,1,(void**)&arg1,SWIGTYPE_p__LWPATHQUERY,0))){
+    SWIG_fail_ptr("LWPATHQUERY_update_output_get",1,SWIGTYPE_p__LWPATHQUERY);
+  }
+  
+  result = (int) ((arg1)->update_output);
+  lua_pushnumber(L, (lua_Number) result); SWIG_arg++;
+  return SWIG_arg;
+  
+  if(0) SWIG_fail;
+  
+fail:
+  lua_error(L);
+  return SWIG_arg;
+}
+
+
 static int _wrap_LWPATHQUERY_spos_set(lua_State* L) {
   int SWIG_arg = 0;
   struct _LWPATHQUERY *arg1 = (struct _LWPATHQUERY *) 0 ;
@@ -32827,6 +33047,56 @@ fail:
 }
 
 
+static int _wrap_LWPATHQUERY_path_t_set(lua_State* L) {
+  int SWIG_arg = 0;
+  struct _LWPATHQUERY *arg1 = (struct _LWPATHQUERY *) 0 ;
+  float arg2 ;
+  
+  SWIG_check_num_args("_LWPATHQUERY::path_t",2,2)
+  if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("_LWPATHQUERY::path_t",1,"struct _LWPATHQUERY *");
+  if(!lua_isnumber(L,2)) SWIG_fail_arg("_LWPATHQUERY::path_t",2,"float");
+  
+  if (!SWIG_IsOK(SWIG_ConvertPtr(L,1,(void**)&arg1,SWIGTYPE_p__LWPATHQUERY,0))){
+    SWIG_fail_ptr("LWPATHQUERY_path_t_set",1,SWIGTYPE_p__LWPATHQUERY);
+  }
+  
+  arg2 = (float)lua_tonumber(L, 2);
+  if (arg1) (arg1)->path_t = arg2;
+  
+  return SWIG_arg;
+  
+  if(0) SWIG_fail;
+  
+fail:
+  lua_error(L);
+  return SWIG_arg;
+}
+
+
+static int _wrap_LWPATHQUERY_path_t_get(lua_State* L) {
+  int SWIG_arg = 0;
+  struct _LWPATHQUERY *arg1 = (struct _LWPATHQUERY *) 0 ;
+  float result;
+  
+  SWIG_check_num_args("_LWPATHQUERY::path_t",1,1)
+  if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("_LWPATHQUERY::path_t",1,"struct _LWPATHQUERY *");
+  
+  if (!SWIG_IsOK(SWIG_ConvertPtr(L,1,(void**)&arg1,SWIGTYPE_p__LWPATHQUERY,0))){
+    SWIG_fail_ptr("LWPATHQUERY_path_t_get",1,SWIGTYPE_p__LWPATHQUERY);
+  }
+  
+  result = (float) ((arg1)->path_t);
+  lua_pushnumber(L, (lua_Number) result); SWIG_arg++;
+  return SWIG_arg;
+  
+  if(0) SWIG_fail;
+  
+fail:
+  lua_error(L);
+  return SWIG_arg;
+}
+
+
 static int _wrap_new_LWPATHQUERY(lua_State* L) {
   int SWIG_arg = 0;
   struct _LWPATHQUERY *result = 0 ;
@@ -32857,10 +33127,13 @@ static int _proxy__wrap_new_LWPATHQUERY(lua_State *L) {
     return 1;
 }
 static swig_lua_attribute swig_LWPATHQUERY_attributes[] = {
+    { "valid", _wrap_LWPATHQUERY_valid_get, _wrap_LWPATHQUERY_valid_set },
+    { "update_output", _wrap_LWPATHQUERY_update_output_get, _wrap_LWPATHQUERY_update_output_set },
     { "spos", _wrap_LWPATHQUERY_spos_get, _wrap_LWPATHQUERY_spos_set },
     { "epos", _wrap_LWPATHQUERY_epos_get, _wrap_LWPATHQUERY_epos_set },
     { "smooth_path", _wrap_LWPATHQUERY_smooth_path_get, _wrap_LWPATHQUERY_smooth_path_set },
     { "n_smooth_path", _wrap_LWPATHQUERY_n_smooth_path_get, _wrap_LWPATHQUERY_n_smooth_path_set },
+    { "path_t", _wrap_LWPATHQUERY_path_t_get, _wrap_LWPATHQUERY_path_t_set },
     {0,0,0}
 };
 static swig_lua_method swig_LWPATHQUERY_methods[]= {
@@ -36998,29 +37271,6 @@ static int _wrap_spawn_all_field_object(lua_State* L) {
   }
   
   spawn_all_field_object(arg1);
-  
-  return SWIG_arg;
-  
-  if(0) SWIG_fail;
-  
-fail:
-  lua_error(L);
-  return SWIG_arg;
-}
-
-
-static int _wrap_despawn_all_field_object(lua_State* L) {
-  int SWIG_arg = 0;
-  LWCONTEXT *arg1 = (LWCONTEXT *) 0 ;
-  
-  SWIG_check_num_args("despawn_all_field_object",1,1)
-  if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("despawn_all_field_object",1,"LWCONTEXT *");
-  
-  if (!SWIG_IsOK(SWIG_ConvertPtr(L,1,(void**)&arg1,SWIGTYPE_p__LWCONTEXT,0))){
-    SWIG_fail_ptr("despawn_all_field_object",1,SWIGTYPE_p__LWCONTEXT);
-  }
-  
-  despawn_all_field_object(arg1);
   
   return SWIG_arg;
   
@@ -42697,7 +42947,7 @@ static swig_lua_attribute swig_SwigModule_attributes[] = {
     { "default_uv_offset", _wrap_default_uv_offset_get, SWIG_Lua_set_immutable },
     { "default_uv_scale", _wrap_default_uv_scale_get, SWIG_Lua_set_immutable },
     { "default_flip_y_uv_scale", _wrap_default_flip_y_uv_scale_get, SWIG_Lua_set_immutable },
-    { "action_filename", _wrap_action_filename_get, SWIG_Lua_set_immutable },
+    { "action_filename", _wrap_action_filename_get, _wrap_action_filename_set },
     { "tex_atlas_filename", _wrap_tex_atlas_filename_get, SWIG_Lua_set_immutable },
     { "EXP_COLOR", _wrap_EXP_COLOR_get, SWIG_Lua_set_immutable },
     { "tex_font_atlas_filename", _wrap_tex_font_atlas_filename_get, _wrap_tex_font_atlas_filename_set },
@@ -43134,6 +43384,14 @@ static swig_lua_method swig_SwigModule_methods[]= {
     { "field_hit_player", _wrap_field_hit_player},
     { "field_despawn_remote_sphere", _wrap_field_despawn_remote_sphere},
     { "field_ps", _wrap_field_ps},
+    { "field_new_path_query", _wrap_field_new_path_query},
+    { "field_update_output_path_query", _wrap_field_update_output_path_query},
+    { "spawn_field_object", _wrap_spawn_field_object},
+    { "despawn_field_object", _wrap_despawn_field_object},
+    { "field_remove_field_object", _wrap_field_remove_field_object},
+    { "despawn_all_field_object", _wrap_despawn_all_field_object},
+    { "field_object", _wrap_field_object},
+    { "field_bind_path_query_output_location", _wrap_field_bind_path_query_output_location},
     { "create_string_from_file", _wrap_create_string_from_file},
     { "release_string", _wrap_release_string},
     { "create_binary_from_file", _wrap_create_binary_from_file},
@@ -43223,8 +43481,6 @@ static swig_lua_method swig_SwigModule_methods[]= {
     { "set_texture_parameter_values", _wrap_set_texture_parameter_values},
     { "get_tex_index_by_hash_key", _wrap_get_tex_index_by_hash_key},
     { "set_texture_parameter", _wrap_set_texture_parameter},
-    { "spawn_field_object", _wrap_spawn_field_object},
-    { "despawn_field_object", _wrap_despawn_field_object},
     { "lw_app_quit", _wrap_lw_app_quit},
     { "hash", _wrap_hash},
     { "reset_battle_context", _wrap_reset_battle_context},
@@ -43332,7 +43588,6 @@ static swig_lua_method swig_SwigModule_methods[]= {
     { "toggle_font_texture_test_mode", _wrap_toggle_font_texture_test_mode},
     { "init_lua", _wrap_init_lua},
     { "spawn_all_field_object", _wrap_spawn_all_field_object},
-    { "despawn_all_field_object", _wrap_despawn_all_field_object},
     { "script_run_file_ex", _wrap_script_run_file_ex},
     { "script_run_file", _wrap_script_run_file},
     { "script_set_context", _wrap_script_set_context},

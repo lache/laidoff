@@ -262,16 +262,6 @@ void spawn_all_field_object(LWCONTEXT* pLwc) {
 	script_run_file(pLwc, LW_SCRIPT_PREFIX_PATH "spawn.lua");
 }
 
-void despawn_all_field_object(LWCONTEXT* pLwc) {
-	for (int i = 0; i < ARRAY_SIZE(pLwc->field_object); i++) {
-		pLwc->field_object[i].valid = 0;
-	}
-	
-	for (int i = 0; i < ARRAY_SIZE(pLwc->box_collider); i++) {
-		pLwc->box_collider[i].valid = 0;
-	}
-}
-
 void script_set_context(LWCONTEXT* pLwc) {
 	context = pLwc;
 }

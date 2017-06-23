@@ -302,7 +302,7 @@ void reset_battle_context(LWCONTEXT* pLwc) {
 
 void reset_field_context(LWCONTEXT* pLwc) {
 
-	despawn_all_field_object(pLwc);
+	despawn_all_field_object(pLwc->field);
 
 	spawn_all_field_object(pLwc);
 

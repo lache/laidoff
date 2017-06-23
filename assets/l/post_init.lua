@@ -64,5 +64,16 @@ start_coro(function ()
     --end
 end)
 
+cw_pq = spawn_oil_truck(pLwc, -8, -8, 6)
+
+
+start_coro(function ()
+    print('...!!!')
+    
+    pq1 = lo.field_new_path_query(c.field)
+    lo.field_update_output_path_query(c.field, pq1, 1)
+    lo.field_bind_path_query_output_location(c.field, pq1, cw_pq)
+  print('new pq', pq1)
+end)
 
 return 1
