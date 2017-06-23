@@ -485,6 +485,10 @@ typedef intptr_t ssize_t;
     typedef unsigned __int64 uint64_t;
 #   endif
     typedef uint32_t in_addr_t;
+// These macros are defined in inttpyes.h on windows platform
+#if defined (__WINDOWS__)
+#include <inttypes.h>
+#endif // #if defined (__WINDOWS__)
 #   if (!defined (PRId8))
 #       define PRId8    "d"
 #   endif

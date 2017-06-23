@@ -1,4 +1,10 @@
 %module lo
+%begin %{
+#ifdef WIN32
+#pragma warning(push)
+#pragma warning(disable:4244)
+#endif
+%}
 %{
 #include "constants.h"
 #include "dialog.h"
@@ -84,6 +90,9 @@
 #include "battle_result.h"
 #include "battlelogic.h"
 
+#ifdef WIN32
+#pragma warning(pop)
+#endif
 %}
 
 %ignore s_set_id;

@@ -92,6 +92,7 @@ void load_emitter2(LWCONTEXT* pLwc) {
 
 void ps_load_particles(LWCONTEXT* pLwc) {
 	pcg32_srandom_r(&rng, 0x0DEEC2CBADF00D77, 0x15881588CA11DAC1);
+	//pcg32_srandom_r(&rng, 3, 56);
 
 	for (int i = 0; i < NUM_PARTICLES; i++) {
 		emitter.particles[i].theta = (float)LWDEG2RAD(i);

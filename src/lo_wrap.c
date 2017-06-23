@@ -8,6 +8,12 @@
  * interface file instead.
  * ----------------------------------------------------------------------------- */
 
+#ifdef WIN32
+#pragma warning(push)
+#pragma warning(disable:4244)
+#endif
+
+
 
 #ifndef SWIGLUA
 #define SWIGLUA
@@ -2863,6 +2869,9 @@ static swig_module_info swig_module = {swig_types, 115, 0, 0, 0, 0};
 #include "battle_result.h"
 #include "battlelogic.h"
 
+#ifdef WIN32
+#pragma warning(pop)
+#endif
 
 
 SWIGINTERN int SWIG_lua_isnilstring(lua_State *L, int idx) {
@@ -19414,6 +19423,56 @@ fail:
 }
 
 
+static int _wrap_LWCONTEXT_script_set(lua_State* L) {
+  int SWIG_arg = 0;
+  struct _LWCONTEXT *arg1 = (struct _LWCONTEXT *) 0 ;
+  void *arg2 = (void *) 0 ;
+  
+  SWIG_check_num_args("_LWCONTEXT::script",2,2)
+  if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("_LWCONTEXT::script",1,"struct _LWCONTEXT *");
+  if(!SWIG_isptrtype(L,2)) SWIG_fail_arg("_LWCONTEXT::script",2,"void *");
+  
+  if (!SWIG_IsOK(SWIG_ConvertPtr(L,1,(void**)&arg1,SWIGTYPE_p__LWCONTEXT,0))){
+    SWIG_fail_ptr("LWCONTEXT_script_set",1,SWIGTYPE_p__LWCONTEXT);
+  }
+  
+  arg2=(void *)SWIG_MustGetPtr(L,2,0,0,2,"LWCONTEXT_script_set");
+  if (arg1) (arg1)->script = arg2;
+  
+  return SWIG_arg;
+  
+  if(0) SWIG_fail;
+  
+fail:
+  lua_error(L);
+  return SWIG_arg;
+}
+
+
+static int _wrap_LWCONTEXT_script_get(lua_State* L) {
+  int SWIG_arg = 0;
+  struct _LWCONTEXT *arg1 = (struct _LWCONTEXT *) 0 ;
+  void *result = 0 ;
+  
+  SWIG_check_num_args("_LWCONTEXT::script",1,1)
+  if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("_LWCONTEXT::script",1,"struct _LWCONTEXT *");
+  
+  if (!SWIG_IsOK(SWIG_ConvertPtr(L,1,(void**)&arg1,SWIGTYPE_p__LWCONTEXT,0))){
+    SWIG_fail_ptr("LWCONTEXT_script_get",1,SWIGTYPE_p__LWCONTEXT);
+  }
+  
+  result = (void *) ((arg1)->script);
+  SWIG_NewPointerObj(L,result,SWIGTYPE_p_void,0); SWIG_arg++; 
+  return SWIG_arg;
+  
+  if(0) SWIG_fail;
+  
+fail:
+  lua_error(L);
+  return SWIG_arg;
+}
+
+
 static int _wrap_LWCONTEXT_armature_set(lua_State* L) {
   int SWIG_arg = 0;
   struct _LWCONTEXT *arg1 = (struct _LWCONTEXT *) 0 ;
@@ -20419,6 +20478,7 @@ static swig_lua_attribute swig_LWCONTEXT_attributes[] = {
     { "last_mouse_move_y", _wrap_LWCONTEXT_last_mouse_move_y_get, _wrap_LWCONTEXT_last_mouse_move_y_set },
     { "admin_button_command", _wrap_LWCONTEXT_admin_button_command_get, _wrap_LWCONTEXT_admin_button_command_set },
     { "L", _wrap_LWCONTEXT_L_get, _wrap_LWCONTEXT_L_set },
+    { "script", _wrap_LWCONTEXT_script_get, _wrap_LWCONTEXT_script_set },
     { "armature", _wrap_LWCONTEXT_armature_get, _wrap_LWCONTEXT_armature_set },
     { "action", _wrap_LWCONTEXT_action_get, _wrap_LWCONTEXT_action_set },
     { "player_skin_time", _wrap_LWCONTEXT_player_skin_time_get, _wrap_LWCONTEXT_player_skin_time_set },
@@ -37058,6 +37118,29 @@ fail:
 }
 
 
+static int _wrap_script_update(lua_State* L) {
+  int SWIG_arg = 0;
+  LWCONTEXT *arg1 = (LWCONTEXT *) 0 ;
+  
+  SWIG_check_num_args("script_update",1,1)
+  if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("script_update",1,"LWCONTEXT *");
+  
+  if (!SWIG_IsOK(SWIG_ConvertPtr(L,1,(void**)&arg1,SWIGTYPE_p__LWCONTEXT,0))){
+    SWIG_fail_ptr("script_update",1,SWIGTYPE_p__LWCONTEXT);
+  }
+  
+  script_update(arg1);
+  
+  return SWIG_arg;
+  
+  if(0) SWIG_fail;
+  
+fail:
+  lua_error(L);
+  return SWIG_arg;
+}
+
+
 static int _wrap_play_sound(lua_State* L) {
   int SWIG_arg = 0;
   LW_SOUND arg1 ;
@@ -43227,6 +43310,7 @@ static swig_lua_method swig_SwigModule_methods[]= {
     { "script_set_context", _wrap_script_set_context},
     { "script_context", _wrap_script_context},
     { "script_prefix_path", _wrap_script_prefix_path},
+    { "script_update", _wrap_script_update},
     { "play_sound", _wrap_play_sound},
     { "init_sys_msg", _wrap_init_sys_msg},
     { "deinit_sys_msg", _wrap_deinit_sys_msg},

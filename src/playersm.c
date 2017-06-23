@@ -220,7 +220,9 @@ static void s_fire_bullet(LWPLAYERSTATEDATA* data) {
 	float speed = 70.0f;
 	
 	// random range around rot_z: [rot_z - data->aim_theta / 2, rot_z + data->aim_theta / 2)
-	const float aimed_rot_z = (float)(data->rot_z - data->aim_theta / 2 + data->aim_theta * field_random_double(data->field));
+	const double rd = field_random_double(data->field);
+	//LOGI("rd = %f", rd);
+	const float aimed_rot_z = (float)(data->rot_z - data->aim_theta / 2 + data->aim_theta * rd);
 	
 	float vel[3] = { speed * cosf(aimed_rot_z), speed * sinf(aimed_rot_z), 0 };
 	if (field_network(data->field)) {

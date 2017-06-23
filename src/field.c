@@ -334,6 +334,7 @@ LWFIELD* load_field(const char* filename) {
 	}
 	// Seed a random number generator
 	pcg32_srandom_r(&field->rng, 0x0DEEC2CBADF00D77, 0x15881588CA11DAC1);
+	//pcg32_srandom_r(&field->rng, 3, 56);
 	// Particle system
 	field->ps = ps_new();
 	// Here it is. A brand new field instance just out of the oven!
@@ -1101,7 +1102,10 @@ unsigned int field_random_unsigned_int(LWFIELD* field, unsigned int bound) {
 
 // return [0, 1) double
 double field_random_double(LWFIELD* field) {
-	return ldexp(pcg32_random_r(&field->rng), -32);
+	uint32_t v = pcg32_random_r(&field->rng);
+	//uint32_t v = pcg32_random();
+	//LOGI("v = 0x%08x", v);
+	return ldexp(v, -32);
 }
 
 float field_test_player_flash(const LWFIELD* field) {
