@@ -73,6 +73,11 @@ start_coro(function ()
     pq1 = lo.field_new_path_query(c.field)
     lo.field_update_output_path_query(c.field, pq1, 1)
     lo.field_bind_path_query_output_location(c.field, pq1, cw_pq)
+    yield_wait_ms(1000)
+    lo.field_update_output_path_query(c.field, pq1, 0)
+    yield_wait_ms(1000)
+    lo.field_update_output_path_query(c.field, pq1, 1)
+    
   print('new pq', pq1)
 end)
 
