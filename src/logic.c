@@ -320,21 +320,21 @@ void toggle_network_poll(LWCONTEXT *pLwc) {
 }
 
 void reset_runtime_context(LWCONTEXT* pLwc) {
-
+	// Reset time
 	reset_time(pLwc);
-
+	// Reset sprite data pointer
 	pLwc->sprite_data = SPRITE_DATA[0];
-
+	// Reset game scene
 	pLwc->next_game_scene = LGS_FIELD;
-
+	// Reset debug font rendering indicator
 	pLwc->font_texture_texture_mode = 0;
-
+	// Reset battle context
 	reset_battle_context(pLwc);
-
+	// Reset field context
 	reset_field_context(pLwc);
-
+	// Make render-to-texture flag dirty
 	pLwc->font_fbo.dirty = 1;
-
+	// Register admin button commands
 	pLwc->admin_button_command[0].name = LWU("신:필드");
 	pLwc->admin_button_command[0].command_handler = change_to_field;
 	pLwc->admin_button_command[1].name = LWU("신:대화");
@@ -369,7 +369,9 @@ void reset_runtime_context(LWCONTEXT* pLwc) {
 	pLwc->admin_button_command[15].command_handler = toggle_ray_test;
 	pLwc->admin_button_command[16].name = LWU("네트워크토글");
 	pLwc->admin_button_command[16].command_handler = toggle_network_poll;
-
+	// Run script for testing script error logging function (no effects on system)
+	script_run_file(pLwc, ASSETS_BASE_PATH "l" PATH_SEPARATOR "error_test.lua");
+	// Run post init script
 	script_run_file(pLwc, ASSETS_BASE_PATH "l" PATH_SEPARATOR "post_init.lua");
 }
 

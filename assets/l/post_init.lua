@@ -64,34 +64,19 @@ start_coro(function ()
     --end
 end)
 
-
-
 nav = lo.field_nav(c.field)
 
-start_coro(function ()
-    print('...!!!')
+function test_coro()
     for i=1, 10 do
-      cw_pq = spawn_oil_truck(pLwc, -8, -8, 6)
-      pq1 = lo.nav_new_path_query(nav)
-      lo.nav_update_output_path_query(nav, pq1, 1)
-      lo.nav_bind_path_query_output_location(nav, pq1, c.field, cw_pq)
+      -- Truck field object
+      truck = spawn_oil_truck(pLwc, -8, -8, 6)
+      -- Path query
+      pq = lo.nav_new_path_query(nav)
+      -- Activate path query update
+      lo.nav_update_output_path_query(nav, pq, 1)
+      -- Bind path query to truck
+      lo.nav_bind_path_query_output_location(nav, pq, c.field, truck)
     end
-    
-    --[[
-    yield_wait_ms(1000)
-    lo.field_update_output_path_query(c.field, pq1, 0)
-    yield_wait_ms(10000)
-    lo.field_update_output_path_query(c.field, pq1, 1)
-    yield_wait_ms(1000)
-    lo.field_update_output_path_query(c.field, pq1, 0)
-    yield_wait_ms(1000)
-    lo.field_update_output_path_query(c.field, pq1, 1)
-    yield_wait_ms(1000)
-    lo.field_update_output_path_query(c.field, pq1, 0)
-    yield_wait_ms(1000)
-    lo.field_update_output_path_query(c.field, pq1, 1)
-    ]]--
-  print('new pq', pq1)
-end)
+end  
 
 return 1

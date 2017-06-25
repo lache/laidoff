@@ -11,6 +11,12 @@
 #define LW_SCRIPT_PREFIX_PATH ASSETS_BASE_PATH "l" PATH_SEPARATOR
 #define LW_MAX_CORO (32)
 
+enum LW_SCRIPT_METADATA_TABLE_KEY {
+	// Lua uses 1-based index
+	LSMTK_COROUTINE_INDEX = 1,
+	LSMTK_DEBUG_TRACEBACK = 2,
+};
+
 // Defined at lo_wrap.c
 int luaopen_lo(lua_State* L);
 
@@ -48,13 +54,17 @@ int l_yield_wait_ms(lua_State* L) {
 	}
 	// Get wait ms from function argument (lua integer is 64-bit)
 	int wait_ms = (int)lua_tointeger(L, 1);
-	// Get coro_index from registry
+	// Get coroutine metadata table from registry
 	lua_pushlightuserdata(L, L);
 	lua_gettable(L, LUA_REGISTRYINDEX);
-	if (!lua_isinteger(L, -1)) {
+	int table_index = lua_gettop(L);
+	if (!lua_istable(L, -1)) {
 		lua_pushliteral(L, "incorrect argument");
 		lua_error(L);
 	}
+	// Get first table value from metadata table (which is coroutine index)
+	lua_pushinteger(L, LSMTK_COROUTINE_INDEX);
+	lua_gettable(L, table_index);
 	int coro_index = (int)lua_tointeger(L, -1);
 	LWCONTEXT* pLwc = context;
 	LWSCRIPT* script = (LWSCRIPT*)pLwc->script;
@@ -64,6 +74,41 @@ int l_yield_wait_ms(lua_State* L) {
 	lua_pushnumber(L, 2);
 	lua_pushcfunction(L, lua_cb);
 	return lua_yield(L, 3);
+}
+
+void push_recursive_traceback(lua_State* L_coro, lua_State* L) {
+	// Get coroutine metadata table of parent (L) from registry
+	lua_pushlightuserdata(L, L);
+	lua_gettable(L, LUA_REGISTRYINDEX);
+	if (!lua_istable(L, -1)) {
+		// No metadata table exists (L is main thread)
+		// Pop everyhing and add main thread's traceback
+		lua_pop(L, 1);
+		// Push L's traceback to L_coro
+		luaL_traceback(L_coro, L, NULL, 1);
+	} else {
+		int table_index = lua_gettop(L);
+		// Get second table value from metadata table (which is parent thread traceback debug info)
+		lua_pushinteger(L, LSMTK_DEBUG_TRACEBACK);
+		lua_gettable(L, table_index);
+		if (lua_isstring(L, -1)) {
+			const char* parent_parent_traceback = lua_tostring(L, -1);
+			// Push L's traceback to L_coro
+			luaL_traceback(L_coro, L, NULL, 1);
+			const char* parent_traceback = lua_tostring(L_coro, -1);
+			char tb[2048];
+			tb[0] = '\0';
+			strncat(tb, parent_traceback, sizeof(tb) - 1);
+			strncat(tb, "\n", sizeof(tb) - 1);
+			strncat(tb, parent_parent_traceback, sizeof(tb) - 1);
+			lua_pop(L, 1);
+			lua_pop(L_coro, 1);
+			lua_pushstring(L_coro, tb);
+		} else {
+			LOGE(LWLOGPOS "coro metadata table corrupted");
+			abort();
+		}
+	}
 }
 
 int l_start_coro(lua_State* L) {
@@ -79,9 +124,20 @@ int l_start_coro(lua_State* L) {
 				script->coro[i].valid = 1;
 				lua_State* L_coro = lua_newthread(L);
 				script->coro[i].L = L_coro;
-				// Set coroutine array index to registry
-				lua_pushlightuserdata(L_coro, L_coro);
+				// Create coroutine metadata table
+				lua_createtable(L_coro, 2, 0);
+				int table_index = lua_gettop(L_coro);
+				// Set coroutine array index to registry (key: 1, value: i)
+				lua_pushinteger(L_coro, LSMTK_COROUTINE_INDEX);
 				lua_pushinteger(L_coro, i);
+				lua_settable(L_coro, table_index);
+				// Set coroutine traceback of parent(main) thread for debugging purpose (key: 2, value: string)
+				lua_pushinteger(L_coro, LSMTK_DEBUG_TRACEBACK);
+				push_recursive_traceback(L_coro, L);
+				lua_settable(L_coro, table_index);
+				// Set metadata table to registry (key: L_coro, value: metadata table)
+				lua_pushlightuserdata(L_coro, L_coro);
+				lua_pushvalue(L_coro, table_index);
 				lua_settable(L_coro, LUA_REGISTRYINDEX);
 				// Copy coroutine entry function (first argument of 'start_coro')
 				// and add onto the top of stack.
@@ -234,13 +290,32 @@ void init_lua(LWCONTEXT* pLwc)
 	script_run_file(pLwc, ASSETS_BASE_PATH "l" PATH_SEPARATOR "post_init_once.lua");
 }
 
+static int traceback(lua_State *L) {
+	lua_getglobal(L, "debug");
+	lua_getfield(L, -1, "traceback");
+	lua_pushvalue(L, 1);
+	lua_pushinteger(L, 2);
+	lua_call(L, 2, 1);
+	//fprintf(stderr, "%s\n", lua_tostring(L, -1));
+	return 1;
+}
+
 int script_run_file_ex(LWCONTEXT* pLwc, const char* filename, int pop_result) {
 	char* script = create_string_from_file(filename);
 	if (script) {
-		int result = luaL_dostring(pLwc->L, script);
+		//int result = luaL_dostring(pLwc->L, script);
+		char prefixed_filename[256];
+		prefixed_filename[0] = '\0';
+		strncat(prefixed_filename, "@", sizeof(prefixed_filename) - 1);
+		strncat(prefixed_filename, filename, sizeof(prefixed_filename) - 1);
+		lua_pushcfunction(pLwc->L, traceback);
+		int result = (luaL_loadbuffer(pLwc->L, script, strlen(script), prefixed_filename) || lua_pcall(pLwc->L, 0, LUA_MULTRET, lua_gettop(pLwc->L) - 1));
 		release_string(script);
 		if (result) {
-			fprintf(stderr, "Failed to run lua: %s\n", lua_tostring(pLwc->L, -1));
+			LOGE("ERROR: %s", lua_tostring(pLwc->L, -1));
+			// Push traceback information
+			//luaL_traceback(pLwc->L, pLwc->L, NULL, 1);
+			//LOGE(lua_tostring(pLwc->L, -1));
 		} else {
 			printf("Lua result: %lld\n", lua_tointeger(pLwc->L, -1));
 		}
@@ -288,12 +363,35 @@ void script_update(LWCONTEXT* pLwc) {
 			} else {
 				// Resume immediately
 				lua_State* L_coro = script->coro[i].L;
-				int status = lua_resume(L_coro, pLwc->L, 0);
+				int status = lua_resume(L_coro, NULL, 0);
 				if (status == LUA_YIELD) {
 					lua_CFunction f = lua_tocfunction(L_coro, -1);
 					f(L_coro);
-				} else {
+				} else if (status == LUA_OK) {
 					// Coroutine execution completed
+					script->coro[i].valid = 0;
+				} else {
+					// Coroutine has errors
+					// Print debug message
+					LOGE("ERROR in coroutine: %s", lua_tostring(L_coro, -1));
+					// Push traceback information
+					luaL_traceback(L_coro, L_coro, NULL, 1);
+					LOGE(lua_tostring(L_coro, -1));
+
+					// Get coroutine metadata table from registry
+					lua_pushlightuserdata(L_coro, L_coro);
+					lua_gettable(L_coro, LUA_REGISTRYINDEX);
+					int table_index = lua_gettop(L_coro);
+					if (!lua_istable(L_coro, -1)) {
+						lua_pushliteral(L_coro, "incorrect argument");
+						lua_error(L_coro);
+					}
+					// Get second table value from metadata table (which is parent thread traceback debug info)
+					lua_pushinteger(L_coro, LSMTK_DEBUG_TRACEBACK);
+					lua_gettable(L_coro, table_index);
+					LOGE(lua_tostring(L_coro, -1));
+					LOGE("end of stack traceback");
+					
 					script->coro[i].valid = 0;
 				}
 			}

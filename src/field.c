@@ -238,6 +238,10 @@ static void resolve_collision_one_fixed(LWCONTEXT* pLwc, const LWBOX2DCOLLIDER *
 }
 
 void resolve_player_collision(LWCONTEXT *pLwc) {
+	if (!pLwc->field) {
+		return;
+	}
+
 	LWBOX2DCOLLIDER player_collider;
 	player_collider.x = pLwc->player_pos_x;
 	player_collider.y = pLwc->player_pos_y;

@@ -3,6 +3,7 @@
 #include "field.h"
 #include "lwlog.h"
 #include "render_text_block.h"
+#include "nav.h"
 
 void toggle_font_texture_test_mode(LWCONTEXT *pLwc);
 
@@ -55,9 +56,9 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
 	if (key == GLFW_KEY_S && action == GLFW_PRESS) {
 		float player_x = 0, player_y = 0, player_z = 0;
 		get_field_player_position(pLwc->field, &player_x, &player_y, &player_z);
-		nav_set_path_query_spos(pLwc->field, player_x, player_y, player_z);
+		nav_set_path_query_spos(field_nav(pLwc->field), player_x, player_y, player_z);
 		float p[3];
-		nav_path_query_spos(pLwc->field, p);
+		nav_path_query_spos(field_nav(pLwc->field), p);
 		LOGI("Nav: start pos set to (%.2f, %.2f, %.2f) [nav coordinates]",
 			p[0],
 			p[1],
@@ -67,9 +68,9 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
 	if (key == GLFW_KEY_E && action == GLFW_PRESS) {
 		float player_x = 0, player_y = 0, player_z = 0;
 		get_field_player_position(pLwc->field, &player_x, &player_y, &player_z);
-		nav_set_path_query_epos(pLwc->field, player_x, player_y, player_z);
+		nav_set_path_query_epos(field_nav(pLwc->field), player_x, player_y, player_z);
 		float p[3];
-		nav_path_query_epos(pLwc->field, p);
+		nav_path_query_epos(field_nav(pLwc->field), p);
 		LOGI("Nav: end pos set to (%.2f, %.2f, %.2f) [nav coordinates]",
 			p[0],
 			p[1],
@@ -78,7 +79,7 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
 
 	if (key == GLFW_KEY_F && action == GLFW_PRESS) {
 		field_nav_query(pLwc->field);
-		LOGI("Nav: path query result - %d points", nav_path_query_n_smooth_path(pLwc->field));
+		LOGI("Nav: path query result - %d points", nav_path_query_n_smooth_path(field_nav(pLwc->field)));
 	}
 
 	if (key == GLFW_KEY_R && action == GLFW_PRESS) {
