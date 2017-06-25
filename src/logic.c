@@ -373,7 +373,7 @@ void reset_runtime_context(LWCONTEXT* pLwc) {
 	pLwc->admin_button_command[3].name = LWU("신:글꼴");
 	pLwc->admin_button_command[3].command_handler = change_to_font_test;
 	pLwc->admin_button_command[4].name = LWU("런타임리셋");
-	pLwc->admin_button_command[4].command_handler = reset_runtime_context;
+	pLwc->admin_button_command[4].command_handler = reset_runtime_context_async;
 	pLwc->admin_button_command[5].name = LWU("글꼴디버그");
 	pLwc->admin_button_command[5].command_handler = toggle_font_texture_test_mode;
 	pLwc->admin_button_command[6].name = LWU("UDP");
@@ -530,6 +530,11 @@ static int loop_pipe_reader(zloop_t* loop, zsock_t* pipe, void* args) {
 		byte* d = zframe_data(f);
 		size_t s = zframe_size(f);
 		if (d && s == sizeof(LWMSGINITFIELD) && *(int*)d == LM_LWMSGINITFIELD) {
+			// Stop new frame of rendering
+			lwcontext_set_safe_to_start_render(pLwc, 0);
+			// Busy wait for current frame of rendering to be completed
+			while (lwcontext_rendering(pLwc)) {}
+
 			LWMSGINITFIELD* m = (LWMSGINITFIELD*)d;
 			init_field(pLwc,
 				m->field_filename,
@@ -542,6 +547,11 @@ static int loop_pipe_reader(zloop_t* loop, zsock_t* pipe, void* args) {
 
 			init_lwc_runtime_data(pLwc);
 		} else if (d && s == sizeof(LWMSGRESETRUNTIMECONTEXT) && *(int*)d == LM_LWMSGRESETRUNTIMECONTEXT) {
+			// Stop new frame of rendering
+			lwcontext_set_safe_to_start_render(pLwc, 0);
+			// Busy wait for current frame of rendering to be completed
+			while (lwcontext_rendering(pLwc)) {}
+
 			reset_runtime_context(pLwc);
 		} else {
 			abort();
