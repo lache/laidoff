@@ -126,7 +126,7 @@ int main(void)
 		}
 	}
 
-	glfwSetWindowPos(window, 600, 400);
+	glfwSetWindowPos(window, 600, 70);
 
 	glfwSetKeyCallback(window, key_callback);
 	glfwSetMouseButtonCallback(window, mouse_button_callback);

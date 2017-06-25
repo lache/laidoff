@@ -267,12 +267,20 @@ typedef struct _LWCONTEXT {
 	GLuint particle_buffer2;
 	// Logic update interval (in seconds)
 	double update_interval;
+	// 1 if safe to render, 0 if otherwise
+	volatile int safe_to_start_render;
+	// 1 if rendering in progress, 0 if otherwise
+	volatile int rendering;
 } LWCONTEXT;
 
 #ifdef __cplusplus
 extern "C" {;
 #endif
 double lwcontext_delta_time(const LWCONTEXT* pLwc);
+int lwcontext_safe_to_start_render(const LWCONTEXT* pLwc);
+void lwcontext_set_safe_to_start_render(LWCONTEXT* pLwc, int v);
+int lwcontext_rendering(const LWCONTEXT* pLwc);
+void lwcontext_set_rendering(LWCONTEXT* pLwc, int v);
 #ifdef __cplusplus
 };
 #endif

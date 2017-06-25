@@ -878,7 +878,13 @@ void render_stat(const LWCONTEXT* pLwc) {
 }
 
 void lwc_render(const LWCONTEXT *pLwc) {
+	// Busy wait for rendering okay sign
+	while (!lwcontext_safe_to_start_render(pLwc)) {}
+	// Set rendering flag to 1 (ignoring const-ness is intentional)
+	lwcontext_set_rendering((LWCONTEXT*)pLwc, 1);
+	// Tick rendering thread
 	deltatime_tick(pLwc->render_dt);
+	// Rendering function w.r.t. game scene dispatched here
 	if (pLwc->game_scene == LGS_BATTLE) {
 		lwc_render_battle(pLwc);
 	} else if (pLwc->game_scene == LGS_DIALOG) {
@@ -900,10 +906,12 @@ void lwc_render(const LWCONTEXT *pLwc) {
 	} else if (pLwc->game_scene == LGS_PARTICLE_SYSTEM) {
 		lwc_render_ps(pLwc);
 	}
-
+	// Rendering a system message
 	render_sys_msg(pLwc, pLwc->def_sys_msg);
-
+	// Rendering stats
 	render_stat(pLwc);
+	// Set rendering flag to 0 (ignoring const-ness is intentional)
+	lwcontext_set_rendering((LWCONTEXT*)pLwc, 0);
 }
 
 static void bind_all_vertex_attrib_shader(const LWCONTEXT *pLwc, int shader_index, int vbo_index) {

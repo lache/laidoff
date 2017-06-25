@@ -15,6 +15,7 @@
 #include "file.h"
 #include "ps.h"
 #include "script.h"
+#include "nav.h"
 
 void toggle_font_texture_test_mode(LWCONTEXT* pLwc);
 
@@ -64,6 +65,7 @@ void change_to_particle_system(LWCONTEXT *pLwc) {
 typedef enum _LW_MSG {
 	LM_ZERO,
 	LM_LWMSGINITFIELD,
+	LM_LWMSGRESETRUNTIMECONTEXT,
 } LW_MSG;
 
 typedef struct _LWMSGINITFIELD {
@@ -76,6 +78,10 @@ typedef struct _LWMSGINITFIELD {
 	float skin_scale;
 	int follow_cam;
 } LWMSGINITFIELD;
+
+typedef struct _LWMSGRESETRUNTIMECONTEXT {
+	LW_MSG type;
+} LWMSGRESETRUNTIMECONTEXT;
 
 void load_field_1_init_runtime_data_async(LWCONTEXT *pLwc, zactor_t* actor) {
 	pLwc->next_game_scene = LGS_FIELD;
@@ -147,6 +153,18 @@ void load_field_3_init_runtime_data_async(LWCONTEXT *pLwc, zactor_t* actor) {
 
 void load_field_3_init_runtime_data(LWCONTEXT *pLwc) {
 	load_field_3_init_runtime_data_async(pLwc, pLwc->logic_actor);
+}
+
+void reset_runtime_context_async(LWCONTEXT *pLwc) {
+	zmsg_t* msg = zmsg_new();
+	LWMSGRESETRUNTIMECONTEXT m = {
+		LM_LWMSGRESETRUNTIMECONTEXT,
+	};
+	zmsg_addmem(msg, &m, sizeof(LWMSGRESETRUNTIMECONTEXT));
+	if (zactor_send(pLwc->logic_actor, &msg) < 0) {
+		zmsg_destroy(&msg);
+		LOGE("Send message to logic worker failed!");
+	}
 }
 
 static void reinit_mq(LWCONTEXT *pLwc) {
@@ -301,10 +319,15 @@ void reset_battle_context(LWCONTEXT* pLwc) {
 }
 
 void reset_field_context(LWCONTEXT* pLwc) {
+	// Despawn all field objects
 	despawn_all_field_object(pLwc->field);
+	// Spawn all initial field objects
 	spawn_all_field_object(pLwc);
-	// should fall from the sky (ray check...)
+	// Clear all path queries
+	nav_clear_all_path_queries(field_nav(pLwc->field));
+	// Player initially should fall from the sky for stable ray checking
 	set_field_player_position(pLwc->field, 0, 0, 10);
+	// Reset player position
 	pLwc->player_pos_x = 0;
 	pLwc->player_pos_y = 0;
 }
@@ -320,6 +343,12 @@ void toggle_network_poll(LWCONTEXT *pLwc) {
 }
 
 void reset_runtime_context(LWCONTEXT* pLwc) {
+	// Stop new frame of rendering
+	lwcontext_set_safe_to_start_render(pLwc, 0);
+	// Busy wait for current frame of rendering to be completed
+	while (lwcontext_rendering(pLwc)) {}
+	// Clear all coroutines
+	script_cleanup_all_coros(pLwc);
 	// Reset time
 	reset_time(pLwc);
 	// Reset sprite data pointer
@@ -373,6 +402,8 @@ void reset_runtime_context(LWCONTEXT* pLwc) {
 	script_run_file(pLwc, ASSETS_BASE_PATH "l" PATH_SEPARATOR "error_test.lua");
 	// Run post init script
 	script_run_file(pLwc, ASSETS_BASE_PATH "l" PATH_SEPARATOR "post_init.lua");
+	// Start rendering
+	lwcontext_set_safe_to_start_render(pLwc, 1);
 }
 
 static void update_battle_wall(LWCONTEXT* pLwc) {
@@ -510,6 +541,10 @@ static int loop_pipe_reader(zloop_t* loop, zsock_t* pipe, void* args) {
 				m->follow_cam);
 
 			init_lwc_runtime_data(pLwc);
+		} else if (d && s == sizeof(LWMSGRESETRUNTIMECONTEXT) && *(int*)d == LM_LWMSGRESETRUNTIMECONTEXT) {
+			reset_runtime_context(pLwc);
+		} else {
+			abort();
 		}
 		f = zmsg_next(msg);
 	}

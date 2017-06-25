@@ -474,6 +474,11 @@ int nav_new_path_query(LWNAV* nav) {
 	return -1;
 }
 
+void nav_clear_all_path_queries(LWNAV* nav) {
+	memset(&nav->path_query_test, 0, sizeof(nav->path_query_test));
+	memset(nav->path_query, 0, sizeof(nav->path_query));
+}
+
 int nav_update_output_path_query(LWNAV* nav, int idx, int val) {
 	if (idx < 0 || idx >= MAX_PATH_QUERY) {
 		LOGE(LWLOGPOS "index error");

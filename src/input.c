@@ -6,6 +6,7 @@
 #include "battle_result.h"
 #include "field.h"
 #include "mq.h"
+#include "logic.h"
 
 float get_dir_pad_size_radius() {
 	return 0.75f;
@@ -237,7 +238,7 @@ void lw_trigger_touch(LWCONTEXT *pLwc, float x, float y) {
 }
 
 void lw_trigger_reset(LWCONTEXT *pLwc) {
-	reset_runtime_context(pLwc);
+	reset_runtime_context_async(pLwc);
 }
 
 void lw_trigger_play_sound(LWCONTEXT *pLwc) {

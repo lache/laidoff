@@ -7,14 +7,18 @@
 #include "file.h"
 #include "lwlog.h"
 #include "laidoff.h"
+#include <assert.h>
 
 #define LW_SCRIPT_PREFIX_PATH ASSETS_BASE_PATH "l" PATH_SEPARATOR
 #define LW_MAX_CORO (32)
 
 enum LW_SCRIPT_METADATA_TABLE_KEY {
-	// Lua uses 1-based index
+	// Coroutine pool index (lua uses 1-based index)
 	LSMTK_COROUTINE_INDEX = 1,
+	// Recursive traceback string for debugging
 	LSMTK_DEBUG_TRACEBACK = 2,
+	// Coroutine lua object reference (prevent garbage collected automatically)
+	LSMTK_COROUTINE_REF = 3,
 };
 
 // Defined at lo_wrap.c
@@ -117,23 +121,34 @@ int l_start_coro(lua_State* L) {
 		if (!lua_isfunction(L, 1)) {
 			lua_pushliteral(L, "incorrect argument");
 			lua_error(L);
+			return 0;
 		}
 		LWSCRIPT* script = (LWSCRIPT*)pLwc->script;
 		for (int i = 0; i < LW_MAX_CORO; i++) {
 			if (!script->coro[i].valid) {
 				script->coro[i].valid = 1;
+				// Create coroutine; created coroutine will be pushed on top of L's stack
 				lua_State* L_coro = lua_newthread(L);
+				int coro_index = lua_gettop(L);
+				assert(lua_isthread(L, coro_index));
+				LOGI("New coroutine started: stack top = %d", coro_index);
+				// Save coroutine pointer in coro pool
 				script->coro[i].L = L_coro;
-				// Create coroutine metadata table
+				// Create coroutine custom data table
 				lua_createtable(L_coro, 2, 0);
 				int table_index = lua_gettop(L_coro);
-				// Set coroutine array index to registry (key: 1, value: i)
+				// Set coroutine array index to registry (key: LSMTK_COROUTINE_INDEX, value: i)
 				lua_pushinteger(L_coro, LSMTK_COROUTINE_INDEX);
 				lua_pushinteger(L_coro, i);
 				lua_settable(L_coro, table_index);
-				// Set coroutine traceback of parent(main) thread for debugging purpose (key: 2, value: string)
+				// Set coroutine traceback of parent(main) thread for debugging purpose (key: LSMTK_DEBUG_TRACEBACK, value: string)
 				lua_pushinteger(L_coro, LSMTK_DEBUG_TRACEBACK);
 				push_recursive_traceback(L_coro, L);
+				lua_settable(L_coro, table_index);
+				// Set coroutine reference (key: LSMTK_COROUTINE_REF, value: coroutine object)
+				lua_pushinteger(L_coro, LSMTK_COROUTINE_REF);
+				lua_pushvalue(L, coro_index);
+				lua_xmove(L, L_coro, 1);
 				lua_settable(L_coro, table_index);
 				// Set metadata table to registry (key: L_coro, value: metadata table)
 				lua_pushlightuserdata(L_coro, L_coro);
@@ -144,13 +159,9 @@ int l_start_coro(lua_State* L) {
 				lua_pushvalue(L, 1);
 				// Move coroutine entry function to new thread's stack
 				lua_xmove(L, L_coro, 1);
-				// Run coroutine
-				/*int status = lua_resume(L_coro, L, 0);
-				if (status == LUA_YIELD) {
-					lua_CFunction f = lua_tocfunction(L_coro, -1);
-					f(L_coro);
-				}*/
-				break;
+				// Return coroutine object
+				lua_pushvalue(L, coro_index);
+				return 1;
 			}
 		}
 		//lua_pushinteger(L, 0);
@@ -230,6 +241,11 @@ int l_load_module(lua_State* L) {
 	return 0;
 }
 
+static int coro_gc(lua_State* L) {
+	puts("__gc called");
+	return 0;
+}
+
 void init_lua(LWCONTEXT* pLwc)
 {
 	LWSCRIPT* script = (LWSCRIPT*)calloc(1, sizeof(LWSCRIPT));
@@ -268,7 +284,14 @@ void init_lua(LWCONTEXT* pLwc)
 	lua_setglobal(L, "pLwc");
 	// Load 'lo' library generated from swig
 	luaopen_lo(L);
-
+	// Register coroutine(lua thread) gc callback
+	struct luaL_Reg coro_metatable_funcs[] = {
+		{ "__gc", coro_gc },
+		{NULL, NULL},
+	};
+	luaL_newmetatable(L, "coro_metatable");
+	luaL_setfuncs(L, coro_metatable_funcs, 0);
+	// Set pLwc context to shared static variable for acessing from scripts
 	script_set_context(pLwc);
 
 	{
@@ -349,6 +372,36 @@ const char* script_prefix_path() {
 	return LW_SCRIPT_PREFIX_PATH;
 }
 
+static void s_cleanup_coro(LWSCRIPT* script, int idx) {
+	if (!script->coro[idx].valid) {
+		LOGF(LWLOGPOS "invalid pool entry to be cleaned up");
+	}
+	lua_State* L = script->coro[idx].L;
+	// Get coroutine custom data table from registry
+	lua_pushlightuserdata(L, L);
+	lua_gettable(L, LUA_REGISTRYINDEX);
+	if (!lua_istable(L, -1)) {
+		lua_pushliteral(L, "incorrect argument");
+		lua_error(L);
+		abort();
+	}
+	// Remove entry from registry
+	lua_pushlightuserdata(L, L);
+	lua_pushnil(L);
+	lua_settable(L, LUA_REGISTRYINDEX);
+
+	memset(script->coro + idx, 0, sizeof(LWCORO));
+}
+
+void script_cleanup_all_coros(LWCONTEXT* pLwc) {
+	LWSCRIPT* script = (LWSCRIPT*)pLwc->script;
+	for (int i = 0; i < LW_MAX_CORO; i++) {
+		if (script->coro[i].valid) {
+			s_cleanup_coro(script, i);
+		}
+	}
+}
+
 void script_update(LWCONTEXT* pLwc) {
 	if (!pLwc->script) {
 		return;
@@ -369,7 +422,7 @@ void script_update(LWCONTEXT* pLwc) {
 					f(L_coro);
 				} else if (status == LUA_OK) {
 					// Coroutine execution completed
-					script->coro[i].valid = 0;
+					s_cleanup_coro(script, i);
 				} else {
 					// Coroutine has errors
 					// Print debug message
@@ -391,8 +444,8 @@ void script_update(LWCONTEXT* pLwc) {
 					lua_gettable(L_coro, table_index);
 					LOGE(lua_tostring(L_coro, -1));
 					LOGE("end of stack traceback");
-					
-					script->coro[i].valid = 0;
+					// Coroutine execution aborted
+					s_cleanup_coro(script, i);
 				}
 			}
 		}

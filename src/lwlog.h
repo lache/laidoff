@@ -20,7 +20,7 @@ SetConsoleTextAttribute(hConsole, FOREGROUND_GREEN | FOREGROUND_INTENSITY); \
 (void)printf("\n"); \
 SetConsoleTextAttribute(hConsole, saved_attributes); \
 }
-#define LOGF(...) LOGE(...);abort()
+#define LOGF(...) LOGE(__VA_ARGS__);abort()
 #define LOGA(...) (void)printf(__VA_ARGS__);(void)printf("\n")
 #elif LW_PLATFORM_OSX || LW_PLATFORM_IOS || LW_PLATFORM_IOS_SIMULATOR || LW_PLATFORM_RPI
 #include <stdio.h>

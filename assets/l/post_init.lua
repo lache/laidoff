@@ -33,12 +33,12 @@ print(coroutine.resume(co))
 tm.testcoro()
 
 start_coro(function ()
-    lo.show_sys_msg(c.def_sys_msg, 'hello 1')
-    yield_wait_ms(1000)
-    lo.show_sys_msg(c.def_sys_msg, 'hello 2')
-    yield_wait_ms(1000)
-    lo.show_sys_msg(c.def_sys_msg, 'hello 3')
+    for i=1,100 do
+      lo.show_sys_msg(c.def_sys_msg, 'hello ' .. i)
+      yield_wait_ms(1000)
+    end
 end)
+--print(coro1)
 
 start_coro(function ()
     yield_wait_ms(5000)
@@ -47,6 +47,9 @@ start_coro(function ()
     lo.show_sys_msg(c.def_sys_msg, 'hello x 2')
     yield_wait_ms(1000)
     lo.show_sys_msg(c.def_sys_msg, 'hello x 3')
+    -- Collect garbage forcefully
+    collectgarbage()
+    print('Garbage collected.')
 end)
 
 start_coro(function ()
@@ -66,7 +69,7 @@ end)
 
 nav = lo.field_nav(c.field)
 
-function test_coro()
+start_coro(function ()
     for i=1, 10 do
       -- Truck field object
       truck = spawn_oil_truck(pLwc, -8, -8, 6)
@@ -77,6 +80,6 @@ function test_coro()
       -- Bind path query to truck
       lo.nav_bind_path_query_output_location(nav, pq, c.field, truck)
     end
-end  
+end)
 
 return 1
