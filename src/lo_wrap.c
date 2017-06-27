@@ -5168,7 +5168,7 @@ static int _wrap_resolve_player_collision(lua_State* L) {
     SWIG_fail_ptr("resolve_player_collision",1,SWIGTYPE_p__LWCONTEXT);
   }
   
-  resolve_player_collision(arg1);
+  resolve_player_event_collision(arg1);
   
   return SWIG_arg;
   

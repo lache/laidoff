@@ -469,9 +469,9 @@ void lwc_update(LWCONTEXT *pLwc, double delta_time) {
 	update_battle(pLwc);
 
 	move_player(pLwc);
-
-	resolve_player_collision(pLwc);
-
+	if (pLwc->game_scene == LGS_FIELD) {
+		resolve_player_event_collision(pLwc);
+	}
 	update_attack_trail(pLwc);
 
 	update_damage_text(pLwc);

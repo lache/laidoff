@@ -28,7 +28,7 @@ typedef struct _LWPATHQUERY LWPATHQUERY;
 typedef struct _LWNAV LWNAV;
 
 void move_player(LWCONTEXT *pLwc);
-void resolve_player_collision(LWCONTEXT *pLwc);
+void resolve_player_event_collision(LWCONTEXT *pLwc);
 LWFIELD* load_field(const char* filename);
 void unload_field(LWFIELD* field);
 void update_field(LWCONTEXT* pLwc, LWFIELD* field);

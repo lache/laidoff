@@ -209,24 +209,21 @@ static float resolve_collision_one_fixed_axis(float fp, float fs, float mp, floa
 
 static void resolve_collision_one_fixed(LWCONTEXT* pLwc, const LWBOX2DCOLLIDER *fixed, LWBOX2DCOLLIDER *movable) {
 	const float dx = resolve_collision_one_fixed_axis(fixed->x, fixed->w, movable->x, movable->w);
-
+	// If penetration depth projected to x axis is non-zero
 	if (dx) {
 		const float dy = resolve_collision_one_fixed_axis(fixed->y, fixed->h, movable->y,
 			movable->h);
-
+		// Also if penetration depth projected to y axis is non-zero: we have collision
 		if (dy) {
-
-			// Enemy encounter
 			if (fixed->field_event_id >= 1 && fixed->field_event_id <= 5) {
+				// Enemy encounter trigger
 				pLwc->field_event_id = fixed->field_event_id;
 				change_to_battle(pLwc);
-			}
-
-			if (fixed->field_event_id == 6) {
+			} else if (fixed->field_event_id == 6) {
+				// Field event trigger
 				pLwc->field_event_id = fixed->field_event_id;
 				change_to_dialog(pLwc);
 			}
-
 
 			if (fabs(dx) < fabs(dy)) {
 				movable->x += dx;
@@ -237,14 +234,14 @@ static void resolve_collision_one_fixed(LWCONTEXT* pLwc, const LWBOX2DCOLLIDER *
 	}
 }
 
-void resolve_player_collision(LWCONTEXT *pLwc) {
+void resolve_player_event_collision(LWCONTEXT *pLwc) {
 	if (!pLwc->field) {
 		return;
 	}
 
 	LWBOX2DCOLLIDER player_collider;
-	player_collider.x = pLwc->player_pos_x;
-	player_collider.y = pLwc->player_pos_y;
+	float unused_z;
+	get_field_player_position(pLwc->field, &player_collider.x, &player_collider.y, &unused_z);
 	player_collider.w = 1.0f;
 	player_collider.h = 1.0f;
 
@@ -254,8 +251,8 @@ void resolve_player_collision(LWCONTEXT *pLwc) {
 		}
 	}
 
-	pLwc->player_pos_x = player_collider.x;
-	pLwc->player_pos_y = player_collider.y;
+	//pLwc->player_pos_x = player_collider.x;
+	//pLwc->player_pos_y = player_collider.y;
 }
 
 LWFIELD* load_field(const char* filename) {

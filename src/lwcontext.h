@@ -176,6 +176,8 @@ typedef struct _LWCONTEXT {
 	int atk_pad_dragging;
 	// Current field event ID
 	int field_event_id;
+	// Next field event ID
+	int next_field_event_id;
 	// Battle: Normal attack effect instance array
 	LWTRAIL trail[MAX_TRAIL];
 	// Battle: Current FOV

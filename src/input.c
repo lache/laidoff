@@ -111,7 +111,7 @@ void lw_trigger_mouse_press(LWCONTEXT *pLwc, float x, float y) {
 		pLwc->fps_mode = !pLwc->fps_mode;
 	}
 
-	if (pLwc->battle_state != LBS_COMMAND_IN_PROGRESS && pLwc->player_turn_creature_index >= 0) {
+	if (pLwc->game_scene == LGS_BATTLE && pLwc->battle_state != LBS_COMMAND_IN_PROGRESS && pLwc->player_turn_creature_index >= 0) {
 		const float command_palette_pos = -0.5f;
 
 		if (y > command_palette_pos) {
