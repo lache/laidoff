@@ -30,6 +30,8 @@ void nav_path_query_epos(const LWNAV* nav, float* p);
 void nav_set_path_query_spos(LWNAV* nav, float x, float y, float z);
 void nav_set_path_query_epos(LWNAV* nav, float x, float y, float z);
 int nav_path_query_n_smooth_path(const LWNAV* nav);
+void nav_reset_deterministic_seed(LWNAV* nav);
+void reset_nav_context(LWNAV* nav);
 #if defined __cplusplus
 }
 #endif  /* defined __cplusplus */

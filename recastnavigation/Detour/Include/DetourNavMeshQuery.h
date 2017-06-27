@@ -21,7 +21,7 @@
 
 #include "DetourNavMesh.h"
 #include "DetourStatus.h"
-
+#include <functional> // std::function
 
 // Define DT_VIRTUAL_QUERYFILTER if you wish to derive a custom filter from dtQueryFilter.
 // On certain platforms indirect or virtual function call is expensive. The default
@@ -445,6 +445,8 @@ public:
 	/// @returns The status flags for the query.
 	dtStatus findRandomPoint(const dtQueryFilter* filter, float (*frand)(),
 							 dtPolyRef* randomRef, float* randomPt) const;
+	dtStatus findRandomPoint(const dtQueryFilter* filter, std::function<float ()> frand,
+		dtPolyRef* randomRef, float* randomPt) const;
 
 	/// Returns random location on navmesh within the reach of specified location.
 	/// Polygons are chosen weighted by area. The search runs in linear related to number of polygon.

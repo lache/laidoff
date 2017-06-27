@@ -336,9 +336,6 @@ LWFIELD* load_field(const char* filename) {
 		field->user[i] = dCreateCapsule(field->space_group[LSG_ENEMY], field->user_radius, field->user_length);
 		dGeomDisable(field->user[i]);
 	}
-	// Seed a random number generator
-	pcg32_srandom_r(&field->rng, 0x0DEEC2CBADF00D77, 0x15881588CA11DAC1);
-	//pcg32_srandom_r(&field->rng, 3, 56);
 	// Particle system
 	field->ps = ps_new();
 	// Here it is. A brand new field instance just out of the oven!
@@ -933,8 +930,6 @@ void init_field(LWCONTEXT* pLwc, const char* field_filename, const char* nav_fil
 	pLwc->field->skin_scale = skin_scale;
 	pLwc->field->field_camera_mode = follow_cam;
 	pLwc->field->mq = pLwc->mq;	
-
-	start_new_path_query_test(pLwc->field->nav, nav_path_query_test(pLwc->field->nav));
 }
 
 int field_spawn_user(LWFIELD* field, vec3 pos, void* owner) {
@@ -1195,4 +1190,9 @@ float* field_field_object_orientation_rawptr(LWFIELD* field, int idx) {
 
 LWNAV* field_nav(LWFIELD* field) {
 	return field->nav;
+}
+
+void field_reset_deterministic_seed(LWFIELD* field) {
+	// Seed a random number generator
+	pcg32_srandom_r(&field->rng, 0x0DEEC2CBADF00D77, 0x15881588CA11DAC1);
 }

@@ -77,6 +77,7 @@ LWFIELDOBJECT* field_object(LWFIELD* field, int idx);
 float* field_field_object_location_rawptr(LWFIELD* field, int idx);
 float* field_field_object_orientation_rawptr(LWFIELD* field, int idx);
 LWNAV* field_nav(LWFIELD* field);
+void field_reset_deterministic_seed(LWFIELD* field);
 
 #if defined __cplusplus
 }

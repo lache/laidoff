@@ -319,17 +319,21 @@ void reset_battle_context(LWCONTEXT* pLwc) {
 }
 
 void reset_field_context(LWCONTEXT* pLwc) {
+	// Reset random generator seed
+	field_reset_deterministic_seed(pLwc->field);
+	// Nav instance shortcut
+	LWNAV* nav = field_nav(pLwc->field);
 	// Despawn all field objects
 	despawn_all_field_object(pLwc->field);
 	// Spawn all initial field objects
 	spawn_all_field_object(pLwc);
-	// Clear all path queries
-	nav_clear_all_path_queries(field_nav(pLwc->field));
 	// Player initially should fall from the sky for stable ray checking
 	set_field_player_position(pLwc->field, 0, 0, 10);
 	// Reset player position
 	pLwc->player_pos_x = 0;
 	pLwc->player_pos_y = 0;
+	// Reset nav context
+	reset_nav_context(nav);
 }
 
 void toggle_ray_test(LWCONTEXT *pLwc) {

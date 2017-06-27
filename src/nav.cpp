@@ -1,5 +1,6 @@
 #include <stdlib.h>
 #include <string.h>
+#include <functional> // std::bind
 #include "DetourNavMesh.h"
 #include "DetourNavMeshQuery.h"
 #include "DetourCommon.h"
@@ -8,6 +9,7 @@
 #include "lwlog.h"
 #include "lwmacro.h"
 #include "field.h"
+#include "pcg_basic.h"
 
 #define MAX_PATHQUERY_POLYS (256)
 #define MAX_PATH_QUERY (100)
@@ -48,6 +50,8 @@ typedef struct _LWNAV {
 	float* path_query_output_location[MAX_PATH_QUERY];
 	// Output orientation (pointer to float)
 	float* path_query_output_orientation[MAX_PATH_QUERY];
+	// Random number generator instance
+	pcg32_random_t rng;
 } LWNAV;
 
 enum SamplePolyAreas {
@@ -67,10 +71,12 @@ enum SamplePolyFlags {
 	SAMPLE_POLYFLAGS_ALL = 0xffff	// All abilities.
 };
 
-// Returns a random number [0..1]
-static float frand() {
-	//	return ((float)(rand() & 0xffff)/(float)0xffff);
-	return (float)rand() / (float)RAND_MAX;
+// return [0, 1) float
+float s_random_float(pcg32_random_t* rng) {
+	uint32_t v = pcg32_random_r(rng);
+	//uint32_t v = pcg32_random();
+	//LOGI("v = 0x%08x", v);
+	return static_cast<float>(ldexp(v, -32));
 }
 
 void* load_nav(const char* filename) {
@@ -479,6 +485,11 @@ void nav_clear_all_path_queries(LWNAV* nav) {
 	memset(nav->path_query, 0, sizeof(nav->path_query));
 }
 
+void nav_reset_deterministic_seed(LWNAV* nav) {
+	// Seed a random number generator
+	pcg32_srandom_r(&nav->rng, 0x0DEEC2CBADF00D77, 0x15881588CA11DAC1);
+}
+
 int nav_update_output_path_query(LWNAV* nav, int idx, int val) {
 	if (idx < 0 || idx >= MAX_PATH_QUERY) {
 		LOGE(LWLOGPOS "index error");
@@ -547,6 +558,8 @@ int nav_path_query_n_smooth_path(const LWNAV* nav) {
 void set_random_start_end_pos(LWNAV* nav, LWPATHQUERY* pq) {
 	dtPolyRef start_ref, end_ref;
 	float spos[3], epos[3];
+	auto frand = std::bind(s_random_float, &nav->rng);
+	
 	dtStatus status = nav->nav_query->findRandomPoint(&nav->filter, frand, &start_ref, spos);
 	if (dtStatusFailed(status)) {
 		LOGE("nav->nav_query->findRandomPoint() error");
@@ -567,7 +580,7 @@ void set_random_next_pos(LWNAV* nav, LWPATHQUERY* pq) {
 
 	dtPolyRef end_ref;
 	float epos[3];
-
+	auto frand = std::bind(s_random_float, &nav->rng);
 	dtStatus status = nav->nav_query->findRandomPoint(&nav->filter, frand, &end_ref, epos);
 	if (dtStatusFailed(status)) {
 		LOGE("nav->nav_query->findRandomPoint() error");
@@ -586,4 +599,13 @@ void start_new_path_query_continue_test(LWNAV* nav, LWPATHQUERY* pq) {
 	set_random_next_pos(nav, pq);
 	nav_query(nav, pq);
 	pq->path_t = 0;
+}
+
+void reset_nav_context(LWNAV* nav) {
+	// Clear all path queries
+	nav_clear_all_path_queries(nav);
+	// Reset random generator seed
+	nav_reset_deterministic_seed(nav);
+	// Start test player nav
+	start_new_path_query_test(nav, &nav->path_query_test);
 }
