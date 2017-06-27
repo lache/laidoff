@@ -347,8 +347,8 @@ void reset_runtime_context(LWCONTEXT* pLwc) {
 	lwcontext_set_safe_to_start_render(pLwc, 0);
 	// Busy wait for current frame of rendering to be completed
 	while (lwcontext_rendering(pLwc)) {}
-	// Clear all coroutines
-	script_cleanup_all_coros(pLwc);
+	// Init lua
+	init_lua(pLwc);
 	// Reset time
 	reset_time(pLwc);
 	// Reset sprite data pointer
@@ -496,8 +496,7 @@ void lwc_update(LWCONTEXT *pLwc, double delta_time) {
 }
 
 void init_lwc_runtime_data(LWCONTEXT *pLwc) {
-	init_lua(pLwc);
-
+	
 	reset_runtime_context(pLwc);
 
 	//pLwc->pFnt = load_fnt(ASSETS_BASE_PATH "fnt" PATH_SEPARATOR "arita-semi-bold.fnt");

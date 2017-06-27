@@ -247,11 +247,27 @@ static int coro_gc(lua_State* L) {
 	return 0;
 }
 
+void deinit_lua(LWCONTEXT* pLwc) {
+	// Clear all coroutines
+	script_cleanup_all_coros(pLwc);
+	// Close lua instance
+	if (pLwc->L) {
+		lua_close(pLwc->L);
+		pLwc->L = 0;
+	}
+	// Free LWSCRIPT instance
+	if (pLwc->script) {
+		free(pLwc->script);
+		pLwc->script = 0;
+	}
+}
+
 void init_lua(LWCONTEXT* pLwc)
 {
+	deinit_lua(pLwc);
+
 	LWSCRIPT* script = (LWSCRIPT*)calloc(1, sizeof(LWSCRIPT));
 	pLwc->script = script;
-
 
 	lua_State* L = luaL_newstate();
 	// Load lua standard libs
@@ -378,27 +394,30 @@ static void s_cleanup_coro(LWSCRIPT* script, int idx) {
 		LOGF(LWLOGPOS "invalid pool entry to be cleaned up");
 	}
 	lua_State* L = script->coro[idx].L;
-	// Get coroutine custom data table from registry
-	lua_pushlightuserdata(L, L);
-	lua_gettable(L, LUA_REGISTRYINDEX);
-	if (!lua_istable(L, -1)) {
-		lua_pushliteral(L, "incorrect argument");
-		lua_error(L);
-		abort();
+	if (L) {
+		// Get coroutine custom data table from registry
+		lua_pushlightuserdata(L, L);
+		lua_gettable(L, LUA_REGISTRYINDEX);
+		if (!lua_istable(L, -1)) {
+			lua_pushliteral(L, "incorrect argument");
+			lua_error(L);
+			abort();
+		}
+		// Remove entry from registry
+		lua_pushlightuserdata(L, L);
+		lua_pushnil(L);
+		lua_settable(L, LUA_REGISTRYINDEX);
 	}
-	// Remove entry from registry
-	lua_pushlightuserdata(L, L);
-	lua_pushnil(L);
-	lua_settable(L, LUA_REGISTRYINDEX);
-
 	memset(script->coro + idx, 0, sizeof(LWCORO));
 }
 
 void script_cleanup_all_coros(LWCONTEXT* pLwc) {
 	LWSCRIPT* script = (LWSCRIPT*)pLwc->script;
-	for (int i = 0; i < LW_MAX_CORO; i++) {
-		if (script->coro[i].valid) {
-			s_cleanup_coro(script, i);
+	if (script) {
+		for (int i = 0; i < LW_MAX_CORO; i++) {
+			if (script->coro[i].valid) {
+				s_cleanup_coro(script, i);
+			}
 		}
 	}
 }
@@ -430,7 +449,7 @@ void script_update(LWCONTEXT* pLwc) {
 					LOGE("ERROR in coroutine: %s", lua_tostring(L_coro, -1));
 					// Push traceback information
 					luaL_traceback(L_coro, L_coro, NULL, 1);
-					LOGE(lua_tostring(L_coro, -1));
+					LOGE("%s", lua_tostring(L_coro, -1));
 
 					// Get coroutine metadata table from registry
 					lua_pushlightuserdata(L_coro, L_coro);
@@ -443,7 +462,7 @@ void script_update(LWCONTEXT* pLwc) {
 					// Get second table value from metadata table (which is parent thread traceback debug info)
 					lua_pushinteger(L_coro, LSMTK_DEBUG_TRACEBACK);
 					lua_gettable(L_coro, table_index);
-					LOGE(lua_tostring(L_coro, -1));
+					LOGE("%s", lua_tostring(L_coro, -1));
 					LOGE("end of stack traceback");
 					// Coroutine execution aborted
 					s_cleanup_coro(script, i);
