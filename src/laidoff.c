@@ -16,7 +16,6 @@
 #include "lwenemy.h"
 #include "render_font_test.h"
 #include "render_admin.h"
-#include "lwkeyframe.h"
 #include "input.h"
 #include "field.h"
 #include "platform_detection.h"
@@ -35,20 +34,6 @@
 #include "logic.h"
 #include "ps.h"
 #include "render_ps.h"
-
-#define INCREASE_RENDER_SCORE (20)
-#define RENDER_SCORE_INITIAL (-5)
-#define APPLY_IMPULSE_COOLTIME (0.1f)
-#define KIWI_COLLISION_BOX_W_MULTIPLIER (0.80f)
-#define KIWI_COLLISION_BOX_H_MULTIPLIER (0.80f)
-#define BAR_COLLISION_BOX_W_MULTIPLIER (0.90f)
-#define BAR_COLLISION_BOX_H_MULTIPLIER (0.95f)
-#define KIWI_X_POS (-0.5f)
-#define BOAST_WAIT_TIME (3)
-#define CANNOT_BOAST_WAIT_TIME (3)
-#define QUIT_WAIT_TIME (3)
-#define COMPLETION_SCORE (3000)
-#define SCROLL_SPEED (0.8f)
 
 #define LW_SUPPORT_ETC1_HARDWARE_DECODING LW_PLATFORM_ANDROID
 #define LW_SUPPORT_VAO (LW_PLATFORM_WIN32 || LW_PLATFORM_OSX)
