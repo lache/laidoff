@@ -509,6 +509,10 @@ static void init_vbo(LWCONTEXT *pLwc) {
 	load_vbo(pLwc, ASSETS_BASE_PATH "vbo" PATH_SEPARATOR "Floor2.vbo",
 		&pLwc->vertex_buffer[LVT_FLOOR2]);
 
+	// LVT_ROOM
+	load_vbo(pLwc, ASSETS_BASE_PATH "vbo" PATH_SEPARATOR "room.vbo",
+		&pLwc->vertex_buffer[LVT_ROOM]);
+
 	// LVT_SPHERE
 	load_vbo(pLwc, ASSETS_BASE_PATH "vbo" PATH_SEPARATOR "Sphere.vbo",
 		&pLwc->vertex_buffer[LVT_SPHERE]);
@@ -780,38 +784,6 @@ void init_font_fbo(LWCONTEXT* pLwc) {
 	}
 
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
-}
-
-void set_sprite_mvp_with_scale(const LWCONTEXT *pLwc, enum _LW_ATLAS_SPRITE las, float x, float y,
-	float angle, float scale, const mat4x4 p, mat4x4 result) {
-	mat4x4 kiwi_trans, kiwi_rotate, kiwi_scale_rotate, kiwi_mv;
-	mat4x4 identity;
-	mat4x4_identity(identity);
-	mat4x4_rotate_Z(kiwi_rotate, identity, angle);
-	mat4x4_scale_aniso(kiwi_scale_rotate, kiwi_rotate,
-		(float)pLwc->sprite_data[las].w / pLwc->width * scale,
-		(float)pLwc->sprite_data[las].h / pLwc->height * scale, (float)1);
-
-	mat4x4_translate(kiwi_trans, x, y, 0);
-
-	mat4x4_mul(kiwi_mv, kiwi_trans, kiwi_scale_rotate);
-	mat4x4_mul(result, p, kiwi_mv);
-}
-
-void set_sprite_mvp(const LWCONTEXT *pLwc, enum _LW_ATLAS_SPRITE las, float x, float y, float angle,
-	const mat4x4 p, mat4x4 result) {
-	mat4x4 kiwi_trans, kiwi_rotate, kiwi_scale_rotate, kiwi_mv;
-	mat4x4 identity;
-	mat4x4_identity(identity);
-	mat4x4_rotate_Z(kiwi_rotate, identity, angle);
-	mat4x4_scale_aniso(kiwi_scale_rotate, kiwi_rotate,
-		(float)pLwc->sprite_data[las].w / pLwc->width,
-		(float)pLwc->sprite_data[las].h / pLwc->height, (float)1);
-
-	mat4x4_translate(kiwi_trans, x, y, 0);
-
-	mat4x4_mul(kiwi_mv, kiwi_trans, kiwi_scale_rotate);
-	mat4x4_mul(result, p, kiwi_mv);
 }
 
 // http://www.cse.yorku.ca/~oz/hash.html
