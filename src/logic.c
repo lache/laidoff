@@ -392,42 +392,33 @@ void reset_runtime_context(LWCONTEXT* pLwc) {
 	// Make render-to-texture flag dirty
 	pLwc->font_fbo.dirty = 1;
 	// Register admin button commands
-	pLwc->admin_button_command[0].name = LWU("신:필드");
-	pLwc->admin_button_command[0].command_handler = change_to_field;
-	pLwc->admin_button_command[1].name = LWU("신:대화");
-	pLwc->admin_button_command[1].command_handler = change_to_dialog;
-	pLwc->admin_button_command[2].name = LWU("신:전투");
-	pLwc->admin_button_command[2].command_handler = change_to_battle;
-	pLwc->admin_button_command[3].name = LWU("신:글꼴");
-	pLwc->admin_button_command[3].command_handler = change_to_font_test;
-	pLwc->admin_button_command[4].name = LWU("런타임리셋");
-	pLwc->admin_button_command[4].command_handler = reset_runtime_context_async;
-	pLwc->admin_button_command[5].name = LWU("글꼴디버그");
-	pLwc->admin_button_command[5].command_handler = toggle_font_texture_test_mode;
-	pLwc->admin_button_command[6].name = LWU("UDP");
-	pLwc->admin_button_command[6].command_handler = net_rtt_test;
-	pLwc->admin_button_command[7].name = LWU("신:스킨");
-	pLwc->admin_button_command[7].command_handler = change_to_skin;
-	pLwc->admin_button_command[8].name = LWU("신:물리");
-	pLwc->admin_button_command[8].command_handler = change_to_physics;
-	pLwc->admin_button_command[9].name = LWU("신:파티클");
-	pLwc->admin_button_command[9].command_handler = change_to_particle_system;
-	pLwc->admin_button_command[10].name = LWU("신:필드1로드");
-	pLwc->admin_button_command[10].command_handler = load_field_1_init_runtime_data;
-	pLwc->admin_button_command[11].name = LWU("신:필드2로드");
-	pLwc->admin_button_command[11].command_handler = load_field_2_init_runtime_data;
-	pLwc->admin_button_command[12].name = LWU("신:필드3로드");
-	pLwc->admin_button_command[12].command_handler = load_field_3_init_runtime_data;
-	pLwc->admin_button_command[13].name = LWU("신:필드4로드");
-	pLwc->admin_button_command[13].command_handler = load_field_4_init_runtime_data;
-	pLwc->admin_button_command[14].name = LWU("Server #0");
-	pLwc->admin_button_command[14].command_handler = connect_to_server_0;
-	pLwc->admin_button_command[15].name = LWU("Server #1");
-	pLwc->admin_button_command[15].command_handler = connect_to_server_1;
-	pLwc->admin_button_command[16].name = LWU("레이테스트토글");
-	pLwc->admin_button_command[16].command_handler = toggle_ray_test;
-	pLwc->admin_button_command[17].name = LWU("네트워크토글");
-	pLwc->admin_button_command[17].command_handler = toggle_network_poll;
+	const struct {
+		const char* name;
+		LW_BUTTON_COMMAND_HANDLER handler;
+	} handler_array[] = {
+		{ LWU("신:필드"),change_to_field },
+		{ LWU("신:대화"),change_to_dialog },
+		{ LWU("신:전투"),change_to_battle },
+		{ LWU("신:글꼴"),change_to_font_test },
+		{ LWU("런타임리셋"),reset_runtime_context_async },
+		{ LWU("글꼴디버그"),toggle_font_texture_test_mode },
+		{ LWU("UDP"),net_rtt_test },
+		{ LWU("신:스킨"),change_to_skin },
+		{ LWU("신:물리"),change_to_physics },
+		{ LWU("신:파티클"),change_to_particle_system },
+		{ LWU("신:필드1로드"),load_field_1_init_runtime_data },
+		{ LWU("신:필드2로드"),load_field_2_init_runtime_data },
+		{ LWU("신:필드3로드"),load_field_3_init_runtime_data },
+		{ LWU("신:필드4로드"),load_field_4_init_runtime_data },
+		{ LWU("Server #0"),connect_to_server_0 },
+		{ LWU("Server #1"),connect_to_server_1 },
+		{ LWU("레이테스트토글"),toggle_ray_test },
+		{ LWU("네트워크토글"),toggle_network_poll },
+	};
+	for (int i = 0; i < ARRAY_SIZE(handler_array); i++) {
+		pLwc->admin_button_command[i].name = handler_array[i].name;
+		pLwc->admin_button_command[i].command_handler = handler_array[i].handler;
+	}
 	// Run script for testing script error logging function (no effects on system)
 	script_run_file(pLwc, ASSETS_BASE_PATH "l" PATH_SEPARATOR "error_test.lua");
 	// Run post init script
@@ -526,11 +517,11 @@ void lwc_update(LWCONTEXT *pLwc, double delta_time) {
 }
 
 void init_lwc_runtime_data(LWCONTEXT *pLwc) {
-	
+
 	reset_runtime_context(pLwc);
 
 	//pLwc->pFnt = load_fnt(ASSETS_BASE_PATH "fnt" PATH_SEPARATOR "arita-semi-bold.fnt");
-	
+
 	pLwc->dialog = create_string_from_file(ASSETS_BASE_PATH "d" PATH_SEPARATOR "d1.txt");
 	if (pLwc->dialog) {
 		pLwc->dialog_bytelen = (int)strlen(pLwc->dialog);
