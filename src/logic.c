@@ -392,32 +392,29 @@ void reset_runtime_context(LWCONTEXT* pLwc) {
 	// Make render-to-texture flag dirty
 	pLwc->font_fbo.dirty = 1;
 	// Register admin button commands
-	const struct {
-		const char* name;
-		LW_BUTTON_COMMAND_HANDLER handler;
-	} handler_array[] = {
-		{ LWU("신:필드"),change_to_field },
-		{ LWU("신:대화"),change_to_dialog },
-		{ LWU("신:전투"),change_to_battle },
-		{ LWU("신:글꼴"),change_to_font_test },
-		{ LWU("런타임리셋"),reset_runtime_context_async },
-		{ LWU("글꼴디버그"),toggle_font_texture_test_mode },
-		{ LWU("UDP"),net_rtt_test },
-		{ LWU("신:스킨"),change_to_skin },
-		{ LWU("신:물리"),change_to_physics },
-		{ LWU("신:파티클"),change_to_particle_system },
-		{ LWU("신:필드1로드"),load_field_1_init_runtime_data },
-		{ LWU("신:필드2로드"),load_field_2_init_runtime_data },
-		{ LWU("신:필드3로드"),load_field_3_init_runtime_data },
-		{ LWU("신:필드4로드"),load_field_4_init_runtime_data },
-		{ LWU("Server #0"),connect_to_server_0 },
-		{ LWU("Server #1"),connect_to_server_1 },
-		{ LWU("레이테스트토글"),toggle_ray_test },
-		{ LWU("네트워크토글"),toggle_network_poll },
+	const LWBUTTONCOMMAND handler_array[] = {
+		{ LWU("신:필드"), change_to_field },
+		{ LWU("신:대화"), change_to_dialog },
+		{ LWU("신:전투"), change_to_battle },
+		{ LWU("신:글꼴"), change_to_font_test },
+		{ LWU("런타임리셋"), reset_runtime_context_async },
+		{ LWU("글꼴디버그"), toggle_font_texture_test_mode },
+		{ LWU("UDP"), net_rtt_test },
+		{ LWU("신:스킨"), change_to_skin },
+		{ LWU("신:물리"), change_to_physics },
+		{ LWU("신:파티클"), change_to_particle_system },
+		{ LWU("신:필드1로드"), load_field_1_init_runtime_data },
+		{ LWU("신:필드2로드"), load_field_2_init_runtime_data },
+		{ LWU("신:필드3로드"), load_field_3_init_runtime_data },
+		{ LWU("신:필드4로드"), load_field_4_init_runtime_data },
+		{ LWU("Server #0"), connect_to_server_0 },
+		{ LWU("Server #1"), connect_to_server_1 },
+		{ LWU("레이테스트토글"), toggle_ray_test },
+		{ LWU("네트워크토글"), toggle_network_poll },
 	};
 	for (int i = 0; i < ARRAY_SIZE(handler_array); i++) {
 		pLwc->admin_button_command[i].name = handler_array[i].name;
-		pLwc->admin_button_command[i].command_handler = handler_array[i].handler;
+		pLwc->admin_button_command[i].command_handler = handler_array[i].command_handler;
 	}
 	// Run script for testing script error logging function (no effects on system)
 	script_run_file(pLwc, ASSETS_BASE_PATH "l" PATH_SEPARATOR "error_test.lua");
