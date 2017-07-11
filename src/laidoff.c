@@ -513,6 +513,14 @@ static void init_vbo(LWCONTEXT *pLwc) {
 	load_vbo(pLwc, ASSETS_BASE_PATH "vbo" PATH_SEPARATOR "room.vbo",
 		&pLwc->vertex_buffer[LVT_ROOM]);
 
+	// LVT_BATTLEGROUND_FLOOR
+	load_vbo(pLwc, ASSETS_BASE_PATH "vbo" PATH_SEPARATOR "battleground-floor.vbo",
+		&pLwc->vertex_buffer[LVT_BATTLEGROUND_FLOOR]);
+
+	// LVT_BATTLEGROUND_WALL
+	load_vbo(pLwc, ASSETS_BASE_PATH "vbo" PATH_SEPARATOR "battleground-wall.vbo",
+		&pLwc->vertex_buffer[LVT_BATTLEGROUND_WALL]);
+
 	// LVT_SPHERE
 	load_vbo(pLwc, ASSETS_BASE_PATH "vbo" PATH_SEPARATOR "Sphere.vbo",
 		&pLwc->vertex_buffer[LVT_SPHERE]);

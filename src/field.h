@@ -26,6 +26,7 @@ typedef struct _LWFIELD LWFIELD;
 typedef struct _LWFIELDOBJECT LWFIELDOBJECT;
 typedef struct _LWPATHQUERY LWPATHQUERY;
 typedef struct _LWNAV LWNAV;
+typedef struct _LWFIELDMESH LWFIELDMESH;
 
 void move_player(LWCONTEXT *pLwc);
 void resolve_player_event_collision(LWCONTEXT *pLwc);
@@ -41,12 +42,14 @@ const float* field_path_query_test_player_pos(const LWFIELD* field);
 float field_path_query_test_player_rot(const LWFIELD* field);
 float field_skin_scale(const LWFIELD* field);
 int field_follow_cam(const LWFIELD* field);
-LW_VBO_TYPE field_field_vbo(const LWFIELD* field);
-GLuint field_field_tex_id(const LWFIELD* field);
-int field_field_tex_mip(const LWFIELD* field);
+int field_field_mesh_count(const LWFIELD* field);
+LW_VBO_TYPE field_field_vbo(const LWFIELD* field, int idx);
+GLuint field_field_tex_id(const LWFIELD* field, int idx);
+int field_field_tex_mip(const LWFIELD* field, int idx);
 double field_ray_nearest_depth(const LWFIELD* field, LW_RAY_ID lri);
 void field_nav_query(LWFIELD* field);
-void init_field(LWCONTEXT* pLwc, const char* field_filename, const char* nav_filename, LW_VBO_TYPE vbo, GLuint tex_id, int tex_mip, float skin_scale, int follow_cam);
+void init_field(LWCONTEXT* pLwc, const char* field_filename, const char* nav_filename, int field_mesh_count,
+	const LWFIELDMESH* field_mesh, float skin_scale, int follow_cam);
 int field_sphere_pos(const LWFIELD* field, int i, float* pos);
 int field_sphere_vel(const LWFIELD* field, int i, float* vel);
 int field_spawn_user(LWFIELD* field, vec3 pos, void* owner);

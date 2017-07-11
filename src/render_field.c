@@ -373,22 +373,25 @@ void lwc_render_field(const LWCONTEXT* pLwc) {
 	//render_ground(pLwc, view, perspective);
 
 	if (!pLwc->hide_field) {
-		render_field_object(
-			pLwc,
-			field_field_vbo(pLwc->field),
-			field_field_tex_id(pLwc->field),
-			view,
-			perspective,
-			0,
-			0,
-			0,
-			1,
-			1,
-			1,
-			1,
-			field_field_tex_mip(pLwc->field),
-			0
-		);
+		int field_mesh_count = field_field_mesh_count(pLwc->field);
+		for (int i = 0; i < field_mesh_count; i++) {
+			render_field_object(
+				pLwc,
+				field_field_vbo(pLwc->field, i),
+				field_field_tex_id(pLwc->field, i),
+				view,
+				perspective,
+				0,
+				0,
+				0,
+				1,
+				1,
+				1,
+				1,
+				field_field_tex_mip(pLwc->field, i),
+				0
+			);
+		}
 	}
 
 	for (int i = 0; i < MAX_FIELD_OBJECT; i++) {

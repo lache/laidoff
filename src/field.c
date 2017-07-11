@@ -16,6 +16,7 @@
 #include "playersm.h"
 #include "pcg_basic.h"
 #include "ps.h"
+#include "logic.h"
 
 #define MAX_BOX_GEOM (100)
 #define MAX_RAY_RESULT_COUNT (10)
@@ -114,12 +115,10 @@ typedef struct _LWFIELD {
 	vec3 path_query_test_player_pos;
 	// Test player orientation
 	float path_query_test_player_rot;
-	// Field VBO
-	LW_VBO_TYPE field_vbo;
-	// Field texture ID
-	GLuint field_tex_id;
-	// 1 if field texture is mipmapped, 0 if otherwise
-	int field_tex_mip;
+	// Should match with LWMSGINITFIELD
+	int field_mesh_count;
+	// Should match with LWMSGINITFIELD
+	LWFIELDMESH field_mesh[4];
 	// Player skinned mesh scale
 	float skin_scale;
 	// Field world camera mode (0 or 1)
@@ -894,16 +893,20 @@ int field_follow_cam(const LWFIELD* field) {
 	return field->field_camera_mode;
 }
 
-LW_VBO_TYPE field_field_vbo(const LWFIELD* field) {
-	return field->field_vbo;
+int field_field_mesh_count(const LWFIELD* field) {
+	return field->field_mesh_count;
 }
 
-GLuint field_field_tex_id(const LWFIELD* field) {
-	return field->field_tex_id;
+LW_VBO_TYPE field_field_vbo(const LWFIELD* field, int idx) {
+	return field->field_mesh[idx].vbo;
 }
 
-int field_field_tex_mip(const LWFIELD* field) {
-	return field->field_tex_mip;
+GLuint field_field_tex_id(const LWFIELD* field, int idx) {
+	return field->field_mesh[idx].tex_id;
+}
+
+int field_field_tex_mip(const LWFIELD* field, int idx) {
+	return field->field_mesh[idx].tex_mip;
 }
 
 double field_ray_nearest_depth(const LWFIELD* field, LW_RAY_ID lri) {
@@ -914,16 +917,16 @@ void field_nav_query(LWFIELD* field) {
 	nav_query(field->nav, nav_path_query_test(field->nav));
 }
 
-void init_field(LWCONTEXT* pLwc, const char* field_filename, const char* nav_filename, LW_VBO_TYPE vbo, GLuint tex_id, int tex_mip, float skin_scale, int follow_cam) {
+void init_field(LWCONTEXT* pLwc, const char* field_filename, const char* nav_filename, int field_mesh_count,
+	const LWFIELDMESH* field_mesh, float skin_scale, int follow_cam) {
 	if (pLwc->field) {
 		unload_field(pLwc->field);
 	}
 
 	pLwc->field = load_field(field_filename);
 	pLwc->field->nav = load_nav(nav_filename);
-	pLwc->field->field_vbo = vbo;
-	pLwc->field->field_tex_id = tex_id;
-	pLwc->field->field_tex_mip = tex_mip;
+	pLwc->field->field_mesh_count = field_mesh_count;
+	memcpy(pLwc->field->field_mesh, field_mesh, sizeof(LWFIELDMESH) * field_mesh_count);
 	pLwc->field->skin_scale = skin_scale;
 	pLwc->field->field_camera_mode = follow_cam;
 	pLwc->field->mq = pLwc->mq;	

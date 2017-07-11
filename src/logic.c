@@ -72,9 +72,8 @@ typedef struct _LWMSGINITFIELD {
 	LW_MSG type;
 	const char* field_filename;
 	const char* nav_filename;
-	LW_VBO_TYPE vbo;
-	GLuint tex_id;
-	int tex_mip;
+	int field_mesh_count;
+	LWFIELDMESH field_mesh[4];
 	float skin_scale;
 	int follow_cam;
 } LWMSGINITFIELD;
@@ -90,9 +89,9 @@ void load_field_1_init_runtime_data_async(LWCONTEXT *pLwc, zactor_t* actor) {
 		LM_LWMSGINITFIELD,
 		ASSETS_BASE_PATH "field" PATH_SEPARATOR "testfield.field",
 		ASSETS_BASE_PATH "nav" PATH_SEPARATOR "apt.nav",
-		LVT_APT,
-		pLwc->tex_atlas[LAE_3D_APT_TEX_MIP_KTX],
-		1,
+		1, {
+			{ LVT_APT, pLwc->tex_atlas[LAE_3D_APT_TEX_MIP_KTX], 1, },
+		},
 		0.9f,
 		0,
 	};
@@ -114,9 +113,9 @@ void load_field_2_init_runtime_data_async(LWCONTEXT *pLwc, zactor_t* actor) {
 		LM_LWMSGINITFIELD,
 		ASSETS_BASE_PATH "field" PATH_SEPARATOR "testfield.field",
 		ASSETS_BASE_PATH "nav" PATH_SEPARATOR "test.nav",
-		LVT_FLOOR,
-		pLwc->tex_atlas[LAE_3D_FLOOR_TEX_KTX],
-		0,
+		1, {
+			{ LVT_FLOOR, pLwc->tex_atlas[LAE_3D_FLOOR_TEX_KTX], 0, },
+		},
 		0.5f,
 		1,
 	};
@@ -138,9 +137,9 @@ void load_field_3_init_runtime_data_async(LWCONTEXT *pLwc, zactor_t* actor) {
 		LM_LWMSGINITFIELD,
 		ASSETS_BASE_PATH "field" PATH_SEPARATOR "testfield2.field",
 		ASSETS_BASE_PATH "nav" PATH_SEPARATOR "test2.nav",
-		LVT_FLOOR2,
-		pLwc->tex_atlas[LAE_3D_FLOOR2_TEX_KTX],
-		0,
+		1, {
+			{ LVT_FLOOR2, pLwc->tex_atlas[LAE_3D_FLOOR2_TEX_KTX], 0, },
+		},
 		0.5f,
 		1,
 	};
@@ -162,9 +161,9 @@ void load_field_4_init_runtime_data_async(LWCONTEXT *pLwc, zactor_t* actor) {
 		LM_LWMSGINITFIELD,
 		ASSETS_BASE_PATH "field" PATH_SEPARATOR "room.field",
 		ASSETS_BASE_PATH "nav" PATH_SEPARATOR "room.nav",
-		LVT_ROOM,
-		pLwc->tex_atlas[LAE_3D_ROOM_TEX_KTX],
-		0,
+		1, {
+			{ LVT_ROOM, pLwc->tex_atlas[LAE_3D_ROOM_TEX_KTX], 0, },
+		},
 		0.5f,
 		1,
 	};
@@ -177,6 +176,31 @@ void load_field_4_init_runtime_data_async(LWCONTEXT *pLwc, zactor_t* actor) {
 
 void load_field_4_init_runtime_data(LWCONTEXT *pLwc) {
 	load_field_4_init_runtime_data_async(pLwc, pLwc->logic_actor);
+}
+
+void load_field_5_init_runtime_data_async(LWCONTEXT *pLwc, zactor_t* actor) {
+	pLwc->next_game_scene = LGS_FIELD;
+	zmsg_t* msg = zmsg_new();
+	LWMSGINITFIELD m = {
+		LM_LWMSGINITFIELD,
+		ASSETS_BASE_PATH "field" PATH_SEPARATOR "battleground.field",
+		ASSETS_BASE_PATH "nav" PATH_SEPARATOR "battleground.nav",
+		2, {
+			{ LVT_BATTLEGROUND_FLOOR, pLwc->tex_atlas[LAE_3D_BATTLEGROUND_FLOOR_BAKE_TEX_KTX], 0, },
+			{ LVT_BATTLEGROUND_WALL, pLwc->tex_atlas[LAE_3D_BATTLEGROUND_WALL_BAKE_TEX_KTX], 0, },
+		},
+		0.5f,
+		1,
+	};
+	zmsg_addmem(msg, &m, sizeof(LWMSGINITFIELD));
+	if (zactor_send(actor, &msg) < 0) {
+		zmsg_destroy(&msg);
+		LOGE("Send message to logic worker failed!");
+	}
+}
+
+void load_field_5_init_runtime_data(LWCONTEXT *pLwc) {
+	load_field_5_init_runtime_data_async(pLwc, pLwc->logic_actor);
 }
 
 void reset_runtime_context_async(LWCONTEXT *pLwc) {
@@ -407,6 +431,7 @@ void reset_runtime_context(LWCONTEXT* pLwc) {
 		{ LWU("신:필드2로드"), load_field_2_init_runtime_data },
 		{ LWU("신:필드3로드"), load_field_3_init_runtime_data },
 		{ LWU("신:필드4로드"), load_field_4_init_runtime_data },
+		{ LWU("신:필드5로드"), load_field_5_init_runtime_data },
 		{ LWU("Server #0"), connect_to_server_0 },
 		{ LWU("Server #1"), connect_to_server_1 },
 		{ LWU("레이테스트토글"), toggle_ray_test },
@@ -556,9 +581,8 @@ static int loop_pipe_reader(zloop_t* loop, zsock_t* pipe, void* args) {
 			init_field(pLwc,
 				m->field_filename,
 				m->nav_filename,
-				m->vbo,
-				m->tex_id,
-				m->tex_mip,
+				m->field_mesh_count,
+				m->field_mesh,
 				m->skin_scale,
 				m->follow_cam);
 
