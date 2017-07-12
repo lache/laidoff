@@ -6364,9 +6364,10 @@ static int _wrap_spawn_field_object(lua_State* L) {
   float arg9 ;
   float arg10 ;
   int arg11 ;
+  int arg12 ;
   int result;
   
-  SWIG_check_num_args("spawn_field_object",11,11)
+  SWIG_check_num_args("spawn_field_object",12,12)
   if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("spawn_field_object",1,"LWFIELD *");
   if(!lua_isnumber(L,2)) SWIG_fail_arg("spawn_field_object",2,"float");
   if(!lua_isnumber(L,3)) SWIG_fail_arg("spawn_field_object",3,"float");
@@ -6378,6 +6379,7 @@ static int _wrap_spawn_field_object(lua_State* L) {
   if(!lua_isnumber(L,9)) SWIG_fail_arg("spawn_field_object",9,"float");
   if(!lua_isnumber(L,10)) SWIG_fail_arg("spawn_field_object",10,"float");
   if(!lua_isnumber(L,11)) SWIG_fail_arg("spawn_field_object",11,"int");
+  if(!lua_isnumber(L,12)) SWIG_fail_arg("spawn_field_object",12,"int");
   
   if (!SWIG_IsOK(SWIG_ConvertPtr(L,1,(void**)&arg1,SWIGTYPE_p__LWFIELD,0))){
     SWIG_fail_ptr("spawn_field_object",1,SWIGTYPE_p__LWFIELD);
@@ -6394,7 +6396,8 @@ static int _wrap_spawn_field_object(lua_State* L) {
   arg9 = (float)lua_tonumber(L, 9);
   arg10 = (float)lua_tonumber(L, 10);
   arg11 = (int)lua_tonumber(L, 11);
-  result = (int)spawn_field_object(arg1,arg2,arg3,arg4,arg5,arg6,arg7,arg8,arg9,arg10,arg11);
+  arg12 = (int)lua_tonumber(L, 12);
+  result = (int)spawn_field_object(arg1,arg2,arg3,arg4,arg5,arg6,arg7,arg8,arg9,arg10,arg11,arg12);
   lua_pushnumber(L, (lua_Number) result); SWIG_arg++;
   return SWIG_arg;
   
@@ -23480,6 +23483,56 @@ fail:
 }
 
 
+static int _wrap_LWFIELDOBJECT_skin_set(lua_State* L) {
+  int SWIG_arg = 0;
+  struct _LWFIELDOBJECT *arg1 = (struct _LWFIELDOBJECT *) 0 ;
+  int arg2 ;
+  
+  SWIG_check_num_args("_LWFIELDOBJECT::skin",2,2)
+  if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("_LWFIELDOBJECT::skin",1,"struct _LWFIELDOBJECT *");
+  if(!lua_isnumber(L,2)) SWIG_fail_arg("_LWFIELDOBJECT::skin",2,"int");
+  
+  if (!SWIG_IsOK(SWIG_ConvertPtr(L,1,(void**)&arg1,SWIGTYPE_p__LWFIELDOBJECT,0))){
+    SWIG_fail_ptr("LWFIELDOBJECT_skin_set",1,SWIGTYPE_p__LWFIELDOBJECT);
+  }
+  
+  arg2 = (int)lua_tonumber(L, 2);
+  if (arg1) (arg1)->skin = arg2;
+  
+  return SWIG_arg;
+  
+  if(0) SWIG_fail;
+  
+fail:
+  lua_error(L);
+  return SWIG_arg;
+}
+
+
+static int _wrap_LWFIELDOBJECT_skin_get(lua_State* L) {
+  int SWIG_arg = 0;
+  struct _LWFIELDOBJECT *arg1 = (struct _LWFIELDOBJECT *) 0 ;
+  int result;
+  
+  SWIG_check_num_args("_LWFIELDOBJECT::skin",1,1)
+  if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("_LWFIELDOBJECT::skin",1,"struct _LWFIELDOBJECT *");
+  
+  if (!SWIG_IsOK(SWIG_ConvertPtr(L,1,(void**)&arg1,SWIGTYPE_p__LWFIELDOBJECT,0))){
+    SWIG_fail_ptr("LWFIELDOBJECT_skin_get",1,SWIGTYPE_p__LWFIELDOBJECT);
+  }
+  
+  result = (int) ((arg1)->skin);
+  lua_pushnumber(L, (lua_Number) result); SWIG_arg++;
+  return SWIG_arg;
+  
+  if(0) SWIG_fail;
+  
+fail:
+  lua_error(L);
+  return SWIG_arg;
+}
+
+
 static int _wrap_new_LWFIELDOBJECT(lua_State* L) {
   int SWIG_arg = 0;
   struct _LWFIELDOBJECT *result = 0 ;
@@ -23520,6 +23573,7 @@ static swig_lua_attribute swig_LWFIELDOBJECT_attributes[] = {
     { "lvt", _wrap_LWFIELDOBJECT_lvt_get, _wrap_LWFIELDOBJECT_lvt_set },
     { "tex_id", _wrap_LWFIELDOBJECT_tex_id_get, _wrap_LWFIELDOBJECT_tex_id_set },
     { "alpha_multiplier", _wrap_LWFIELDOBJECT_alpha_multiplier_get, _wrap_LWFIELDOBJECT_alpha_multiplier_set },
+    { "skin", _wrap_LWFIELDOBJECT_skin_get, _wrap_LWFIELDOBJECT_skin_set },
     {0,0,0}
 };
 static swig_lua_method swig_LWFIELDOBJECT_methods[]= {
@@ -43561,6 +43615,7 @@ static swig_lua_const_info swig_SwigModule_constants[]= {
     {SWIG_LUA_CONSTTAB_INT("LWAC_HUMANACTION_DEATH", LWAC_HUMANACTION_DEATH)},
     {SWIG_LUA_CONSTTAB_INT("LWAC_DETACHPLANEACTION", LWAC_DETACHPLANEACTION)},
     {SWIG_LUA_CONSTTAB_INT("LWAC_DETACHPLANEACTION_CHILDTRANS", LWAC_DETACHPLANEACTION_CHILDTRANS)},
+    {SWIG_LUA_CONSTTAB_INT("LWAC_RECOIL", LWAC_RECOIL)},
     {SWIG_LUA_CONSTTAB_INT("LWAC_COUNT", LWAC_COUNT)},
     {SWIG_LUA_CONSTTAB_INT("LAE_TWIRL_PNG", LAE_TWIRL_PNG)},
     {SWIG_LUA_CONSTTAB_INT("LAE_C2_PNG", LAE_C2_PNG)},
@@ -43613,6 +43668,7 @@ static swig_lua_const_info swig_SwigModule_constants[]= {
     {SWIG_LUA_CONSTTAB_INT("LAE_3D_ROOM_TEX_KTX", LAE_3D_ROOM_TEX_KTX)},
     {SWIG_LUA_CONSTTAB_INT("LAE_3D_BATTLEGROUND_FLOOR_BAKE_TEX_KTX", LAE_3D_BATTLEGROUND_FLOOR_BAKE_TEX_KTX)},
     {SWIG_LUA_CONSTTAB_INT("LAE_3D_BATTLEGROUND_WALL_BAKE_TEX_KTX", LAE_3D_BATTLEGROUND_WALL_BAKE_TEX_KTX)},
+    {SWIG_LUA_CONSTTAB_INT("LAE_GUNTOWER_KTX", LAE_GUNTOWER_KTX)},
     {SWIG_LUA_CONSTTAB_INT("LAE_BEAM_KTX", LAE_BEAM_KTX)},
     {SWIG_LUA_CONSTTAB_INT("LAE_COUNT", LAE_COUNT)},
     {SWIG_LUA_CONSTTAB_INT("LAS_COMMAND_SELECTED_BG", LAS_COMMAND_SELECTED_BG)},
@@ -43804,6 +43860,7 @@ static swig_lua_const_info swig_SwigModule_constants[]= {
     {SWIG_LUA_CONSTTAB_INT("LSVT_TREEPLANE", LSVT_TREEPLANE)},
     {SWIG_LUA_CONSTTAB_INT("LSVT_HUMAN", LSVT_HUMAN)},
     {SWIG_LUA_CONSTTAB_INT("LSVT_DETACHPLANE", LSVT_DETACHPLANE)},
+    {SWIG_LUA_CONSTTAB_INT("LSVT_GUNTOWER", LSVT_GUNTOWER)},
     {SWIG_LUA_CONSTTAB_INT("LSVT_COUNT", LSVT_COUNT)},
     {SWIG_LUA_CONSTTAB_INT("LFVT_DEFAULT", LFVT_DEFAULT)},
     {SWIG_LUA_CONSTTAB_INT("LFVT_COUNT", LFVT_COUNT)},
@@ -43840,6 +43897,7 @@ static swig_lua_const_info swig_SwigModule_constants[]= {
     {SWIG_LUA_CONSTTAB_INT("LWAR_TREEPLANEARMATURE", LWAR_TREEPLANEARMATURE)},
     {SWIG_LUA_CONSTTAB_INT("LWAR_HUMANARMATURE", LWAR_HUMANARMATURE)},
     {SWIG_LUA_CONSTTAB_INT("LWAR_DETACHPLANEARMATURE", LWAR_DETACHPLANEARMATURE)},
+    {SWIG_LUA_CONSTTAB_INT("LWAR_GUNTOWER_ARMATURE", LWAR_GUNTOWER_ARMATURE)},
     {SWIG_LUA_CONSTTAB_INT("LWAR_COUNT", LWAR_COUNT)},
     {0,0,0,0,0,0}
 };

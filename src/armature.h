@@ -16,6 +16,7 @@ typedef enum _LW_ARMATURE {
 	LWAR_TREEPLANEARMATURE,
 	LWAR_HUMANARMATURE,
 	LWAR_DETACHPLANEARMATURE,
+	LWAR_GUNTOWER_ARMATURE,
 
 	LWAR_COUNT,
 } LW_ARMATURE;
@@ -25,6 +26,7 @@ static const char* armature_filename[] = {
 	ASSETS_BASE_PATH "armature" PATH_SEPARATOR "TreePlaneArmature.arm",
 	ASSETS_BASE_PATH "armature" PATH_SEPARATOR "HumanArmature.arm",
 	ASSETS_BASE_PATH "armature" PATH_SEPARATOR "DetachPlaneArmature.arm",
+	ASSETS_BASE_PATH "armature" PATH_SEPARATOR "guntower-armature.arm",
 };
 
 int load_armature(const char* filename, LWARMATURE* ar);

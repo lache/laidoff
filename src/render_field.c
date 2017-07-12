@@ -146,6 +146,37 @@ void render_debug_sphere(const LWCONTEXT* pLwc, GLuint tex_id, const mat4x4 pers
 	);
 }
 
+
+void render_guntower(const LWCONTEXT* pLwc, mat4x4 perspective, mat4x4 view, float x, float y) {
+	const float path_query_test_player_pos[] = { x, y, 0 };
+	const float skin_scale_f = 0.5f;
+
+	mat4x4 skin_trans;
+	mat4x4_identity(skin_trans);
+	mat4x4_translate(skin_trans, path_query_test_player_pos[0], path_query_test_player_pos[1], path_query_test_player_pos[2]);
+	mat4x4 skin_scale;
+	mat4x4_identity(skin_scale);
+	mat4x4_scale_aniso(skin_scale, skin_scale, skin_scale_f, skin_scale_f, skin_scale_f);
+	mat4x4 skin_rot;
+	mat4x4_identity(skin_rot);
+	mat4x4_rotate_Z(skin_rot, skin_rot, field_path_query_test_player_rot(pLwc->field) + (float)LWDEG2RAD(90));
+
+	mat4x4 skin_model;
+	mat4x4_identity(skin_model);
+	mat4x4_mul(skin_model, skin_rot, skin_model);
+	mat4x4_mul(skin_model, skin_scale, skin_model);
+	mat4x4_mul(skin_model, skin_trans, skin_model);
+
+	const float flash = 0;
+
+	render_skin(pLwc,
+		pLwc->tex_atlas[LAE_GUNTOWER_KTX],
+		LSVT_GUNTOWER,
+		&pLwc->action[LWAC_RECOIL],
+		&pLwc->armature[LWAR_GUNTOWER_ARMATURE],
+		1, 1, 1, 1, flash, perspective, view, skin_model, pLwc->test_player_skin_time * 5, 1);
+}
+
 void render_path_query_test_player(const LWCONTEXT* pLwc, mat4x4 perspective, mat4x4 view) {
 
 	float spos[3], epos[3];
@@ -398,22 +429,26 @@ void lwc_render_field(const LWCONTEXT* pLwc) {
 		LWFIELDOBJECT* fo = field_object(pLwc->field, i);
 
 		if (fo->valid) {
-			render_field_object(
-				pLwc,
-				fo->lvt,
-				fo->tex_id,
-				view,
-				perspective,
-				fo->x,
-				fo->y,
-				fo->z,
-				fo->sx,
-				fo->sy,
-				1.0f,
-				fo->alpha_multiplier,
-				0,
-				fo->rot_z
-			);
+			if (fo->skin == 0) {
+				render_field_object(
+					pLwc,
+					fo->lvt,
+					fo->tex_id,
+					view,
+					perspective,
+					fo->x,
+					fo->y,
+					fo->z,
+					fo->sx,
+					fo->sy,
+					1.0f,
+					fo->alpha_multiplier,
+					0,
+					fo->rot_z
+				);
+			} else {
+				render_guntower(pLwc, perspective, view, fo->x, fo->y);
+			}
 		}
 	}
 
@@ -433,6 +468,8 @@ void lwc_render_field(const LWCONTEXT* pLwc) {
 	mq_unlock_mutex(pLwc->mq);
 
 	render_path_query_test_player(pLwc, perspective, view);
+
+	//render_guntower(pLwc, perspective, view);
 
 	s_render_field_sphere(pLwc, pLwc->field, perspective, view);
 

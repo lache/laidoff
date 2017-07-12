@@ -10,4 +10,5 @@ typedef struct _LWFIELDOBJECT {
 	enum _LW_VBO_TYPE lvt;
 	GLuint tex_id;
 	float alpha_multiplier;
+	int skin;
 } LWFIELDOBJECT;

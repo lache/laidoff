@@ -583,6 +583,10 @@ static void init_vbo(LWCONTEXT *pLwc) {
 	load_skin_vbo(pLwc, ASSETS_BASE_PATH "svbo" PATH_SEPARATOR "DetachPlane.svbo",
 		&pLwc->skin_vertex_buffer[LSVT_DETACHPLANE]);
 
+	// LSVT_GUNTOWER
+	load_skin_vbo(pLwc, ASSETS_BASE_PATH "svbo" PATH_SEPARATOR "guntower.svbo",
+		&pLwc->skin_vertex_buffer[LSVT_GUNTOWER]);
+
 	// === STATIC MESHES (FAN TYPE) ===
 	load_fan_vbo(pLwc);
 }

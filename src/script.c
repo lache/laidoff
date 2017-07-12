@@ -175,7 +175,7 @@ int l_spawn_blue_cube_wall_2(lua_State* L) {
 		LWCONTEXT* pLwc = lua_touserdata(L, lua_upvalueindex(1));
 		float x = (float)lua_tonumber(L, 1);
 		float y = (float)lua_tonumber(L, 2);
-		int r = spawn_field_object(pLwc->field, x, y, 1, 1, LVT_CUBE_WALL, pLwc->tex_programmed[LPT_SOLID_BLUE], 1, 1, 1, 0);
+		int r = spawn_field_object(pLwc->field, x, y, 1, 1, LVT_CUBE_WALL, pLwc->tex_programmed[LPT_SOLID_BLUE], 1, 1, 1, 0, 0);
 		lua_pushinteger(L, r);
 	}
 	return 1;
@@ -188,7 +188,7 @@ int l_spawn_blue_cube_wall(lua_State* L)
 		LWCONTEXT* pLwc = lua_touserdata(L, 1);
 		float x = (float)lua_tonumber(L, 2);
 		float y = (float)lua_tonumber(L, 3);
-		int r = spawn_field_object(pLwc->field, x, y, 1, 1, LVT_CUBE_WALL, pLwc->tex_programmed[LPT_SOLID_BLUE], 1, 1, 1, 0);
+		int r = spawn_field_object(pLwc->field, x, y, 1, 1, LVT_CUBE_WALL, pLwc->tex_programmed[LPT_SOLID_BLUE], 1, 1, 1, 0, 0);
 		lua_pushinteger(L, r);
 	}
 	return 1;
@@ -200,7 +200,7 @@ int l_spawn_red_cube_wall(lua_State* L) {
 		float x = (float)lua_tonumber(L, 2);
 		float y = (float)lua_tonumber(L, 3);
 		int field_event_id = (int)lua_tonumber(L, 4);
-		int r = spawn_field_object(pLwc->field, x, y, 1, 1, LVT_CUBE_WALL, pLwc->tex_programmed[LPT_SOLID_RED], 1, 1, 0.5f, field_event_id);
+		int r = spawn_field_object(pLwc->field, x, y, 1, 1, LVT_CUBE_WALL, pLwc->tex_programmed[LPT_SOLID_RED], 1, 1, 0.5f, field_event_id, 0);
 		lua_pushinteger(L, r);
 	}
 	return 1;
@@ -212,7 +212,7 @@ int l_spawn_pump(lua_State* L) {
 		float x = (float)lua_tonumber(L, 2);
 		float y = (float)lua_tonumber(L, 3);
 		int field_event_id = (int)lua_tonumber(L, 4);
-		int r = spawn_field_object(pLwc->field, x, y, 1, 1, LVT_PUMP, pLwc->tex_programmed[LPT_SOLID_RED], 1, 1, 0.5f, field_event_id);
+		int r = spawn_field_object(pLwc->field, x, y, 1, 1, LVT_PUMP, pLwc->tex_programmed[LPT_SOLID_RED], 1, 1, 0.5f, field_event_id, 0);
 		lua_pushinteger(L, r);
 	}
 	return 1;
@@ -224,7 +224,7 @@ int l_spawn_oil_truck(lua_State* L) {
 		float x = (float)lua_tonumber(L, 2);
 		float y = (float)lua_tonumber(L, 3);
 		int field_event_id = (int)lua_tonumber(L, 4);
-		int r = spawn_field_object(pLwc->field, x, y, 1, 1, LVT_OIL_TRUCK, pLwc->tex_atlas[LAE_3D_OIL_TRUCK_TEX_KTX], 1, 1, 1.0f, field_event_id);
+		int r = spawn_field_object(pLwc->field, x, y, 1, 1, LVT_OIL_TRUCK, pLwc->tex_atlas[LAE_3D_OIL_TRUCK_TEX_KTX], 1, 1, 1.0f, field_event_id, 0);
 		lua_pushinteger(L, r);
 	}
 	return 1;

@@ -16,6 +16,7 @@ const char* action_filename[] = {
 	ASSETS_BASE_PATH "action" PATH_SEPARATOR "HumanAction_Death.act",
 	ASSETS_BASE_PATH "action" PATH_SEPARATOR "DetachPlaneAction.act",
 	ASSETS_BASE_PATH "action" PATH_SEPARATOR "DetachPlaneAction_ChildTrans.act",
+	ASSETS_BASE_PATH "action" PATH_SEPARATOR "Recoil.act",
 };
 
 void load_action(const char* filename, LWANIMACTION* action) {

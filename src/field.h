@@ -72,7 +72,7 @@ int field_remote_sphere_vel(const LWFIELD* field, int i, float* vel);
 void field_hit_player(LWFIELD* field);
 void field_despawn_remote_sphere(LWFIELD* field, int bullet_id, const char* owner_key);
 void* field_ps(LWFIELD* field);
-int spawn_field_object(LWFIELD* field, float x, float y, float w, float h, enum _LW_VBO_TYPE lvt, unsigned int tex_id, float sx, float sy, float alpha_multiplier, int field_event_id);
+int spawn_field_object(LWFIELD* field, float x, float y, float w, float h, enum _LW_VBO_TYPE lvt, unsigned int tex_id, float sx, float sy, float alpha_multiplier, int field_event_id, int skin);
 int despawn_field_object(struct _LWCONTEXT *pLwc, int idx);
 void field_remove_field_object(LWFIELD* field, int field_event_id);
 void despawn_all_field_object(LWFIELD* field);

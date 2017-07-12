@@ -1101,7 +1101,7 @@ void* field_ps(LWFIELD* field) {
 }
 
 int spawn_field_object(LWFIELD* field, float x, float y, float w, float h, enum _LW_VBO_TYPE lvt,
-	unsigned int tex_id, float sx, float sy, float alpha_multiplier, int field_event_id) {
+	unsigned int tex_id, float sx, float sy, float alpha_multiplier, int field_event_id, int skin) {
 	for (int i = 0; i < MAX_FIELD_OBJECT; i++) {
 		LWFIELDOBJECT* fo = &field->field_object[i];
 		LWBOX2DCOLLIDER* bc = &field->box_collider[i];
@@ -1116,6 +1116,7 @@ int spawn_field_object(LWFIELD* field, float x, float y, float w, float h, enum 
 			fo->lvt = lvt;
 			fo->tex_id = tex_id;
 			fo->alpha_multiplier = alpha_multiplier;
+			fo->skin = skin;
 			fo->valid = 1;
 			// Box collider fields
 			bc->x = x;
