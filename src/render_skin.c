@@ -226,6 +226,22 @@ void render_skin(const LWCONTEXT* pLwc,
 	render_paramed_skin(pLwc, tex_index, lvt, action, armature, alpha_multiplier, or , og, ob, oratio, proj, view, model, skin_time, loop, bone_q);
 }
 
+void render_yaw_skin(const LWCONTEXT* pLwc,
+	GLuint tex_index,
+	enum _LW_SKIN_VBO_TYPE lvt,
+	const struct _LWANIMACTION* action,
+	const struct _LWARMATURE* armature,
+	float alpha_multiplier, float or , float og, float ob, float oratio,
+	const mat4x4 proj, const mat4x4 view, const mat4x4 model, double skin_time, int loop, float yaw) {
+
+	quat bone_q[MAX_BONE];
+	for (int i = 0; i < ARRAY_SIZE(bone_q); i++) {
+		quat_identity(bone_q[i]);
+	}
+	vec3 yaw_axis = { 0, 0, 1 };
+	quat_rotate(bone_q[1], yaw, yaw_axis);
+	render_paramed_skin(pLwc, tex_index, lvt, action, armature, alpha_multiplier, or , og, ob, oratio, proj, view, model, skin_time, loop, bone_q);
+}
 
 void render_skin_ui(const LWCONTEXT* pLwc,
 	float x, float y, float scale,
