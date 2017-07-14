@@ -173,7 +173,7 @@ void render_guntower(const LWCONTEXT* pLwc, mat4x4 perspective, mat4x4 view, flo
 		LSVT_GUNTOWER,
 		&pLwc->action[LWAC_RECOIL],
 		&pLwc->armature[LWAR_GUNTOWER_ARMATURE],
-		1, 1, 1, 1, flash, perspective, view, skin_model, pLwc->test_player_skin_time * 5, 1, 0);
+		1, 1, 1, 1, flash, perspective, view, skin_model, pLwc->test_player_skin_time * 5, 1, (float)LWDEG2RAD(45));
 }
 
 void render_path_query_test_player(const LWCONTEXT* pLwc, mat4x4 perspective, mat4x4 view) {

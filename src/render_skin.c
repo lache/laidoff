@@ -238,7 +238,7 @@ void render_yaw_skin(const LWCONTEXT* pLwc,
 	for (int i = 0; i < ARRAY_SIZE(bone_q); i++) {
 		quat_identity(bone_q[i]);
 	}
-	vec3 yaw_axis = { 0, 0, 1 };
+	vec3 yaw_axis = { 0, 1, 0 };
 	quat_rotate(bone_q[1], yaw, yaw_axis);
 	render_paramed_skin(pLwc, tex_index, lvt, action, armature, alpha_multiplier, or , og, ob, oratio, proj, view, model, skin_time, loop, bone_q);
 }
