@@ -146,7 +146,6 @@ void render_debug_sphere(const LWCONTEXT* pLwc, GLuint tex_id, const mat4x4 pers
 	);
 }
 
-
 void render_guntower(const LWCONTEXT* pLwc, mat4x4 perspective, mat4x4 view, float x, float y) {
 	const float path_query_test_player_pos[] = { x, y, 0 };
 	const float skin_scale_f = 0.5f;

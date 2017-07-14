@@ -3,6 +3,7 @@
 #include "render_solid.h"
 #include "laidoff.h"
 #include "lwlog.h"
+#include <assert.h>
 
 static void render_ground(const LWCONTEXT* pLwc, const mat4x4 view, const mat4x4 proj) {
 	int shader_index = LWST_DEFAULT;
@@ -85,19 +86,18 @@ void lwc_render_skin(const struct _LWCONTEXT* pLwc) {
 	glEnable(GL_DEPTH_TEST);
 }
 
+// MAX_BONE should match with shader code
+#define MAX_BONE (40)
 
-void render_skin(const LWCONTEXT* pLwc,
+void render_paramed_skin(const LWCONTEXT* pLwc,
 	GLuint tex_index,
 	enum _LW_SKIN_VBO_TYPE lvt,
 	const struct _LWANIMACTION* action,
 	const struct _LWARMATURE* armature,
 	float alpha_multiplier, float or , float og, float ob, float oratio,
-	const mat4x4 proj, const mat4x4 view, const mat4x4 model, double skin_time, int loop) {
+	const mat4x4 proj, const mat4x4 view, const mat4x4 model, double skin_time, int loop, quat* bone_q) {
 
 	int shader_index = LWST_SKIN;
-
-	// MAX_BONE should be matched with a shader code
-#define MAX_BONE (40)
 
 	if (armature->count > MAX_BONE) {
 		LOGE("Armature bone count (=%d) exceeding the supported bone count(=%d)!", armature->count, MAX_BONE);
@@ -105,11 +105,7 @@ void render_skin(const LWCONTEXT* pLwc,
 	}
 
 	vec3 bone_trans[MAX_BONE] = { 0, };
-	quat bone_q[MAX_BONE];
-	for (int i = 0; i < ARRAY_SIZE(bone_q); i++) {
-		quat_identity(bone_q[i]);
-	}
-
+	
 	float f = (float)(skin_time * action->fps);
 	f = loop ? fmodf(f, action->last_key_f) : LWMIN(f, action->last_key_f);
 
@@ -127,10 +123,11 @@ void render_skin(const LWCONTEXT* pLwc,
 		}
 
 		if (curve->anim_curve_type == LACT_ROTATION_QUATERNION) {
-			// Anim curve saved in w, x, y, z order, but client needs x, y, z, w order.
-			get_curve_value(anim_key, curve->key_num, f, &bone_q[bi][(ci + 3) % 4]);
+			// Quaternion anim curves are serialized in w, x, y, z order,
+			// but the runtime needs in x, y, z, w order.
+			const int ci_client = (ci + 3) % 4;
+			get_curve_value(anim_key, curve->key_num, f, &bone_q[bi][ci_client]);
 		}
-
 	}
 
 	// Renormalize quaternion since linear interpolation applied by anim curve.
@@ -142,7 +139,8 @@ void render_skin(const LWCONTEXT* pLwc,
 	for (int i = 0; i < armature->count; i++) {
 		mat4x4_identity(bone[i]);
 	}
-
+	// Calculate world transform for each bone at pose state
+	assert(armature->parent_index[0] == -1);
 	mat4x4 bone_unmod_world[MAX_BONE];
 	for (int i = 0; i < armature->count; i++) {
 		if (armature->parent_index[i] >= 0) {
@@ -155,7 +153,8 @@ void render_skin(const LWCONTEXT* pLwc,
 	for (int i = 0; i < armature->count; i++) {
 		mat4x4 bone_mat_anim_trans;
 
-		// Connected bones should not have their own translation.
+		// Connected bones should not have their own translation
+		// even if bone_trans[i] seemed to have reasonable values
 		if (armature->use_connect[i]) {
 			mat4x4_identity(bone_mat_anim_trans);
 		} else {
@@ -168,8 +167,7 @@ void render_skin(const LWCONTEXT* pLwc,
 		mat4x4 bone_unmod_world_inv;
 		mat4x4_invert(bone_unmod_world_inv, bone_unmod_world[i]);
 
-		mat4x4 trans_bone_to_origin, trans_bone_to_its_position;
-		mat4x4_translate(trans_bone_to_origin, -bone_unmod_world[i][3][0], -bone_unmod_world[i][3][1], -bone_unmod_world[i][3][2]);
+		mat4x4 trans_bone_to_its_position;
 		mat4x4_translate(trans_bone_to_its_position, bone_unmod_world[i][3][0], bone_unmod_world[i][3][1], bone_unmod_world[i][3][2]);
 
 		mat4x4_identity(bone[i]);
@@ -210,6 +208,24 @@ void render_skin(const LWCONTEXT* pLwc,
 
 	glActiveTexture(GL_TEXTURE0);
 }
+
+
+void render_skin(const LWCONTEXT* pLwc,
+	GLuint tex_index,
+	enum _LW_SKIN_VBO_TYPE lvt,
+	const struct _LWANIMACTION* action,
+	const struct _LWARMATURE* armature,
+	float alpha_multiplier, float or , float og, float ob, float oratio,
+	const mat4x4 proj, const mat4x4 view, const mat4x4 model, double skin_time, int loop) {
+
+	quat bone_q[MAX_BONE];
+	for (int i = 0; i < ARRAY_SIZE(bone_q); i++) {
+		quat_identity(bone_q[i]);
+	}
+
+	render_paramed_skin(pLwc, tex_index, lvt, action, armature, alpha_multiplier, or , og, ob, oratio, proj, view, model, skin_time, loop, bone_q);
+}
+
 
 void render_skin_ui(const LWCONTEXT* pLwc,
 	float x, float y, float scale,
