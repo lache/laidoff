@@ -19,3 +19,11 @@ void render_skin(const LWCONTEXT* pLwc,
 	const struct _LWARMATURE* armature,
 	float alpha_multiplier, float or , float og, float ob, float oratio,
 	const mat4x4 proj, const mat4x4 view, const mat4x4 model, double skin_time, int loop);
+
+void render_yaw_skin(const LWCONTEXT* pLwc,
+	GLuint tex_index,
+	enum _LW_SKIN_VBO_TYPE lvt,
+	const struct _LWANIMACTION* action,
+	const struct _LWARMATURE* armature,
+	float alpha_multiplier, float or , float og, float ob, float oratio,
+	const mat4x4 proj, const mat4x4 view, const mat4x4 model, double skin_time, int loop, float yaw);

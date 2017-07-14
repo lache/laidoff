@@ -158,7 +158,7 @@ void render_guntower(const LWCONTEXT* pLwc, mat4x4 perspective, mat4x4 view, flo
 	mat4x4_scale_aniso(skin_scale, skin_scale, skin_scale_f, skin_scale_f, skin_scale_f);
 	mat4x4 skin_rot;
 	mat4x4_identity(skin_rot);
-	mat4x4_rotate_Z(skin_rot, skin_rot, field_path_query_test_player_rot(pLwc->field) + (float)LWDEG2RAD(90));
+	mat4x4_rotate_Z(skin_rot, skin_rot, 0);
 
 	mat4x4 skin_model;
 	mat4x4_identity(skin_model);
@@ -168,12 +168,12 @@ void render_guntower(const LWCONTEXT* pLwc, mat4x4 perspective, mat4x4 view, flo
 
 	const float flash = 0;
 
-	render_skin(pLwc,
+	render_yaw_skin(pLwc,
 		pLwc->tex_atlas[LAE_GUNTOWER_KTX],
 		LSVT_GUNTOWER,
 		&pLwc->action[LWAC_RECOIL],
 		&pLwc->armature[LWAR_GUNTOWER_ARMATURE],
-		1, 1, 1, 1, flash, perspective, view, skin_model, pLwc->test_player_skin_time * 5, 1);
+		1, 1, 1, 1, flash, perspective, view, skin_model, pLwc->test_player_skin_time * 5, 1, 0);
 }
 
 void render_path_query_test_player(const LWCONTEXT* pLwc, mat4x4 perspective, mat4x4 view) {
