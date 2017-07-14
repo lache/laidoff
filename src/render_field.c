@@ -168,12 +168,17 @@ void render_guntower(const LWCONTEXT* pLwc, mat4x4 perspective, mat4x4 view, flo
 
 	const float flash = 0;
 
+	float player_x = 0, player_y = 0, player_z = 0;
+	get_field_player_position(pLwc->field, &player_x, &player_y, &player_z);
+
+	float a = atan2f(player_y - y, player_x - x);
+
 	render_yaw_skin(pLwc,
 		pLwc->tex_atlas[LAE_GUNTOWER_KTX],
 		LSVT_GUNTOWER,
 		&pLwc->action[LWAC_RECOIL],
 		&pLwc->armature[LWAR_GUNTOWER_ARMATURE],
-		1, 1, 1, 1, flash, perspective, view, skin_model, pLwc->test_player_skin_time * 5, 1, (float)LWDEG2RAD(45));
+		1, 1, 1, 1, flash, perspective, view, skin_model, pLwc->test_player_skin_time * 5, 1, a);
 }
 
 void render_path_query_test_player(const LWCONTEXT* pLwc, mat4x4 perspective, mat4x4 view) {
