@@ -11,6 +11,7 @@
 #include "ps.h"
 #include "render_ps.h"
 #include "nav.h"
+#include "script.h"
 
 static void render_field_object_rot(const LWCONTEXT* pLwc, int vbo_index, GLuint tex_id, const mat4x4 view, const mat4x4 proj, float x, float y, float z, float sx, float sy, float sz, float alpha_multiplier, int mipmap, const mat4x4 rot) {
 	int shader_index = LWST_DEFAULT;
@@ -146,7 +147,7 @@ void render_debug_sphere(const LWCONTEXT* pLwc, GLuint tex_id, const mat4x4 pers
 	);
 }
 
-void render_guntower(const LWCONTEXT* pLwc, mat4x4 perspective, mat4x4 view, float x, float y) {
+void render_guntower_yaw(const LWCONTEXT* pLwc, mat4x4 perspective, mat4x4 view, float x, float y, float yaw) {
 	const float path_query_test_player_pos[] = { x, y, 0 };
 	const float skin_scale_f = 0.5f;
 
@@ -167,18 +168,23 @@ void render_guntower(const LWCONTEXT* pLwc, mat4x4 perspective, mat4x4 view, flo
 	mat4x4_mul(skin_model, skin_trans, skin_model);
 
 	const float flash = 0;
+	
+	render_yaw_skin(pLwc,
+		pLwc->tex_atlas[LAE_GUNTOWER_KTX],
+		LSVT_GUNTOWER,
+		&pLwc->action[LWAC_RECOIL],
+		&pLwc->armature[LWAR_GUNTOWER_ARMATURE],
+		1, 1, 1, 1, flash, perspective, view, skin_model, pLwc->test_player_skin_time * 5, 1, yaw);
+}
+
+void render_guntower(const LWCONTEXT* pLwc, mat4x4 perspective, mat4x4 view, float x, float y) {
 
 	float player_x = 0, player_y = 0, player_z = 0;
 	get_field_player_position(pLwc->field, &player_x, &player_y, &player_z);
 
 	float a = atan2f(player_y - y, player_x - x);
 
-	render_yaw_skin(pLwc,
-		pLwc->tex_atlas[LAE_GUNTOWER_KTX],
-		LSVT_GUNTOWER,
-		&pLwc->action[LWAC_RECOIL],
-		&pLwc->armature[LWAR_GUNTOWER_ARMATURE],
-		1, 1, 1, 1, flash, perspective, view, skin_model, pLwc->test_player_skin_time * 5, 1, a);
+	render_guntower_yaw(pLwc, perspective, view, x, y, a);
 }
 
 void render_path_query_test_player(const LWCONTEXT* pLwc, mat4x4 perspective, mat4x4 view) {
@@ -337,6 +343,41 @@ static void s_render_field_sphere(const LWCONTEXT* pLwc, struct _LWFIELD* const 
 	}
 }
 
+void render_command(const LWCONTEXT* pLwc, mat4x4 view, mat4x4 perspective) {
+	const LWFIELDRENDERCOMMAND* rc = script_render_command();
+	int rc_len = script_render_command_length();
+	for (int i = 0; i < rc_len; i++) {
+		if (rc[i].objtype == 1) {
+			render_guntower_yaw(pLwc, perspective, view, rc[i].x, rc[i].y, rc[i].angle);
+		} else {
+			const float s_x = 1.5f;
+			const float s_y = 4.0f;
+			const float s_z = 4.0f;
+			mat4x4 rot, iden;
+			mat4x4_identity(rot);
+			mat4x4_identity(iden);
+			mat4x4_rotate_Z(rot, iden, rc[i].angle);
+			vec3 pos = { rc[i].x, rc[i].y, 0 };
+			render_field_object_rot(
+				pLwc,
+				LVT_BEAM,
+				pLwc->tex_atlas[LAE_BEAM_KTX],
+				view,
+				perspective,
+				pos[0],
+				pos[1],
+				pos[2],
+				s_x,
+				s_y,
+				s_z,
+				1,
+				0,
+				rot
+			);
+		}
+	}
+}
+
 void lwc_render_field(const LWCONTEXT* pLwc) {
 	glViewport(0, 0, pLwc->width, pLwc->height);
 	lw_clear_color();
@@ -472,6 +513,8 @@ void lwc_render_field(const LWCONTEXT* pLwc) {
 	mq_unlock_mutex(pLwc->mq);
 
 	render_path_query_test_player(pLwc, perspective, view);
+
+	render_command(pLwc, view, perspective);
 
 	//render_guntower(pLwc, perspective, view);
 

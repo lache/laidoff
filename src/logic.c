@@ -66,6 +66,7 @@ typedef enum _LW_MSG {
 	LM_ZERO,
 	LM_LWMSGINITFIELD,
 	LM_LWMSGRESETRUNTIMECONTEXT,
+	LM_LWMSGRELOADSCRIPT,
 } LW_MSG;
 
 typedef struct _LWMSGINITFIELD {
@@ -81,6 +82,10 @@ typedef struct _LWMSGINITFIELD {
 typedef struct _LWMSGRESETRUNTIMECONTEXT {
 	LW_MSG type;
 } LWMSGRESETRUNTIMECONTEXT;
+
+typedef struct _LWMSGRELOADSCRIPT {
+	LW_MSG type;
+} LWMSGRELOADSCRIPT;
 
 void load_field_1_init_runtime_data_async(LWCONTEXT *pLwc, zactor_t* actor) {
 	pLwc->next_game_scene = LGS_FIELD;
@@ -594,6 +599,7 @@ static int loop_pipe_reader(zloop_t* loop, zsock_t* pipe, void* args) {
 			while (lwcontext_rendering(pLwc)) {}
 
 			reset_runtime_context(pLwc);
+		} else if (d && s == sizeof(LWMSGRELOADSCRIPT) && *(int*)d == LM_LWMSGRELOADSCRIPT) {
 		} else {
 			abort();
 		}

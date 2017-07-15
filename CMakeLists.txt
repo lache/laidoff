@@ -99,6 +99,8 @@ if (WIN32)
 		win32/lwxaudio2.cpp
 		win32/lwxaudio2.h
 		win32/net.c
+		win32/scriptwatch.h
+		win32/scriptwatch.c
 		)
 elseif (APPLE)
     set(ICON osx/laidoff.icns)

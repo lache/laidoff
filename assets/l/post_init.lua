@@ -14,6 +14,49 @@ package.loaded.testmod = nil
 tm = require('testmod')
 print('testmod.foo()', tm.foo())
 
+-- Always reload test module by clearing the previous loaded instance
+package.loaded.bullet = nil
+require('bullet')
+
+-- Always reload field module
+package.loaded.field = nil
+local Field = require('field')
+print('Field loaded!')
+local field = Field:new('test field')
+local field2 = Field:new('test field another')
+field:test()
+field2:test(0)
+field:start_updating()
+-- Always reload guntower module
+package.loaded.guntower = nil
+local Guntower = require('guntower')
+print('Guntower loaded! ^__^')
+local Faction1 = 1
+local Faction2 = 2
+
+local guntower1 = Guntower:new('gt1', 0, 0)
+--print(inspect(guntower1))
+--guntower1:test()
+field:spawn(guntower1, Faction1)
+guntower1:start_thinking()
+
+start_coro(function()
+	local idx = 1
+	while true do
+		local guntower2 = Guntower:new('gt-enemy-'..idx, math.random(-10, 10), math.random(-10, 0))
+		idx = idx + 1
+		--guntower2:test()
+		--print(inspect(guntower2))
+		field:spawn(guntower2, Faction2)
+		yield_wait_ms(3 * 1000)
+	end
+end)
+
+--field:despawn(guntower1)
+--field:despawn(guntower2)
+
+
+
 function foo()
   print("foo", 1)
   coroutine.yield('yielded value')
@@ -33,7 +76,7 @@ print(coroutine.resume(co))
 tm.testcoro()
 
 start_coro(function ()
-    for i=1,100 do
+    for i=1,4 do
       lo.show_sys_msg(c.def_sys_msg, 'hello ' .. i)
       yield_wait_ms(1000)
     end
@@ -47,6 +90,7 @@ start_coro(function ()
     lo.show_sys_msg(c.def_sys_msg, 'hello x 2')
     yield_wait_ms(1000)
     lo.show_sys_msg(c.def_sys_msg, 'hello x 3')
+	
     -- Collect garbage forcefully
     collectgarbage()
     print('Garbage collected.')

@@ -5,6 +5,9 @@
 #include "lwdeltatime.h"
 #include "lwtimepoint.h"
 #include "lwlog.h"
+#if LW_PLATFORM_WIN32
+#include "scriptwatch.h"
+#endif
 
 #ifndef BOOL
 #define BOOL int
@@ -158,6 +161,11 @@ int main(void)
 	glfwSetWindowUserPointer(window, pLwc);
 
 	lwc_start_logic_thread(pLwc);
+
+#if LW_PLATFORM_WIN32
+	lwc_start_scriptwatch_thread(pLwc);
+#endif
+	
 
 	while (!glfwWindowShouldClose(window))
 	{

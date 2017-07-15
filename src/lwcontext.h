@@ -263,6 +263,8 @@ typedef struct _LWCONTEXT {
 	int quit_request;
 	// CZMQ actor for logic thread
 	void* logic_actor;
+	// CZMQ actor for script watch thread (win32 dev only)
+	void* scriptwatch_actor;
 	// Particle system buffer (rose)
 	GLuint particle_buffer;
 	// Particle system buffer (explosion)
