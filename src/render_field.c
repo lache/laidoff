@@ -350,14 +350,14 @@ void render_command(const LWCONTEXT* pLwc, mat4x4 view, mat4x4 perspective) {
 		if (rc[i].objtype == 1) {
 			render_guntower_yaw(pLwc, perspective, view, rc[i].x, rc[i].y, rc[i].angle);
 		} else {
-			const float s_x = 1.5f;
+			const float s_x = 3.0f;
 			const float s_y = 4.0f;
 			const float s_z = 4.0f;
 			mat4x4 rot, iden;
 			mat4x4_identity(rot);
 			mat4x4_identity(iden);
 			mat4x4_rotate_Z(rot, iden, rc[i].angle);
-			vec3 pos = { rc[i].x, rc[i].y, 0 };
+			vec3 pos = { rc[i].x, rc[i].y, 1.548f / 2 };
 			render_field_object_rot(
 				pLwc,
 				LVT_BEAM,

@@ -40,15 +40,27 @@ local guntower1 = Guntower:new('gt1', 0, 0)
 field:spawn(guntower1, Faction1)
 guntower1:start_thinking()
 
+local guntower2 = Guntower:new('gt1', 10, 3)
+--print(inspect(guntower1))
+--guntower1:test()
+field:spawn(guntower2, Faction1)
+guntower2:start_thinking()
+
+local guntower2 = Guntower:new('gt1', -10, 3)
+--print(inspect(guntower1))
+--guntower1:test()
+field:spawn(guntower2, Faction1)
+guntower2:start_thinking()
+
 start_coro(function()
 	local idx = 1
 	while true do
-		local guntower2 = Guntower:new('gt-enemy-'..idx, math.random(-10, 10), math.random(-10, 0))
+		local guntower2 = Guntower:new('gt-enemy-'..idx, math.random(-10, 10), math.random(-13, -3))
 		idx = idx + 1
 		--guntower2:test()
 		--print(inspect(guntower2))
 		field:spawn(guntower2, Faction2)
-		yield_wait_ms(3 * 1000)
+		yield_wait_ms(1.5 * 1000)
 	end
 end)
 

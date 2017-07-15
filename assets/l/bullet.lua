@@ -14,7 +14,7 @@ function M:new(name, x, y, angle, speed)
 	o.speed = speed
 	o.age = 0
 	o.max_age = 3
-	o.range = 3
+	o.range = 1
 	o.damage = 50
 	setmetatable(o, self)
 	--print(self, 'bullet spawned')
@@ -30,14 +30,14 @@ function M:update(dt)
 	self.x = self.x + dt * self.speed * math.cos(self.angle)
 	self.y = self.y + dt * self.speed * math.sin(self.angle)
 	self.age = self.age + dt
-	print(self, 'x', self.x, 'y', self.y)
+	--print(self, 'x', self.x, 'y', self.y)
 	if self.age > self.max_age then
 		self.dead_flag = true
 	end
 	local target = self.field:query_nearest_target_in_range(self, self.range)
 	if target then
 		target.hp = target.hp - self.damage
-		print(self, 'target HP reduced to ', target.hp, 'damage', self.damage)
+		--print(self, 'target HP reduced to ', target.hp, 'damage', self.damage)
 		self.dead_flag = true
 	end
 end

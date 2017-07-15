@@ -9,8 +9,8 @@ local M = {
 	angle = 0, -- current angle
 	targetangle = 0, -- target angle
 	firerange = 100, -- fire range
-	firearcangle = 0.01, -- rad
-	bulletspeed = 60,
+	firearcangle = 0.05, -- rad
+	bulletspeed = 30,
 	x = 0, -- x position
 	y = 0, -- y position
 	target = nil, -- current target
@@ -50,7 +50,7 @@ function M:nearest_target_in_range_coro(range)
 	while true do
 		local target = self.field:query_nearest_target_in_range(self, range)
 		if target == nil then
-			yield_wait_ms(500)
+			yield_wait_ms(100)
 		else
 			return target
 		end
@@ -59,7 +59,7 @@ end
 
 function M:play_fire_anim()
 	--play_skin_anim(self, 'Recoil')
-	print(self, 'play Recoil anim')
+	--print(self, 'play Recoil anim')
 end
 
 function M:bullet_spawn_pos()

@@ -25,13 +25,13 @@ function M:spawn(obj, faction)
 	obj.key = #self.objs
 	obj.faction = faction
 	obj.field = self
-	print(self, 'Spawn', obj, 'key', obj.key, 'faction', obj.faction)
+	--print(self, 'Spawn', obj, 'key', obj.key, 'faction', obj.faction)
 end
 
 function M:despawn(obj)
 	self.objs[obj.key] = 'dead'
 	obj.field = nil
-	print(self, 'Despawn', obj, 'key', obj.key, 'faction', obj.faction)
+	--print(self, 'Despawn', obj, 'key', obj.key, 'faction', obj.faction)
 end
 
 function M:query_nearest_target_in_range(caller, range)
