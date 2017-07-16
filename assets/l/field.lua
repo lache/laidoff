@@ -55,7 +55,7 @@ function M:query_nearest_target_in_range(caller, range)
 end
 
 function M:time()
-	return os.clock()
+	return lo.lwtimepoint_now_seconds()
 end
 
 function M:start_updating()
