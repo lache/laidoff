@@ -95,6 +95,7 @@ void lw_app_quit(LWCONTEXT *pLwc);
 unsigned long hash(const unsigned char *str);
 void reset_battle_context(LWCONTEXT* pLwc);
 void lwc_start_logic_thread(LWCONTEXT* pLwc);
+void delete_all_rmsgs(LWCONTEXT* pLwc);
 
 extern const float default_uv_offset[2];
 extern const float default_uv_scale[2];

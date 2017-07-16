@@ -89,6 +89,7 @@
 #include "battle.h"
 #include "battle_result.h"
 #include "battlelogic.h"
+#include "rmsg.h"
 
 #ifdef WIN32
 #pragma warning(pop)
@@ -181,3 +182,4 @@
 %include "battle.h"
 %include "battle_result.h"
 %include "battlelogic.h"
+%include "rmsg.h"

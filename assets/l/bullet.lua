@@ -3,6 +3,7 @@ local M = {
 	objtype = 2,
 }
 M.__index = M
+local c = lo.script_context()
 
 function M:new(name, x, y, angle, speed)
 	o = {}
@@ -29,6 +30,8 @@ function M:update(dt)
 	--print(self, 'update')
 	self.x = self.x + dt * self.speed * math.cos(self.angle)
 	self.y = self.y + dt * self.speed * math.sin(self.angle)
+	lo.rmsg_pos(c, self.key, self.x, self.y)
+	
 	self.age = self.age + dt
 	--print(self, 'x', self.x, 'y', self.y)
 	if self.age > self.max_age then

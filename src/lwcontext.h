@@ -16,13 +16,16 @@
 #include "lwgamescene.h"
 #include "lwanim.h"
 #include "lwtouchproc.h"
-#include "lwbox2dcollider.h"
-#include "lwfieldobject.h"
+//#include "lwbox2dcollider.h"
+//#include "lwfieldobject.h"
 #include "lwfbo.h"
 #include "lwtrail.h"
 #include "armature.h"
 #include "playersm.h"
 #include "lwdeltatime.h"
+#include "lwfieldrendercommand.h"
+
+#define MAX_RENDER_QUEUE_CAPACITY (512)
 
 typedef enum _LW_SHADER_TYPE {
 	LWST_DEFAULT,
@@ -275,6 +278,8 @@ typedef struct _LWCONTEXT {
 	volatile int safe_to_start_render;
 	// 1 if rendering in progress, 0 if otherwise
 	volatile int rendering;
+
+	LWFIELDRENDERCOMMAND render_command[MAX_RENDER_QUEUE_CAPACITY];
 } LWCONTEXT;
 
 #ifdef __cplusplus
@@ -285,6 +290,7 @@ int lwcontext_safe_to_start_render(const LWCONTEXT* pLwc);
 void lwcontext_set_safe_to_start_render(LWCONTEXT* pLwc, int v);
 int lwcontext_rendering(const LWCONTEXT* pLwc);
 void lwcontext_set_rendering(LWCONTEXT* pLwc, int v);
+void* lwcontext_mq(LWCONTEXT* pLwc);
 #ifdef __cplusplus
 };
 #endif

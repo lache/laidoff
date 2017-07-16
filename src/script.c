@@ -244,90 +244,6 @@ int l_load_module(lua_State* L) {
 	return 0;
 }
 
-static volatile int s_current_rendering_queue_index = 0;
-static volatile int s_current_pushing_queue_index = 0;
-#define MAX_RENDER_QUEUE_COUNT (3)
-#define MAX_RENDER_QUEUE_CAPACITY (1024)
-static LWFIELDRENDERCOMMAND s_render_queue[MAX_RENDER_QUEUE_COUNT][MAX_RENDER_QUEUE_CAPACITY];
-static int s_render_queue_length[MAX_RENDER_QUEUE_COUNT];
-static int s_render_frame_number[MAX_RENDER_QUEUE_COUNT];
-
-const LWFIELDRENDERCOMMAND* script_render_command() {
-	s_current_rendering_queue_index = (s_current_rendering_queue_index + 1) % MAX_RENDER_QUEUE_COUNT;
-	if (s_current_rendering_queue_index == s_current_pushing_queue_index) {
-		s_current_rendering_queue_index = (s_current_rendering_queue_index + 1) % MAX_RENDER_QUEUE_COUNT;
-	}
-	return s_render_queue[s_current_rendering_queue_index];
-}
-
-int script_render_command_length() {
-	return s_render_queue_length[s_current_rendering_queue_index];
-}
-
-int l_render_queue_new(lua_State* L) {
-	if (lua_gettop(L) >= 0) {
-		LWCONTEXT* pLwc = lua_touserdata(L, lua_upvalueindex(1));
-		int prev_queue_index = s_current_pushing_queue_index;
-		s_current_pushing_queue_index = (s_current_pushing_queue_index + 1) % MAX_RENDER_QUEUE_COUNT;
-		if (s_current_pushing_queue_index == s_current_rendering_queue_index) {
-			s_current_pushing_queue_index = (s_current_pushing_queue_index + 1) % MAX_RENDER_QUEUE_COUNT;
-		}
-		s_render_frame_number[s_current_pushing_queue_index] = s_render_frame_number[prev_queue_index] + 1;
-		s_render_queue_length[s_current_pushing_queue_index] = 0;
-		int r = 0;
-		lua_pushinteger(L, r);
-	}
-	return 1;
-}
-
-int l_render_queue_push(lua_State* L) {
-	if (lua_gettop(L) >= 4) {
-		LWCONTEXT* pLwc = lua_touserdata(L, lua_upvalueindex(1));
-		int objtype = (int)lua_tonumber(L, 1);
-		float x = (float)lua_tonumber(L, 2);
-		float y = (float)lua_tonumber(L, 3);
-		float angle = (float)lua_tonumber(L, 4);
-		int queue_len = s_render_queue_length[s_current_pushing_queue_index];
-		if (queue_len >= MAX_RENDER_QUEUE_CAPACITY) {
-			LOGE("Render queue capacity exceeded.");
-		} else {
-			LWFIELDRENDERCOMMAND* cmd = &s_render_queue[s_current_pushing_queue_index][queue_len];
-			cmd->objtype = objtype;
-			cmd->x = x;
-			cmd->y = y;
-			cmd->angle = angle;
-			s_render_queue_length[s_current_pushing_queue_index]++;
-			// Send render message
-			zmq_msg_t rmsg;
-			zmq_msg_init_size(&rmsg, sizeof(LWFIELDRENDERCOMMAND));
-			memcpy(zmq_msg_data(&rmsg), cmd, sizeof(LWFIELDRENDERCOMMAND));
-			zmq_msg_send(&rmsg, mq_rmsg_writer(pLwc->mq), 0);
-			zmq_msg_close(&rmsg);
-		}
-		// Set return value for lua side
-		int r = 0;
-		lua_pushinteger(L, r);
-	}
-	return 1;
-}
-
-int l_render_queue_finalize(lua_State* L) {
-	if (lua_gettop(L) >= 0) {
-		LWCONTEXT* pLwc = lua_touserdata(L, lua_upvalueindex(1));
-		// Send render message
-		zmq_msg_t rmsg;
-		zmq_msg_init_size(&rmsg, sizeof(LWFIELDRENDERCOMMAND));
-		LWFIELDRENDERCOMMAND* cmd = zmq_msg_data(&rmsg);
-		cmd->objtype = -1;
-		zmq_msg_send(&rmsg, mq_rmsg_writer(pLwc->mq), 0);
-		zmq_msg_close(&rmsg);
-		// Set return value for lua side
-		int r = 0;
-		lua_pushinteger(L, r);
-	}
-	return 1;
-}
-
 static int coro_gc(lua_State* L) {
 	puts("__gc called");
 	return 0;
@@ -382,17 +298,6 @@ void init_lua(LWCONTEXT* pLwc)
 	lua_register(L, "spawn_oil_truck", l_spawn_oil_truck);
 	// load_module
 	lua_register(L, "load_module", l_load_module);
-	// render queue commands
-	// (1)
-	lua_register(L, "render_queue_new", l_render_queue_new);
-	// (2)
-	lua_pushlightuserdata(L, pLwc);
-	lua_pushcclosure(L, l_render_queue_push, 1);
-	lua_setglobal(L, "render_queue_push");
-	// (3)
-	lua_pushlightuserdata(L, pLwc);
-	lua_pushcclosure(L, l_render_queue_finalize, 1);
-	lua_setglobal(L, "render_queue_finalize");
 	// 'pLwc'
 	lua_pushlightuserdata(L, pLwc);
 	lua_setglobal(L, "pLwc");

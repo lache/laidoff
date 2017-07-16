@@ -12,6 +12,7 @@
 #include "render_ps.h"
 #include "nav.h"
 #include "script.h"
+#include "lwfieldobject.h"
 
 static void render_field_object_rot(const LWCONTEXT* pLwc, int vbo_index, GLuint tex_id, const mat4x4 view, const mat4x4 proj, float x, float y, float z, float sx, float sy, float sz, float alpha_multiplier, int mipmap, const mat4x4 rot) {
 	int shader_index = LWST_DEFAULT;
@@ -344,11 +345,13 @@ static void s_render_field_sphere(const LWCONTEXT* pLwc, struct _LWFIELD* const 
 }
 
 void render_command(const LWCONTEXT* pLwc, mat4x4 view, mat4x4 perspective) {
-	const LWFIELDRENDERCOMMAND* rc = script_render_command();
-	int rc_len = script_render_command_length();
-	for (int i = 0; i < rc_len; i++) {
-		if (rc[i].objtype == 1) {
-			render_guntower_yaw(pLwc, perspective, view, rc[i].x, rc[i].y, rc[i].angle);
+	for (int i = 0; i < MAX_RENDER_QUEUE_CAPACITY; i++) {
+		const LWFIELDRENDERCOMMAND* cmd = &pLwc->render_command[i];
+		if (cmd->key == 0) {
+			continue;
+		}
+		if (cmd->objtype == 1) {
+			render_guntower_yaw(pLwc, perspective, view, cmd->x, cmd->y, cmd->angle);
 		} else {
 			const float s_x = 3.0f;
 			const float s_y = 4.0f;
@@ -356,8 +359,8 @@ void render_command(const LWCONTEXT* pLwc, mat4x4 view, mat4x4 perspective) {
 			mat4x4 rot, iden;
 			mat4x4_identity(rot);
 			mat4x4_identity(iden);
-			mat4x4_rotate_Z(rot, iden, rc[i].angle);
-			vec3 pos = { rc[i].x, rc[i].y, 1.548f / 2 };
+			mat4x4_rotate_Z(rot, iden, cmd->angle);
+			vec3 pos = { cmd->x, cmd->y, 1.548f / 2 };
 			render_field_object_rot(
 				pLwc,
 				LVT_BEAM,

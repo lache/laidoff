@@ -17,6 +17,8 @@
 #include "pcg_basic.h"
 #include "ps.h"
 #include "logic.h"
+#include "lwfieldobject.h"
+#include "lwbox2dcollider.h"
 
 #define MAX_BOX_GEOM (100)
 #define MAX_RAY_RESULT_COUNT (10)

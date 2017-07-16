@@ -16,6 +16,7 @@
 #include "ps.h"
 #include "script.h"
 #include "nav.h"
+#include "laidoff.h"
 
 void toggle_font_texture_test_mode(LWCONTEXT* pLwc);
 
@@ -387,6 +388,10 @@ void reset_field_context(LWCONTEXT* pLwc) {
 	pLwc->player_pos_y = 0;
 	// Reset nav context
 	reset_nav_context(nav);
+	// Delete all pending render messages
+	delete_all_rmsgs(pLwc);
+	// Clear render command
+	memset(pLwc->render_command, 0, sizeof(pLwc->render_command));
 }
 
 void toggle_ray_test(LWCONTEXT *pLwc) {

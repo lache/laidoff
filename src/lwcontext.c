@@ -24,3 +24,7 @@ int lwcontext_rendering(const LWCONTEXT* pLwc) {
 void lwcontext_set_rendering(LWCONTEXT* pLwc, int v) {
 	pLwc->rendering = v;
 }
+
+void* lwcontext_mq(LWCONTEXT* pLwc) {
+	return pLwc->mq;
+}

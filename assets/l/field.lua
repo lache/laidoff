@@ -3,6 +3,7 @@ local M = {
 	objs = {}
 }
 M.__index = M
+local c = lo.script_context()
 
 function M:new(name)
 	o = {}
@@ -26,12 +27,17 @@ function M:spawn(obj, faction)
 	obj.faction = faction
 	obj.field = self
 	--print(self, 'Spawn', obj, 'key', obj.key, 'faction', obj.faction)
+	
+	lo.rmsg_spawn(c, obj.key, obj.objtype, obj.x, obj.y, obj.angle)
+	
 end
 
 function M:despawn(obj)
 	self.objs[obj.key] = 'dead'
 	obj.field = nil
 	--print(self, 'Despawn', obj, 'key', obj.key, 'faction', obj.faction)
+	
+	lo.rmsg_despawn(c, obj.key)
 end
 
 function M:query_nearest_target_in_range(caller, range)
@@ -76,15 +82,12 @@ function M:update(dt)
 		end
 	end
 	-- call update
-	render_queue_new()
 	for k,v in pairs(self.objs) do
 		local obj = v.obj
 		if obj and obj ~= 'dead' then
 			obj:update(dt)
-			render_queue_push(obj.objtype, obj.x, obj.y, obj.angle)
 		end
 	end
-	render_queue_finalize()
 end
 
 return M

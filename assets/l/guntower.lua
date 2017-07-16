@@ -17,6 +17,7 @@ local M = {
 	hp = 100,
 }
 M.__index = M
+local c = lo.script_context()
 
 function M:new(name, x, y)
 	o = {}
@@ -60,6 +61,7 @@ end
 function M:play_fire_anim()
 	--play_skin_anim(self, 'Recoil')
 	--print(self, 'play Recoil anim')
+	lo.rmsg_anim(c, self.key, 0)
 end
 
 function M:bullet_spawn_pos()
@@ -92,6 +94,9 @@ function M:turn_barrel(target)
 	local angle_diff = self.targetangle - self.angle
 	local move_angle = angle_diff * self.turnspeed * self.field.dt
 	self.angle = self.angle + move_angle;
+	
+	lo.rmsg_turn(c, self.key, self.angle)
+	
 	if math.abs(self.angle - self.targetangle) < self.firearcangle then
 		return true
 	else

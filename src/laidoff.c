@@ -847,30 +847,107 @@ void render_stat(const LWCONTEXT* pLwc) {
 	render_text_block(pLwc, &text_block);
 }
 
-static void read_all_rmsgs(const LWCONTEXT* pLwc) {
+void handle_rmsg_spawn(LWCONTEXT* pLwc, const LWFIELDRENDERCOMMAND* cmd) {
+	for (int i = 0; i < MAX_RENDER_QUEUE_CAPACITY; i++) {
+		if (!pLwc->render_command[i].key) {
+			pLwc->render_command[i] = *cmd;
+			return;
+		}
+	}
+	LOGE(LWLOGPOS "maximum capacity exceeded");
+	abort();
+}
+
+void handle_rmsg_anim(LWCONTEXT* pLwc, const LWFIELDRENDERCOMMAND* cmd) {
+
+}
+
+void handle_rmsg_despawn(LWCONTEXT* pLwc, const LWFIELDRENDERCOMMAND* cmd) {
+	for (int i = 0; i < MAX_RENDER_QUEUE_CAPACITY; i++) {
+		if (pLwc->render_command[i].key == cmd->key) {
+			pLwc->render_command[i].key = 0;
+			return;
+		}
+	}
+	LOGE(LWLOGPOS "object key %d not exist", cmd->key);
+	abort();
+}
+
+void handle_rmsg_pos(LWCONTEXT* pLwc, const LWFIELDRENDERCOMMAND* cmd) {
+	for (int i = 0; i < MAX_RENDER_QUEUE_CAPACITY; i++) {
+		if (pLwc->render_command[i].key == cmd->key) {
+			pLwc->render_command[i].x = cmd->x;
+			pLwc->render_command[i].y = cmd->y;
+			return;
+		}
+	}
+	LOGE(LWLOGPOS "object key %d not exist", cmd->key);
+	abort();
+}
+
+void handle_rmsg_turn(LWCONTEXT* pLwc, const LWFIELDRENDERCOMMAND* cmd) {
+	for (int i = 0; i < MAX_RENDER_QUEUE_CAPACITY; i++) {
+		if (pLwc->render_command[i].key == cmd->key) {
+			pLwc->render_command[i].angle = cmd->angle;
+			return;
+		}
+	}
+	LOGE(LWLOGPOS "object key %d not exist", cmd->key);
+	abort();
+}
+
+void delete_all_rmsgs(LWCONTEXT* pLwc) {
+	zmq_msg_t rmsg;
+	while (1) {
+		zmq_msg_init(&rmsg);
+		int rc = zmq_msg_recv(&rmsg, mq_rmsg_reader(pLwc->mq), ZMQ_DONTWAIT);
+		zmq_msg_close(&rmsg);
+		if (rc == -1) {
+			break;
+		}
+	}
+}
+static void read_all_rmsgs(LWCONTEXT* pLwc) {
 	zmq_msg_t rmsg;
 	while (1) {
 		zmq_msg_init(&rmsg);
 		int rc = zmq_msg_recv(&rmsg, mq_rmsg_reader(pLwc->mq), ZMQ_DONTWAIT);
 		if (rc == -1) {
+			zmq_msg_close(&rmsg);
 			break;
 		}
 		// Process command here
 		LWFIELDRENDERCOMMAND* cmd = zmq_msg_data(&rmsg);
-		//printf(".");
+		switch (cmd->cmdtype) {
+		case LRCT_SPAWN:
+			handle_rmsg_spawn(pLwc, cmd);
+			break;
+		case LRCT_ANIM:
+			handle_rmsg_anim(pLwc, cmd);
+			break;
+		case LRCT_DESPAWN:
+			handle_rmsg_despawn(pLwc, cmd);
+			break;
+		case LRCT_POS:
+			handle_rmsg_pos(pLwc, cmd);
+			break;
+		case LRCT_TURN:
+			handle_rmsg_turn(pLwc, cmd);
+			break;
+		}
 		zmq_msg_close(&rmsg);
 	}
 }
 
 void lwc_render(const LWCONTEXT* pLwc) {
-	// Process all render messages
-	read_all_rmsgs(pLwc);
 	// Busy wait for rendering okay sign
 	while (!lwcontext_safe_to_start_render(pLwc)) {}
 	// Set rendering flag to 1 (ignoring const-ness.......)
 	lwcontext_set_rendering((LWCONTEXT*)pLwc, 1);
 	// Tick rendering thread
 	deltatime_tick(pLwc->render_dt);
+	// Process all render messages (ignoring const-ness.......)
+	read_all_rmsgs((LWCONTEXT*)pLwc);
 	// Rendering function w.r.t. game scene dispatched here
 	if (pLwc->game_scene == LGS_BATTLE) {
 		lwc_render_battle(pLwc);
