@@ -2,9 +2,10 @@
 #include "lwgl.h"
 #include "laidoff.h"
 #include "czmq.h"
-#include "lwdeltatime.h"
+//#include "lwdeltatime.h"
 #include "lwtimepoint.h"
 #include "lwlog.h"
+//#include "script.h"
 #if LW_PLATFORM_WIN32
 #include "scriptwatch.h"
 #endif
@@ -165,7 +166,6 @@ int main(void)
 #if LW_PLATFORM_WIN32
 	lwc_start_scriptwatch_thread(pLwc);
 #endif
-	
 
 	while (!glfwWindowShouldClose(window))
 	{

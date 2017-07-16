@@ -5,6 +5,8 @@
 void* init_mq(const char* addr, void* sm);
 void deinit_mq(void* _mq);
 void mq_poll(void* pLwc, void* sm, void* _mq, void* field);
+void* mq_rmsg_reader(void* _mq);
+void* mq_rmsg_writer(void* _mq);
 void mq_shutdown();
 
 typedef struct _LWANIMACTION LWANIMACTION;

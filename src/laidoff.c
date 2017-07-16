@@ -34,6 +34,7 @@
 #include "logic.h"
 #include "ps.h"
 #include "render_ps.h"
+#include "script.h"
 
 #define LW_SUPPORT_ETC1_HARDWARE_DECODING LW_PLATFORM_ANDROID
 #define LW_SUPPORT_VAO (LW_PLATFORM_WIN32 || LW_PLATFORM_OSX)
@@ -846,7 +847,24 @@ void render_stat(const LWCONTEXT* pLwc) {
 	render_text_block(pLwc, &text_block);
 }
 
-void lwc_render(const LWCONTEXT *pLwc) {
+static void read_all_rmsgs(const LWCONTEXT* pLwc) {
+	zmq_msg_t rmsg;
+	while (1) {
+		zmq_msg_init(&rmsg);
+		int rc = zmq_msg_recv(&rmsg, mq_rmsg_reader(pLwc->mq), ZMQ_DONTWAIT);
+		if (rc == -1) {
+			break;
+		}
+		// Process command here
+		LWFIELDRENDERCOMMAND* cmd = zmq_msg_data(&rmsg);
+		//printf(".");
+		zmq_msg_close(&rmsg);
+	}
+}
+
+void lwc_render(const LWCONTEXT* pLwc) {
+	// Process all render messages
+	read_all_rmsgs(pLwc);
 	// Busy wait for rendering okay sign
 	while (!lwcontext_safe_to_start_render(pLwc)) {}
 	// Set rendering flag to 1 (ignoring const-ness.......)

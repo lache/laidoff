@@ -9,6 +9,8 @@
 #include "lwlog.h"
 #include "laidoff.h"
 #include <assert.h>
+#include "zmq.h"
+#include "mq.h"
 
 #define LW_SCRIPT_PREFIX_PATH ASSETS_BASE_PATH "l" PATH_SEPARATOR
 #define LW_MAX_CORO (32)
@@ -295,7 +297,14 @@ int l_render_queue_push(lua_State* L) {
 			cmd->y = y;
 			cmd->angle = angle;
 			s_render_queue_length[s_current_pushing_queue_index]++;
+			// Send render message
+			zmq_msg_t rmsg;
+			zmq_msg_init_size(&rmsg, sizeof(LWFIELDRENDERCOMMAND));
+			memcpy(zmq_msg_data(&rmsg), cmd, sizeof(LWFIELDRENDERCOMMAND));
+			zmq_msg_send(&rmsg, mq_rmsg_writer(pLwc->mq), 0);
+			zmq_msg_close(&rmsg);
 		}
+		// Set return value for lua side
 		int r = 0;
 		lua_pushinteger(L, r);
 	}
@@ -305,6 +314,14 @@ int l_render_queue_push(lua_State* L) {
 int l_render_queue_finalize(lua_State* L) {
 	if (lua_gettop(L) >= 0) {
 		LWCONTEXT* pLwc = lua_touserdata(L, lua_upvalueindex(1));
+		// Send render message
+		zmq_msg_t rmsg;
+		zmq_msg_init_size(&rmsg, sizeof(LWFIELDRENDERCOMMAND));
+		LWFIELDRENDERCOMMAND* cmd = zmq_msg_data(&rmsg);
+		cmd->objtype = -1;
+		zmq_msg_send(&rmsg, mq_rmsg_writer(pLwc->mq), 0);
+		zmq_msg_close(&rmsg);
+		// Set return value for lua side
 		int r = 0;
 		lua_pushinteger(L, r);
 	}
@@ -345,15 +362,15 @@ void init_lua(LWCONTEXT* pLwc)
 	lua_register(L, "ink", l_ink);
 	// spawn_blue_cube_wall
 	lua_register(L, "spawn_blue_cube_wall", l_spawn_blue_cube_wall);
-	// spawn_blue_cube_wall_2
+	// spawn_blue_cube_wall_2 (first upvalue is pLwc)
 	lua_pushlightuserdata(L, pLwc);
 	lua_pushcclosure(L, l_spawn_blue_cube_wall_2, 1);
 	lua_setglobal(L, "spawn_blue_cube_wall_2");
-	// start_coro
+	// start_coro (first upvalue is pLwc)
 	lua_pushlightuserdata(L, pLwc);
 	lua_pushcclosure(L, l_start_coro, 1);
 	lua_setglobal(L, "start_coro");
-	// wait_ms
+	// yield_wait_ms (first upvalue is pLwc)
 	lua_pushlightuserdata(L, pLwc);
 	lua_pushcclosure(L, l_yield_wait_ms, 1);
 	lua_setglobal(L, "yield_wait_ms");
@@ -366,9 +383,16 @@ void init_lua(LWCONTEXT* pLwc)
 	// load_module
 	lua_register(L, "load_module", l_load_module);
 	// render queue commands
+	// (1)
 	lua_register(L, "render_queue_new", l_render_queue_new);
-	lua_register(L, "render_queue_push", l_render_queue_push);
-	lua_register(L, "render_queue_finalize", l_render_queue_finalize);
+	// (2)
+	lua_pushlightuserdata(L, pLwc);
+	lua_pushcclosure(L, l_render_queue_push, 1);
+	lua_setglobal(L, "render_queue_push");
+	// (3)
+	lua_pushlightuserdata(L, pLwc);
+	lua_pushcclosure(L, l_render_queue_finalize, 1);
+	lua_setglobal(L, "render_queue_finalize");
 	// 'pLwc'
 	lua_pushlightuserdata(L, pLwc);
 	lua_setglobal(L, "pLwc");

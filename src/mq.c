@@ -50,6 +50,10 @@ typedef struct _LWMESSAGEQUEUE {
 	int64_t start_req_time_mono;
 	zsys_mutex_t mutex;
 	void* bullet_counter;
+	// Render message pipe writer (PAIR)
+	zsock_t* rmsg_writer;
+	// Render message pipe reader (PAIR)
+	zsock_t* rmsg_reader;
 } LWMESSAGEQUEUE;
 
 #define DELTA_REQ_COUNT (15)
@@ -95,6 +99,8 @@ void* init_mq(const char* addr, void* sm) {
 
 	ZMUTEX_INIT(mq->mutex);
 
+	// Create PAIR socket for render messages
+	mq->rmsg_reader = zsys_create_pipe(&mq->rmsg_writer);
 	return mq;
 }
 
@@ -552,6 +558,8 @@ void deinit_mq(void* _mq) {
 	zsock_destroy(&mq->subscriber);
 	zuuid_destroy(&mq->uuid);
 	ZMUTEX_DESTROY(mq->mutex);
+	zsock_destroy(&mq->rmsg_reader);
+	zsock_destroy(&mq->rmsg_writer);
 	zmq_atomic_counter_destroy(&mq->bullet_counter);
 	mq->state = LMQS_TERM;
 	free(mq);
@@ -627,4 +635,14 @@ void mq_send_despawn_bullet(void* _mq, int bullet_id) {
 	if (mq->verbose) {
 		LOGI(__func__);
 	}
+}
+
+void* mq_rmsg_reader(void* _mq) {
+	LWMESSAGEQUEUE* mq = (LWMESSAGEQUEUE*)_mq;
+	return zsock_resolve(mq->rmsg_reader);
+}
+
+void* mq_rmsg_writer(void* _mq) {
+	LWMESSAGEQUEUE* mq = (LWMESSAGEQUEUE*)_mq;
+	return zsock_resolve(mq->rmsg_writer);
 }
