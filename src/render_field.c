@@ -148,7 +148,7 @@ void render_debug_sphere(const LWCONTEXT* pLwc, GLuint tex_id, const mat4x4 pers
 	);
 }
 
-void render_guntower_yaw(const LWCONTEXT* pLwc, mat4x4 perspective, mat4x4 view, float x, float y, float yaw) {
+void render_guntower_yaw(const LWCONTEXT* pLwc, mat4x4 perspective, mat4x4 view, float x, float y, float yaw, LW_ACTION action, float animtime, int loop) {
 	const float path_query_test_player_pos[] = { x, y, 0 };
 	const float skin_scale_f = 0.5f;
 
@@ -173,19 +173,19 @@ void render_guntower_yaw(const LWCONTEXT* pLwc, mat4x4 perspective, mat4x4 view,
 	render_yaw_skin(pLwc,
 		pLwc->tex_atlas[LAE_GUNTOWER_KTX],
 		LSVT_GUNTOWER,
-		&pLwc->action[LWAC_RECOIL],
+		&pLwc->action[action],
 		&pLwc->armature[LWAR_GUNTOWER_ARMATURE],
-		1, 1, 1, 1, flash, perspective, view, skin_model, pLwc->test_player_skin_time * 5, 1, yaw);
+		1, 1, 1, 1, flash, perspective, view, skin_model, animtime, loop, yaw);
 }
 
-void render_guntower(const LWCONTEXT* pLwc, mat4x4 perspective, mat4x4 view, float x, float y) {
+void render_guntower(const LWCONTEXT* pLwc, mat4x4 perspective, mat4x4 view, float x, float y, LW_ACTION action, float animtime, int loop) {
 
 	float player_x = 0, player_y = 0, player_z = 0;
 	get_field_player_position(pLwc->field, &player_x, &player_y, &player_z);
 
 	float a = atan2f(player_y - y, player_x - x);
 
-	render_guntower_yaw(pLwc, perspective, view, x, y, a);
+	render_guntower_yaw(pLwc, perspective, view, x, y, a, action, animtime, loop);
 }
 
 void render_path_query_test_player(const LWCONTEXT* pLwc, mat4x4 perspective, mat4x4 view) {
@@ -345,13 +345,14 @@ static void s_render_field_sphere(const LWCONTEXT* pLwc, struct _LWFIELD* const 
 }
 
 void render_command(const LWCONTEXT* pLwc, mat4x4 view, mat4x4 perspective) {
+	const double now = lwtimepoint_now_seconds();
 	for (int i = 0; i < MAX_RENDER_QUEUE_CAPACITY; i++) {
 		const LWFIELDRENDERCOMMAND* cmd = &pLwc->render_command[i];
 		if (cmd->key == 0) {
 			continue;
 		}
 		if (cmd->objtype == 1) {
-			render_guntower_yaw(pLwc, perspective, view, cmd->x, cmd->y, cmd->angle);
+			render_guntower_yaw(pLwc, perspective, view, cmd->x, cmd->y, cmd->angle, cmd->actionid, (float)(now - cmd->animstarttime), cmd->loop);
 		} else {
 			const float s_x = 3.0f;
 			const float s_y = 4.0f;
@@ -495,7 +496,7 @@ void lwc_render_field(const LWCONTEXT* pLwc) {
 					fo->rot_z
 				);
 			} else {
-				render_guntower(pLwc, perspective, view, fo->x, fo->y);
+				render_guntower(pLwc, perspective, view, fo->x, fo->y, LWAC_RECOIL, pLwc->test_player_skin_time, 1);
 			}
 		}
 	}

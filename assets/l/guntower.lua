@@ -4,7 +4,7 @@ local Bullet = require('bullet')
 local M = {
 	objtype = 1,
 	fired = 0, -- last fired field time
-	turnspeed = 12, -- rad/sec
+	turnspeed = 5, -- rad/sec
 	fireinterval = 1, -- seconds
 	angle = 0, -- current angle
 	targetangle = 0, -- target angle
@@ -61,7 +61,7 @@ end
 function M:play_fire_anim()
 	--play_skin_anim(self, 'Recoil')
 	--print(self, 'play Recoil anim')
-	lo.rmsg_anim(c, self.key, 0)
+	lo.rmsg_anim(c, self.key, 11) -- Recoil
 end
 
 function M:bullet_spawn_pos()
@@ -118,7 +118,7 @@ function M:think_coro()
 		else
 			--print(self, 'Barrel NOT aligned to target. current', self.angle, 'target', self.targetangle, 'No fire.')
 			--print(self, 'Wait for next think tick.. (short)')
-			yield_wait_ms(100)
+			yield_wait_ms(32)
 		end
     end
 end

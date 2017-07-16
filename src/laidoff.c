@@ -859,7 +859,14 @@ void handle_rmsg_spawn(LWCONTEXT* pLwc, const LWFIELDRENDERCOMMAND* cmd) {
 }
 
 void handle_rmsg_anim(LWCONTEXT* pLwc, const LWFIELDRENDERCOMMAND* cmd) {
-
+	for (int i = 0; i < MAX_RENDER_QUEUE_CAPACITY; i++) {
+		if (pLwc->render_command[i].key == cmd->key) {
+			pLwc->render_command[i].animstarttime = lwtimepoint_now_seconds();
+			return;
+		}
+	}
+	LOGE(LWLOGPOS "object key %d not exist", cmd->key);
+	abort();
 }
 
 void handle_rmsg_despawn(LWCONTEXT* pLwc, const LWFIELDRENDERCOMMAND* cmd) {
