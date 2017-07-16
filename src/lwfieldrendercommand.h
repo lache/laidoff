@@ -1,7 +1,5 @@
 #pragma once
 
-#include "lwtimepoint.h"
-
 typedef enum _LW_RENDER_COMMAND_TYPE {
 	LRCT_SPAWN,
 	LRCT_DESPAWN,

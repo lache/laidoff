@@ -13,7 +13,7 @@
 #include "ktx.h"
 #include "tex.h"
 #include "lwmacro.h"
-#include "lwenemy.h"
+//#include "lwenemy.h"
 #include "render_font_test.h"
 #include "render_admin.h"
 #include "input.h"
@@ -34,7 +34,8 @@
 #include "logic.h"
 #include "ps.h"
 #include "render_ps.h"
-#include "script.h"
+//#include "script.h"
+#include "lwtimepoint.h"
 
 #define LW_SUPPORT_ETC1_HARDWARE_DECODING LW_PLATFORM_ANDROID
 #define LW_SUPPORT_VAO (LW_PLATFORM_WIN32 || LW_PLATFORM_OSX)
