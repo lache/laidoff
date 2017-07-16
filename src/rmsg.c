@@ -2,6 +2,7 @@
 #include "mq.h"
 #include "zmq.h"
 #include "lwcontext.h"
+#include <string.h>
 
 void rmsg_spawn(LWCONTEXT* pLwc, int key, int objtype, float x, float y, float angle) {
 	zmq_msg_t rmsg;
