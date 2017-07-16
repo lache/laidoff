@@ -11,7 +11,7 @@
 #include "ps.h"
 #include "render_ps.h"
 #include "nav.h"
-#include "script.h"
+#include "lwtimepoint.h"
 #include "lwfieldobject.h"
 
 static void render_field_object_rot(const LWCONTEXT* pLwc, int vbo_index, GLuint tex_id, const mat4x4 view, const mat4x4 proj, float x, float y, float z, float sx, float sy, float sz, float alpha_multiplier, int mipmap, const mat4x4 rot) {
