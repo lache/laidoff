@@ -5,12 +5,13 @@ local M = {
 M.__index = M
 local c = lo.script_context()
 
-function M:new(name, x, y, angle, speed)
+function M:new(name, x, y, z, angle, speed)
 	o = {}
 	o.orig_string = tostring(o)
 	o.name = name
 	o.x = x
 	o.y = y
+	o.z = z
 	o.angle = angle
 	o.speed = speed
 	o.age = 0
@@ -30,7 +31,7 @@ function M:update(dt)
 	--print(self, 'update')
 	self.x = self.x + dt * self.speed * math.cos(self.angle)
 	self.y = self.y + dt * self.speed * math.sin(self.angle)
-	lo.rmsg_pos(c, self.key, self.x, self.y)
+	lo.rmsg_pos(c, self.key, self.x, self.y, self.z)
 	
 	self.age = self.age + dt
 	--print(self, 'x', self.x, 'y', self.y)

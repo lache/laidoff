@@ -13,18 +13,25 @@ local M = {
 	bulletspeed = 30,
 	x = 0, -- x position
 	y = 0, -- y position
+	z = 0, -- z position
 	target = nil, -- current target
 	hp = 100,
+	anim_action_id = lo.LWAC_RECOIL,
+	atlas = lo.LAE_GUNTOWER_KTX,
+	skin_vbo = lo.LSVT_GUNTOWER,
+	armature = lo.LWAR_GUNTOWER_ARMATURE,
+	bulletspawnheight = 1.548 / 2,
 }
 M.__index = M
 local c = lo.script_context()
 
-function M:new(name, x, y)
+function M:new(name, x, y, z)
 	o = {}
 	o.orig_string = tostring(o)
 	o.name = name
 	o.x = x
 	o.y = y
+	o.z = z
 	setmetatable(o, self)
 	return o
 end
@@ -59,18 +66,16 @@ function M:nearest_target_in_range_coro(range)
 end
 
 function M:play_fire_anim()
-	--play_skin_anim(self, 'Recoil')
-	--print(self, 'play Recoil anim')
-	lo.rmsg_anim(c, self.key, 11) -- Recoil
+	lo.rmsg_anim(c, self.key, self.anim_action_id)
 end
 
 function M:bullet_spawn_pos()
-	return {x=self.x, y=self.y}
+	return {x=self.x, y=self.y, z=self.z + self.bulletspawnheight}
 end
 
 function M:spawn_bullet()
 	local bsp = self:bullet_spawn_pos()
-	local bullet = Bullet:new('', bsp.x, bsp.y, self.angle, self.bulletspeed)
+	local bullet = Bullet:new('', bsp.x, bsp.y, bsp.z, self.angle, self.bulletspeed)
 	self.field:spawn(bullet, self.faction)
 end
 

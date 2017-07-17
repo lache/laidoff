@@ -28,8 +28,10 @@ function M:spawn(obj, faction)
 	obj.field = self
 	--print(self, 'Spawn', obj, 'key', obj.key, 'faction', obj.faction)
 	
-	lo.rmsg_spawn(c, obj.key, obj.objtype, obj.x, obj.y, obj.angle)
-	
+	lo.rmsg_spawn(c, obj.key, obj.objtype, obj.x, obj.y, obj.z, obj.angle)
+	if obj.objtype == 1 then
+		lo.rmsg_rparams(c, obj.key, obj.atlas, obj.skin_vbo, obj.armature)
+	end
 end
 
 function M:despawn(obj)

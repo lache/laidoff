@@ -34,28 +34,27 @@ print('Guntower loaded! ^__^')
 local Faction1 = 1
 local Faction2 = 2
 
-local guntower1 = Guntower:new('gt1', 0, 0)
---print(inspect(guntower1))
---guntower1:test()
+local guntower1 = Guntower:new('gt1', 0, 0, 0)
 field:spawn(guntower1, Faction1)
 guntower1:start_thinking()
 
-local guntower2 = Guntower:new('gt1', 10, 3)
---print(inspect(guntower1))
---guntower1:test()
+local guntower2 = Guntower:new('gt2', 10, 3, 0)
 field:spawn(guntower2, Faction1)
 guntower2:start_thinking()
 
-local guntower2 = Guntower:new('gt1', -10, 3)
---print(inspect(guntower1))
---guntower1:test()
-field:spawn(guntower2, Faction1)
-guntower2:start_thinking()
+local guntower3 = Guntower:new('gt3', -10, 3, 0)
+guntower3.atlas = lo.LAE_TURRET_KTX
+guntower3.skin_vbo = lo.LSVT_TURRET
+guntower3.armature = lo.LWAR_TURRET_ARMATURE
+guntower3.anim_action_id = lo.LWAC_TURRET_RECOIL
+guntower3.bulletspawnheight = 3.15099 / 2
+field:spawn(guntower3, Faction1)
+guntower3:start_thinking()
 
 start_coro(function()
 	local idx = 1
 	while true do
-		local guntower2 = Guntower:new('gt-enemy-'..idx, math.random(-10, 10), math.random(-13, -3))
+		local guntower2 = Guntower:new('gt-enemy-'..idx, math.random(-10, 10), math.random(-13, -3), 0)
 		idx = idx + 1
 		--guntower2:test()
 		--print(inspect(guntower2))

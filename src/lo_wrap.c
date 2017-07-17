@@ -8906,6 +8906,29 @@ fail:
 }
 
 
+static int _wrap_delete_all_rmsgs(lua_State* L) {
+  int SWIG_arg = 0;
+  LWCONTEXT *arg1 = (LWCONTEXT *) 0 ;
+  
+  SWIG_check_num_args("delete_all_rmsgs",1,1)
+  if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("delete_all_rmsgs",1,"LWCONTEXT *");
+  
+  if (!SWIG_IsOK(SWIG_ConvertPtr(L,1,(void**)&arg1,SWIGTYPE_p__LWCONTEXT,0))){
+    SWIG_fail_ptr("delete_all_rmsgs",1,SWIGTYPE_p__LWCONTEXT);
+  }
+  
+  delete_all_rmsgs(arg1);
+  
+  return SWIG_arg;
+  
+  if(0) SWIG_fail;
+  
+fail:
+  lua_error(L);
+  return SWIG_arg;
+}
+
+
 static int _wrap_default_uv_offset_get(lua_State* L) {
   int SWIG_arg = 0;
   float *result = 0 ;
@@ -43841,14 +43864,16 @@ static int _wrap_rmsg_spawn(lua_State* L) {
   float arg4 ;
   float arg5 ;
   float arg6 ;
+  float arg7 ;
   
-  SWIG_check_num_args("rmsg_spawn",6,6)
+  SWIG_check_num_args("rmsg_spawn",7,7)
   if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("rmsg_spawn",1,"LWCONTEXT *");
   if(!lua_isnumber(L,2)) SWIG_fail_arg("rmsg_spawn",2,"int");
   if(!lua_isnumber(L,3)) SWIG_fail_arg("rmsg_spawn",3,"int");
   if(!lua_isnumber(L,4)) SWIG_fail_arg("rmsg_spawn",4,"float");
   if(!lua_isnumber(L,5)) SWIG_fail_arg("rmsg_spawn",5,"float");
   if(!lua_isnumber(L,6)) SWIG_fail_arg("rmsg_spawn",6,"float");
+  if(!lua_isnumber(L,7)) SWIG_fail_arg("rmsg_spawn",7,"float");
   
   if (!SWIG_IsOK(SWIG_ConvertPtr(L,1,(void**)&arg1,SWIGTYPE_p__LWCONTEXT,0))){
     SWIG_fail_ptr("rmsg_spawn",1,SWIGTYPE_p__LWCONTEXT);
@@ -43859,7 +43884,8 @@ static int _wrap_rmsg_spawn(lua_State* L) {
   arg4 = (float)lua_tonumber(L, 4);
   arg5 = (float)lua_tonumber(L, 5);
   arg6 = (float)lua_tonumber(L, 6);
-  rmsg_spawn(arg1,arg2,arg3,arg4,arg5,arg6);
+  arg7 = (float)lua_tonumber(L, 7);
+  rmsg_spawn(arg1,arg2,arg3,arg4,arg5,arg6,arg7);
   
   return SWIG_arg;
   
@@ -43903,12 +43929,14 @@ static int _wrap_rmsg_pos(lua_State* L) {
   int arg2 ;
   float arg3 ;
   float arg4 ;
+  float arg5 ;
   
-  SWIG_check_num_args("rmsg_pos",4,4)
+  SWIG_check_num_args("rmsg_pos",5,5)
   if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("rmsg_pos",1,"LWCONTEXT *");
   if(!lua_isnumber(L,2)) SWIG_fail_arg("rmsg_pos",2,"int");
   if(!lua_isnumber(L,3)) SWIG_fail_arg("rmsg_pos",3,"float");
   if(!lua_isnumber(L,4)) SWIG_fail_arg("rmsg_pos",4,"float");
+  if(!lua_isnumber(L,5)) SWIG_fail_arg("rmsg_pos",5,"float");
   
   if (!SWIG_IsOK(SWIG_ConvertPtr(L,1,(void**)&arg1,SWIGTYPE_p__LWCONTEXT,0))){
     SWIG_fail_ptr("rmsg_pos",1,SWIGTYPE_p__LWCONTEXT);
@@ -43917,7 +43945,8 @@ static int _wrap_rmsg_pos(lua_State* L) {
   arg2 = (int)lua_tonumber(L, 2);
   arg3 = (float)lua_tonumber(L, 3);
   arg4 = (float)lua_tonumber(L, 4);
-  rmsg_pos(arg1,arg2,arg3,arg4);
+  arg5 = (float)lua_tonumber(L, 5);
+  rmsg_pos(arg1,arg2,arg3,arg4,arg5);
   
   return SWIG_arg;
   
@@ -43987,6 +44016,41 @@ fail:
 }
 
 
+static int _wrap_rmsg_rparams(lua_State* L) {
+  int SWIG_arg = 0;
+  LWCONTEXT *arg1 = (LWCONTEXT *) 0 ;
+  int arg2 ;
+  int arg3 ;
+  int arg4 ;
+  int arg5 ;
+  
+  SWIG_check_num_args("rmsg_rparams",5,5)
+  if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("rmsg_rparams",1,"LWCONTEXT *");
+  if(!lua_isnumber(L,2)) SWIG_fail_arg("rmsg_rparams",2,"int");
+  if(!lua_isnumber(L,3)) SWIG_fail_arg("rmsg_rparams",3,"int");
+  if(!lua_isnumber(L,4)) SWIG_fail_arg("rmsg_rparams",4,"int");
+  if(!lua_isnumber(L,5)) SWIG_fail_arg("rmsg_rparams",5,"int");
+  
+  if (!SWIG_IsOK(SWIG_ConvertPtr(L,1,(void**)&arg1,SWIGTYPE_p__LWCONTEXT,0))){
+    SWIG_fail_ptr("rmsg_rparams",1,SWIGTYPE_p__LWCONTEXT);
+  }
+  
+  arg2 = (int)lua_tonumber(L, 2);
+  arg3 = (int)lua_tonumber(L, 3);
+  arg4 = (int)lua_tonumber(L, 4);
+  arg5 = (int)lua_tonumber(L, 5);
+  rmsg_rparams(arg1,arg2,arg3,arg4,arg5);
+  
+  return SWIG_arg;
+  
+  if(0) SWIG_fail;
+  
+fail:
+  lua_error(L);
+  return SWIG_arg;
+}
+
+
 static swig_lua_attribute swig_SwigModule_attributes[] = {
     { "default_uv_offset", _wrap_default_uv_offset_get, SWIG_Lua_set_immutable },
     { "default_uv_scale", _wrap_default_uv_scale_get, SWIG_Lua_set_immutable },
@@ -44040,6 +44104,7 @@ static swig_lua_const_info swig_SwigModule_constants[]= {
     {SWIG_LUA_CONSTTAB_INT("LWAC_DETACHPLANEACTION", LWAC_DETACHPLANEACTION)},
     {SWIG_LUA_CONSTTAB_INT("LWAC_DETACHPLANEACTION_CHILDTRANS", LWAC_DETACHPLANEACTION_CHILDTRANS)},
     {SWIG_LUA_CONSTTAB_INT("LWAC_RECOIL", LWAC_RECOIL)},
+    {SWIG_LUA_CONSTTAB_INT("LWAC_TURRET_RECOIL", LWAC_TURRET_RECOIL)},
     {SWIG_LUA_CONSTTAB_INT("LWAC_COUNT", LWAC_COUNT)},
     {SWIG_LUA_CONSTTAB_INT("LAE_TWIRL_PNG", LAE_TWIRL_PNG)},
     {SWIG_LUA_CONSTTAB_INT("LAE_C2_PNG", LAE_C2_PNG)},
@@ -44093,6 +44158,7 @@ static swig_lua_const_info swig_SwigModule_constants[]= {
     {SWIG_LUA_CONSTTAB_INT("LAE_3D_BATTLEGROUND_FLOOR_BAKE_TEX_KTX", LAE_3D_BATTLEGROUND_FLOOR_BAKE_TEX_KTX)},
     {SWIG_LUA_CONSTTAB_INT("LAE_3D_BATTLEGROUND_WALL_BAKE_TEX_KTX", LAE_3D_BATTLEGROUND_WALL_BAKE_TEX_KTX)},
     {SWIG_LUA_CONSTTAB_INT("LAE_GUNTOWER_KTX", LAE_GUNTOWER_KTX)},
+    {SWIG_LUA_CONSTTAB_INT("LAE_TURRET_KTX", LAE_TURRET_KTX)},
     {SWIG_LUA_CONSTTAB_INT("LAE_BEAM_KTX", LAE_BEAM_KTX)},
     {SWIG_LUA_CONSTTAB_INT("LAE_COUNT", LAE_COUNT)},
     {SWIG_LUA_CONSTTAB_INT("LAS_COMMAND_SELECTED_BG", LAS_COMMAND_SELECTED_BG)},
@@ -44286,6 +44352,7 @@ static swig_lua_const_info swig_SwigModule_constants[]= {
     {SWIG_LUA_CONSTTAB_INT("LSVT_HUMAN", LSVT_HUMAN)},
     {SWIG_LUA_CONSTTAB_INT("LSVT_DETACHPLANE", LSVT_DETACHPLANE)},
     {SWIG_LUA_CONSTTAB_INT("LSVT_GUNTOWER", LSVT_GUNTOWER)},
+    {SWIG_LUA_CONSTTAB_INT("LSVT_TURRET", LSVT_TURRET)},
     {SWIG_LUA_CONSTTAB_INT("LSVT_COUNT", LSVT_COUNT)},
     {SWIG_LUA_CONSTTAB_INT("LFVT_DEFAULT", LFVT_DEFAULT)},
     {SWIG_LUA_CONSTTAB_INT("LFVT_COUNT", LFVT_COUNT)},
@@ -44323,6 +44390,7 @@ static swig_lua_const_info swig_SwigModule_constants[]= {
     {SWIG_LUA_CONSTTAB_INT("LWAR_HUMANARMATURE", LWAR_HUMANARMATURE)},
     {SWIG_LUA_CONSTTAB_INT("LWAR_DETACHPLANEARMATURE", LWAR_DETACHPLANEARMATURE)},
     {SWIG_LUA_CONSTTAB_INT("LWAR_GUNTOWER_ARMATURE", LWAR_GUNTOWER_ARMATURE)},
+    {SWIG_LUA_CONSTTAB_INT("LWAR_TURRET_ARMATURE", LWAR_TURRET_ARMATURE)},
     {SWIG_LUA_CONSTTAB_INT("LWAR_COUNT", LWAR_COUNT)},
     {0,0,0,0,0,0}
 };
@@ -44537,6 +44605,7 @@ static swig_lua_method swig_SwigModule_methods[]= {
     { "hash", _wrap_hash},
     { "reset_battle_context", _wrap_reset_battle_context},
     { "lwc_start_logic_thread", _wrap_lwc_start_logic_thread},
+    { "delete_all_rmsgs", _wrap_delete_all_rmsgs},
     { "logic_server_addr", _wrap_logic_server_addr},
     { "logic_udate_default_projection", _wrap_logic_udate_default_projection},
     { "reset_runtime_context_async", _wrap_reset_runtime_context_async},
@@ -44713,6 +44782,7 @@ static swig_lua_method swig_SwigModule_methods[]= {
     { "rmsg_pos", _wrap_rmsg_pos},
     { "rmsg_turn", _wrap_rmsg_turn},
     { "rmsg_anim", _wrap_rmsg_anim},
+    { "rmsg_rparams", _wrap_rmsg_rparams},
     {0,0}
 };
 static swig_lua_class* swig_SwigModule_classes[]= {

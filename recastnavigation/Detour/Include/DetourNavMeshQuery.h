@@ -446,7 +446,7 @@ public:
 	dtStatus findRandomPoint(const dtQueryFilter* filter, float (*frand)(),
 							 dtPolyRef* randomRef, float* randomPt) const;
 	dtStatus findRandomPoint(const dtQueryFilter* filter, std::function<float ()> frand,
-		dtPolyRef* randomRef, float* randomPt) const;
+							 dtPolyRef* randomRef, float* randomPt) const;
 
 	/// Returns random location on navmesh within the reach of specified location.
 	/// Polygons are chosen weighted by area. The search runs in linear related to number of polygon.

@@ -149,7 +149,10 @@ void render_debug_sphere(const LWCONTEXT* pLwc, GLuint tex_id, const mat4x4 pers
 	);
 }
 
-void render_guntower_yaw(const LWCONTEXT* pLwc, mat4x4 perspective, mat4x4 view, float x, float y, float yaw, LW_ACTION action, float animtime, int loop, float alpha) {
+void render_tower_yaw(const LWCONTEXT* pLwc, mat4x4 perspective, mat4x4 view,
+	float x, float y, float yaw, LW_ACTION action, float animtime, int loop, float alpha,
+	LW_ATLAS_ENUM atlas, LW_SKIN_VBO_TYPE skin_vbo, LW_ARMATURE armature) {
+
 	const float path_query_test_player_pos[] = { x, y, 0 };
 	const float skin_scale_f = 0.5f;
 
@@ -172,11 +175,17 @@ void render_guntower_yaw(const LWCONTEXT* pLwc, mat4x4 perspective, mat4x4 view,
 	const float flash = 0;
 	
 	render_yaw_skin(pLwc,
-		pLwc->tex_atlas[LAE_GUNTOWER_KTX],
-		LSVT_GUNTOWER,
+		pLwc->tex_atlas[atlas],
+		skin_vbo,
 		&pLwc->action[action],
-		&pLwc->armature[LWAR_GUNTOWER_ARMATURE],
+		&pLwc->armature[armature],
 		alpha, 1, 1, 1, flash, perspective, view, skin_model, animtime, loop, yaw);
+}
+
+void render_guntower_yaw(const LWCONTEXT* pLwc, mat4x4 perspective, mat4x4 view,
+	float x, float y, float yaw, LW_ACTION action, float animtime, int loop, float alpha) {
+
+	render_tower_yaw(pLwc, perspective, view, x, y, yaw, action, animtime, loop, alpha, LAE_GUNTOWER_KTX, LSVT_GUNTOWER, LWAR_GUNTOWER_ARMATURE);
 }
 
 void render_guntower(const LWCONTEXT* pLwc, mat4x4 perspective, mat4x4 view, float x, float y, LW_ACTION action, float animtime, int loop) {
@@ -359,7 +368,9 @@ void render_command(const LWCONTEXT* pLwc, mat4x4 view, mat4x4 perspective) {
 			continue;
 		}
 		if (cmd->objtype == 1) {
-			render_guntower_yaw(pLwc, perspective, view, cmd->x, cmd->y, cmd->angle, cmd->actionid, (float)(now - cmd->animstarttime), cmd->loop, 1.0f);
+			render_tower_yaw(pLwc, perspective, view, cmd->pos[0], cmd->pos[1], cmd->angle,
+				cmd->actionid, (float)(now - cmd->animstarttime), cmd->loop, 1.0f,
+				cmd->atlas, cmd->skin_vbo, cmd->armature);
 		} else {
 			const float s_x = 3.0f;
 			const float s_y = 4.0f;
@@ -368,16 +379,15 @@ void render_command(const LWCONTEXT* pLwc, mat4x4 view, mat4x4 perspective) {
 			mat4x4_identity(rot);
 			mat4x4_identity(iden);
 			mat4x4_rotate_Z(rot, iden, cmd->angle);
-			vec3 pos = { cmd->x, cmd->y, 1.548f / 2 };
 			render_field_object_rot(
 				pLwc,
 				LVT_BEAM,
 				pLwc->tex_atlas[LAE_BEAM_KTX],
 				view,
 				perspective,
-				pos[0],
-				pos[1],
-				pos[2],
+				cmd->pos[0],
+				cmd->pos[1],
+				cmd->pos[2],
 				s_x,
 				s_y,
 				s_z,

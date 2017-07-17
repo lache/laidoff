@@ -589,6 +589,10 @@ static void init_vbo(LWCONTEXT *pLwc) {
 	load_skin_vbo(pLwc, ASSETS_BASE_PATH "svbo" PATH_SEPARATOR "guntower.svbo",
 		&pLwc->skin_vertex_buffer[LSVT_GUNTOWER]);
 
+	// LSVT_TURRET
+	load_skin_vbo(pLwc, ASSETS_BASE_PATH "svbo" PATH_SEPARATOR "turret.svbo",
+		&pLwc->skin_vertex_buffer[LSVT_TURRET]);
+
 	// === STATIC MESHES (FAN TYPE) ===
 	load_fan_vbo(pLwc);
 }
@@ -863,6 +867,7 @@ void handle_rmsg_anim(LWCONTEXT* pLwc, const LWFIELDRENDERCOMMAND* cmd) {
 	for (int i = 0; i < MAX_RENDER_QUEUE_CAPACITY; i++) {
 		if (pLwc->render_command[i].key == cmd->key) {
 			pLwc->render_command[i].animstarttime = lwtimepoint_now_seconds();
+			pLwc->render_command[i].actionid = cmd->actionid;
 			return;
 		}
 	}
@@ -884,8 +889,7 @@ void handle_rmsg_despawn(LWCONTEXT* pLwc, const LWFIELDRENDERCOMMAND* cmd) {
 void handle_rmsg_pos(LWCONTEXT* pLwc, const LWFIELDRENDERCOMMAND* cmd) {
 	for (int i = 0; i < MAX_RENDER_QUEUE_CAPACITY; i++) {
 		if (pLwc->render_command[i].key == cmd->key) {
-			pLwc->render_command[i].x = cmd->x;
-			pLwc->render_command[i].y = cmd->y;
+			memcpy(pLwc->render_command[i].pos, cmd->pos, sizeof(vec3));
 			return;
 		}
 	}
@@ -897,6 +901,30 @@ void handle_rmsg_turn(LWCONTEXT* pLwc, const LWFIELDRENDERCOMMAND* cmd) {
 	for (int i = 0; i < MAX_RENDER_QUEUE_CAPACITY; i++) {
 		if (pLwc->render_command[i].key == cmd->key) {
 			pLwc->render_command[i].angle = cmd->angle;
+			return;
+		}
+	}
+	LOGE(LWLOGPOS "object key %d not exist", cmd->key);
+	abort();
+}
+
+void handle_rmsg_rparams(LWCONTEXT* pLwc, const LWFIELDRENDERCOMMAND* cmd) {
+	for (int i = 0; i < MAX_RENDER_QUEUE_CAPACITY; i++) {
+		if (pLwc->render_command[i].key == cmd->key) {
+			pLwc->render_command[i].atlas = cmd->atlas;
+			pLwc->render_command[i].skin_vbo = cmd->skin_vbo;
+			pLwc->render_command[i].armature = cmd->armature;
+			return;
+		}
+	}
+	LOGE(LWLOGPOS "object key %d not exist", cmd->key);
+	abort();
+}
+
+void handle_rmsg_bulletspawnheight(LWCONTEXT* pLwc, const LWFIELDRENDERCOMMAND* cmd) {
+	for (int i = 0; i < MAX_RENDER_QUEUE_CAPACITY; i++) {
+		if (pLwc->render_command[i].key == cmd->key) {
+			pLwc->render_command[i].bullet_spawn_height= cmd->bullet_spawn_height;
 			return;
 		}
 	}
@@ -941,6 +969,12 @@ static void read_all_rmsgs(LWCONTEXT* pLwc) {
 			break;
 		case LRCT_TURN:
 			handle_rmsg_turn(pLwc, cmd);
+			break;
+		case LRCT_RPARAMS:
+			handle_rmsg_rparams(pLwc, cmd);
+			break;
+		case LRCT_BULLETSPAWNHEIGHT:
+			handle_rmsg_bulletspawnheight(pLwc, cmd);
 			break;
 		}
 		zmq_msg_close(&rmsg);
