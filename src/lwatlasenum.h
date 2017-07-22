@@ -66,6 +66,7 @@ typedef enum _LW_ATLAS_ENUM
 	LAE_3D_BATTLEGROUND_WALL_BAKE_TEX_KTX,
 	LAE_GUNTOWER_KTX,
 	LAE_TURRET_KTX,
+	LAE_CROSSBOW_KTX,
 
 	LAE_BEAM_KTX,
     
@@ -135,6 +136,7 @@ static const char *tex_atlas_filename[] = {
 	ASSETS_BASE_PATH "ktx" PATH_SEPARATOR "3d-battleground-wall-bake-tex.ktx",
 	ASSETS_BASE_PATH "ktx" PATH_SEPARATOR "guntower.ktx",
 	ASSETS_BASE_PATH "ktx" PATH_SEPARATOR "turret.ktx",
+	ASSETS_BASE_PATH "ktx" PATH_SEPARATOR "crossbow.ktx",
 
 	ASSETS_BASE_PATH "ktx" PATH_SEPARATOR "fx-beam.ktx",
 };

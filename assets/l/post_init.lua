@@ -39,6 +39,11 @@ field:spawn(guntower1, Faction1)
 guntower1:start_thinking()
 
 local guntower2 = Guntower:new('gt2', 10, 3, 0)
+guntower2.atlas = lo.LAE_CROSSBOW_KTX
+guntower2.skin_vbo = lo.LSVT_CROSSBOW
+guntower2.armature = lo.LWAR_CROSSBOW_ARMATURE
+guntower2.anim_action_id = lo.LWAC_CROSSBOW_FIRE
+guntower2.bulletspawnheight = 3.15099 / 2
 field:spawn(guntower2, Faction1)
 guntower2:start_thinking()
 

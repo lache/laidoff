@@ -593,6 +593,10 @@ static void init_vbo(LWCONTEXT *pLwc) {
 	load_skin_vbo(pLwc, ASSETS_BASE_PATH "svbo" PATH_SEPARATOR "turret.svbo",
 		&pLwc->skin_vertex_buffer[LSVT_TURRET]);
 
+	// LSVT_CROSSBOW
+	load_skin_vbo(pLwc, ASSETS_BASE_PATH "svbo" PATH_SEPARATOR "crossbow.svbo",
+		&pLwc->skin_vertex_buffer[LSVT_CROSSBOW]);
+
 	// === STATIC MESHES (FAN TYPE) ===
 	load_fan_vbo(pLwc);
 }
