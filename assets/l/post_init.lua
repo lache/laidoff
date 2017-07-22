@@ -38,7 +38,7 @@ local guntower1 = Guntower:new('gt1', 0, 0, 0)
 field:spawn(guntower1, Faction1)
 guntower1:start_thinking()
 
-local guntower2 = Guntower:new('gt2', 10, 3, 0)
+local guntower2 = Guntower:new('gt2', 13, 3, 0)
 guntower2.atlas = lo.LAE_CROSSBOW_KTX
 guntower2.skin_vbo = lo.LSVT_CROSSBOW
 guntower2.armature = lo.LWAR_CROSSBOW_ARMATURE
