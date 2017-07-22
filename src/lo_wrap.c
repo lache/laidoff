@@ -44023,13 +44023,19 @@ static int _wrap_rmsg_rparams(lua_State* L) {
   int arg3 ;
   int arg4 ;
   int arg5 ;
+  float arg6 ;
+  float arg7 ;
+  float arg8 ;
   
-  SWIG_check_num_args("rmsg_rparams",5,5)
+  SWIG_check_num_args("rmsg_rparams",8,8)
   if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("rmsg_rparams",1,"LWCONTEXT *");
   if(!lua_isnumber(L,2)) SWIG_fail_arg("rmsg_rparams",2,"int");
   if(!lua_isnumber(L,3)) SWIG_fail_arg("rmsg_rparams",3,"int");
   if(!lua_isnumber(L,4)) SWIG_fail_arg("rmsg_rparams",4,"int");
   if(!lua_isnumber(L,5)) SWIG_fail_arg("rmsg_rparams",5,"int");
+  if(!lua_isnumber(L,6)) SWIG_fail_arg("rmsg_rparams",6,"float");
+  if(!lua_isnumber(L,7)) SWIG_fail_arg("rmsg_rparams",7,"float");
+  if(!lua_isnumber(L,8)) SWIG_fail_arg("rmsg_rparams",8,"float");
   
   if (!SWIG_IsOK(SWIG_ConvertPtr(L,1,(void**)&arg1,SWIGTYPE_p__LWCONTEXT,0))){
     SWIG_fail_ptr("rmsg_rparams",1,SWIGTYPE_p__LWCONTEXT);
@@ -44039,7 +44045,10 @@ static int _wrap_rmsg_rparams(lua_State* L) {
   arg3 = (int)lua_tonumber(L, 3);
   arg4 = (int)lua_tonumber(L, 4);
   arg5 = (int)lua_tonumber(L, 5);
-  rmsg_rparams(arg1,arg2,arg3,arg4,arg5);
+  arg6 = (float)lua_tonumber(L, 6);
+  arg7 = (float)lua_tonumber(L, 7);
+  arg8 = (float)lua_tonumber(L, 8);
+  rmsg_rparams(arg1,arg2,arg3,arg4,arg5,arg6,arg7,arg8);
   
   return SWIG_arg;
   
@@ -44348,6 +44357,7 @@ static swig_lua_const_info swig_SwigModule_constants[]= {
     {SWIG_LUA_CONSTTAB_INT("LVT_ROOM", LVT_ROOM)},
     {SWIG_LUA_CONSTTAB_INT("LVT_BATTLEGROUND_FLOOR", LVT_BATTLEGROUND_FLOOR)},
     {SWIG_LUA_CONSTTAB_INT("LVT_BATTLEGROUND_WALL", LVT_BATTLEGROUND_WALL)},
+    {SWIG_LUA_CONSTTAB_INT("LVT_CROSSBOW_ARROW", LVT_CROSSBOW_ARROW)},
     {SWIG_LUA_CONSTTAB_INT("LVT_COUNT", LVT_COUNT)},
     {SWIG_LUA_CONSTTAB_INT("LSVT_TRIANGLE", LSVT_TRIANGLE)},
     {SWIG_LUA_CONSTTAB_INT("LSVT_TREEPLANE", LSVT_TREEPLANE)},

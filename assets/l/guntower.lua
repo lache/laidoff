@@ -20,6 +20,11 @@ local M = {
 	atlas = lo.LAE_GUNTOWER_KTX,
 	skin_vbo = lo.LSVT_GUNTOWER,
 	armature = lo.LWAR_GUNTOWER_ARMATURE,
+	bullet_vbo = lo.LVT_BEAM,
+	bullet_atlas = lo.LAE_BEAM_KTX,
+	bullet_sx = 3,
+	bullet_sy = 4,
+	bullet_sz = 4,
 	bulletspawnheight = 1.548 / 2,
 }
 M.__index = M
@@ -76,6 +81,11 @@ end
 function M:spawn_bullet()
 	local bsp = self:bullet_spawn_pos()
 	local bullet = Bullet:new('', bsp.x, bsp.y, bsp.z, self.angle, self.bulletspeed)
+	bullet.vbo = self.bullet_vbo
+	bullet.atlas = self.bullet_atlas
+	bullet.sx = self.bullet_sx
+	bullet.sy = self.bullet_sy
+	bullet.sz = self.bullet_sz
 	self.field:spawn(bullet, self.faction)
 end
 

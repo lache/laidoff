@@ -43,7 +43,12 @@ guntower2.atlas = lo.LAE_CROSSBOW_KTX
 guntower2.skin_vbo = lo.LSVT_CROSSBOW
 guntower2.armature = lo.LWAR_CROSSBOW_ARMATURE
 guntower2.anim_action_id = lo.LWAC_CROSSBOW_FIRE
-guntower2.bulletspawnheight = 3.15099 / 2
+guntower2.bulletspawnheight = 2.23069 / 2
+guntower2.bullet_vbo = lo.LVT_CROSSBOW_ARROW
+guntower2.bullet_atlas = lo.LAE_CROSSBOW_KTX
+guntower2.bullet_sx = 0.5
+guntower2.bullet_sy = 0.5
+guntower2.bullet_sz = 0.5
 field:spawn(guntower2, Faction1)
 guntower2:start_thinking()
 

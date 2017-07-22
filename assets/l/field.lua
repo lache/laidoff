@@ -30,7 +30,9 @@ function M:spawn(obj, faction)
 	
 	lo.rmsg_spawn(c, obj.key, obj.objtype, obj.x, obj.y, obj.z, obj.angle)
 	if obj.objtype == 1 then
-		lo.rmsg_rparams(c, obj.key, obj.atlas, obj.skin_vbo, obj.armature)
+		lo.rmsg_rparams(c, obj.key, obj.atlas, obj.skin_vbo, obj.armature, 1, 1, 1)
+	elseif obj.objtype == 2 then
+		lo.rmsg_rparams(c, obj.key, obj.atlas, obj.vbo, 0, obj.sx, obj.sy, obj.sz)
 	end
 end
 

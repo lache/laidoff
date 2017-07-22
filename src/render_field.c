@@ -381,16 +381,16 @@ void render_command(const LWCONTEXT* pLwc, mat4x4 view, mat4x4 perspective) {
 			mat4x4_rotate_Z(rot, iden, cmd->angle);
 			render_field_object_rot(
 				pLwc,
-				LVT_BEAM,
-				pLwc->tex_atlas[LAE_BEAM_KTX],
+				cmd->vbo,
+				pLwc->tex_atlas[cmd->atlas],
 				view,
 				perspective,
 				cmd->pos[0],
 				cmd->pos[1],
 				cmd->pos[2],
-				s_x,
-				s_y,
-				s_z,
+				cmd->scale[0],
+				cmd->scale[1],
+				cmd->scale[2],
 				1,
 				0,
 				rot

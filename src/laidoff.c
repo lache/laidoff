@@ -543,6 +543,10 @@ static void init_vbo(LWCONTEXT *pLwc) {
 	load_vbo(pLwc, ASSETS_BASE_PATH "vbo" PATH_SEPARATOR "OilTruck.vbo",
 		&pLwc->vertex_buffer[LVT_OIL_TRUCK]);
 
+	// LVT_CROSSBOW_ARROW
+	load_vbo(pLwc, ASSETS_BASE_PATH "vbo" PATH_SEPARATOR "crossbow-arrow.vbo",
+		&pLwc->vertex_buffer[LVT_CROSSBOW_ARROW]);
+
 	// LVT_LEFT_TOP_ANCHORED_SQUARE ~ LVT_RIGHT_BOTTOM_ANCHORED_SQUARE
 	// 9 anchored squares...
 	const float anchored_square_offset[][2] = {
@@ -915,9 +919,17 @@ void handle_rmsg_turn(LWCONTEXT* pLwc, const LWFIELDRENDERCOMMAND* cmd) {
 void handle_rmsg_rparams(LWCONTEXT* pLwc, const LWFIELDRENDERCOMMAND* cmd) {
 	for (int i = 0; i < MAX_RENDER_QUEUE_CAPACITY; i++) {
 		if (pLwc->render_command[i].key == cmd->key) {
-			pLwc->render_command[i].atlas = cmd->atlas;
-			pLwc->render_command[i].skin_vbo = cmd->skin_vbo;
-			pLwc->render_command[i].armature = cmd->armature;
+			if (pLwc->render_command[i].objtype == 1) {
+				// Skinned mesh
+				pLwc->render_command[i].atlas = cmd->atlas;
+				pLwc->render_command[i].skin_vbo = cmd->skin_vbo;
+				pLwc->render_command[i].armature = cmd->armature;
+			} else if (pLwc->render_command[i].objtype == 2) {
+				// Static mesh
+				pLwc->render_command[i].atlas = cmd->atlas;
+				pLwc->render_command[i].vbo = cmd->skin_vbo;
+				memcpy(pLwc->render_command[i].scale, cmd->scale, sizeof(vec3));
+			}
 			return;
 		}
 	}

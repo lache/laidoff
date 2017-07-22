@@ -18,6 +18,9 @@ function M:new(name, x, y, z, angle, speed)
 	o.max_age = 3
 	o.range = 1
 	o.damage = 50
+	o.sx = 3
+	o.sy = 4
+	o.sz = 4
 	setmetatable(o, self)
 	--print(self, 'bullet spawned')
 	return o

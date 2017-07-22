@@ -19,6 +19,8 @@ typedef struct _LWFIELDRENDERCOMMAND {
 	int objtype;
 	// XYZ position
 	vec3 pos;
+	// XYZ scale
+	vec3 scale;
 	// Face direction
 	float angle;
 	// Animation action ID
@@ -35,4 +37,6 @@ typedef struct _LWFIELDRENDERCOMMAND {
 	LW_ARMATURE armature;
 	// Bullet spawn height
 	float bullet_spawn_height;
+	// VBO
+	LW_VBO_TYPE vbo;
 } LWFIELDRENDERCOMMAND;

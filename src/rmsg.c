@@ -15,6 +15,9 @@ void rmsg_spawn(LWCONTEXT* pLwc, int key, int objtype, float x, float y, float z
 	cmd->pos[0] = x;
 	cmd->pos[1] = y;
 	cmd->pos[2] = z;
+	cmd->scale[0] = 1;
+	cmd->scale[1] = 1;
+	cmd->scale[2] = 1;
 	cmd->angle = angle;
 	cmd->actionid = LWAC_RECOIL;
 	zmq_msg_send(&rmsg, mq_rmsg_writer(lwcontext_mq(pLwc)), 0);
@@ -66,7 +69,7 @@ void rmsg_anim(LWCONTEXT* pLwc, int key, int actionid) {
 	zmq_msg_close(&rmsg);	
 }
 
-void rmsg_rparams(LWCONTEXT* pLwc, int key, int atlas, int skin_vbo, int armature) {
+void rmsg_rparams(LWCONTEXT* pLwc, int key, int atlas, int skin_vbo, int armature, float sx, float sy, float sz) {
 	zmq_msg_t rmsg;
 	zmq_msg_init_size(&rmsg, sizeof(LWFIELDRENDERCOMMAND));
 	LWFIELDRENDERCOMMAND* cmd = zmq_msg_data(&rmsg);
@@ -75,6 +78,9 @@ void rmsg_rparams(LWCONTEXT* pLwc, int key, int atlas, int skin_vbo, int armatur
 	cmd->atlas = atlas;
 	cmd->skin_vbo = skin_vbo;
 	cmd->armature = armature;
+	cmd->scale[0] = sx;
+	cmd->scale[1] = sy;
+	cmd->scale[2] = sz;
 	zmq_msg_send(&rmsg, mq_rmsg_writer(lwcontext_mq(pLwc)), 0);
 	zmq_msg_close(&rmsg);
 }
