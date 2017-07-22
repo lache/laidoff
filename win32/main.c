@@ -112,7 +112,9 @@ int main(void)
 #if LW_PLATFORM_RPI
 	glfwWindowHint(GLFW_CLIENT_API, GLFW_OPENGL_ES_API);
 #endif
-	//glfwWindowHint(GLFW_DECORATED, GLFW_FALSE);
+
+	// Borderless or bordered window
+	glfwWindowHint(GLFW_DECORATED, GLFW_FALSE);
 
 	GLFWwindow* window = create_glfw_window();
 
