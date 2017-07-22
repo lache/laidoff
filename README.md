@@ -2,6 +2,8 @@
 
 Private toy project
 
+![screenshot](images/ss.png)
+
 ### What is this repository for? ###
 
 Just playing around...
