@@ -3,7 +3,8 @@
 #include "lwlog.h"
 #include "constants.h"
 #include "sound.h"
-#if LW_PLATFORM_WIN32
+#define LW_ENABLE_SOUND (LW_PLATFORM_WIN32 && 0)
+#if LW_ENABLE_SOUND
 #include <windows.h>
 #include <xaudio2.h>
 #include <stdlib.h>  
@@ -169,7 +170,7 @@ int create_sound_source_pool() {
 
 extern "C" HRESULT init_ext_sound_lib()
 {
-#if LW_PLATFORM_WIN32
+#if LW_PLATFORM_WIN32 && LW_ENABLE_SOUND
 
 	CoInitializeEx(NULL, COINIT_MULTITHREADED);
 
@@ -200,13 +201,16 @@ extern "C" HRESULT init_ext_sound_lib()
 
 extern "C" void destroy_ext_sound_lib()
 {
+#if LW_ENABLE_SOUND
 	for (int i = 0; i < LWS_COUNT; i++) {
 		release_sound(i);
 	}
+#endif
 }
 
 extern "C" void play_sound(LW_SOUND lws)
 {
+#if LW_ENABLE_SOUND
 	if (sound_pool[lws].wf.nChannels == 1) {
 		mono_sound_source_pool[mono_sound_source_pool_index].source->SubmitSourceBuffer(&sound_pool[lws].xa);
 		mono_sound_source_pool_index = (mono_sound_source_pool_index + 1) % MAX_MONO_SOUND_SOURCE_POOL;
@@ -214,8 +218,8 @@ extern "C" void play_sound(LW_SOUND lws)
 		stereo_sound_source_pool[stereo_sound_source_pool_index].source->SubmitSourceBuffer(&sound_pool[lws].xa);
 		stereo_sound_source_pool_index = (stereo_sound_source_pool_index + 1) % MAX_STEREO_SOUND_SOURCE_POOL;
 	}
-	
 	//PlaySound(sound_pool[lws].buffer, NULL, SND_MEMORY | SND_ASYNC);
+#endif
 }
 
 extern "C" void stop_sound(LW_SOUND lws)

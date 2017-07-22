@@ -1,4 +1,5 @@
 #include "lwxaudio2.h"
+#if 0
 #include <windows.h>
 #include <xaudio2.h>
 
@@ -130,3 +131,4 @@ int LoadWaveFile() {
 
 	return S_OK;
 }
+#endif
