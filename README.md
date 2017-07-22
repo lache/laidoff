@@ -17,5 +17,5 @@ Just playing around...
 5. Execute: `cd c:\laidoff && mkdir build && cd build && cmake ..`
 6. Open `Project.sln` generated at `C:\laidoff\build`
 7. Rebuild all
-8. Set `laidoff` as StarUp Project
+8. Set `laidoff` as StartUp Project
 9. Run!
