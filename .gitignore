@@ -10,3 +10,4 @@ build-x86
 /android/keystore.properties
 /assets/list.txt
 /android/app/app-release
+*.dir
