@@ -105,6 +105,13 @@ void render_paramed_skin(const LWCONTEXT* pLwc,
 	}
 
 	vec3 bone_trans[MAX_BONE] = { 0, };
+
+	vec3 bone_scale[MAX_BONE];
+	for (int i = 0; i < armature->count; i++) {
+		bone_scale[i][0] = 1;
+		bone_scale[i][1] = 1;
+		bone_scale[i][2] = 1;
+	}
 	
 	float f = (float)(skin_time * action->fps);
 	f = loop ? fmodf(f, action->last_key_f) : LWMIN(f, action->last_key_f);
@@ -120,6 +127,10 @@ void render_paramed_skin(const LWCONTEXT* pLwc,
 
 		if (curve->anim_curve_type == LACT_LOCATION) {
 			get_curve_value(anim_key, curve->key_num, f, &bone_trans[bi][ci]);
+		}
+
+		if (curve->anim_curve_type == LACT_SCALE) {
+			get_curve_value(anim_key, curve->key_num, f, &bone_scale[bi][ci]);
 		}
 
 		if (curve->anim_curve_type == LACT_ROTATION_QUATERNION) {
@@ -150,6 +161,9 @@ void render_paramed_skin(const LWCONTEXT* pLwc,
 		}
 	}
 
+	mat4x4 mat_identity;
+	mat4x4_identity(mat_identity);
+
 	for (int i = 0; i < armature->count; i++) {
 		mat4x4 bone_mat_anim_trans;
 
@@ -164,6 +178,9 @@ void render_paramed_skin(const LWCONTEXT* pLwc,
 		mat4x4 bone_mat_anim_rot;
 		mat4x4_from_quat(bone_mat_anim_rot, bone_q[i]);
 
+		mat4x4 bone_mat_anim_scale;
+		mat4x4_scale_aniso(bone_mat_anim_scale, mat_identity, bone_scale[i][0], bone_scale[i][1], bone_scale[i][2]);
+
 		mat4x4 bone_unmod_world_inv;
 		mat4x4_invert(bone_unmod_world_inv, bone_unmod_world[i]);
 
@@ -172,6 +189,7 @@ void render_paramed_skin(const LWCONTEXT* pLwc,
 
 		mat4x4_identity(bone[i]);
 		mat4x4_mul(bone[i], bone_unmod_world_inv, bone[i]);
+		mat4x4_mul(bone[i], bone_mat_anim_scale , bone[i]);
 		mat4x4_mul(bone[i], bone_mat_anim_rot, bone[i]);
 		mat4x4_mul(bone[i], bone_mat_anim_trans, bone[i]);
 		mat4x4_mul(bone[i], bone_unmod_world[i], bone[i]);
