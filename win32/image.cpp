@@ -33,13 +33,17 @@ extern "C" void unload_png_ios(LWBITMAPCONTEXT* pBitmapContext);
 #if LW_PLATFORM_WIN32
 static VOID GetImageFromFile(LPCWSTR file, IWICBitmap** bitmap)
 {
-
 	IWICImagingFactory* factory = nullptr;
 	IWICBitmapDecoder* decoder = nullptr;
 	IWICBitmapFrameDecode* frame = nullptr;
 	IWICFormatConverter* converter = nullptr;
 
-	CoCreateInstance(CLSID_WICImagingFactory, nullptr, CLSCTX_INPROC_SERVER, IID_PPV_ARGS(&factory));
+	//
+	// Using 'CLSID_WICImagingFactory1' instead of 'CLSID_WICImagingFactory'
+	// for runtime compatability on Windows 7.
+	// https://stackoverflow.com/questions/16697112/why-using-wic-in-my-32-bit-application-fails-in-windows-7-32-bit
+	//
+	CoCreateInstance(CLSID_WICImagingFactory1, nullptr, CLSCTX_INPROC_SERVER, IID_PPV_ARGS(&factory));
 	factory->CreateDecoderFromFilename(file, nullptr, GENERIC_READ | GENERIC_WRITE, WICDecodeMetadataCacheOnDemand, &decoder);
 	decoder->GetFrame(0, &frame);
 	factory->CreateFormatConverter(&converter);
