@@ -1,5 +1,33 @@
 local inspect = require('inspect')
 
+-- Utility functions begin
+
+function lo.new_vec3(x, y, z)
+	local v = lo.new_float(3)
+	lo.float_setitem(v, 0, x)
+	lo.float_setitem(v, 1, y)
+	lo.float_setitem(v, 2, z)
+	return v
+end
+
+function lo.print_vec3(v)
+	print('x', lo.float_getitem(v, 0), 'y', lo.float_getitem(v, 1), 'z', lo.float_getitem(v, 2))
+end
+
+function lo.get_vec3(v)
+	return {
+		['x'] = lo.float_getitem(v, 0),
+		['y'] = lo.float_getitem(v, 1),
+		['z'] = lo.float_getitem(v, 2)
+	}
+end
+
+function lo.delete_vec3(v)
+	lo.delete_float(v)
+end
+
+-- Utility functions end
+
 print("post init lua")
 
 print("LVT_ENEMY_SCOPE: " .. lo.LVT_ENEMY_SCOPE)
@@ -43,7 +71,7 @@ guntower2.atlas = lo.LAE_CROSSBOW_KTX
 guntower2.skin_vbo = lo.LSVT_CROSSBOW
 guntower2.armature = lo.LWAR_CROSSBOW_ARMATURE
 guntower2.anim_action_id = lo.LWAC_CROSSBOW_FIRE
-guntower2.bulletspawnheight = 2.23069 / 2
+guntower2.bullet_spawn_offset_z = 2.23069 / 2
 guntower2.bullet_vbo = lo.LVT_CROSSBOW_ARROW
 guntower2.bullet_atlas = lo.LAE_CROSSBOW_KTX
 guntower2.bullet_sx = 0.5
@@ -58,7 +86,7 @@ guntower3.atlas = lo.LAE_TURRET_KTX
 guntower3.skin_vbo = lo.LSVT_TURRET
 guntower3.armature = lo.LWAR_TURRET_ARMATURE
 guntower3.anim_action_id = lo.LWAC_TURRET_RECOIL
-guntower3.bulletspawnheight = 3.15099 / 2
+guntower3.bullet_spawn_offset_z = 3.15099 / 2
 field:spawn(guntower3, Faction1)
 guntower3:start_thinking()
 
@@ -67,8 +95,16 @@ guntower4.atlas = lo.LAE_CATAPULT_KTX
 guntower4.skin_vbo = lo.LSVT_CATAPULT
 guntower4.armature = lo.LWAR_CATAPULT_ARMATURE
 guntower4.anim_action_id = lo.LWAC_CATAPULT_FIRE
-guntower4.bulletspawnheight = 3.15099 / 2
+guntower4.bullet_spawn_offset_x = -2.28591 / 2
+guntower4.bullet_spawn_offset_y = 0
+guntower4.bullet_spawn_offset_z = 4.57434 / 2
+guntower4.bullet_vbo = lo.LVT_CATAPULT_BALL
+guntower4.bullet_atlas = lo.LAE_CATAPULT_KTX
+guntower4.bullet_sx = 0.5
+guntower4.bullet_sy = 0.5
+guntower4.bullet_sz = 0.5
 guntower4.fire_anim_marker = 'fire'
+guntower4.parabola = true
 field:spawn(guntower4, Faction1)
 guntower4:start_thinking()
 

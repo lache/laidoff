@@ -36,6 +36,7 @@
 #include "render_ps.h"
 //#include "script.h"
 #include "lwtimepoint.h"
+#include "lwparabola.h"
 
 #define LW_SUPPORT_ETC1_HARDWARE_DECODING LW_PLATFORM_ANDROID
 #define LW_SUPPORT_VAO (LW_PLATFORM_WIN32 || LW_PLATFORM_OSX)
@@ -546,6 +547,10 @@ static void init_vbo(LWCONTEXT *pLwc) {
 	// LVT_CROSSBOW_ARROW
 	load_vbo(pLwc, ASSETS_BASE_PATH "vbo" PATH_SEPARATOR "crossbow-arrow.vbo",
 		&pLwc->vertex_buffer[LVT_CROSSBOW_ARROW]);
+
+	// LVT_CATAPULT_BALL
+	load_vbo(pLwc, ASSETS_BASE_PATH "vbo" PATH_SEPARATOR "catapult-ball.vbo",
+		&pLwc->vertex_buffer[LVT_CATAPULT_BALL]);
 
 	// LVT_LEFT_TOP_ANCHORED_SQUARE ~ LVT_RIGHT_BOTTOM_ANCHORED_SQUARE
 	// 9 anchored squares...
@@ -1311,6 +1316,8 @@ LWCONTEXT *lw_init(void) {
 	init_armature(pLwc);
 
 	init_action(pLwc);
+
+	lwparabola_test();
 
 	return pLwc;
 }

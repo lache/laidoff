@@ -15,8 +15,8 @@ function M:new(name, x, y, z, angle, speed)
 	o.angle = angle
 	o.speed = speed
 	o.age = 0
-	o.max_age = 3
-	o.range = 1
+	o.max_age = 5
+	o.range = 2
 	o.damage = 50
 	o.sx = 3
 	o.sy = 4
@@ -32,13 +32,26 @@ end
 
 function M:update(dt)
 	--print(self, 'update')
-	self.x = self.x + dt * self.speed * math.cos(self.angle)
-	self.y = self.y + dt * self.speed * math.sin(self.angle)
+	if self.parabola3d then
+		local pt = lo.new_vec3(0, 0, 0)
+		local pt_diff = self.parabola3d.p2t - self.parabola3d.p0t
+		local pt_count = 10
+		local pt_step = pt_diff / pt_count
+		lo.lwparabola_p_3d_from_param_t(self.parabola3d, self.parabola3d.p0t + pt_diff * self.age / 2, pt)
+		local ptvec = lo.get_vec3(pt)
+		self.x = ptvec.x
+		self.y = ptvec.y
+		self.z = ptvec.z
+		lo.delete_vec3(pt)
+	else
+		self.x = self.x + dt * self.speed * math.cos(self.angle)
+		self.y = self.y + dt * self.speed * math.sin(self.angle)
+	end
 	lo.rmsg_pos(c, self.key, self.x, self.y, self.z)
 	
 	self.age = self.age + dt
 	--print(self, 'x', self.x, 'y', self.y)
-	if self.age > self.max_age then
+	if self.age > self.max_age or self.z < 0 then
 		self.dead_flag = true
 	end
 	local target = self.field:query_nearest_target_in_range(self, self.range)

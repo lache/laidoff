@@ -6,6 +6,7 @@
 #define LWMIN(a, b)					((a) < (b) ? (a) : (b))
 #define LWCLAMP(v, a, b)			((v) < (a) ? (a) : (v) > (b) ? (b) : (v))
 #define LWDEG2RAD(x)				((x) / 180.0 * M_PI)
+#define LWRAD2DEG(x)				((x) / M_PI * 180.0)
 
 #define __WIDEN_TEXT(quote) L##quote
 #define WIDEN_TEXT(quote) __WIDEN_TEXT(quote)   // r_winnt

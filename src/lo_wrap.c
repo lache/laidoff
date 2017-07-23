@@ -2704,79 +2704,80 @@ SWIG_Lua_dostring(lua_State *L, const char *str) {
 #define SWIGTYPE_p__LWMESSAGEQUEUE swig_types[44]
 #define SWIGTYPE_p__LWMQMSG swig_types[45]
 #define SWIGTYPE_p__LWNAV swig_types[46]
-#define SWIGTYPE_p__LWPARTICLE swig_types[47]
-#define SWIGTYPE_p__LWPARTICLE2 swig_types[48]
-#define SWIGTYPE_p__LWPATHQUERY swig_types[49]
-#define SWIGTYPE_p__LWPLAYERSTATEDATA swig_types[50]
-#define SWIGTYPE_p__LWPOSSYNCMSG swig_types[51]
-#define SWIGTYPE_p__LWPS swig_types[52]
-#define SWIGTYPE_p__LWSHADER swig_types[53]
-#define SWIGTYPE_p__LWSKILL swig_types[54]
-#define SWIGTYPE_p__LWSKINVERTEX swig_types[55]
-#define SWIGTYPE_p__LWTEXTBLOCK swig_types[56]
-#define SWIGTYPE_p__LWTIMEPOINT swig_types[57]
-#define SWIGTYPE_p__LWUIDIM swig_types[58]
-#define SWIGTYPE_p__LWVBO swig_types[59]
-#define SWIGTYPE_p__LWVERTEX swig_types[60]
-#define SWIGTYPE_p__LW_ACTION swig_types[61]
-#define SWIGTYPE_p__LW_ANIM_CURVE_TYPE swig_types[62]
-#define SWIGTYPE_p__LW_ARMATURE swig_types[63]
-#define SWIGTYPE_p__LW_ATLAS_ENUM swig_types[64]
-#define SWIGTYPE_p__LW_ATLAS_SPRITE swig_types[65]
-#define SWIGTYPE_p__LW_BATTLE_COMMAND_RESULT swig_types[66]
-#define SWIGTYPE_p__LW_BATTLE_STATE swig_types[67]
-#define SWIGTYPE_p__LW_DAMAGE_TEXT_COORD swig_types[68]
-#define SWIGTYPE_p__LW_FAN_VBO_TYPE swig_types[69]
-#define SWIGTYPE_p__LW_GAME_SCENE swig_types[70]
-#define SWIGTYPE_p__LW_PLAYER_STATE swig_types[71]
-#define SWIGTYPE_p__LW_PS_VBO_TYPE swig_types[72]
-#define SWIGTYPE_p__LW_RAY_ID swig_types[73]
-#define SWIGTYPE_p__LW_SHADER_TYPE swig_types[74]
-#define SWIGTYPE_p__LW_SKILL_DATA swig_types[75]
-#define SWIGTYPE_p__LW_SKILL_EFFECT swig_types[76]
-#define SWIGTYPE_p__LW_SKILL_TARGET swig_types[77]
-#define SWIGTYPE_p__LW_SKIN_VBO_TYPE swig_types[78]
-#define SWIGTYPE_p__LW_SOUND swig_types[79]
-#define SWIGTYPE_p__LW_UI_ALIGN swig_types[80]
-#define SWIGTYPE_p__LW_VBO_TYPE swig_types[81]
-#define SWIGTYPE_p__kvmsg swig_types[82]
-#define SWIGTYPE_p_a_2__float swig_types[83]
-#define SWIGTYPE_p_a_3__float swig_types[84]
-#define SWIGTYPE_p_a_4__a_4__float swig_types[85]
-#define SWIGTYPE_p_a_4__float swig_types[86]
-#define SWIGTYPE_p_a_8__LWSPRITE swig_types[87]
-#define SWIGTYPE_p_byte swig_types[88]
-#define SWIGTYPE_p_char swig_types[89]
-#define SWIGTYPE_p_f_p_q_const__struct__LWCONTEXT_float_float_float__void swig_types[90]
-#define SWIGTYPE_p_f_p_struct__LWCONTEXT__void swig_types[91]
-#define SWIGTYPE_p_float swig_types[92]
-#define SWIGTYPE_p_int swig_types[93]
-#define SWIGTYPE_p_int64_t swig_types[94]
-#define SWIGTYPE_p_p__LWDELTATIME swig_types[95]
-#define SWIGTYPE_p_p__LWPS swig_types[96]
-#define SWIGTYPE_p_p__LWSKILL swig_types[97]
-#define SWIGTYPE_p_p__kvmsg swig_types[98]
-#define SWIGTYPE_p_p_char swig_types[99]
-#define SWIGTYPE_p_p_tinyobj_material_t swig_types[100]
-#define SWIGTYPE_p_p_tinyobj_shape_t swig_types[101]
-#define SWIGTYPE_p_p_void swig_types[102]
-#define SWIGTYPE_p_pcg_state_setseq_64 swig_types[103]
-#define SWIGTYPE_p_short swig_types[104]
-#define SWIGTYPE_p_size_t swig_types[105]
-#define SWIGTYPE_p_tinyobj_attrib_t swig_types[106]
-#define SWIGTYPE_p_tinyobj_material_t swig_types[107]
-#define SWIGTYPE_p_tinyobj_shape_t swig_types[108]
-#define SWIGTYPE_p_tinyobj_vertex_index_t swig_types[109]
-#define SWIGTYPE_p_uint32_t swig_types[110]
-#define SWIGTYPE_p_uint64_t swig_types[111]
-#define SWIGTYPE_p_unsigned_char swig_types[112]
-#define SWIGTYPE_p_unsigned_int swig_types[113]
-#define SWIGTYPE_p_unsigned_long swig_types[114]
-#define SWIGTYPE_p_unsigned_short swig_types[115]
-#define SWIGTYPE_p_void swig_types[116]
-#define SWIGTYPE_p_zhash_t swig_types[117]
-static swig_type_info *swig_types[119];
-static swig_module_info swig_module = {swig_types, 118, 0, 0, 0, 0};
+#define SWIGTYPE_p__LWPARABOLA3D swig_types[47]
+#define SWIGTYPE_p__LWPARTICLE swig_types[48]
+#define SWIGTYPE_p__LWPARTICLE2 swig_types[49]
+#define SWIGTYPE_p__LWPATHQUERY swig_types[50]
+#define SWIGTYPE_p__LWPLAYERSTATEDATA swig_types[51]
+#define SWIGTYPE_p__LWPOSSYNCMSG swig_types[52]
+#define SWIGTYPE_p__LWPS swig_types[53]
+#define SWIGTYPE_p__LWSHADER swig_types[54]
+#define SWIGTYPE_p__LWSKILL swig_types[55]
+#define SWIGTYPE_p__LWSKINVERTEX swig_types[56]
+#define SWIGTYPE_p__LWTEXTBLOCK swig_types[57]
+#define SWIGTYPE_p__LWTIMEPOINT swig_types[58]
+#define SWIGTYPE_p__LWUIDIM swig_types[59]
+#define SWIGTYPE_p__LWVBO swig_types[60]
+#define SWIGTYPE_p__LWVERTEX swig_types[61]
+#define SWIGTYPE_p__LW_ACTION swig_types[62]
+#define SWIGTYPE_p__LW_ANIM_CURVE_TYPE swig_types[63]
+#define SWIGTYPE_p__LW_ARMATURE swig_types[64]
+#define SWIGTYPE_p__LW_ATLAS_ENUM swig_types[65]
+#define SWIGTYPE_p__LW_ATLAS_SPRITE swig_types[66]
+#define SWIGTYPE_p__LW_BATTLE_COMMAND_RESULT swig_types[67]
+#define SWIGTYPE_p__LW_BATTLE_STATE swig_types[68]
+#define SWIGTYPE_p__LW_DAMAGE_TEXT_COORD swig_types[69]
+#define SWIGTYPE_p__LW_FAN_VBO_TYPE swig_types[70]
+#define SWIGTYPE_p__LW_GAME_SCENE swig_types[71]
+#define SWIGTYPE_p__LW_PLAYER_STATE swig_types[72]
+#define SWIGTYPE_p__LW_PS_VBO_TYPE swig_types[73]
+#define SWIGTYPE_p__LW_RAY_ID swig_types[74]
+#define SWIGTYPE_p__LW_SHADER_TYPE swig_types[75]
+#define SWIGTYPE_p__LW_SKILL_DATA swig_types[76]
+#define SWIGTYPE_p__LW_SKILL_EFFECT swig_types[77]
+#define SWIGTYPE_p__LW_SKILL_TARGET swig_types[78]
+#define SWIGTYPE_p__LW_SKIN_VBO_TYPE swig_types[79]
+#define SWIGTYPE_p__LW_SOUND swig_types[80]
+#define SWIGTYPE_p__LW_UI_ALIGN swig_types[81]
+#define SWIGTYPE_p__LW_VBO_TYPE swig_types[82]
+#define SWIGTYPE_p__kvmsg swig_types[83]
+#define SWIGTYPE_p_a_2__float swig_types[84]
+#define SWIGTYPE_p_a_3__float swig_types[85]
+#define SWIGTYPE_p_a_4__a_4__float swig_types[86]
+#define SWIGTYPE_p_a_4__float swig_types[87]
+#define SWIGTYPE_p_a_8__LWSPRITE swig_types[88]
+#define SWIGTYPE_p_byte swig_types[89]
+#define SWIGTYPE_p_char swig_types[90]
+#define SWIGTYPE_p_f_p_q_const__struct__LWCONTEXT_float_float_float__void swig_types[91]
+#define SWIGTYPE_p_f_p_struct__LWCONTEXT__void swig_types[92]
+#define SWIGTYPE_p_float swig_types[93]
+#define SWIGTYPE_p_int swig_types[94]
+#define SWIGTYPE_p_int64_t swig_types[95]
+#define SWIGTYPE_p_p__LWDELTATIME swig_types[96]
+#define SWIGTYPE_p_p__LWPS swig_types[97]
+#define SWIGTYPE_p_p__LWSKILL swig_types[98]
+#define SWIGTYPE_p_p__kvmsg swig_types[99]
+#define SWIGTYPE_p_p_char swig_types[100]
+#define SWIGTYPE_p_p_tinyobj_material_t swig_types[101]
+#define SWIGTYPE_p_p_tinyobj_shape_t swig_types[102]
+#define SWIGTYPE_p_p_void swig_types[103]
+#define SWIGTYPE_p_pcg_state_setseq_64 swig_types[104]
+#define SWIGTYPE_p_short swig_types[105]
+#define SWIGTYPE_p_size_t swig_types[106]
+#define SWIGTYPE_p_tinyobj_attrib_t swig_types[107]
+#define SWIGTYPE_p_tinyobj_material_t swig_types[108]
+#define SWIGTYPE_p_tinyobj_shape_t swig_types[109]
+#define SWIGTYPE_p_tinyobj_vertex_index_t swig_types[110]
+#define SWIGTYPE_p_uint32_t swig_types[111]
+#define SWIGTYPE_p_uint64_t swig_types[112]
+#define SWIGTYPE_p_unsigned_char swig_types[113]
+#define SWIGTYPE_p_unsigned_int swig_types[114]
+#define SWIGTYPE_p_unsigned_long swig_types[115]
+#define SWIGTYPE_p_unsigned_short swig_types[116]
+#define SWIGTYPE_p_void swig_types[117]
+#define SWIGTYPE_p_zhash_t swig_types[118]
+static swig_type_info *swig_types[120];
+static swig_module_info swig_module = {swig_types, 119, 0, 0, 0, 0};
 #define SWIG_TypeQuery(name) SWIG_TypeQueryModule(&swig_module, &swig_module, name)
 #define SWIG_MangledTypeQuery(name) SWIG_MangledTypeQueryModule(&swig_module, &swig_module, name)
 
@@ -2872,6 +2873,7 @@ static swig_module_info swig_module = {swig_types, 118, 0, 0, 0, 0};
 #include "battle_result.h"
 #include "battlelogic.h"
 #include "rmsg.h"
+#include "lwparabola.h"
 
 #ifdef WIN32
 #pragma warning(pop)
@@ -2893,6 +2895,38 @@ typedef struct {
   unsigned int god : 2;
   unsigned int evl : 2;
 } LWATTRIBVALUE_bits;
+
+
+static int *new_int(int nelements) { 
+  return (int *) calloc(nelements,sizeof(int)); 
+}
+
+static void delete_int(int *ary) { 
+  free(ary); 
+}
+
+static int int_getitem(int *ary, int index) {
+    return ary[index];
+}
+static void int_setitem(int *ary, int index, int value) {
+    ary[index] = value;
+}
+
+
+static float *new_float(int nelements) { 
+  return (float *) calloc(nelements,sizeof(float)); 
+}
+
+static void delete_float(float *ary) { 
+  free(ary); 
+}
+
+static float float_getitem(float *ary, int index) {
+    return ary[index];
+}
+static void float_setitem(float *ary, int index, float value) {
+    ary[index] = value;
+}
 
 #ifdef __cplusplus
 extern "C" {
@@ -4239,7 +4273,7 @@ static int _wrap_mat4x4_invert(lua_State* L) {
   
   SWIG_check_num_args("mat4x4_invert",2,2)
   if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("mat4x4_invert",1,"mat4x4");
-  if(!SWIG_isptrtype(L,2)) SWIG_fail_arg("mat4x4_invert",2,"mat4x4");
+  if(!SWIG_isptrtype(L,2)) SWIG_fail_arg("mat4x4_invert",2,"mat4x4 const");
   
   if (!SWIG_IsOK(SWIG_ConvertPtr(L,1,(void**)&arg1,SWIGTYPE_p_a_4__float,0))){
     SWIG_fail_ptr("mat4x4_invert",1,SWIGTYPE_p_a_4__float);
@@ -4250,7 +4284,7 @@ static int _wrap_mat4x4_invert(lua_State* L) {
     SWIG_fail_ptr("mat4x4_invert",2,SWIGTYPE_p_a_4__float);
   }
   
-  mat4x4_invert((float (*)[4])arg1,(float (*)[4])arg2);
+  mat4x4_invert((float (*)[4])arg1,(float const (*)[4])arg2);
   
   return SWIG_arg;
   
@@ -44117,6 +44151,832 @@ fail:
 }
 
 
+static int _wrap_LWPARABOLA3D_abc_set(lua_State* L) {
+  int SWIG_arg = 0;
+  struct _LWPARABOLA3D *arg1 = (struct _LWPARABOLA3D *) 0 ;
+  float *arg2 ;
+  
+  SWIG_check_num_args("_LWPARABOLA3D::abc",2,2)
+  if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("_LWPARABOLA3D::abc",1,"struct _LWPARABOLA3D *");
+  if(!SWIG_isptrtype(L,2)) SWIG_fail_arg("_LWPARABOLA3D::abc",2,"float [3]");
+  
+  if (!SWIG_IsOK(SWIG_ConvertPtr(L,1,(void**)&arg1,SWIGTYPE_p__LWPARABOLA3D,0))){
+    SWIG_fail_ptr("LWPARABOLA3D_abc_set",1,SWIGTYPE_p__LWPARABOLA3D);
+  }
+  
+  
+  if (!SWIG_IsOK(SWIG_ConvertPtr(L,2,(void**)&arg2,SWIGTYPE_p_float,0))){
+    SWIG_fail_ptr("LWPARABOLA3D_abc_set",2,SWIGTYPE_p_float);
+  }
+  
+  {
+    size_t ii;
+    float *b = (float *) arg1->abc;
+    for (ii = 0; ii < (size_t)3; ii++) b[ii] = *((float *) arg2 + ii);
+  }
+  
+  return SWIG_arg;
+  
+  if(0) SWIG_fail;
+  
+fail:
+  lua_error(L);
+  return SWIG_arg;
+}
+
+
+static int _wrap_LWPARABOLA3D_abc_get(lua_State* L) {
+  int SWIG_arg = 0;
+  struct _LWPARABOLA3D *arg1 = (struct _LWPARABOLA3D *) 0 ;
+  float *result = 0 ;
+  
+  SWIG_check_num_args("_LWPARABOLA3D::abc",1,1)
+  if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("_LWPARABOLA3D::abc",1,"struct _LWPARABOLA3D *");
+  
+  if (!SWIG_IsOK(SWIG_ConvertPtr(L,1,(void**)&arg1,SWIGTYPE_p__LWPARABOLA3D,0))){
+    SWIG_fail_ptr("LWPARABOLA3D_abc_get",1,SWIGTYPE_p__LWPARABOLA3D);
+  }
+  
+  result = (float *)(float *) ((arg1)->abc);
+  SWIG_NewPointerObj(L,result,SWIGTYPE_p_float,0); SWIG_arg++; 
+  return SWIG_arg;
+  
+  if(0) SWIG_fail;
+  
+fail:
+  lua_error(L);
+  return SWIG_arg;
+}
+
+
+static int _wrap_LWPARABOLA3D_angle_set(lua_State* L) {
+  int SWIG_arg = 0;
+  struct _LWPARABOLA3D *arg1 = (struct _LWPARABOLA3D *) 0 ;
+  float arg2 ;
+  
+  SWIG_check_num_args("_LWPARABOLA3D::angle",2,2)
+  if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("_LWPARABOLA3D::angle",1,"struct _LWPARABOLA3D *");
+  if(!lua_isnumber(L,2)) SWIG_fail_arg("_LWPARABOLA3D::angle",2,"float");
+  
+  if (!SWIG_IsOK(SWIG_ConvertPtr(L,1,(void**)&arg1,SWIGTYPE_p__LWPARABOLA3D,0))){
+    SWIG_fail_ptr("LWPARABOLA3D_angle_set",1,SWIGTYPE_p__LWPARABOLA3D);
+  }
+  
+  arg2 = (float)lua_tonumber(L, 2);
+  if (arg1) (arg1)->angle = arg2;
+  
+  return SWIG_arg;
+  
+  if(0) SWIG_fail;
+  
+fail:
+  lua_error(L);
+  return SWIG_arg;
+}
+
+
+static int _wrap_LWPARABOLA3D_angle_get(lua_State* L) {
+  int SWIG_arg = 0;
+  struct _LWPARABOLA3D *arg1 = (struct _LWPARABOLA3D *) 0 ;
+  float result;
+  
+  SWIG_check_num_args("_LWPARABOLA3D::angle",1,1)
+  if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("_LWPARABOLA3D::angle",1,"struct _LWPARABOLA3D *");
+  
+  if (!SWIG_IsOK(SWIG_ConvertPtr(L,1,(void**)&arg1,SWIGTYPE_p__LWPARABOLA3D,0))){
+    SWIG_fail_ptr("LWPARABOLA3D_angle_get",1,SWIGTYPE_p__LWPARABOLA3D);
+  }
+  
+  result = (float) ((arg1)->angle);
+  lua_pushnumber(L, (lua_Number) result); SWIG_arg++;
+  return SWIG_arg;
+  
+  if(0) SWIG_fail;
+  
+fail:
+  lua_error(L);
+  return SWIG_arg;
+}
+
+
+static int _wrap_LWPARABOLA3D_p0_set(lua_State* L) {
+  int SWIG_arg = 0;
+  struct _LWPARABOLA3D *arg1 = (struct _LWPARABOLA3D *) 0 ;
+  float *arg2 ;
+  
+  SWIG_check_num_args("_LWPARABOLA3D::p0",2,2)
+  if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("_LWPARABOLA3D::p0",1,"struct _LWPARABOLA3D *");
+  if(!SWIG_isptrtype(L,2)) SWIG_fail_arg("_LWPARABOLA3D::p0",2,"vec3");
+  
+  if (!SWIG_IsOK(SWIG_ConvertPtr(L,1,(void**)&arg1,SWIGTYPE_p__LWPARABOLA3D,0))){
+    SWIG_fail_ptr("LWPARABOLA3D_p0_set",1,SWIGTYPE_p__LWPARABOLA3D);
+  }
+  
+  
+  if (!SWIG_IsOK(SWIG_ConvertPtr(L,2,(void**)&arg2,SWIGTYPE_p_float,0))){
+    SWIG_fail_ptr("LWPARABOLA3D_p0_set",2,SWIGTYPE_p_float);
+  }
+  
+  {
+    size_t ii;
+    float *b = (float *) arg1->p0;
+    for (ii = 0; ii < (size_t)3; ii++) b[ii] = *((float *) arg2 + ii);
+  }
+  
+  return SWIG_arg;
+  
+  if(0) SWIG_fail;
+  
+fail:
+  lua_error(L);
+  return SWIG_arg;
+}
+
+
+static int _wrap_LWPARABOLA3D_p0_get(lua_State* L) {
+  int SWIG_arg = 0;
+  struct _LWPARABOLA3D *arg1 = (struct _LWPARABOLA3D *) 0 ;
+  float *result = 0 ;
+  
+  SWIG_check_num_args("_LWPARABOLA3D::p0",1,1)
+  if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("_LWPARABOLA3D::p0",1,"struct _LWPARABOLA3D *");
+  
+  if (!SWIG_IsOK(SWIG_ConvertPtr(L,1,(void**)&arg1,SWIGTYPE_p__LWPARABOLA3D,0))){
+    SWIG_fail_ptr("LWPARABOLA3D_p0_get",1,SWIGTYPE_p__LWPARABOLA3D);
+  }
+  
+  result = (float *) ((arg1)->p0);
+  SWIG_NewPointerObj(L,result,SWIGTYPE_p_float,0); SWIG_arg++; 
+  return SWIG_arg;
+  
+  if(0) SWIG_fail;
+  
+fail:
+  lua_error(L);
+  return SWIG_arg;
+}
+
+
+static int _wrap_LWPARABOLA3D_p0t_set(lua_State* L) {
+  int SWIG_arg = 0;
+  struct _LWPARABOLA3D *arg1 = (struct _LWPARABOLA3D *) 0 ;
+  float arg2 ;
+  
+  SWIG_check_num_args("_LWPARABOLA3D::p0t",2,2)
+  if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("_LWPARABOLA3D::p0t",1,"struct _LWPARABOLA3D *");
+  if(!lua_isnumber(L,2)) SWIG_fail_arg("_LWPARABOLA3D::p0t",2,"float");
+  
+  if (!SWIG_IsOK(SWIG_ConvertPtr(L,1,(void**)&arg1,SWIGTYPE_p__LWPARABOLA3D,0))){
+    SWIG_fail_ptr("LWPARABOLA3D_p0t_set",1,SWIGTYPE_p__LWPARABOLA3D);
+  }
+  
+  arg2 = (float)lua_tonumber(L, 2);
+  if (arg1) (arg1)->p0t = arg2;
+  
+  return SWIG_arg;
+  
+  if(0) SWIG_fail;
+  
+fail:
+  lua_error(L);
+  return SWIG_arg;
+}
+
+
+static int _wrap_LWPARABOLA3D_p0t_get(lua_State* L) {
+  int SWIG_arg = 0;
+  struct _LWPARABOLA3D *arg1 = (struct _LWPARABOLA3D *) 0 ;
+  float result;
+  
+  SWIG_check_num_args("_LWPARABOLA3D::p0t",1,1)
+  if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("_LWPARABOLA3D::p0t",1,"struct _LWPARABOLA3D *");
+  
+  if (!SWIG_IsOK(SWIG_ConvertPtr(L,1,(void**)&arg1,SWIGTYPE_p__LWPARABOLA3D,0))){
+    SWIG_fail_ptr("LWPARABOLA3D_p0t_get",1,SWIGTYPE_p__LWPARABOLA3D);
+  }
+  
+  result = (float) ((arg1)->p0t);
+  lua_pushnumber(L, (lua_Number) result); SWIG_arg++;
+  return SWIG_arg;
+  
+  if(0) SWIG_fail;
+  
+fail:
+  lua_error(L);
+  return SWIG_arg;
+}
+
+
+static int _wrap_LWPARABOLA3D_p2t_set(lua_State* L) {
+  int SWIG_arg = 0;
+  struct _LWPARABOLA3D *arg1 = (struct _LWPARABOLA3D *) 0 ;
+  float arg2 ;
+  
+  SWIG_check_num_args("_LWPARABOLA3D::p2t",2,2)
+  if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("_LWPARABOLA3D::p2t",1,"struct _LWPARABOLA3D *");
+  if(!lua_isnumber(L,2)) SWIG_fail_arg("_LWPARABOLA3D::p2t",2,"float");
+  
+  if (!SWIG_IsOK(SWIG_ConvertPtr(L,1,(void**)&arg1,SWIGTYPE_p__LWPARABOLA3D,0))){
+    SWIG_fail_ptr("LWPARABOLA3D_p2t_set",1,SWIGTYPE_p__LWPARABOLA3D);
+  }
+  
+  arg2 = (float)lua_tonumber(L, 2);
+  if (arg1) (arg1)->p2t = arg2;
+  
+  return SWIG_arg;
+  
+  if(0) SWIG_fail;
+  
+fail:
+  lua_error(L);
+  return SWIG_arg;
+}
+
+
+static int _wrap_LWPARABOLA3D_p2t_get(lua_State* L) {
+  int SWIG_arg = 0;
+  struct _LWPARABOLA3D *arg1 = (struct _LWPARABOLA3D *) 0 ;
+  float result;
+  
+  SWIG_check_num_args("_LWPARABOLA3D::p2t",1,1)
+  if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("_LWPARABOLA3D::p2t",1,"struct _LWPARABOLA3D *");
+  
+  if (!SWIG_IsOK(SWIG_ConvertPtr(L,1,(void**)&arg1,SWIGTYPE_p__LWPARABOLA3D,0))){
+    SWIG_fail_ptr("LWPARABOLA3D_p2t_get",1,SWIGTYPE_p__LWPARABOLA3D);
+  }
+  
+  result = (float) ((arg1)->p2t);
+  lua_pushnumber(L, (lua_Number) result); SWIG_arg++;
+  return SWIG_arg;
+  
+  if(0) SWIG_fail;
+  
+fail:
+  lua_error(L);
+  return SWIG_arg;
+}
+
+
+static int _wrap_LWPARABOLA3D_rotzinv_set(lua_State* L) {
+  int SWIG_arg = 0;
+  struct _LWPARABOLA3D *arg1 = (struct _LWPARABOLA3D *) 0 ;
+  vec4 *arg2 ;
+  
+  SWIG_check_num_args("_LWPARABOLA3D::rotzinv",2,2)
+  if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("_LWPARABOLA3D::rotzinv",1,"struct _LWPARABOLA3D *");
+  if(!SWIG_isptrtype(L,2)) SWIG_fail_arg("_LWPARABOLA3D::rotzinv",2,"mat4x4");
+  
+  if (!SWIG_IsOK(SWIG_ConvertPtr(L,1,(void**)&arg1,SWIGTYPE_p__LWPARABOLA3D,0))){
+    SWIG_fail_ptr("LWPARABOLA3D_rotzinv_set",1,SWIGTYPE_p__LWPARABOLA3D);
+  }
+  
+  
+  if (!SWIG_IsOK(SWIG_ConvertPtr(L,2,(void**)&arg2,SWIGTYPE_p_a_4__float,0))){
+    SWIG_fail_ptr("LWPARABOLA3D_rotzinv_set",2,SWIGTYPE_p_a_4__float);
+  }
+  
+  {
+    float (*inp)[4] = (float (*)[4])(arg2);
+    float (*dest)[4] = (float (*)[4])(arg1->rotzinv);
+    size_t ii = 0;
+    for (; ii < 4; ++ii) {
+      float *ip = inp[ii];
+      float *dp = dest[ii];
+      size_t jj = 0;
+      for (; jj < 4; ++jj) dp[jj] = ip[jj];
+    }
+  }
+  
+  return SWIG_arg;
+  
+  if(0) SWIG_fail;
+  
+fail:
+  lua_error(L);
+  return SWIG_arg;
+}
+
+
+static int _wrap_LWPARABOLA3D_rotzinv_get(lua_State* L) {
+  int SWIG_arg = 0;
+  struct _LWPARABOLA3D *arg1 = (struct _LWPARABOLA3D *) 0 ;
+  vec4 *result = 0 ;
+  
+  SWIG_check_num_args("_LWPARABOLA3D::rotzinv",1,1)
+  if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("_LWPARABOLA3D::rotzinv",1,"struct _LWPARABOLA3D *");
+  
+  if (!SWIG_IsOK(SWIG_ConvertPtr(L,1,(void**)&arg1,SWIGTYPE_p__LWPARABOLA3D,0))){
+    SWIG_fail_ptr("LWPARABOLA3D_rotzinv_get",1,SWIGTYPE_p__LWPARABOLA3D);
+  }
+  
+  result = (vec4 *) ((arg1)->rotzinv);
+  SWIG_NewPointerObj(L,result,SWIGTYPE_p_a_4__float,0); SWIG_arg++; 
+  return SWIG_arg;
+  
+  if(0) SWIG_fail;
+  
+fail:
+  lua_error(L);
+  return SWIG_arg;
+}
+
+
+static int _wrap_new_LWPARABOLA3D(lua_State* L) {
+  int SWIG_arg = 0;
+  struct _LWPARABOLA3D *result = 0 ;
+  
+  SWIG_check_num_args("_LWPARABOLA3D::_LWPARABOLA3D",0,0)
+  result = (struct _LWPARABOLA3D *)calloc(1, sizeof(struct _LWPARABOLA3D));
+  SWIG_NewPointerObj(L,result,SWIGTYPE_p__LWPARABOLA3D,1); SWIG_arg++; 
+  return SWIG_arg;
+  
+  if(0) SWIG_fail;
+  
+fail:
+  lua_error(L);
+  return SWIG_arg;
+}
+
+
+static void swig_delete_LWPARABOLA3D(void *obj) {
+struct _LWPARABOLA3D *arg1 = (struct _LWPARABOLA3D *) obj;
+free((char *) arg1);
+}
+static int _proxy__wrap_new_LWPARABOLA3D(lua_State *L) {
+    assert(lua_istable(L,1));
+    lua_pushcfunction(L,_wrap_new_LWPARABOLA3D);
+    assert(!lua_isnil(L,-1));
+    lua_replace(L,1); /* replace our table with real constructor */
+    lua_call(L,lua_gettop(L)-1,1);
+    return 1;
+}
+static swig_lua_attribute swig_LWPARABOLA3D_attributes[] = {
+    { "abc", _wrap_LWPARABOLA3D_abc_get, _wrap_LWPARABOLA3D_abc_set },
+    { "angle", _wrap_LWPARABOLA3D_angle_get, _wrap_LWPARABOLA3D_angle_set },
+    { "p0", _wrap_LWPARABOLA3D_p0_get, _wrap_LWPARABOLA3D_p0_set },
+    { "p0t", _wrap_LWPARABOLA3D_p0t_get, _wrap_LWPARABOLA3D_p0t_set },
+    { "p2t", _wrap_LWPARABOLA3D_p2t_get, _wrap_LWPARABOLA3D_p2t_set },
+    { "rotzinv", _wrap_LWPARABOLA3D_rotzinv_get, _wrap_LWPARABOLA3D_rotzinv_set },
+    {0,0,0}
+};
+static swig_lua_method swig_LWPARABOLA3D_methods[]= {
+    {0,0}
+};
+static swig_lua_method swig_LWPARABOLA3D_meta[] = {
+    {0,0}
+};
+
+static swig_lua_attribute swig_LWPARABOLA3D_Sf_SwigStatic_attributes[] = {
+    {0,0,0}
+};
+static swig_lua_const_info swig_LWPARABOLA3D_Sf_SwigStatic_constants[]= {
+    {0,0,0,0,0,0}
+};
+static swig_lua_method swig_LWPARABOLA3D_Sf_SwigStatic_methods[]= {
+    {0,0}
+};
+static swig_lua_class* swig_LWPARABOLA3D_Sf_SwigStatic_classes[]= {
+    0
+};
+
+static swig_lua_namespace swig_LWPARABOLA3D_Sf_SwigStatic = {
+    "LWPARABOLA3D",
+    swig_LWPARABOLA3D_Sf_SwigStatic_methods,
+    swig_LWPARABOLA3D_Sf_SwigStatic_attributes,
+    swig_LWPARABOLA3D_Sf_SwigStatic_constants,
+    swig_LWPARABOLA3D_Sf_SwigStatic_classes,
+    0
+};
+static swig_lua_class *swig_LWPARABOLA3D_bases[] = {0};
+static const char *swig_LWPARABOLA3D_base_names[] = {0};
+static swig_lua_class _wrap_class_LWPARABOLA3D = { "LWPARABOLA3D", "LWPARABOLA3D", &SWIGTYPE_p__LWPARABOLA3D,_proxy__wrap_new_LWPARABOLA3D, swig_delete_LWPARABOLA3D, swig_LWPARABOLA3D_methods, swig_LWPARABOLA3D_attributes, &swig_LWPARABOLA3D_Sf_SwigStatic, swig_LWPARABOLA3D_meta, swig_LWPARABOLA3D_bases, swig_LWPARABOLA3D_base_names };
+
+static int _wrap_lwparabola_three_points_on_2d_plane(lua_State* L) {
+  int SWIG_arg = 0;
+  float *arg1 ;
+  float *arg2 ;
+  float *arg3 ;
+  float *arg4 ;
+  
+  SWIG_check_num_args("lwparabola_three_points_on_2d_plane",4,4)
+  if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("lwparabola_three_points_on_2d_plane",1,"vec2 const");
+  if(!SWIG_isptrtype(L,2)) SWIG_fail_arg("lwparabola_three_points_on_2d_plane",2,"vec2 const");
+  if(!SWIG_isptrtype(L,3)) SWIG_fail_arg("lwparabola_three_points_on_2d_plane",3,"vec2 const");
+  if(!SWIG_isptrtype(L,4)) SWIG_fail_arg("lwparabola_three_points_on_2d_plane",4,"vec3");
+  
+  if (!SWIG_IsOK(SWIG_ConvertPtr(L,1,(void**)&arg1,SWIGTYPE_p_float,0))){
+    SWIG_fail_ptr("lwparabola_three_points_on_2d_plane",1,SWIGTYPE_p_float);
+  }
+  
+  
+  if (!SWIG_IsOK(SWIG_ConvertPtr(L,2,(void**)&arg2,SWIGTYPE_p_float,0))){
+    SWIG_fail_ptr("lwparabola_three_points_on_2d_plane",2,SWIGTYPE_p_float);
+  }
+  
+  
+  if (!SWIG_IsOK(SWIG_ConvertPtr(L,3,(void**)&arg3,SWIGTYPE_p_float,0))){
+    SWIG_fail_ptr("lwparabola_three_points_on_2d_plane",3,SWIGTYPE_p_float);
+  }
+  
+  
+  if (!SWIG_IsOK(SWIG_ConvertPtr(L,4,(void**)&arg4,SWIGTYPE_p_float,0))){
+    SWIG_fail_ptr("lwparabola_three_points_on_2d_plane",4,SWIGTYPE_p_float);
+  }
+  
+  lwparabola_three_points_on_2d_plane((float const (*))arg1,(float const (*))arg2,(float const (*))arg3,arg4);
+  
+  return SWIG_arg;
+  
+  if(0) SWIG_fail;
+  
+fail:
+  lua_error(L);
+  return SWIG_arg;
+}
+
+
+static int _wrap_lwparabola_param_t(lua_State* L) {
+  int SWIG_arg = 0;
+  float *arg1 ;
+  float *arg2 ;
+  float result;
+  
+  SWIG_check_num_args("lwparabola_param_t",2,2)
+  if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("lwparabola_param_t",1,"vec3 const");
+  if(!SWIG_isptrtype(L,2)) SWIG_fail_arg("lwparabola_param_t",2,"vec2 const");
+  
+  if (!SWIG_IsOK(SWIG_ConvertPtr(L,1,(void**)&arg1,SWIGTYPE_p_float,0))){
+    SWIG_fail_ptr("lwparabola_param_t",1,SWIGTYPE_p_float);
+  }
+  
+  
+  if (!SWIG_IsOK(SWIG_ConvertPtr(L,2,(void**)&arg2,SWIGTYPE_p_float,0))){
+    SWIG_fail_ptr("lwparabola_param_t",2,SWIGTYPE_p_float);
+  }
+  
+  result = (float)lwparabola_param_t((float const (*))arg1,(float const (*))arg2);
+  lua_pushnumber(L, (lua_Number) result); SWIG_arg++;
+  return SWIG_arg;
+  
+  if(0) SWIG_fail;
+  
+fail:
+  lua_error(L);
+  return SWIG_arg;
+}
+
+
+static int _wrap_lwparabola_p_from_param_t(lua_State* L) {
+  int SWIG_arg = 0;
+  float *arg1 ;
+  float arg2 ;
+  float *arg3 ;
+  
+  SWIG_check_num_args("lwparabola_p_from_param_t",3,3)
+  if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("lwparabola_p_from_param_t",1,"vec3 const");
+  if(!lua_isnumber(L,2)) SWIG_fail_arg("lwparabola_p_from_param_t",2,"float const");
+  if(!SWIG_isptrtype(L,3)) SWIG_fail_arg("lwparabola_p_from_param_t",3,"vec2");
+  
+  if (!SWIG_IsOK(SWIG_ConvertPtr(L,1,(void**)&arg1,SWIGTYPE_p_float,0))){
+    SWIG_fail_ptr("lwparabola_p_from_param_t",1,SWIGTYPE_p_float);
+  }
+  
+  arg2 = (float const)lua_tonumber(L, 2);
+  
+  if (!SWIG_IsOK(SWIG_ConvertPtr(L,3,(void**)&arg3,SWIGTYPE_p_float,0))){
+    SWIG_fail_ptr("lwparabola_p_from_param_t",3,SWIGTYPE_p_float);
+  }
+  
+  lwparabola_p_from_param_t((float const (*))arg1,arg2,arg3);
+  
+  return SWIG_arg;
+  
+  if(0) SWIG_fail;
+  
+fail:
+  lua_error(L);
+  return SWIG_arg;
+}
+
+
+static int _wrap_lwparabola_pitch_rad_from_param_t(lua_State* L) {
+  int SWIG_arg = 0;
+  float *arg1 ;
+  float arg2 ;
+  float result;
+  
+  SWIG_check_num_args("lwparabola_pitch_rad_from_param_t",2,2)
+  if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("lwparabola_pitch_rad_from_param_t",1,"vec3 const");
+  if(!lua_isnumber(L,2)) SWIG_fail_arg("lwparabola_pitch_rad_from_param_t",2,"float const");
+  
+  if (!SWIG_IsOK(SWIG_ConvertPtr(L,1,(void**)&arg1,SWIGTYPE_p_float,0))){
+    SWIG_fail_ptr("lwparabola_pitch_rad_from_param_t",1,SWIGTYPE_p_float);
+  }
+  
+  arg2 = (float const)lua_tonumber(L, 2);
+  result = (float)lwparabola_pitch_rad_from_param_t((float const (*))arg1,arg2);
+  lua_pushnumber(L, (lua_Number) result); SWIG_arg++;
+  return SWIG_arg;
+  
+  if(0) SWIG_fail;
+  
+fail:
+  lua_error(L);
+  return SWIG_arg;
+}
+
+
+static int _wrap_lwparabola_three_points_on_plane_perpendicular_to_xy_plane(lua_State* L) {
+  int SWIG_arg = 0;
+  float *arg1 ;
+  float *arg2 ;
+  float *arg3 ;
+  LWPARABOLA3D *arg4 = (LWPARABOLA3D *) 0 ;
+  
+  SWIG_check_num_args("lwparabola_three_points_on_plane_perpendicular_to_xy_plane",4,4)
+  if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("lwparabola_three_points_on_plane_perpendicular_to_xy_plane",1,"vec3 const");
+  if(!SWIG_isptrtype(L,2)) SWIG_fail_arg("lwparabola_three_points_on_plane_perpendicular_to_xy_plane",2,"vec3 const");
+  if(!SWIG_isptrtype(L,3)) SWIG_fail_arg("lwparabola_three_points_on_plane_perpendicular_to_xy_plane",3,"vec3 const");
+  if(!SWIG_isptrtype(L,4)) SWIG_fail_arg("lwparabola_three_points_on_plane_perpendicular_to_xy_plane",4,"LWPARABOLA3D *");
+  
+  if (!SWIG_IsOK(SWIG_ConvertPtr(L,1,(void**)&arg1,SWIGTYPE_p_float,0))){
+    SWIG_fail_ptr("lwparabola_three_points_on_plane_perpendicular_to_xy_plane",1,SWIGTYPE_p_float);
+  }
+  
+  
+  if (!SWIG_IsOK(SWIG_ConvertPtr(L,2,(void**)&arg2,SWIGTYPE_p_float,0))){
+    SWIG_fail_ptr("lwparabola_three_points_on_plane_perpendicular_to_xy_plane",2,SWIGTYPE_p_float);
+  }
+  
+  
+  if (!SWIG_IsOK(SWIG_ConvertPtr(L,3,(void**)&arg3,SWIGTYPE_p_float,0))){
+    SWIG_fail_ptr("lwparabola_three_points_on_plane_perpendicular_to_xy_plane",3,SWIGTYPE_p_float);
+  }
+  
+  
+  if (!SWIG_IsOK(SWIG_ConvertPtr(L,4,(void**)&arg4,SWIGTYPE_p__LWPARABOLA3D,0))){
+    SWIG_fail_ptr("lwparabola_three_points_on_plane_perpendicular_to_xy_plane",4,SWIGTYPE_p__LWPARABOLA3D);
+  }
+  
+  lwparabola_three_points_on_plane_perpendicular_to_xy_plane((float const (*))arg1,(float const (*))arg2,(float const (*))arg3,arg4);
+  
+  return SWIG_arg;
+  
+  if(0) SWIG_fail;
+  
+fail:
+  lua_error(L);
+  return SWIG_arg;
+}
+
+
+static int _wrap_lwparabola_p_3d_from_param_t(lua_State* L) {
+  int SWIG_arg = 0;
+  LWPARABOLA3D *arg1 = (LWPARABOLA3D *) 0 ;
+  float arg2 ;
+  float *arg3 ;
+  
+  SWIG_check_num_args("lwparabola_p_3d_from_param_t",3,3)
+  if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("lwparabola_p_3d_from_param_t",1,"LWPARABOLA3D const *");
+  if(!lua_isnumber(L,2)) SWIG_fail_arg("lwparabola_p_3d_from_param_t",2,"float const");
+  if(!SWIG_isptrtype(L,3)) SWIG_fail_arg("lwparabola_p_3d_from_param_t",3,"vec3");
+  
+  if (!SWIG_IsOK(SWIG_ConvertPtr(L,1,(void**)&arg1,SWIGTYPE_p__LWPARABOLA3D,0))){
+    SWIG_fail_ptr("lwparabola_p_3d_from_param_t",1,SWIGTYPE_p__LWPARABOLA3D);
+  }
+  
+  arg2 = (float const)lua_tonumber(L, 2);
+  
+  if (!SWIG_IsOK(SWIG_ConvertPtr(L,3,(void**)&arg3,SWIGTYPE_p_float,0))){
+    SWIG_fail_ptr("lwparabola_p_3d_from_param_t",3,SWIGTYPE_p_float);
+  }
+  
+  lwparabola_p_3d_from_param_t((struct _LWPARABOLA3D const *)arg1,arg2,arg3);
+  
+  return SWIG_arg;
+  
+  if(0) SWIG_fail;
+  
+fail:
+  lua_error(L);
+  return SWIG_arg;
+}
+
+
+static int _wrap_lwparabola_test(lua_State* L) {
+  int SWIG_arg = 0;
+  
+  SWIG_check_num_args("lwparabola_test",0,0)
+  lwparabola_test();
+  
+  return SWIG_arg;
+  
+  if(0) SWIG_fail;
+  
+fail:
+  lua_error(L);
+  return SWIG_arg;
+}
+
+
+static int _wrap_new_int(lua_State* L) {
+  int SWIG_arg = 0;
+  int arg1 ;
+  int *result = 0 ;
+  
+  SWIG_check_num_args("new_int",1,1)
+  if(!lua_isnumber(L,1)) SWIG_fail_arg("new_int",1,"int");
+  arg1 = (int)lua_tonumber(L, 1);
+  result = (int *)new_int(arg1);
+  SWIG_NewPointerObj(L,result,SWIGTYPE_p_int,0); SWIG_arg++; 
+  return SWIG_arg;
+  
+  if(0) SWIG_fail;
+  
+fail:
+  lua_error(L);
+  return SWIG_arg;
+}
+
+
+static int _wrap_delete_int(lua_State* L) {
+  int SWIG_arg = 0;
+  int *arg1 = (int *) 0 ;
+  
+  SWIG_check_num_args("delete_int",1,1)
+  if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("delete_int",1,"int *");
+  
+  if (!SWIG_IsOK(SWIG_ConvertPtr(L,1,(void**)&arg1,SWIGTYPE_p_int,0))){
+    SWIG_fail_ptr("delete_int",1,SWIGTYPE_p_int);
+  }
+  
+  delete_int(arg1);
+  
+  return SWIG_arg;
+  
+  if(0) SWIG_fail;
+  
+fail:
+  lua_error(L);
+  return SWIG_arg;
+}
+
+
+static int _wrap_int_getitem(lua_State* L) {
+  int SWIG_arg = 0;
+  int *arg1 = (int *) 0 ;
+  int arg2 ;
+  int result;
+  
+  SWIG_check_num_args("int_getitem",2,2)
+  if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("int_getitem",1,"int *");
+  if(!lua_isnumber(L,2)) SWIG_fail_arg("int_getitem",2,"int");
+  
+  if (!SWIG_IsOK(SWIG_ConvertPtr(L,1,(void**)&arg1,SWIGTYPE_p_int,0))){
+    SWIG_fail_ptr("int_getitem",1,SWIGTYPE_p_int);
+  }
+  
+  arg2 = (int)lua_tonumber(L, 2);
+  result = (int)int_getitem(arg1,arg2);
+  lua_pushnumber(L, (lua_Number) result); SWIG_arg++;
+  return SWIG_arg;
+  
+  if(0) SWIG_fail;
+  
+fail:
+  lua_error(L);
+  return SWIG_arg;
+}
+
+
+static int _wrap_int_setitem(lua_State* L) {
+  int SWIG_arg = 0;
+  int *arg1 = (int *) 0 ;
+  int arg2 ;
+  int arg3 ;
+  
+  SWIG_check_num_args("int_setitem",3,3)
+  if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("int_setitem",1,"int *");
+  if(!lua_isnumber(L,2)) SWIG_fail_arg("int_setitem",2,"int");
+  if(!lua_isnumber(L,3)) SWIG_fail_arg("int_setitem",3,"int");
+  
+  if (!SWIG_IsOK(SWIG_ConvertPtr(L,1,(void**)&arg1,SWIGTYPE_p_int,0))){
+    SWIG_fail_ptr("int_setitem",1,SWIGTYPE_p_int);
+  }
+  
+  arg2 = (int)lua_tonumber(L, 2);
+  arg3 = (int)lua_tonumber(L, 3);
+  int_setitem(arg1,arg2,arg3);
+  
+  return SWIG_arg;
+  
+  if(0) SWIG_fail;
+  
+fail:
+  lua_error(L);
+  return SWIG_arg;
+}
+
+
+static int _wrap_new_float(lua_State* L) {
+  int SWIG_arg = 0;
+  int arg1 ;
+  float *result = 0 ;
+  
+  SWIG_check_num_args("new_float",1,1)
+  if(!lua_isnumber(L,1)) SWIG_fail_arg("new_float",1,"int");
+  arg1 = (int)lua_tonumber(L, 1);
+  result = (float *)new_float(arg1);
+  SWIG_NewPointerObj(L,result,SWIGTYPE_p_float,0); SWIG_arg++; 
+  return SWIG_arg;
+  
+  if(0) SWIG_fail;
+  
+fail:
+  lua_error(L);
+  return SWIG_arg;
+}
+
+
+static int _wrap_delete_float(lua_State* L) {
+  int SWIG_arg = 0;
+  float *arg1 = (float *) 0 ;
+  
+  SWIG_check_num_args("delete_float",1,1)
+  if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("delete_float",1,"float *");
+  
+  if (!SWIG_IsOK(SWIG_ConvertPtr(L,1,(void**)&arg1,SWIGTYPE_p_float,0))){
+    SWIG_fail_ptr("delete_float",1,SWIGTYPE_p_float);
+  }
+  
+  delete_float(arg1);
+  
+  return SWIG_arg;
+  
+  if(0) SWIG_fail;
+  
+fail:
+  lua_error(L);
+  return SWIG_arg;
+}
+
+
+static int _wrap_float_getitem(lua_State* L) {
+  int SWIG_arg = 0;
+  float *arg1 = (float *) 0 ;
+  int arg2 ;
+  float result;
+  
+  SWIG_check_num_args("float_getitem",2,2)
+  if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("float_getitem",1,"float *");
+  if(!lua_isnumber(L,2)) SWIG_fail_arg("float_getitem",2,"int");
+  
+  if (!SWIG_IsOK(SWIG_ConvertPtr(L,1,(void**)&arg1,SWIGTYPE_p_float,0))){
+    SWIG_fail_ptr("float_getitem",1,SWIGTYPE_p_float);
+  }
+  
+  arg2 = (int)lua_tonumber(L, 2);
+  result = (float)float_getitem(arg1,arg2);
+  lua_pushnumber(L, (lua_Number) result); SWIG_arg++;
+  return SWIG_arg;
+  
+  if(0) SWIG_fail;
+  
+fail:
+  lua_error(L);
+  return SWIG_arg;
+}
+
+
+static int _wrap_float_setitem(lua_State* L) {
+  int SWIG_arg = 0;
+  float *arg1 = (float *) 0 ;
+  int arg2 ;
+  float arg3 ;
+  
+  SWIG_check_num_args("float_setitem",3,3)
+  if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("float_setitem",1,"float *");
+  if(!lua_isnumber(L,2)) SWIG_fail_arg("float_setitem",2,"int");
+  if(!lua_isnumber(L,3)) SWIG_fail_arg("float_setitem",3,"float");
+  
+  if (!SWIG_IsOK(SWIG_ConvertPtr(L,1,(void**)&arg1,SWIGTYPE_p_float,0))){
+    SWIG_fail_ptr("float_setitem",1,SWIGTYPE_p_float);
+  }
+  
+  arg2 = (int)lua_tonumber(L, 2);
+  arg3 = (float)lua_tonumber(L, 3);
+  float_setitem(arg1,arg2,arg3);
+  
+  return SWIG_arg;
+  
+  if(0) SWIG_fail;
+  
+fail:
+  lua_error(L);
+  return SWIG_arg;
+}
+
+
 static swig_lua_attribute swig_SwigModule_attributes[] = {
     { "default_uv_offset", _wrap_default_uv_offset_get, SWIG_Lua_set_immutable },
     { "default_uv_scale", _wrap_default_uv_scale_get, SWIG_Lua_set_immutable },
@@ -44137,8 +44997,8 @@ static swig_lua_const_info swig_SwigModule_constants[]= {
     {SWIG_LUA_CONSTTAB_STRING("ASSETS_BASE_PATH", "assets\\")},
     {SWIG_LUA_CONSTTAB_FLOAT("M_PI", (3.14159265358979323846))},
     {SWIG_LUA_CONSTTAB_FLOAT("LWEPSILON", (1e-3))},
-    {SWIG_LUA_CONSTTAB_STRING("__LW_STRING_LINE__", "81")},
-    {SWIG_LUA_CONSTTAB_STRING("LWLOGPOS", "lwmacro.h(82): ")},
+    {SWIG_LUA_CONSTTAB_STRING("__LW_STRING_LINE__", "82")},
+    {SWIG_LUA_CONSTTAB_STRING("LWLOGPOS", "lwmacro.h(83): ")},
     {SWIG_LUA_CONSTTAB_INT("MAX_FIELD_SPHERE", (50))},
     {SWIG_LUA_CONSTTAB_INT("MAX_FIELD_REMOTE_SPHERE", (50))},
     {SWIG_LUA_CONSTTAB_INT("MAX_USER_GEOM", (16))},
@@ -44417,6 +45277,7 @@ static swig_lua_const_info swig_SwigModule_constants[]= {
     {SWIG_LUA_CONSTTAB_INT("LVT_BATTLEGROUND_FLOOR", LVT_BATTLEGROUND_FLOOR)},
     {SWIG_LUA_CONSTTAB_INT("LVT_BATTLEGROUND_WALL", LVT_BATTLEGROUND_WALL)},
     {SWIG_LUA_CONSTTAB_INT("LVT_CROSSBOW_ARROW", LVT_CROSSBOW_ARROW)},
+    {SWIG_LUA_CONSTTAB_INT("LVT_CATAPULT_BALL", LVT_CATAPULT_BALL)},
     {SWIG_LUA_CONSTTAB_INT("LVT_COUNT", LVT_COUNT)},
     {SWIG_LUA_CONSTTAB_INT("LSVT_TRIANGLE", LSVT_TRIANGLE)},
     {SWIG_LUA_CONSTTAB_INT("LSVT_TREEPLANE", LSVT_TREEPLANE)},
@@ -44860,6 +45721,21 @@ static swig_lua_method swig_SwigModule_methods[]= {
     { "rmsg_turn", _wrap_rmsg_turn},
     { "rmsg_anim", _wrap_rmsg_anim},
     { "rmsg_rparams", _wrap_rmsg_rparams},
+    { "lwparabola_three_points_on_2d_plane", _wrap_lwparabola_three_points_on_2d_plane},
+    { "lwparabola_param_t", _wrap_lwparabola_param_t},
+    { "lwparabola_p_from_param_t", _wrap_lwparabola_p_from_param_t},
+    { "lwparabola_pitch_rad_from_param_t", _wrap_lwparabola_pitch_rad_from_param_t},
+    { "lwparabola_three_points_on_plane_perpendicular_to_xy_plane", _wrap_lwparabola_three_points_on_plane_perpendicular_to_xy_plane},
+    { "lwparabola_p_3d_from_param_t", _wrap_lwparabola_p_3d_from_param_t},
+    { "lwparabola_test", _wrap_lwparabola_test},
+    { "new_int", _wrap_new_int},
+    { "delete_int", _wrap_delete_int},
+    { "int_getitem", _wrap_int_getitem},
+    { "int_setitem", _wrap_int_setitem},
+    { "new_float", _wrap_new_float},
+    { "delete_float", _wrap_delete_float},
+    { "float_getitem", _wrap_float_getitem},
+    { "float_setitem", _wrap_float_setitem},
     {0,0}
 };
 static swig_lua_class* swig_SwigModule_classes[]= {
@@ -44915,6 +45791,7 @@ static swig_lua_class* swig_SwigModule_classes[]= {
 &_wrap_class_LWSKINVERTEX,
 &_wrap_class_LWFANVERTEX,
 &_wrap_class_LWARMATURE,
+&_wrap_class_LWPARABOLA3D,
     0
 };
 static swig_lua_namespace* swig_SwigModule_namespaces[] = {
@@ -44982,6 +45859,7 @@ static swig_type_info _swigt__p__LWKEYFRAME = {"_p__LWKEYFRAME", "struct _LWKEYF
 static swig_type_info _swigt__p__LWMESSAGEQUEUE = {"_p__LWMESSAGEQUEUE", "struct _LWMESSAGEQUEUE *|LWMESSAGEQUEUE *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p__LWMQMSG = {"_p__LWMQMSG", "struct _LWMQMSG *|_LWMQMSG *|LWMQMSG *", 0, 0, (void*)&_wrap_class_LWMQMSG, 0};
 static swig_type_info _swigt__p__LWNAV = {"_p__LWNAV", "struct _LWNAV *|LWNAV *", 0, 0, (void*)0, 0};
+static swig_type_info _swigt__p__LWPARABOLA3D = {"_p__LWPARABOLA3D", "struct _LWPARABOLA3D *|_LWPARABOLA3D *|LWPARABOLA3D *", 0, 0, (void*)&_wrap_class_LWPARABOLA3D, 0};
 static swig_type_info _swigt__p__LWPARTICLE = {"_p__LWPARTICLE", "struct _LWPARTICLE *|_LWPARTICLE *|LWPARTICLE *", 0, 0, (void*)&_wrap_class_LWPARTICLE, 0};
 static swig_type_info _swigt__p__LWPARTICLE2 = {"_p__LWPARTICLE2", "struct _LWPARTICLE2 *|_LWPARTICLE2 *|LWPARTICLE2 *", 0, 0, (void*)&_wrap_class_LWPARTICLE2, 0};
 static swig_type_info _swigt__p__LWPATHQUERY = {"_p__LWPATHQUERY", "struct _LWPATHQUERY *|LWPATHQUERY *", 0, 0, (void*)0, 0};
@@ -45102,6 +45980,7 @@ static swig_type_info *swig_type_initial[] = {
   &_swigt__p__LWMESSAGEQUEUE,
   &_swigt__p__LWMQMSG,
   &_swigt__p__LWNAV,
+  &_swigt__p__LWPARABOLA3D,
   &_swigt__p__LWPARTICLE,
   &_swigt__p__LWPARTICLE2,
   &_swigt__p__LWPATHQUERY,
@@ -45222,6 +46101,7 @@ static swig_cast_info _swigc__p__LWKEYFRAME[] = {  {&_swigt__p__LWKEYFRAME, 0, 0
 static swig_cast_info _swigc__p__LWMESSAGEQUEUE[] = {  {&_swigt__p__LWMESSAGEQUEUE, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p__LWMQMSG[] = {  {&_swigt__p__LWMQMSG, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p__LWNAV[] = {  {&_swigt__p__LWNAV, 0, 0, 0},{0, 0, 0, 0}};
+static swig_cast_info _swigc__p__LWPARABOLA3D[] = {  {&_swigt__p__LWPARABOLA3D, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p__LWPARTICLE[] = {  {&_swigt__p__LWPARTICLE, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p__LWPARTICLE2[] = {  {&_swigt__p__LWPARTICLE2, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p__LWPATHQUERY[] = {  {&_swigt__p__LWPATHQUERY, 0, 0, 0},{0, 0, 0, 0}};
@@ -45342,6 +46222,7 @@ static swig_cast_info *swig_cast_initial[] = {
   _swigc__p__LWMESSAGEQUEUE,
   _swigc__p__LWMQMSG,
   _swigc__p__LWNAV,
+  _swigc__p__LWPARABOLA3D,
   _swigc__p__LWPARTICLE,
   _swigc__p__LWPARTICLE2,
   _swigc__p__LWPATHQUERY,

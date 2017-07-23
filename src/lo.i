@@ -90,6 +90,7 @@
 #include "battle_result.h"
 #include "battlelogic.h"
 #include "rmsg.h"
+#include "lwparabola.h"
 
 #ifdef WIN32
 #pragma warning(pop)
@@ -183,3 +184,10 @@
 %include "battle_result.h"
 %include "battlelogic.h"
 %include "rmsg.h"
+%include "lwparabola.h"
+
+
+// using the C-array
+%include <carrays.i>
+%array_functions(int,int)
+%array_functions(float,float)

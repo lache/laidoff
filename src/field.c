@@ -22,6 +22,7 @@
 #include "lwtimepoint.h"
 #include "lwanim.h"
 #include "script.h"
+#include "lwparabola.h"
 
 #define MAX_BOX_GEOM (100)
 #define MAX_RAY_RESULT_COUNT (10)

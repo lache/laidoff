@@ -256,7 +256,7 @@ static inline void mat4x4_rotate_Z(mat4x4 Q, mat4x4 M, float angle)
 	};
 	mat4x4_mul(Q, M, R);
 }
-static inline void mat4x4_invert(mat4x4 T, mat4x4 M)
+static inline void mat4x4_invert(mat4x4 T, const mat4x4 M)
 {
 	float idet;
 	float s[6];

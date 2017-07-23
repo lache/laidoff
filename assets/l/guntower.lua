@@ -25,7 +25,9 @@ local M = {
 	bullet_sx = 3,
 	bullet_sy = 4,
 	bullet_sz = 4,
-	bulletspawnheight = 1.548 / 2,
+	bullet_spawn_offset_x = 0,
+	bullet_spawn_offset_y = 0,
+	bullet_spawn_offset_z = 1.548 / 2,
 }
 M.__index = M
 local c = lo.script_context()
@@ -75,7 +77,13 @@ function M:play_fire_anim()
 end
 
 function M:bullet_spawn_pos()
-	return {x=self.x, y=self.y, z=self.z + self.bulletspawnheight}
+	local ca = math.cos(self.angle)
+	local sa = math.sin(self.angle)
+	return {
+		x = self.x + (ca * self.bullet_spawn_offset_x - sa * self.bullet_spawn_offset_y),
+		y = self.y + (sa * self.bullet_spawn_offset_x + ca * self.bullet_spawn_offset_y),
+		z = self.z + self.bullet_spawn_offset_z,
+	}
 end
 
 function M:spawn_bullet()
@@ -86,7 +94,26 @@ function M:spawn_bullet()
 	bullet.sx = self.bullet_sx
 	bullet.sy = self.bullet_sy
 	bullet.sz = self.bullet_sz
+	if self.parabola then
+		self:setup_parabola(bullet)
+	end
 	self.field:spawn(bullet, self.faction)
+end
+
+function M:setup_parabola(bullet)
+	bullet.parabola3d = lo.LWPARABOLA3D()
+	local p0 = lo.new_vec3(bullet.x, bullet.y, bullet.z)
+	local a = 0.85
+	local p1 = lo.new_vec3(
+		a * bullet.x + (1 - a) * self.last_target_x,
+		a * bullet.y + (1 - a) * self.last_target_y,
+		bullet.z * 2
+	)
+	local p2 = lo.new_vec3(self.last_target_x, self.last_target_y, 0)
+	lo.lwparabola_three_points_on_plane_perpendicular_to_xy_plane(p0, p1, p2, bullet.parabola3d)
+	lo.delete_vec3(p0)
+	lo.delete_vec3(p1)
+	lo.delete_vec3(p2)
 end
 
 function M:try_fire(target)
@@ -120,6 +147,9 @@ function M:turn_barrel(target)
 	self.angle = self.angle + move_angle;
 	
 	lo.rmsg_turn(c, self.key, self.angle)
+	
+	self.last_target_x = target.x
+	self.last_target_y = target.y
 	
 	if math.abs(self.angle - self.targetangle) < self.firearcangle then
 		return true

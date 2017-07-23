@@ -52,7 +52,8 @@ function M:query_nearest_target_in_range(caller, range)
 		if obj and obj ~= caller and obj.faction ~= caller.faction then
 			local dx = obj.x - caller.x
 			local dy = obj.y - caller.y
-			local dist = math.sqrt(dx*dx + dy*dy)
+			local dz = obj.z - caller.z
+			local dist = math.sqrt(dx*dx + dy*dy + dz*dz)
 			if dist < range then return obj end
 		end
 	end
