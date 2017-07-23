@@ -119,3 +119,7 @@ int get_curve_value(const LWANIMKEY* key, int key_len, float f, float* v) {
 
 	return 0;
 }
+
+float lwanimaction_animtime_to_f(const LWANIMACTION* action, float animtime) {
+	return animtime * action->fps;
+}

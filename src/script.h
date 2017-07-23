@@ -9,3 +9,4 @@ LWCONTEXT* script_context();
 const char* script_prefix_path();
 void script_update(LWCONTEXT* pLwc);
 void script_cleanup_all_coros(LWCONTEXT* pLwc);
+int script_emit_anim_marker(LWCONTEXT* pLwc, int key, const char* name);

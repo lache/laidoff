@@ -876,6 +876,7 @@ void handle_rmsg_anim(LWCONTEXT* pLwc, const LWFIELDRENDERCOMMAND* cmd) {
 		if (pLwc->render_command[i].key == cmd->key) {
 			pLwc->render_command[i].animstarttime = lwtimepoint_now_seconds();
 			pLwc->render_command[i].actionid = cmd->actionid;
+			pLwc->render_command[i].anim_marker_search_begin = 0;
 			return;
 		}
 	}

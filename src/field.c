@@ -19,6 +19,9 @@
 #include "logic.h"
 #include "lwfieldobject.h"
 #include "lwbox2dcollider.h"
+#include "lwtimepoint.h"
+#include "lwanim.h"
+#include "script.h"
 
 #define MAX_BOX_GEOM (100)
 #define MAX_RAY_RESULT_COUNT (10)
@@ -700,6 +703,29 @@ void update_path_query_test(void* nav, LWPATHQUERY* pq, float move_speed, float 
 	}
 }
 
+void field_update_render_command(LWCONTEXT* pLwc) {
+	const double now = lwtimepoint_now_seconds();
+	for (int i = 0; i < MAX_RENDER_QUEUE_CAPACITY; i++) {
+		LWFIELDRENDERCOMMAND* cmd = &pLwc->render_command[i];
+		if (cmd->key == 0) {
+			continue;
+		}
+		if (cmd->objtype == 1) {
+			const LWANIMACTION* action = &pLwc->action[cmd->actionid];
+			double animtime = rendercommand_animtime(cmd, now);
+			float f = lwanimaction_animtime_to_f(action, (float)animtime);
+			for (int j = cmd->anim_marker_search_begin; j < action->anim_marker_num; j++) {
+				if (f >= action->anim_marker[j].f) {
+					// anim marker triggered!
+					//LOGI("Anim marker triggered: %s", action->anim_marker[j].name);
+					cmd->anim_marker_search_begin = j + 1;
+					script_emit_anim_marker(pLwc, cmd->key, action->anim_marker[j].name);
+				}
+			}
+		}
+	}
+}
+
 void update_field(LWCONTEXT* pLwc, LWFIELD* field) {
 	// Check for invalid input
 	if (!pLwc) {
@@ -756,7 +782,7 @@ void update_field(LWCONTEXT* pLwc, LWFIELD* field) {
 	LW_ACTION player_anim_0 = get_anim_by_state(pLwc->player_state_data.state, &pLwc->player_action_loop);
 	pLwc->player_action = &pLwc->action[player_anim_0];
 	// Get current frame index of the anim action
-	float f = (float)(pLwc->player_state_data.skin_time * pLwc->player_action->fps);
+	float f = lwanimaction_animtime_to_f(pLwc->player_action, pLwc->player_state_data.skin_time);
 	// Check current anim action sequence reaches its end
 	const int player_action_animfin = f > pLwc->player_action->last_key_f;
 	// Update player state data:
@@ -831,6 +857,8 @@ void update_field(LWCONTEXT* pLwc, LWFIELD* field) {
 	field->player_flash = LWMAX(0, field->player_flash - (float)lwcontext_delta_time(pLwc) * 4);
 	// Update particle system
 	ps_update(field->ps, lwcontext_delta_time(pLwc));
+	// Update render command objects
+	field_update_render_command(pLwc);
 }
 
 void unload_field(LWFIELD* field) {

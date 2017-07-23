@@ -94,4 +94,15 @@ function M:update(dt)
 	end
 end
 
+function M:on_anim_marker(key, name)
+	for k,v in pairs(self.objs) do
+		local obj = v.obj
+		if obj and not obj.dead_flag then
+			if obj.key == key then
+				obj:on_anim_marker(name)
+			end
+		end
+	end
+end
+
 return M

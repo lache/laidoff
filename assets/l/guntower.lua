@@ -99,6 +99,15 @@ function M:try_fire(target)
 	else
 		self.fired = ft
 		self:play_fire_anim()
+		if self.fire_anim_marker == nil then
+			self:spawn_bullet()
+		end
+	end
+end
+
+function M:on_anim_marker(name)
+	--print('guntower: anim marker triggered', name)
+	if self.fire_anim_marker and name == self.fire_anim_marker then
 		self:spawn_bullet()
 	end
 end

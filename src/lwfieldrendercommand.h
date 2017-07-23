@@ -1,5 +1,10 @@
 #pragma once
 
+#include <linmath.h>
+#include "lwatlasenum.h"
+#include "lwvbotype.h"
+#include "armature.h"
+
 typedef enum _LW_RENDER_COMMAND_TYPE {
 	LRCT_SPAWN,
 	LRCT_DESPAWN,
@@ -39,4 +44,8 @@ typedef struct _LWFIELDRENDERCOMMAND {
 	float bullet_spawn_height;
 	// VBO
 	LW_VBO_TYPE vbo;
+	// Starting anim marker index for scanning events
+	int anim_marker_search_begin;
 } LWFIELDRENDERCOMMAND;
+
+double rendercommand_animtime(const LWFIELDRENDERCOMMAND* rcmd, double now);

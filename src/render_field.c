@@ -369,7 +369,7 @@ void render_command(const LWCONTEXT* pLwc, mat4x4 view, mat4x4 perspective) {
 		}
 		if (cmd->objtype == 1) {
 			render_tower_yaw(pLwc, perspective, view, cmd->pos[0], cmd->pos[1], cmd->angle,
-				cmd->actionid, (float)(now - cmd->animstarttime), cmd->loop, 1.0f,
+				cmd->actionid, (float)rendercommand_animtime(cmd, now), cmd->loop, 1.0f,
 				cmd->atlas, cmd->skin_vbo, cmd->armature);
 		} else {
 			const float s_x = 3.0f;

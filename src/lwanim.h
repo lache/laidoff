@@ -103,3 +103,4 @@ extern const char* action_filename[LWAC_COUNT];
 void load_action(const char* filename, LWANIMACTION* action);
 void unload_action(LWANIMACTION* action);
 int get_curve_value(const LWANIMKEY* key, int key_len, float t, float* v);
+float lwanimaction_animtime_to_f(const LWANIMACTION* action, float animtime);

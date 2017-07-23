@@ -473,3 +473,26 @@ void script_update(LWCONTEXT* pLwc) {
 		}
 	}
 }
+
+int script_emit_anim_marker(LWCONTEXT* pLwc, int key, const char* name) {
+	int ret;
+
+	/* push functions and arguments */
+	lua_getglobal(pLwc->L, "on_anim_marker");  /* function to be called */
+	lua_pushnumber(pLwc->L, key);   /* push 1st argument */
+	lua_pushstring(pLwc->L, name);   /* push 2nd argument */
+
+	/* do the call (2 arguments, 1 result) */
+	if (lua_pcall(pLwc->L, 2, 1, 0) != 0) {
+		LOGE(LWLOGPOS "error: %s", lua_tostring(pLwc->L, -1));
+	}	
+
+	/* retrieve result */
+	if (!lua_isnumber(pLwc->L, -1)) {
+		LOGE(LWLOGPOS "error: %s", lua_tostring(pLwc->L, -1));
+	}
+		
+	ret = (int)lua_tonumber(pLwc->L, -1);
+	lua_pop(pLwc->L, 1);  /* pop returned value */
+	return ret;
+}

@@ -49,6 +49,7 @@ guntower2.bullet_atlas = lo.LAE_CROSSBOW_KTX
 guntower2.bullet_sx = 0.5
 guntower2.bullet_sy = 0.5
 guntower2.bullet_sz = 0.5
+guntower2.fire_anim_marker = 'fire'
 field:spawn(guntower2, Faction1)
 guntower2:start_thinking()
 
@@ -60,6 +61,12 @@ guntower3.anim_action_id = lo.LWAC_TURRET_RECOIL
 guntower3.bulletspawnheight = 3.15099 / 2
 field:spawn(guntower3, Faction1)
 guntower3:start_thinking()
+
+function on_anim_marker(key, name)
+	--print('on_anim_marker key:',key,', name:', name)
+	field:on_anim_marker(key, name)
+	return 0
+end
 
 start_coro(function()
 	local idx = 1
