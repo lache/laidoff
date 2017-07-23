@@ -11841,6 +11841,33 @@ fail:
 }
 
 
+static int _wrap_lwanimaction_animtime_to_f(lua_State* L) {
+  int SWIG_arg = 0;
+  LWANIMACTION *arg1 = (LWANIMACTION *) 0 ;
+  float arg2 ;
+  float result;
+  
+  SWIG_check_num_args("lwanimaction_animtime_to_f",2,2)
+  if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("lwanimaction_animtime_to_f",1,"LWANIMACTION const *");
+  if(!lua_isnumber(L,2)) SWIG_fail_arg("lwanimaction_animtime_to_f",2,"float");
+  
+  if (!SWIG_IsOK(SWIG_ConvertPtr(L,1,(void**)&arg1,SWIGTYPE_p__LWANIMACTION,0))){
+    SWIG_fail_ptr("lwanimaction_animtime_to_f",1,SWIGTYPE_p__LWANIMACTION);
+  }
+  
+  arg2 = (float)lua_tonumber(L, 2);
+  result = (float)lwanimaction_animtime_to_f((struct _LWANIMACTION const *)arg1,arg2);
+  lua_pushnumber(L, (lua_Number) result); SWIG_arg++;
+  return SWIG_arg;
+  
+  if(0) SWIG_fail;
+  
+fail:
+  lua_error(L);
+  return SWIG_arg;
+}
+
+
 static int _wrap_tex_atlas_filename_get(lua_State* L) {
   int SWIG_arg = 0;
   char **result = 0 ;
@@ -38331,6 +38358,36 @@ fail:
 }
 
 
+static int _wrap_script_emit_anim_marker(lua_State* L) {
+  int SWIG_arg = 0;
+  LWCONTEXT *arg1 = (LWCONTEXT *) 0 ;
+  int arg2 ;
+  char *arg3 = (char *) 0 ;
+  int result;
+  
+  SWIG_check_num_args("script_emit_anim_marker",3,3)
+  if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("script_emit_anim_marker",1,"LWCONTEXT *");
+  if(!lua_isnumber(L,2)) SWIG_fail_arg("script_emit_anim_marker",2,"int");
+  if(!SWIG_lua_isnilstring(L,3)) SWIG_fail_arg("script_emit_anim_marker",3,"char const *");
+  
+  if (!SWIG_IsOK(SWIG_ConvertPtr(L,1,(void**)&arg1,SWIGTYPE_p__LWCONTEXT,0))){
+    SWIG_fail_ptr("script_emit_anim_marker",1,SWIGTYPE_p__LWCONTEXT);
+  }
+  
+  arg2 = (int)lua_tonumber(L, 2);
+  arg3 = (char *)lua_tostring(L, 3);
+  result = (int)script_emit_anim_marker(arg1,arg2,(char const *)arg3);
+  lua_pushnumber(L, (lua_Number) result); SWIG_arg++;
+  return SWIG_arg;
+  
+  if(0) SWIG_fail;
+  
+fail:
+  lua_error(L);
+  return SWIG_arg;
+}
+
+
 static int _wrap_play_sound(lua_State* L) {
   int SWIG_arg = 0;
   LW_SOUND arg1 ;
@@ -44115,6 +44172,7 @@ static swig_lua_const_info swig_SwigModule_constants[]= {
     {SWIG_LUA_CONSTTAB_INT("LWAC_RECOIL", LWAC_RECOIL)},
     {SWIG_LUA_CONSTTAB_INT("LWAC_TURRET_RECOIL", LWAC_TURRET_RECOIL)},
     {SWIG_LUA_CONSTTAB_INT("LWAC_CROSSBOW_FIRE", LWAC_CROSSBOW_FIRE)},
+    {SWIG_LUA_CONSTTAB_INT("LWAC_CATAPULT_FIRE", LWAC_CATAPULT_FIRE)},
     {SWIG_LUA_CONSTTAB_INT("LWAC_COUNT", LWAC_COUNT)},
     {SWIG_LUA_CONSTTAB_INT("LAE_TWIRL_PNG", LAE_TWIRL_PNG)},
     {SWIG_LUA_CONSTTAB_INT("LAE_C2_PNG", LAE_C2_PNG)},
@@ -44170,6 +44228,7 @@ static swig_lua_const_info swig_SwigModule_constants[]= {
     {SWIG_LUA_CONSTTAB_INT("LAE_GUNTOWER_KTX", LAE_GUNTOWER_KTX)},
     {SWIG_LUA_CONSTTAB_INT("LAE_TURRET_KTX", LAE_TURRET_KTX)},
     {SWIG_LUA_CONSTTAB_INT("LAE_CROSSBOW_KTX", LAE_CROSSBOW_KTX)},
+    {SWIG_LUA_CONSTTAB_INT("LAE_CATAPULT_KTX", LAE_CATAPULT_KTX)},
     {SWIG_LUA_CONSTTAB_INT("LAE_BEAM_KTX", LAE_BEAM_KTX)},
     {SWIG_LUA_CONSTTAB_INT("LAE_COUNT", LAE_COUNT)},
     {SWIG_LUA_CONSTTAB_INT("LAS_COMMAND_SELECTED_BG", LAS_COMMAND_SELECTED_BG)},
@@ -44366,6 +44425,7 @@ static swig_lua_const_info swig_SwigModule_constants[]= {
     {SWIG_LUA_CONSTTAB_INT("LSVT_GUNTOWER", LSVT_GUNTOWER)},
     {SWIG_LUA_CONSTTAB_INT("LSVT_TURRET", LSVT_TURRET)},
     {SWIG_LUA_CONSTTAB_INT("LSVT_CROSSBOW", LSVT_CROSSBOW)},
+    {SWIG_LUA_CONSTTAB_INT("LSVT_CATAPULT", LSVT_CATAPULT)},
     {SWIG_LUA_CONSTTAB_INT("LSVT_COUNT", LSVT_COUNT)},
     {SWIG_LUA_CONSTTAB_INT("LFVT_DEFAULT", LFVT_DEFAULT)},
     {SWIG_LUA_CONSTTAB_INT("LFVT_COUNT", LFVT_COUNT)},
@@ -44405,6 +44465,7 @@ static swig_lua_const_info swig_SwigModule_constants[]= {
     {SWIG_LUA_CONSTTAB_INT("LWAR_GUNTOWER_ARMATURE", LWAR_GUNTOWER_ARMATURE)},
     {SWIG_LUA_CONSTTAB_INT("LWAR_TURRET_ARMATURE", LWAR_TURRET_ARMATURE)},
     {SWIG_LUA_CONSTTAB_INT("LWAR_CROSSBOW_ARMATURE", LWAR_CROSSBOW_ARMATURE)},
+    {SWIG_LUA_CONSTTAB_INT("LWAR_CATAPULT_ARMATURE", LWAR_CATAPULT_ARMATURE)},
     {SWIG_LUA_CONSTTAB_INT("LWAR_COUNT", LWAR_COUNT)},
     {0,0,0,0,0,0}
 };
@@ -44626,6 +44687,7 @@ static swig_lua_method swig_SwigModule_methods[]= {
     { "load_action", _wrap_load_action},
     { "unload_action", _wrap_unload_action},
     { "get_curve_value", _wrap_get_curve_value},
+    { "lwanimaction_animtime_to_f", _wrap_lwanimaction_animtime_to_f},
     { "update_player", _wrap_update_player},
     { "lwcontext_delta_time", _wrap_lwcontext_delta_time},
     { "lwcontext_safe_to_start_render", _wrap_lwcontext_safe_to_start_render},
@@ -44757,6 +44819,7 @@ static swig_lua_method swig_SwigModule_methods[]= {
     { "script_prefix_path", _wrap_script_prefix_path},
     { "script_update", _wrap_script_update},
     { "script_cleanup_all_coros", _wrap_script_cleanup_all_coros},
+    { "script_emit_anim_marker", _wrap_script_emit_anim_marker},
     { "play_sound", _wrap_play_sound},
     { "init_sys_msg", _wrap_init_sys_msg},
     { "deinit_sys_msg", _wrap_deinit_sys_msg},

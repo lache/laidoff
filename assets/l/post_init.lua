@@ -62,6 +62,16 @@ guntower3.bulletspawnheight = 3.15099 / 2
 field:spawn(guntower3, Faction1)
 guntower3:start_thinking()
 
+local guntower4 = Guntower:new('gt4', -14, 3, 0)
+guntower4.atlas = lo.LAE_CATAPULT_KTX
+guntower4.skin_vbo = lo.LSVT_CATAPULT
+guntower4.armature = lo.LWAR_CATAPULT_ARMATURE
+guntower4.anim_action_id = lo.LWAC_CATAPULT_FIRE
+guntower4.bulletspawnheight = 3.15099 / 2
+guntower4.fire_anim_marker = 'fire'
+field:spawn(guntower4, Faction1)
+guntower4:start_thinking()
+
 -- this function is called from C, thus should not have 'local' specifier
 function on_anim_marker(key, name)
 	--print('on_anim_marker key:',key,', name:', name)
