@@ -1,4 +1,4 @@
-inspect = require('inspect')
+local inspect = require('inspect')
 
 print("post init lua")
 
@@ -11,7 +11,7 @@ lo.show_sys_msg(c.def_sys_msg, 'I AM SCRIPT 5 한글')
 
 -- Always reload test module by clearing the previous loaded instance
 package.loaded.testmod = nil
-tm = require('testmod')
+local tm = require('testmod')
 print('testmod.foo()', tm.foo())
 
 -- Always reload test module by clearing the previous loaded instance
@@ -62,6 +62,7 @@ guntower3.bulletspawnheight = 3.15099 / 2
 field:spawn(guntower3, Faction1)
 guntower3:start_thinking()
 
+-- this function is called from C, thus should not have 'local' specifier
 function on_anim_marker(key, name)
 	--print('on_anim_marker key:',key,', name:', name)
 	field:on_anim_marker(key, name)
@@ -126,27 +127,27 @@ end)
 
 start_coro(function ()
     --while true do
-      cw1 = spawn_blue_cube_wall_2(10, 10, 1)
+      local cw1 = spawn_blue_cube_wall_2(10, 10, 1)
       yield_wait_ms(1000)
       lo.despawn_field_object(c, cw1)
-      cw2 = spawn_blue_cube_wall_2(11, 11, 1)
+      local cw2 = spawn_blue_cube_wall_2(11, 11, 1)
       yield_wait_ms(1000)
       lo.despawn_field_object(c, cw2)
-      cw3 = spawn_blue_cube_wall_2(12, 12, 1)
+      local cw3 = spawn_blue_cube_wall_2(12, 12, 1)
       yield_wait_ms(1000)
       lo.despawn_field_object(c, cw3)
       yield_wait_ms(1000)
     --end
 end)
 
-nav = lo.field_nav(c.field)
+local nav = lo.field_nav(c.field)
 
 start_coro(function ()
     for i=1, 10 do
       -- Truck field object
-      truck = spawn_oil_truck(pLwc, -8, -8, 6)
+      local truck = spawn_oil_truck(pLwc, -8, -8, 6)
       -- Path query
-      pq = lo.nav_new_path_query(nav)
+      local pq = lo.nav_new_path_query(nav)
       -- Activate path query update
       lo.nav_update_output_path_query(nav, pq, 1)
       -- Bind path query to truck
