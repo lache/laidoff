@@ -107,7 +107,7 @@ int main(void)
 
 	glfwWindowHint(GLFW_DEPTH_BITS, 16);
 
-	glfwWindowHint(GLFW_SAMPLES, 4); // supersampling
+	//glfwWindowHint(GLFW_SAMPLES, 8); // supersampling
 
 #if LW_PLATFORM_RPI
 	glfwWindowHint(GLFW_CLIENT_API, GLFW_OPENGL_ES_API);

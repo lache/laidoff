@@ -610,6 +610,10 @@ static void init_vbo(LWCONTEXT *pLwc) {
 	load_skin_vbo(pLwc, ASSETS_BASE_PATH "svbo" PATH_SEPARATOR "catapult.svbo",
 		&pLwc->skin_vertex_buffer[LSVT_CATAPULT]);
 
+	// LSVT_PYRO
+	load_skin_vbo(pLwc, ASSETS_BASE_PATH "svbo" PATH_SEPARATOR "pyro.svbo",
+		&pLwc->skin_vertex_buffer[LSVT_PYRO]);
+
 	// === STATIC MESHES (FAN TYPE) ===
 	load_fan_vbo(pLwc);
 }
