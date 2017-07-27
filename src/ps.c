@@ -66,7 +66,7 @@ void load_emitter2(LWCONTEXT* pLwc) {
 
 	// 5
 	// Load Properties
-	emitter2.eRadius = 0.75f;                                     // Blast radius
+	emitter2.eRadius = 2.75f;                                     // Blast radius
 	emitter2.eVelocity = 3.00f;                                   // Explosion velocity
 	emitter2.eDecay = 2.00f;                                      // Explosion decay
 	emitter2.eSizeStart = 32.00f;                                 // Fragment size

@@ -63,7 +63,7 @@ void main(void)
     }
     
     // Required OpenGL ES 2.0 outputs
-    gl_Position = u_ProjectionMatrix * vec4(x, y, 0.0, 1.0);
+    gl_Position = u_ProjectionMatrix * vec4(x, y, 5.0, 1.0);
     
     // 3
     gl_PointSize = max(0.0, (s + a_pSizeOffset));

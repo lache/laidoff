@@ -561,10 +561,24 @@ void lwc_render_field(const LWCONTEXT* pLwc) {
 	glEnable(GL_VERTEX_PROGRAM_POINT_SIZE);
 #endif
 	LWEMITTER2OBJECT* emit_object = ps_emit_object_begin(field_ps(pLwc->field));
+	mat4x4 view_perspective;
+	mat4x4_mul(view_perspective, perspective, view);
+	//glEnable(GL_BLEND);
+	//glBlendFunc(GL_DST_COLOR, GL_ONE_MINUS_SRC_ALPHA);
+	//glBlendFunc(GL_DST_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	//glBlendFunc(GL_ONE, GL_ONE);
+	//glDepthFunc()
+	//glBlendEquation(GL_MAX);
+	//glDisable(GL_DEPTH_TEST);
 	while (emit_object) {
-		ps_render_explosion(pLwc, emit_object);
+		//mat4x4 identity;
+		//mat4x4_identity(identity);
+		ps_render_explosion(pLwc, emit_object, view_perspective);
 		emit_object = ps_emit_object_next(field_ps(pLwc->field), emit_object);
 	}
+	//glBlendEquation(GL_FUNC_ADD);
+	//glEnable(GL_DEPTH_TEST);
+	//glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
 	render_ui(pLwc);
 

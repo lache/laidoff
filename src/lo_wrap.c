@@ -37591,10 +37591,12 @@ static int _wrap_ps_render_explosion(lua_State* L) {
   int SWIG_arg = 0;
   LWCONTEXT *arg1 = (LWCONTEXT *) 0 ;
   LWEMITTER2OBJECT *arg2 = (LWEMITTER2OBJECT *) 0 ;
+  vec4 *arg3 ;
   
-  SWIG_check_num_args("ps_render_explosion",2,2)
+  SWIG_check_num_args("ps_render_explosion",3,3)
   if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("ps_render_explosion",1,"LWCONTEXT const *");
   if(!SWIG_isptrtype(L,2)) SWIG_fail_arg("ps_render_explosion",2,"LWEMITTER2OBJECT const *");
+  if(!SWIG_isptrtype(L,3)) SWIG_fail_arg("ps_render_explosion",3,"mat4x4 const");
   
   if (!SWIG_IsOK(SWIG_ConvertPtr(L,1,(void**)&arg1,SWIGTYPE_p__LWCONTEXT,0))){
     SWIG_fail_ptr("ps_render_explosion",1,SWIGTYPE_p__LWCONTEXT);
@@ -37605,7 +37607,12 @@ static int _wrap_ps_render_explosion(lua_State* L) {
     SWIG_fail_ptr("ps_render_explosion",2,SWIGTYPE_p__LWEMITTER2OBJECT);
   }
   
-  ps_render_explosion((struct _LWCONTEXT const *)arg1,(struct _LWEMITTER2OBJECT const *)arg2);
+  
+  if (!SWIG_IsOK(SWIG_ConvertPtr(L,3,(void**)&arg3,SWIGTYPE_p_a_4__float,0))){
+    SWIG_fail_ptr("ps_render_explosion",3,SWIGTYPE_p_a_4__float);
+  }
+  
+  ps_render_explosion((struct _LWCONTEXT const *)arg1,(struct _LWEMITTER2OBJECT const *)arg2,(float const (*)[4])arg3);
   
   return SWIG_arg;
   

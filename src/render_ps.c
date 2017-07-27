@@ -35,13 +35,11 @@ static void s_render_rose(const LWCONTEXT* pLwc) {
 	glDisableVertexAttribArray(pLwc->shader[shader_index].shade_location);
 }
 
-void ps_render_explosion(const LWCONTEXT* pLwc, const LWEMITTER2OBJECT* emit_object) {
+void ps_render_explosion(const LWCONTEXT* pLwc, const LWEMITTER2OBJECT* emit_object, const mat4x4 mvp) {
 	int shader_index = LWST_EMITTER2;
 	glUseProgram(pLwc->shader[shader_index].program);
-	mat4x4 identity;
-	mat4x4_identity(identity);
 	// Uniforms
-	glUniformMatrix4fv(pLwc->shader[shader_index].u_ProjectionMatrix, 1, 0, (const GLfloat*)identity);
+	glUniformMatrix4fv(pLwc->shader[shader_index].u_ProjectionMatrix, 1, 0, (const GLfloat*)mvp);
 	glUniform2f(pLwc->shader[shader_index].u_Gravity, emit_object->gravity[0], emit_object->gravity[1]);
 	glUniform1f(pLwc->shader[shader_index].u_Time, emit_object->time);
 	glUniform1f(pLwc->shader[shader_index].u_eRadius, emitter2.eRadius);
@@ -106,7 +104,9 @@ void lwc_render_ps(const LWCONTEXT* pLwc) {
 	// Test render rose
 	s_render_rose(pLwc);
 	// Test render explosion
-	ps_render_explosion(pLwc, &emitter2_object);
+	mat4x4 identity;
+	mat4x4_identity(identity);
+	ps_render_explosion(pLwc, &emitter2_object, identity);
 }
 
 void ps_render_with_projection(const LWCONTEXT* pLwc, const LWEMITTER2OBJECT* emit, const float* proj) {
