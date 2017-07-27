@@ -108,6 +108,24 @@ guntower4.parabola = true
 field:spawn(guntower4, Faction1)
 guntower4:start_thinking()
 
+local guntower5 = Guntower:new('gt5', -12, 6, 0)
+guntower5.atlas = lo.LAE_PYRO_KTX
+guntower5.skin_vbo = lo.LSVT_PYRO
+guntower5.armature = lo.LWAR_PYRO_ARMATURE
+guntower5.anim_action_id = lo.LWAC_PYRO_IDLE
+guntower5.bullet_spawn_offset_x = -2.28591 / 2
+guntower5.bullet_spawn_offset_y = 0
+guntower5.bullet_spawn_offset_z = 4.57434 / 2
+guntower5.bullet_vbo = lo.LVT_CATAPULT_BALL
+guntower5.bullet_atlas = lo.LAE_CATAPULT_KTX
+guntower5.bullet_sx = 0.5
+guntower5.bullet_sy = 0.5
+guntower5.bullet_sz = 0.5
+guntower5.fire_anim_marker = 'fire'
+guntower5.parabola = true
+field:spawn(guntower5, Faction1)
+guntower5:start_thinking()
+
 -- this function is called from C, thus should not have 'local' specifier
 function on_anim_marker(key, name)
 	--print('on_anim_marker key:',key,', name:', name)
