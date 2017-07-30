@@ -26777,27 +26777,27 @@ fail:
 }
 
 
-static int _wrap_LWSHADER_u_ProjectionMatrix_set(lua_State* L) {
+static int _wrap_LWSHADER_u_ProjectionViewMatrix_set(lua_State* L) {
   int SWIG_arg = 0;
   struct _LWSHADER *arg1 = (struct _LWSHADER *) 0 ;
   GLint arg2 ;
   GLint *argp2 ;
   
-  SWIG_check_num_args("_LWSHADER::u_ProjectionMatrix",2,2)
-  if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("_LWSHADER::u_ProjectionMatrix",1,"struct _LWSHADER *");
-  if(!lua_isuserdata(L,2)) SWIG_fail_arg("_LWSHADER::u_ProjectionMatrix",2,"GLint");
+  SWIG_check_num_args("_LWSHADER::u_ProjectionViewMatrix",2,2)
+  if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("_LWSHADER::u_ProjectionViewMatrix",1,"struct _LWSHADER *");
+  if(!lua_isuserdata(L,2)) SWIG_fail_arg("_LWSHADER::u_ProjectionViewMatrix",2,"GLint");
   
   if (!SWIG_IsOK(SWIG_ConvertPtr(L,1,(void**)&arg1,SWIGTYPE_p__LWSHADER,0))){
-    SWIG_fail_ptr("LWSHADER_u_ProjectionMatrix_set",1,SWIGTYPE_p__LWSHADER);
+    SWIG_fail_ptr("LWSHADER_u_ProjectionViewMatrix_set",1,SWIGTYPE_p__LWSHADER);
   }
   
   
   if (!SWIG_IsOK(SWIG_ConvertPtr(L,2,(void**)&argp2,SWIGTYPE_p_GLint,0))){
-    SWIG_fail_ptr("LWSHADER_u_ProjectionMatrix_set",2,SWIGTYPE_p_GLint);
+    SWIG_fail_ptr("LWSHADER_u_ProjectionViewMatrix_set",2,SWIGTYPE_p_GLint);
   }
   arg2 = *argp2;
   
-  if (arg1) (arg1)->u_ProjectionMatrix = arg2;
+  if (arg1) (arg1)->u_ProjectionViewMatrix = arg2;
   
   return SWIG_arg;
   
@@ -26809,19 +26809,80 @@ fail:
 }
 
 
-static int _wrap_LWSHADER_u_ProjectionMatrix_get(lua_State* L) {
+static int _wrap_LWSHADER_u_ProjectionViewMatrix_get(lua_State* L) {
   int SWIG_arg = 0;
   struct _LWSHADER *arg1 = (struct _LWSHADER *) 0 ;
   GLint result;
   
-  SWIG_check_num_args("_LWSHADER::u_ProjectionMatrix",1,1)
-  if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("_LWSHADER::u_ProjectionMatrix",1,"struct _LWSHADER *");
+  SWIG_check_num_args("_LWSHADER::u_ProjectionViewMatrix",1,1)
+  if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("_LWSHADER::u_ProjectionViewMatrix",1,"struct _LWSHADER *");
   
   if (!SWIG_IsOK(SWIG_ConvertPtr(L,1,(void**)&arg1,SWIGTYPE_p__LWSHADER,0))){
-    SWIG_fail_ptr("LWSHADER_u_ProjectionMatrix_get",1,SWIGTYPE_p__LWSHADER);
+    SWIG_fail_ptr("LWSHADER_u_ProjectionViewMatrix_get",1,SWIGTYPE_p__LWSHADER);
   }
   
-  result =  ((arg1)->u_ProjectionMatrix);
+  result =  ((arg1)->u_ProjectionViewMatrix);
+  {
+    GLint * resultptr;
+    resultptr = (GLint *) malloc(sizeof(GLint));
+    memmove(resultptr, &result, sizeof(GLint));
+    SWIG_NewPointerObj(L,(void *) resultptr,SWIGTYPE_p_GLint,1); SWIG_arg++;
+  }
+  return SWIG_arg;
+  
+  if(0) SWIG_fail;
+  
+fail:
+  lua_error(L);
+  return SWIG_arg;
+}
+
+
+static int _wrap_LWSHADER_u_ModelMatrix_set(lua_State* L) {
+  int SWIG_arg = 0;
+  struct _LWSHADER *arg1 = (struct _LWSHADER *) 0 ;
+  GLint arg2 ;
+  GLint *argp2 ;
+  
+  SWIG_check_num_args("_LWSHADER::u_ModelMatrix",2,2)
+  if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("_LWSHADER::u_ModelMatrix",1,"struct _LWSHADER *");
+  if(!lua_isuserdata(L,2)) SWIG_fail_arg("_LWSHADER::u_ModelMatrix",2,"GLint");
+  
+  if (!SWIG_IsOK(SWIG_ConvertPtr(L,1,(void**)&arg1,SWIGTYPE_p__LWSHADER,0))){
+    SWIG_fail_ptr("LWSHADER_u_ModelMatrix_set",1,SWIGTYPE_p__LWSHADER);
+  }
+  
+  
+  if (!SWIG_IsOK(SWIG_ConvertPtr(L,2,(void**)&argp2,SWIGTYPE_p_GLint,0))){
+    SWIG_fail_ptr("LWSHADER_u_ModelMatrix_set",2,SWIGTYPE_p_GLint);
+  }
+  arg2 = *argp2;
+  
+  if (arg1) (arg1)->u_ModelMatrix = arg2;
+  
+  return SWIG_arg;
+  
+  if(0) SWIG_fail;
+  
+fail:
+  lua_error(L);
+  return SWIG_arg;
+}
+
+
+static int _wrap_LWSHADER_u_ModelMatrix_get(lua_State* L) {
+  int SWIG_arg = 0;
+  struct _LWSHADER *arg1 = (struct _LWSHADER *) 0 ;
+  GLint result;
+  
+  SWIG_check_num_args("_LWSHADER::u_ModelMatrix",1,1)
+  if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("_LWSHADER::u_ModelMatrix",1,"struct _LWSHADER *");
+  
+  if (!SWIG_IsOK(SWIG_ConvertPtr(L,1,(void**)&arg1,SWIGTYPE_p__LWSHADER,0))){
+    SWIG_fail_ptr("LWSHADER_u_ModelMatrix_get",1,SWIGTYPE_p__LWSHADER);
+  }
+  
+  result =  ((arg1)->u_ModelMatrix);
   {
     GLint * resultptr;
     resultptr = (GLint *) malloc(sizeof(GLint));
@@ -27576,7 +27637,8 @@ static swig_lua_attribute swig_LWSHADER_attributes[] = {
     { "color_location", _wrap_LWSHADER_color_location_get, _wrap_LWSHADER_color_location_set },
     { "time_location", _wrap_LWSHADER_time_location_get, _wrap_LWSHADER_time_location_set },
     { "texture_location", _wrap_LWSHADER_texture_location_get, _wrap_LWSHADER_texture_location_set },
-    { "u_ProjectionMatrix", _wrap_LWSHADER_u_ProjectionMatrix_get, _wrap_LWSHADER_u_ProjectionMatrix_set },
+    { "u_ProjectionViewMatrix", _wrap_LWSHADER_u_ProjectionViewMatrix_get, _wrap_LWSHADER_u_ProjectionViewMatrix_set },
+    { "u_ModelMatrix", _wrap_LWSHADER_u_ModelMatrix_get, _wrap_LWSHADER_u_ModelMatrix_set },
     { "u_Gravity", _wrap_LWSHADER_u_Gravity_get, _wrap_LWSHADER_u_Gravity_set },
     { "u_Time", _wrap_LWSHADER_u_Time_get, _wrap_LWSHADER_u_Time_set },
     { "u_eRadius", _wrap_LWSHADER_u_eRadius_get, _wrap_LWSHADER_u_eRadius_set },
@@ -37592,11 +37654,13 @@ static int _wrap_ps_render_explosion(lua_State* L) {
   LWCONTEXT *arg1 = (LWCONTEXT *) 0 ;
   LWEMITTER2OBJECT *arg2 = (LWEMITTER2OBJECT *) 0 ;
   vec4 *arg3 ;
+  vec4 *arg4 ;
   
-  SWIG_check_num_args("ps_render_explosion",3,3)
+  SWIG_check_num_args("ps_render_explosion",4,4)
   if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("ps_render_explosion",1,"LWCONTEXT const *");
   if(!SWIG_isptrtype(L,2)) SWIG_fail_arg("ps_render_explosion",2,"LWEMITTER2OBJECT const *");
   if(!SWIG_isptrtype(L,3)) SWIG_fail_arg("ps_render_explosion",3,"mat4x4 const");
+  if(!SWIG_isptrtype(L,4)) SWIG_fail_arg("ps_render_explosion",4,"mat4x4 const");
   
   if (!SWIG_IsOK(SWIG_ConvertPtr(L,1,(void**)&arg1,SWIGTYPE_p__LWCONTEXT,0))){
     SWIG_fail_ptr("ps_render_explosion",1,SWIGTYPE_p__LWCONTEXT);
@@ -37612,7 +37676,12 @@ static int _wrap_ps_render_explosion(lua_State* L) {
     SWIG_fail_ptr("ps_render_explosion",3,SWIGTYPE_p_a_4__float);
   }
   
-  ps_render_explosion((struct _LWCONTEXT const *)arg1,(struct _LWEMITTER2OBJECT const *)arg2,(float const (*)[4])arg3);
+  
+  if (!SWIG_IsOK(SWIG_ConvertPtr(L,4,(void**)&arg4,SWIGTYPE_p_a_4__float,0))){
+    SWIG_fail_ptr("ps_render_explosion",4,SWIGTYPE_p_a_4__float);
+  }
+  
+  ps_render_explosion((struct _LWCONTEXT const *)arg1,(struct _LWEMITTER2OBJECT const *)arg2,(float const (*)[4])arg3,(float const (*)[4])arg4);
   
   return SWIG_arg;
   

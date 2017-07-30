@@ -42,7 +42,7 @@ void load_emitter2(LWCONTEXT* pLwc) {
 	float oRadius = 0.10f;      // 0.0 = circle; 1.0 = ring
 	float oVelocity = 0.50f;    // Speed
 	
-	float oSize = 8.00f;        // Pixels
+	float oSize = 60.0f;        // Pixels
 	float oColor = 0.25f;       // 0.5 = 50% shade offset
 
 	// 4

@@ -1,4 +1,3 @@
-#version 150
 #if GL_ES
 #define fragColor gl_FragColor
 #define FRAG_COLOR_OUTPUT_DECL
@@ -23,8 +22,8 @@ FRAG_COLOR_OUTPUT_DECL
 
 void main()
 {
-	highp vec4 texture = texture2D(u_Texture, gl_PointCoord);
-	highp vec4 textureAlpha = texture2D(u_TextureAlpha, gl_PointCoord);
+    highp vec4 texture = texture2D(u_Texture, gl_PointCoord);
+    highp vec4 textureAlpha = texture2D(u_TextureAlpha, gl_PointCoord);
 
     // Color
     highp vec4 color = vec4(1.0);
@@ -49,5 +48,5 @@ void main()
     
     // Required OpenGL ES 2.0 outputs
     fragColor = texture * color;
-	fragColor.a = textureAlpha.r;
+    fragColor.a = textureAlpha.r;
 }

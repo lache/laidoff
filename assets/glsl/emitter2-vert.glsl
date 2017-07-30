@@ -1,12 +1,12 @@
-#version 150
 #if GL_ES
 #else
 #define attribute in
 #define varying out
 #endif
-precision mediump float;
+precision highp float;
 // Uniforms
-uniform mat4        u_ProjectionMatrix;
+uniform mat4        u_ProjectionViewMatrix;
+uniform mat4        u_ModelMatrix;
 uniform vec2        u_Gravity;
 uniform float       u_Time;
 uniform float       u_eRadius;
@@ -63,7 +63,7 @@ void main(void)
     }
     
     // Required OpenGL ES 2.0 outputs
-    gl_Position = u_ProjectionMatrix * vec4(x, y, 5.0, 1.0);
+    gl_Position = u_ProjectionViewMatrix * u_ModelMatrix * vec4(x, y, 5.0, 1.0);
     
     // 3
     gl_PointSize = max(0.0, (s + a_pSizeOffset));

@@ -1,7 +1,11 @@
-#version 100
-
+#if GL_ES
+#else
+#define attribute in
+#define varying out
+#endif
 // mediump causes z-fighting on iOS devices. highp required.
 precision highp float;
+
 
 uniform mat4 MVP;
 uniform vec2 vUvOffset;

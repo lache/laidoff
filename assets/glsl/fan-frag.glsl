@@ -1,6 +1,14 @@
-#version 150
-precision mediump float;
-out vec4 fragColor;
+#if GL_ES
+#define fragColor gl_FragColor
+#define FRAG_COLOR_OUTPUT_DECL
+#else
+#define FRAG_COLOR_OUTPUT_DECL out vec4 fragColor;
+#define varying in
+#endif
+
+precision highp float;
+// Outputs
+FRAG_COLOR_OUTPUT_DECL
 
 void main()
 {

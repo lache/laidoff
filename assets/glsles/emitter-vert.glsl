@@ -1,5 +1,11 @@
-#version 100
-precision mediump float;
+#if GL_ES
+#else
+#define attribute in
+#define varying out
+#endif
+// mediump causes z-fighting on iOS devices. highp required.
+precision highp float;
+
 // Uniforms
 uniform mat4 uProjectionMatrix;
 uniform float uK;

@@ -1,4 +1,3 @@
-#version 100
 #if GL_ES
 #define fragColor gl_FragColor
 #define FRAG_COLOR_OUTPUT_DECL
@@ -49,5 +48,5 @@ void main()
     
     // Required OpenGL ES 2.0 outputs
     fragColor = texture * color;
-	fragColor.a = textureAlpha.r;
+    fragColor.a = textureAlpha.r;
 }

@@ -182,12 +182,17 @@ static void delete_shader(LWSHADER *pShader) {
 
 static void
 create_shader(const char *shader_name, LWSHADER *pShader, const GLchar *vst, const GLchar *fst) {
+#if LW_PLATFORM_WIN32 || LW_PLATFORM_OSX
+#define LW_GLSL_VERSION_STATEMENT "#version 150\n"
+#else
+#define LW_GLSL_VERSION_STATEMENT "#version 100\n"
+#endif
 	pShader->valid = 0;
 
 	pShader->vertex_shader = glCreateShader(GL_VERTEX_SHADER);
 
-	const GLchar* vstarray[] = { vst };
-	glShaderSource(pShader->vertex_shader, 1, vstarray, NULL);
+	const GLchar* vstarray[] = { LW_GLSL_VERSION_STATEMENT, vst };
+	glShaderSource(pShader->vertex_shader, 2, vstarray, NULL);
 	glCompileShader(pShader->vertex_shader);
 	GLint isCompiled = 0;
 	glGetShaderiv(pShader->vertex_shader, GL_COMPILE_STATUS, &isCompiled);
@@ -210,8 +215,8 @@ create_shader(const char *shader_name, LWSHADER *pShader, const GLchar *vst, con
 	// fragment shader
 
 	pShader->fragment_shader = glCreateShader(GL_FRAGMENT_SHADER);
-	const GLchar* fstarray[] = { fst };
-	glShaderSource(pShader->fragment_shader, 1, fstarray, NULL);
+	const GLchar* fstarray[] = { LW_GLSL_VERSION_STATEMENT, fst };
+	glShaderSource(pShader->fragment_shader, 2, fstarray, NULL);
 	glCompileShader(pShader->fragment_shader);
 	glGetShaderiv(pShader->fragment_shader, GL_COMPILE_STATUS, &isCompiled);
 	if (isCompiled == GL_FALSE) {
@@ -280,7 +285,8 @@ create_shader(const char *shader_name, LWSHADER *pShader, const GLchar *vst, con
 	pShader->color_location = glGetUniformLocation(pShader->program, "uColor");
 	pShader->time_location = glGetUniformLocation(pShader->program, "uTime");
 	pShader->texture_location = glGetUniformLocation(pShader->program, "uTexture");
-	pShader->u_ProjectionMatrix = glGetUniformLocation(pShader->program, "u_ProjectionMatrix");
+	pShader->u_ProjectionViewMatrix = glGetUniformLocation(pShader->program, "u_ProjectionViewMatrix");
+	pShader->u_ModelMatrix = glGetUniformLocation(pShader->program, "u_ModelMatrix");
 	pShader->u_Gravity = glGetUniformLocation(pShader->program, "u_Gravity");
 	pShader->u_Time = glGetUniformLocation(pShader->program, "u_Time");
 	pShader->u_eRadius = glGetUniformLocation(pShader->program, "u_eRadius");
@@ -314,11 +320,11 @@ create_shader(const char *shader_name, LWSHADER *pShader, const GLchar *vst, con
 
 void init_gl_shaders(LWCONTEXT *pLwc) {
 
-#if LW_PLATFORM_WIN32 || LW_PLATFORM_OSX
+//#if LW_PLATFORM_WIN32 || LW_PLATFORM_OSX
 #define GLSL_DIR_NAME "glsl"
-#else
-#define GLSL_DIR_NAME "glsles"
-#endif
+//#else
+//#define GLSL_DIR_NAME "glsles"
+//#endif
 
 	// Vertex Shader
 	char *default_vert_glsl = create_string_from_file(ASSETS_BASE_PATH
