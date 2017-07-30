@@ -1,5 +1,7 @@
 #pragma once
 
+#include <linmath.h>
+
 typedef struct _LWCONTEXT LWCONTEXT;
 
 #define NUM_PARTICLES (360)
@@ -40,6 +42,7 @@ typedef struct _LWEMITTER2OBJECT {
 	float gravity[2];
 	float life;
 	float time;
+	vec3 pos;
 } LWEMITTER2OBJECT;
 
 typedef struct _LWPS LWPS;
@@ -52,4 +55,5 @@ void ps_update(LWPS* ps, double delta_time);
 void ps_destroy(LWPS** ps);
 LWEMITTER2OBJECT* ps_emit_object_begin(LWPS* ps);
 LWEMITTER2OBJECT* ps_emit_object_next(LWPS* ps, LWEMITTER2OBJECT* cursor);
+void ps_play_new_pos(LWPS* ps, const vec3 pos);
 void ps_play_new(LWPS* ps);

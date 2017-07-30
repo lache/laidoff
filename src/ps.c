@@ -160,6 +160,11 @@ void ps_destroy(LWPS** ps) {
 }
 
 void ps_play_new(LWPS* ps) {
+	vec3 zero = { 0, 0, 0 };
+	ps_play_new_pos(ps, zero);
+}
+
+void ps_play_new_pos(LWPS* ps, const vec3 pos) {
 	for (int i = 0; i < NUM_PS_INSTANCE; i++) {
 		if (ps->inst[i].valid) {
 			continue;
@@ -173,6 +178,7 @@ void ps_play_new(LWPS* ps) {
 		ps->inst[i].emit_object.gravity[0] = 0;
 		ps->inst[i].emit_object.gravity[1] = -9.81f * (1.0f / drag);
 		ps->inst[i].emit_object.time = 0;
+		memcpy(ps->inst[i].emit_object.pos, pos, sizeof(vec3));
 		break;
 	}
 }

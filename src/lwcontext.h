@@ -291,6 +291,7 @@ void lwcontext_set_safe_to_start_render(LWCONTEXT* pLwc, int v);
 int lwcontext_rendering(const LWCONTEXT* pLwc);
 void lwcontext_set_rendering(LWCONTEXT* pLwc, int v);
 void* lwcontext_mq(LWCONTEXT* pLwc);
+LWFIELD* lwcontext_field(LWCONTEXT* pLwc);
 #ifdef __cplusplus
 };
 #endif

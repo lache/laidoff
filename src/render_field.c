@@ -563,8 +563,6 @@ void lwc_render_field(const LWCONTEXT* pLwc) {
 	LWEMITTER2OBJECT* emit_object = ps_emit_object_begin(field_ps(pLwc->field));
 	mat4x4 proj_view;
 	mat4x4_mul(proj_view, perspective, view);
-	mat4x4 model;
-	mat4x4_identity(model);
 	//glEnable(GL_BLEND);
 	//glBlendFunc(GL_DST_COLOR, GL_ONE_MINUS_SRC_ALPHA);
 	//glBlendFunc(GL_DST_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -573,8 +571,9 @@ void lwc_render_field(const LWCONTEXT* pLwc) {
 	//glBlendEquation(GL_MAX);
 	//glDisable(GL_DEPTH_TEST);
 	while (emit_object) {
-		//mat4x4 identity;
-		//mat4x4_identity(identity);
+		mat4x4 model;
+		mat4x4_identity(model);
+		mat4x4_translate_in_place(model, emit_object->pos[0], emit_object->pos[1], emit_object->pos[2]);
 		ps_render_explosion(pLwc, emit_object, proj_view, model);
 		emit_object = ps_emit_object_next(field_ps(pLwc->field), emit_object);
 	}

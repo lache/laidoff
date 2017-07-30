@@ -28,3 +28,7 @@ void lwcontext_set_rendering(LWCONTEXT* pLwc, int v) {
 void* lwcontext_mq(LWCONTEXT* pLwc) {
 	return pLwc->mq;
 }
+
+LWFIELD* lwcontext_field(LWCONTEXT* pLwc) {
+	return pLwc->field;
+}

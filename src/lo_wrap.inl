@@ -6366,7 +6366,7 @@ fail:
 static int _wrap_field_ps(lua_State* L) {
   int SWIG_arg = 0;
   LWFIELD *arg1 = (LWFIELD *) 0 ;
-  void *result = 0 ;
+  LWPS *result = 0 ;
   
   SWIG_check_num_args("field_ps",1,1)
   if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("field_ps",1,"LWFIELD *");
@@ -6375,8 +6375,8 @@ static int _wrap_field_ps(lua_State* L) {
     SWIG_fail_ptr("field_ps",1,SWIGTYPE_p__LWFIELD);
   }
   
-  result = (void *)field_ps(arg1);
-  SWIG_NewPointerObj(L,result,SWIGTYPE_p_void,0); SWIG_arg++; 
+  result = (LWPS *)field_ps(arg1);
+  SWIG_NewPointerObj(L,result,SWIGTYPE_p__LWPS,0); SWIG_arg++; 
   return SWIG_arg;
   
   if(0) SWIG_fail;
@@ -21266,6 +21266,30 @@ static int _wrap_lwcontext_mq(lua_State* L) {
   
   result = (void *)lwcontext_mq(arg1);
   SWIG_NewPointerObj(L,result,SWIGTYPE_p_void,0); SWIG_arg++; 
+  return SWIG_arg;
+  
+  if(0) SWIG_fail;
+  
+fail:
+  lua_error(L);
+  return SWIG_arg;
+}
+
+
+static int _wrap_lwcontext_field(lua_State* L) {
+  int SWIG_arg = 0;
+  LWCONTEXT *arg1 = (LWCONTEXT *) 0 ;
+  LWFIELD *result = 0 ;
+  
+  SWIG_check_num_args("lwcontext_field",1,1)
+  if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("lwcontext_field",1,"LWCONTEXT *");
+  
+  if (!SWIG_IsOK(SWIG_ConvertPtr(L,1,(void**)&arg1,SWIGTYPE_p__LWCONTEXT,0))){
+    SWIG_fail_ptr("lwcontext_field",1,SWIGTYPE_p__LWCONTEXT);
+  }
+  
+  result = (LWFIELD *)lwcontext_field(arg1);
+  SWIG_NewPointerObj(L,result,SWIGTYPE_p__LWFIELD,0); SWIG_arg++; 
   return SWIG_arg;
   
   if(0) SWIG_fail;
@@ -36862,6 +36886,64 @@ fail:
 }
 
 
+static int _wrap_LWEMITTER2OBJECT_pos_set(lua_State* L) {
+  int SWIG_arg = 0;
+  struct _LWEMITTER2OBJECT *arg1 = (struct _LWEMITTER2OBJECT *) 0 ;
+  float *arg2 ;
+  
+  SWIG_check_num_args("_LWEMITTER2OBJECT::pos",2,2)
+  if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("_LWEMITTER2OBJECT::pos",1,"struct _LWEMITTER2OBJECT *");
+  if(!SWIG_isptrtype(L,2)) SWIG_fail_arg("_LWEMITTER2OBJECT::pos",2,"vec3");
+  
+  if (!SWIG_IsOK(SWIG_ConvertPtr(L,1,(void**)&arg1,SWIGTYPE_p__LWEMITTER2OBJECT,0))){
+    SWIG_fail_ptr("LWEMITTER2OBJECT_pos_set",1,SWIGTYPE_p__LWEMITTER2OBJECT);
+  }
+  
+  
+  if (!SWIG_IsOK(SWIG_ConvertPtr(L,2,(void**)&arg2,SWIGTYPE_p_float,0))){
+    SWIG_fail_ptr("LWEMITTER2OBJECT_pos_set",2,SWIGTYPE_p_float);
+  }
+  
+  {
+    size_t ii;
+    float *b = (float *) arg1->pos;
+    for (ii = 0; ii < (size_t)3; ii++) b[ii] = *((float *) arg2 + ii);
+  }
+  
+  return SWIG_arg;
+  
+  if(0) SWIG_fail;
+  
+fail:
+  lua_error(L);
+  return SWIG_arg;
+}
+
+
+static int _wrap_LWEMITTER2OBJECT_pos_get(lua_State* L) {
+  int SWIG_arg = 0;
+  struct _LWEMITTER2OBJECT *arg1 = (struct _LWEMITTER2OBJECT *) 0 ;
+  float *result = 0 ;
+  
+  SWIG_check_num_args("_LWEMITTER2OBJECT::pos",1,1)
+  if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("_LWEMITTER2OBJECT::pos",1,"struct _LWEMITTER2OBJECT *");
+  
+  if (!SWIG_IsOK(SWIG_ConvertPtr(L,1,(void**)&arg1,SWIGTYPE_p__LWEMITTER2OBJECT,0))){
+    SWIG_fail_ptr("LWEMITTER2OBJECT_pos_get",1,SWIGTYPE_p__LWEMITTER2OBJECT);
+  }
+  
+  result = (float *) ((arg1)->pos);
+  SWIG_NewPointerObj(L,result,SWIGTYPE_p_float,0); SWIG_arg++; 
+  return SWIG_arg;
+  
+  if(0) SWIG_fail;
+  
+fail:
+  lua_error(L);
+  return SWIG_arg;
+}
+
+
 static int _wrap_new_LWEMITTER2OBJECT(lua_State* L) {
   int SWIG_arg = 0;
   struct _LWEMITTER2OBJECT *result = 0 ;
@@ -36895,6 +36977,7 @@ static swig_lua_attribute swig_LWEMITTER2OBJECT_attributes[] = {
     { "gravity", _wrap_LWEMITTER2OBJECT_gravity_get, _wrap_LWEMITTER2OBJECT_gravity_set },
     { "life", _wrap_LWEMITTER2OBJECT_life_get, _wrap_LWEMITTER2OBJECT_life_set },
     { "time", _wrap_LWEMITTER2OBJECT_time_get, _wrap_LWEMITTER2OBJECT_time_set },
+    { "pos", _wrap_LWEMITTER2OBJECT_pos_get, _wrap_LWEMITTER2OBJECT_pos_set },
     {0,0,0}
 };
 static swig_lua_method swig_LWEMITTER2OBJECT_methods[]= {
@@ -37109,6 +37192,36 @@ static int _wrap_ps_emit_object_next(lua_State* L) {
   
   result = (LWEMITTER2OBJECT *)ps_emit_object_next(arg1,arg2);
   SWIG_NewPointerObj(L,result,SWIGTYPE_p__LWEMITTER2OBJECT,0); SWIG_arg++; 
+  return SWIG_arg;
+  
+  if(0) SWIG_fail;
+  
+fail:
+  lua_error(L);
+  return SWIG_arg;
+}
+
+
+static int _wrap_ps_play_new_pos(lua_State* L) {
+  int SWIG_arg = 0;
+  LWPS *arg1 = (LWPS *) 0 ;
+  float *arg2 ;
+  
+  SWIG_check_num_args("ps_play_new_pos",2,2)
+  if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("ps_play_new_pos",1,"LWPS *");
+  if(!SWIG_isptrtype(L,2)) SWIG_fail_arg("ps_play_new_pos",2,"vec3 const");
+  
+  if (!SWIG_IsOK(SWIG_ConvertPtr(L,1,(void**)&arg1,SWIGTYPE_p__LWPS,0))){
+    SWIG_fail_ptr("ps_play_new_pos",1,SWIGTYPE_p__LWPS);
+  }
+  
+  
+  if (!SWIG_IsOK(SWIG_ConvertPtr(L,2,(void**)&arg2,SWIGTYPE_p_float,0))){
+    SWIG_fail_ptr("ps_play_new_pos",2,SWIGTYPE_p_float);
+  }
+  
+  ps_play_new_pos(arg1,(float const (*))arg2);
+  
   return SWIG_arg;
   
   if(0) SWIG_fail;
@@ -45636,6 +45749,7 @@ static swig_lua_method swig_SwigModule_methods[]= {
     { "lwcontext_rendering", _wrap_lwcontext_rendering},
     { "lwcontext_set_rendering", _wrap_lwcontext_set_rendering},
     { "lwcontext_mq", _wrap_lwcontext_mq},
+    { "lwcontext_field", _wrap_lwcontext_field},
     { "deltatime_new", _wrap_deltatime_new},
     { "deltatime_destroy", _wrap_deltatime_destroy},
     { "deltatime_tick_delta", _wrap_deltatime_tick_delta},
@@ -45724,6 +45838,7 @@ static swig_lua_method swig_SwigModule_methods[]= {
     { "ps_destroy", _wrap_ps_destroy},
     { "ps_emit_object_begin", _wrap_ps_emit_object_begin},
     { "ps_emit_object_next", _wrap_ps_emit_object_next},
+    { "ps_play_new_pos", _wrap_ps_play_new_pos},
     { "ps_play_new", _wrap_ps_play_new},
     { "lwc_render_admin", _wrap_lwc_render_admin},
     { "touch_admin", _wrap_touch_admin},

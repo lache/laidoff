@@ -430,7 +430,13 @@ static void field_world_bullet_near(void *data, dGeomID o1, dGeomID o2) {
 		dGeomDisable(o2);
 		int idx = (int)dGeomGetData(o2);
 		mq_send_despawn_bullet(field->mq, field->sphere_bullet_id[idx]);
-		ps_play_new(field->ps);
+		//ps_play_new(field->ps);
+		vec3 pos = {
+			(float)contact[0].geom.pos[0],
+			(float)contact[0].geom.pos[1],
+			(float)contact[0].geom.pos[2],
+		};
+		ps_play_new_pos(field->ps, pos);
 	}
 }
 
@@ -1127,7 +1133,7 @@ void field_despawn_remote_sphere(LWFIELD* field, int bullet_id, const char* owne
 	}
 }
 
-void* field_ps(LWFIELD* field) {
+LWPS* field_ps(LWFIELD* field) {
 	return field->ps;
 }
 
