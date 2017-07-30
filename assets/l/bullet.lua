@@ -60,7 +60,7 @@ function M:update(dt)
 		--print(self, 'target HP reduced to ', target.hp, 'damage', self.damage)
 		self.dead_flag = true
 		
-		self:play_explosion()
+		--self:play_explosion()
 	end
 end
 
