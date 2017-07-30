@@ -37,6 +37,8 @@
 //#include "script.h"
 #include "lwtimepoint.h"
 #include "lwparabola.h"
+// SWIG output file
+#include "lo_wrap.inl"
 
 #define LW_SUPPORT_ETC1_HARDWARE_DECODING LW_PLATFORM_ANDROID
 #define LW_SUPPORT_VAO (LW_PLATFORM_WIN32 || LW_PLATFORM_OSX)
