@@ -14,6 +14,7 @@ uniform float       u_eVelocity;
 uniform float       u_eDecay;
 uniform float       u_eSizeStart;
 uniform float       u_eSizeEnd;
+uniform float       u_eScreenWidth;
 // Attributes (inputs)
 attribute float     a_pID;
 attribute float     a_pRadiusOffset;
@@ -38,7 +39,7 @@ void main(void)
     float decay = u_eDecay + a_pDecayOffset;
     
     // Size
-    float s = 1.0;
+    float s = u_eScreenWidth / 640.0 * 1.0;
     
     // If blast is growing
     if(u_Time < growth)
@@ -66,7 +67,7 @@ void main(void)
     gl_Position = u_ProjectionViewMatrix * u_ModelMatrix * vec4(x, y, 0.0, 1.0);
     
     // 3
-    gl_PointSize = max(0.0, (s + a_pSizeOffset));
+    gl_PointSize = min(60.0, max(0.0, (s + a_pSizeOffset)));
     
     // Fragment Shader outputs
     v_pColorOffset = a_pColorOffset;

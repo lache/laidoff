@@ -296,6 +296,7 @@ create_shader(const char *shader_name, LWSHADER *pShader, const GLchar *vst, con
 	pShader->u_eDecay = glGetUniformLocation(pShader->program, "u_eDecay");
 	pShader->u_eSizeStart = glGetUniformLocation(pShader->program, "u_eSizeStart");
 	pShader->u_eSizeEnd = glGetUniformLocation(pShader->program, "u_eSizeEnd");
+	pShader->u_eScreenWidth = glGetUniformLocation(pShader->program, "u_eScreenWidth");
 	pShader->u_eColorStart = glGetUniformLocation(pShader->program, "u_eColorStart");
 	pShader->u_eColorEnd = glGetUniformLocation(pShader->program, "u_eColorEnd");
 	pShader->u_Texture = glGetUniformLocation(pShader->program, "u_Texture");
@@ -1293,7 +1294,7 @@ void init_action(LWCONTEXT* pLwc) {
 	}
 }
 
-LWCONTEXT *lw_init(void) {
+LWCONTEXT* lw_init_initial_size(int width, int height) {
 
 	init_ext_image_lib();
 
@@ -1302,6 +1303,9 @@ LWCONTEXT *lw_init(void) {
 	//test_image();
 
 	LWCONTEXT *pLwc = (LWCONTEXT *)calloc(1, sizeof(LWCONTEXT));
+
+	pLwc->width = width;
+	pLwc->height = height;
 
 	setlocale(LC_ALL, "");
 
@@ -1332,6 +1336,10 @@ LWCONTEXT *lw_init(void) {
 	lwparabola_test();
 
 	return pLwc;
+}
+
+LWCONTEXT *lw_init(void) {
+	return lw_init_initial_size(0, 0);
 }
 
 void lw_set_size(LWCONTEXT *pLwc, int w, int h) {

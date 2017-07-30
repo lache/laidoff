@@ -54,6 +54,7 @@ typedef struct _LWSHADER {
 	GLint u_eDecay;
 	GLint u_eSizeStart;
 	GLint u_eSizeEnd;
+	GLint u_eScreenWidth;
 	GLint u_eColorStart;
 	GLint u_eColorEnd;
 	GLint u_Texture;

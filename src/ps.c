@@ -40,10 +40,10 @@ float random_float_between(float min, float max) {
 void load_emitter2(LWCONTEXT* pLwc) {
 	// 3
 	// Offset bounds
-	float oRadius = 0.10f;      // 0.0 = circle; 1.0 = ring
+	float oRadius = pLwc->width / 640.0f * 0.10f;      // 0.0 = circle; 1.0 = ring
 	float oVelocity = 0.50f;    // Speed
 	
-	float oSize = 60.0f;        // Pixels
+	float oSize = LWMIN(60.0f, pLwc->width / 1920.0f * 60.0f);        // Pixels
 	float oColor = 0.25f;       // 0.5 = 50% shade offset
 
 	// 4
@@ -53,7 +53,7 @@ void load_emitter2(LWCONTEXT* pLwc) {
 		emitter2.eParticles[i].pId = (float)LWDEG2RAD(((float)i / (float)NUM_PARTICLES2)*360.0f);
 
 		// Assign random offsets within bounds
-		emitter2.eParticles[i].pRadiusOffset = random_float_between(oRadius, 1.00f);
+		emitter2.eParticles[i].pRadiusOffset = 1.0f;// random_float_between(oRadius, 1.00f);
 		emitter2.eParticles[i].pVelocityOffset = random_float_between(-oVelocity, oVelocity);
 		emitter2.eParticles[i].pDecayOffset = random_float_between(-oDecay, oDecay);
 		emitter2.eParticles[i].pSizeOffset = random_float_between(-oSize, oSize);

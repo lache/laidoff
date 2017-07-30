@@ -570,6 +570,10 @@ void lwc_render_field(const LWCONTEXT* pLwc) {
 	//glDepthFunc()
 	//glBlendEquation(GL_MAX);
 	//glDisable(GL_DEPTH_TEST);
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE);
+	glDepthMask(GL_FALSE);
+	//glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	while (emit_object) {
 		mat4x4 model;
 		mat4x4_identity(model);
@@ -579,7 +583,8 @@ void lwc_render_field(const LWCONTEXT* pLwc) {
 	}
 	//glBlendEquation(GL_FUNC_ADD);
 	//glEnable(GL_DEPTH_TEST);
-	//glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	glDepthMask(GL_TRUE);
 
 	render_ui(pLwc);
 

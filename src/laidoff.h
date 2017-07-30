@@ -14,6 +14,7 @@ extern "C" {;
 typedef struct _LWCONTEXT LWCONTEXT;
 typedef struct GLFWwindow GLFWwindow;
 
+LWCONTEXT* lw_init_initial_size(int width, int height);
 LWCONTEXT* lw_init(void);
 void lw_deinit(LWCONTEXT* pLwc);
 void lwc_update(LWCONTEXT* pLwc, double delta_time);

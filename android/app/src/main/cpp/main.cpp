@@ -688,7 +688,7 @@ void android_main(struct android_app* state) {
             {
                 lw_deinit(engine.pLwc);
             }
-            engine.pLwc = lw_init();
+            engine.pLwc = lw_init_initial_size(engine.width, engine.height);
             lw_set_size(engine.pLwc, engine.width, engine.height);
             engine.inited = true;
             lwc_start_logic_thread(engine.pLwc);

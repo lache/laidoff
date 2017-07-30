@@ -153,13 +153,14 @@ int main(void)
 
 	srand((unsigned int)time(0));
 
-	LWCONTEXT* pLwc = lw_init();
-
-	lw_set_window(pLwc, window);
-
 	int width = 0;
 	int height = 0;
 	glfwGetFramebufferSize(window, &width, &height);
+
+	LWCONTEXT* pLwc = lw_init_initial_size(width, height);
+
+	lw_set_window(pLwc, window);
+
 	lw_set_size(pLwc, width, height);
 
 	glfwSetWindowUserPointer(window, pLwc);
