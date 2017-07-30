@@ -209,7 +209,7 @@ local nav = lo.field_nav(c.field)
 start_coro(function ()
     for i=1, 10 do
       -- Truck field object
-      local truck = spawn_oil_truck(pLwc, -8, -8, 6)
+      local truck = spawn_oil_truck(pLwc, -8, -8, 0)
       -- Path query
       local pq = lo.nav_new_path_query(nav)
       -- Activate path query update
