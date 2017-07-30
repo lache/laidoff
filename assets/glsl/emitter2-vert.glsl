@@ -39,7 +39,7 @@ void main(void)
     float decay = u_eDecay + a_pDecayOffset;
     
     // Size
-    float s = u_eScreenWidth / 640.0 * 1.0;
+    float s = 1.0; // dummy initial value (always assigned again)
     
     // If blast is growing
     if(u_Time < growth)
