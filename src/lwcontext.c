@@ -32,3 +32,11 @@ void* lwcontext_mq(LWCONTEXT* pLwc) {
 LWFIELD* lwcontext_field(LWCONTEXT* pLwc) {
 	return pLwc->field;
 }
+
+void lwcontext_inc_rmsg_send(LWCONTEXT* pLwc) {
+	pLwc->rmsg_send_count++;
+}
+
+void lwcontext_inc_rmsg_recv(LWCONTEXT* pLwc) {
+	pLwc->rmsg_recv_count++;
+}

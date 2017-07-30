@@ -868,10 +868,14 @@ void render_stat(const LWCONTEXT* pLwc) {
 	SET_COLOR_RGBA_FLOAT(text_block.color_normal_outline, 0, 0, 0, 1);
 	SET_COLOR_RGBA_FLOAT(text_block.color_emp_glyph, 1, 1, 0, 1);
 	SET_COLOR_RGBA_FLOAT(text_block.color_emp_outline, 0, 0, 0, 1);
-	char msg[32];
-	sprintf(msg, "L:%.1f\nR:%.1f",
+	char msg[128];
+	sprintf(msg, "L:%.1f\nR:%.1f\nRMSG:%d(%d-%d)",
 		(float)(1.0 / deltatime_history_avg(pLwc->update_dt)),
-		(float)(1.0 / deltatime_history_avg(pLwc->render_dt)));
+		(float)(1.0 / deltatime_history_avg(pLwc->render_dt)),
+		pLwc->rmsg_send_count - pLwc->rmsg_recv_count,
+		pLwc->rmsg_send_count,
+		pLwc->rmsg_recv_count
+	);
 	text_block.text = msg;
 	text_block.text_bytelen = (int)strlen(text_block.text);
 	text_block.begin_index = 0;
@@ -991,6 +995,7 @@ static void read_all_rmsgs(LWCONTEXT* pLwc) {
 			zmq_msg_close(&rmsg);
 			break;
 		}
+		lwcontext_inc_rmsg_recv(pLwc);
 		// Process command here
 		LWFIELDRENDERCOMMAND* cmd = zmq_msg_data(&rmsg);
 		switch (cmd->cmdtype) {

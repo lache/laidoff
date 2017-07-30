@@ -4,6 +4,12 @@
 #include "lwcontext.h"
 #include <string.h>
 
+static s_send_and_close_rmsg(LWCONTEXT* pLwc, zmq_msg_t* rmsg) {
+	zmq_msg_send(rmsg, mq_rmsg_writer(lwcontext_mq(pLwc)), 0);
+	lwcontext_inc_rmsg_send(pLwc);
+	zmq_msg_close(rmsg);
+}
+
 void rmsg_spawn(LWCONTEXT* pLwc, int key, int objtype, float x, float y, float z, float angle) {
 	zmq_msg_t rmsg;
 	zmq_msg_init_size(&rmsg, sizeof(LWFIELDRENDERCOMMAND));
@@ -20,8 +26,7 @@ void rmsg_spawn(LWCONTEXT* pLwc, int key, int objtype, float x, float y, float z
 	cmd->scale[2] = 1;
 	cmd->angle = angle;
 	cmd->actionid = LWAC_RECOIL;
-	zmq_msg_send(&rmsg, mq_rmsg_writer(lwcontext_mq(pLwc)), 0);
-	zmq_msg_close(&rmsg);
+	s_send_and_close_rmsg(pLwc, &rmsg);
 }
 
 void rmsg_despawn(LWCONTEXT* pLwc, int key) {
@@ -30,8 +35,7 @@ void rmsg_despawn(LWCONTEXT* pLwc, int key) {
 	LWFIELDRENDERCOMMAND* cmd = zmq_msg_data(&rmsg);
 	cmd->cmdtype = LRCT_DESPAWN;
 	cmd->key = key;
-	zmq_msg_send(&rmsg, mq_rmsg_writer(lwcontext_mq(pLwc)), 0);
-	zmq_msg_close(&rmsg);
+	s_send_and_close_rmsg(pLwc, &rmsg);
 }
 
 void rmsg_pos(LWCONTEXT* pLwc, int key, float x, float y, float z) {
@@ -43,8 +47,7 @@ void rmsg_pos(LWCONTEXT* pLwc, int key, float x, float y, float z) {
 	cmd->pos[0] = x;
 	cmd->pos[1] = y;
 	cmd->pos[2] = z;
-	zmq_msg_send(&rmsg, mq_rmsg_writer(lwcontext_mq(pLwc)), 0);
-	zmq_msg_close(&rmsg);	
+	s_send_and_close_rmsg(pLwc, &rmsg);
 }
 
 void rmsg_turn(LWCONTEXT* pLwc, int key, float angle) {
@@ -54,8 +57,7 @@ void rmsg_turn(LWCONTEXT* pLwc, int key, float angle) {
 	cmd->cmdtype = LRCT_TURN;
 	cmd->key = key;
 	cmd->angle = angle;
-	zmq_msg_send(&rmsg, mq_rmsg_writer(lwcontext_mq(pLwc)), 0);
-	zmq_msg_close(&rmsg);
+	s_send_and_close_rmsg(pLwc, &rmsg);
 }
 
 void rmsg_anim(LWCONTEXT* pLwc, int key, int actionid) {
@@ -65,8 +67,7 @@ void rmsg_anim(LWCONTEXT* pLwc, int key, int actionid) {
 	cmd->cmdtype = LRCT_ANIM;
 	cmd->key = key;
 	cmd->actionid = actionid;
-	zmq_msg_send(&rmsg, mq_rmsg_writer(lwcontext_mq(pLwc)), 0);
-	zmq_msg_close(&rmsg);	
+	s_send_and_close_rmsg(pLwc, &rmsg);
 }
 
 void rmsg_rparams(LWCONTEXT* pLwc, int key, int atlas, int skin_vbo, int armature, float sx, float sy, float sz) {
@@ -81,6 +82,5 @@ void rmsg_rparams(LWCONTEXT* pLwc, int key, int atlas, int skin_vbo, int armatur
 	cmd->scale[0] = sx;
 	cmd->scale[1] = sy;
 	cmd->scale[2] = sz;
-	zmq_msg_send(&rmsg, mq_rmsg_writer(lwcontext_mq(pLwc)), 0);
-	zmq_msg_close(&rmsg);
+	s_send_and_close_rmsg(pLwc, &rmsg);
 }

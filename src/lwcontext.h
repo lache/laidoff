@@ -278,8 +278,12 @@ typedef struct _LWCONTEXT {
 	volatile int safe_to_start_render;
 	// 1 if rendering in progress, 0 if otherwise
 	volatile int rendering;
-
+	// Asynchronous render command queue
 	LWFIELDRENDERCOMMAND render_command[MAX_RENDER_QUEUE_CAPACITY];
+	// Render command message send count
+	int rmsg_send_count;
+	// Render command message recv(handle) count
+	int rmsg_recv_count;
 } LWCONTEXT;
 
 #ifdef __cplusplus
@@ -292,6 +296,8 @@ int lwcontext_rendering(const LWCONTEXT* pLwc);
 void lwcontext_set_rendering(LWCONTEXT* pLwc, int v);
 void* lwcontext_mq(LWCONTEXT* pLwc);
 LWFIELD* lwcontext_field(LWCONTEXT* pLwc);
+void lwcontext_inc_rmsg_send(LWCONTEXT* pLwc);
+void lwcontext_inc_rmsg_recv(LWCONTEXT* pLwc);
 #ifdef __cplusplus
 };
 #endif
