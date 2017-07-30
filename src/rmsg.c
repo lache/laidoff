@@ -4,7 +4,7 @@
 #include "lwcontext.h"
 #include <string.h>
 
-static s_send_and_close_rmsg(LWCONTEXT* pLwc, zmq_msg_t* rmsg) {
+static void s_send_and_close_rmsg(LWCONTEXT* pLwc, zmq_msg_t* rmsg) {
 	zmq_msg_send(rmsg, mq_rmsg_writer(lwcontext_mq(pLwc)), 0);
 	lwcontext_inc_rmsg_send(pLwc);
 	zmq_msg_close(rmsg);
