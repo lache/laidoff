@@ -7,11 +7,12 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		26304DE41F2DB4DD006D9D3D /* lwparabola.c in Sources */ = {isa = PBXBuildFile; fileRef = 26304DE21F2DB4DD006D9D3D /* lwparabola.c */; };
+		26304DE71F2DB52E006D9D3D /* lwfieldrendercommand.c in Sources */ = {isa = PBXBuildFile; fileRef = 26304DE51F2DB52E006D9D3D /* lwfieldrendercommand.c */; };
 		263F9BF41EEAEFEA00991437 /* ps.c in Sources */ = {isa = PBXBuildFile; fileRef = 263F9BF01EEAEFEA00991437 /* ps.c */; };
 		263F9BF51EEAEFEA00991437 /* render_ps.c in Sources */ = {isa = PBXBuildFile; fileRef = 263F9BF21EEAEFEA00991437 /* render_ps.c */; };
 		264254371F1B7E1C00A890F0 /* rmsg.c in Sources */ = {isa = PBXBuildFile; fileRef = 264254351F1B7E1C00A890F0 /* rmsg.c */; };
 		264553421EE4815A004064D0 /* logic.c in Sources */ = {isa = PBXBuildFile; fileRef = 264553401EE4815A004064D0 /* logic.c */; };
-		265E1F0A1EF9902E00E82C3C /* lo_wrap.c in Sources */ = {isa = PBXBuildFile; fileRef = 265E1F091EF9902E00E82C3C /* lo_wrap.c */; };
 		265E1F0C1EF9903C00E82C3C /* lwskill.c in Sources */ = {isa = PBXBuildFile; fileRef = 265E1F0B1EF9903C00E82C3C /* lwskill.c */; };
 		265E1F0E1EF9904600E82C3C /* lwcontext.c in Sources */ = {isa = PBXBuildFile; fileRef = 265E1F0D1EF9904600E82C3C /* lwcontext.c */; };
 		562DAF601ED1920300208E62 /* playersm.c in Sources */ = {isa = PBXBuildFile; fileRef = 562DAF5E1ED1920300208E62 /* playersm.c */; };
@@ -363,6 +364,10 @@
 
 /* Begin PBXFileReference section */
 		2601AFFC1EE1549700989AA6 /* platform.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = platform.h; path = ../build/include/platform.h; sourceTree = "<group>"; };
+		26304DE21F2DB4DD006D9D3D /* lwparabola.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = lwparabola.c; sourceTree = "<group>"; };
+		26304DE31F2DB4DD006D9D3D /* lwparabola.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = lwparabola.h; sourceTree = "<group>"; };
+		26304DE51F2DB52E006D9D3D /* lwfieldrendercommand.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = lwfieldrendercommand.c; sourceTree = "<group>"; };
+		26304DE61F2DB52E006D9D3D /* lwfieldrendercommand.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = lwfieldrendercommand.h; sourceTree = "<group>"; };
 		263F9BF01EEAEFEA00991437 /* ps.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = ps.c; sourceTree = "<group>"; };
 		263F9BF11EEAEFEA00991437 /* ps.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ps.h; sourceTree = "<group>"; };
 		263F9BF21EEAEFEA00991437 /* render_ps.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = render_ps.c; sourceTree = "<group>"; };
@@ -371,7 +376,6 @@
 		264254361F1B7E1C00A890F0 /* rmsg.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = rmsg.h; sourceTree = "<group>"; };
 		264553401EE4815A004064D0 /* logic.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = logic.c; sourceTree = "<group>"; };
 		264553411EE4815A004064D0 /* logic.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = logic.h; sourceTree = "<group>"; };
-		265E1F091EF9902E00E82C3C /* lo_wrap.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = lo_wrap.c; sourceTree = "<group>"; };
 		265E1F0B1EF9903C00E82C3C /* lwskill.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = lwskill.c; sourceTree = "<group>"; };
 		265E1F0D1EF9904600E82C3C /* lwcontext.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = lwcontext.c; sourceTree = "<group>"; };
 		562DAF5E1ED1920300208E62 /* playersm.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = playersm.c; sourceTree = "<group>"; };
@@ -1964,7 +1968,6 @@
 				564D11921ECA2812002CCCAE /* kvmsg.h */,
 				5644E9A11EA8B69000EAA658 /* laidoff.c */,
 				5644E9A21EA8B69000EAA658 /* laidoff.h */,
-				265E1F091EF9902E00E82C3C /* lo_wrap.c */,
 				5644E9A31EA8B69000EAA658 /* loadobj.c */,
 				264553401EE4815A004064D0 /* logic.c */,
 				264553411EE4815A004064D0 /* logic.h */,
@@ -1990,11 +1993,15 @@
 				5644E9B31EA8B69000EAA658 /* lwenemy.h */,
 				5644E9B41EA8B69000EAA658 /* lwfbo.h */,
 				5644E9B51EA8B69000EAA658 /* lwfieldobject.h */,
+				26304DE51F2DB52E006D9D3D /* lwfieldrendercommand.c */,
+				26304DE61F2DB52E006D9D3D /* lwfieldrendercommand.h */,
 				5644E9B61EA8B69000EAA658 /* lwgamescene.h */,
 				5644E9B71EA8B69000EAA658 /* lwgl.h */,
 				5644E9B81EA8B69000EAA658 /* lwkeyframe.h */,
 				5633AC341EADE025003F1549 /* lwlog.h */,
 				5644E9BA1EA8B69000EAA658 /* lwmacro.h */,
+				26304DE21F2DB4DD006D9D3D /* lwparabola.c */,
+				26304DE31F2DB4DD006D9D3D /* lwparabola.h */,
 				5644E9BB1EA8B69000EAA658 /* lwpkm.h */,
 				5644E9BC1EA8B69000EAA658 /* lwprogrammedtex.h */,
 				5644E9BD1EA8B69000EAA658 /* lwshader.h */,
@@ -2380,7 +2387,6 @@
 				56F189031EC74DB60019312F /* v2_encoder.cpp in Sources */,
 				6CA16D861EA210BB00DB7AF0 /* lctype.c in Sources */,
 				566373391EBA52D3001DA3F4 /* collision_trimesh_box.cpp in Sources */,
-				265E1F0A1EF9902E00E82C3C /* lo_wrap.c in Sources */,
 				6CA16D9F1EA210BB00DB7AF0 /* lundump.c in Sources */,
 				5644E9FA1EA8B69000EAA658 /* unicode.c in Sources */,
 				56F189AB1EC751950019312F /* zlistx.c in Sources */,
@@ -2395,6 +2401,7 @@
 				5644E9F01EA8B69000EAA658 /* render_admin.c in Sources */,
 				565676AA1EAFB4F800FF64B3 /* render_skin.c in Sources */,
 				56F189061EC74DB60019312F /* vmci_address.cpp in Sources */,
+				26304DE41F2DB4DD006D9D3D /* lwparabola.c in Sources */,
 				6CA16D971EA210BB00DB7AF0 /* lstate.c in Sources */,
 				6CA16D951EA210BB00DB7AF0 /* loslib.c in Sources */,
 				5663735A1EBA52D4001DA3F4 /* piston.cpp in Sources */,
@@ -2508,6 +2515,7 @@
 				566373481EBA52D4001DA3F4 /* export-dif.cpp in Sources */,
 				56F188BB1EC74DB60019312F /* ip.cpp in Sources */,
 				5663733F1EBA52D4001DA3F4 /* collision_trimesh_plane.cpp in Sources */,
+				26304DE71F2DB52E006D9D3D /* lwfieldrendercommand.c in Sources */,
 				5663737B1EBA52D4001DA3F4 /* util.cpp in Sources */,
 				566373541EBA52D4001DA3F4 /* fixed.cpp in Sources */,
 				6CA16D811EA210BB00DB7AF0 /* lauxlib.c in Sources */,

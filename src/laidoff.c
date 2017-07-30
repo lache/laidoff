@@ -95,8 +95,8 @@ typedef struct {
 } TGAHEADER;
 #pragma pack(pop)
 
-void play_sound(enum LW_SOUND lws);
-void stop_sound(enum LW_SOUND lws);
+void play_sound(LW_SOUND lws);
+void stop_sound(LW_SOUND lws);
 HRESULT init_ext_image_lib();
 HRESULT init_ext_sound_lib();
 void destroy_ext_sound_lib();
