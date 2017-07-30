@@ -48,7 +48,7 @@
     CGFloat screenHeight = screenScale * screenRect.size.height;
     
     
-    self.pLwc = lw_init();
+    self.pLwc = lw_init_initial_size((int)screenWidth, (int)screenHeight);
     lw_set_size(self.pLwc, (int)screenWidth, (int)screenHeight);
     lwc_start_logic_thread(self.pLwc);
 }
