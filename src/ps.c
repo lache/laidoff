@@ -44,12 +44,13 @@ void load_emitter2(LWCONTEXT* pLwc) {
 	float oRadius2 = 1.0f;
 	float oVelocity = 1.50f;    // Speed
 
-	float oSize = LWMIN(10.0f, pLwc->width / 1920.0f * 10.0f);        // Pixels
+	float size_offset_range = 10.0f / 2;
+	float oSize = LWMIN(size_offset_range, pLwc->width / 1920.0f * size_offset_range);        // Pixels
 	float oColor = 0.25f;       // 0.5 = 50% shade offset
 
 	// 4
 	// Load Particles
-	int angle = 5;
+	int angle = 2;
 	for (int i = 0; i < NUM_PARTICLES2; i++) {
 		// Assign a unique ID to each particle, between 0 and 360 (in radians)
 		emitter2.eParticles[i].pId = (float)LWDEG2RAD(((float)(-angle / 2 + i % angle) / (float)NUM_PARTICLES2)*360.0f);
@@ -72,8 +73,8 @@ void load_emitter2(LWCONTEXT* pLwc) {
 	emitter2.eRadius = 6.0f;                                     // Blast radius
 	emitter2.eVelocity = 3.00f;                                   // Explosion velocity
 	emitter2.eDecay = 2.00f;                                      // Explosion decay
-	emitter2.eSizeStart = LWMIN(50.0f, pLwc->width / 1920.0f * 50.0f);        // Pixels
-	emitter2.eSizeEnd = LWMIN(16.0f, pLwc->width / 1920.0f * 16.0f);        // Pixels
+	emitter2.eSizeStart = LWMIN(50.0f / 2, pLwc->width / 1920.0f * 50.0f);        // Pixels
+	emitter2.eSizeEnd = LWMIN(16.0f / 2, pLwc->width / 1920.0f * 16.0f);        // Pixels
 	emitter2.eColorStart[0] = 1.0f;
 	emitter2.eColorStart[1] = 0.5f;
 	emitter2.eColorStart[2] = 0.0f;

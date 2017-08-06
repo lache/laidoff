@@ -312,7 +312,7 @@ static int engine_init_display(struct engine* engine) {
     eglQuerySurface(display, surface, EGL_WIDTH, &w);
     eglQuerySurface(display, surface, EGL_HEIGHT, &h);
 
-    eglSwapInterval(display, 1);
+    //eglSwapInterval(display, 3);
 
     engine->display = display;
     engine->context = context;
@@ -508,6 +508,10 @@ static int32_t engine_handle_input(struct android_app* app, AInputEvent* event) 
             } // end switch
             break;
         case AINPUT_EVENT_TYPE_KEY:
+			if (AKeyEvent_getKeyCode(event) == AKEYCODE_BACK) {
+				// actions on back key
+				//return 1; // <-- prevent default handler
+			};
             // handle key input...
             break;
     } // end switch

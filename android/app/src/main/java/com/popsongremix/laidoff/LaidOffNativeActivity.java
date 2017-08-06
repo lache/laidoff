@@ -11,6 +11,7 @@ import android.media.SoundPool;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.WindowManager;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -59,7 +60,8 @@ public class LaidOffNativeActivity extends NativeActivity
         super.onCreate(savedInstanceState);
         //setContentView(R.layout.main);
 
-        getWindow().getDecorView().setKeepScreenOn(true);
+        //getWindow().getDecorView().setKeepScreenOn(true);
+        getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
         Log.i(LOG_TAG, "Device Android Version: " + Build.VERSION.SDK_INT);
 

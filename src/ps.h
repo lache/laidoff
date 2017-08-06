@@ -5,7 +5,7 @@
 typedef struct _LWCONTEXT LWCONTEXT;
 
 #define NUM_PARTICLES (360)
-#define NUM_PARTICLES2 (1800)
+#define NUM_PARTICLES2 (100)
 
 typedef struct _LWPARTICLE {
 	float theta;

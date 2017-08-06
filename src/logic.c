@@ -473,7 +473,8 @@ void logic_udate_default_projection(LWCONTEXT* pLwc) {
 
 	if (ratio > 1) {
 		mat4x4_ortho(pLwc->proj, -ratio, ratio, -1.f, 1.f, 1.f, -1.f);
-	} else {
+	}
+	else {
 		mat4x4_ortho(pLwc->proj, -1.f, 1.f, -1 / ratio, 1 / ratio, 1.f, -1.f);
 	}
 }
@@ -508,25 +509,32 @@ void lwc_update(LWCONTEXT *pLwc, double delta_time) {
 		mq_poll(pLwc, pLwc->def_sys_msg, pLwc->mq, pLwc->field);
 	}
 
-	update_dialog(pLwc);
+	if (pLwc->game_scene == LGS_DIALOG) {
+		update_dialog(pLwc);
+	}
 
 	//****//
 	// fix delta time
 	//lwcontext_delta_time(pLwc) = 1.0f / 60;
 	//****//
 
-	update_battle(pLwc);
-
-	move_player(pLwc);
+	if (pLwc->game_scene == LGS_BATTLE) {
+		update_battle(pLwc);
+	}
+	
+	
 	if (pLwc->game_scene == LGS_FIELD) {
+		move_player(pLwc);
 		resolve_player_event_collision(pLwc);
 	}
-	update_attack_trail(pLwc);
 
-	update_damage_text(pLwc);
+	if (pLwc->game_scene == LGS_BATTLE) {
+		update_attack_trail(pLwc);
 
-	update_battle_wall(pLwc);
+		update_damage_text(pLwc);
 
+		update_battle_wall(pLwc);
+	}
 	update_sys_msg(pLwc->def_sys_msg, (float)delta_time);
 
 	if (pLwc->battle_state == LBS_START_PLAYER_WIN || pLwc->battle_state == LBS_PLAYER_WIN_IN_PROGRESS) {
@@ -541,7 +549,9 @@ void lwc_update(LWCONTEXT *pLwc, double delta_time) {
 		ps_test_update(pLwc);
 	}
 
-	script_update(pLwc);
+	if (pLwc->game_scene == LGS_FIELD) {
+		script_update(pLwc);
+	}
 
 	((LWCONTEXT *)pLwc)->update_count++;
 
@@ -557,7 +567,8 @@ void init_lwc_runtime_data(LWCONTEXT *pLwc) {
 	pLwc->dialog = create_string_from_file(ASSETS_BASE_PATH "d" PATH_SEPARATOR "d1.txt");
 	if (pLwc->dialog) {
 		pLwc->dialog_bytelen = (int)strlen(pLwc->dialog);
-	} else {
+	}
+	else {
 		LOGE("dialog loading failed.");
 	}
 }
@@ -597,15 +608,18 @@ static int loop_pipe_reader(zloop_t* loop, zsock_t* pipe, void* args) {
 				m->follow_cam);
 
 			init_lwc_runtime_data(pLwc);
-		} else if (d && s == sizeof(LWMSGRESETRUNTIMECONTEXT) && *(int*)d == LM_LWMSGRESETRUNTIMECONTEXT) {
+		}
+		else if (d && s == sizeof(LWMSGRESETRUNTIMECONTEXT) && *(int*)d == LM_LWMSGRESETRUNTIMECONTEXT) {
 			// Stop new frame of rendering
 			lwcontext_set_safe_to_start_render(pLwc, 0);
 			// Busy wait for current frame of rendering to be completed
 			while (lwcontext_rendering(pLwc)) {}
 
 			reset_runtime_context(pLwc);
-		} else if (d && s == sizeof(LWMSGRELOADSCRIPT) && *(int*)d == LM_LWMSGRELOADSCRIPT) {
-		} else {
+		}
+		else if (d && s == sizeof(LWMSGRELOADSCRIPT) && *(int*)d == LM_LWMSGRELOADSCRIPT) {
+		}
+		else {
 			abort();
 		}
 		f = zmsg_next(msg);
