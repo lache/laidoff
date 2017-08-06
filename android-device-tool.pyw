@@ -43,16 +43,16 @@ class Application(tk.Frame):
 		#self.quit.pack(side="bottom")
 
 	def power(self):
-		call(["adb", "shell", "input", "keyevent", "KEYCODE_POWER"])
+		call(["adb", "shell", "input", "keyevent", "KEYCODE_POWER"], shell=True)
 		
 	def home(self):
-		call(["adb", "shell", "input", "keyevent", "KEYCODE_HOME"])
+		call(["adb", "shell", "input", "keyevent", "KEYCODE_HOME"], shell=True)
 		
 	def force_stop(self):
-		call(["adb", "shell", "am", "force-stop", "com.popsongremix.laidoff"])
+		call(["adb", "shell", "am", "force-stop", "com.popsongremix.laidoff"], shell=True)
 		
 	def start(self):
-		call(["adb", "shell", "am", "start", "-n", "com.popsongremix.laidoff/com.popsongremix.laidoff.LaidOffNativeActivity"])
+		call(["adb", "shell", "am", "start", "-n", "com.popsongremix.laidoff/com.popsongremix.laidoff.LaidOffNativeActivity"], shell=True)
 
 root = tk.Tk()
 root.wm_title("Laidoff")
