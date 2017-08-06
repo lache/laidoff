@@ -577,6 +577,7 @@ void lwc_render_field(const LWCONTEXT* pLwc) {
 	while (emit_object) {
 		mat4x4 model;
 		mat4x4_identity(model);
+		mat4x4_rotate_Z(model, model, (float)LWDEG2RAD(45));
 		mat4x4_translate_in_place(model, emit_object->pos[0], emit_object->pos[1], emit_object->pos[2]);
 		ps_render_explosion(pLwc, emit_object, proj_view, model);
 		emit_object = ps_emit_object_next(field_ps(pLwc->field), emit_object);

@@ -41,10 +41,12 @@ void main(void)
     // Size
     float s = 1.0; // dummy initial value (always assigned again)
     
+	float time = 1.0;
+	
     // If blast is growing
     if(u_Time < growth)
     {
-        float time = u_Time / growth;
+        time = u_Time / growth;
         x = x * r * time;
         y = y * r * time;
         
@@ -55,7 +57,7 @@ void main(void)
     // Else if blast is decaying
     else
     {
-        float time = (u_Time - growth) / decay;
+        time = (u_Time - growth) / decay;
         x = (x * r) + (u_Gravity.x * time);
         y = (y * r) + (u_Gravity.y * time);
         
@@ -64,7 +66,7 @@ void main(void)
     }
     
     // Required OpenGL ES 2.0 outputs
-    gl_Position = u_ProjectionViewMatrix * u_ModelMatrix * vec4(x, y, 0.0, 1.0);
+    gl_Position = u_ProjectionViewMatrix * u_ModelMatrix * vec4(x, y, max(0.0, 2.0 - time), 1.0);
     
     // 3
     gl_PointSize = min(60.0, max(0.0, (s + a_pSizeOffset)));

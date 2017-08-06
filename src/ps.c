@@ -40,20 +40,22 @@ float random_float_between(float min, float max) {
 void load_emitter2(LWCONTEXT* pLwc) {
 	// 3
 	// Offset bounds
-	float oRadius = 0.1f; //pLwc->width / 640.0f * 0.10f;      // 0.0 = circle; 1.0 = ring
-	float oVelocity = 0.50f;    // Speed
-	
+	float oRadius1 = 0.1f; //pLwc->width / 640.0f * 0.10f;      // 0.0 = circle; 1.0 = ring
+	float oRadius2 = 1.0f;
+	float oVelocity = 1.50f;    // Speed
+
 	float oSize = LWMIN(10.0f, pLwc->width / 1920.0f * 10.0f);        // Pixels
 	float oColor = 0.25f;       // 0.5 = 50% shade offset
 
 	// 4
 	// Load Particles
-	for (int i = 0; i<NUM_PARTICLES2; i++) {
+	int angle = 5;
+	for (int i = 0; i < NUM_PARTICLES2; i++) {
 		// Assign a unique ID to each particle, between 0 and 360 (in radians)
-		emitter2.eParticles[i].pId = (float)LWDEG2RAD(((float)i / (float)NUM_PARTICLES2)*360.0f);
+		emitter2.eParticles[i].pId = (float)LWDEG2RAD(((float)(-angle / 2 + i % angle) / (float)NUM_PARTICLES2)*360.0f);
 
 		// Assign random offsets within bounds
-		emitter2.eParticles[i].pRadiusOffset = random_float_between(oRadius, 1.00f);
+		emitter2.eParticles[i].pRadiusOffset = random_float_between(oRadius1, oRadius2);
 		emitter2.eParticles[i].pVelocityOffset = random_float_between(-oVelocity, oVelocity);
 		emitter2.eParticles[i].pDecayOffset = random_float_between(-oDecay, oDecay);
 		emitter2.eParticles[i].pSizeOffset = random_float_between(-oSize, oSize);
@@ -67,7 +69,7 @@ void load_emitter2(LWCONTEXT* pLwc) {
 
 	// 5
 	// Load Properties
-	emitter2.eRadius = 2.75f;                                     // Blast radius
+	emitter2.eRadius = 6.0f;                                     // Blast radius
 	emitter2.eVelocity = 3.00f;                                   // Explosion velocity
 	emitter2.eDecay = 2.00f;                                      // Explosion decay
 	emitter2.eSizeStart = LWMIN(50.0f, pLwc->width / 1920.0f * 50.0f);        // Pixels
@@ -78,14 +80,14 @@ void load_emitter2(LWCONTEXT* pLwc) {
 	emitter2.eColorEnd[0] = 0.25f;
 	emitter2.eColorEnd[1] = 0.0f;
 	emitter2.eColorEnd[2] = 0.0f;
-																// Set global factors
+	// Set global factors
 	float growth = emitter2.eRadius / emitter2.eVelocity;       // Growth time
 	emitter2_object.life = growth + emitter2.eDecay + oDecay;                    // Simulation lifetime
 
 	float drag = 10.00f;                                            // Drag (air resistance)
 	emitter2_object.gravity[0] = 0;
-	emitter2_object.gravity[1] = -9.81f * (1.0f / drag);			  // 7
-	
+	emitter2_object.gravity[1] = 0;// -9.81f * (1.0f / drag);			  // 7
+
 	glGenBuffers(1, &pLwc->particle_buffer2);
 	glBindBuffer(GL_ARRAY_BUFFER, pLwc->particle_buffer2);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(emitter2.eParticles), emitter2.eParticles, GL_STATIC_DRAW);
@@ -127,7 +129,8 @@ void ps_load_emitter(LWCONTEXT* pLwc) {
 void ps_test_update(LWCONTEXT* pLwc) {
 	if (time_current > time_max) {
 		time_direction = -1;
-	} else if (time_current < 0.0f) {
+	}
+	else if (time_current < 0.0f) {
 		time_direction = 1;
 	}
 	const float time_elapsed = (float)lwcontext_delta_time(pLwc);
@@ -177,7 +180,7 @@ void ps_play_new_pos(LWPS* ps, const vec3 pos) {
 
 		float drag = 10.00f;
 		ps->inst[i].emit_object.gravity[0] = 0;
-		ps->inst[i].emit_object.gravity[1] = -9.81f * (1.0f / drag);
+		ps->inst[i].emit_object.gravity[1] = 0;// -9.81f * (1.0f / drag);
 		ps->inst[i].emit_object.time = 0;
 		memcpy(ps->inst[i].emit_object.pos, pos, sizeof(vec3));
 		break;
