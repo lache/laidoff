@@ -16,7 +16,7 @@
 #include "laidoff.h"
 #include "lwlog.h"
 #include "czmq.h"
-
+#include "logic.h"
 /**
  * Our saved state data.
  */
@@ -396,21 +396,20 @@ static void recreate_surface(engine *engine)
 
         engine->surface = eglCreateWindowSurface(engine->display, engine->config, engine->app->window, NULL);
 
-        if (eglMakeCurrent(engine->display, engine->surface, engine->surface, engine->context) == EGL_FALSE)
-        {
+        if (eglMakeCurrent(engine->display, engine->surface, engine->surface, engine->context) == EGL_FALSE) {
             LOGW("Unable to eglMakeCurrent!!");
-        }
+        } else {
+			EGLint w, h;
+			eglQuerySurface(engine->display, engine->surface, EGL_WIDTH, &w);
+			eglQuerySurface(engine->display, engine->surface, EGL_HEIGHT, &h);
+			engine->width = w;
+			engine->height = h;
+			lw_set_size(engine->pLwc, w, h);
 
-        EGLint w, h;
-        eglQuerySurface(engine->display, engine->surface, EGL_WIDTH, &w);
-        eglQuerySurface(engine->display, engine->surface, EGL_HEIGHT, &h);
-        engine->width = w;
-        engine->height = h;
-        lw_set_size(engine->pLwc, w, h);
+			LOGI("Change surface (width x height) to (%d x %d)", w, h);
 
-        LOGI("Change surface (width x height) to (%d x %d)", w, h);
-
-        engine->surface_ready = 1;
+			engine->surface_ready = 1;
+		}
     }
     else
     {
@@ -547,10 +546,12 @@ static void engine_handle_cmd(struct android_app* app, int32_t cmd) {
             LOGI("APP_CMD_RESUME");
             engine->resumed = 1;
             ALooper_wake(engine->app->looper);
+			logic_start_logic_update_job_async(engine->pLwc);
             break;
         case APP_CMD_PAUSE:
             LOGI("APP_CMD_PAUSE");
             engine->resumed = 0;
+			logic_stop_logic_update_job_async(engine->pLwc);
             break;
         case APP_CMD_STOP:
             LOGI("APP_CMD_STOP");

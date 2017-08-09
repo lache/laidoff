@@ -284,6 +284,10 @@ typedef struct _LWCONTEXT {
 	int rmsg_send_count;
 	// Render command message recv(handle) count
 	int rmsg_recv_count;
+	// ZeroMQ logic loop
+	void* logic_loop;
+	// ZeroMQ logic update timer job
+	int logic_update_job;
 } LWCONTEXT;
 
 #ifdef __cplusplus

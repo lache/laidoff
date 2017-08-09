@@ -68,6 +68,8 @@ typedef enum _LW_MSG {
 	LM_LWMSGINITFIELD,
 	LM_LWMSGRESETRUNTIMECONTEXT,
 	LM_LWMSGRELOADSCRIPT,
+	LM_LWMSGSTARTLOGICLOOP,
+	LM_LWMSGSTOPLOGICLOOP,
 } LW_MSG;
 
 typedef struct _LWMSGINITFIELD {
@@ -87,6 +89,44 @@ typedef struct _LWMSGRESETRUNTIMECONTEXT {
 typedef struct _LWMSGRELOADSCRIPT {
 	LW_MSG type;
 } LWMSGRELOADSCRIPT;
+
+typedef struct _LWMSGSTARTLOGICLOOP {
+	LW_MSG type;
+} LWMSGSTARTLOGICLOOP;
+
+typedef struct _LWMSGSTOPLOGICLOOP {
+	LW_MSG type;
+} LWMSGSTOPLOGICLOOP;
+
+void logic_start_logic_update_job_async(LWCONTEXT* pLwc) {
+	if (pLwc == 0 || pLwc->logic_actor == 0) {
+		return;
+	}
+	zmsg_t* msg = zmsg_new();
+	LWMSGSTARTLOGICLOOP m = {
+			LM_LWMSGSTARTLOGICLOOP,
+	};
+	zmsg_addmem(msg, &m, sizeof(LWMSGSTARTLOGICLOOP));
+	if (zactor_send(pLwc->logic_actor, &msg) < 0) {
+		zmsg_destroy(&msg);
+		LOGE("Send message to logic worker failed!");
+	}
+}
+
+void logic_stop_logic_update_job_async(LWCONTEXT* pLwc) {
+	if (pLwc == 0 || pLwc->logic_actor == 0) {
+		return;
+	}
+	zmsg_t* msg = zmsg_new();
+	LWMSGSTOPLOGICLOOP m = {
+			LM_LWMSGSTOPLOGICLOOP,
+	};
+	zmsg_addmem(msg, &m, sizeof(LWMSGSTOPLOGICLOOP));
+	if (zactor_send(pLwc->logic_actor, &msg) < 0) {
+		zmsg_destroy(&msg);
+		LOGE("Send message to logic worker failed!");
+	}
+}
 
 void load_field_1_init_runtime_data_async(LWCONTEXT *pLwc, zactor_t* actor) {
 	pLwc->next_game_scene = LGS_FIELD;
@@ -608,18 +648,19 @@ static int loop_pipe_reader(zloop_t* loop, zsock_t* pipe, void* args) {
 				m->follow_cam);
 
 			init_lwc_runtime_data(pLwc);
-		}
-		else if (d && s == sizeof(LWMSGRESETRUNTIMECONTEXT) && *(int*)d == LM_LWMSGRESETRUNTIMECONTEXT) {
+		} else if (d && s == sizeof(LWMSGRESETRUNTIMECONTEXT) && *(int*)d == LM_LWMSGRESETRUNTIMECONTEXT) {
 			// Stop new frame of rendering
 			lwcontext_set_safe_to_start_render(pLwc, 0);
 			// Busy wait for current frame of rendering to be completed
 			while (lwcontext_rendering(pLwc)) {}
 
 			reset_runtime_context(pLwc);
-		}
-		else if (d && s == sizeof(LWMSGRELOADSCRIPT) && *(int*)d == LM_LWMSGRELOADSCRIPT) {
-		}
-		else {
+		} else if (d && s == sizeof(LWMSGRELOADSCRIPT) && *(int*)d == LM_LWMSGRELOADSCRIPT) {
+		} else if (d && s == sizeof(LWMSGRELOADSCRIPT) && *(int*)d == LM_LWMSGSTARTLOGICLOOP) {
+			logic_start_logic_update_job(pLwc);
+		} else if (d && s == sizeof(LWMSGRELOADSCRIPT) && *(int*)d == LM_LWMSGSTOPLOGICLOOP) {
+			logic_stop_logic_update_job(pLwc);
+		} else {
 			abort();
 		}
 		f = zmsg_next(msg);
@@ -638,13 +679,32 @@ static void s_logic_worker(zsock_t *pipe, void *args) {
 	pLwc->update_interval = 1 / 125.0;// 1 / 120.0;// 0.02; // seconds
 
 	zloop_t* loop = zloop_new();
-	zloop_timer(loop, (size_t)(pLwc->update_interval * 1000), 0, loop_logic_update, pLwc);
+	pLwc->logic_loop = loop;
+	logic_start_logic_update_job(pLwc);
 	zloop_reader(loop, pipe, loop_pipe_reader, pLwc);
 	// Start the reactor loop
 	zloop_start_noalloc(loop);
 	// Reactor loop finished.
 	// Send 'worker finished' signal to parent thread
 	zsock_signal(pipe, 0);
+}
+
+void logic_start_logic_update_job(LWCONTEXT* pLwc) {
+	if (pLwc == 0 || pLwc->logic_loop == 0) {
+		return;
+	}
+	if (pLwc->logic_update_job) {
+		logic_stop_logic_update_job(pLwc);
+	}
+	pLwc->logic_update_job = zloop_timer(pLwc->logic_loop, (size_t)(pLwc->update_interval * 1000), 0, loop_logic_update, pLwc);
+}
+
+void logic_stop_logic_update_job(LWCONTEXT* pLwc) {
+	if (pLwc == 0 || pLwc->logic_loop == 0) {
+		return;
+	}
+	zloop_timer_end(pLwc->logic_loop, pLwc->logic_update_job);
+	pLwc->logic_update_job = 0;
 }
 
 void lwc_start_logic_thread(LWCONTEXT* pLwc) {
