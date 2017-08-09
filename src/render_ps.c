@@ -52,7 +52,6 @@ void ps_render_explosion(const LWCONTEXT* pLwc, const LWEMITTER2OBJECT* emit_obj
 	glUniform3fv(pLwc->shader[shader_index].u_eColorStart, 1, emitter2.eColorStart);
 	glUniform3fv(pLwc->shader[shader_index].u_eColorEnd, 1, emitter2.eColorEnd);
 
-
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, pLwc->tex_atlas[LAE_U_GLOW]);
 	glUniform1i(pLwc->shader[shader_index].u_Texture, 0);

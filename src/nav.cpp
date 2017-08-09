@@ -522,6 +522,8 @@ void nav_update(LWNAV* nav, float move_speed, float delta_time) {
 		if (nav->path_query[i].valid && nav->path_query[i].update_output) {
 			nav_update_path_query(nav, &nav->path_query[i], move_speed, delta_time,
 				nav->path_query_output_location[i], nav->path_query_output_orientation[i]);
+
+			nav->path_query_output_location[i][2] += 0.7f * fabs(sinf(nav->path_query[i].path_t * 11));
 		}
 	}
 }

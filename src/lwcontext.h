@@ -288,6 +288,8 @@ typedef struct _LWCONTEXT {
 	void* logic_loop;
 	// ZeroMQ logic update timer job
 	int logic_update_job;
+	// Last now (seconds)
+	double last_now;
 } LWCONTEXT;
 
 #ifdef __cplusplus

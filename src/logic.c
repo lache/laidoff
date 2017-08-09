@@ -620,7 +620,9 @@ static int loop_logic_update(zloop_t* loop, int timer_id, void* args) {
 		// End the reactor
 		return -1;
 	}
-	lwc_update(pLwc, pLwc->update_interval);
+	double now = lwtimepoint_now_seconds();
+	lwc_update(pLwc, now - pLwc->last_now);
+	pLwc->last_now = now;
 	return 0;
 }
 
@@ -656,6 +658,7 @@ static int loop_pipe_reader(zloop_t* loop, zsock_t* pipe, void* args) {
 
 			reset_runtime_context(pLwc);
 		} else if (d && s == sizeof(LWMSGRELOADSCRIPT) && *(int*)d == LM_LWMSGRELOADSCRIPT) {
+			// TODO: Reload all scripts
 		} else if (d && s == sizeof(LWMSGRELOADSCRIPT) && *(int*)d == LM_LWMSGSTARTLOGICLOOP) {
 			logic_start_logic_update_job(pLwc);
 		} else if (d && s == sizeof(LWMSGRELOADSCRIPT) && *(int*)d == LM_LWMSGSTOPLOGICLOOP) {
@@ -696,6 +699,7 @@ void logic_start_logic_update_job(LWCONTEXT* pLwc) {
 	if (pLwc->logic_update_job) {
 		logic_stop_logic_update_job(pLwc);
 	}
+	pLwc->last_now = lwtimepoint_now_seconds();
 	pLwc->logic_update_job = zloop_timer(pLwc->logic_loop, (size_t)(pLwc->update_interval * 1000), 0, loop_logic_update, pLwc);
 }
 

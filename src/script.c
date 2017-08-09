@@ -232,6 +232,18 @@ int l_spawn_oil_truck(lua_State* L) {
 	return 1;
 }
 
+int l_spawn_devil(lua_State* L) {
+	if (lua_gettop(L) >= 4) {
+		LWCONTEXT* pLwc = lua_touserdata(L, 1);
+		float x = (float)lua_tonumber(L, 2);
+		float y = (float)lua_tonumber(L, 3);
+		int field_event_id = (int)lua_tonumber(L, 4);
+		int r = spawn_field_object(pLwc->field, x, y, 1, 1, LVT_DEVIL, pLwc->tex_atlas[LAE_DEVIL_KTX], 1, 1, 1.0f, field_event_id, 0);
+		lua_pushinteger(L, r);
+	}
+	return 1;
+}
+
 int l_load_module(lua_State* L) {
 	if (lua_gettop(L) >= 2) {
 		LWCONTEXT* pLwc = lua_touserdata(L, 1);
@@ -296,6 +308,8 @@ void init_lua(LWCONTEXT* pLwc)
 	lua_register(L, "spawn_pump", l_spawn_pump);
 	// spawn_oil_truck
 	lua_register(L, "spawn_oil_truck", l_spawn_oil_truck);
+	// spawn_oil_truck
+	lua_register(L, "spawn_devil", l_spawn_devil);
 	// load_module
 	lua_register(L, "load_module", l_load_module);
 	// 'pLwc'
