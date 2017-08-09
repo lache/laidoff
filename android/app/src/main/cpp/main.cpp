@@ -63,6 +63,7 @@ static JavaVM* s_vm_from_cpp;
 static JNIEnv* s_env_from_java;
 static jobject s_obj_from_java;
 static jobject s_obj_from_cpp;
+static ALooper* s_looper_from_cpp;
 static bool s_java_activity_created;
 
 const static char* JAVA_NATIVE_ACTIVITY_NAME = "com.popsongremix.laidoff.LaidOffNativeActivity";
@@ -273,13 +274,13 @@ static int engine_init_display(struct engine* engine) {
                               EGL_SURFACE_TYPE,
                               EGL_WINDOW_BIT,
                               EGL_BLUE_SIZE,
-                              8,
+                              5,
                               EGL_GREEN_SIZE,
-                              8,
+                              6,
                               EGL_RED_SIZE,
-                              8,
+                              5,
                               EGL_DEPTH_SIZE,
-                              24,
+                              16,
                               EGL_NONE};
     EGLint w, h, dummy, format;
     EGLint numConfigs;
@@ -312,7 +313,13 @@ static int engine_init_display(struct engine* engine) {
     eglQuerySurface(display, surface, EGL_WIDTH, &w);
     eglQuerySurface(display, surface, EGL_HEIGHT, &h);
 
-    //eglSwapInterval(display, 3);
+	int min_swap_interval, max_swap_interval;
+	eglGetConfigAttrib(display, config, EGL_MIN_SWAP_INTERVAL, &min_swap_interval);
+	eglGetConfigAttrib(display, config, EGL_MAX_SWAP_INTERVAL, &max_swap_interval);
+
+	// Calling eglSwapInterval has no meaning on Android?
+	// (https://groups.google.com/forum/#!topic/android-developers/HvMZRcp3pt0)
+    //eglSwapInterval(display, 1);
 
     engine->display = display;
     engine->context = context;
@@ -539,6 +546,7 @@ static void engine_handle_cmd(struct android_app* app, int32_t cmd) {
         case APP_CMD_RESUME:
             LOGI("APP_CMD_RESUME");
             engine->resumed = 1;
+            ALooper_wake(engine->app->looper);
             break;
         case APP_CMD_PAUSE:
             LOGI("APP_CMD_PAUSE");
@@ -633,15 +641,6 @@ void android_main(struct android_app* state) {
     // Make sure glue isn't stripped.
     app_dummy();
 
-    // Setup static variables for calling Java functions from C++ side
-    {
-        JNIEnv *env;
-        JavaVM* lJavaVM = state->activity->vm;
-
-        s_vm_from_cpp = lJavaVM;
-        s_obj_from_cpp = state->activity->clazz;
-    }
-
     memset(&engine, 0, sizeof(engine));
     state->userData = &engine;
     state->onAppCmd = engine_handle_cmd;
@@ -667,6 +666,17 @@ void android_main(struct android_app* state) {
         // We are starting with a previous saved state; restore from it.
         engine.state = *(struct saved_state*)state->savedState;
     }
+
+	// Setup static variables for calling Java functions from C++ side
+	{
+		JNIEnv *env;
+		JavaVM* lJavaVM = state->activity->vm;
+
+		s_vm_from_cpp = lJavaVM;
+		s_obj_from_cpp = state->activity->clazz;
+
+		s_looper_from_cpp = engine.app->looper;
+	}
 
     struct timespec last_time;
     clock_gettime(CLOCK_MONOTONIC, &last_time);
@@ -713,8 +723,7 @@ void android_main(struct android_app* state) {
              engine.resumed);
         */
 
-        while ((ident=ALooper_pollAll(poll_without_timeout ? 0 : -1, NULL, &events,
-                                      (void**)&source)) >= 0) {
+        while ((ident=ALooper_pollAll(poll_without_timeout ? 0 : -1, NULL, &events, (void**)&source)) >= 0) {
 
             // Process this event.
             if (source != NULL) {
@@ -745,7 +754,6 @@ void android_main(struct android_app* state) {
                 return;
             }
         }
-
 
         // Done with events; draw next animation frame.
         engine.state.angle += .01f;
@@ -834,6 +842,8 @@ extern "C" JNIEXPORT jstring JNICALL Java_com_popsongremix_laidoff_LaidOffNative
     std::string hello = "Hello from C++";
 
     s_java_activity_created = true;
+
+	ALooper_wake(s_looper_from_cpp);
 
     return env->NewStringUTF(hello.c_str());
 }

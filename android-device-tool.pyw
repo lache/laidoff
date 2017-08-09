@@ -12,8 +12,8 @@ class Application(tk.Frame):
 	def create_widgets(self):
 		btn_font = font.Font(family='Helvetica', size=20, weight='bold')
 	
-		#self.title_label = tk.Label(self, text = 'Laidoff', font=("Courier", 44))
-		#self.title_label.pack(side="top")
+		self.title_label = tk.Label(self, text = 'Laidoff', font=("Courier", 44))
+		self.title_label.pack(side="top")
 		
 		self.power_btn = tk.Button(self)
 		self.power_btn["text"] = "Power"

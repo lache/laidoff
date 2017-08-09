@@ -29,15 +29,7 @@ public class LaidOffNativeActivity extends NativeActivity
         System.loadLibrary("native-activity");
     }
 
-    private static SoundPool mSoundPool;
     private static MediaPlayer mBgmPlayer;
-
-    // SFX
-    private static int mSound_Tapping01;
-    private static int mSound_Completed03;
-    private static int mSound_GameOver01;
-    private static int mSound_GameStart01;
-    private static int mSound_Point;
 
     public static native String signalResourceReady(Class<LaidOffNativeActivity> and9NativeActivityClass);
     public static native int pushTextureData(int width, int height, int[] data, int texAtlasIndex);
@@ -51,8 +43,6 @@ public class LaidOffNativeActivity extends NativeActivity
     
     public static final String LOG_TAG = "and9";
 
-    private static AssetsLoader assetsLoader;
-
     /** Called when the activity is first created. */
     @Override
     public void onCreate(Bundle savedInstanceState)
@@ -61,11 +51,15 @@ public class LaidOffNativeActivity extends NativeActivity
         //setContentView(R.layout.main);
 
         //getWindow().getDecorView().setKeepScreenOn(true);
-        getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+        getWindow().addFlags(WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED |
+                WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD |
+                WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON |
+                WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON |
+                WindowManager.LayoutParams.FLAG_ALLOW_LOCK_WHILE_SCREEN_ON);
 
         Log.i(LOG_TAG, "Device Android Version: " + Build.VERSION.SDK_INT);
 
-        assetsLoader = new AssetsLoader(this);
+        AssetsLoader assetsLoader = new AssetsLoader(this);
         Log.i(LOG_TAG, "APK Path: " + assetsLoader.GetAPKPath());
         assetsLoader.registerAllAssetsOfType("tex");
         assetsLoader.registerAllAssetsOfType("pkm");
@@ -85,7 +79,7 @@ public class LaidOffNativeActivity extends NativeActivity
         downloadResFromServer();
 
         //noinspection deprecation
-        mSoundPool = new SoundPool(5, AudioManager.STREAM_MUSIC, 0);
+        SoundPool mSoundPool = new SoundPool(5, AudioManager.STREAM_MUSIC, 0);
         mSoundPool.setOnLoadCompleteListener(new SoundPool.OnLoadCompleteListener() {
             @Override
             public void onLoadComplete(SoundPool soundPool, int sampleId,
@@ -96,11 +90,11 @@ public class LaidOffNativeActivity extends NativeActivity
             }
         });
 
-        mSound_Tapping01 = mSoundPool.load(getApplicationContext(), R.raw.jump, 1);
-        mSound_Completed03 = mSoundPool.load(getApplicationContext(), R.raw.completed, 1);
-        mSound_GameOver01 = mSoundPool.load(getApplicationContext(), R.raw.over, 1);
-        mSound_GameStart01 = mSoundPool.load(getApplicationContext(), R.raw.start, 1);
-        mSound_Point = mSoundPool.load(getApplicationContext(), R.raw.point, 1);
+        int mSound_Tapping01 = mSoundPool.load(getApplicationContext(), R.raw.jump, 1);
+        int mSound_Completed03 = mSoundPool.load(getApplicationContext(), R.raw.completed, 1);
+        int mSound_GameOver01 = mSoundPool.load(getApplicationContext(), R.raw.over, 1);
+        int mSound_GameStart01 = mSoundPool.load(getApplicationContext(), R.raw.start, 1);
+        int mSound_Point = mSoundPool.load(getApplicationContext(), R.raw.point, 1);
 
         mBgmPlayer = MediaPlayer.create(getApplicationContext(), R.raw.opening); // in 2nd param u have to pass your desire ringtone
         mBgmPlayer.setLooping(true);
