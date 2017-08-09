@@ -142,6 +142,7 @@ start_coro(function()
 		--print(inspect(guntower2))
 		field:spawn(guntower2, Faction2)
 		yield_wait_ms(1.5 * 1000)
+		--yield_wait_ms(0.1 * 1000)
 	end
 end)
 

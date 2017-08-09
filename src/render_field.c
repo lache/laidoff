@@ -490,10 +490,40 @@ void lwc_render_field(const LWCONTEXT* pLwc) {
 			);
 		}
 	}
-
+	// Render field object shadows
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE);
+	glBlendEquation(GL_FUNC_REVERSE_SUBTRACT);
+	glDepthMask(GL_FALSE);
 	for (int i = 0; i < MAX_FIELD_OBJECT; i++) {
 		LWFIELDOBJECT* fo = field_object(pLwc->field, i);
-
+		if (fo->valid) {
+			if (fo->skin == 0) {
+				render_field_object(
+					pLwc,
+					LVT_CENTER_CENTER_ANCHORED_SQUARE,
+					pLwc->tex_atlas[LAE_CIRCLE_SHADOW_KTX],
+					view,
+					perspective,
+					fo->x,
+					fo->y,
+					0.001f,
+					fo->sx * (0.25f + fo->z / 0.7f * 0.1f), // search for nav_jump_height
+					fo->sy * (0.25f + fo->z / 0.7f * 0.1f), // search for nav_jump_height
+					1.0f,
+					0.75f, // shadow darkness (0 - no shadow, 1 - darkest)
+					0,
+					fo->rot_z
+				);
+			}
+		}
+	}
+	glBlendEquation(GL_FUNC_ADD);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	glDepthMask(GL_TRUE);
+	// Render field objects
+	for (int i = 0; i < MAX_FIELD_OBJECT; i++) {
+		LWFIELDOBJECT* fo = field_object(pLwc->field, i);
 		if (fo->valid) {
 			if (fo->skin == 0) {
 				render_field_object(
