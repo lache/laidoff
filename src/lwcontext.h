@@ -275,9 +275,9 @@ typedef struct _LWCONTEXT {
 	// Logic update interval (in seconds)
 	double update_interval;
 	// 1 if safe to render, 0 if otherwise
-	volatile int safe_to_start_render;
+	/*volatile*/ int safe_to_start_render;
 	// 1 if rendering in progress, 0 if otherwise
-	volatile int rendering;
+	/*volatile*/ int rendering;
 	// Asynchronous render command queue
 	LWFIELDRENDERCOMMAND render_command[MAX_RENDER_QUEUE_CAPACITY];
 	// Render command message send count

@@ -423,6 +423,10 @@ void reset_field_context(LWCONTEXT* pLwc) {
 	spawn_all_field_object(pLwc);
 	// Player initially should fall from the sky for stable ray checking
 	set_field_player_position(pLwc->field, 0, 0, 10);
+	// Create all field cube colliders
+	field_create_field_box_collider(pLwc->field);
+	// Destroy all script colliders
+	field_destroy_all_script_colliders(pLwc->field);
 	// Reset player position
 	pLwc->player_pos_x = 0;
 	pLwc->player_pos_y = 0;
@@ -715,7 +719,7 @@ void lwc_start_logic_thread(LWCONTEXT* pLwc) {
 	// Start logic thread
 	pLwc->logic_actor = zactor_new(s_logic_worker, pLwc);
 	// Load initial stage
-	load_field_3_init_runtime_data_async(pLwc, pLwc->logic_actor);
+	load_field_2_init_runtime_data_async(pLwc, pLwc->logic_actor);
 }
 
 const char* logic_server_addr(int idx) {

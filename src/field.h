@@ -22,6 +22,17 @@ typedef enum _LW_RAY_ID {
 	LRI_COUNT
 } LW_RAY_ID;
 
+typedef enum _LW_SPACE_GROUP {
+	LSG_PLAYER,
+	LSG_WORLD,
+	LSG_RAY,
+	LSG_BULLET,
+	LSG_ENEMY,
+	LSG_TOWER,
+
+	LSG_COUNT,
+} LW_SPACE_GROUP;
+
 typedef struct _LWFIELD LWFIELD;
 typedef struct _LWFIELDOBJECT LWFIELDOBJECT;
 typedef struct _LWPATHQUERY LWPATHQUERY;
@@ -83,6 +94,10 @@ float* field_field_object_orientation_rawptr(LWFIELD* field, int idx);
 LWNAV* field_nav(LWFIELD* field);
 void field_reset_deterministic_seed(LWFIELD* field);
 const char* field_filename(LWFIELD* field);
+int field_create_sphere_script_collider(LWFIELD* field, LW_SPACE_GROUP space_group, float radius, float x, float y, float z);
+void field_destroy_script_collider(LWFIELD* field, int geom_idx);
+void field_create_field_box_collider(LWFIELD* field);
+void field_destroy_all_script_colliders(LWFIELD* field);
 #if defined __cplusplus
 }
 #endif  /* defined __cplusplus */

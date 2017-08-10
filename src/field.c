@@ -25,6 +25,7 @@
 #include "lwparabola.h"
 
 #define MAX_BOX_GEOM (100)
+#define MAX_SCRIPT_GEOM (200)
 #define MAX_RAY_RESULT_COUNT (10)
 #define MAX_FIELD_CONTACT (10)
 
@@ -33,16 +34,6 @@ typedef struct _LWFIELDCUBEOBJECT {
 	float dimx, dimy, dimz;
 	float axis_angle[4];
 } LWFIELDCUBEOBJECT;
-
-typedef enum _LW_SPACE_GROUP {
-	LSG_PLAYER,
-	LSG_WORLD,
-	LSG_RAY,
-	LSG_BULLET,
-	LSG_ENEMY,
-
-	LSG_COUNT,
-} LW_SPACE_GROUP;
 
 typedef struct _LWFIELD {
 	char filename[512];
@@ -56,6 +47,8 @@ typedef struct _LWFIELD {
 	dGeomID ground;
 	// Box(world collider) geom array
 	dGeomID box_geom[MAX_BOX_GEOM];
+	// Collider geoms managed by scripts array
+	dGeomID script_geom[MAX_SCRIPT_GEOM];
 	// Box(world collider) geom count
 	int box_geom_count;
 	// Player geom
@@ -261,6 +254,29 @@ void resolve_player_event_collision(LWCONTEXT *pLwc) {
 	//pLwc->player_pos_y = player_collider.y;
 }
 
+int field_create_sphere_script_collider(LWFIELD* field, LW_SPACE_GROUP space_group, float radius, float x, float y, float z) {
+	for (int i = 0; i < MAX_SCRIPT_GEOM; i++) {
+		if (field->script_geom[i] == 0) {
+			field->script_geom[i] = dCreateSphere(field->space_group[space_group], radius);
+			dGeomSetPosition(field->script_geom[i], x, y, z);
+			return i;
+		}
+	}
+	LOGE(LWLOGPOS "exceeds");
+	return -1;
+}
+
+void field_destroy_script_collider(LWFIELD* field, int geom_idx) {
+	if (geom_idx < 0 || geom_idx >= MAX_SCRIPT_GEOM) {
+		LOGE(LWLOGPOS "range error: %d", geom_idx);
+		return;
+	}
+	if (field->script_geom[geom_idx]) {
+		dGeomDestroy(field->script_geom[geom_idx]);
+	}
+	field->script_geom[geom_idx] = 0;
+}
+
 LWFIELD* load_field(const char* filename) {
 	// Initialize OpenDE
 	dInitODE2(0);
@@ -309,18 +325,6 @@ LWFIELD* load_field(const char* filename) {
 	field->field_raw_data = d;
 	field->field_cube_object = (LWFIELDCUBEOBJECT*)d;
 	field->field_cube_object_count = size / sizeof(LWFIELDCUBEOBJECT);
-	// Create geoms for field cube objects
-	for (int i = 0; i < field->field_cube_object_count; i++) {
-		const LWFIELDCUBEOBJECT* lco = &field->field_cube_object[i];
-
-		field->box_geom[field->box_geom_count] = dCreateBox(field->space_group[LSG_WORLD], lco->dimx, lco->dimy, lco->dimz);
-		dMatrix3 r;
-		dRFromAxisAndAngle(r, lco->axis_angle[0], lco->axis_angle[1], lco->axis_angle[2], lco->axis_angle[3]);
-		dGeomSetPosition(field->box_geom[field->box_geom_count], lco->x, lco->y, lco->z);
-		dGeomSetRotation(field->box_geom[field->box_geom_count], r);
-
-		field->box_geom_count++;
-	}
 	// Create sphere geom pool for bullets, projectiles, ...
 	// which are initially disabled and enabled before they are used.
 	for (int i = 0; i < MAX_FIELD_SPHERE; i++) {
@@ -414,6 +418,33 @@ static void field_player_world_near(void *data, dGeomID o1, dGeomID o2) {
 		if (contact[i].geom.g1 == field->player_geom) {
 			sign = 1;
 		} else if (contact[i].geom.g2 == field->player_geom) {
+			sign = -1;
+		}
+
+		if (sign) {
+			dReal* normal = contact[i].geom.normal;
+			dReal depth = contact[i].geom.depth;
+
+			field->player_pos[0] += sign * normal[0] * depth;
+			field->player_pos[1] += sign * normal[1] * depth;
+		}
+	}
+}
+
+static void field_player_tower_near(void *data, dGeomID o1, dGeomID o2) {
+	LWFIELD* field = (LWFIELD*)data;
+	assert(dGeomGetSpace(o1) == field->space_group[LSG_PLAYER]);
+	assert(dGeomGetSpace(o2) == field->space_group[LSG_TOWER]);
+
+	dContact contact[MAX_FIELD_CONTACT];
+	int n = dCollide(o1, o2, MAX_FIELD_CONTACT, &contact[0].geom, sizeof(dContact));
+	for (int i = 0; i < n; i++) {
+
+		dReal sign = 0;
+		if (contact[i].geom.g1 == field->player_geom) {
+			sign = 1;
+		}
+		else if (contact[i].geom.g2 == field->player_geom) {
 			sign = -1;
 		}
 
@@ -783,7 +814,7 @@ void update_field(LWCONTEXT* pLwc, LWFIELD* field) {
 		// Resolve collision (ray-world)
 		collide_between_spaces(field, field->space_group[LSG_WORLD], field->space_group[LSG_RAY], field_world_ray_near);
 		// Resolve collision (ray-enemy)
-		collide_between_spaces(field, field->space_group[LSG_ENEMY], field->space_group[LSG_RAY], field_enemy_ray_near);
+		//collide_between_spaces(field, field->space_group[LSG_ENEMY], field->space_group[LSG_RAY], field_enemy_ray_near);
 		// Gather ray result reported by collision report.
 		// Specifically, get minimum ray length collision point.
 		gather_ray_result(field);
@@ -793,6 +824,8 @@ void update_field(LWCONTEXT* pLwc, LWFIELD* field) {
 	collide_between_spaces(field, field->space_group[LSG_PLAYER], field->space_group[LSG_WORLD], field_player_world_near);
 	// Resolve collision (player-bullet collision)
 	collide_between_spaces(field, field->space_group[LSG_PLAYER], field->space_group[LSG_BULLET], field_player_bullet_near);
+	// Resolve collision (player-tower collision)
+	collide_between_spaces(field, field->space_group[LSG_PLAYER], field->space_group[LSG_TOWER], field_player_tower_near);
 	// Resolve collision (world-bullet collision)
 	collide_between_spaces(field, field->space_group[LSG_WORLD], field->space_group[LSG_BULLET], field_world_bullet_near);
 	// Resolve collision (test player-bullet collision)
@@ -1262,4 +1295,32 @@ void field_reset_deterministic_seed(LWFIELD* field) {
 
 const char* field_filename(LWFIELD* field) {
 	return field->filename;
+}
+
+void field_create_field_box_collider(LWFIELD* field) {
+	// Destroy previous geoms
+	for (int i = 0; i < field->box_geom_count; i++) {
+		assert(field->box_geom[i]);
+		dGeomDestroy(field->box_geom[i]);
+		field->box_geom[i] = 0;
+	}
+	field->box_geom_count = 0;
+	// Create geoms for field cube objects
+	for (int i = 0; i < field->field_cube_object_count; i++) {
+		const LWFIELDCUBEOBJECT* lco = &field->field_cube_object[i];
+
+		field->box_geom[field->box_geom_count] = dCreateBox(field->space_group[LSG_WORLD], lco->dimx, lco->dimy, lco->dimz);
+		dMatrix3 r;
+		dRFromAxisAndAngle(r, lco->axis_angle[0], lco->axis_angle[1], lco->axis_angle[2], lco->axis_angle[3]);
+		dGeomSetPosition(field->box_geom[field->box_geom_count], lco->x, lco->y, lco->z);
+		dGeomSetRotation(field->box_geom[field->box_geom_count], r);
+
+		field->box_geom_count++;
+	}
+}
+
+void field_destroy_all_script_colliders(LWFIELD* field) {
+	for (int i = 0; i < MAX_SCRIPT_GEOM; i++) {
+		field_destroy_script_collider(field, i);
+	}
 }

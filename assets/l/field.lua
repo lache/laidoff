@@ -22,25 +22,29 @@ function M:test()
 end
 
 function M:spawn(obj, faction)
+	-- Insert to field object table and set basic info
 	table.insert(self.objs, { obj = obj, faction = faction, })
 	obj.key = #self.objs
 	obj.faction = faction
 	obj.field = self
 	--print(self, 'Spawn', obj, 'key', obj.key, 'faction', obj.faction)
-	
+	-- Queue 'spawn' message
 	lo.rmsg_spawn(c, obj.key, obj.objtype, obj.x, obj.y, obj.z, obj.angle)
+	-- Queue 'rparams' (rendering parameters) message
 	if obj.objtype == 1 then
 		lo.rmsg_rparams(c, obj.key, obj.atlas, obj.skin_vbo, obj.armature, 1, 1, 1)
 	elseif obj.objtype == 2 then
 		lo.rmsg_rparams(c, obj.key, obj.atlas, obj.vbo, 0, obj.sx, obj.sy, obj.sz)
 	end
+	-- Create sphere collider
+	obj.geom_idx = lo.field_create_sphere_script_collider(c.field, lo.LSG_TOWER, 1, obj.x, obj.y, obj.z)
 end
 
 function M:despawn(obj)
 	self.objs[obj.key] = 'dead'
 	obj.field = nil
 	--print(self, 'Despawn', obj, 'key', obj.key, 'faction', obj.faction)
-	
+	lo.field_destroy_script_collider(c.field, obj.geom_idx)
 	lo.rmsg_despawn(c, obj.key)
 end
 

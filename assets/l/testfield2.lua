@@ -205,7 +205,7 @@ function M:test()
 		  lo.nav_bind_path_query_output_location(nav, pq, c.field, truck)
 		end
 	end)
-
+	
 	return 'testfield2'
 end
 
