@@ -45,6 +45,7 @@ typedef enum _LW_SPACE_GROUP {
 } LW_SPACE_GROUP;
 
 typedef struct _LWFIELD {
+	char filename[512];
 	// ODE world instance
 	dWorldID world;
 	// Root space
@@ -340,6 +341,8 @@ LWFIELD* load_field(const char* filename) {
 	}
 	// Particle system
 	field->ps = ps_new();
+	// Copy field filename
+	strcpy(field->filename, filename);
 	// Here it is. A brand new field instance just out of the oven!
 	return field;
 }
@@ -361,6 +364,26 @@ static int s_is_ray_or_player_geom(const LWFIELD* field, dGeomID o) {
 static void field_world_ray_near(void *data, dGeomID o1, dGeomID o2) {
 	LWFIELD* field = (LWFIELD*)data;
 	assert(dGeomGetSpace(o1) == field->space_group[LSG_WORLD]);
+	assert(dGeomGetSpace(o2) == field->space_group[LSG_RAY]);
+
+	dContact contact[MAX_FIELD_CONTACT];
+	int n = dCollide(o1, o2, MAX_FIELD_CONTACT, &contact[0].geom, sizeof(dContact));
+	for (int i = 0; i < n; i++) {
+		// Get ray index from custom data
+		// Note that the return value of dGeomGetData is coerced to integer since LW_RAY_ID is a sparse enum
+		const LW_RAY_ID lri = (int)dGeomGetData(o2);
+		// Negate normal direction of contact result data
+		dNegateVector3(contact[i].geom.normal);
+		// Copy to ours
+		field->ray_result[lri][field->ray_result_count[lri]] = contact[i];
+		// Increase ray result count
+		field->ray_result_count[lri]++;
+	}
+}
+
+static void field_enemy_ray_near(void *data, dGeomID o1, dGeomID o2) {
+	LWFIELD* field = (LWFIELD*)data;
+	assert(dGeomGetSpace(o1) == field->space_group[LSG_ENEMY]);
 	assert(dGeomGetSpace(o2) == field->space_group[LSG_RAY]);
 
 	dContact contact[MAX_FIELD_CONTACT];
@@ -759,6 +782,8 @@ void update_field(LWCONTEXT* pLwc, LWFIELD* field) {
 		reset_ray_result(field);
 		// Resolve collision (ray-world)
 		collide_between_spaces(field, field->space_group[LSG_WORLD], field->space_group[LSG_RAY], field_world_ray_near);
+		// Resolve collision (ray-enemy)
+		collide_between_spaces(field, field->space_group[LSG_ENEMY], field->space_group[LSG_RAY], field_enemy_ray_near);
 		// Gather ray result reported by collision report.
 		// Specifically, get minimum ray length collision point.
 		gather_ray_result(field);
@@ -1233,4 +1258,8 @@ LWNAV* field_nav(LWFIELD* field) {
 void field_reset_deterministic_seed(LWFIELD* field) {
 	// Seed a random number generator
 	pcg32_srandom_r(&field->rng, 0x0DEEC2CBADF00D77, 0x15881588CA11DAC1);
+}
+
+const char* field_filename(LWFIELD* field) {
+	return field->filename;
 }

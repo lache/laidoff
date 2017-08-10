@@ -82,7 +82,7 @@ float* field_field_object_location_rawptr(LWFIELD* field, int idx);
 float* field_field_object_orientation_rawptr(LWFIELD* field, int idx);
 LWNAV* field_nav(LWFIELD* field);
 void field_reset_deterministic_seed(LWFIELD* field);
-
+const char* field_filename(LWFIELD* field);
 #if defined __cplusplus
 }
 #endif  /* defined __cplusplus */
