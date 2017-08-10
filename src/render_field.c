@@ -149,7 +149,7 @@ void render_debug_sphere(const LWCONTEXT* pLwc, GLuint tex_id, const mat4x4 pers
 	);
 }
 
-void render_tower_yaw(const LWCONTEXT* pLwc, mat4x4 perspective, mat4x4 view,
+void render_tower_yaw(const LWCONTEXT* pLwc, const mat4x4 perspective, const mat4x4 view,
 	float x, float y, float yaw, LW_ACTION action, float animtime, int loop, float alpha,
 	LW_ATLAS_ENUM atlas, LW_SKIN_VBO_TYPE skin_vbo, LW_ARMATURE armature) {
 
@@ -182,13 +182,13 @@ void render_tower_yaw(const LWCONTEXT* pLwc, mat4x4 perspective, mat4x4 view,
 		alpha, 1, 1, 1, flash, perspective, view, skin_model, animtime, loop, yaw);
 }
 
-void render_guntower_yaw(const LWCONTEXT* pLwc, mat4x4 perspective, mat4x4 view,
+void render_guntower_yaw(const LWCONTEXT* pLwc, const mat4x4 perspective, const mat4x4 view,
 	float x, float y, float yaw, LW_ACTION action, float animtime, int loop, float alpha) {
 
 	render_tower_yaw(pLwc, perspective, view, x, y, yaw, action, animtime, loop, alpha, LAE_GUNTOWER_KTX, LSVT_GUNTOWER, LWAR_GUNTOWER_ARMATURE);
 }
 
-void render_guntower(const LWCONTEXT* pLwc, mat4x4 perspective, mat4x4 view, float x, float y, LW_ACTION action, float animtime, int loop) {
+void render_guntower(const LWCONTEXT* pLwc, const mat4x4 perspective, const mat4x4 view, float x, float y, LW_ACTION action, float animtime, int loop) {
 
 	float player_x = 0, player_y = 0, player_z = 0;
 	get_field_player_position(pLwc->field, &player_x, &player_y, &player_z);
@@ -198,15 +198,14 @@ void render_guntower(const LWCONTEXT* pLwc, mat4x4 perspective, mat4x4 view, flo
 	render_guntower_yaw(pLwc, perspective, view, x, y, a, action, animtime, loop, 1.0f);
 }
 
-void render_path_query_test_player(const LWCONTEXT* pLwc, mat4x4 perspective, mat4x4 view) {
-
+static void s_render_path_query_test_player(const LWCONTEXT* pLwc, const mat4x4 view, const mat4x4 proj) {
 	float spos[3], epos[3];
 	nav_path_query_spos(field_nav(pLwc->field), spos);
 	nav_path_query_epos(field_nav(pLwc->field), epos);
 
 	render_debug_sphere(pLwc,
 		pLwc->tex_programmed[LPT_SOLID_RED],
-		perspective,
+		proj,
 		view,
 		spos[0],
 		spos[1],
@@ -215,7 +214,7 @@ void render_path_query_test_player(const LWCONTEXT* pLwc, mat4x4 perspective, ma
 
 	render_debug_sphere(pLwc,
 		pLwc->tex_programmed[LPT_SOLID_BLUE],
-		perspective,
+		proj,
 		view,
 		epos[0],
 		epos[1],
@@ -248,17 +247,17 @@ void render_path_query_test_player(const LWCONTEXT* pLwc, mat4x4 perspective, ma
 			LSVT_HUMAN,
 			&pLwc->action[LWAC_HUMANACTION_WALKPOLISH],
 			&pLwc->armature[LWAR_HUMANARMATURE],
-			1, 1, 1, 1, field_test_player_flash(pLwc->field), perspective, view, skin_model, pLwc->test_player_skin_time * 5, 1);
+			1, 1, 1, 1, field_test_player_flash(pLwc->field), proj, view, skin_model, pLwc->test_player_skin_time * 5, 1);
 	}
 }
 
-void render_construct_preview_model(const LWCONTEXT* pLwc, mat4x4 perspective, mat4x4 view, float x, float y, float z, float a) {
+static void s_render_construct_preview_model(const LWCONTEXT* pLwc, const mat4x4 view, const mat4x4 perspective, float x, float y, float z, float a) {
 	float model_radius = 2.5f;
 
 	render_guntower_yaw(pLwc, perspective, view, x + model_radius * cosf(a), y + model_radius * sinf(a), a, LWAC_RECOIL, FLT_MAX, 0, 0.25f);
 }
 
-void render_player_model(const LWCONTEXT* pLwc, mat4x4 perspective, mat4x4 view, float x, float y, float z, float a, const LWANIMACTION* action, float skin_time, int loop, float flash) {
+static void s_render_player_model(const LWCONTEXT* pLwc, const mat4x4 view, const mat4x4 proj, float x, float y, float z, float a, const LWANIMACTION* action, float skin_time, int loop, float flash) {
 	const float skin_scale_f = field_skin_scale(pLwc->field);
 
 	mat4x4 skin_trans;
@@ -283,11 +282,11 @@ void render_player_model(const LWCONTEXT* pLwc, mat4x4 perspective, mat4x4 view,
 			LSVT_HUMAN,
 			action,
 			&pLwc->armature[LWAR_HUMANARMATURE],
-			1, 1, 1, 1, flash, perspective, view, skin_model, skin_time, loop);
+			1, 1, 1, 1, flash, proj, view, skin_model, skin_time, loop);
 	}
 }
 
-static void s_render_field_sphere(const LWCONTEXT* pLwc, struct _LWFIELD* const field, const mat4x4 proj, const mat4x4 view) {
+static void s_render_field_sphere(const LWCONTEXT* pLwc, struct _LWFIELD* const field, const mat4x4 view, const mat4x4 proj) {
 	// Render player-spawned field spheres
 	for (int i = 0; i < MAX_FIELD_SPHERE; i++) {
 		float pos[3];
@@ -360,7 +359,7 @@ static void s_render_field_sphere(const LWCONTEXT* pLwc, struct _LWFIELD* const 
 	}
 }
 
-void render_command(const LWCONTEXT* pLwc, mat4x4 view, mat4x4 perspective) {
+static void s_render_render_command(const LWCONTEXT* pLwc, mat4x4 view, mat4x4 proj) {
 	const double now = lwtimepoint_now_seconds();
 	for (int i = 0; i < MAX_RENDER_QUEUE_CAPACITY; i++) {
 		const LWFIELDRENDERCOMMAND* cmd = &pLwc->render_command[i];
@@ -368,7 +367,7 @@ void render_command(const LWCONTEXT* pLwc, mat4x4 view, mat4x4 perspective) {
 			continue;
 		}
 		if (cmd->objtype == 1) {
-			render_tower_yaw(pLwc, perspective, view, cmd->pos[0], cmd->pos[1], cmd->angle,
+			render_tower_yaw(pLwc, proj, view, cmd->pos[0], cmd->pos[1], cmd->angle,
 				cmd->actionid, (float)rendercommand_animtime(cmd, now), cmd->loop, 1.0f,
 				cmd->atlas, cmd->skin_vbo, cmd->armature);
 		} else {
@@ -384,7 +383,7 @@ void render_command(const LWCONTEXT* pLwc, mat4x4 view, mat4x4 perspective) {
 				cmd->vbo,
 				pLwc->tex_atlas[cmd->atlas],
 				view,
-				perspective,
+				proj,
 				cmd->pos[0],
 				cmd->pos[1],
 				cmd->pos[2],
@@ -396,6 +395,97 @@ void render_command(const LWCONTEXT* pLwc, mat4x4 view, mat4x4 perspective) {
 				rot
 			);
 		}
+	}
+}
+
+static void s_render_field_object_shadow(const LWCONTEXT* pLwc, const mat4x4 view, const mat4x4 proj) {
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE);
+	glBlendEquation(GL_FUNC_REVERSE_SUBTRACT);
+	glDepthMask(GL_FALSE);
+	for (int i = 0; i < MAX_FIELD_OBJECT; i++) {
+		LWFIELDOBJECT* fo = field_object(pLwc->field, i);
+		if (fo->valid) {
+			if (fo->skin == 0) {
+				render_field_object(
+					pLwc,
+					LVT_CENTER_CENTER_ANCHORED_SQUARE,
+					pLwc->tex_atlas[LAE_CIRCLE_SHADOW_KTX],
+					view,
+					proj,
+					fo->x,
+					fo->y,
+					0.001f,
+					fo->sx * (0.25f + fo->z / 0.7f * 0.1f), // search for nav_jump_height
+					fo->sy * (0.25f + fo->z / 0.7f * 0.1f), // search for nav_jump_height
+					1.0f,
+					0.75f, // shadow darkness (0 - no shadow, 1 - darkest)
+					0,
+					fo->rot_z
+				);
+			}
+		}
+	}
+	glBlendEquation(GL_FUNC_ADD);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	glDepthMask(GL_TRUE);
+}
+
+static void s_render_field_object(const LWCONTEXT* pLwc, const mat4x4 view, const mat4x4 proj) {
+	for (int i = 0; i < MAX_FIELD_OBJECT; i++) {
+		LWFIELDOBJECT* fo = field_object(pLwc->field, i);
+		if (fo->valid) {
+			if (fo->skin == 0) {
+				render_field_object(
+					pLwc,
+					fo->lvt,
+					fo->tex_id,
+					view,
+					proj,
+					fo->x,
+					fo->y,
+					fo->z,
+					fo->sx,
+					fo->sy,
+					1.0f,
+					fo->alpha_multiplier,
+					0,
+					fo->rot_z
+				);
+			} else {
+				render_guntower(pLwc, proj, view, fo->x, fo->y, LWAC_RECOIL, pLwc->test_player_skin_time, 1);
+			}
+		}
+	}
+}
+
+static void s_render_remote_player(const LWCONTEXT* pLwc, const mat4x4 view, const mat4x4 proj) {
+	mq_lock_mutex(pLwc->mq);
+	LWPOSSYNCMSG* value = mq_possync_first(pLwc->mq);
+	while (value) {
+		const char* cursor = mq_possync_cursor(pLwc->mq);
+		// Only render player model if anim_action is not null.
+		// Also, exclude the player itself.
+		if (value->anim_action && !mq_cursor_player(pLwc->mq, cursor)) {
+			s_render_player_model(pLwc, view, proj, value->x, value->y, value->z, value->a, value->anim_action, pLwc->player_skin_time, 1, value->flash);
+		}
+		value = mq_possync_next(pLwc->mq);
+	}
+	mq_unlock_mutex(pLwc->mq);
+}
+
+static void s_render_player_aim_fan(const LWCONTEXT* pLwc, const mat4x4 view, const mat4x4 proj, float player_x, float player_y, float player_z) {
+	float rscale[FAN_VERTEX_COUNT_PER_ARRAY];
+	rscale[0] = 0; // center vertex has no meaningful rscale
+	mq_lock_mutex(pLwc->mq);
+	for (int i = 1; i < FAN_VERTEX_COUNT_PER_ARRAY; i++) {
+		rscale[i] = (float)field_ray_nearest_depth(pLwc->field, LRI_AIM_SECTOR_FIRST_INCLUSIVE + i - 1);
+	}
+	mq_unlock_mutex(pLwc->mq);
+
+	if (pLwc->player_state_data.state == LPS_AIM || pLwc->player_state_data.state == LPS_FIRE) {
+		render_fan(pLwc, proj, view,
+			player_x, player_y, player_z, pLwc->player_state_data.rot_z, pLwc->player_state_data.aim_theta, rscale);
 	}
 }
 
@@ -491,101 +581,23 @@ void lwc_render_field(const LWCONTEXT* pLwc) {
 		}
 	}
 	// Render field object shadows
-	glEnable(GL_BLEND);
-	glBlendFunc(GL_SRC_ALPHA, GL_ONE);
-	glBlendEquation(GL_FUNC_REVERSE_SUBTRACT);
-	glDepthMask(GL_FALSE);
-	for (int i = 0; i < MAX_FIELD_OBJECT; i++) {
-		LWFIELDOBJECT* fo = field_object(pLwc->field, i);
-		if (fo->valid) {
-			if (fo->skin == 0) {
-				render_field_object(
-					pLwc,
-					LVT_CENTER_CENTER_ANCHORED_SQUARE,
-					pLwc->tex_atlas[LAE_CIRCLE_SHADOW_KTX],
-					view,
-					perspective,
-					fo->x,
-					fo->y,
-					0.001f,
-					fo->sx * (0.25f + fo->z / 0.7f * 0.1f), // search for nav_jump_height
-					fo->sy * (0.25f + fo->z / 0.7f * 0.1f), // search for nav_jump_height
-					1.0f,
-					0.75f, // shadow darkness (0 - no shadow, 1 - darkest)
-					0,
-					fo->rot_z
-				);
-			}
-		}
-	}
-	glBlendEquation(GL_FUNC_ADD);
-	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-	glDepthMask(GL_TRUE);
+	s_render_field_object_shadow(pLwc, view, perspective);
 	// Render field objects
-	for (int i = 0; i < MAX_FIELD_OBJECT; i++) {
-		LWFIELDOBJECT* fo = field_object(pLwc->field, i);
-		if (fo->valid) {
-			if (fo->skin == 0) {
-				render_field_object(
-					pLwc,
-					fo->lvt,
-					fo->tex_id,
-					view,
-					perspective,
-					fo->x,
-					fo->y,
-					fo->z,
-					fo->sx,
-					fo->sy,
-					1.0f,
-					fo->alpha_multiplier,
-					0,
-					fo->rot_z
-				);
-			} else {
-				render_guntower(pLwc, perspective, view, fo->x, fo->y, LWAC_RECOIL, pLwc->test_player_skin_time, 1);
-			}
-		}
-	}
-
-	render_player_model(pLwc, perspective, view, player_x, player_y, player_z, pLwc->player_state_data.rot_z, pLwc->player_action, pLwc->player_state_data.skin_time, pLwc->player_action_loop, field_player_flash(pLwc->field));
-
-	render_construct_preview_model(pLwc, perspective, view, player_x, player_y, player_z, pLwc->player_state_data.rot_z);
-
-	mq_lock_mutex(pLwc->mq);
-	LWPOSSYNCMSG* value = mq_possync_first(pLwc->mq);
-	while (value) {
-		const char* cursor = mq_possync_cursor(pLwc->mq);
-		// Only render player model if anim_action is not null.
-		// Also, exclude the player itself.
-		if (value->anim_action && !mq_cursor_player(pLwc->mq, cursor)) {
-			render_player_model(pLwc, perspective, view, value->x, value->y, value->z, value->a, value->anim_action, pLwc->player_skin_time, 1, value->flash);
-		}
-		value = mq_possync_next(pLwc->mq);
-	}
-	mq_unlock_mutex(pLwc->mq);
-
-	render_path_query_test_player(pLwc, perspective, view);
-
-	render_command(pLwc, view, perspective);
-
-	//render_guntower(pLwc, perspective, view);
-
-	s_render_field_sphere(pLwc, pLwc->field, perspective, view);
-
-	float rscale[FAN_VERTEX_COUNT_PER_ARRAY];
-	rscale[0] = 0; // center vertex has no meaningful rscale
-	mq_lock_mutex(pLwc->mq);
-	for (int i = 1; i < FAN_VERTEX_COUNT_PER_ARRAY; i++) {
-		rscale[i] = (float)field_ray_nearest_depth(pLwc->field, LRI_AIM_SECTOR_FIRST_INCLUSIVE + i - 1);
-	}
-	mq_unlock_mutex(pLwc->mq);
-
-	if (pLwc->player_state_data.state == LPS_AIM || pLwc->player_state_data.state == LPS_FIRE) {
-		render_fan(pLwc, perspective, view,
-			player_x, player_y, player_z, pLwc->player_state_data.rot_z, pLwc->player_state_data.aim_theta, rscale);
-	}
-
+	s_render_field_object(pLwc, view, perspective);
+	// Render player
+	s_render_player_model(pLwc, view, perspective, player_x, player_y, player_z, pLwc->player_state_data.rot_z, pLwc->player_action, pLwc->player_state_data.skin_time, pLwc->player_action_loop, field_player_flash(pLwc->field));
+	// Render player construct preview model
+	s_render_construct_preview_model(pLwc, view, perspective, player_x, player_y, player_z, pLwc->player_state_data.rot_z);
+	// Render remote players
+	s_render_remote_player(pLwc, view, perspective);
+	// Render path query test player
+	s_render_path_query_test_player(pLwc, view, perspective);
+	// Render objects driven by render commands
+	s_render_render_command(pLwc, view, perspective);
+	// Render bullets
+	s_render_field_sphere(pLwc, pLwc->field, view, perspective);
+	// Render player aim fan
+	s_render_player_aim_fan(pLwc, view, perspective, player_x, player_y, player_z);
 	// For gl_PointSize support on vertex shader
 #if LW_PLATFORM_WIN32
 	glEnable(GL_VERTEX_PROGRAM_POINT_SIZE);
