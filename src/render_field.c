@@ -87,7 +87,7 @@ static void render_ground(const LWCONTEXT* pLwc, const mat4x4 view, const mat4x4
 	glDrawArrays(GL_TRIANGLES, 0, pLwc->vertex_buffer[vbo_index].vertex_count);
 }
 
-static void render_ui(const LWCONTEXT* pLwc) {
+static void s_render_ui(const LWCONTEXT* pLwc) {
 	int shader_index = LWST_DEFAULT;
 	const int vbo_index = LVT_CENTER_CENTER_ANCHORED_SQUARE;
 
@@ -489,6 +489,39 @@ static void s_render_player_aim_fan(const LWCONTEXT* pLwc, const mat4x4 view, co
 	}
 }
 
+static void s_render_test_particle(const LWCONTEXT* pLwc, const mat4x4 view, const mat4x4 proj) {
+	// For gl_PointSize support on vertex shader
+#if LW_PLATFORM_WIN32
+	glEnable(GL_VERTEX_PROGRAM_POINT_SIZE);
+#endif
+	LWEMITTER2OBJECT* emit_object = ps_emit_object_begin(field_ps(pLwc->field));
+	mat4x4 proj_view;
+	mat4x4_mul(proj_view, proj, view);
+	//glEnable(GL_BLEND);
+	//glBlendFunc(GL_DST_COLOR, GL_ONE_MINUS_SRC_ALPHA);
+	//glBlendFunc(GL_DST_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	//glBlendFunc(GL_ONE, GL_ONE);
+	//glDepthFunc()
+	//glBlendEquation(GL_MAX);
+	//glDisable(GL_DEPTH_TEST);
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE);
+	glDepthMask(GL_FALSE);
+	//glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	while (emit_object) {
+		mat4x4 model;
+		mat4x4_identity(model);
+		mat4x4_translate_in_place(model, emit_object->pos[0], emit_object->pos[1], emit_object->pos[2]);
+		mat4x4_rotate_Z(model, model, (float)LWDEG2RAD(45));
+		ps_render_explosion(pLwc, emit_object, proj_view, model);
+		emit_object = ps_emit_object_next(field_ps(pLwc->field), emit_object);
+	}
+	//glBlendEquation(GL_FUNC_ADD);
+	//glEnable(GL_DEPTH_TEST);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	glDepthMask(GL_TRUE);
+}
+
 void lwc_render_field(const LWCONTEXT* pLwc) {
 	glViewport(0, 0, pLwc->width, pLwc->height);
 	lw_clear_color();
@@ -598,39 +631,10 @@ void lwc_render_field(const LWCONTEXT* pLwc) {
 	s_render_field_sphere(pLwc, pLwc->field, view, perspective);
 	// Render player aim fan
 	s_render_player_aim_fan(pLwc, view, perspective, player_x, player_y, player_z);
-	// For gl_PointSize support on vertex shader
-#if LW_PLATFORM_WIN32
-	glEnable(GL_VERTEX_PROGRAM_POINT_SIZE);
-#endif
-	LWEMITTER2OBJECT* emit_object = ps_emit_object_begin(field_ps(pLwc->field));
-	mat4x4 proj_view;
-	mat4x4_mul(proj_view, perspective, view);
-	//glEnable(GL_BLEND);
-	//glBlendFunc(GL_DST_COLOR, GL_ONE_MINUS_SRC_ALPHA);
-	//glBlendFunc(GL_DST_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-	//glBlendFunc(GL_ONE, GL_ONE);
-	//glDepthFunc()
-	//glBlendEquation(GL_MAX);
-	//glDisable(GL_DEPTH_TEST);
-	glEnable(GL_BLEND);
-	glBlendFunc(GL_SRC_ALPHA, GL_ONE);
-	glDepthMask(GL_FALSE);
-	//glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-	while (emit_object) {
-		mat4x4 model;
-		mat4x4_identity(model);
-		mat4x4_translate_in_place(model, emit_object->pos[0], emit_object->pos[1], emit_object->pos[2]);
-		mat4x4_rotate_Z(model, model, (float)LWDEG2RAD(45));
-		ps_render_explosion(pLwc, emit_object, proj_view, model);
-		emit_object = ps_emit_object_next(field_ps(pLwc->field), emit_object);
-	}
-	//glBlendEquation(GL_FUNC_ADD);
-	//glEnable(GL_DEPTH_TEST);
-	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-	glDepthMask(GL_TRUE);
-
-	render_ui(pLwc);
-
-	// give up const-ness
+	// Render test particle emitters
+	s_render_test_particle(pLwc, view, perspective);
+	// Render UI
+	s_render_ui(pLwc);
+	// Give up const-ness...
 	((LWCONTEXT*)pLwc)->render_count++;
 }
