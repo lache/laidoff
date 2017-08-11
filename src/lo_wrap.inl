@@ -6677,31 +6677,34 @@ fail:
 static int _wrap_field_create_sphere_script_collider(lua_State* L) {
   int SWIG_arg = 0;
   LWFIELD *arg1 = (LWFIELD *) 0 ;
-  LW_SPACE_GROUP arg2 ;
-  float arg3 ;
+  int arg2 ;
+  LW_SPACE_GROUP arg3 ;
   float arg4 ;
   float arg5 ;
   float arg6 ;
+  float arg7 ;
   int result;
   
-  SWIG_check_num_args("field_create_sphere_script_collider",6,6)
+  SWIG_check_num_args("field_create_sphere_script_collider",7,7)
   if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("field_create_sphere_script_collider",1,"LWFIELD *");
-  if(!lua_isnumber(L,2)) SWIG_fail_arg("field_create_sphere_script_collider",2,"LW_SPACE_GROUP");
-  if(!lua_isnumber(L,3)) SWIG_fail_arg("field_create_sphere_script_collider",3,"float");
+  if(!lua_isnumber(L,2)) SWIG_fail_arg("field_create_sphere_script_collider",2,"int");
+  if(!lua_isnumber(L,3)) SWIG_fail_arg("field_create_sphere_script_collider",3,"LW_SPACE_GROUP");
   if(!lua_isnumber(L,4)) SWIG_fail_arg("field_create_sphere_script_collider",4,"float");
   if(!lua_isnumber(L,5)) SWIG_fail_arg("field_create_sphere_script_collider",5,"float");
   if(!lua_isnumber(L,6)) SWIG_fail_arg("field_create_sphere_script_collider",6,"float");
+  if(!lua_isnumber(L,7)) SWIG_fail_arg("field_create_sphere_script_collider",7,"float");
   
   if (!SWIG_IsOK(SWIG_ConvertPtr(L,1,(void**)&arg1,SWIGTYPE_p__LWFIELD,0))){
     SWIG_fail_ptr("field_create_sphere_script_collider",1,SWIGTYPE_p__LWFIELD);
   }
   
-  arg2 = (LW_SPACE_GROUP)(int)lua_tonumber(L, 2);
-  arg3 = (float)lua_tonumber(L, 3);
+  arg2 = (int)lua_tonumber(L, 2);
+  arg3 = (LW_SPACE_GROUP)(int)lua_tonumber(L, 3);
   arg4 = (float)lua_tonumber(L, 4);
   arg5 = (float)lua_tonumber(L, 5);
   arg6 = (float)lua_tonumber(L, 6);
-  result = (int)field_create_sphere_script_collider(arg1,arg2,arg3,arg4,arg5,arg6);
+  arg7 = (float)lua_tonumber(L, 7);
+  result = (int)field_create_sphere_script_collider(arg1,arg2,arg3,arg4,arg5,arg6,arg7);
   lua_pushnumber(L, (lua_Number) result); SWIG_arg++;
   return SWIG_arg;
   
@@ -6751,6 +6754,41 @@ static int _wrap_field_create_field_box_collider(lua_State* L) {
   }
   
   field_create_field_box_collider(arg1);
+  
+  return SWIG_arg;
+  
+  if(0) SWIG_fail;
+  
+fail:
+  lua_error(L);
+  return SWIG_arg;
+}
+
+
+static int _wrap_field_geom_set_position(lua_State* L) {
+  int SWIG_arg = 0;
+  LWFIELD *arg1 = (LWFIELD *) 0 ;
+  int arg2 ;
+  float arg3 ;
+  float arg4 ;
+  float arg5 ;
+  
+  SWIG_check_num_args("field_geom_set_position",5,5)
+  if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("field_geom_set_position",1,"LWFIELD *");
+  if(!lua_isnumber(L,2)) SWIG_fail_arg("field_geom_set_position",2,"int");
+  if(!lua_isnumber(L,3)) SWIG_fail_arg("field_geom_set_position",3,"float");
+  if(!lua_isnumber(L,4)) SWIG_fail_arg("field_geom_set_position",4,"float");
+  if(!lua_isnumber(L,5)) SWIG_fail_arg("field_geom_set_position",5,"float");
+  
+  if (!SWIG_IsOK(SWIG_ConvertPtr(L,1,(void**)&arg1,SWIGTYPE_p__LWFIELD,0))){
+    SWIG_fail_ptr("field_geom_set_position",1,SWIGTYPE_p__LWFIELD);
+  }
+  
+  arg2 = (int)lua_tonumber(L, 2);
+  arg3 = (float)lua_tonumber(L, 3);
+  arg4 = (float)lua_tonumber(L, 4);
+  arg5 = (float)lua_tonumber(L, 5);
+  field_geom_set_position(arg1,arg2,arg3,arg4,arg5);
   
   return SWIG_arg;
   
@@ -39243,23 +39281,65 @@ fail:
 
 static int _wrap_script_emit_anim_marker(lua_State* L) {
   int SWIG_arg = 0;
-  LWCONTEXT *arg1 = (LWCONTEXT *) 0 ;
+  void *arg1 = (void *) 0 ;
   int arg2 ;
   char *arg3 = (char *) 0 ;
   int result;
   
   SWIG_check_num_args("script_emit_anim_marker",3,3)
-  if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("script_emit_anim_marker",1,"LWCONTEXT *");
+  if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("script_emit_anim_marker",1,"void *");
   if(!lua_isnumber(L,2)) SWIG_fail_arg("script_emit_anim_marker",2,"int");
   if(!SWIG_lua_isnilstring(L,3)) SWIG_fail_arg("script_emit_anim_marker",3,"char const *");
-  
-  if (!SWIG_IsOK(SWIG_ConvertPtr(L,1,(void**)&arg1,SWIGTYPE_p__LWCONTEXT,0))){
-    SWIG_fail_ptr("script_emit_anim_marker",1,SWIGTYPE_p__LWCONTEXT);
-  }
-  
+  arg1=(void *)SWIG_MustGetPtr(L,1,0,0,1,"script_emit_anim_marker");
   arg2 = (int)lua_tonumber(L, 2);
   arg3 = (char *)lua_tostring(L, 3);
   result = (int)script_emit_anim_marker(arg1,arg2,(char const *)arg3);
+  lua_pushnumber(L, (lua_Number) result); SWIG_arg++;
+  return SWIG_arg;
+  
+  if(0) SWIG_fail;
+  
+fail:
+  lua_error(L);
+  return SWIG_arg;
+}
+
+
+static int _wrap_script_emit_near(lua_State* L) {
+  int SWIG_arg = 0;
+  void *arg1 = (void *) 0 ;
+  int arg2 ;
+  int arg3 ;
+  int result;
+  
+  SWIG_check_num_args("script_emit_near",3,3)
+  if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("script_emit_near",1,"void *");
+  if(!lua_isnumber(L,2)) SWIG_fail_arg("script_emit_near",2,"int");
+  if(!lua_isnumber(L,3)) SWIG_fail_arg("script_emit_near",3,"int");
+  arg1=(void *)SWIG_MustGetPtr(L,1,0,0,1,"script_emit_near");
+  arg2 = (int)lua_tonumber(L, 2);
+  arg3 = (int)lua_tonumber(L, 3);
+  result = (int)script_emit_near(arg1,arg2,arg3);
+  lua_pushnumber(L, (lua_Number) result); SWIG_arg++;
+  return SWIG_arg;
+  
+  if(0) SWIG_fail;
+  
+fail:
+  lua_error(L);
+  return SWIG_arg;
+}
+
+
+static int _wrap_script_emit_logic_frame_finish(lua_State* L) {
+  int SWIG_arg = 0;
+  void *arg1 = (void *) 0 ;
+  int result;
+  
+  SWIG_check_num_args("script_emit_logic_frame_finish",1,1)
+  if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("script_emit_logic_frame_finish",1,"void *");
+  arg1=(void *)SWIG_MustGetPtr(L,1,0,0,1,"script_emit_logic_frame_finish");
+  result = (int)script_emit_logic_frame_finish(arg1);
   lua_pushnumber(L, (lua_Number) result); SWIG_arg++;
   return SWIG_arg;
   
@@ -45862,6 +45942,7 @@ static swig_lua_const_info swig_SwigModule_constants[]= {
     {SWIG_LUA_CONSTTAB_INT("LSG_BULLET", LSG_BULLET)},
     {SWIG_LUA_CONSTTAB_INT("LSG_ENEMY", LSG_ENEMY)},
     {SWIG_LUA_CONSTTAB_INT("LSG_TOWER", LSG_TOWER)},
+    {SWIG_LUA_CONSTTAB_INT("LSG_SCRIPT_BULLET", LSG_SCRIPT_BULLET)},
     {SWIG_LUA_CONSTTAB_INT("LSG_COUNT", LSG_COUNT)},
     {SWIG_LUA_CONSTTAB_INT("MAX_COMMAND_SLOT", (6))},
     {SWIG_LUA_CONSTTAB_INT("LACT_NONE", LACT_NONE)},
@@ -46315,6 +46396,7 @@ static swig_lua_method swig_SwigModule_methods[]= {
     { "field_create_sphere_script_collider", _wrap_field_create_sphere_script_collider},
     { "field_destroy_script_collider", _wrap_field_destroy_script_collider},
     { "field_create_field_box_collider", _wrap_field_create_field_box_collider},
+    { "field_geom_set_position", _wrap_field_geom_set_position},
     { "field_destroy_all_script_colliders", _wrap_field_destroy_all_script_colliders},
     { "create_string_from_file", _wrap_create_string_from_file},
     { "release_string", _wrap_release_string},
@@ -46560,6 +46642,8 @@ static swig_lua_method swig_SwigModule_methods[]= {
     { "script_update", _wrap_script_update},
     { "script_cleanup_all_coros", _wrap_script_cleanup_all_coros},
     { "script_emit_anim_marker", _wrap_script_emit_anim_marker},
+    { "script_emit_near", _wrap_script_emit_near},
+    { "script_emit_logic_frame_finish", _wrap_script_emit_logic_frame_finish},
     { "play_sound", _wrap_play_sound},
     { "init_sys_msg", _wrap_init_sys_msg},
     { "deinit_sys_msg", _wrap_deinit_sys_msg},

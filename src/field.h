@@ -29,6 +29,7 @@ typedef enum _LW_SPACE_GROUP {
 	LSG_BULLET,
 	LSG_ENEMY,
 	LSG_TOWER,
+	LSG_SCRIPT_BULLET,
 
 	LSG_COUNT,
 } LW_SPACE_GROUP;
@@ -94,9 +95,10 @@ float* field_field_object_orientation_rawptr(LWFIELD* field, int idx);
 LWNAV* field_nav(LWFIELD* field);
 void field_reset_deterministic_seed(LWFIELD* field);
 const char* field_filename(LWFIELD* field);
-int field_create_sphere_script_collider(LWFIELD* field, LW_SPACE_GROUP space_group, float radius, float x, float y, float z);
+int field_create_sphere_script_collider(LWFIELD* field, int obj_key, LW_SPACE_GROUP space_group, float radius, float x, float y, float z);
 void field_destroy_script_collider(LWFIELD* field, int geom_idx);
 void field_create_field_box_collider(LWFIELD* field);
+void field_geom_set_position(LWFIELD* field, int geom_idx, float x, float y, float z);
 void field_destroy_all_script_colliders(LWFIELD* field);
 #if defined __cplusplus
 }

@@ -488,25 +488,60 @@ void script_update(LWCONTEXT* pLwc) {
 	}
 }
 
-int script_emit_anim_marker(LWCONTEXT* pLwc, int key, const char* name) {
+int script_emit_anim_marker(void* L, int key, const char* name) {
 	int ret;
-
-	/* push functions and arguments */
-	lua_getglobal(pLwc->L, "on_anim_marker");  /* function to be called */
-	lua_pushnumber(pLwc->L, key);   /* push 1st argument */
-	lua_pushstring(pLwc->L, name);   /* push 2nd argument */
-
-	/* do the call (2 arguments, 1 result) */
-	if (lua_pcall(pLwc->L, 2, 1, 0) != 0) {
-		LOGE(LWLOGPOS "error: %s", lua_tostring(pLwc->L, -1));
+	// push functions and arguments
+	lua_getglobal(L, "on_anim_marker"); // function to be called
+	lua_pushinteger(L, key); // push 1st argument
+	lua_pushstring(L, name); // push 2nd argument
+	// do the call (2 arguments, 1 result)
+	if (lua_pcall(L, 2, 1, 0) != 0) {
+		LOGE(LWLOGPOS "error: %s", lua_tostring(L, -1));
 	}	
-
 	/* retrieve result */
-	if (!lua_isnumber(pLwc->L, -1)) {
-		LOGE(LWLOGPOS "error: %s", lua_tostring(pLwc->L, -1));
+	if (!lua_isnumber(L, -1)) {
+		LOGE(LWLOGPOS "error: %s", lua_tostring(L, -1));
 	}
-		
-	ret = (int)lua_tonumber(pLwc->L, -1);
-	lua_pop(pLwc->L, 1);  /* pop returned value */
+	ret = (int)lua_tonumber(L, -1);
+	lua_pop(L, 1); // pop returned value
+	return ret;
+}
+
+int script_emit_near(void* L, int key1, int key2) {
+	int ret;
+	// push functions and arguments
+	lua_getglobal(L, "on_near"); // function to be called
+	lua_pushinteger(L, key1); // push 1st argument
+	lua_pushinteger(L, key2); // push 1st argument
+	// do the call (2 arguments, 1 result)
+	if (lua_pcall(L, 2, 1, 0) != 0) {
+		LOGE(LWLOGPOS "error: %s", lua_tostring(L, -1));
+	}
+	// retrieve result
+	if (!lua_isnumber(L, -1)) {
+		LOGE(LWLOGPOS "error: %s", lua_tostring(L, -1));
+	}
+	ret = (int)lua_tonumber(L, -1);
+	lua_pop(L, 1); // pop returned value
+	return ret;
+}
+
+int script_emit_logic_frame_finish(void* L) {
+	if (L == 0) {
+		return 0;
+	}
+	int ret;
+	// push functions and arguments
+	lua_getglobal(L, "on_logic_frame_finish"); // function to be called
+	// do the call (0 arguments, 1 result)
+	if (lua_pcall(L, 0, 1, 0) != 0) {
+		LOGE(LWLOGPOS "error: %s", lua_tostring(L, -1));
+	}
+	// retrieve result
+	if (!lua_isnumber(L, -1)) {
+		LOGE(LWLOGPOS "error: %s", lua_tostring(L, -1));
+	}
+	ret = (int)lua_tonumber(L, -1);
+	lua_pop(L, 1); // pop returned value
 	return ret;
 }

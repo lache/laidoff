@@ -28,6 +28,11 @@ local M = {
 	bullet_spawn_offset_x = 0,
 	bullet_spawn_offset_y = 0,
 	bullet_spawn_offset_z = 1.548 / 2,
+	collider_offset_x = 0,
+	collider_offset_y = 0,
+	collider_offset_z = 0.5,
+	space_group = lo.LSG_TOWER,
+	collider_radius = 1,
 }
 M.__index = M
 local c = lo.script_context()
@@ -50,7 +55,7 @@ end
 function M:update(dt)
 	if self.hp <= 0 then
 		self.dead_flag = true
-		self:play_explosion()
+		--self:play_explosion()
 	end
 end
 

@@ -47,7 +47,7 @@ function M:test()
 	local Faction1 = 1
 	local Faction2 = 2
 
-	local guntower1 = Guntower:new('gt1', 0, 0, 0)
+	local guntower1 = Guntower:new('gt1', 4, 0, 0)
 	field:spawn(guntower1, Faction1)
 	guntower1:start_thinking()
 
@@ -117,7 +117,18 @@ function M:test()
 		field:on_anim_marker(key, name)
 		return 0
 	end
-
+	-- Lua handler for collision events (near events) emitted from C.
+	function on_near(key1, key2)
+		--print('on_near key1', key1, 'key2', key2)
+		field.objs[key2].obj:collide_with(key1)
+		--field:delayed_despawn_by_key(key2)
+		return 0
+	end
+	-- Lua handler for logc frame finish events emitted from C
+	function on_logic_frame_finish()
+		field:despawn_zombie_obj_keys()
+		return 0
+	end
 	start_coro(function()
 		local idx = 1
 		while true do

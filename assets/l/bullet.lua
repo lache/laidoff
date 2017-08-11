@@ -1,6 +1,11 @@
 print('bullet.lua visible')
 local M = {
 	objtype = 2,
+	space_group = lo.LSG_SCRIPT_BULLET,
+	collider_radius = 0.5,
+	collider_offset_x = 0,
+	collider_offset_y = 0,
+	collider_offset_z = 0,
 }
 M.__index = M
 local c = lo.script_context()
@@ -48,19 +53,28 @@ function M:update(dt)
 		self.y = self.y + dt * self.speed * math.sin(self.angle)
 	end
 	lo.rmsg_pos(c, self.key, self.x, self.y, self.z)
+	lo.field_geom_set_position(c.field, self.geom_idx, self.x, self.y, self.z)
 	
 	self.age = self.age + dt
 	--print(self, 'x', self.x, 'y', self.y)
 	if self.age > self.max_age or self.z < 0 then
 		self.dead_flag = true
 	end
-	local target = self.field:query_nearest_target_in_range(self, self.range)
+end
+
+function M:collide_with(obj_key)
+	if self.dead_flag then return end
+	local target = self.field.objs[obj_key]
 	if target then
-		target.hp = target.hp - self.damage
-		--print(self, 'target HP reduced to ', target.hp, 'damage', self.damage)
+		if target.faction ~= self.faction then
+			target.obj.hp = target.obj.hp - self.damage
+			--print(self, 'target HP reduced to ', target.hp, 'damage', self.damage)
+			self.dead_flag = true
+			--self:play_explosion()
+		end
+	else
 		self.dead_flag = true
-		
-		--self:play_explosion()
+		self:play_explosion()
 	end
 end
 

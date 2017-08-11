@@ -1,6 +1,7 @@
 print('field.lua visible')
 local M = {
-	objs = {}
+	objs = {},
+	zombie_obj_keys = {},
 }
 M.__index = M
 local c = lo.script_context()
@@ -37,7 +38,8 @@ function M:spawn(obj, faction)
 		lo.rmsg_rparams(c, obj.key, obj.atlas, obj.vbo, 0, obj.sx, obj.sy, obj.sz)
 	end
 	-- Create sphere collider
-	obj.geom_idx = lo.field_create_sphere_script_collider(c.field, lo.LSG_TOWER, 1, obj.x, obj.y, obj.z)
+	obj.geom_idx = lo.field_create_sphere_script_collider(c.field, obj.key, obj.space_group, obj.collider_radius,
+		obj.x + obj.collider_offset_x, obj.y + obj.collider_offset_y, obj.z + obj.collider_offset_z)
 end
 
 function M:despawn(obj)
@@ -46,6 +48,18 @@ function M:despawn(obj)
 	--print(self, 'Despawn', obj, 'key', obj.key, 'faction', obj.faction)
 	lo.field_destroy_script_collider(c.field, obj.geom_idx)
 	lo.rmsg_despawn(c, obj.key)
+end
+
+function M:despawn_zombie_obj_keys()
+	for i = 1, #self.zombie_obj_keys do
+		local obj = self.objs[self.zombie_obj_keys[i]]
+		self:despawn(obj.obj)
+		self.zombie_obj_keys[i] = nil
+	end
+end
+
+function M:delayed_despawn_by_key(obj_key)
+	table.insert(self.zombie_obj_keys, obj_key)
 end
 
 function M:query_nearest_target_in_range(caller, range)

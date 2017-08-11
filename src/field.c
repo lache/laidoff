@@ -254,16 +254,29 @@ void resolve_player_event_collision(LWCONTEXT *pLwc) {
 	//pLwc->player_pos_y = player_collider.y;
 }
 
-int field_create_sphere_script_collider(LWFIELD* field, LW_SPACE_GROUP space_group, float radius, float x, float y, float z) {
+int field_create_sphere_script_collider(LWFIELD* field, int obj_key, LW_SPACE_GROUP space_group, float radius, float x, float y, float z) {
 	for (int i = 0; i < MAX_SCRIPT_GEOM; i++) {
 		if (field->script_geom[i] == 0) {
 			field->script_geom[i] = dCreateSphere(field->space_group[space_group], radius);
+			dGeomSetData(field->script_geom[i], (void*)obj_key);
 			dGeomSetPosition(field->script_geom[i], x, y, z);
 			return i;
 		}
 	}
 	LOGE(LWLOGPOS "exceeds");
 	return -1;
+}
+
+void field_geom_set_position(LWFIELD* field, int geom_idx, float x, float y, float z) {
+	if (geom_idx < 0 || geom_idx >= MAX_SCRIPT_GEOM) {
+		LOGE(LWLOGPOS "range error: %d", geom_idx);
+		return;
+	}
+	if (field->script_geom[geom_idx]) {
+		dGeomSetPosition(field->script_geom[geom_idx], x, y, z);
+	} else {
+		LOGE(LWLOGPOS "null: %d", geom_idx);
+	}
 }
 
 void field_destroy_script_collider(LWFIELD* field, int geom_idx) {
@@ -365,8 +378,8 @@ static int s_is_ray_or_player_geom(const LWFIELD* field, dGeomID o) {
 	return 0;
 }
 
-static void field_world_ray_near(void *data, dGeomID o1, dGeomID o2) {
-	LWFIELD* field = (LWFIELD*)data;
+static void field_world_ray_near(void* data, dGeomID o1, dGeomID o2) {
+	LWFIELD* field = ((LWCONTEXT*)data)->field;
 	assert(dGeomGetSpace(o1) == field->space_group[LSG_WORLD]);
 	assert(dGeomGetSpace(o2) == field->space_group[LSG_RAY]);
 
@@ -405,8 +418,8 @@ static void field_enemy_ray_near(void *data, dGeomID o1, dGeomID o2) {
 	}
 }
 
-static void field_player_world_near(void *data, dGeomID o1, dGeomID o2) {
-	LWFIELD* field = (LWFIELD*)data;
+static void field_player_world_near(void* data, dGeomID o1, dGeomID o2) {
+	LWFIELD* field = ((LWCONTEXT*)data)->field;
 	assert(dGeomGetSpace(o1) == field->space_group[LSG_PLAYER]);
 	assert(dGeomGetSpace(o2) == field->space_group[LSG_WORLD]);
 
@@ -431,8 +444,8 @@ static void field_player_world_near(void *data, dGeomID o1, dGeomID o2) {
 	}
 }
 
-static void field_player_tower_near(void *data, dGeomID o1, dGeomID o2) {
-	LWFIELD* field = (LWFIELD*)data;
+static void field_player_tower_near(void* data, dGeomID o1, dGeomID o2) {
+	LWFIELD* field = ((LWCONTEXT*)data)->field;
 	assert(dGeomGetSpace(o1) == field->space_group[LSG_PLAYER]);
 	assert(dGeomGetSpace(o2) == field->space_group[LSG_TOWER]);
 
@@ -458,8 +471,8 @@ static void field_player_tower_near(void *data, dGeomID o1, dGeomID o2) {
 	}
 }
 
-static void field_player_bullet_near(void *data, dGeomID o1, dGeomID o2) {
-	LWFIELD* field = (LWFIELD*)data;
+static void field_player_bullet_near(void* data, dGeomID o1, dGeomID o2) {
+	LWFIELD* field = ((LWCONTEXT*)data)->field;
 	assert(dGeomGetSpace(o1) == field->space_group[LSG_PLAYER]);
 	assert(dGeomGetSpace(o2) == field->space_group[LSG_BULLET]);
 
@@ -469,8 +482,8 @@ static void field_player_bullet_near(void *data, dGeomID o1, dGeomID o2) {
 	}
 }
 
-static void field_world_bullet_near(void *data, dGeomID o1, dGeomID o2) {
-	LWFIELD* field = (LWFIELD*)data;
+static void field_world_bullet_near(void* data, dGeomID o1, dGeomID o2) {
+	LWFIELD* field = ((LWCONTEXT*)data)->field;
 	assert(dGeomGetSpace(o1) == field->space_group[LSG_WORLD]);
 	assert(dGeomGetSpace(o2) == field->space_group[LSG_BULLET]);
 
@@ -484,7 +497,6 @@ static void field_world_bullet_near(void *data, dGeomID o1, dGeomID o2) {
 		dGeomDisable(o2);
 		int idx = (int)dGeomGetData(o2);
 		mq_send_despawn_bullet(field->mq, field->sphere_bullet_id[idx]);
-		//ps_play_new(field->ps);
 		vec3 pos = {
 			(float)contact[0].geom.pos[0],
 			(float)contact[0].geom.pos[1],
@@ -494,12 +506,50 @@ static void field_world_bullet_near(void *data, dGeomID o1, dGeomID o2) {
 	}
 }
 
+static void field_world_script_bullet_near(void* data, dGeomID o1, dGeomID o2) {
+	LWCONTEXT* pLwc = (LWCONTEXT*)data;
+	LWFIELD* field = pLwc->field;
+	assert(dGeomGetSpace(o1) == field->space_group[LSG_WORLD]);
+	assert(dGeomGetSpace(o2) == field->space_group[LSG_SCRIPT_BULLET]);
+
+	dContact contact[1];
+	int n = dCollide(o1, o2, 1, &contact[0].geom, sizeof(dContact));
+	if (n > 0) {
+		/*LOGI("Script bullet at %f,%f,%f (WORLD)",
+			contact[0].geom.pos[0],
+			contact[0].geom.pos[1],
+			contact[0].geom.pos[2]);*/
+		int obj_key1 = (int)dGeomGetData(o1);
+		int obj_key2 = (int)dGeomGetData(o2);
+		script_emit_near(pLwc->L, obj_key1, obj_key2);
+	}
+}
+
+static void field_tower_script_bullet_near(void* data, dGeomID o1, dGeomID o2) {
+	LWCONTEXT* pLwc = (LWCONTEXT*)data;
+	LWFIELD* field = pLwc->field;
+	assert(dGeomGetSpace(o1) == field->space_group[LSG_TOWER]);
+	assert(dGeomGetSpace(o2) == field->space_group[LSG_SCRIPT_BULLET]);
+
+	dContact contact[1];
+	int n = dCollide(o1, o2, 1, &contact[0].geom, sizeof(dContact));
+	if (n > 0) {
+		/*LOGI("Script bullet at %f,%f,%f (TOWER)",
+			contact[0].geom.pos[0],
+			contact[0].geom.pos[1],
+			contact[0].geom.pos[2]);*/
+		int obj_key1 = (int)dGeomGetData(o1);
+		int obj_key2 = (int)dGeomGetData(o2);
+		script_emit_near(pLwc->L, obj_key1, obj_key2);
+	}
+}
+
 void field_send_hit(LWFIELD* field, LWPOSSYNCMSG* possyncmsg) {
 	mq_send_hit(field->mq, possyncmsg);
 }
 
-static void field_test_player_bullet_near(void *data, dGeomID o1, dGeomID o2) {
-	LWFIELD* field = (LWFIELD*)data;
+static void field_test_player_bullet_near(void* data, dGeomID o1, dGeomID o2) {
+	LWFIELD* field = ((LWCONTEXT*)data)->field;
 	assert(dGeomGetSpace(o1) == field->space_group[LSG_ENEMY]);
 	assert(dGeomGetSpace(o2) == field->space_group[LSG_BULLET]);
 
@@ -527,8 +577,8 @@ static void field_test_player_bullet_near(void *data, dGeomID o1, dGeomID o2) {
 	}
 }
 
-static void collide_between_spaces(LWFIELD* field, dSpaceID o1, dSpaceID o2, dNearCallback* callback) {
-	dSpaceCollide2((dGeomID)o1, (dGeomID)o2, field, callback);
+static void collide_between_spaces(LWCONTEXT* pLwc, dSpaceID o1, dSpaceID o2, dNearCallback* callback) {
+	dSpaceCollide2((dGeomID)o1, (dGeomID)o2, pLwc, callback);
 	// collision between objects within the same space.
 	//dSpaceCollide(o1, field, callback);
 	//dSpaceCollide(o2, field, callback);
@@ -780,7 +830,7 @@ void field_update_render_command(LWCONTEXT* pLwc) {
 					// anim marker triggered!
 					//LOGI("Anim marker triggered: %s", action->anim_marker[j].name);
 					cmd->anim_marker_search_begin = j + 1;
-					script_emit_anim_marker(pLwc, cmd->key, action->anim_marker[j].name);
+					script_emit_anim_marker(pLwc->L, cmd->key, action->anim_marker[j].name);
 				}
 			}
 		}
@@ -812,7 +862,7 @@ void update_field(LWCONTEXT* pLwc, LWFIELD* field) {
 		// Clear ray result from the previous frame
 		reset_ray_result(field);
 		// Resolve collision (ray-world)
-		collide_between_spaces(field, field->space_group[LSG_WORLD], field->space_group[LSG_RAY], field_world_ray_near);
+		collide_between_spaces(pLwc, field->space_group[LSG_WORLD], field->space_group[LSG_RAY], field_world_ray_near);
 		// Resolve collision (ray-enemy)
 		//collide_between_spaces(field, field->space_group[LSG_ENEMY], field->space_group[LSG_RAY], field_enemy_ray_near);
 		// Gather ray result reported by collision report.
@@ -821,15 +871,19 @@ void update_field(LWCONTEXT* pLwc, LWFIELD* field) {
 	}
 	mq_unlock_mutex(pLwc->mq);
 	// Resolve collision (player-world collision)
-	collide_between_spaces(field, field->space_group[LSG_PLAYER], field->space_group[LSG_WORLD], field_player_world_near);
+	collide_between_spaces(pLwc, field->space_group[LSG_PLAYER], field->space_group[LSG_WORLD], field_player_world_near);
 	// Resolve collision (player-bullet collision)
-	collide_between_spaces(field, field->space_group[LSG_PLAYER], field->space_group[LSG_BULLET], field_player_bullet_near);
+	collide_between_spaces(pLwc, field->space_group[LSG_PLAYER], field->space_group[LSG_BULLET], field_player_bullet_near);
 	// Resolve collision (player-tower collision)
-	collide_between_spaces(field, field->space_group[LSG_PLAYER], field->space_group[LSG_TOWER], field_player_tower_near);
+	collide_between_spaces(pLwc, field->space_group[LSG_PLAYER], field->space_group[LSG_TOWER], field_player_tower_near);
 	// Resolve collision (world-bullet collision)
-	collide_between_spaces(field, field->space_group[LSG_WORLD], field->space_group[LSG_BULLET], field_world_bullet_near);
+	collide_between_spaces(pLwc, field->space_group[LSG_WORLD], field->space_group[LSG_BULLET], field_world_bullet_near);
+	// Resolve collision (world-script bullet collision)
+	collide_between_spaces(pLwc, field->space_group[LSG_WORLD], field->space_group[LSG_SCRIPT_BULLET], field_world_script_bullet_near);
+	// Resolve collision (tower-script bullet collision)
+	collide_between_spaces(pLwc, field->space_group[LSG_TOWER], field->space_group[LSG_SCRIPT_BULLET], field_tower_script_bullet_near);
 	// Resolve collision (test player-bullet collision)
-	collide_between_spaces(field, field->space_group[LSG_ENEMY], field->space_group[LSG_BULLET], field_test_player_bullet_near);
+	collide_between_spaces(pLwc, field->space_group[LSG_ENEMY], field->space_group[LSG_BULLET], field_test_player_bullet_near);
 	// Stepping the physics world (player-spawned bullet movement update)
 	if (lwcontext_delta_time(pLwc) > 0) {
 		dWorldStep(field->world, lwcontext_delta_time(pLwc));
@@ -1024,7 +1078,7 @@ void init_field(LWCONTEXT* pLwc, const char* field_filename, const char* nav_fil
 	memcpy(pLwc->field->field_mesh, field_mesh, sizeof(LWFIELDMESH) * field_mesh_count);
 	pLwc->field->skin_scale = skin_scale;
 	pLwc->field->field_camera_mode = follow_cam;
-	pLwc->field->mq = pLwc->mq;	
+	pLwc->field->mq = pLwc->mq;
 }
 
 int field_spawn_user(LWFIELD* field, vec3 pos, void* owner) {
