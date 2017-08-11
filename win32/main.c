@@ -8,6 +8,7 @@
 //#include "script.h"
 #if LW_PLATFORM_WIN32
 #include "scriptwatch.h"
+#include "lwimgui.h"
 #endif
 
 #ifndef BOOL
@@ -31,6 +32,7 @@
 
 void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods);
 void mouse_button_callback(GLFWwindow* window, int button, int action, int mods);
+void scroll_callback(GLFWwindow* window, double xoffset, double yoffset);
 void mouse_pos_callback(GLFWwindow* window, double x, double y);
 void destroy_ext_sound_lib();
 
@@ -134,11 +136,13 @@ int main(void)
 
 	//glfwSetWindowPos(window, 600, 70);
 	glfwSetWindowPos(window, 100, 70);
-
+	// Register glfw event callbacks
 	glfwSetKeyCallback(window, key_callback);
 	glfwSetMouseButtonCallback(window, mouse_button_callback);
 	glfwSetWindowSizeCallback(window, window_size_callback);
 	glfwSetCursorPosCallback(window, mouse_pos_callback);
+	glfwSetScrollCallback(window, scroll_callback);
+	// Make OpenGL context current
 	glfwMakeContextCurrent(window);
 #if !LW_PLATFORM_RPI
 	gladLoadGLLoader((GLADloadproc)glfwGetProcAddress);
@@ -169,13 +173,16 @@ int main(void)
 
 #if LW_PLATFORM_WIN32
 	lwc_start_scriptwatch_thread(pLwc);
+	lwimgui_init(window);
 #endif
 
 	while (!glfwWindowShouldClose(window))
 	{
-		lwc_render(pLwc);
-		glfwSwapBuffers(window);
 		glfwPollEvents();
+		lwc_render(pLwc);
+		lwimgui_render(window);
+		glfwSwapBuffers(window);
+		
 	}
 	// If glfw loop is terminated without calling 'lw_app_quit'
 	// (i.e., by clicking 'X' button on the window)
@@ -183,6 +190,8 @@ int main(void)
 	if (!pLwc->quit_request) {
 		lw_app_quit(pLwc);
 	}
+
+	lwimgui_shutdown();
 
 	glfwDestroyWindow(window);
 

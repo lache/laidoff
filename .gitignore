@@ -11,3 +11,4 @@ build-x86
 /assets/list.txt
 /android/app/app-release
 *.dir
+/imgui.ini

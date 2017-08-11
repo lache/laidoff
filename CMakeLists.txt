@@ -60,6 +60,7 @@ include_directories("ode/ou/include")
 include_directories("ode/ode/src")
 include_directories("recastnavigation/Detour/Include")
 include_directories("zmq/include")
+include_directories("imgui")
 
 #include_directories(libpng-1.6.28)
 
@@ -83,6 +84,19 @@ if (WIN32)
 	set(WINXAUDIO2 Xaudio2) # XAudio2
 	set(WINOPENGL32 Opengl32)
 	set(WINSOCK2 ws2_32)
+	set(IMGUI
+		imgui/imgui_impl_glfw_gl3.cpp
+		imgui/imgui_impl_glfw_gl3.h
+		imgui/imgui.cpp
+		imgui/imgui.h
+		imgui/imgui_demo.cpp
+		imgui/imgui_draw.cpp
+		imgui/imgui_internal.h
+		imgui/imconfig.h
+		imgui/stb_rect_pack.h
+		imgui/stb_textedit.h
+		imgui/stb_truetype.h
+		)
 	set(WIN32_DEPS
 		win32/etc1.cpp
 		win32/file.c
@@ -101,6 +115,8 @@ if (WIN32)
 		win32/net.c
 		win32/scriptwatch.h
 		win32/scriptwatch.c
+		win32/lwimgui.cpp
+		win32/lwimgui.h
 		)
 elseif (APPLE)
     set(ICON osx/laidoff.icns)
@@ -157,6 +173,7 @@ source_group(Ode FILES ${ODE_LIB})
 source_group(Detour FILES ${DETOUR_LIB})
 source_group(Zmq FILES ${ZMQ_LIB})
 source_group(Win32 FILES ${WIN32_DEPS} ${ICON})
+source_group(Imgui FILES ${IMGUI})
 
 #add_executable(laidoff WIN32 MACOSX_BUNDLE laidoff.c ${ICON} ${GLAD})
 add_executable(laidoff
@@ -166,6 +183,7 @@ ${ODE_LIB}
 ${LUA_LIB}
 ${DETOUR_LIB}
 #${ZMQ_LIB}
+${IMGUI}
 ${WIN32_DEPS}
 ${OSX_DEPS}
 ${RPI_DEPS}

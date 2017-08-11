@@ -4,6 +4,9 @@
 #include "lwlog.h"
 #include "render_text_block.h"
 #include "nav.h"
+#if LW_PLATFORM_WIN32
+#include "lwimgui.h"
+#endif
 
 void toggle_font_texture_test_mode(LWCONTEXT *pLwc);
 
@@ -42,6 +45,12 @@ static void handle_move_key_press_release(LWCONTEXT* pLwc, int key, int action) 
 }
 
 void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods) {
+#if LW_PLATFORM_WIN32
+	lwimgui_key_callback(window, key, scancode, action, mods);
+	if (lwimgui_want_capture_keyboard() || lwimgui_want_text_input()) {
+		return;
+	}
+#endif
 	LWCONTEXT* pLwc = (LWCONTEXT*)glfwGetWindowUserPointer(window);
 
 	if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS) {

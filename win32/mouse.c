@@ -1,9 +1,16 @@
 #include <stdio.h>
-
 #include "laidoff.h"
+#if LW_PLATFORM_WIN32
+#include "lwimgui.h"
+#endif
 
-void mouse_button_callback(GLFWwindow* window, int button, int action, int mods)
-{
+void mouse_button_callback(GLFWwindow* window, int button, int action, int mods) {
+#if LW_PLATFORM_WIN32
+	lwimgui_mouse_button_callback(window, button, action, mods);
+	if (lwimgui_want_capture_mouse()) {
+		return;
+	}
+#endif
 	LWCONTEXT* pLwc = (LWCONTEXT*)glfwGetWindowUserPointer(window);
 
     if (button == GLFW_MOUSE_BUTTON_LEFT)
@@ -33,8 +40,7 @@ void mouse_button_callback(GLFWwindow* window, int button, int action, int mods)
     }
 }
 
-void mouse_pos_callback(GLFWwindow* window, double xpos, double ypos)
-{
+void mouse_pos_callback(GLFWwindow* window, double xpos, double ypos) {
 	LWCONTEXT* pLwc = (LWCONTEXT*)glfwGetWindowUserPointer(window);
 
 	int width, height;
@@ -44,4 +50,13 @@ void mouse_pos_callback(GLFWwindow* window, double xpos, double ypos)
 	double normalized_ypos = 1.0 - 2 * (ypos / height);
 
 	lw_trigger_mouse_move(pLwc, (float)normalized_xpos, (float)normalized_ypos);
+}
+
+void scroll_callback(GLFWwindow* window, double xoffset, double yoffset) {
+#if LW_PLATFORM_WIN32
+	lwimgui_scroll_callback(window, xoffset, yoffset);
+	if (lwimgui_want_capture_mouse()) {
+		return;
+	}
+#endif
 }
