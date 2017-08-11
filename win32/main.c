@@ -34,6 +34,7 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
 void mouse_button_callback(GLFWwindow* window, int button, int action, int mods);
 void scroll_callback(GLFWwindow* window, double xoffset, double yoffset);
 void mouse_pos_callback(GLFWwindow* window, double x, double y);
+void char_callback(GLFWwindow* window, unsigned int c);
 void destroy_ext_sound_lib();
 
 static void error_callback(int error, const char* description)
@@ -142,6 +143,7 @@ int main(void)
 	glfwSetWindowSizeCallback(window, window_size_callback);
 	glfwSetCursorPosCallback(window, mouse_pos_callback);
 	glfwSetScrollCallback(window, scroll_callback);
+	glfwSetCharCallback(window, char_callback);
 	// Make OpenGL context current
 	glfwMakeContextCurrent(window);
 #if !LW_PLATFORM_RPI

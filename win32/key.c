@@ -186,3 +186,12 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
 		lw_set_kp(pLwc, 5);
 	}
 }
+
+void char_callback(GLFWwindow* window, unsigned int c) {
+#if LW_PLATFORM_WIN32
+	lwimgui_char_callback(window, c);
+	if (lwimgui_want_capture_keyboard() || lwimgui_want_text_input()) {
+		return;
+	}
+#endif
+}
