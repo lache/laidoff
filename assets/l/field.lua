@@ -1,7 +1,7 @@
 print('field.lua visible')
 local M = {
 	objs = {},
-	zombie_obj_keys = {},
+	dt = 0,
 }
 M.__index = M
 local c = lo.script_context()
@@ -50,18 +50,6 @@ function M:despawn(obj)
 	lo.rmsg_despawn(c, obj.key)
 end
 
-function M:despawn_zombie_obj_keys()
-	for i = 1, #self.zombie_obj_keys do
-		local obj = self.objs[self.zombie_obj_keys[i]]
-		self:despawn(obj.obj)
-		self.zombie_obj_keys[i] = nil
-	end
-end
-
-function M:delayed_despawn_by_key(obj_key)
-	table.insert(self.zombie_obj_keys, obj_key)
-end
-
 function M:query_nearest_target_in_range(caller, range)
 	for k,v in pairs(self.objs) do
 		--print('k',k,'v',v)
@@ -82,11 +70,12 @@ function M:time()
 end
 
 function M:start_updating()
-	self.last_update = self:time()
-	start_coro(function() self:update_coro() end)
+	--self.last_update = self:time()
+	--start_coro(function() self:update_coro() end)
 end
 
 function M:update_coro()
+	--[[
 	while true do
 		local t = self:time()
 		self.dt = t - self.last_update
@@ -94,9 +83,11 @@ function M:update_coro()
 		self.last_update = t
 		yield_wait_ms(8)
 	end
+	]]--
 end
 
 function M:update(dt)
+	self.dt = dt
 	-- flush out dead objects
 	for k,v in pairs(self.objs) do
 		local obj = v.obj

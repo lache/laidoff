@@ -11,4 +11,4 @@ void script_update(LWCONTEXT* pLwc);
 void script_cleanup_all_coros(LWCONTEXT* pLwc);
 int script_emit_anim_marker(void* L, int key, const char* name);
 int script_emit_near(void* L, int key1, int key2);
-int script_emit_logic_frame_finish(void* L);
+int script_emit_logic_frame_finish(void* L, float dt);

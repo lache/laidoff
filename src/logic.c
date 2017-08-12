@@ -597,7 +597,7 @@ void lwc_update(LWCONTEXT *pLwc, double delta_time) {
 		script_update(pLwc);
 	}
 
-	script_emit_logic_frame_finish(pLwc->L);
+	script_emit_logic_frame_finish(pLwc->L, (float)delta_time);
 
 	((LWCONTEXT *)pLwc)->update_count++;
 

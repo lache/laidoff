@@ -359,6 +359,58 @@ static void s_render_field_sphere(const LWCONTEXT* pLwc, struct _LWFIELD* const 
 	}
 }
 
+static void s_render_field_sphere_shadow(const LWCONTEXT* pLwc, struct _LWFIELD* const field, const mat4x4 view, const mat4x4 proj) {
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE);
+	glBlendEquation(GL_FUNC_REVERSE_SUBTRACT);
+	glDepthMask(GL_FALSE);
+	for (int i = 0; i < MAX_FIELD_SPHERE; i++) {
+		float pos[3];
+		if (field_sphere_pos(field, i, pos)) {
+			render_field_object(
+				pLwc,
+				LVT_CENTER_CENTER_ANCHORED_SQUARE,
+				pLwc->tex_atlas[LAE_CIRCLE_SHADOW_KTX],
+				view,
+				proj,
+				pos[0],
+				pos[1],
+				0.001f,
+				1.0f,
+				1.0f,
+				1.0f,
+				0.75f, // shadow darkness (0 - no shadow, 1 - darkest)
+				0,
+				0
+			);
+		}
+	}
+	for (int i = 0; i < MAX_FIELD_REMOTE_SPHERE; i++) {
+		float pos[3];
+		if (field_remote_sphere_pos(field, i, pos)) {
+			render_field_object(
+				pLwc,
+				LVT_CENTER_CENTER_ANCHORED_SQUARE,
+				pLwc->tex_atlas[LAE_CIRCLE_SHADOW_KTX],
+				view,
+				proj,
+				pos[0],
+				pos[1],
+				0.001f,
+				1.0f,
+				1.0f,
+				1.0f,
+				0.75f, // shadow darkness (0 - no shadow, 1 - darkest)
+				0,
+				0
+			);
+		}
+	}
+	glBlendEquation(GL_FUNC_ADD);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	glDepthMask(GL_TRUE);
+}
+
 static void s_render_render_command(const LWCONTEXT* pLwc, mat4x4 view, mat4x4 proj) {
 	const double now = lwtimepoint_now_seconds();
 	for (int i = 0; i < MAX_RENDER_QUEUE_CAPACITY; i++) {
@@ -396,6 +448,43 @@ static void s_render_render_command(const LWCONTEXT* pLwc, mat4x4 view, mat4x4 p
 			);
 		}
 	}
+}
+
+static void s_render_render_command_shadow(const LWCONTEXT* pLwc, mat4x4 view, mat4x4 proj) {
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE);
+	glBlendEquation(GL_FUNC_REVERSE_SUBTRACT);
+	glDepthMask(GL_FALSE);
+	const double now = lwtimepoint_now_seconds();
+	for (int i = 0; i < MAX_RENDER_QUEUE_CAPACITY; i++) {
+		const LWFIELDRENDERCOMMAND* cmd = &pLwc->render_command[i];
+		if (cmd->key == 0) {
+			continue;
+		}
+		if (cmd->objtype == 1) {
+			// No shadows for guntowers
+		} else {
+			render_field_object(
+				pLwc,
+				LVT_CENTER_CENTER_ANCHORED_SQUARE,
+				pLwc->tex_atlas[LAE_CIRCLE_SHADOW_KTX],
+				view,
+				proj,
+				cmd->pos[0],
+				cmd->pos[1],
+				0.001f,
+				0.5f,
+				0.5f,
+				0.5f,
+				0.75f, // shadow darkness (0 - no shadow, 1 - darkest)
+				0,
+				0
+			);
+		}
+	}
+	glBlendEquation(GL_FUNC_ADD);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	glDepthMask(GL_TRUE);
 }
 
 static void s_render_field_object_shadow(const LWCONTEXT* pLwc, const mat4x4 view, const mat4x4 proj) {
@@ -615,6 +704,10 @@ void lwc_render_field(const LWCONTEXT* pLwc) {
 	}
 	// Render field object shadows
 	s_render_field_object_shadow(pLwc, view, perspective);
+	// Render bullet shadows
+	s_render_field_sphere_shadow(pLwc, pLwc->field, view, perspective);
+	// Render objects driven by render commands
+	s_render_render_command_shadow(pLwc, view, perspective);
 	// Render field objects
 	s_render_field_object(pLwc, view, perspective);
 	// Render player

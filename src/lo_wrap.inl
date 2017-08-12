@@ -39334,12 +39334,15 @@ fail:
 static int _wrap_script_emit_logic_frame_finish(lua_State* L) {
   int SWIG_arg = 0;
   void *arg1 = (void *) 0 ;
+  float arg2 ;
   int result;
   
-  SWIG_check_num_args("script_emit_logic_frame_finish",1,1)
+  SWIG_check_num_args("script_emit_logic_frame_finish",2,2)
   if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("script_emit_logic_frame_finish",1,"void *");
+  if(!lua_isnumber(L,2)) SWIG_fail_arg("script_emit_logic_frame_finish",2,"float");
   arg1=(void *)SWIG_MustGetPtr(L,1,0,0,1,"script_emit_logic_frame_finish");
-  result = (int)script_emit_logic_frame_finish(arg1);
+  arg2 = (float)lua_tonumber(L, 2);
+  result = (int)script_emit_logic_frame_finish(arg1,arg2);
   lua_pushnumber(L, (lua_Number) result); SWIG_arg++;
   return SWIG_arg;
   

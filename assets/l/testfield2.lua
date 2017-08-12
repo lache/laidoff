@@ -5,10 +5,11 @@ local M = {
 M.__index = M
 local c = lo.script_context()
 
-function M:new(name)
+function M:new(name, field)
 	o = {}
 	o.orig_string = tostring(o)
 	o.name = name
+	o.field = field
 	setmetatable(o, self)
 	return o
 end
@@ -31,15 +32,6 @@ function M:test()
 	package.loaded.bullet = nil
 	require('bullet')
 
-	-- Always reload field module
-	package.loaded.field = nil
-	local Field = require('field')
-	print('Field loaded!')
-	local field = Field:new('test field')
-	local field2 = Field:new('test field another')
-	field:test()
-	field2:test(0)
-	field:start_updating()
 	-- Always reload guntower module
 	package.loaded.guntower = nil
 	local Guntower = require('guntower')
@@ -48,7 +40,7 @@ function M:test()
 	local Faction2 = 2
 
 	local guntower1 = Guntower:new('gt1', 4, 0, 0)
-	field:spawn(guntower1, Faction1)
+	self.field:spawn(guntower1, Faction1)
 	guntower1:start_thinking()
 
 	local guntower2 = Guntower:new('gt2', 13, 3, 0)
@@ -63,7 +55,7 @@ function M:test()
 	guntower2.bullet_sy = 0.5
 	guntower2.bullet_sz = 0.5
 	guntower2.fire_anim_marker = 'fire'
-	field:spawn(guntower2, Faction1)
+	self.field:spawn(guntower2, Faction1)
 	guntower2:start_thinking()
 
 	local guntower3 = Guntower:new('gt3', -10, 3, 0)
@@ -72,7 +64,7 @@ function M:test()
 	guntower3.armature = lo.LWAR_TURRET_ARMATURE
 	guntower3.anim_action_id = lo.LWAC_TURRET_RECOIL
 	guntower3.bullet_spawn_offset_z = 3.15099 / 2
-	field:spawn(guntower3, Faction1)
+	self.field:spawn(guntower3, Faction1)
 	guntower3:start_thinking()
 
 	local guntower4 = Guntower:new('gt4', -14, 3, 0)
@@ -90,7 +82,7 @@ function M:test()
 	guntower4.bullet_sz = 0.5
 	guntower4.fire_anim_marker = 'fire'
 	guntower4.parabola = true
-	field:spawn(guntower4, Faction1)
+	self.field:spawn(guntower4, Faction1)
 	guntower4:start_thinking()
 
 	local guntower5 = Guntower:new('gt5', -12, 6, 0)
@@ -108,27 +100,9 @@ function M:test()
 	guntower5.bullet_sz = 0.5
 	guntower5.fire_anim_marker = 'fire'
 	guntower5.parabola = true
-	field:spawn(guntower5, Faction1)
+	self.field:spawn(guntower5, Faction1)
 	guntower5:start_thinking()
 
-	-- this function is called from C, thus should not have 'local' specifier
-	function on_anim_marker(key, name)
-		--print('on_anim_marker key:',key,', name:', name)
-		field:on_anim_marker(key, name)
-		return 0
-	end
-	-- Lua handler for collision events (near events) emitted from C.
-	function on_near(key1, key2)
-		--print('on_near key1', key1, 'key2', key2)
-		field.objs[key2].obj:collide_with(key1)
-		--field:delayed_despawn_by_key(key2)
-		return 0
-	end
-	-- Lua handler for logc frame finish events emitted from C
-	function on_logic_frame_finish()
-		field:despawn_zombie_obj_keys()
-		return 0
-	end
 	start_coro(function()
 		local idx = 1
 		while true do
@@ -136,7 +110,7 @@ function M:test()
 			idx = idx + 1
 			--guntower2:test()
 			--print(inspect(guntower2))
-			field:spawn(guntower2, Faction2)
+			self.field:spawn(guntower2, Faction2)
 			yield_wait_ms(1.5 * 1000)
 			--yield_wait_ms(0.1 * 1000)
 		end

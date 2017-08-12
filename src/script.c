@@ -526,15 +526,16 @@ int script_emit_near(void* L, int key1, int key2) {
 	return ret;
 }
 
-int script_emit_logic_frame_finish(void* L) {
+int script_emit_logic_frame_finish(void* L, float delta_time) {
 	if (L == 0) {
 		return 0;
 	}
 	int ret;
 	// push functions and arguments
 	lua_getglobal(L, "on_logic_frame_finish"); // function to be called
+	lua_pushnumber(L, delta_time); // push 1st argument
 	// do the call (0 arguments, 1 result)
-	if (lua_pcall(L, 0, 1, 0) != 0) {
+	if (lua_pcall(L, 1, 1, 0) != 0) {
 		LOGE(LWLOGPOS "error: %s", lua_tostring(L, -1));
 	}
 	// retrieve result

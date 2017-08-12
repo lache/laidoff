@@ -14,10 +14,6 @@ function M:new(name)
 end
 
 function M:test()
-	-- Lua handler for logc frame finish events emitted from C
-	function on_logic_frame_finish()
-		return 0
-	end
 	return 'battleground'
 end
 

@@ -31,6 +31,33 @@ end
 
 local c = lo.script_context()
 
+-- Always reload field module
+package.loaded.field = nil
+local Field = require('field')
+print('Field loaded!')
+local field = Field:new('test field')
+field:test()
+field:start_updating()
+-- Lua handler for anim marker events emitted from C.
+-- This function is called from C, thus should not have 'local' specifier.
+-- Also note that this function implicitly captures 'field'.
+function on_anim_marker(key, name)
+	--print('on_anim_marker key:',key,', name:', name)
+	field:on_anim_marker(key, name)
+	return 0
+end
+-- Lua handler for collision events (near events) emitted from C.
+function on_near(key1, key2)
+	--print('on_near key1', key1, 'key2', key2)
+	field.objs[key2].obj:collide_with(key1)
+	return 0
+end
+-- Lua handler for logc frame finish events emitted from C
+function on_logic_frame_finish(dt)
+	field:update(dt)
+	return 0
+end
+
 local function split_path(p)
 	return string.match(p, "(.-)([^\\/]-%.?([^%.\\/]*))$")
 end
@@ -46,7 +73,7 @@ print('Field filename ext:' .. field_filename_ext)
 -- Always reload test module by clearing the previous loaded instance
 package.loaded[field_module_name] = nil
 local FieldModule = require(field_module_name)
-local field_module = FieldModule:new()
+local field_module = FieldModule:new(field_filename_name, field)
 print('field_module:test()', field_module:test())
 
 return 1
