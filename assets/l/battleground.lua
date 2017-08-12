@@ -23,14 +23,11 @@ function M:test()
 
 	lo.show_sys_msg(c.def_sys_msg, 'I AM SCRIPT 5 한글')
 
-	-- Always reload test module by clearing the previous loaded instance
 	local tm = reload_require('testmod')
 	print('testmod.foo()', tm.foo())
 
-	-- Always reload test module by clearing the previous loaded instance
 	reload_require('bullet')
 
-	-- Always reload guntower module
 	local Guntower = reload_require('guntower')
 	print('Guntower loaded! ^__^')
 	local Faction1 = 1

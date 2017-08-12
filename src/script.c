@@ -134,7 +134,7 @@ int l_start_coro(lua_State* L) {
 				lua_State* L_coro = lua_newthread(L);
 				int coro_index = lua_gettop(L);
 				assert(lua_isthread(L, coro_index));
-				LOGI("New coroutine started: stack top = %d", coro_index);
+				//LOGI("New coroutine started: stack top = %d", coro_index);
 				// Save coroutine pointer in coro pool
 				script->coro[i].L = L_coro;
 				// Create coroutine custom data table

@@ -1,6 +1,5 @@
 print('testfield2.lua visible')
 
--- Always reload guntower module
 local Guntower = reload_require('guntower')
 print('Guntower loaded! ^__^')
 
@@ -23,33 +22,26 @@ function M:start_enemy_spawn_coro()
 	start_coro(function()
 		local idx = 1
 		while true do
-			local guntower2 = Guntower:new('gt-enemy-'..idx, math.random(-10, 10), math.random(-13, -3), 0)
+			local gt = Guntower:new('gt-enemy-'..idx, math.random(-10, 10), math.random(-13, -3), 0)
 			idx = idx + 1
-			--guntower2:test()
-			--print(inspect(guntower2))
-			self.field:spawn(guntower2, Faction2)
+			self.field:spawn(gt, Faction2)
 			yield_wait_ms(1.5 * 1000)
-			--yield_wait_ms(0.1 * 1000)
 		end
 	end)
 end
 
-function M:start_spawn_nav_devil_coro()
+function M:spawn_nav_devil()
 	local nav = lo.field_nav(c.field)
-
-	start_coro(function ()
-		for i=1, 10 do
-		  -- Truck field object
-		  --local truck = spawn_oil_truck(pLwc, -8, -8, 0)
-		  local truck = spawn_devil(pLwc, -8, -8, 0)
-		  -- Path query
-		  local pq = lo.nav_new_path_query(nav)
-		  -- Activate path query update
-		  lo.nav_update_output_path_query(nav, pq, 1)
-		  -- Bind path query to truck
-		  lo.nav_bind_path_query_output_location(nav, pq, c.field, truck)
-		end
-	end)
+	for i = 1, 10 do
+	  -- Devil field object
+	  local devil = spawn_devil(pLwc, -8, -8, 0)
+	  -- Path query
+	  local pq = lo.nav_new_path_query(nav)
+	  -- Activate path query update
+	  lo.nav_update_output_path_query(nav, pq, 1)
+	  -- Bind path query to devil
+	  lo.nav_bind_path_query_output_location(nav, pq, c.field, devil)
+	end
 end
 
 function M:test()
@@ -123,7 +115,7 @@ function M:test()
 	guntower5:start_thinking()
 
 	self:start_enemy_spawn_coro()
-	self:start_spawn_nav_devil_coro()
+	self:spawn_nav_devil()
 	
 	return 'testfield2'
 end

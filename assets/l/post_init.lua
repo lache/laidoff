@@ -36,7 +36,6 @@ end
 
 local c = lo.script_context()
 
--- Always reload field module
 local Field = reload_require('field')
 print('Field loaded!')
 local field = Field:new('test field')
@@ -74,7 +73,6 @@ print('Field filename name:' .. field_filename_name)
 print('Field filename name only:' .. field_module_name)
 print('Field filename ext:' .. field_filename_ext)
 
--- Always reload test module by clearing the previous loaded instance
 local FieldModule = reload_require(field_module_name)
 local field_module = FieldModule:new(field_filename_name, field)
 print('field_module:test()', field_module:test())
