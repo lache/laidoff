@@ -16,8 +16,7 @@ end
 
 function M:test()
 	-- Always reload guntower module
-	package.loaded.guntower = nil
-	local Guntower = require('guntower')
+	local Guntower = reload_require('guntower')
 	local Faction1 = 1
 	local guntower1 = Guntower:new('gt1', 3, 0, 0)
 	self.field:spawn(guntower1, Faction1)

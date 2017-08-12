@@ -27,13 +27,17 @@ function lo.delete_vec3(v)
 	lo.delete_float(v)
 end
 
+function reload_require(modname)
+	package.loaded[modname] = nil
+	return require(modname)
+end
+
 -- Utility functions end
 
 local c = lo.script_context()
 
 -- Always reload field module
-package.loaded.field = nil
-local Field = require('field')
+local Field = reload_require('field')
 print('Field loaded!')
 local field = Field:new('test field')
 field:test()
@@ -71,8 +75,7 @@ print('Field filename name only:' .. field_module_name)
 print('Field filename ext:' .. field_filename_ext)
 
 -- Always reload test module by clearing the previous loaded instance
-package.loaded[field_module_name] = nil
-local FieldModule = require(field_module_name)
+local FieldModule = reload_require(field_module_name)
 local field_module = FieldModule:new(field_filename_name, field)
 print('field_module:test()', field_module:test())
 
