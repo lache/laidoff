@@ -6,7 +6,11 @@ static void handle_move_key_press_release(LWCONTEXT* pLwc, int key, int action)
 
 void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods)
 {
+	LWCONTEXT* pLwc = (LWCONTEXT*)window;
 	switch (key) {
+		case 1: // ESCAPE
+			lw_app_quit(pLwc);
+			break;
 		case 59: // F1
 		change_to_field(window);
 		break;

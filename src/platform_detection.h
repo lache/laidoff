@@ -12,10 +12,10 @@
 #	else
 #		define LW_PLATFORM_OSX 1
 #	endif
-#elif __linux__
-#	define LW_PLATFORM_LINUX 1
 #elif RPI
 #	define LW_PLATFORM_RPI 1
+#elif __linux__
+#	define LW_PLATFORM_LINUX 1
 #else
 #	define LW_PLATFORM_ANDROID 1
 #endif

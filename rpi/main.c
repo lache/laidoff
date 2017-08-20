@@ -258,7 +258,9 @@ int main(void)
 
 	gettimeofday(&t1, &tz);
 
-	while (1)
+	lwc_start_logic_thread(pLwc);
+
+	while (!pLwc->quit_request)
 	{
 		gettimeofday(&t2, &tz);
 		deltatime = (float)(t2.tv_sec - t1.tv_sec + (t2.tv_usec - t1.tv_usec) * 1e-6);
@@ -278,8 +280,13 @@ int main(void)
 			key_callback((GLFWwindow*)pLwc, (int)ev.code, 0, 0, 0);
 		}
 
+		/*
+		lwcontext_set_safe_to_start_render(pLwc, 0);
 
 		lwc_update(pLwc, 1.0/60);
+
+		lwcontext_set_safe_to_start_render(pLwc, 1);
+		*/
 
 		lwc_render(pLwc);
 
@@ -308,8 +315,9 @@ int main(void)
 	exit(EXIT_SUCCESS);
 }
 
-void lw_app_quit(const LWCONTEXT* pLwc)
+void lw_app_quit(LWCONTEXT* pLwc)
 {
+	pLwc->quit_request = 1;
 }
 
 int request_get_today_played_count()

@@ -10,7 +10,7 @@ set(GLFW_BUILD_TESTS OFF CACHE BOOL "" FORCE)
 set(GLFW_BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
 
 set(CMAKE_CXX_STANDARD 11)
-
+set(CMAKE_C_STANDARD 11)
 add_subdirectory(glfw-3.2.1)
 
 include_directories(${glfw_INCLUDE_DIRS})
@@ -154,6 +154,7 @@ elseif (RPI)
 	   rpi/mouse.c
 	   win32/sound.cpp
 	   rpi/rpi_image.c
+	   ios/laidoff/net.c
 	)
 elseif (UNIX)
 
