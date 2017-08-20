@@ -2,7 +2,7 @@
 
 #include "platform_detection.h"
 
-#if LW_PLATFORM_WIN32 || LW_PLATFORM_OSX
+#if LW_PLATFORM_WIN32 || LW_PLATFORM_OSX || LW_PLATFORM_LINUX
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 #include <limits.h> // INT_MAX

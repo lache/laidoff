@@ -100,7 +100,7 @@ int main(void)
 	4.3 -	430
 	*/
 
-#if !LW_PLATFORM_RPI
+#if (!LW_PLATFORM_RPI && !LW_PLATFORM_LINUX)
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 2);
     glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GLFW_TRUE);
@@ -182,7 +182,9 @@ int main(void)
 	{
 		glfwPollEvents();
 		lwc_render(pLwc);
+#if LW_PLATFORM_WIN32
 		lwimgui_render(window);
+#endif
 		glfwSwapBuffers(window);
 		
 	}
@@ -192,8 +194,9 @@ int main(void)
 	if (!pLwc->quit_request) {
 		lw_app_quit(pLwc);
 	}
-
+#if LW_PLATFORM_WIN32
 	lwimgui_shutdown();
+#endif
 
 	glfwDestroyWindow(window);
 

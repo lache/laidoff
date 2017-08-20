@@ -17,7 +17,7 @@
 #   define LwStaticAssert(x,y)
 #   define ARRAY_SIZE(arr) 0 // Swig has no support of compile time arithmetic
 #elif LW_PLATFORM_WIN32
-#include <stdlib.h>
+#   include <stdlib.h>
 #   define PATH_SEPARATOR "\\"
 #   define ASSETS_BASE_PATH "assets" PATH_SEPARATOR
 #   define LwStaticAssert(x,y) _STATIC_ASSERT(x)
@@ -25,6 +25,11 @@
 #elif LW_PLATFORM_OSX
 #   define PATH_SEPARATOR "/"
 #   define ASSETS_BASE_PATH "/Users/kimgeoyeob/laidoff/assets/"
+#   define LwStaticAssert(x,y) //_STATIC_ASSERT(x) // diabled...
+#   define ARRAY_SIZE(arr) (sizeof(arr) / sizeof((arr)[0]))
+#elif LW_PLATFORM_LINUX
+#   define PATH_SEPARATOR "/"
+#   define ASSETS_BASE_PATH "/home/gasbank/laidoff/assets/"
 #   define LwStaticAssert(x,y) //_STATIC_ASSERT(x) // diabled...
 #   define ARRAY_SIZE(arr) (sizeof(arr) / sizeof((arr)[0]))
 #elif LW_PLATFORM_ANDROID || LW_PLATFORM_IOS || LW_PLATFORM_IOS_SIMULATOR
@@ -49,7 +54,7 @@
 #   define M_PI       (3.14159265358979323846)  /* pi */
 #endif
 
-#if LW_PLATFORM_OSX || LW_PLATFORM_RPI
+#if LW_PLATFORM_OSX || LW_PLATFORM_RPI || LW_PLATFORM_LINUX
 #   define HRESULT int
 #elif LW_PLATFORM_ANDROID || LW_PLATFORM_IOS || LW_PLATFORM_IOS_SIMULATOR
 #   define HRESULT int

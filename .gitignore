@@ -12,3 +12,4 @@ build-x86
 /android/app/app-release
 *.dir
 /imgui.ini
+*.swp

@@ -85,7 +85,7 @@ int load_ktx_hw_or_sw(const char* tex_atlas_filename)
 			const short mip_height = extended_height >> i;
 			
             // TODO: iOS texture
-#if LW_PLATFORM_WIN32 || LW_PLATFORM_OSX || LW_PLATFORM_IOS || LW_PLATFORM_IOS_SIMULATOR || LW_PLATFORM_RPI
+#if LW_PLATFORM_WIN32 || LW_PLATFORM_OSX || LW_PLATFORM_IOS || LW_PLATFORM_IOS_SIMULATOR || LW_PLATFORM_RPI || LW_PLATFORM_LINUX
 			char* decoded_rgb_data = load_software_decode_etc1_rgb(mip_width, mip_height, d);
 
 			glTexImage2D(GL_TEXTURE_2D, i, GL_RGB, mip_width, mip_height, 0,

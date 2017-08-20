@@ -41,7 +41,7 @@
 #include "lo_wrap.inl"
 
 #define LW_SUPPORT_ETC1_HARDWARE_DECODING LW_PLATFORM_ANDROID
-#define LW_SUPPORT_VAO (LW_PLATFORM_WIN32 || LW_PLATFORM_OSX)
+#define LW_SUPPORT_VAO (LW_PLATFORM_WIN32 || LW_PLATFORM_OSX || LW_PLATFORM_LINUX)
 
 const float default_uv_offset[2] = { 0, 0 };
 const float default_uv_scale[2] = { 1, 1 };

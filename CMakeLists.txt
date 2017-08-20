@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.6)
+cmake_minimum_required(VERSION 3.5)
 
 # CMake의 Visual Studio Solution Folders 기능 켬
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
@@ -8,6 +8,8 @@ set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 set(GLFW_BUILD_DOCS OFF CACHE BOOL "" FORCE)
 set(GLFW_BUILD_TESTS OFF CACHE BOOL "" FORCE)
 set(GLFW_BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
+
+set(CMAKE_CXX_STANDARD 11)
 
 add_subdirectory(glfw-3.2.1)
 
@@ -73,8 +75,9 @@ CHECK_INCLUDE_FILE(/opt/vc/include/bcm_host.h BCM_HOST_AVAILABLE)
 
 if (MSVC)
     add_definitions(-D_CRT_SECURE_NO_WARNINGS)
-	add_definitions(-DdDOUBLE)
 endif()
+
+add_definitions(-DdDOUBLE)
 
 if (WIN32)
     set(ICON win32/laidoff.rc)
@@ -152,7 +155,19 @@ elseif (RPI)
 	   win32/sound.cpp
 	   rpi/rpi_image.c
 	)
+elseif (UNIX)
 
+   set(UNIX_DEPS
+	   win32/etc1.cpp
+	   win32/file.c
+	   win32/image.cpp
+	   win32/key.c
+	   win32/main.c
+	   win32/mouse.c
+	   win32/sound.cpp
+           ios/laidoff/net.c
+	   rpi/rpi_image.c
+	)
 endif()
 
 set(GLAD "${GLFW_SOURCE_DIR}/deps/glad/glad.h"
@@ -187,6 +202,7 @@ ${IMGUI}
 ${WIN32_DEPS}
 ${OSX_DEPS}
 ${RPI_DEPS}
+${UNIX_DEPS}
 ${ICON}
 ${GLAD})
 
