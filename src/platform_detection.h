@@ -14,6 +14,8 @@
 #	endif
 #elif RPI
 #	define LW_PLATFORM_RPI 1
+#elif __ANDROID__
+#	define LW_PLATFORM_ANDROID 1
 #elif __linux__
 #	define LW_PLATFORM_LINUX 1
 #else
