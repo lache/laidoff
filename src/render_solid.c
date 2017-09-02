@@ -21,8 +21,17 @@ void render_solid_vb_ui_flip_y_uv(const LWCONTEXT* pLwc,
 	GLuint tex_index,
 	enum _LW_VBO_TYPE lvt,
 	float alpha_multiplier, float or, float og, float ob, float oratio, int flip_y_uv) {
-	int shader_index = LWST_DEFAULT;
 
+	int shader_index = LWST_DEFAULT;
+	render_solid_vb_ui_flip_y_uv_shader(pLwc, x, y, w, h, tex_index, lvt, alpha_multiplier, or , og, ob, oratio, flip_y_uv, shader_index);
+}
+
+void render_solid_vb_ui_flip_y_uv_shader(const LWCONTEXT* pLwc,
+	float x, float y, float w, float h,
+	GLuint tex_index,
+	enum _LW_VBO_TYPE lvt,
+	float alpha_multiplier, float or, float og, float ob, float oratio, int flip_y_uv, int shader_index) {
+	
 	glUseProgram(pLwc->shader[shader_index].program);
 	glUniform2fv(pLwc->shader[shader_index].vuvoffset_location, 1, default_uv_offset);
 	glUniform2fv(pLwc->shader[shader_index].vuvscale_location, 1, flip_y_uv ? default_flip_y_uv_scale : default_uv_scale);

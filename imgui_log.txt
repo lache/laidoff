@@ -1,0 +1,246 @@
+
+
+## Widgets #
+> Trees
+    > Basic trees
+        > Child 0
+        > Child 1
+        > Child 2
+        > Child 3
+        > Child 4
+    > Advanced, with Selectable nodes
+        (?)
+        [ ] Align label with current X position)
+        Hello!
+        > Selectable Node 0
+        > Selectable Node 1
+        > Selectable Node 2
+        > Selectable Leaf 3
+        > Selectable Leaf 4
+        > Selectable Leaf 5
+> Collapsing Headers
+    
+    ## Header #
+    
+    ## Header with a close button #
+> Bullets
+    Bullet point 1
+    Bullet point 2
+    On multiple lines
+    Bullet point 3 (two calls)
+    Button
+> Colored Text
+    Pink
+    Yellow
+    Disabled
+> Word Wrapping
+    This text should automatically wrap on the edge of the window. The current implementation for text wrapping follows simple rules suitable for English and possibly other languages.
+    105 Wrap width
+    Test paragraph 1:
+    The lazy dog is a good dog. This paragraph is made to fit within 105 pixels. Testing a 1 character word. The quick brown fox jumps over the lazy dog.
+    Test paragraph 2:
+    aaaaaaaa bbbbbbbb, c cccccccc,dddddddd. d eeeeeeee   ffffffff. gggggggg!hhhhhhhh
+> UTF-8 Text
+    CJK text will only appears if the font was loaded with the appropriate CJK character ranges. Call io.Font->LoadFromFileTTF() manually to load extra character ranges.
+    Hiragana: かきくけこ (kakikukeko)
+    Kanjis: 日本語 (nihongo)
+    日本語 UTF-8 input
+> Images
+    Below we are displaying the font texture (which is the only texture we have access to in this demo). Use the 'ImTextureID' type as storage to pass pointers or identifier to your own texture data. Hover the texture for a zoomed view!
+    512x64
+    And now some textured buttons..
+    Pressed 0 times.
+> Selectables
+    > Basic
+        1. I am selectable
+        2. I am selectable
+        3. I am not selectable
+        4. I am selectable
+        5. I am double clickable
+    > Rendering more text into the same block
+        main.c  2,345 bytes
+        Hello.cpp 12,345 bytes
+        Hello.h  2,345 bytes
+    > In columns
+        Item 0 Item 1 Item 2
+        Item 3 Item 4 Item 5
+        Item 6 Item 7 Item 8
+        Item 9 Item 10 Item 11
+        Item 12 Item 13 Item 14
+        Item 15
+    > Grid
+        Sailor Sailor Sailor Sailor
+        Sailor Sailor Sailor Sailor
+        Sailor Sailor Sailor Sailor
+        Sailor Sailor Sailor Sailor
+> Filtered Text Input
+    fdsfa default
+    32423 decimal
+    FDAFFD hexadecimal
+    SDFAFASFADFS323FESAF uppercase
+    sdaf no blank "imgui" letters
+    Password input
+    password (?)
+    password123 password (clear)
+> Multi-line Text Input
+    [ ] Read-only
+Button
+[x] checkbox
+( ) radio a (x) radio b ( ) radio c
+Click Click Click Click Click Click Click
+Hover over me - or me
+--------------------------------
+Value label
+dddd combo
+DDDD combo scroll
+Hello, world! input text (?)
+123 - + input int
+(?)
+0.001000 - + input float
+0.100000
+0.200000
+0.300000
+input float3
+50 drag int (?)
+42% drag int 0..100
+1.000 drag float
+0.006700 ns drag small float
+0 slider int (?)
+ratio = 0.123 slider float
+0.0000 slider log float
+0 deg slider angle
+R:255 G:  0 B: 51 color 1
+(?)
+R:102 G:179 B:  0 A:128 color 2
+listbox
+(single select)
+> Range Widgets
+    Min: 10.0 % Max: 88.2 % range
+    Min: 100 units Max: 625 units range int (no bounds)
+> Multi-component Widgets
+    0.100000
+    0.331000
+    input float2
+    0.100 0.331 drag float2
+    0.100 0.331 slider float2
+    1 5 drag int2
+    1
+    5
+    input int2
+    1 5 slider int2
+    0.100000
+    0.331000
+    0.300000
+    input float3
+    0.100 0.331 0.300 drag float3
+    0.100 0.331 0.300 slider float3
+    1 5 100 drag int3
+    1
+    5
+    100
+    input int3
+    1 5 100 slider int3
+    0.100000
+    0.331000
+    0.300000
+    0.440000
+    input float4
+    0.100 0.331 0.300 0.440 drag float4
+    0.100 0.331 0.300 0.440 slider float4
+    1
+    5
+    100
+    255
+    input int4
+    1 5 100 255 drag int4
+    1 5 100 255 slider int4
+> Vertical Sliders
+    2
+    0.27
+    sec 0.17
+    sec 0.16
+    sec 0.21
+    sec
+
+## Graphs widgets #
+[x] Animate
+Frame Times
+avg 0.0 Lines
+Histogram
+--------------------------------
+Sin func 70 Sample count
+Lines
+Histogram
+--------------------------------
+13% Progress Bar
+234/1753
+
+## Layout #
+
+## Popups & Modal windows #
+
+## Columns #
+> Basic
+    Without border:
+--------------------------------
+    Item 0 Item 1 Item 2
+    Item 3 Item 4 Item 5
+    Item 6 Item 7 Item 8
+    Item 9 Item 10 Item 11
+    Item 12 Item 13
+--------------------------------
+    With border:
+--------------------------------
+    ID Name Path Flags
+--------------------------------
+    0000 One /path/one ....
+    0001 Two /path/two ....
+    0002 Three /path/three ....
+--------------------------------
+> Mixed items
+--------------------------------
+    Hello
+    Banana ImGui
+    Apple
+    1.000 - + red
+    An extra line here. Sailor
+    Corniflower
+    1.000 - + blue
+    
+    ## Category A # 
+    ## Category B # 
+    ## Category C #
+--------------------------------
+> Word-wrapping
+--------------------------------
+    The quick brown fox jumps over the lazy dog.
+    Hello Left The quick brown fox jumps over the lazy dog.
+    Hello Right
+--------------------------------
+> Borders
+    [ ] horizontal [x] vertical
+    aaa bbb ccc ddd
+    eee fff ggg hhh
+> Tree within single cell (?)
+--------------------------------
+    > Hello
+        Sailor > Bonjour
+        Marin
+--------------------------------
+
+## Filtering #
+Filter usage:
+  ""         display all lines
+  "xxx"      display lines containing "xxx"
+  "xxx,yyy"  display lines containing "xxx" or "yyy"
+  "-xxx"     hide lines containing "xxx" Filter (inc,-exc)
+aaa1.c
+bbb1.c
+ccc1.c
+aaa2.cpp
+bbb2.cpp
+ccc2.cpp
+abc.h
+hello, world
+
+## Keyboard, Mouse & Focus #

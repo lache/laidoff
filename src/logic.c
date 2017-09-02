@@ -63,6 +63,10 @@ void change_to_particle_system(LWCONTEXT *pLwc) {
 	pLwc->next_game_scene = LGS_PARTICLE_SYSTEM;
 }
 
+void change_to_ui(LWCONTEXT *pLwc) {
+	pLwc->next_game_scene = LGS_UI;
+}
+
 typedef enum _LW_MSG {
 	LM_ZERO,
 	LM_LWMSGINITFIELD,
@@ -70,6 +74,7 @@ typedef enum _LW_MSG {
 	LM_LWMSGRELOADSCRIPT,
 	LM_LWMSGSTARTLOGICLOOP,
 	LM_LWMSGSTOPLOGICLOOP,
+	LM_LWMSGINITSCENE,
 } LW_MSG;
 
 typedef struct _LWMSGINITFIELD {
@@ -97,6 +102,10 @@ typedef struct _LWMSGSTARTLOGICLOOP {
 typedef struct _LWMSGSTOPLOGICLOOP {
 	LW_MSG type;
 } LWMSGSTOPLOGICLOOP;
+
+typedef struct _LWMSGINITSCENE {
+	LW_MSG type;
+} LWMSGINITSCENE;
 
 void logic_start_logic_update_job_async(LWCONTEXT* pLwc) {
 	if (pLwc == 0 || pLwc->logic_actor == 0) {
@@ -247,6 +256,19 @@ void load_field_5_init_runtime_data_async(LWCONTEXT *pLwc, zactor_t* actor) {
 
 void load_field_5_init_runtime_data(LWCONTEXT *pLwc) {
 	load_field_5_init_runtime_data_async(pLwc, pLwc->logic_actor);
+}
+
+void load_scene_async(LWCONTEXT *pLwc, zactor_t* actor, LW_GAME_SCENE next_game_scene) {
+	pLwc->next_game_scene = next_game_scene;
+	zmsg_t* msg = zmsg_new();
+	LWMSGINITSCENE m = {
+		LM_LWMSGINITSCENE,
+	};
+	zmsg_addmem(msg, &m, sizeof(LWMSGINITSCENE));
+	if (zactor_send(actor, &msg) < 0) {
+		zmsg_destroy(&msg);
+		LOGE("Send message to logic worker failed!");
+	}
 }
 
 void reset_runtime_context_async(LWCONTEXT *pLwc) {
@@ -460,13 +482,15 @@ void reset_runtime_context(LWCONTEXT* pLwc) {
 	// Reset sprite data pointer
 	pLwc->sprite_data = SPRITE_DATA[0];
 	// Reset game scene
-	pLwc->next_game_scene = LGS_FIELD;
+	//pLwc->next_game_scene = LGS_FIELD;
 	// Reset debug font rendering indicator
 	pLwc->font_texture_texture_mode = 0;
 	// Reset battle context
 	reset_battle_context(pLwc);
 	// Reset field context
-	reset_field_context(pLwc);
+	if (pLwc->field) {
+		reset_field_context(pLwc);
+	}
 	// Make render-to-texture flag dirty
 	pLwc->font_fbo.dirty = 1;
 	// Register admin button commands
@@ -486,6 +510,7 @@ void reset_runtime_context(LWCONTEXT* pLwc) {
 		{ LWU("신:필드3로드"), load_field_3_init_runtime_data },
 		{ LWU("신:필드4로드"), load_field_4_init_runtime_data },
 		{ LWU("신:필드5로드"), load_field_5_init_runtime_data },
+		{ LWU("신:UI"), change_to_ui },
 		{ LWU("Server #0"), connect_to_server_0 },
 		{ LWU("Server #1"), connect_to_server_1 },
 		{ LWU("레이테스트토글"), toggle_ray_test },
@@ -656,6 +681,13 @@ static int loop_pipe_reader(zloop_t* loop, zsock_t* pipe, void* args) {
 				m->follow_cam);
 
 			init_lwc_runtime_data(pLwc);
+		} else if (d && s == sizeof(LWMSGINITSCENE) && *(int*)d == LM_LWMSGINITSCENE) {
+			// Stop new frame of rendering
+			lwcontext_set_safe_to_start_render(pLwc, 0);
+			// Busy wait for current frame of rendering to be completed
+			while (lwcontext_rendering(pLwc)) {}
+
+			init_lwc_runtime_data(pLwc);
 		} else if (d && s == sizeof(LWMSGRESETRUNTIMECONTEXT) && *(int*)d == LM_LWMSGRESETRUNTIMECONTEXT) {
 			// Stop new frame of rendering
 			lwcontext_set_safe_to_start_render(pLwc, 0);
@@ -721,7 +753,8 @@ void lwc_start_logic_thread(LWCONTEXT* pLwc) {
 	// Start logic thread
 	pLwc->logic_actor = zactor_new(s_logic_worker, pLwc);
 	// Load initial stage
-	load_field_2_init_runtime_data_async(pLwc, pLwc->logic_actor);
+	//load_field_2_init_runtime_data_async(pLwc, pLwc->logic_actor);
+	load_scene_async(pLwc, pLwc->logic_actor, LGS_UI);
 }
 
 const char* logic_server_addr(int idx) {

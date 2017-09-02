@@ -1343,8 +1343,10 @@ LWNAV* field_nav(LWFIELD* field) {
 }
 
 void field_reset_deterministic_seed(LWFIELD* field) {
-	// Seed a random number generator
-	pcg32_srandom_r(&field->rng, 0x0DEEC2CBADF00D77, 0x15881588CA11DAC1);
+	if (field) {
+		// Seed a random number generator
+		pcg32_srandom_r(&field->rng, 0x0DEEC2CBADF00D77, 0x15881588CA11DAC1);
+	}
 }
 
 const char* field_filename(LWFIELD* field) {

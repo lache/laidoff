@@ -37,6 +37,7 @@
 //#include "script.h"
 #include "lwtimepoint.h"
 #include "lwparabola.h"
+#include "render_ui.h"
 // SWIG output file
 #include "lo_wrap.inl"
 
@@ -344,6 +345,8 @@ void init_gl_shaders(LWCONTEXT *pLwc) {
 	// Fragment Shader
 	char *default_frag_glsl = create_string_from_file(ASSETS_BASE_PATH
 		GLSL_DIR_NAME PATH_SEPARATOR "default-frag.glsl");
+	char *color_frag_glsl = create_string_from_file(ASSETS_BASE_PATH
+		GLSL_DIR_NAME PATH_SEPARATOR "color-frag.glsl");
 	char *font_frag_glsl = create_string_from_file(ASSETS_BASE_PATH
 		GLSL_DIR_NAME PATH_SEPARATOR "font-frag.glsl");
 	char *etc1_frag_glsl = create_string_from_file(ASSETS_BASE_PATH
@@ -385,6 +388,11 @@ void init_gl_shaders(LWCONTEXT *pLwc) {
 		return;
 	}
 
+	if (!color_frag_glsl) {
+		LOGE("init_gl_shaders: color-frag.glsl not loaded. Abort...");
+		return;
+	}
+
 	if (!font_frag_glsl) {
 		LOGE("init_gl_shaders: font-frag.glsl not loaded. Abort...");
 		return;
@@ -417,6 +425,7 @@ void init_gl_shaders(LWCONTEXT *pLwc) {
 	create_shader("Fan Shader", &pLwc->shader[LWST_FAN], fan_vert_glsl, fan_frag_glsl);
 	create_shader("Emitter Shader", &pLwc->shader[LWST_EMITTER], emitter_vert_glsl, emitter_frag_glsl);
 	create_shader("Emitter2 Shader", &pLwc->shader[LWST_EMITTER2], emitter2_vert_glsl, emitter2_frag_glsl);
+	create_shader("Color Shader", &pLwc->shader[LWST_COLOR], default_vert_glsl, color_frag_glsl);
 
 	release_string(default_vert_glsl);
 	release_string(skin_vert_glsl);
@@ -424,6 +433,7 @@ void init_gl_shaders(LWCONTEXT *pLwc) {
 	release_string(emitter_vert_glsl);
 	release_string(emitter2_vert_glsl);
 	release_string(default_frag_glsl);
+	release_string(color_frag_glsl);
 	release_string(font_frag_glsl);
 	release_string(etc1_frag_glsl);
 	release_string(fan_frag_glsl);
@@ -629,6 +639,8 @@ static void init_vbo(LWCONTEXT *pLwc) {
 
 	// === STATIC MESHES (FAN TYPE) ===
 	load_fan_vbo(pLwc);
+
+	lwc_create_ui_vbo(pLwc);
 }
 
 void set_vertex_attrib_pointer(const LWCONTEXT* pLwc, int shader_index) {
@@ -693,7 +705,14 @@ static void init_vao(LWCONTEXT *pLwc, int shader_index) {
 	for (int i = 0; i < VERTEX_BUFFER_COUNT; i++) {
 		glBindVertexArray(pLwc->vao[i]);
 		glBindBuffer(GL_ARRAY_BUFFER, pLwc->vertex_buffer[i].vertex_buffer);
-		set_vertex_attrib_pointer(pLwc, shader_index);
+		if (i == LVT_UI_SCRAP_BG || i == LVT_UI_TOWER_BUTTON_BG)
+		{
+			set_vertex_attrib_pointer(pLwc, LWST_COLOR);
+		}
+		else
+		{
+			set_vertex_attrib_pointer(pLwc, shader_index);
+		}
 	}
 
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
@@ -1059,6 +1078,8 @@ void lwc_render(const LWCONTEXT* pLwc) {
 		lwc_render_physics(pLwc);
 	} else if (pLwc->game_scene == LGS_PARTICLE_SYSTEM) {
 		lwc_render_ps(pLwc);
+	} else if (pLwc->game_scene == LGS_UI) {
+		lwc_render_ui(pLwc);
 	}
 	// Rendering a system message
 	render_sys_msg(pLwc, pLwc->def_sys_msg);

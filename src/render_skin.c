@@ -94,7 +94,7 @@ void render_paramed_skin(const LWCONTEXT* pLwc,
 	enum _LW_SKIN_VBO_TYPE lvt,
 	const struct _LWANIMACTION* action,
 	const struct _LWARMATURE* armature,
-	float alpha_multiplier, float or , float og, float ob, float oratio,
+	float alpha_multiplier, float or, float og, float ob, float oratio,
 	const mat4x4 proj, const mat4x4 view, const mat4x4 model, double skin_time, int loop, quat* bone_q) {
 
 	int shader_index = LWST_SKIN;
@@ -233,7 +233,7 @@ void render_skin(const LWCONTEXT* pLwc,
 	enum _LW_SKIN_VBO_TYPE lvt,
 	const struct _LWANIMACTION* action,
 	const struct _LWARMATURE* armature,
-	float alpha_multiplier, float or , float og, float ob, float oratio,
+	float alpha_multiplier, float or, float og, float ob, float oratio,
 	const mat4x4 proj, const mat4x4 view, const mat4x4 model, double skin_time, int loop) {
 
 	quat bone_q[MAX_BONE];
@@ -249,7 +249,7 @@ void render_yaw_skin(const LWCONTEXT* pLwc,
 	enum _LW_SKIN_VBO_TYPE lvt,
 	const struct _LWANIMACTION* action,
 	const struct _LWARMATURE* armature,
-	float alpha_multiplier, float or , float og, float ob, float oratio,
+	float alpha_multiplier, float or, float og, float ob, float oratio,
 	const mat4x4 proj, const mat4x4 view, const mat4x4 model, double skin_time, int loop, float yaw) {
 
 	quat bone_q[MAX_BONE];
@@ -267,7 +267,7 @@ void render_skin_ui(const LWCONTEXT* pLwc,
 	enum _LW_SKIN_VBO_TYPE lvt,
 	const struct _LWANIMACTION* action,
 	const struct _LWARMATURE* armature,
-	float alpha_multiplier, float or , float og, float ob, float oratio, double skin_time) {
+	float alpha_multiplier, float or, float og, float ob, float oratio, double skin_time) {
 
 	mat4x4 model;
 	mat4x4 model_translate;

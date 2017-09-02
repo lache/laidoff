@@ -72,6 +72,12 @@ typedef enum _LW_ATLAS_ENUM
 	LAE_DEVIL_KTX,
 	LAE_CIRCLE_SHADOW_KTX,
 
+	LAE_BB_CATAPULT,
+	LAE_BB_CROSSBOW,
+	LAE_BB_GUNTOWER,
+	LAE_BB_PYRO,
+	LAE_BB_TURRET,
+
 	LAE_BEAM_KTX,
     
     LAE_COUNT,
@@ -145,6 +151,12 @@ static const char *tex_atlas_filename[] = {
 	ASSETS_BASE_PATH "ktx" PATH_SEPARATOR "pyro.ktx",
 	ASSETS_BASE_PATH "ktx" PATH_SEPARATOR "devil.ktx",
 	ASSETS_BASE_PATH "ktx" PATH_SEPARATOR "circle-shadow.ktx",
+
+	ASSETS_BASE_PATH "ktx" PATH_SEPARATOR "bb-catapult.ktx",
+	ASSETS_BASE_PATH "ktx" PATH_SEPARATOR "bb-crossbow.ktx",
+	ASSETS_BASE_PATH "ktx" PATH_SEPARATOR "bb-guntower.ktx",
+	ASSETS_BASE_PATH "ktx" PATH_SEPARATOR "bb-pyro.ktx",
+	ASSETS_BASE_PATH "ktx" PATH_SEPARATOR "bb-turret.ktx",
 
 	ASSETS_BASE_PATH "ktx" PATH_SEPARATOR "fx-beam.ktx",
 };
