@@ -15,17 +15,17 @@ extern "C" {;
 const char* logic_server_addr(int idx);
 void logic_udate_default_projection(LWCONTEXT* pLwc);
 void reset_runtime_context(LWCONTEXT* pLwc);
-void reset_runtime_context_async(LWCONTEXT *pLwc);
+void reset_runtime_context_async(LWCONTEXT* pLwc);
 void logic_start_logic_update_job(LWCONTEXT* pLwc);
 void logic_stop_logic_update_job(LWCONTEXT* pLwc);
 void logic_start_logic_update_job_async(LWCONTEXT* pLwc);
 void logic_stop_logic_update_job_async(LWCONTEXT* pLwc);
 
-void load_field_1_init_runtime_data(LWCONTEXT *pLwc);
-void load_field_2_init_runtime_data(LWCONTEXT *pLwc);
-void load_field_3_init_runtime_data(LWCONTEXT *pLwc);
-void load_field_4_init_runtime_data(LWCONTEXT *pLwc);
-void load_field_5_init_runtime_data(LWCONTEXT *pLwc);
+void load_field_1_init_runtime_data(LWCONTEXT* pLwc);
+void load_field_2_init_runtime_data(LWCONTEXT* pLwc);
+void load_field_3_init_runtime_data(LWCONTEXT* pLwc);
+void load_field_4_init_runtime_data(LWCONTEXT* pLwc);
+void load_field_5_init_runtime_data(LWCONTEXT* pLwc);
 
 #ifdef __cplusplus
 };

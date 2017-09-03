@@ -23,7 +23,7 @@ void get_dir_pad_center(float aspect_ratio, float *x, float *y) {
 	}
 }
 
-int lw_get_normalized_dir_pad_input(const LWCONTEXT *pLwc, float *dx, float *dy, float *dlen) {
+int lw_get_normalized_dir_pad_input(const LWCONTEXT* pLwc, float *dx, float *dy, float *dlen) {
 	if (!pLwc->dir_pad_dragging) {
 		return 0;
 	}
@@ -50,7 +50,7 @@ int lw_get_normalized_dir_pad_input(const LWCONTEXT *pLwc, float *dx, float *dy,
 	return 1;
 }
 
-void reset_dir_pad_position(LWCONTEXT *pLwc) {
+void reset_dir_pad_position(LWCONTEXT* pLwc) {
 	const float aspect_ratio = (float)pLwc->width / pLwc->height;
 
 	float dir_pad_center_x = 0;
@@ -61,7 +61,7 @@ void reset_dir_pad_position(LWCONTEXT *pLwc) {
 	pLwc->dir_pad_y = dir_pad_center_y;
 }
 
-static void convert_touch_coord_to_ui_coord(LWCONTEXT *pLwc, float *x, float *y) {
+static void convert_touch_coord_to_ui_coord(LWCONTEXT* pLwc, float *x, float *y) {
 	if (pLwc->height < pLwc->width) {
 		*x *= (float)pLwc->width / pLwc->height;
 	} else {
@@ -69,7 +69,7 @@ static void convert_touch_coord_to_ui_coord(LWCONTEXT *pLwc, float *x, float *y)
 	}
 }
 
-void lw_trigger_mouse_press(LWCONTEXT *pLwc, float x, float y) {
+void lw_trigger_mouse_press(LWCONTEXT* pLwc, float x, float y) {
 	if (!pLwc) {
 		return;
 	}
@@ -131,7 +131,7 @@ void lw_trigger_mouse_press(LWCONTEXT *pLwc, float x, float y) {
 	}
 }
 
-void lw_trigger_mouse_move(LWCONTEXT *pLwc, float x, float y) {
+void lw_trigger_mouse_move(LWCONTEXT* pLwc, float x, float y) {
 	if (!pLwc) {
 		return;
 	}
@@ -171,7 +171,7 @@ void lw_trigger_mouse_move(LWCONTEXT *pLwc, float x, float y) {
 	}
 }
 
-void lw_trigger_mouse_release(LWCONTEXT *pLwc, float x, float y) {
+void lw_trigger_mouse_release(LWCONTEXT* pLwc, float x, float y) {
 	if (!pLwc) {
 		return;
 	}
@@ -215,7 +215,7 @@ void lw_trigger_mouse_release(LWCONTEXT *pLwc, float x, float y) {
 	}
 }
 
-void lw_trigger_touch(LWCONTEXT *pLwc, float x, float y) {
+void lw_trigger_touch(LWCONTEXT* pLwc, float x, float y) {
 	if (!pLwc) {
 		return;
 	}
@@ -237,14 +237,14 @@ void lw_trigger_touch(LWCONTEXT *pLwc, float x, float y) {
 	}
 }
 
-void lw_trigger_reset(LWCONTEXT *pLwc) {
+void lw_trigger_reset(LWCONTEXT* pLwc) {
 	reset_runtime_context_async(pLwc);
 }
 
-void lw_trigger_play_sound(LWCONTEXT *pLwc) {
+void lw_trigger_play_sound(LWCONTEXT* pLwc) {
 }
 
-void lw_trigger_key_right(LWCONTEXT *pLwc) {
+void lw_trigger_key_right(LWCONTEXT* pLwc) {
 
 	// battle
 
@@ -284,7 +284,7 @@ void lw_trigger_key_right(LWCONTEXT *pLwc) {
 	}
 }
 
-void lw_trigger_key_left(LWCONTEXT *pLwc) {
+void lw_trigger_key_left(LWCONTEXT* pLwc) {
 
 	// battle
 
@@ -323,7 +323,7 @@ void lw_trigger_key_left(LWCONTEXT *pLwc) {
 	}
 }
 
-void lw_trigger_key_enter(LWCONTEXT *pLwc) {
+void lw_trigger_key_enter(LWCONTEXT* pLwc) {
 
 	// battle
 
@@ -342,34 +342,34 @@ void lw_trigger_key_enter(LWCONTEXT *pLwc) {
 	}
 }
 
-void lw_press_key_left(LWCONTEXT *pLwc) {
+void lw_press_key_left(LWCONTEXT* pLwc) {
 	pLwc->player_move_left = 1;
 }
 
-void lw_press_key_right(LWCONTEXT *pLwc) {
+void lw_press_key_right(LWCONTEXT* pLwc) {
 	pLwc->player_move_right = 1;
 }
 
-void lw_press_key_up(LWCONTEXT *pLwc) {
+void lw_press_key_up(LWCONTEXT* pLwc) {
 	pLwc->player_move_up = 1;
 }
 
-void lw_press_key_down(LWCONTEXT *pLwc) {
+void lw_press_key_down(LWCONTEXT* pLwc) {
 	pLwc->player_move_down = 1;
 }
 
-void lw_release_key_left(LWCONTEXT *pLwc) {
+void lw_release_key_left(LWCONTEXT* pLwc) {
 	pLwc->player_move_left = 0;
 }
 
-void lw_release_key_right(LWCONTEXT *pLwc) {
+void lw_release_key_right(LWCONTEXT* pLwc) {
 	pLwc->player_move_right = 0;
 }
 
-void lw_release_key_up(LWCONTEXT *pLwc) {
+void lw_release_key_up(LWCONTEXT* pLwc) {
 	pLwc->player_move_up = 0;
 }
 
-void lw_release_key_down(LWCONTEXT *pLwc) {
+void lw_release_key_down(LWCONTEXT* pLwc) {
 	pLwc->player_move_down = 0;
 }

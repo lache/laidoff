@@ -23,3 +23,8 @@ void render_solid_vb_ui_flip_y_uv_shader(const LWCONTEXT* pLwc,
 	GLuint tex_index,
 	enum _LW_VBO_TYPE lvt,
 	float alpha_multiplier, float or , float og, float ob, float oratio, int flip_y_uv, int shader_index);
+void render_solid_vb_ui_flip_y_uv_shader_rot(const LWCONTEXT* pLwc,
+	float x, float y, float w, float h,
+	GLuint tex_index,
+	enum _LW_VBO_TYPE lvt,
+	float alpha_multiplier, float or , float og, float ob, float oratio, int flip_y_uv, int shader_index, float rot);

@@ -59,5 +59,6 @@ typedef struct _LWSHADER {
 	GLint u_eColorEnd;
 	GLint u_Texture;
 	GLint u_TextureAlpha;
-
+	GLint time;
+	GLint resolution;
 } LWSHADER;

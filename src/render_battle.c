@@ -159,7 +159,7 @@ void render_enemy_scope(const LWCONTEXT* pLwc, float ux, float uy, float width, 
 }
 
 void render_enemy_shadow_3d(
-	const LWCONTEXT *pLwc,
+	const LWCONTEXT* pLwc,
 	float x,
 	float y,
 	float z,
@@ -211,7 +211,7 @@ void render_enemy_shadow_3d(
 }
 
 void render_enemy_3d(
-	const LWCONTEXT *pLwc,
+	const LWCONTEXT* pLwc,
 	const LWENEMY* enemy,
 	int selected,
 	float overlay[5],
@@ -308,7 +308,7 @@ void render_enemy_3d(
 }
 
 void render_attack_trail_3d(
-	const LWCONTEXT *pLwc,
+	const LWCONTEXT* pLwc,
 	const LWTRAIL* trail,
 	const mat4x4 view,
 	const mat4x4 proj) {
@@ -387,7 +387,7 @@ void render_attack_trail_3d(
 }
 
 void render_damage_text_3d(
-	const LWCONTEXT *pLwc,
+	const LWCONTEXT* pLwc,
 	const LWDAMAGETEXT* damage_text,
 	const mat4x4 view,
 	const mat4x4 proj) {

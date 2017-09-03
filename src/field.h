@@ -41,8 +41,8 @@ typedef struct _LWNAV LWNAV;
 typedef struct _LWFIELDMESH LWFIELDMESH;
 typedef struct _LWPS LWPS;
 
-void move_player(LWCONTEXT *pLwc);
-void resolve_player_event_collision(LWCONTEXT *pLwc);
+void move_player(LWCONTEXT* pLwc);
+void resolve_player_event_collision(LWCONTEXT* pLwc);
 LWFIELD* load_field(const char* filename);
 void unload_field(LWFIELD* field);
 void update_field(LWCONTEXT* pLwc, LWFIELD* field);

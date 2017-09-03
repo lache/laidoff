@@ -31,6 +31,15 @@ void render_solid_vb_ui_flip_y_uv_shader(const LWCONTEXT* pLwc,
 	GLuint tex_index,
 	enum _LW_VBO_TYPE lvt,
 	float alpha_multiplier, float or, float og, float ob, float oratio, int flip_y_uv, int shader_index) {
+
+	render_solid_vb_ui_flip_y_uv_shader_rot(pLwc, x, y, w, h, tex_index, lvt, alpha_multiplier, or, og, ob, oratio, flip_y_uv, shader_index, 0);
+}
+
+void render_solid_vb_ui_flip_y_uv_shader_rot(const LWCONTEXT* pLwc,
+	float x, float y, float w, float h,
+	GLuint tex_index,
+	enum _LW_VBO_TYPE lvt,
+	float alpha_multiplier, float or, float og, float ob, float oratio, int flip_y_uv, int shader_index, float rot) {
 	
 	glUseProgram(pLwc->shader[shader_index].program);
 	glUniform2fv(pLwc->shader[shader_index].vuvoffset_location, 1, default_uv_offset);
@@ -51,12 +60,14 @@ void render_solid_vb_ui_flip_y_uv_shader(const LWCONTEXT* pLwc,
 	mat4x4 view_model;
 	mat4x4 proj_view_model;
 	mat4x4 model_scale;
+	mat4x4 model_scale_rotate;
 
 	mat4x4_identity(model_scale);
 	mat4x4_scale_aniso(model_scale, model_scale, ui_scale_x, ui_scale_y, 1.0f);
+	mat4x4_rotate_Z(model_scale_rotate, model_scale, rot);
 	mat4x4_translate(model_translate, x, y, 0);
 	mat4x4_identity(model);
-	mat4x4_mul(model, model_translate, model_scale);
+	mat4x4_mul(model, model_translate, model_scale_rotate);
 	mat4x4_mul(view_model, identity_view, model);
 	mat4x4_identity(proj_view_model);
 	mat4x4_mul(proj_view_model, pLwc->proj, view_model);

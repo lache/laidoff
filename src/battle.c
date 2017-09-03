@@ -11,14 +11,14 @@
 #include "laidoff.h"
 #include "sound.h"
 
-int calculate_and_apply_attack_1_on_1(LWCONTEXT *pLwc, LWBATTLECREATURE* ca, const LWSKILL* s, LWBATTLECREATURE* cb,
+int calculate_and_apply_attack_1_on_1(LWCONTEXT* pLwc, LWBATTLECREATURE* ca, const LWSKILL* s, LWBATTLECREATURE* cb,
 	LWBATTLECOMMANDRESULT* cmd_result_a, LWBATTLECOMMANDRESULT* cmd_result_b);
 void play_enemy_hp_desc_anim(LWCONTEXT* pLwc, LWENEMY* enemy, int enemy_slot,
 	const LWBATTLECOMMANDRESULT* cmd_result_a, const LWBATTLECOMMANDRESULT* cmd_result_b);
 int get_alive_enemy_count(struct _LWCONTEXT* pLwc);
 void exec_player_win(struct _LWCONTEXT* pLwc);
 
-int spawn_attack_trail(LWCONTEXT *pLwc, float x, float y, float z) {
+int spawn_attack_trail(LWCONTEXT* pLwc, float x, float y, float z) {
 	for (int i = 0; i < MAX_TRAIL; i++) {
 		if (!pLwc->trail[i].valid) {
 			pLwc->trail[i].x = x;
@@ -105,7 +105,7 @@ void revert_battle_cam_and_update_player_turn(LWCONTEXT* pLwc) {
 	}
 }
 
-void update_attack_trail(LWCONTEXT *pLwc) {
+void update_attack_trail(LWCONTEXT* pLwc) {
 	for (int i = 0; i < MAX_TRAIL; i++) {
 		if (pLwc->trail[i].valid) {
 			pLwc->trail[i].age += (float)lwcontext_delta_time(pLwc);
@@ -121,7 +121,7 @@ void update_attack_trail(LWCONTEXT *pLwc) {
 	}
 }
 
-int spawn_damage_text_color(LWCONTEXT *pLwc, float x, float y, float z, const char *text, LW_DAMAGE_TEXT_COORD coord, float r, float g, float b) {
+int spawn_damage_text_color(LWCONTEXT* pLwc, float x, float y, float z, const char *text, LW_DAMAGE_TEXT_COORD coord, float r, float g, float b) {
 	for (int i = 0; i < MAX_DAMAGE_TEXT; i++) {
 		if (!pLwc->damage_text[i].valid) {
 			LWDAMAGETEXT *dt = &pLwc->damage_text[i];
@@ -163,15 +163,15 @@ int spawn_damage_text_color(LWCONTEXT *pLwc, float x, float y, float z, const ch
 }
 
 
-int spawn_damage_text(LWCONTEXT *pLwc, float x, float y, float z, const char *text, LW_DAMAGE_TEXT_COORD coord) {
+int spawn_damage_text(LWCONTEXT* pLwc, float x, float y, float z, const char *text, LW_DAMAGE_TEXT_COORD coord) {
 	return spawn_damage_text_color(pLwc, x, y, z, text, coord, 1.00f, 0.25f, 0.25f);
 }
 
-int spawn_exp_text(LWCONTEXT *pLwc, float x, float y, float z, const char *text, LW_DAMAGE_TEXT_COORD coord) {
+int spawn_exp_text(LWCONTEXT* pLwc, float x, float y, float z, const char *text, LW_DAMAGE_TEXT_COORD coord) {
 	return spawn_damage_text_color(pLwc, x, y, z, text, coord, 90/255.0f, 173/255.0f, 255/255.0f);
 }
 
-void update_damage_text(LWCONTEXT *pLwc) {
+void update_damage_text(LWCONTEXT* pLwc) {
 	for (int i = 0; i < MAX_TRAIL; i++) {
 		if (pLwc->damage_text[i].valid) {
 			pLwc->damage_text[i].age += (float)lwcontext_delta_time(pLwc);

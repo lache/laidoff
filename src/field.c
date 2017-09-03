@@ -160,7 +160,7 @@ dReal get_dreal_min() {
 #endif
 }
 
-void move_player(LWCONTEXT *pLwc) {
+void move_player(LWCONTEXT* pLwc) {
 	if (pLwc->game_scene == LGS_FIELD) {
 		const float move_speed = 3.5f;
 		const float move_speed_delta = (float)(lwcontext_delta_time(pLwc) * move_speed);
@@ -233,7 +233,7 @@ static void resolve_collision_one_fixed(LWCONTEXT* pLwc, const LWBOX2DCOLLIDER *
 	}
 }
 
-void resolve_player_event_collision(LWCONTEXT *pLwc) {
+void resolve_player_event_collision(LWCONTEXT* pLwc) {
 	if (!pLwc->field) {
 		return;
 	}

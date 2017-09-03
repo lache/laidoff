@@ -103,14 +103,14 @@ HRESULT init_ext_sound_lib();
 void destroy_ext_sound_lib();
 void create_image(const char *filename, LWBITMAPCONTEXT *pBitmapContext, int tex_atlas_index);
 void release_image(LWBITMAPCONTEXT *pBitmapContext);
-void lwc_render(const LWCONTEXT *pLwc);
-void lwc_render_battle(const LWCONTEXT *pLwc);
-void lwc_render_dialog(const LWCONTEXT *pLwc);
-void lwc_render_field(const LWCONTEXT *pLwc);
-void init_load_textures(LWCONTEXT *pLwc);
-void load_test_font(LWCONTEXT *pLwc);
+void lwc_render(const LWCONTEXT* pLwc);
+void lwc_render_battle(const LWCONTEXT* pLwc);
+void lwc_render_dialog(const LWCONTEXT* pLwc);
+void lwc_render_field(const LWCONTEXT* pLwc);
+void init_load_textures(LWCONTEXT* pLwc);
+void load_test_font(LWCONTEXT* pLwc);
 int LoadObjAndConvert(float bmin[3], float bmax[3], const char *filename);
-int spawn_attack_trail(LWCONTEXT *pLwc, float x, float y, float z);
+int spawn_attack_trail(LWCONTEXT* pLwc, float x, float y, float z);
 float get_battle_enemy_x_center(int enemy_slot_index);
 void init_font_fbo(LWCONTEXT* pLwc);
 
@@ -143,7 +143,7 @@ unsigned int swap_4_bytes(unsigned int num) {
 		((num << 24) & 0xff000000); // byte 0 to byte 3
 }
 
-void set_texture_parameter_values(const LWCONTEXT *pLwc, float x, float y, float w, float h,
+void set_texture_parameter_values(const LWCONTEXT* pLwc, float x, float y, float w, float h,
 	float atlas_w, float atlas_h, int shader_index) {
 
 	const float offset[2] = {
@@ -161,7 +161,7 @@ void set_texture_parameter_values(const LWCONTEXT *pLwc, float x, float y, float
 }
 
 void
-set_texture_parameter(const LWCONTEXT *pLwc, LWENUM _LW_ATLAS_ENUM lae, LWENUM _LW_ATLAS_SPRITE las) {
+set_texture_parameter(const LWCONTEXT* pLwc, LWENUM _LW_ATLAS_ENUM lae, LWENUM _LW_ATLAS_SPRITE las) {
 	set_texture_parameter_values(
 		pLwc,
 		(float)pLwc->sprite_data[las].x,
@@ -274,8 +274,7 @@ create_shader(const char *shader_name, LWSHADER *pShader, const GLchar *vst, con
 	pShader->vs9offset_location = glGetUniformLocation(pShader->program, "vS9Offset");
 	pShader->alpha_multiplier_location = glGetUniformLocation(pShader->program, "alpha_multiplier");
 	pShader->overlay_color_location = glGetUniformLocation(pShader->program, "overlay_color");
-	pShader->overlay_color_ratio_location = glGetUniformLocation(pShader->program,
-		"overlay_color_ratio");
+	pShader->overlay_color_ratio_location = glGetUniformLocation(pShader->program, "overlay_color_ratio");
 	pShader->diffuse_location = glGetUniformLocation(pShader->program, "diffuse");
 	pShader->alpha_only_location = glGetUniformLocation(pShader->program, "alpha_only");
 	pShader->glyph_color_location = glGetUniformLocation(pShader->program, "glyph_color");
@@ -302,6 +301,8 @@ create_shader(const char *shader_name, LWSHADER *pShader, const GLchar *vst, con
 	pShader->u_eColorEnd = glGetUniformLocation(pShader->program, "u_eColorEnd");
 	pShader->u_Texture = glGetUniformLocation(pShader->program, "u_Texture");
 	pShader->u_TextureAlpha = glGetUniformLocation(pShader->program, "u_TextureAlpha");
+	pShader->time = glGetUniformLocation(pShader->program, "time");
+	pShader->resolution = glGetUniformLocation(pShader->program, "resolution");
 
 	// Attribs
 	pShader->vpos_location = glGetAttribLocation(pShader->program, "vPos");
@@ -322,7 +323,7 @@ create_shader(const char *shader_name, LWSHADER *pShader, const GLchar *vst, con
 	pShader->valid = 1;
 }
 
-void init_gl_shaders(LWCONTEXT *pLwc) {
+void init_gl_shaders(LWCONTEXT* pLwc) {
 
 //#if LW_PLATFORM_WIN32 || LW_PLATFORM_OSX
 #define GLSL_DIR_NAME "glsl"
@@ -347,6 +348,8 @@ void init_gl_shaders(LWCONTEXT *pLwc) {
 		GLSL_DIR_NAME PATH_SEPARATOR "default-frag.glsl");
 	char *color_frag_glsl = create_string_from_file(ASSETS_BASE_PATH
 		GLSL_DIR_NAME PATH_SEPARATOR "color-frag.glsl");
+	char *panel_frag_glsl = create_string_from_file(ASSETS_BASE_PATH
+		GLSL_DIR_NAME PATH_SEPARATOR "panel-frag.glsl");
 	char *font_frag_glsl = create_string_from_file(ASSETS_BASE_PATH
 		GLSL_DIR_NAME PATH_SEPARATOR "font-frag.glsl");
 	char *etc1_frag_glsl = create_string_from_file(ASSETS_BASE_PATH
@@ -393,6 +396,11 @@ void init_gl_shaders(LWCONTEXT *pLwc) {
 		return;
 	}
 
+	if (!panel_frag_glsl) {
+		LOGE("init_gl_shaders: panel-frag.glsl not loaded. Abort...");
+		return;
+	}
+
 	if (!font_frag_glsl) {
 		LOGE("init_gl_shaders: font-frag.glsl not loaded. Abort...");
 		return;
@@ -426,6 +434,7 @@ void init_gl_shaders(LWCONTEXT *pLwc) {
 	create_shader("Emitter Shader", &pLwc->shader[LWST_EMITTER], emitter_vert_glsl, emitter_frag_glsl);
 	create_shader("Emitter2 Shader", &pLwc->shader[LWST_EMITTER2], emitter2_vert_glsl, emitter2_frag_glsl);
 	create_shader("Color Shader", &pLwc->shader[LWST_COLOR], default_vert_glsl, color_frag_glsl);
+	create_shader("Panel Shader", &pLwc->shader[LWST_PANEL], default_vert_glsl, panel_frag_glsl);
 
 	release_string(default_vert_glsl);
 	release_string(skin_vert_glsl);
@@ -434,6 +443,7 @@ void init_gl_shaders(LWCONTEXT *pLwc) {
 	release_string(emitter2_vert_glsl);
 	release_string(default_frag_glsl);
 	release_string(color_frag_glsl);
+	release_string(panel_frag_glsl);
 	release_string(font_frag_glsl);
 	release_string(etc1_frag_glsl);
 	release_string(fan_frag_glsl);
@@ -441,7 +451,7 @@ void init_gl_shaders(LWCONTEXT *pLwc) {
 	release_string(emitter2_frag_glsl);
 }
 
-static void load_vbo(LWCONTEXT *pLwc, const char *filename, LWVBO *pVbo) {
+static void load_vbo(LWCONTEXT* pLwc, const char *filename, LWVBO *pVbo) {
 	GLuint vbo = 0;
 	glGenBuffers(1, &vbo);
 	glBindBuffer(GL_ARRAY_BUFFER, vbo);
@@ -457,7 +467,7 @@ static void load_vbo(LWCONTEXT *pLwc, const char *filename, LWVBO *pVbo) {
 	pVbo->vertex_count = (int)(mesh_file_size / stride_in_bytes);
 }
 
-static void load_skin_vbo(LWCONTEXT *pLwc, const char *filename, LWVBO *pSvbo) {
+static void load_skin_vbo(LWCONTEXT* pLwc, const char *filename, LWVBO *pSvbo) {
 	GLuint vbo = 0;
 	glGenBuffers(1, &vbo);
 	glBindBuffer(GL_ARRAY_BUFFER, vbo);
@@ -491,7 +501,7 @@ static void load_fan_vbo(LWCONTEXT* pLwc) {
 	pLwc->fan_vertex_buffer[LFVT_DEFAULT].vertex_count = FAN_VERTEX_COUNT_PER_ARRAY;
 }
 
-static void init_vbo(LWCONTEXT *pLwc) {
+static void init_vbo(LWCONTEXT* pLwc) {
 
 	// === STATIC MESHES ===
 
@@ -698,19 +708,18 @@ void set_ps_vertex_attrib_pointer(const LWCONTEXT* pLwc, int shader_index) {
 	glVertexAttribPointer(pLwc->shader[shader_index].a_pColorOffset, 3, GL_FLOAT, GL_FALSE, sizeof(LWPARTICLE2), (void*)(LWOFFSETOF(LWPARTICLE2, pColorOffset)));
 }
 
-static void init_vao(LWCONTEXT *pLwc, int shader_index) {
+static void init_vao(LWCONTEXT* pLwc, int shader_index) {
 	// Vertex Array Objects
 #if LW_SUPPORT_VAO
 	glGenVertexArrays(VERTEX_BUFFER_COUNT, pLwc->vao);
 	for (int i = 0; i < VERTEX_BUFFER_COUNT; i++) {
 		glBindVertexArray(pLwc->vao[i]);
 		glBindBuffer(GL_ARRAY_BUFFER, pLwc->vertex_buffer[i].vertex_buffer);
-		if (i == LVT_UI_SCRAP_BG || i == LVT_UI_TOWER_BUTTON_BG)
-		{
+		if (i == LVT_UI_SCRAP_BG || i == LVT_UI_TOWER_BUTTON_BG || i == LVT_UI_LEFT_BUTTON_BG) {
 			set_vertex_attrib_pointer(pLwc, LWST_COLOR);
-		}
-		else
-		{
+		} else if (i == LVT_UI_FULL_PANEL_BG) {
+			set_vertex_attrib_pointer(pLwc, LWST_PANEL);
+		} else {
 			set_vertex_attrib_pointer(pLwc, shader_index);
 		}
 	}
@@ -720,7 +729,7 @@ static void init_vao(LWCONTEXT *pLwc, int shader_index) {
 #endif
 }
 
-static void init_skin_vao(LWCONTEXT *pLwc, int shader_index) {
+static void init_skin_vao(LWCONTEXT* pLwc, int shader_index) {
 	// Skin Vertex Array Objects
 #if LW_SUPPORT_VAO
 	glGenVertexArrays(SKIN_VERTEX_BUFFER_COUNT, pLwc->skin_vao);
@@ -735,7 +744,7 @@ static void init_skin_vao(LWCONTEXT *pLwc, int shader_index) {
 #endif
 }
 
-static void init_fan_vao(LWCONTEXT *pLwc, int shader_index) {
+static void init_fan_vao(LWCONTEXT* pLwc, int shader_index) {
 	// Skin Vertex Array Objects
 #if LW_SUPPORT_VAO
 	glGenVertexArrays(FAN_VERTEX_BUFFER_COUNT, pLwc->fan_vao);
@@ -750,7 +759,7 @@ static void init_fan_vao(LWCONTEXT *pLwc, int shader_index) {
 #endif
 }
 
-static void init_ps_vao(LWCONTEXT *pLwc, int shader_index) {
+static void init_ps_vao(LWCONTEXT* pLwc, int shader_index) {
 	// Particle System Vertex Array Objects
 #if LW_SUPPORT_VAO
 	glGenVertexArrays(PS_VERTEX_BUFFER_COUNT, pLwc->ps_vao);
@@ -775,7 +784,7 @@ void init_ps(LWCONTEXT* pLwc) {
 	ps_load_particles(pLwc);
 }
 
-static void init_gl_context(LWCONTEXT *pLwc) {
+static void init_gl_context(LWCONTEXT* pLwc) {
 	init_gl_shaders(pLwc);
 
 	init_vbo(pLwc);
@@ -868,7 +877,7 @@ unsigned long hash(const unsigned char *str) {
 	return hash;
 }
 
-int get_tex_index_by_hash_key(const LWCONTEXT *pLwc, const char *hash_key) {
+int get_tex_index_by_hash_key(const LWCONTEXT* pLwc, const char *hash_key) {
 	unsigned long h = hash((const unsigned char *)hash_key);
 	for (int i = 0; i < MAX_TEX_ATLAS; i++) {
 		if (pLwc->tex_atlas_hash[i] == h) {
@@ -1089,7 +1098,7 @@ void lwc_render(const LWCONTEXT* pLwc) {
 	lwcontext_set_rendering((LWCONTEXT*)pLwc, 0);
 }
 
-static void bind_all_vertex_attrib_shader(const LWCONTEXT *pLwc, int shader_index, int vbo_index) {
+static void bind_all_vertex_attrib_shader(const LWCONTEXT* pLwc, int shader_index, int vbo_index) {
 #if LW_PLATFORM_WIN32 || LW_PLATFORM_OSX
 	glBindVertexArray(pLwc->vao[vbo_index]);
 #else
@@ -1097,7 +1106,7 @@ static void bind_all_vertex_attrib_shader(const LWCONTEXT *pLwc, int shader_inde
 #endif
 }
 
-static void bind_all_skin_vertex_attrib_shader(const LWCONTEXT *pLwc, int shader_index, int vbo_index) {
+static void bind_all_skin_vertex_attrib_shader(const LWCONTEXT* pLwc, int shader_index, int vbo_index) {
 #if LW_PLATFORM_WIN32 || LW_PLATFORM_OSX
 	glBindVertexArray(pLwc->skin_vao[vbo_index]);
 #else
@@ -1105,7 +1114,7 @@ static void bind_all_skin_vertex_attrib_shader(const LWCONTEXT *pLwc, int shader
 #endif
 }
 
-static void bind_all_fan_vertex_attrib_shader(const LWCONTEXT *pLwc, int shader_index, int vbo_index) {
+static void bind_all_fan_vertex_attrib_shader(const LWCONTEXT* pLwc, int shader_index, int vbo_index) {
 #if LW_PLATFORM_WIN32 || LW_PLATFORM_OSX
 	glBindVertexArray(pLwc->fan_vao[vbo_index]);
 #else
@@ -1113,7 +1122,7 @@ static void bind_all_fan_vertex_attrib_shader(const LWCONTEXT *pLwc, int shader_
 #endif
 }
 
-static void bind_all_ps_vertex_attrib_shader(const LWCONTEXT *pLwc, int shader_index, int vbo_index) {
+static void bind_all_ps_vertex_attrib_shader(const LWCONTEXT* pLwc, int shader_index, int vbo_index) {
 #if LW_PLATFORM_WIN32 || LW_PLATFORM_OSX
 	glBindVertexArray(pLwc->ps_vao[vbo_index]);
 #else
@@ -1121,27 +1130,27 @@ static void bind_all_ps_vertex_attrib_shader(const LWCONTEXT *pLwc, int shader_i
 #endif
 }
 
-void bind_all_vertex_attrib(const LWCONTEXT *pLwc, int vbo_index) {
+void bind_all_vertex_attrib(const LWCONTEXT* pLwc, int vbo_index) {
 	bind_all_vertex_attrib_shader(pLwc, LWST_DEFAULT, vbo_index);
 }
 
-void bind_all_vertex_attrib_font(const LWCONTEXT *pLwc, int vbo_index) {
+void bind_all_vertex_attrib_font(const LWCONTEXT* pLwc, int vbo_index) {
 	bind_all_vertex_attrib_shader(pLwc, LWST_FONT, vbo_index);
 }
 
-void bind_all_vertex_attrib_etc1_with_alpha(const LWCONTEXT *pLwc, int vbo_index) {
+void bind_all_vertex_attrib_etc1_with_alpha(const LWCONTEXT* pLwc, int vbo_index) {
 	bind_all_vertex_attrib_shader(pLwc, LWST_ETC1, vbo_index);
 }
 
-void bind_all_skin_vertex_attrib(const LWCONTEXT *pLwc, int vbo_index) {
+void bind_all_skin_vertex_attrib(const LWCONTEXT* pLwc, int vbo_index) {
 	bind_all_skin_vertex_attrib_shader(pLwc, LWST_SKIN, vbo_index);
 }
 
-void bind_all_fan_vertex_attrib(const LWCONTEXT *pLwc, int vbo_index) {
+void bind_all_fan_vertex_attrib(const LWCONTEXT* pLwc, int vbo_index) {
 	bind_all_fan_vertex_attrib_shader(pLwc, LWST_FAN, vbo_index);
 }
 
-void bind_all_ps_vertex_attrib(const LWCONTEXT *pLwc, int vbo_index) {
+void bind_all_ps_vertex_attrib(const LWCONTEXT* pLwc, int vbo_index) {
 	bind_all_ps_vertex_attrib_shader(pLwc, LWST_EMITTER2, vbo_index);
 }
 
@@ -1214,7 +1223,7 @@ static void load_png_pkm_sw_decoding(LWCONTEXT* pLwc, int i) {
 	}
 }
 
-static void load_tex_files(LWCONTEXT *pLwc) {
+static void load_tex_files(LWCONTEXT* pLwc) {
 	glGenTextures(MAX_TEX_ATLAS, pLwc->tex_atlas);
 
 	for (int i = 0; i < MAX_TEX_ATLAS; i++) {
@@ -1249,7 +1258,7 @@ static void load_tex_files(LWCONTEXT *pLwc) {
 	}
 }
 
-void init_load_textures(LWCONTEXT *pLwc) {
+void init_load_textures(LWCONTEXT* pLwc) {
 	// Sprites
 
 	load_tex_files(pLwc);
@@ -1266,7 +1275,7 @@ void init_load_textures(LWCONTEXT *pLwc) {
 
 }
 
-void load_test_font(LWCONTEXT *pLwc) {
+void load_test_font(LWCONTEXT* pLwc) {
 	glGenTextures(MAX_TEX_FONT_ATLAS, pLwc->tex_font_atlas);
 
 	for (int i = 0; i < MAX_TEX_FONT_ATLAS; i++) {
@@ -1332,7 +1341,7 @@ LWCONTEXT* lw_init_initial_size(int width, int height) {
 
 	//test_image();
 
-	LWCONTEXT *pLwc = (LWCONTEXT *)calloc(1, sizeof(LWCONTEXT));
+	LWCONTEXT* pLwc = (LWCONTEXT *)calloc(1, sizeof(LWCONTEXT));
 
 	pLwc->width = width;
 	pLwc->height = height;
@@ -1372,7 +1381,7 @@ LWCONTEXT *lw_init(void) {
 	return lw_init_initial_size(0, 0);
 }
 
-void lw_set_size(LWCONTEXT *pLwc, int w, int h) {
+void lw_set_size(LWCONTEXT* pLwc, int w, int h) {
 	pLwc->width = w;
 	pLwc->height = h;
 	// Update default projection matrix (pLwc->proj)
@@ -1385,27 +1394,27 @@ void lw_set_size(LWCONTEXT *pLwc, int w, int h) {
 	reset_dir_pad_position(pLwc);
 }
 
-void lw_set_window(LWCONTEXT *pLwc, struct GLFWwindow *window) {
+void lw_set_window(LWCONTEXT* pLwc, struct GLFWwindow *window) {
 	pLwc->window = window;
 }
 
-struct GLFWwindow *lw_get_window(const LWCONTEXT *pLwc) {
+struct GLFWwindow *lw_get_window(const LWCONTEXT* pLwc) {
 	return pLwc->window;
 }
 
-int lw_get_game_scene(LWCONTEXT *pLwc) {
+int lw_get_game_scene(LWCONTEXT* pLwc) {
 	return pLwc->game_scene;
 }
 
-int lw_get_update_count(LWCONTEXT *pLwc) {
+int lw_get_update_count(LWCONTEXT* pLwc) {
 	return pLwc->update_count;
 }
 
-int lw_get_render_count(LWCONTEXT *pLwc) {
+int lw_get_render_count(LWCONTEXT* pLwc) {
 	return pLwc->render_count;
 }
 
-void lw_deinit(LWCONTEXT *pLwc) {
+void lw_deinit(LWCONTEXT* pLwc) {
 
 	for (int i = 0; i < LVT_COUNT; i++) {
 		glDeleteBuffers(1, &pLwc->vertex_buffer[i].vertex_buffer);
@@ -1454,7 +1463,7 @@ void lw_deinit(LWCONTEXT *pLwc) {
 	free(pLwc);
 }
 
-void lw_on_destroy(LWCONTEXT *pLwc) {
+void lw_on_destroy(LWCONTEXT* pLwc) {
 	release_font(pLwc->pFnt);
 	release_string(pLwc->dialog);
 	deinit_net(pLwc);
@@ -1463,7 +1472,7 @@ void lw_on_destroy(LWCONTEXT *pLwc) {
 	mq_shutdown();
 }
 
-void lw_set_kp(LWCONTEXT *pLwc, int kp) {
+void lw_set_kp(LWCONTEXT* pLwc, int kp) {
 	pLwc->kp = kp;
 }
 

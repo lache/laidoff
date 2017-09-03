@@ -25,45 +25,45 @@ static const char* server_addr[] = {
 	"222.110.4.119", // private dev
 };
 
-static void reinit_mq(LWCONTEXT *pLwc);
+static void reinit_mq(LWCONTEXT* pLwc);
 
-void change_to_field(LWCONTEXT *pLwc) {
+void change_to_field(LWCONTEXT* pLwc) {
 	pLwc->next_game_scene = LGS_FIELD;
 }
 
-void change_to_dialog(LWCONTEXT *pLwc) {
+void change_to_dialog(LWCONTEXT* pLwc) {
 	pLwc->next_game_scene = LGS_DIALOG;
 }
 
-void change_to_battle(LWCONTEXT *pLwc) {
+void change_to_battle(LWCONTEXT* pLwc) {
 	pLwc->next_game_scene = LGS_BATTLE;
 }
 
-void change_to_font_test(LWCONTEXT *pLwc) {
+void change_to_font_test(LWCONTEXT* pLwc) {
 	pLwc->next_game_scene = LGS_FONT_TEST;
 }
 
-void change_to_admin(LWCONTEXT *pLwc) {
+void change_to_admin(LWCONTEXT* pLwc) {
 	pLwc->next_game_scene = LGS_ADMIN;
 }
 
-void change_to_battle_result(LWCONTEXT *pLwc) {
+void change_to_battle_result(LWCONTEXT* pLwc) {
 	pLwc->next_game_scene = LGS_BATTLE_RESULT;
 }
 
-void change_to_skin(LWCONTEXT *pLwc) {
+void change_to_skin(LWCONTEXT* pLwc) {
 	pLwc->next_game_scene = LGS_SKIN;
 }
 
-void change_to_physics(LWCONTEXT *pLwc) {
+void change_to_physics(LWCONTEXT* pLwc) {
 	pLwc->next_game_scene = LGS_PHYSICS;
 }
 
-void change_to_particle_system(LWCONTEXT *pLwc) {
+void change_to_particle_system(LWCONTEXT* pLwc) {
 	pLwc->next_game_scene = LGS_PARTICLE_SYSTEM;
 }
 
-void change_to_ui(LWCONTEXT *pLwc) {
+void change_to_ui(LWCONTEXT* pLwc) {
 	pLwc->next_game_scene = LGS_UI;
 }
 
@@ -137,7 +137,7 @@ void logic_stop_logic_update_job_async(LWCONTEXT* pLwc) {
 	}
 }
 
-void load_field_1_init_runtime_data_async(LWCONTEXT *pLwc, zactor_t* actor) {
+void load_field_1_init_runtime_data_async(LWCONTEXT* pLwc, zactor_t* actor) {
 	pLwc->next_game_scene = LGS_FIELD;
 	zmsg_t* msg = zmsg_new();
 	LWMSGINITFIELD m = {
@@ -157,11 +157,11 @@ void load_field_1_init_runtime_data_async(LWCONTEXT *pLwc, zactor_t* actor) {
 	}
 }
 
-void load_field_1_init_runtime_data(LWCONTEXT *pLwc) {
+void load_field_1_init_runtime_data(LWCONTEXT* pLwc) {
 	load_field_1_init_runtime_data_async(pLwc, pLwc->logic_actor);
 }
 
-void load_field_2_init_runtime_data_async(LWCONTEXT *pLwc, zactor_t* actor) {
+void load_field_2_init_runtime_data_async(LWCONTEXT* pLwc, zactor_t* actor) {
 	pLwc->next_game_scene = LGS_FIELD;
 	zmsg_t* msg = zmsg_new();
 	LWMSGINITFIELD m = {
@@ -181,11 +181,11 @@ void load_field_2_init_runtime_data_async(LWCONTEXT *pLwc, zactor_t* actor) {
 	}
 }
 
-void load_field_2_init_runtime_data(LWCONTEXT *pLwc) {
+void load_field_2_init_runtime_data(LWCONTEXT* pLwc) {
 	load_field_2_init_runtime_data_async(pLwc, pLwc->logic_actor);
 }
 
-void load_field_3_init_runtime_data_async(LWCONTEXT *pLwc, zactor_t* actor) {
+void load_field_3_init_runtime_data_async(LWCONTEXT* pLwc, zactor_t* actor) {
 	pLwc->next_game_scene = LGS_FIELD;
 	zmsg_t* msg = zmsg_new();
 	LWMSGINITFIELD m = {
@@ -205,11 +205,11 @@ void load_field_3_init_runtime_data_async(LWCONTEXT *pLwc, zactor_t* actor) {
 	}
 }
 
-void load_field_3_init_runtime_data(LWCONTEXT *pLwc) {
+void load_field_3_init_runtime_data(LWCONTEXT* pLwc) {
 	load_field_3_init_runtime_data_async(pLwc, pLwc->logic_actor);
 }
 
-void load_field_4_init_runtime_data_async(LWCONTEXT *pLwc, zactor_t* actor) {
+void load_field_4_init_runtime_data_async(LWCONTEXT* pLwc, zactor_t* actor) {
 	pLwc->next_game_scene = LGS_FIELD;
 	zmsg_t* msg = zmsg_new();
 	LWMSGINITFIELD m = {
@@ -229,11 +229,11 @@ void load_field_4_init_runtime_data_async(LWCONTEXT *pLwc, zactor_t* actor) {
 	}
 }
 
-void load_field_4_init_runtime_data(LWCONTEXT *pLwc) {
+void load_field_4_init_runtime_data(LWCONTEXT* pLwc) {
 	load_field_4_init_runtime_data_async(pLwc, pLwc->logic_actor);
 }
 
-void load_field_5_init_runtime_data_async(LWCONTEXT *pLwc, zactor_t* actor) {
+void load_field_5_init_runtime_data_async(LWCONTEXT* pLwc, zactor_t* actor) {
 	pLwc->next_game_scene = LGS_FIELD;
 	zmsg_t* msg = zmsg_new();
 	LWMSGINITFIELD m = {
@@ -254,11 +254,11 @@ void load_field_5_init_runtime_data_async(LWCONTEXT *pLwc, zactor_t* actor) {
 	}
 }
 
-void load_field_5_init_runtime_data(LWCONTEXT *pLwc) {
+void load_field_5_init_runtime_data(LWCONTEXT* pLwc) {
 	load_field_5_init_runtime_data_async(pLwc, pLwc->logic_actor);
 }
 
-void load_scene_async(LWCONTEXT *pLwc, zactor_t* actor, LW_GAME_SCENE next_game_scene) {
+void load_scene_async(LWCONTEXT* pLwc, zactor_t* actor, LW_GAME_SCENE next_game_scene) {
 	pLwc->next_game_scene = next_game_scene;
 	zmsg_t* msg = zmsg_new();
 	LWMSGINITSCENE m = {
@@ -271,7 +271,7 @@ void load_scene_async(LWCONTEXT *pLwc, zactor_t* actor, LW_GAME_SCENE next_game_
 	}
 }
 
-void reset_runtime_context_async(LWCONTEXT *pLwc) {
+void reset_runtime_context_async(LWCONTEXT* pLwc) {
 	zmsg_t* msg = zmsg_new();
 	LWMSGRESETRUNTIMECONTEXT m = {
 		LM_LWMSGRESETRUNTIMECONTEXT,
@@ -283,7 +283,7 @@ void reset_runtime_context_async(LWCONTEXT *pLwc) {
 	}
 }
 
-static void reinit_mq(LWCONTEXT *pLwc) {
+static void reinit_mq(LWCONTEXT* pLwc) {
 
 	//mq_interrupt();
 
@@ -292,13 +292,13 @@ static void reinit_mq(LWCONTEXT *pLwc) {
 	pLwc->mq = init_mq(server_addr[pLwc->server_index], pLwc->def_sys_msg);
 }
 
-void connect_to_server_0(LWCONTEXT *pLwc) {
+void connect_to_server_0(LWCONTEXT* pLwc) {
 	pLwc->server_index = 0;
 
 	reinit_mq(pLwc);
 }
 
-void connect_to_server_1(LWCONTEXT *pLwc) {
+void connect_to_server_1(LWCONTEXT* pLwc) {
 	pLwc->server_index = 1;
 
 	reinit_mq(pLwc);
@@ -460,13 +460,13 @@ void reset_field_context(LWCONTEXT* pLwc) {
 	memset(pLwc->render_command, 0, sizeof(pLwc->render_command));
 }
 
-void toggle_ray_test(LWCONTEXT *pLwc) {
+void toggle_ray_test(LWCONTEXT* pLwc) {
 	pLwc->ray_test = !pLwc->ray_test;
 
 	field_enable_ray_test(pLwc->field, pLwc->ray_test);
 }
 
-void toggle_network_poll(LWCONTEXT *pLwc) {
+void toggle_network_poll(LWCONTEXT* pLwc) {
 	field_set_network(pLwc->field, !field_network(pLwc->field));
 }
 
@@ -548,7 +548,7 @@ void logic_udate_default_projection(LWCONTEXT* pLwc) {
 	}
 }
 
-void lwc_update(LWCONTEXT *pLwc, double delta_time) {
+void lwc_update(LWCONTEXT* pLwc, double delta_time) {
 
 	deltatime_tick_delta(pLwc->update_dt, delta_time);
 
@@ -629,7 +629,7 @@ void lwc_update(LWCONTEXT *pLwc, double delta_time) {
 	//LOGI("X");
 }
 
-void init_lwc_runtime_data(LWCONTEXT *pLwc) {
+void init_lwc_runtime_data(LWCONTEXT* pLwc) {
 
 	reset_runtime_context(pLwc);
 
@@ -761,6 +761,6 @@ const char* logic_server_addr(int idx) {
 	return server_addr[idx];
 }
 
-void toggle_font_texture_test_mode(LWCONTEXT *pLwc) {
+void toggle_font_texture_test_mode(LWCONTEXT* pLwc) {
 	pLwc->font_texture_texture_mode = !pLwc->font_texture_texture_mode;
 }
