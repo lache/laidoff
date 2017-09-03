@@ -78,6 +78,8 @@ typedef enum _LW_ATLAS_ENUM
 	LAE_BB_PYRO,
 	LAE_BB_TURRET,
 
+	LAE_SPLASH512512,
+
 	LAE_BEAM_KTX,
     
     LAE_COUNT,
@@ -157,6 +159,8 @@ static const char *tex_atlas_filename[] = {
 	ASSETS_BASE_PATH "ktx" PATH_SEPARATOR "bb-guntower.ktx",
 	ASSETS_BASE_PATH "ktx" PATH_SEPARATOR "bb-pyro.ktx",
 	ASSETS_BASE_PATH "ktx" PATH_SEPARATOR "bb-turret.ktx",
+
+	ASSETS_BASE_PATH "ktx" PATH_SEPARATOR "splash512512.ktx",
 
 	ASSETS_BASE_PATH "ktx" PATH_SEPARATOR "fx-beam.ktx",
 };

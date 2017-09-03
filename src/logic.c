@@ -67,6 +67,10 @@ void change_to_ui(LWCONTEXT* pLwc) {
 	pLwc->next_game_scene = LGS_UI;
 }
 
+void change_to_splash(LWCONTEXT* pLwc) {
+	pLwc->next_game_scene = LGS_SPLASH;
+}
+
 typedef enum _LW_MSG {
 	LM_ZERO,
 	LM_LWMSGINITFIELD,
@@ -511,6 +515,7 @@ void reset_runtime_context(LWCONTEXT* pLwc) {
 		{ LWU("신:필드4로드"), load_field_4_init_runtime_data },
 		{ LWU("신:필드5로드"), load_field_5_init_runtime_data },
 		{ LWU("신:UI"), change_to_ui },
+		{ LWU("신:스플래시"), change_to_splash },
 		{ LWU("Server #0"), connect_to_server_0 },
 		{ LWU("Server #1"), connect_to_server_1 },
 		{ LWU("레이테스트토글"), toggle_ray_test },

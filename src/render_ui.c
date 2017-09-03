@@ -112,7 +112,7 @@ static void s_create_left_button_bg_vbo(LWCONTEXT* pLwc) {
 }
 
 const float full_panel_height = 1.75f;
-const float full_panel_width = 2.0f;
+const float full_panel_width = 2.8f;
 const float full_panel_trim = 0.2f;
 const float full_panel_left_edge_width = 1.0f;
 const float full_panel_right_edge_width = 2.0f;
@@ -124,18 +124,18 @@ static void s_create_full_panel_bg_vbo(LWCONTEXT* pLwc) {
 	const float c2[3] = { 0.4f, 0.4f, 0.4f };
 	const LWVERTEX full_panel_bg[] = {
 		{ -full_panel_width/2 + full_panel_trim, -full_panel_height / 2,	0, c0[0], c0[1], c0[2], 0, 1, 0, 0 },
-		{ full_panel_width/2,	-full_panel_height / 2,	0, c1[0], c1[1], c1[2], 1, 1, 0, 0 },
-		{ full_panel_width / 2,					full_panel_height / 2 - full_panel_trim,					0, c2[0], c2[1], c2[2], 1, 0, 0, 0 },
+		{ full_panel_width/2,	-full_panel_height / 2,	0, c0[0], c0[1], c0[2], 1, 1, 0, 0 },
+		{ full_panel_width / 2,					full_panel_height / 2 - full_panel_trim,					0, c0[0], c0[1], c0[2], 1, 0, 0, 0 },
 
-		{ full_panel_width / 2,					full_panel_height / 2 - full_panel_trim,					0, c2[0], c2[1], c2[2], 1, 0, 0, 0 },
+		{ full_panel_width / 2,					full_panel_height / 2 - full_panel_trim,					0, c0[0], c0[1], c0[2], 1, 0, 0, 0 },
 		{ full_panel_width / 2 - full_panel_trim, full_panel_height / 2,	0, c0[0], c0[1], c0[2], 0, 1, 0, 0 },
 		{ -full_panel_width / 2 + full_panel_trim, -full_panel_height / 2,	0, c0[0], c0[1], c0[2], 0, 1, 0, 0 },
 
 		{ -full_panel_width / 2 + full_panel_trim, -full_panel_height / 2,	0, c0[0], c0[1], c0[2], 0, 1, 0, 0 },
 		{ full_panel_width / 2 - full_panel_trim, full_panel_height / 2,	0, c0[0], c0[1], c0[2], 0, 1, 0, 0 },
-		{ -full_panel_width / 2,					-full_panel_height / 2 + full_panel_trim,					0, c2[0], c2[1], c2[2], 1, 0, 0, 0 },
+		{ -full_panel_width / 2,					-full_panel_height / 2 + full_panel_trim,					0, c0[0], c0[1], c0[2], 1, 0, 0, 0 },
 
-		{ -full_panel_width / 2,					-full_panel_height / 2 + full_panel_trim,					0, c2[0], c2[1], c2[2], 1, 0, 0, 0 },
+		{ -full_panel_width / 2,					-full_panel_height / 2 + full_panel_trim,					0, c0[0], c0[1], c0[2], 1, 0, 0, 0 },
 		{ full_panel_width / 2 - full_panel_trim, full_panel_height / 2,	0, c0[0], c0[1], c0[2], 0, 1, 0, 0 },
 		{ -full_panel_width / 2, full_panel_height / 2,	0, c0[0], c0[1], c0[2], 0, 1, 0, 0 },
 	};
@@ -151,11 +151,78 @@ static void s_create_full_panel_bg_vbo(LWCONTEXT* pLwc) {
 	pLwc->vertex_buffer[lvt].vertex_count = ARRAY_SIZE(full_panel_bg);
 }
 
+const float button_height = 1.0f;
+const float button_width = 6.0f;
+const float button_trim = 0.2f;
+const float button_depth = 0.1f;
+
+static void s_create_button_bg_vbo(LWCONTEXT* pLwc) {
+	const float c0[3] = { 0.18f, 0.46f, 0.71f };
+	const float c1[3] = { 0.18f, 0.46f, 0.71f };
+	const float c2[3] = { 0.18f, 0.46f, 0.71f };
+	const float c3[3] = { 0.1f, 0.2f, 0.3f };
+#define BTN_PC { 0, 0,	0, c0[0], c0[1], c0[2], 0, 1, 0, 0 }
+#define BTN_P0 { -button_width/2+button_trim, -button_height/2,	0, c2[0], c2[1], c2[2], 0, 1, 0, 0 }
+#define BTN_P1 { +button_width/2-button_trim, -button_height/2,	0, c2[0], c2[1], c2[2], 0, 1, 0, 0 }
+#define BTN_P2 { +button_width/2, -button_height/2 + button_trim,	0, c2[0], c2[1], c2[2], 0, 1, 0, 0 }
+#define BTN_P3 { +button_width/2, +button_height/2 - button_trim,	0, c1[0], c1[1], c1[2], 0, 1, 0, 0 }
+#define BTN_P4 { +button_width/2-button_trim, +button_height/2,	0, c1[0], c1[1], c1[2], 0, 1, 0, 0 }
+#define BTN_P5 { -button_width/2+button_trim, +button_height/2,	0, c1[0], c1[1], c1[2], 0, 1, 0, 0 }
+#define BTN_P6 { -button_width/2, +button_height/2 - button_trim,	0, c1[0], c1[1], c1[2], 0, 1, 0, 0 }
+#define BTN_P7 { -button_width/2, -button_height/2 + button_trim,	0, c2[0], c2[1], c2[2], 0, 1, 0, 0 }
+// Button depth vertices
+#define BTN_P0U { -button_width/2+button_trim, -button_height/2,	0, c3[0], c3[1], c3[2], 0, 1, 0, 0 }
+#define BTN_P1U { +button_width/2-button_trim, -button_height/2,	0, c3[0], c3[1], c3[2], 0, 1, 0, 0 }
+#define BTN_P2U { +button_width/2, -button_height/2 + button_trim,	0, c3[0], c3[1], c3[2], 0, 1, 0, 0 }
+#define BTN_P7U { -button_width/2, -button_height/2 + button_trim,	0, c3[0], c3[1], c3[2], 0, 1, 0, 0 }
+#define BTN_P0B { -button_width/2+button_trim, -button_height/2 - button_depth,	0, c3[0], c3[1], c3[2], 0, 1, 0, 0 }
+#define BTN_P1B { +button_width/2-button_trim, -button_height/2 - button_depth,	0, c3[0], c3[1], c3[2], 0, 1, 0, 0 }
+#define BTN_P2B { +button_width/2, -button_height/2 + button_trim - button_depth,	0, c3[0], c3[1], c3[2], 0, 1, 0, 0 }
+#define BTN_P7B { -button_width/2, -button_height/2 + button_trim - button_depth,	0, c3[0], c3[1], c3[2], 0, 1, 0, 0 }
+	const LWVERTEX btn_bg[] = {
+		BTN_P0, BTN_P1, BTN_PC,
+		BTN_P1, BTN_P2, BTN_PC,
+		BTN_P2, BTN_P3, BTN_PC,
+		BTN_P3, BTN_P4, BTN_PC,
+		BTN_P4, BTN_P5, BTN_PC,
+		BTN_P5, BTN_P6, BTN_PC,
+		BTN_P6, BTN_P7, BTN_PC,
+		BTN_P7, BTN_P0, BTN_PC,
+		// Button depth
+		BTN_P7B, BTN_P0U, BTN_P7U,
+		BTN_P7B, BTN_P0B, BTN_P0U,
+		BTN_P0B, BTN_P1U, BTN_P0U,
+		BTN_P0B, BTN_P1B, BTN_P1U,
+		BTN_P1B, BTN_P2U, BTN_P1U,
+		BTN_P1B, BTN_P2B, BTN_P2U,
+	};
+#undef BTN_PC
+#undef BTN_P0
+#undef BTN_P1
+#undef BTN_P2
+#undef BTN_P3
+#undef BTN_P4
+#undef BTN_P5
+#undef BTN_P6
+#undef BTN_P7
+	LWVERTEX square_vertices[ARRAY_SIZE(btn_bg)];
+	memcpy(square_vertices, btn_bg, sizeof(btn_bg));
+
+	const LW_VBO_TYPE lvt = LVT_UI_BUTTON_BG;
+
+	glGenBuffers(1, &pLwc->vertex_buffer[lvt].vertex_buffer);
+	glBindBuffer(GL_ARRAY_BUFFER, pLwc->vertex_buffer[lvt].vertex_buffer);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(LWVERTEX) * ARRAY_SIZE(btn_bg),
+		square_vertices, GL_STATIC_DRAW);
+	pLwc->vertex_buffer[lvt].vertex_count = ARRAY_SIZE(btn_bg);
+}
+
 void lwc_create_ui_vbo(LWCONTEXT* pLwc) {
 	s_create_scrap_bg_vbo(pLwc);
 	s_create_tower_button_bg_vbo(pLwc);
 	s_create_left_button_bg_vbo(pLwc);
 	s_create_full_panel_bg_vbo(pLwc);
+	s_create_button_bg_vbo(pLwc);
 }
 
 static void s_render_scrap(const LWCONTEXT* pLwc) {
@@ -249,10 +316,10 @@ static void s_render_tower_page_button(const LWCONTEXT* pLwc) {
 static void s_render_full_panel(const LWCONTEXT* pLwc) {
 	const float aspect_ratio = (float)pLwc->width / pLwc->height;
 	const float full_panel_bg_size_nor = 1.0f;
-	const float full_panel_bg_x_nor = 0;
+	const float full_panel_bg_x_nor = -aspect_ratio + full_panel_width/2;
 	const float full_panel_bg_y_nor = -0.25f/2;
 
-	int shader_index = LWST_PANEL;
+	int shader_index = LWST_COLOR;
 
 	glUseProgram(pLwc->shader[shader_index].program);
 	glUniform1f(pLwc->shader[shader_index].time, (float)pLwc->app_time);
@@ -277,7 +344,7 @@ static void s_render_full_panel(const LWCONTEXT* pLwc) {
 	text_block.text_bytelen = (int)strlen(text_block.text);
 	text_block.begin_index = 0;
 	text_block.end_index = text_block.text_bytelen;
-	text_block.text_block_x = -1.0f;
+	text_block.text_block_x = -aspect_ratio;
 	text_block.text_block_y = 0.75f;
 	text_block.multiline = 0;
 	render_text_block(pLwc, &text_block);
@@ -294,9 +361,17 @@ static void s_render_full_panel(const LWCONTEXT* pLwc) {
 		u8"최대 사거리",
 		u8"최소 사거리",
 	};
+	const float prop_tab_width = 0.3f;
+	const float prop_width = 0.8f;
+	const float button_scale = 0.125f;
+	const float val_width = 0.75f;
+	const float button_x = -aspect_ratio + prop_tab_width + prop_width + val_width;
+	const float upgrade_text_width_margin = 0.1f;
 	for (int i = 0; i < 9; i++) {
-		text_block.text_block_x = -1.0f + 0.3f;
-		text_block.text_block_y = 0.75f - 0.05f - 0.175f * (i + 1);
+		const float prop_y = (1.0f + full_panel_bg_y_nor * 2) - 0.05f - 0.175f * (i + 1);
+		const float button_y = prop_y;
+		text_block.text_block_x = -aspect_ratio + prop_tab_width;
+		text_block.text_block_y = prop_y;
 		text_block.size = DEFAULT_TEXT_BLOCK_SIZE_D;
 		char prop_msg[128];
 		sprintf(prop_msg, u8"%s", prop_str[i]);
@@ -306,11 +381,26 @@ static void s_render_full_panel(const LWCONTEXT* pLwc) {
 		text_block.end_index = text_block.text_bytelen;
 		render_text_block(pLwc, &text_block);
 
-		text_block.text_block_x = -1.0f + 0.3f + 0.8f;
+		text_block.text_block_x = -aspect_ratio + prop_tab_width + prop_width;
 		text_block.size = DEFAULT_TEXT_BLOCK_SIZE_D;
 		char val_msg[128];
 		sprintf(val_msg, "%d", 100 + i + 1);
 		text_block.text = val_msg;
+		text_block.text_bytelen = (int)strlen(text_block.text);
+		text_block.begin_index = 0;
+		text_block.end_index = text_block.text_bytelen;
+		render_text_block(pLwc, &text_block);
+
+		// Upgrade button
+		render_solid_vb_ui_flip_y_uv_shader_rot(pLwc, button_x, button_y, 2.0f * button_scale, 2.0f * button_scale,
+			0, LVT_UI_BUTTON_BG,
+			1, 0, 0, 0, 0, 0, shader_index, 0);
+		// Upgrade button text
+		text_block.text_block_x = button_x - button_width/2 * button_scale + upgrade_text_width_margin;
+		text_block.size = DEFAULT_TEXT_BLOCK_SIZE_D;
+		char up_msg[128];
+		sprintf(up_msg, "+%d [=] %d", i + 1, (i + 1) * 100);
+		text_block.text = up_msg;
 		text_block.text_bytelen = (int)strlen(text_block.text);
 		text_block.begin_index = 0;
 		text_block.end_index = text_block.text_bytelen;
