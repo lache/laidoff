@@ -1,53 +1,53 @@
 #if GL_ES
 #define fragColor gl_FragColor
 #define FRAG_COLOR_OUTPUT_DECL
-precision mediump float;
 #else
 #define FRAG_COLOR_OUTPUT_DECL out vec4 fragColor;
 #define varying in
 #endif
+
+precision mediump float;
 
 uniform float time;
 uniform vec2 resolution;
 // Outputs
 FRAG_COLOR_OUTPUT_DECL
 
-float snoise(vec3 uv, float res)
-{
-	const vec3 s = vec3(1e0, 1e2, 1e3);
-	
-	uv *= res;
-	
-	vec3 uv0 = floor(mod(uv, res))*s;
-	vec3 uv1 = floor(mod(uv+vec3(1.), res))*s;
-	
-	vec3 f = fract(uv); f = f*f*(3.0-2.0*f);
+vec2 R = resolution;
+vec2 Offset;
+vec2 Scale=vec2(0.002,0.002);
+float Saturation = 0.8; // 0 - 1;
 
-	vec4 v = vec4(uv0.x+uv0.y+uv0.z, uv1.x+uv0.y+uv0.z,
-		      	  uv0.x+uv1.y+uv0.z, uv1.x+uv1.y+uv0.z);
 
-	vec4 r = fract(sin(v*1e-1)*1e3);
-	float r0 = mix(mix(r.x, r.y, f.x), mix(r.z, r.w, f.x), f.y);
-	
-	r = fract(sin((v + uv1.z - uv0.z)*1e-1)*1e3);
-	float r1 = mix(mix(r.x, r.y, f.x), mix(r.z, r.w, f.x), f.y);
-	
-	return mix(r0, r1, f.z)*2.-1.;
+vec3 lungth(vec2 x,vec3 c){
+       return vec3(length(x+c.r),length(x+c.g),length(c.b));
 }
 
 void main( void ) {
+	
+	vec2 position = (gl_FragCoord.xy - resolution * 0.9) / resolution.yy;
+	float th = atan(position.y, position.x) / (1.0 * 3.1415926);
+	float dd = length(position) + 0.005;
+	float d = 0.5 / dd + time;
+	
+    	vec2 x = gl_FragCoord.xy;
+    	vec3 c2=vec3(0,0,0);
+   	x=x*Scale*R/R.x;
+    	x+sin(x.yx*sqrt(vec2(1,9)))/1.;
+    	c2=lungth(sin(x*sqrt(vec2(3,43))),vec3(5,6,7)*Saturation * d);
+	x+=sin(x.yx*sqrt(vec2(73,5)))/5.;
+    	c2=2.*lungth(sin(time+x*sqrt(vec2(33.,23.))),c2/9.);
+    	x+=sin(x.yx*sqrt(vec2(93,7)))/3.;
+    	c2=lungth(sin(x*sqrt(vec2(3.,1.))),c2/2.0);
+    	c2=.5+.5*sin(c2*8.);
+	
+	vec3 uv = vec3(th + d, th - d, th + sin(d) * 0.45);
+	float a = 0.5 + cos(uv.x * 3.1415926 * 2.0) * 0.5;
+	float b = 0.5 + cos(uv.y * 3.1415926 * 2.0) * 0.5;
+	float c = 0.5 + cos(uv.z * 3.1415926 * 6.0) * 0.5;
+	vec3 color = 	mix(vec3(0.1, 0.5, 0.5), 	vec3(0.1, 0.1, 0.2),  pow(a, 0.2)) * 3.;
+	color += 	mix(vec3(0.8, 0.2, 1.0), 	vec3(0.1, 0.1, 0.2),  pow(b, 0.1)) * 0.75;
+	color += 	mix(c2, 			vec3(0.1, 0.2, 0.2),  pow(c, 0.1)) * 0.75;
 
-	vec2 p = -.5 + gl_FragCoord.xy / resolution.xy;
-	p.x *= resolution.x/resolution.y;
-	
-	float color = 2.0 - (3.*length(2.*p));
-	
-	vec3 coord = vec3(atan(p.x,p.y)/2.2832+.5, length(p)*1.4, 2.5);
-	
-	for(int i = 1; i <= 1; i++)
-	{
-		float power = pow(2.0, float(i));
-		color += (.5 / power) * snoise(coord + vec3(0.9,-time*.15, time*.01), power*19.);
-	}
-	fragColor = vec4( color, pow(max(color,0.),2.)*0.4, pow(max(color,0.),3.)*0.15 , 9.0);
+	fragColor = vec4( (color * dd) * 0.15, 1.0);
 }
