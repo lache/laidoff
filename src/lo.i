@@ -91,7 +91,7 @@
 #include "battlelogic.h"
 #include "rmsg.h"
 #include "lwparabola.h"
-
+#include "construct.h"
 #ifdef WIN32
 #pragma warning(pop)
 #endif
@@ -185,7 +185,7 @@
 %include "battlelogic.h"
 %include "rmsg.h"
 %include "lwparabola.h"
-
+%include "construct.h"
 
 // using the C-array
 %include <carrays.i>

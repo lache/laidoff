@@ -13,6 +13,7 @@
 #include "nav.h"
 #include "lwtimepoint.h"
 #include "lwfieldobject.h"
+#include "render_ui.h"
 #include <float.h>
 
 static void render_field_object_rot(const LWCONTEXT* pLwc, int vbo_index, GLuint tex_id, const mat4x4 view, const mat4x4 proj, float x, float y, float z, float sx, float sy, float sz, float alpha_multiplier, int mipmap, const mat4x4 rot) {
@@ -124,9 +125,11 @@ static void s_render_ui(const LWCONTEXT* pLwc) {
 	const float fist_icon_margin_x = 0.3f;
 	const float fist_icon_margin_y = 0.2f;
 
-	render_solid_vb_ui_alpha(pLwc, aspect_ratio - fist_icon_margin_x, -1 + fist_icon_margin_y, 0.75f, 0.75f,
+	/*render_solid_vb_ui_alpha(pLwc, aspect_ratio - fist_icon_margin_x, -1 + fist_icon_margin_y, 0.75f, 0.75f,
 		pLwc->tex_atlas[LAE_U_FIST_ICON_KTX], pLwc->tex_atlas[LAE_U_FIST_ICON_ALPHA_KTX],
-		LVT_RIGHT_BOTTOM_ANCHORED_SQUARE, 1, 0, 0, 0, 0);
+		LVT_RIGHT_BOTTOM_ANCHORED_SQUARE, 1, 0, 0, 0, 0);*/
+
+	render_basic_field_ui(pLwc);
 }
 
 void render_debug_sphere(const LWCONTEXT* pLwc, GLuint tex_id, const mat4x4 perspective, const mat4x4 view, float x, float y, float z, float s) {
@@ -252,9 +255,18 @@ static void s_render_path_query_test_player(const LWCONTEXT* pLwc, const mat4x4 
 }
 
 static void s_render_construct_preview_model(const LWCONTEXT* pLwc, const mat4x4 view, const mat4x4 perspective, float x, float y, float z, float a) {
-	float model_radius = 2.5f;
-
-	render_guntower_yaw(pLwc, perspective, view, x + model_radius * cosf(a), y + model_radius * sinf(a), a, LWAC_RECOIL, FLT_MAX, 0, 0.25f);
+	if (pLwc->construct.preview_enable) {
+		const float model_radius = 2.5f;
+		render_tower_yaw(pLwc, perspective, view, x, y, a,
+			pLwc->construct.preview.anim_action_id,
+			FLT_MAX,
+			0,
+			0.25f,
+			pLwc->construct.preview.atlas,
+			pLwc->construct.preview.skin_vbo,
+			pLwc->construct.preview.armature
+		);
+	}
 }
 
 static void s_render_player_model(const LWCONTEXT* pLwc, const mat4x4 view, const mat4x4 proj, float x, float y, float z, float a, const LWANIMACTION* action, float skin_time, int loop, float flash) {

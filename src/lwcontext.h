@@ -25,6 +25,7 @@
 #include "lwdeltatime.h"
 #include "lwfieldrendercommand.h"
 #include "lwbutton.h"
+#include "construct.h"
 
 #define MAX_RENDER_QUEUE_CAPACITY (512)
 
@@ -295,6 +296,8 @@ typedef struct _LWCONTEXT {
 	double last_now;
 	// Button list
 	LWBUTTONLIST button_list;
+	// Construct
+	LWCONSTRUCT construct;
 } LWCONTEXT;
 
 #ifdef __cplusplus

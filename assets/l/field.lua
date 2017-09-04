@@ -7,7 +7,7 @@ M.__index = M
 local c = lo.script_context()
 
 function M:new(name)
-	o = {}
+	local o = {}
 	o.orig_string = tostring(o)
 	o.name = name
 	setmetatable(o, self)

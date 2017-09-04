@@ -36,6 +36,10 @@ end
 
 local c = lo.script_context()
 
+local Data = reload_require('data')
+print('Data loaded!')
+local data = Data:new()
+
 local Field = reload_require('field')
 print('Field loaded!')
 local field = Field:new('test field')
@@ -58,6 +62,51 @@ end
 -- Lua handler for logc frame finish events emitted from C
 function on_logic_frame_finish(dt)
 	field:update(dt)
+	return 0
+end
+
+local last_construct_gtid = ''
+
+function copy(obj, seen)
+  if type(obj) ~= 'table' then return obj end
+  if seen and seen[obj] then return seen[obj] end
+  local s = seen or {}
+  local res = setmetatable({}, getmetatable(obj))
+  s[obj] = res
+  for k, v in pairs(obj) do res[copy(k, s)] = copy(v, s) end
+  return res
+end
+
+-- Lua handler for logc frame finish events emitted from C
+function on_ui_event(id)
+	print('ui event emitted from C:' .. id)
+	local gtid = 'catapult'
+	if id == 'seltower0' then gtid = 'catapult'
+	elseif id == 'seltower1' then gtid = 'crossbow'
+	elseif id == 'seltower2' then gtid = 'guntower'
+	elseif id == 'seltower3' then gtid = 'pyro'
+	else 
+		lo.construct_set_preview_enable(c.construct, 0)
+		return 0
+	end
+	local gt = data.guntower[gtid]
+	if last_construct_gtid ~= gtid then
+		lo.construct_set_preview_enable(c.construct, 1)
+		lo.construct_set_preview(c.construct, gt.atlas, gt.skin_vbo, gt.armature, gt.anim_action_id)
+	else
+		local Faction1 = 1
+		local gtinst = copy(gt)
+		print(inspect(gtinst))
+		local pt = lo.new_vec3(0, 0, 0)
+		lo.field_get_player_position(c.field, pt)
+		local ptvec = lo.get_vec3(pt)
+		gtinst.x = ptvec.x
+		gtinst.y = ptvec.y
+		gtinst.z = ptvec.z
+		field:spawn(gtinst, Faction1)
+		gtinst:start_thinking()
+	end
+	last_construct_gtid = gtid
 	return 0
 end
 

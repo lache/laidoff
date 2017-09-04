@@ -230,7 +230,7 @@ static void s_fire_bullet(LWPLAYERSTATEDATA* data) {
 	} else {
 		field_spawn_sphere(data->field, pos, vel, mq_bullet_counter(data->mq));
 
-		spawn_field_object(data->field, pos[0], pos[1], 1, 1, LVT_PUMP, data->pLwc->tex_programmed[LPT_SOLID_RED],
-			1, 1, 0.5f, 0, 1);
+		/*spawn_field_object(data->field, pos[0], pos[1], 1, 1, LVT_PUMP, data->pLwc->tex_programmed[LPT_SOLID_RED],
+			1, 1, 0.5f, 0, 1);*/
 	}
 }

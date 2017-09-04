@@ -3,6 +3,7 @@
 #include "lwanim.h"
 #include "lwvbotype.h"
 #include "vertices.h"
+#include "linmath.h"
 
 #define MAX_AIM_SECTOR_RAY (FAN_SECTOR_COUNT_PER_ARRAY + 1) // 1 for the end vertex
 #define MAX_FIELD_SPHERE (50)
@@ -49,6 +50,7 @@ void update_field(LWCONTEXT* pLwc, LWFIELD* field);
 void set_field_player_delta(LWFIELD* field, float x, float y, float z);
 void set_field_player_position(LWFIELD* field, float x, float y, float z);
 void get_field_player_position(const LWFIELD* field, float* x, float* y, float* z);
+void field_get_player_position(const LWFIELD* field, vec3 p);
 void field_attack(LWCONTEXT* pLwc);
 void field_enable_ray_test(LWFIELD* field, int enable);
 const float* field_path_query_test_player_pos(const LWFIELD* field);

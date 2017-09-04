@@ -438,3 +438,11 @@ void lwc_render_ui(const LWCONTEXT* pLwc) {
 	s_render_tower_page_button(pLwc, button_list);
 	s_render_full_panel(pLwc, button_list);
 }
+
+void render_basic_field_ui(const LWCONTEXT* pLwc) {
+	// Button count to zero (ignoring const-ness......)
+	LWBUTTONLIST* button_list = &((LWCONTEXT*)pLwc)->button_list;
+	s_render_scrap(pLwc, button_list);
+	s_render_tower_button(pLwc, button_list);
+	s_render_tower_page_button(pLwc, button_list);
+}

@@ -101,15 +101,18 @@ void lw_trigger_mouse_press(LWCONTEXT* pLwc, float x, float y) {
 	}
 
 	if (pLwc->game_scene == LGS_FIELD && fabs(aspect_ratio - 0.3f - 0.75f/2 - x) < 0.75f && fabs(-1 + 0.75f/2 - y) < 0.75f) {
-		field_attack(pLwc);
+		//field_attack(pLwc);
 
 		//pLwc->hide_field = !pLwc->hide_field;
-		pLwc->atk_pad_dragging = 1;
+		
 		//LOGI("atk_pad_dragging ON");
+
+		// Player combat mode...
+		//pLwc->atk_pad_dragging = 1;
 	}
 
 	if (pLwc->game_scene == LGS_FIELD && fabs(aspect_ratio - 0.3f - 0.75f / 2 - x) < 0.75f && fabs(1 - 0.75f / 2 - y) < 0.75f) {
-		pLwc->fps_mode = !pLwc->fps_mode;
+		//pLwc->fps_mode = !pLwc->fps_mode;
 	}
 
 	if (pLwc->game_scene == LGS_BATTLE && pLwc->battle_state != LBS_COMMAND_IN_PROGRESS && pLwc->player_turn_creature_index >= 0) {
@@ -130,12 +133,10 @@ void lw_trigger_mouse_press(LWCONTEXT* pLwc, float x, float y) {
 			//printf("mouse press command slot %d\n", command_slot);
 		}
 	}
-	if (pLwc->game_scene == LGS_UI) {
-		int pressed_idx = lwbutton_press(&pLwc->button_list, x, y);
-		if (pressed_idx >= 0) {
-			const char* id = lwbutton_id(&pLwc->button_list, pressed_idx);
-			logic_emit_ui_event_async(pLwc, id);
-		}
+	int pressed_idx = lwbutton_press(&pLwc->button_list, x, y);
+	if (pressed_idx >= 0) {
+		const char* id = lwbutton_id(&pLwc->button_list, pressed_idx);
+		logic_emit_ui_event_async(pLwc, id);
 	}
 }
 

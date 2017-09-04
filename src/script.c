@@ -546,3 +546,21 @@ int script_emit_logic_frame_finish(void* L, float delta_time) {
 	lua_pop(L, 1); // pop returned value
 	return ret;
 }
+
+int script_emit_ui_event(void* L, const char* id) {
+	int ret;
+	// push functions and arguments
+	lua_getglobal(L, "on_ui_event"); // function to be called
+	lua_pushstring(L, id); // push 2nd argument
+	// do the call (1 arguments, 1 result)
+	if (lua_pcall(L, 1, 1, 0) != 0) {
+		LOGE(LWLOGPOS "error: %s", lua_tostring(L, -1));
+	}
+	/* retrieve result */
+	if (!lua_isnumber(L, -1)) {
+		LOGE(LWLOGPOS "error: %s", lua_tostring(L, -1));
+	}
+	ret = (int)lua_tonumber(L, -1);
+	lua_pop(L, 1); // pop returned value
+	return ret;
+}

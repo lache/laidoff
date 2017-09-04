@@ -1380,3 +1380,9 @@ void field_destroy_all_script_colliders(LWFIELD* field) {
 		field_destroy_script_collider(field, i);
 	}
 }
+
+void field_get_player_position(const LWFIELD* field, vec3 p) {
+	p[0] = (float)field->player_pos[0];
+	p[1] = (float)field->player_pos[1];
+	p[2] = (float)(field->player_pos[2] - field->player_length / 2 - field->player_radius);
+}

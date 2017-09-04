@@ -210,7 +210,7 @@ void load_field_3_init_runtime_data_async(LWCONTEXT* pLwc, zactor_t* actor) {
 		1, {
 			{ LVT_FLOOR2, pLwc->tex_atlas[LAE_3D_FLOOR2_TEX_KTX], 0, },
 		},
-		0.5f,
+		0.35f,
 		1,
 	};
 	zmsg_addmem(msg, &m, sizeof(LWMSGINITFIELD));
@@ -737,6 +737,7 @@ static int loop_pipe_reader(zloop_t* loop, zsock_t* pipe, void* args) {
 		} else if (d && s == sizeof(LWMSGUIEVENT) && *(int*)d == LM_LWMSGUIEVENT) {
 			LWMSGUIEVENT* m = (LWMSGUIEVENT*)d;
 			LOGI("UI Event: %s", m->id);
+			script_emit_ui_event(pLwc->L, m->id);
 		} else {
 			abort();
 		}
@@ -789,7 +790,7 @@ void lwc_start_logic_thread(LWCONTEXT* pLwc) {
 	// Start logic thread
 	pLwc->logic_actor = zactor_new(s_logic_worker, pLwc);
 	// Load initial stage
-	load_field_3_init_runtime_data_async(pLwc, pLwc->logic_actor);
+	load_field_2_init_runtime_data_async(pLwc, pLwc->logic_actor);
 	//load_scene_async(pLwc, pLwc->logic_actor, LGS_UI);
 }
 
