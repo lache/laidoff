@@ -39,6 +39,7 @@
 #include "lwparabola.h"
 #include "render_ui.h"
 #include "render_splash.h"
+#include "lwbutton.h"
 // SWIG output file
 #include "lo_wrap.inl"
 
@@ -104,7 +105,6 @@ HRESULT init_ext_sound_lib();
 void destroy_ext_sound_lib();
 void create_image(const char *filename, LWBITMAPCONTEXT *pBitmapContext, int tex_atlas_index);
 void release_image(LWBITMAPCONTEXT *pBitmapContext);
-void lwc_render(const LWCONTEXT* pLwc);
 void lwc_render_battle(const LWCONTEXT* pLwc);
 void lwc_render_dialog(const LWCONTEXT* pLwc);
 void lwc_render_field(const LWCONTEXT* pLwc);
@@ -1064,6 +1064,8 @@ void lwc_render(const LWCONTEXT* pLwc) {
 	while (!lwcontext_safe_to_start_render(pLwc)) {}
 	// Set rendering flag to 1 (ignoring const-ness.......)
 	lwcontext_set_rendering((LWCONTEXT*)pLwc, 1);
+	// Button count to zero (ignoring const-ness......)
+	((LWCONTEXT*)pLwc)->button_list.button_count = 0;
 	// Tick rendering thread
 	deltatime_tick(pLwc->render_dt);
 	// Process all render messages (ignoring const-ness.......)

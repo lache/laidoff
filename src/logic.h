@@ -20,13 +20,12 @@ void logic_start_logic_update_job(LWCONTEXT* pLwc);
 void logic_stop_logic_update_job(LWCONTEXT* pLwc);
 void logic_start_logic_update_job_async(LWCONTEXT* pLwc);
 void logic_stop_logic_update_job_async(LWCONTEXT* pLwc);
-
+void logic_emit_ui_event_async(LWCONTEXT* pLwc, const char* id);
 void load_field_1_init_runtime_data(LWCONTEXT* pLwc);
 void load_field_2_init_runtime_data(LWCONTEXT* pLwc);
 void load_field_3_init_runtime_data(LWCONTEXT* pLwc);
 void load_field_4_init_runtime_data(LWCONTEXT* pLwc);
 void load_field_5_init_runtime_data(LWCONTEXT* pLwc);
-
 #ifdef __cplusplus
 };
 #endif

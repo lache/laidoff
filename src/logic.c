@@ -17,6 +17,7 @@
 #include "script.h"
 #include "nav.h"
 #include "laidoff.h"
+#include "lwbutton.h"
 
 void toggle_font_texture_test_mode(LWCONTEXT* pLwc);
 
@@ -28,7 +29,11 @@ static const char* server_addr[] = {
 static void reinit_mq(LWCONTEXT* pLwc);
 
 void change_to_field(LWCONTEXT* pLwc) {
-	pLwc->next_game_scene = LGS_FIELD;
+	if (pLwc->field) {
+		pLwc->next_game_scene = LGS_FIELD;
+	} else {
+		LOGE("pLwc->field null");
+	}
 }
 
 void change_to_dialog(LWCONTEXT* pLwc) {
@@ -79,6 +84,7 @@ typedef enum _LW_MSG {
 	LM_LWMSGSTARTLOGICLOOP,
 	LM_LWMSGSTOPLOGICLOOP,
 	LM_LWMSGINITSCENE,
+	LM_LWMSGUIEVENT,
 } LW_MSG;
 
 typedef struct _LWMSGINITFIELD {
@@ -110,6 +116,11 @@ typedef struct _LWMSGSTOPLOGICLOOP {
 typedef struct _LWMSGINITSCENE {
 	LW_MSG type;
 } LWMSGINITSCENE;
+
+typedef struct _LWMSGUIEVENT {
+	LW_MSG type;
+	char id[LW_UI_IDENTIFIER_LENGTH];
+} LWMSGUIEVENT;
 
 void logic_start_logic_update_job_async(LWCONTEXT* pLwc) {
 	if (pLwc == 0 || pLwc->logic_actor == 0) {
@@ -269,6 +280,23 @@ void load_scene_async(LWCONTEXT* pLwc, zactor_t* actor, LW_GAME_SCENE next_game_
 		LM_LWMSGINITSCENE,
 	};
 	zmsg_addmem(msg, &m, sizeof(LWMSGINITSCENE));
+	if (zactor_send(actor, &msg) < 0) {
+		zmsg_destroy(&msg);
+		LOGE("Send message to logic worker failed!");
+	}
+}
+
+void logic_emit_ui_event_async(LWCONTEXT* pLwc, const char* id) {
+	if (strlen(id) > LW_UI_IDENTIFIER_LENGTH - 1) {
+		LOGE(LWLOGPOS "id('%s') length exceeds (max %d)", id, LW_UI_IDENTIFIER_LENGTH - 1);
+		return;
+	}
+	zmsg_t* msg = zmsg_new();
+	LWMSGUIEVENT m;
+	m.type = LM_LWMSGUIEVENT;
+	strcpy(m.id, id);
+	zmsg_addmem(msg, &m, sizeof(LWMSGUIEVENT));
+	zactor_t* actor = pLwc->logic_actor;
 	if (zactor_send(actor, &msg) < 0) {
 		zmsg_destroy(&msg);
 		LOGE("Send message to logic worker failed!");
@@ -706,6 +734,9 @@ static int loop_pipe_reader(zloop_t* loop, zsock_t* pipe, void* args) {
 			logic_start_logic_update_job(pLwc);
 		} else if (d && s == sizeof(LWMSGRELOADSCRIPT) && *(int*)d == LM_LWMSGSTOPLOGICLOOP) {
 			logic_stop_logic_update_job(pLwc);
+		} else if (d && s == sizeof(LWMSGUIEVENT) && *(int*)d == LM_LWMSGUIEVENT) {
+			LWMSGUIEVENT* m = (LWMSGUIEVENT*)d;
+			LOGI("UI Event: %s", m->id);
 		} else {
 			abort();
 		}
@@ -758,8 +789,8 @@ void lwc_start_logic_thread(LWCONTEXT* pLwc) {
 	// Start logic thread
 	pLwc->logic_actor = zactor_new(s_logic_worker, pLwc);
 	// Load initial stage
-	//load_field_2_init_runtime_data_async(pLwc, pLwc->logic_actor);
-	load_scene_async(pLwc, pLwc->logic_actor, LGS_UI);
+	load_field_3_init_runtime_data_async(pLwc, pLwc->logic_actor);
+	//load_scene_async(pLwc, pLwc->logic_actor, LGS_UI);
 }
 
 const char* logic_server_addr(int idx) {

@@ -5,6 +5,7 @@
 #include "render_solid.h"
 #include "render_text_block.h"
 #include "lwmacro.h"
+#include "lwbutton.h"
 
 const float scrap_bg_width = 7.0f;
 const float scrap_bg_height = 1.0f;
@@ -42,9 +43,9 @@ const float tower_button_height_margin = 0.2f;
 const float tower_button_border = 0.075f;
 
 static void s_create_tower_button_bg_vbo(LWCONTEXT* pLwc) {
-	const float c0[3] = { 0.2f, 0.2f, 0.2f };
-	const float c1[3] = { 0.3f, 0.3f, 0.3f };
-	const float c2[3] = { 0.4f, 0.4f, 0.4f };
+	const float c0[3] = { 0.18f, 0.46f, 0.71f };
+	const float c1[3] = { 0.18f, 0.46f, 0.71f };
+	const float c2[3] = { 0.18f, 0.46f, 0.71f };
 	const LWVERTEX tower_button_bg[] =
 	{
 		{ 0,								-tower_button_height,	0, c0[0], c0[1], c0[2], 0, 1, 0, 0 },
@@ -82,9 +83,9 @@ const float left_button_right_edge_width = 2.0f;
 const float left_button_width_margin = 0.6f;
 
 static void s_create_left_button_bg_vbo(LWCONTEXT* pLwc) {
-	const float c0[3] = { 0.2f, 0.2f, 0.2f };
-	const float c1[3] = { 0.3f, 0.3f, 0.3f };
-	const float c2[3] = { 0.4f, 0.4f, 0.4f };
+	const float c0[3] = { 0.18f, 0.46f, 0.71f };
+	const float c1[3] = { 0.18f, 0.46f, 0.71f };
+	const float c2[3] = { 0.18f, 0.46f, 0.71f };
 	const LWVERTEX left_button_bg[] =
 	{
 		{ 0,								-left_button_height/2,	0, c0[0], c0[1], c0[2], 0, 1, 0, 0 },
@@ -225,7 +226,7 @@ void lwc_create_ui_vbo(LWCONTEXT* pLwc) {
 	s_create_button_bg_vbo(pLwc);
 }
 
-static void s_render_scrap(const LWCONTEXT* pLwc) {
+static void s_render_scrap(const LWCONTEXT* pLwc, LWBUTTONLIST* button_list) {
 	const float aspect_ratio = (float)pLwc->width / pLwc->height;
 
 	const float scrap_bg_size_nor = 0.15f;
@@ -256,12 +257,14 @@ static void s_render_scrap(const LWCONTEXT* pLwc) {
 	render_text_block(pLwc, &text_block);
 }
 
-static void s_render_tower_button(const LWCONTEXT* pLwc) {
+static void s_render_tower_button(const LWCONTEXT* pLwc, LWBUTTONLIST* button_list) {
 	const float aspect_ratio = (float)pLwc->width / pLwc->height;
 
 	for (int i = 0; i < 4; i++) {
 		const float btn_bg_size_nor = 0.3f;
-		const float btn_bg_x_nor = aspect_ratio - (tower_button_width + tower_button_tag_width) * btn_bg_size_nor;
+		const float wf = (tower_button_width + tower_button_tag_width) * btn_bg_size_nor;
+		const float hf = tower_button_height * btn_bg_size_nor;
+		const float btn_bg_x_nor = aspect_ratio - wf;
 		const float btn_bg_y_nor = 1.0f - (tower_button_height_margin + tower_button_height) * btn_bg_size_nor * (i + 1);
 		const float border_scaled = tower_button_border * btn_bg_size_nor;
 		const float sprite_size_nor = btn_bg_size_nor * (1.0f - 2.0f * tower_button_border);
@@ -292,14 +295,20 @@ static void s_render_tower_button(const LWCONTEXT* pLwc) {
 		text_block.text_block_y = btn_bg_y_nor - tower_button_tag_height / 2 * btn_bg_size_nor;
 		text_block.multiline = 1;
 		render_text_block(pLwc, &text_block);
+		// Register as a button
+		char btn_id[32];
+		sprintf(btn_id, "seltower%d", i);
+		lwbutton_append(button_list, btn_id, btn_bg_x_nor, btn_bg_y_nor, wf, hf);
 	}
 }
 
-static void s_render_tower_page_button(const LWCONTEXT* pLwc) {
+static void s_render_tower_page_button(const LWCONTEXT* pLwc, LWBUTTONLIST* button_list) {
 	const float aspect_ratio = (float)pLwc->width / pLwc->height;
 	const float left_button_total_width = left_button_width + left_button_left_edge_width + left_button_right_edge_width;
 
 	const float btn_bg_size_nor = 0.1f;
+	const float wf = left_button_total_width * btn_bg_size_nor;
+	const float hf = left_button_height * btn_bg_size_nor;
 	const float btn_bg_x_nor = aspect_ratio - (left_button_width + left_button_right_edge_width + left_button_width_margin + left_button_width + left_button_left_edge_width) * btn_bg_size_nor;
 	const float btn_bg_y_nor = -1.0f + left_button_height * btn_bg_size_nor;
 
@@ -307,13 +316,17 @@ static void s_render_tower_page_button(const LWCONTEXT* pLwc) {
 	render_solid_vb_ui_flip_y_uv_shader_rot(pLwc, btn_bg_x_nor, btn_bg_y_nor, 2 * btn_bg_size_nor, 2 * btn_bg_size_nor,
 		0, LVT_UI_LEFT_BUTTON_BG,
 		1, 0, 0, 0, 0, 0, LWST_COLOR, 0);
+	// Register as a button
+	lwbutton_append(button_list, "seltower_left", btn_bg_x_nor - (left_button_width*btn_bg_size_nor), btn_bg_y_nor + hf/2, wf - (left_button_right_edge_width*btn_bg_size_nor / 2), hf);
 	// Right arrow button (180-deg rotation)
 	render_solid_vb_ui_flip_y_uv_shader_rot(pLwc, btn_bg_x_nor + (left_button_total_width + left_button_width_margin) * btn_bg_size_nor, btn_bg_y_nor, 2 * btn_bg_size_nor, 2 * btn_bg_size_nor,
 		0, LVT_UI_LEFT_BUTTON_BG,
 		1, 0, 0, 0, 0, 0, LWST_COLOR, (float)M_PI);
+	// Register as a button
+	lwbutton_append(button_list, "seltower_right", btn_bg_x_nor + (left_button_width + left_button_right_edge_width/2 + left_button_width_margin) * btn_bg_size_nor, btn_bg_y_nor + hf / 2, wf - (left_button_right_edge_width*btn_bg_size_nor / 2), hf);
 }
 
-static void s_render_full_panel(const LWCONTEXT* pLwc) {
+static void s_render_full_panel(const LWCONTEXT* pLwc, LWBUTTONLIST* button_list) {
 	const float aspect_ratio = (float)pLwc->width / pLwc->height;
 	const float full_panel_bg_size_nor = 1.0f;
 	const float full_panel_bg_x_nor = -aspect_ratio + full_panel_width/2;
@@ -392,6 +405,8 @@ static void s_render_full_panel(const LWCONTEXT* pLwc) {
 		render_text_block(pLwc, &text_block);
 
 		// Upgrade button
+		const float wf = button_width * button_scale;
+		const float hf = button_height * button_scale;
 		render_solid_vb_ui_flip_y_uv_shader_rot(pLwc, button_x, button_y, 2.0f * button_scale, 2.0f * button_scale,
 			0, LVT_UI_BUTTON_BG,
 			1, 0, 0, 0, 0, 0, shader_index, 0);
@@ -405,6 +420,10 @@ static void s_render_full_panel(const LWCONTEXT* pLwc) {
 		text_block.begin_index = 0;
 		text_block.end_index = text_block.text_bytelen;
 		render_text_block(pLwc, &text_block);
+		// Register as a button
+		char btn_id[32];
+		sprintf(btn_id, "upgrade%d", i);
+		lwbutton_append(button_list, btn_id, button_x - wf/2, button_y + hf/2, wf, hf);
 	}
 }
 
@@ -412,9 +431,10 @@ void lwc_render_ui(const LWCONTEXT* pLwc) {
 	glViewport(0, 0, pLwc->width, pLwc->height);
 	lw_clear_color();
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-	s_render_scrap(pLwc);
-	s_render_tower_button(pLwc);
-	s_render_tower_page_button(pLwc);
-	s_render_full_panel(pLwc);
+	// Button count to zero (ignoring const-ness......)
+	LWBUTTONLIST* button_list = &((LWCONTEXT*)pLwc)->button_list;
+	s_render_scrap(pLwc, button_list);
+	s_render_tower_button(pLwc, button_list);
+	s_render_tower_page_button(pLwc, button_list);
+	s_render_full_panel(pLwc, button_list);
 }

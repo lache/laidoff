@@ -24,6 +24,7 @@
 #include "playersm.h"
 #include "lwdeltatime.h"
 #include "lwfieldrendercommand.h"
+#include "lwbutton.h"
 
 #define MAX_RENDER_QUEUE_CAPACITY (512)
 
@@ -292,6 +293,8 @@ typedef struct _LWCONTEXT {
 	int logic_update_job;
 	// Last now (seconds)
 	double last_now;
+	// Button list
+	LWBUTTONLIST button_list;
 } LWCONTEXT;
 
 #ifdef __cplusplus

@@ -7,6 +7,7 @@
 #include "field.h"
 #include "mq.h"
 #include "logic.h"
+#include "lwbutton.h"
 
 float get_dir_pad_size_radius() {
 	return 0.75f;
@@ -127,6 +128,13 @@ void lw_trigger_mouse_press(LWCONTEXT* pLwc, float x, float y) {
 			}
 
 			//printf("mouse press command slot %d\n", command_slot);
+		}
+	}
+	if (pLwc->game_scene == LGS_UI) {
+		int pressed_idx = lwbutton_press(&pLwc->button_list, x, y);
+		if (pressed_idx >= 0) {
+			const char* id = lwbutton_id(&pLwc->button_list, pressed_idx);
+			logic_emit_ui_event_async(pLwc, id);
 		}
 	}
 }
