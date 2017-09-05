@@ -1,6 +1,7 @@
 #include "lwbutton.h"
 #include "lwmacro.h"
 #include "lwlog.h"
+#include <string.h>
 
 void lwbutton_append(LWBUTTONLIST* button_list, const char* id, float x, float y, float w, float h) {
 	if (button_list->button_count >= ARRAY_SIZE(button_list->button)) {

@@ -15,6 +15,13 @@
 		264553421EE4815A004064D0 /* logic.c in Sources */ = {isa = PBXBuildFile; fileRef = 264553401EE4815A004064D0 /* logic.c */; };
 		265E1F0C1EF9903C00E82C3C /* lwskill.c in Sources */ = {isa = PBXBuildFile; fileRef = 265E1F0B1EF9903C00E82C3C /* lwskill.c */; };
 		265E1F0E1EF9904600E82C3C /* lwcontext.c in Sources */ = {isa = PBXBuildFile; fileRef = 265E1F0D1EF9904600E82C3C /* lwcontext.c */; };
+		267BFC3B1F5E23DE008D0821 /* construct.c in Sources */ = {isa = PBXBuildFile; fileRef = 267BFC351F5E23DE008D0821 /* construct.c */; };
+		267BFC3C1F5E23DE008D0821 /* lwbutton.c in Sources */ = {isa = PBXBuildFile; fileRef = 267BFC371F5E23DE008D0821 /* lwbutton.c */; };
+		267BFC3D1F5E23DE008D0821 /* render_ui.c in Sources */ = {isa = PBXBuildFile; fileRef = 267BFC391F5E23DE008D0821 /* render_ui.c */; };
+		267BFC401F5E2453008D0821 /* splash.c in Sources */ = {isa = PBXBuildFile; fileRef = 267BFC3E1F5E2453008D0821 /* splash.c */; };
+		267BFC471F5E248D008D0821 /* render_splash.c in Sources */ = {isa = PBXBuildFile; fileRef = 267BFC411F5E248D008D0821 /* render_splash.c */; };
+		267BFC481F5E248D008D0821 /* splash.c in Sources */ = {isa = PBXBuildFile; fileRef = 267BFC431F5E248D008D0821 /* splash.c */; };
+		267BFC491F5E248D008D0821 /* ui.c in Sources */ = {isa = PBXBuildFile; fileRef = 267BFC451F5E248D008D0821 /* ui.c */; };
 		562DAF601ED1920300208E62 /* playersm.c in Sources */ = {isa = PBXBuildFile; fileRef = 562DAF5E1ED1920300208E62 /* playersm.c */; };
 		5633AC321EADDF98003F1549 /* net.c in Sources */ = {isa = PBXBuildFile; fileRef = 5633AC311EADDF98003F1549 /* net.c */; };
 		5644E9E31EA8B69000EAA658 /* battle.c in Sources */ = {isa = PBXBuildFile; fileRef = 5644E98F1EA8B69000EAA658 /* battle.c */; };
@@ -378,6 +385,19 @@
 		264553411EE4815A004064D0 /* logic.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = logic.h; sourceTree = "<group>"; };
 		265E1F0B1EF9903C00E82C3C /* lwskill.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = lwskill.c; sourceTree = "<group>"; };
 		265E1F0D1EF9904600E82C3C /* lwcontext.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = lwcontext.c; sourceTree = "<group>"; };
+		267BFC351F5E23DE008D0821 /* construct.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = construct.c; sourceTree = "<group>"; };
+		267BFC361F5E23DE008D0821 /* construct.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = construct.h; sourceTree = "<group>"; };
+		267BFC371F5E23DE008D0821 /* lwbutton.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = lwbutton.c; sourceTree = "<group>"; };
+		267BFC381F5E23DE008D0821 /* lwbutton.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = lwbutton.h; sourceTree = "<group>"; };
+		267BFC391F5E23DE008D0821 /* render_ui.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = render_ui.c; sourceTree = "<group>"; };
+		267BFC3A1F5E23DE008D0821 /* render_ui.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = render_ui.h; sourceTree = "<group>"; };
+		267BFC3E1F5E2453008D0821 /* splash.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = splash.c; sourceTree = "<group>"; };
+		267BFC3F1F5E2453008D0821 /* splash.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = splash.h; sourceTree = "<group>"; };
+		267BFC411F5E248D008D0821 /* render_splash.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = render_splash.c; sourceTree = "<group>"; };
+		267BFC421F5E248D008D0821 /* render_splash.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = render_splash.h; sourceTree = "<group>"; };
+		267BFC431F5E248D008D0821 /* splash.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = splash.c; sourceTree = "<group>"; };
+		267BFC451F5E248D008D0821 /* ui.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = ui.c; sourceTree = "<group>"; };
+		267BFC461F5E248D008D0821 /* ui.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ui.h; sourceTree = "<group>"; };
 		562DAF5E1ED1920300208E62 /* playersm.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = playersm.c; sourceTree = "<group>"; };
 		562DAF5F1ED1920300208E62 /* playersm.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = playersm.h; sourceTree = "<group>"; };
 		5633AC301EADDF62003F1549 /* sound.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = sound.h; sourceTree = "<group>"; };
@@ -1949,6 +1969,8 @@
 				5644E9911EA8B69000EAA658 /* battlelogic.c */,
 				5644E9921EA8B69000EAA658 /* battlelogic.h */,
 				5644E9931EA8B69000EAA658 /* constants.h */,
+				267BFC351F5E23DE008D0821 /* construct.c */,
+				267BFC361F5E23DE008D0821 /* construct.h */,
 				5644E9941EA8B69000EAA658 /* dialog.c */,
 				5644E9951EA8B69000EAA658 /* dialog.h */,
 				5644E9961EA8B69000EAA658 /* etc1.h */,
@@ -1983,6 +2005,8 @@
 				5644E9AC1EA8B69000EAA658 /* lwbattlestate.h */,
 				5644E9AD1EA8B69000EAA658 /* lwbitmapcontext.h */,
 				5644E9AE1EA8B69000EAA658 /* lwbox2dcollider.h */,
+				267BFC371F5E23DE008D0821 /* lwbutton.c */,
+				267BFC381F5E23DE008D0821 /* lwbutton.h */,
 				5644E9AF1EA8B69000EAA658 /* lwbuttoncommand.h */,
 				265E1F0D1EF9904600E82C3C /* lwcontext.c */,
 				5644E9B01EA8B69000EAA658 /* lwcontext.h */,
@@ -2055,14 +2079,20 @@
 				565676A81EAFB4F800FF64B3 /* render_skin.h */,
 				5644E9D41EA8B69000EAA658 /* render_solid.c */,
 				5644E9D51EA8B69000EAA658 /* render_solid.h */,
+				267BFC411F5E248D008D0821 /* render_splash.c */,
+				267BFC421F5E248D008D0821 /* render_splash.h */,
 				5644E9D61EA8B69000EAA658 /* render_text_block.c */,
 				5644E9D71EA8B69000EAA658 /* render_text_block.h */,
+				267BFC391F5E23DE008D0821 /* render_ui.c */,
+				267BFC3A1F5E23DE008D0821 /* render_ui.h */,
 				264254351F1B7E1C00A890F0 /* rmsg.c */,
 				264254361F1B7E1C00A890F0 /* rmsg.h */,
 				5644E9D81EA8B69000EAA658 /* script.c */,
 				5644E9D91EA8B69000EAA658 /* script.h */,
 				5644E9DA1EA8B69000EAA658 /* skill.c */,
 				5633AC301EADDF62003F1549 /* sound.h */,
+				267BFC431F5E248D008D0821 /* splash.c */,
+				267BFC3F1F5E2453008D0821 /* splash.h */,
 				5644E9DB1EA8B69000EAA658 /* sprite_data.h */,
 				5644E9DC1EA8B69000EAA658 /* sprite.h */,
 				56F1866F1EC74D430019312F /* sysmsg.c */,
@@ -2070,10 +2100,14 @@
 				5644E9DD1EA8B69000EAA658 /* tex.c */,
 				5644E9DE1EA8B69000EAA658 /* tex.h */,
 				5644E9DF1EA8B69000EAA658 /* tinyobj_loader_c.h */,
+				267BFC451F5E248D008D0821 /* ui.c */,
+				267BFC461F5E248D008D0821 /* ui.h */,
 				5644E9E01EA8B69000EAA658 /* unicode.c */,
 				5644E9E11EA8B69000EAA658 /* unicode.h */,
 				5644E9E21EA8B69000EAA658 /* vertices.h */,
 				56F186711EC74D430019312F /* zhelpers.h */,
+				267BFC3E1F5E2453008D0821 /* splash.c */,
+				267BFC3F1F5E2453008D0821 /* splash.h */,
 				5644E9B91EA8B69000EAA658 /* lwlog.h */,
 			);
 			name = src;
@@ -2361,6 +2395,7 @@
 				566373691EBA52D4001DA3F4 /* objects.cpp in Sources */,
 				5663735C1EBA52D4001DA3F4 /* pr.cpp in Sources */,
 				5663736D1EBA52D4001DA3F4 /* odemath.cpp in Sources */,
+				267BFC471F5E248D008D0821 /* render_splash.c in Sources */,
 				566373321EBA52D3001DA3F4 /* collision_cylinder_sphere.cpp in Sources */,
 				263F9BF41EEAEFEA00991437 /* ps.c in Sources */,
 				6CA16D8F1EA210BB00DB7AF0 /* llex.c in Sources */,
@@ -2423,6 +2458,7 @@
 				5663737A1EBA52D4001DA3F4 /* timer.cpp in Sources */,
 				56F188ED1EC74DB60019312F /* socket_poller.cpp in Sources */,
 				56F188E61EC74DB60019312F /* router.cpp in Sources */,
+				267BFC3B1F5E23DE008D0821 /* construct.c in Sources */,
 				56F188A71EC74DB60019312F /* client.cpp in Sources */,
 				6CA16D8B1EA210BB00DB7AF0 /* lfunc.c in Sources */,
 				5663733D1EBA52D3001DA3F4 /* collision_trimesh_internal.cpp in Sources */,
@@ -2477,14 +2513,17 @@
 				56F188E31EC74DB60019312F /* reaper.cpp in Sources */,
 				56F189A91EC751950019312F /* ziflist.c in Sources */,
 				56F188EF1EC74DB60019312F /* socks_connecter.cpp in Sources */,
+				267BFC401F5E2453008D0821 /* splash.c in Sources */,
 				56F189BA1EC751950019312F /* ztimerset.c in Sources */,
 				562DAF601ED1920300208E62 /* playersm.c in Sources */,
+				267BFC481F5E248D008D0821 /* splash.c in Sources */,
 				56F189AA1EC751950019312F /* zlist.c in Sources */,
 				56F189981EC751950019312F /* zchunk.c in Sources */,
 				56F188CA1EC74DB60019312F /* norm_engine.cpp in Sources */,
 				56F188CB1EC74DB60019312F /* null_mechanism.cpp in Sources */,
 				6CA16DA11EA210BB00DB7AF0 /* lvm.c in Sources */,
 				566373561EBA52D4001DA3F4 /* hinge2.cpp in Sources */,
+				267BFC491F5E248D008D0821 /* ui.c in Sources */,
 				564D11931ECA2812002CCCAE /* kvmsg.c in Sources */,
 				56F188C41EC74DB60019312F /* mailbox.cpp in Sources */,
 				6CA16D8E1EA210BB00DB7AF0 /* liolib.c in Sources */,
@@ -2494,6 +2533,7 @@
 				5663737F1EBA52D4001DA3F4 /* malloc.cpp in Sources */,
 				56F188F11EC74DB60019312F /* stream_engine.cpp in Sources */,
 				56F188E21EC74DB60019312F /* raw_encoder.cpp in Sources */,
+				267BFC3D1F5E23DE008D0821 /* render_ui.c in Sources */,
 				56F189B11EC751950019312F /* zproc.c in Sources */,
 				566373571EBA52D4001DA3F4 /* joint.cpp in Sources */,
 				56F188DA1EC74DB60019312F /* precompiled.cpp in Sources */,
@@ -2531,6 +2571,7 @@
 				56F188D41EC74DB60019312F /* plain_client.cpp in Sources */,
 				56F189081EC74DB60019312F /* vmci_listener.cpp in Sources */,
 				56F188F01EC74DB60019312F /* stream.cpp in Sources */,
+				267BFC3C1F5E23DE008D0821 /* lwbutton.c in Sources */,
 				56F189A61EC751950019312F /* zhash.c in Sources */,
 				5644E9EC1EA8B69000EAA658 /* lwbattlecreature.c in Sources */,
 				6CA16D831EA210BB00DB7AF0 /* lbitlib.c in Sources */,

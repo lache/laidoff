@@ -6,6 +6,8 @@
 #include "render_text_block.h"
 #include "lwmacro.h"
 #include "lwbutton.h"
+#include <string.h>
+#include <stdio.h>
 
 const float scrap_bg_width = 7.0f;
 const float scrap_bg_height = 1.0f;
