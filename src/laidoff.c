@@ -586,6 +586,14 @@ static void init_vbo(LWCONTEXT* pLwc) {
 	load_vbo(pLwc, ASSETS_BASE_PATH "vbo" PATH_SEPARATOR "devil.vbo",
 		&pLwc->vertex_buffer[LVT_DEVIL]);
 
+	// LVT_CRYSTAL
+	load_vbo(pLwc, ASSETS_BASE_PATH "vbo" PATH_SEPARATOR "crystal.vbo",
+		&pLwc->vertex_buffer[LVT_CRYSTAL]);
+
+	// LVT_SPIRAL
+	load_vbo(pLwc, ASSETS_BASE_PATH "vbo" PATH_SEPARATOR "spiral.vbo",
+		&pLwc->vertex_buffer[LVT_SPIRAL]);
+
 	// LVT_LEFT_TOP_ANCHORED_SQUARE ~ LVT_RIGHT_BOTTOM_ANCHORED_SQUARE
 	// 9 anchored squares...
 	const float anchored_square_offset[][2] = {

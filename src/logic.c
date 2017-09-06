@@ -186,7 +186,7 @@ void load_field_2_init_runtime_data_async(LWCONTEXT* pLwc, zactor_t* actor) {
 		1, {
 			{ LVT_FLOOR, pLwc->tex_atlas[LAE_3D_FLOOR_TEX_KTX], 0, },
 		},
-		0.5f,
+		0.35f,
 		1,
 	};
 	zmsg_addmem(msg, &m, sizeof(LWMSGINITFIELD));
@@ -234,7 +234,7 @@ void load_field_4_init_runtime_data_async(LWCONTEXT* pLwc, zactor_t* actor) {
 		1, {
 			{ LVT_ROOM, pLwc->tex_atlas[LAE_3D_ROOM_TEX_KTX], 0, },
 		},
-		0.5f,
+		0.35f,
 		1,
 	};
 	zmsg_addmem(msg, &m, sizeof(LWMSGINITFIELD));
@@ -259,7 +259,7 @@ void load_field_5_init_runtime_data_async(LWCONTEXT* pLwc, zactor_t* actor) {
 			{ LVT_BATTLEGROUND_FLOOR, pLwc->tex_atlas[LAE_3D_BATTLEGROUND_FLOOR_BAKE_TEX_KTX], 0, },
 			{ LVT_BATTLEGROUND_WALL, pLwc->tex_atlas[LAE_3D_BATTLEGROUND_WALL_BAKE_TEX_KTX], 0, },
 		},
-		0.5f,
+		0.35f,
 		1,
 	};
 	zmsg_addmem(msg, &m, sizeof(LWMSGINITFIELD));
@@ -271,6 +271,30 @@ void load_field_5_init_runtime_data_async(LWCONTEXT* pLwc, zactor_t* actor) {
 
 void load_field_5_init_runtime_data(LWCONTEXT* pLwc) {
 	load_field_5_init_runtime_data_async(pLwc, pLwc->logic_actor);
+}
+
+void load_field_6_init_runtime_data_async(LWCONTEXT* pLwc, zactor_t* actor) {
+	pLwc->next_game_scene = LGS_FIELD;
+	zmsg_t* msg = zmsg_new();
+	LWMSGINITFIELD m = {
+		LM_LWMSGINITFIELD,
+		ASSETS_BASE_PATH "field" PATH_SEPARATOR "spiral.field",
+		ASSETS_BASE_PATH "nav" PATH_SEPARATOR "spiral.nav",
+		1,{
+			{ LVT_SPIRAL, pLwc->tex_atlas[LAE_SPIRAL_KTX], 0, },
+		},
+		0.35f,
+		1,
+	};
+	zmsg_addmem(msg, &m, sizeof(LWMSGINITFIELD));
+	if (zactor_send(actor, &msg) < 0) {
+		zmsg_destroy(&msg);
+		LOGE("Send message to logic worker failed!");
+	}
+}
+
+void load_field_6_init_runtime_data(LWCONTEXT* pLwc) {
+	load_field_6_init_runtime_data_async(pLwc, pLwc->logic_actor);
 }
 
 void load_scene_async(LWCONTEXT* pLwc, zactor_t* actor, LW_GAME_SCENE next_game_scene) {
@@ -542,6 +566,7 @@ void reset_runtime_context(LWCONTEXT* pLwc) {
 		{ LWU("신:필드3로드"), load_field_3_init_runtime_data },
 		{ LWU("신:필드4로드"), load_field_4_init_runtime_data },
 		{ LWU("신:필드5로드"), load_field_5_init_runtime_data },
+		{ LWU("신:필드6로드"), load_field_6_init_runtime_data },
 		{ LWU("신:UI"), change_to_ui },
 		{ LWU("신:스플래시"), change_to_splash },
 		{ LWU("Server #0"), connect_to_server_0 },

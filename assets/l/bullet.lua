@@ -11,7 +11,7 @@ M.__index = M
 local c = lo.script_context()
 
 function M:new(name, x, y, z, angle, speed)
-	o = {}
+	local o = {}
 	o.orig_string = tostring(o)
 	o.name = name
 	o.x = x
