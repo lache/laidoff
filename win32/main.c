@@ -136,7 +136,7 @@ int main(void)
 	}
 
 	//glfwSetWindowPos(window, 600, 70);
-	glfwSetWindowPos(window, 100, 70);
+	glfwSetWindowPos(window, 20, 40);
 	// Register glfw event callbacks
 	glfwSetKeyCallback(window, key_callback);
 	glfwSetMouseButtonCallback(window, mouse_button_callback);
@@ -216,49 +216,4 @@ void lw_app_quit(LWCONTEXT* pLwc)
 	pLwc->quit_request = 1;
 	zsock_wait(pLwc->logic_actor);
 	glfwSetWindowShouldClose(lw_get_window(pLwc), GLFW_TRUE);
-}
-
-int request_get_today_played_count()
-{
-	return 0;
-}
-
-int request_get_today_playing_limit_count()
-{
-	return 5;
-}
-
-void request_on_game_start()
-{
-	// do nothing
-}
-
-void request_on_game_over(int point)
-{
-	// do nothing
-}
-
-void request_boast(int point)
-{
-	// do nothing
-}
-
-int request_is_retryable()
-{
-	return 1;
-}
-
-int request_is_boasted()
-{
-	return 0;
-}
-
-int request_get_highscore()
-{
-	return 0;
-}
-
-void request_set_highscore(int highscore)
-{
-	// do nothing
 }

@@ -39,6 +39,12 @@ class Application(tk.Frame):
 		self.start_btn["font"] = btn_font
 		self.start_btn.pack(side="top")
 		
+		self.reboot_btn = tk.Button(self)
+		self.reboot_btn["text"] = "Reboot"
+		self.reboot_btn["command"] = self.reboot
+		self.reboot_btn["font"] = btn_font
+		self.reboot_btn.pack(side="top")
+		
 		#self.quit = tk.Button(self, text="QUIT", fg="red", command=root.destroy)
 		#self.quit.pack(side="bottom")
 
@@ -53,6 +59,9 @@ class Application(tk.Frame):
 		
 	def start(self):
 		call(["adb", "shell", "am", "start", "-n", "com.popsongremix.laidoff/com.popsongremix.laidoff.LaidOffNativeActivity"], shell=True)
+		
+	def reboot(self):
+		call(["adb", "reboot"], shell=True)
 
 root = tk.Tk()
 root.wm_title("Laidoff")
