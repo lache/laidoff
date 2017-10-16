@@ -76,6 +76,8 @@ extern const char* tex_font_atlas_filename[2];
 #define PS_VERTEX_BUFFER_COUNT LPVT_COUNT
 #define MAX_DELTA_TIME_HISTORY (60)
 
+typedef struct _LWPUCKGAME LWPUCKGAME;
+
 typedef struct _LWCONTEXT {
 	// Window instance
 	struct GLFWwindow* window;
@@ -298,6 +300,8 @@ typedef struct _LWCONTEXT {
 	LWBUTTONLIST button_list;
 	// Construct
 	LWCONSTRUCT construct;
+	// Puck game sub-context
+	LWPUCKGAME* puck_game;
 } LWCONTEXT;
 
 #ifdef __cplusplus

@@ -40,6 +40,7 @@
 #include "render_ui.h"
 #include "render_splash.h"
 #include "lwbutton.h"
+#include "puckgame.h"
 // SWIG output file
 #include "lo_wrap.inl"
 
@@ -593,6 +594,9 @@ static void init_vbo(LWCONTEXT* pLwc) {
 	// LVT_SPIRAL
 	load_vbo(pLwc, ASSETS_BASE_PATH "vbo" PATH_SEPARATOR "spiral.vbo",
 		&pLwc->vertex_buffer[LVT_SPIRAL]);
+	// LVT_PUCK
+	load_vbo(pLwc, ASSETS_BASE_PATH "vbo" PATH_SEPARATOR "puck.vbo",
+		&pLwc->vertex_buffer[LVT_PUCK]);
 
 	// LVT_LEFT_TOP_ANCHORED_SQUARE ~ LVT_RIGHT_BOTTOM_ANCHORED_SQUARE
 	// 9 anchored squares...
@@ -1388,6 +1392,8 @@ LWCONTEXT* lw_init_initial_size(int width, int height) {
 
 	lwparabola_test();
 
+	pLwc->puck_game = new_puck_game();
+
 	return pLwc;
 }
 
@@ -1473,6 +1479,8 @@ void lw_deinit(LWCONTEXT* pLwc) {
 	deinit_sys_msg(pLwc->def_sys_msg);
 
 	deltatime_destroy(&pLwc->update_dt);
+
+	delete_puck_game(&pLwc->puck_game);
 
 	free(pLwc);
 }

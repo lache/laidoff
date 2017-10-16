@@ -4,6 +4,7 @@
 #include "lwlog.h"
 #include "render_text_block.h"
 #include "nav.h"
+#include "puckgame.h"
 #if LW_PLATFORM_WIN32
 #include "lwimgui.h"
 #endif
@@ -87,8 +88,14 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
 	}
 
 	if (key == GLFW_KEY_F && action == GLFW_PRESS) {
-		field_nav_query(pLwc->field);
-		LOGI("Nav: path query result - %d points", nav_path_query_n_smooth_path(field_nav(pLwc->field)));
+		if (pLwc->field) {
+			field_nav_query(pLwc->field);
+			LOGI("Nav: path query result - %d points", nav_path_query_n_smooth_path(field_nav(pLwc->field)));
+		}
+		else {
+			puck_game_push(pLwc->puck_game);
+		}
+		
 	}
 
 	if (key == GLFW_KEY_R && action == GLFW_PRESS) {
@@ -121,6 +128,10 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
 		lw_trigger_key_enter(pLwc);
 	}
 
+	if (key == GLFW_KEY_GRAVE_ACCENT && action == GLFW_PRESS) {
+		change_to_admin(pLwc);
+	}
+
 	if (key == GLFW_KEY_F1 && action == GLFW_PRESS) {
 		change_to_field(pLwc);
 	}
@@ -138,26 +149,22 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
 	}
 
 	if (key == GLFW_KEY_F5 && action == GLFW_PRESS) {
-		change_to_admin(pLwc);
-	}
-
-	if (key == GLFW_KEY_F6 && action == GLFW_PRESS) {
 		change_to_battle_result(pLwc);
 	}
 
-	if (key == GLFW_KEY_F7 && action == GLFW_PRESS) {
+	if (key == GLFW_KEY_F6 && action == GLFW_PRESS) {
 		change_to_skin(pLwc);
 	}
 
-	if (key == GLFW_KEY_F8 && action == GLFW_PRESS) {
+	if (key == GLFW_KEY_F7 && action == GLFW_PRESS) {
 		change_to_physics(pLwc);
 	}
 
-	if (key == GLFW_KEY_F9 && action == GLFW_PRESS) {
+	if (key == GLFW_KEY_F8 && action == GLFW_PRESS) {
 		change_to_particle_system(pLwc);
 	}
 
-	if (key == GLFW_KEY_F11 && action == GLFW_PRESS) {
+	if (key == GLFW_KEY_F9 && action == GLFW_PRESS) {
 		toggle_font_texture_test_mode(pLwc);
 	}
 

@@ -18,6 +18,8 @@
 #include "nav.h"
 #include "laidoff.h"
 #include "lwbutton.h"
+#include "physics.h"
+#include "puckgame.h"
 
 void toggle_font_texture_test_mode(LWCONTEXT* pLwc);
 
@@ -640,6 +642,10 @@ void lwc_update(LWCONTEXT* pLwc, double delta_time) {
 		update_dialog(pLwc);
 	}
 
+	if (pLwc->game_scene == LGS_PHYSICS) {
+		update_puck_game(pLwc->puck_game);
+	}
+
 	//****//
 	// fix delta time
 	//lwcontext_delta_time(pLwc) = 1.0f / 60;
@@ -678,6 +684,10 @@ void lwc_update(LWCONTEXT* pLwc, double delta_time) {
 
 	if (pLwc->game_scene == LGS_FIELD) {
 		script_update(pLwc);
+	}
+
+	if (pLwc->game_scene == LGS_PHYSICS) {
+		update_physics(pLwc);
 	}
 
 	script_emit_logic_frame_finish(pLwc->L, (float)delta_time);
@@ -815,8 +825,8 @@ void lwc_start_logic_thread(LWCONTEXT* pLwc) {
 	// Start logic thread
 	pLwc->logic_actor = zactor_new(s_logic_worker, pLwc);
 	// Load initial stage
-	load_field_2_init_runtime_data_async(pLwc, pLwc->logic_actor);
-	//load_scene_async(pLwc, pLwc->logic_actor, LGS_UI);
+	//load_field_2_init_runtime_data_async(pLwc, pLwc->logic_actor);
+	load_scene_async(pLwc, pLwc->logic_actor, LGS_PHYSICS);
 }
 
 const char* logic_server_addr(int idx) {
