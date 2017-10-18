@@ -29,12 +29,14 @@ static const char* server_addr[] = {
 };
 
 static void reinit_mq(LWCONTEXT* pLwc);
+void load_field_2_init_runtime_data_async(LWCONTEXT* pLwc, zactor_t* actor);
 
 void change_to_field(LWCONTEXT* pLwc) {
 	if (pLwc->field) {
 		pLwc->next_game_scene = LGS_FIELD;
 	} else {
 		LOGE("pLwc->field null");
+		load_field_2_init_runtime_data_async(pLwc, pLwc->logic_actor);
 	}
 }
 
@@ -643,7 +645,7 @@ void lwc_update(LWCONTEXT* pLwc, double delta_time) {
 	}
 
 	if (pLwc->game_scene == LGS_PHYSICS) {
-		update_puck_game(pLwc->puck_game);
+		update_puck_game(pLwc, pLwc->puck_game);
 	}
 
 	//****//

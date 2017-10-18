@@ -100,3 +100,5 @@ target_link_libraries(native-activity
                       log
                       libzmq
                       czmq)
+
+					  

@@ -94,7 +94,8 @@ void lw_trigger_mouse_press(LWCONTEXT* pLwc, float x, float y) {
 
 	const float sr = get_dir_pad_size_radius();
 
-	if (pLwc->game_scene == LGS_FIELD && fabs(dir_pad_center_x - x) < sr && fabs(dir_pad_center_y - y) < sr) {
+	if ((pLwc->game_scene == LGS_FIELD || pLwc->game_scene == LGS_PHYSICS)
+		&& fabs(dir_pad_center_x - x) < sr && fabs(dir_pad_center_y - y) < sr) {
 		pLwc->dir_pad_x = x;
 		pLwc->dir_pad_y = y;
 		pLwc->dir_pad_dragging = 1;
@@ -152,7 +153,8 @@ void lw_trigger_mouse_move(LWCONTEXT* pLwc, float x, float y) {
 
 	const float aspect_ratio = (float)pLwc->width / pLwc->height;
 
-	if (pLwc->game_scene == LGS_FIELD && pLwc->dir_pad_dragging) {
+	if ((pLwc->game_scene == LGS_FIELD || pLwc->game_scene == LGS_PHYSICS)
+		&& pLwc->dir_pad_dragging) {
 		float dir_pad_center_x = 0;
 		float dir_pad_center_y = 0;
 		get_dir_pad_center(aspect_ratio, &dir_pad_center_x, &dir_pad_center_y);
