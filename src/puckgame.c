@@ -50,11 +50,15 @@ static void create_go(LWPUCKGAME* puck_game, LW_PUCK_GAME_OBJECT lpgo, float mas
 }
 
 LWPUCKGAME* new_puck_game() {
+	// Static game data
 	LWPUCKGAME* puck_game = malloc(sizeof(LWPUCKGAME));
 	memset(puck_game, 0, sizeof(LWPUCKGAME));
-
 	puck_game->world_size = 4.0f;
 	puck_game->world_size_half = puck_game->world_size / 2.0f;
+	puck_game->dash_interval = 1.5f;
+	puck_game->dash_duration = 0.1f;
+	puck_game->dash_speed_ratio = 8.0f;
+	// ------
 
 	// Initialize OpenDE
 	dInitODE2(0);
@@ -70,6 +74,7 @@ LWPUCKGAME* new_puck_game() {
 	
 	create_go(puck_game, LPGO_PUCK, 0.1f, 0.125f, 1.0f, 0.0f);
 	create_go(puck_game, LPGO_PLAYER, 0.1f, 0.125f, 0.0f, 0.0f);
+	create_go(puck_game, LPGO_TARGET, 0.1f, 0.125f, 0.0f, 1.0f);
 
 	puck_game->player_control_joint = dJointCreateLMotor(puck_game->world, puck_game->player_control_joint_group);
 	dJointID pcj = puck_game->player_control_joint;
@@ -84,7 +89,7 @@ LWPUCKGAME* new_puck_game() {
 	puck_game->player_control_joint_group = dJointGroupCreate(0);
 
 	dBodySetKinematic(puck_game->go[LPGO_PUCK].body);
-	
+
 	return puck_game;
 }
 
@@ -185,10 +190,11 @@ static void near_callback(void *data, dGeomID o1, dGeomID o2)
 	}
 }
 
-void update_puck_game(LWCONTEXT* pLwc, LWPUCKGAME* puck_game) {
+void update_puck_game(LWCONTEXT* pLwc, LWPUCKGAME* puck_game, double delta_time) {
 	if (!puck_game->world) {
 		return;
 	}
+	puck_game->time += (float)delta_time;
 	dSpaceCollide(puck_game->space, puck_game, near_callback);
 	//dWorldStep(puck_game->world, 0.005f);
 	dWorldQuickStep(puck_game->world, 0.02f);
@@ -199,18 +205,27 @@ void update_puck_game(LWCONTEXT* pLwc, LWPUCKGAME* puck_game) {
 
 	dJointID pcj = puck_game->player_control_joint;
 	float player_speed = 0.5f;
-	dJointSetLMotorParam(pcj, dParamVel1, player_speed * (pLwc->player_move_right - pLwc->player_move_left));
-	dJointSetLMotorParam(pcj, dParamVel2, player_speed * (pLwc->player_move_up - pLwc->player_move_down));
+	//dJointSetLMotorParam(pcj, dParamVel1, player_speed * (pLwc->player_move_right - pLwc->player_move_left));
+	//dJointSetLMotorParam(pcj, dParamVel2, player_speed * (pLwc->player_move_up - pLwc->player_move_down));
 
 	//pLwc->player_pos_last_moved_dx
 	float dx, dy, dlen;
 	if (lw_get_normalized_dir_pad_input(pLwc, &dx, &dy, &dlen)) {
-		if (dx) {
-			dJointSetLMotorParam(pcj, dParamVel1, player_speed * dx);
-		}
-		if (dy) {
-			dJointSetLMotorParam(pcj, dParamVel2, player_speed * dy);
-		}
+		dJointSetLMotorParam(pcj, dParamVel1, player_speed * dx);
+		dJointSetLMotorParam(pcj, dParamVel2, player_speed * dy);
+	} else {
+		dJointSetLMotorParam(pcj, dParamVel1, 0);
+		dJointSetLMotorParam(pcj, dParamVel2, 0);
+	}
+
+	// Move direction fixed while dashing
+	if (puck_game->dash.remain_time > 0) {
+		player_speed *= puck_game->dash_speed_ratio;
+		dx = puck_game->dash.dir_x;
+		dy = puck_game->dash.dir_y;
+		dJointSetLMotorParam(pcj, dParamVel1, player_speed * dx);
+		dJointSetLMotorParam(pcj, dParamVel2, player_speed * dy);
+		puck_game->dash.remain_time -= (float)delta_time;
 	}
 }
 
@@ -218,4 +233,29 @@ void puck_game_push(LWPUCKGAME* puck_game) {
 	//puck_game->push = 1;
 
 	dBodySetLinearVel(puck_game->go[LPGO_PUCK].body, 1, 1, 0);
+}
+
+void puck_game_dash(LWCONTEXT* pLwc, LWPUCKGAME* puck_game) {
+	// Check params
+	if (!pLwc || !puck_game) {
+		return;
+	}
+	// Check cooltime
+	if (puck_game->time - puck_game->dash.last_time < puck_game->dash_interval) {
+		return;
+	}
+	// Check already effective dash
+	if (puck_game->dash.remain_time > 0) {
+		return;
+	}
+	// Check effective move input
+	float dx, dy, dlen;
+	if (!lw_get_normalized_dir_pad_input(pLwc, &dx, &dy, &dlen)) {
+		return;
+	}
+	// Start dash!
+	puck_game->dash.remain_time = puck_game->dash_duration;
+	puck_game->dash.dir_x = dx;
+	puck_game->dash.dir_y = dy;
+	puck_game->dash.last_time = puck_game->time;
 }

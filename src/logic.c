@@ -645,7 +645,7 @@ void lwc_update(LWCONTEXT* pLwc, double delta_time) {
 	}
 
 	if (pLwc->game_scene == LGS_PHYSICS) {
-		update_puck_game(pLwc, pLwc->puck_game);
+		update_puck_game(pLwc, pLwc->puck_game, delta_time);
 	}
 
 	//****//

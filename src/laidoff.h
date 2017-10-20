@@ -33,15 +33,6 @@ void lw_trigger_key_left(LWCONTEXT* pLwc);
 void lw_trigger_key_right(LWCONTEXT* pLwc);
 void lw_trigger_key_enter(LWCONTEXT* pLwc);
 
-void lw_press_key_left(LWCONTEXT* pLwc);
-void lw_press_key_right(LWCONTEXT* pLwc);
-void lw_press_key_up(LWCONTEXT* pLwc);
-void lw_press_key_down(LWCONTEXT* pLwc);
-void lw_release_key_left(LWCONTEXT* pLwc);
-void lw_release_key_right(LWCONTEXT* pLwc);
-void lw_release_key_up(LWCONTEXT* pLwc);
-void lw_release_key_down(LWCONTEXT* pLwc);
-
 int lw_get_update_count(LWCONTEXT* pLwc);
 int lw_get_render_count(LWCONTEXT* pLwc);
 

@@ -8,6 +8,7 @@
 #include "mq.h"
 #include "logic.h"
 #include "lwbutton.h"
+#include "puckgame.h"
 
 float get_dir_pad_size_radius() {
 	return 0.75f;
@@ -101,6 +102,10 @@ void lw_trigger_mouse_press(LWCONTEXT* pLwc, float x, float y) {
 		pLwc->dir_pad_dragging = 1;
 	}
 
+	if (pLwc->game_scene == LGS_PHYSICS && fabs(aspect_ratio - 0.3f - 0.75f / 2 - x) < 0.75f && fabs(-1 + 0.75f / 2 - y) < 0.75f) {
+		//puck_game_dash(pLwc, pLwc->puck_game);
+	}
+
 	if (pLwc->game_scene == LGS_FIELD && fabs(aspect_ratio - 0.3f - 0.75f/2 - x) < 0.75f && fabs(-1 + 0.75f/2 - y) < 0.75f) {
 		//field_attack(pLwc);
 
@@ -111,6 +116,8 @@ void lw_trigger_mouse_press(LWCONTEXT* pLwc, float x, float y) {
 		// Player combat mode...
 		//pLwc->atk_pad_dragging = 1;
 	}
+
+
 
 	if (pLwc->game_scene == LGS_FIELD && fabs(aspect_ratio - 0.3f - 0.75f / 2 - x) < 0.75f && fabs(1 - 0.75f / 2 - y) < 0.75f) {
 		//pLwc->fps_mode = !pLwc->fps_mode;
@@ -353,34 +360,63 @@ void lw_trigger_key_enter(LWCONTEXT* pLwc) {
 	}
 }
 
+static void simulate_dir_pad_touch_input(LWCONTEXT* pLwc) {
+	pLwc->dir_pad_dragging = pLwc->player_move_left || pLwc->player_move_right || pLwc->player_move_down || pLwc->player_move_up;
+
+	const float aspect_ratio = (float)pLwc->width / pLwc->height;
+	float dir_pad_center_x = 0;
+	float dir_pad_center_y = 0;
+	get_dir_pad_center(aspect_ratio, &dir_pad_center_x, &dir_pad_center_y);
+
+	pLwc->dir_pad_x = dir_pad_center_x + (pLwc->player_move_right - pLwc->player_move_left) / 5.0f;
+	pLwc->dir_pad_y = dir_pad_center_y + (pLwc->player_move_up - pLwc->player_move_down) / 5.0f;
+}
+
 void lw_press_key_left(LWCONTEXT* pLwc) {
 	pLwc->player_move_left = 1;
+	simulate_dir_pad_touch_input(pLwc);
 }
 
 void lw_press_key_right(LWCONTEXT* pLwc) {
 	pLwc->player_move_right = 1;
+	simulate_dir_pad_touch_input(pLwc);
 }
 
 void lw_press_key_up(LWCONTEXT* pLwc) {
 	pLwc->player_move_up = 1;
+	simulate_dir_pad_touch_input(pLwc);
 }
 
 void lw_press_key_down(LWCONTEXT* pLwc) {
 	pLwc->player_move_down = 1;
+	simulate_dir_pad_touch_input(pLwc);
+}
+
+void lw_press_key_space(LWCONTEXT* pLwc) {
+	pLwc->player_space = 1;
+	puck_game_dash(pLwc, pLwc->puck_game);
 }
 
 void lw_release_key_left(LWCONTEXT* pLwc) {
 	pLwc->player_move_left = 0;
+	simulate_dir_pad_touch_input(pLwc);
 }
 
 void lw_release_key_right(LWCONTEXT* pLwc) {
 	pLwc->player_move_right = 0;
+	simulate_dir_pad_touch_input(pLwc);
 }
 
 void lw_release_key_up(LWCONTEXT* pLwc) {
 	pLwc->player_move_up = 0;
+	simulate_dir_pad_touch_input(pLwc);
 }
 
 void lw_release_key_down(LWCONTEXT* pLwc) {
 	pLwc->player_move_down = 0;
+	simulate_dir_pad_touch_input(pLwc);
+}
+
+void lw_release_key_space(LWCONTEXT* pLwc) {
+	pLwc->player_space = 0;
 }

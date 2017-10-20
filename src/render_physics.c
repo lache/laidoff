@@ -6,9 +6,8 @@
 #include "puckgame.h"
 #include "render_field.h"
 
-static void render_go(const LWCONTEXT* pLwc, const mat4x4 view, const mat4x4 proj, const LWPUCKGAMEOBJECT* go) {
+static void render_go(const LWCONTEXT* pLwc, const mat4x4 view, const mat4x4 proj, const LWPUCKGAMEOBJECT* go, int tex_index) {
 	int shader_index = LWST_DEFAULT;
-	const int tex_index = pLwc->tex_atlas[LAE_PUCK_KTX];
 	mat4x4 rot;
 	mat4x4_identity(rot);
 	float sx = go->radius, sy = go->radius, sz = go->radius;
@@ -121,8 +120,9 @@ void lwc_render_physics(const struct _LWCONTEXT* pLwc) {
 		glDrawArrays(GL_TRIANGLES, 0, pLwc->vertex_buffer[lvt].vertex_count);
 	}
 
-	render_go(pLwc, view, proj, &puck_game->go[LPGO_PUCK]);
-	render_go(pLwc, view, proj, &puck_game->go[LPGO_PLAYER]);
+	render_go(pLwc, view, proj, &puck_game->go[LPGO_PUCK], pLwc->tex_atlas[LAE_PUCK_KTX]);
+	render_go(pLwc, view, proj, &puck_game->go[LPGO_PLAYER], pLwc->tex_atlas[LAE_PUCK_PLAYER_KTX]);
+	render_go(pLwc, view, proj, &puck_game->go[LPGO_TARGET], pLwc->tex_atlas[LAE_PUCK_ENEMY_KTX]);
 
 	render_dir_pad(pLwc);
 }

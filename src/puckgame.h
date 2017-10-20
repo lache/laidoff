@@ -30,9 +30,22 @@ typedef struct _LWPUCKGAMEOBJECT {
 	int wall_hit_count;
 } LWPUCKGAMEOBJECT;
 
+typedef struct _LWPUCKGAMEDASH {
+	float last_time;
+	float remain_time;
+	float dir_x;
+	float dir_y;
+} LWPUCKGAMEDASH;
+
 typedef struct _LWPUCKGAME {
+	// Static game data
 	float world_size;
 	float world_size_half;
+	float dash_interval;
+	float dash_duration;
+	float dash_speed_ratio;
+	// ----
+
 	dWorldID world;
 	dSpaceID space;
 	dGeomID boundary[LPGB_COUNT];
@@ -41,9 +54,12 @@ typedef struct _LWPUCKGAME {
 	dJointGroupID  player_control_joint_group;
 	dJointID player_control_joint;
 	int push;
+	float time;
+	LWPUCKGAMEDASH dash;
 } LWPUCKGAME;
 
 LWPUCKGAME* new_puck_game();
 void delete_puck_game(LWPUCKGAME** puck_game);
-void update_puck_game(LWCONTEXT* pLwc, LWPUCKGAME* puck_game);
+void update_puck_game(LWCONTEXT* pLwc, LWPUCKGAME* puck_game, double delta_time);
 void puck_game_push(LWPUCKGAME* puck_game);
+void puck_game_dash(LWCONTEXT* pLwc, LWPUCKGAME* puck_game);

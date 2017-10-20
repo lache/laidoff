@@ -163,6 +163,8 @@ typedef struct _LWCONTEXT {
 	int player_move_up;
 	// 1 if player move down key is down, 0 if otherwise
 	int player_move_down;
+	// 1 if player space key is down, 0 if otherwise
+	int player_space;
 	// Current player x coordinate
 	float player_pos_x;
 	// Current player y coordinate
