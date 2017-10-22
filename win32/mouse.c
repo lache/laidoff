@@ -28,14 +28,14 @@ void mouse_button_callback(GLFWwindow* window, int button, int action, int mods)
 		{
 			//printf("glfw mouse press pos x=%f, y=%f (normalized x=%f, y=%f)\n", xpos, ypos, normalized_xpos, normalized_ypos);
 
-			lw_trigger_touch(pLwc, (float)normalized_xpos, (float)normalized_ypos);
+			lw_trigger_touch(pLwc, (float)normalized_xpos, (float)normalized_ypos, 0);
 
-			lw_trigger_mouse_press(pLwc, (float)normalized_xpos, (float)normalized_ypos);
+			lw_trigger_mouse_press(pLwc, (float)normalized_xpos, (float)normalized_ypos, 0);
 		}
 
 		if (action == GLFW_RELEASE)
 		{
-			lw_trigger_mouse_release(pLwc, (float)normalized_xpos, (float)normalized_ypos);
+			lw_trigger_mouse_release(pLwc, (float)normalized_xpos, (float)normalized_ypos, 0);
 		}
     }
 }
@@ -49,7 +49,7 @@ void mouse_pos_callback(GLFWwindow* window, double xpos, double ypos) {
 	double normalized_xpos = 2 * (xpos / width - 0.5);
 	double normalized_ypos = 1.0 - 2 * (ypos / height);
 
-	lw_trigger_mouse_move(pLwc, (float)normalized_xpos, (float)normalized_ypos);
+	lw_trigger_mouse_move(pLwc, (float)normalized_xpos, (float)normalized_ypos, 0);
 }
 
 void scroll_callback(GLFWwindow* window, double xoffset, double yoffset) {

@@ -442,81 +442,91 @@ static void engine_term_display(struct engine* engine) {
  */
 static int32_t engine_handle_input(struct android_app* app, AInputEvent* event) {
     struct engine* engine = (struct engine*)app->userData;
-
     switch(AInputEvent_getType(event)){
         case AINPUT_EVENT_TYPE_MOTION:
-            if( AMotionEvent_getPointerCount(event) > 1 )
-            {
-                // Only support single touch
-                return 0;
-            }
-
-            switch(AInputEvent_getSource(event)){
+			switch(AInputEvent_getSource(event)){
                 case AINPUT_SOURCE_TOUCHSCREEN:
+					int pointer_count = AMotionEvent_getPointerCount(event);
+					//LOGI("Pointer count *** %d", pointer_count);
+					int action = AKeyEvent_getAction(event);
+                    int motion_event_action = action & AMOTION_EVENT_ACTION_MASK;
+					int pointer_index = (action & AMOTION_EVENT_ACTION_POINTER_INDEX_MASK) >> AMOTION_EVENT_ACTION_POINTER_INDEX_SHIFT;
 
-                    int action = AKeyEvent_getAction(event) & AMOTION_EVENT_ACTION_MASK;
+					const float xpos = AMotionEvent_getX(event, pointer_index);
+					const float ypos = AMotionEvent_getY(event, pointer_index);
+					//LOGI("Pointer #%d", pointer_index);
+					const int pointer_id = AMotionEvent_getPointerId(event, pointer_index);
 
-                    const float xpos = AMotionEvent_getX(event, 0);
-                    const float ypos = AMotionEvent_getY(event, 0);
+					int width = engine->width;
+					int height = engine->height;
 
-                    int width = engine->width;
-                    int height = engine->height;
+					float normalized_xpos = (float)(2 * (xpos / width - 0.5));
+					float normalized_ypos = (float)(1.0 - 2 * (ypos / height));
 
-                    float normalized_xpos = (float)(2 * (xpos / width - 0.5));
-                    float normalized_ypos = (float)(1.0 - 2 * (ypos / height));
+					const int verbose_log = 0;
+					const int verbose_move_log = 0;
 
-                    switch(action){
-                        case AMOTION_EVENT_ACTION_DOWN:
-                        {
-                            lw_trigger_touch(engine->pLwc, normalized_xpos, normalized_ypos);
-
-                            lw_trigger_mouse_press(engine->pLwc, normalized_xpos, normalized_ypos);
-
-                            /*
-                            if (engine->pLwc)
-                            {
-                                lwc_update(engine->pLwc, 1.0/60);
-                                lwc_render_battle(engine->pLwc);
-
-                                GLboolean swap_result = eglSwapBuffers(engine->display, engine->surface);
-                                GLint swap_error = eglGetError();
-                                LOGI("Swap Result: %d", swap_result);
-                                if (swap_result != EGL_TRUE)
-                                {
-                                    LOGI("eglGetError() = %d", swap_error);
-                                    LOGI("eglGetError descrption = %s", egl_get_error_string(swap_error));
-
-                                    // EGL 서피스 문제면 서피스만 새로 만들어보자...
-                                    if (swap_error == EGL_BAD_SURFACE)
-                                    {
-                                        engine->surface = eglCreateWindowSurface(engine->display, engine->config, engine->app->window, NULL);
-                                        if (eglMakeCurrent(engine->display, engine->surface, engine->surface, engine->context) == EGL_FALSE) {
-                                            LOGW("Unable to eglMakeCurrent!!");
-                                        }
-                                    }
-                                }
-                            }
-                            else
-                            {
-                                LOGI("pLwc NULL");
-                            }
-                            */
-                        }
-                            return 1;
-                        case AMOTION_EVENT_ACTION_UP:
-                            lw_trigger_mouse_release(engine->pLwc, normalized_xpos, normalized_ypos);
-                            return 1;
-                        case AMOTION_EVENT_ACTION_MOVE:
-                            lw_trigger_mouse_move(engine->pLwc, normalized_xpos, normalized_ypos);
-                            return 1;
-                    }
+					switch(motion_event_action){
+						case AMOTION_EVENT_ACTION_DOWN:
+							if (verbose_log) {
+								LOGI("[%d] AMOTION_EVENT_ACTION_DOWN [%d] %.2f %.2f", pointer_count, pointer_id, xpos, ypos);
+							}
+							lw_trigger_touch(engine->pLwc, normalized_xpos, normalized_ypos, pointer_id);
+							lw_trigger_mouse_press(engine->pLwc, normalized_xpos, normalized_ypos, pointer_id);
+							break;
+						case AMOTION_EVENT_ACTION_UP:
+							if (verbose_log) {
+								LOGI("[%d] AMOTION_EVENT_ACTION_UP [%d] %.2f %.2f", pointer_count, pointer_id, xpos, ypos);
+							}
+							lw_trigger_mouse_release(engine->pLwc, normalized_xpos, normalized_ypos, pointer_id);
+							break;
+						case AMOTION_EVENT_ACTION_MOVE:
+						{
+							for (size_t i = 0; i < pointer_count; i++) {
+								const int move_pointer_id = AMotionEvent_getPointerId(event, i);
+								const float move_xpos = AMotionEvent_getX(event, i);
+								const float move_ypos = AMotionEvent_getY(event, i);
+								float move_normalized_xpos = (float)(2 * (move_xpos / width - 0.5));
+								float move_normalized_ypos = (float)(1.0 - 2 * (move_ypos / height));
+								if (verbose_move_log) {
+									LOGI("[%d] AMOTION_EVENT_ACTION_MOVE [%d] %.2f %.2f", pointer_count, move_pointer_id, move_xpos, move_ypos);
+								}
+								lw_trigger_mouse_move(engine->pLwc, move_normalized_xpos, move_normalized_ypos, move_pointer_id);
+							}
+							break;
+						}
+						case AMOTION_EVENT_ACTION_POINTER_DOWN:
+						{
+							if (verbose_log) {
+								LOGI("[%d] AMOTION_EVENT_ACTION_POINTER_DOWN [%d] %.2f %.2f",
+									 pointer_count, pointer_id, xpos, ypos);
+							}
+							lw_trigger_mouse_press(engine->pLwc, normalized_xpos, normalized_ypos, pointer_id);
+							break;
+						}
+						case AMOTION_EVENT_ACTION_POINTER_UP:
+						{
+							if (verbose_log) {
+								LOGI("[%d] AMOTION_EVENT_ACTION_POINTER_UP [%d] %.2f %.2f",
+									 pointer_count, pointer_id, xpos, ypos);
+							}
+							lw_trigger_mouse_release(engine->pLwc, normalized_xpos, normalized_ypos, pointer_id);
+							break;
+						}
+						case AMOTION_EVENT_ACTION_CANCEL:
+							break;
+						default:
+							LOGI("[%d] ????????? DEFAULT: [%d] %.2f %.2f", pointer_count, pointer_id, xpos, ypos);
+							return 0;
+					}
                     break;
             } // end switch
-            break;
+			// AINPUT_EVENT_TYPE_MOTION always handled
+			return 1;
         case AINPUT_EVENT_TYPE_KEY:
 			if (AKeyEvent_getKeyCode(event) == AKEYCODE_BACK) {
 				// actions on back key
-				//return 1; // <-- prevent default handler
+				//return 1; // <-- uncomment this line to prevent default back button handler called
 			};
             // handle key input...
             break;
@@ -725,7 +735,6 @@ void android_main(struct android_app* state) {
         */
 
         while ((ident=ALooper_pollAll(poll_without_timeout ? 0 : -1, NULL, &events, (void**)&source)) >= 0) {
-
             // Process this event.
             if (source != NULL) {
                 source->process(state, source);

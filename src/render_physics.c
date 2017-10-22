@@ -125,4 +125,5 @@ void lwc_render_physics(const struct _LWCONTEXT* pLwc) {
 	render_go(pLwc, view, proj, &puck_game->go[LPGO_TARGET], pLwc->tex_atlas[LAE_PUCK_ENEMY_KTX]);
 
 	render_dir_pad(pLwc);
+	render_fist_button(pLwc);
 }

@@ -88,6 +88,17 @@ static void render_ground(const LWCONTEXT* pLwc, const mat4x4 view, const mat4x4
 	glDrawArrays(GL_TRIANGLES, 0, pLwc->vertex_buffer[vbo_index].vertex_count);
 }
 
+void render_fist_button(const LWCONTEXT* pLwc) {
+	const float aspect_ratio = (float)pLwc->width / pLwc->height;
+
+	const float fist_icon_margin_x = 0.3f;
+	const float fist_icon_margin_y = 0.2f;
+
+	render_solid_vb_ui_alpha(pLwc, aspect_ratio - fist_icon_margin_x, -1 + fist_icon_margin_y, 0.75f, 0.75f,
+		pLwc->tex_atlas[LAE_U_FIST_ICON_KTX], pLwc->tex_atlas[LAE_U_FIST_ICON_ALPHA_KTX],
+		LVT_RIGHT_BOTTOM_ANCHORED_SQUARE, 1, 0, 0, 0, 0);
+}
+
 void render_dir_pad(const LWCONTEXT* pLwc) {
 	int shader_index = LWST_DEFAULT;
 	const int vbo_index = LVT_CENTER_CENTER_ANCHORED_SQUARE;

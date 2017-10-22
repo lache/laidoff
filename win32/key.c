@@ -70,7 +70,7 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
 	}
 
 	if (key == GLFW_KEY_T && action == GLFW_PRESS) {
-		lw_trigger_touch(pLwc, 0, 0);
+		lw_trigger_touch(pLwc, 0, 0, 0);
 	}
 
 	if (key == GLFW_KEY_S && action == GLFW_PRESS) {

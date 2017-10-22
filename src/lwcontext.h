@@ -183,6 +183,8 @@ typedef struct _LWCONTEXT {
 	float dir_pad_y;
 	// 1 if dir pad (left button) is dragged, 0 if otherwise
 	int dir_pad_dragging;
+	// dir_pad_dragging pointer index
+	int dir_pad_pointer_id;
 	// 1 if attack pad (right button) is dragged, 0 if otherwise
 	int atk_pad_dragging;
 	// Current field event ID

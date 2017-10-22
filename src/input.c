@@ -71,7 +71,7 @@ static void convert_touch_coord_to_ui_coord(LWCONTEXT* pLwc, float *x, float *y)
 	}
 }
 
-void lw_trigger_mouse_press(LWCONTEXT* pLwc, float x, float y) {
+void lw_trigger_mouse_press(LWCONTEXT* pLwc, float x, float y, int pointer_id) {
 	if (!pLwc) {
 		return;
 	}
@@ -96,14 +96,17 @@ void lw_trigger_mouse_press(LWCONTEXT* pLwc, float x, float y) {
 	const float sr = get_dir_pad_size_radius();
 
 	if ((pLwc->game_scene == LGS_FIELD || pLwc->game_scene == LGS_PHYSICS)
-		&& fabs(dir_pad_center_x - x) < sr && fabs(dir_pad_center_y - y) < sr) {
+		&& fabs(dir_pad_center_x - x) < sr && fabs(dir_pad_center_y - y) < sr
+		&& !pLwc->dir_pad_dragging) {
 		pLwc->dir_pad_x = x;
 		pLwc->dir_pad_y = y;
 		pLwc->dir_pad_dragging = 1;
+		pLwc->dir_pad_pointer_id = pointer_id;
 	}
 
-	if (pLwc->game_scene == LGS_PHYSICS && fabs(aspect_ratio - 0.3f - 0.75f / 2 - x) < 0.75f && fabs(-1 + 0.75f / 2 - y) < 0.75f) {
-		//puck_game_dash(pLwc, pLwc->puck_game);
+	if (pLwc->game_scene == LGS_PHYSICS && fabs(aspect_ratio - 0.3f - 0.75f / 2 - x) < 0.75f && fabs(-1 + 0.75f / 2 - y) < 0.75f
+		&& (!pLwc->dir_pad_dragging || (pLwc->dir_pad_pointer_id != pointer_id))) {
+		puck_game_dash(pLwc, pLwc->puck_game);
 	}
 
 	if (pLwc->game_scene == LGS_FIELD && fabs(aspect_ratio - 0.3f - 0.75f/2 - x) < 0.75f && fabs(-1 + 0.75f/2 - y) < 0.75f) {
@@ -148,7 +151,7 @@ void lw_trigger_mouse_press(LWCONTEXT* pLwc, float x, float y) {
 	}
 }
 
-void lw_trigger_mouse_move(LWCONTEXT* pLwc, float x, float y) {
+void lw_trigger_mouse_move(LWCONTEXT* pLwc, float x, float y, int pointer_id) {
 	if (!pLwc) {
 		return;
 	}
@@ -161,7 +164,7 @@ void lw_trigger_mouse_move(LWCONTEXT* pLwc, float x, float y) {
 	const float aspect_ratio = (float)pLwc->width / pLwc->height;
 
 	if ((pLwc->game_scene == LGS_FIELD || pLwc->game_scene == LGS_PHYSICS)
-		&& pLwc->dir_pad_dragging) {
+		&& pLwc->dir_pad_dragging && pLwc->dir_pad_pointer_id == pointer_id) {
 		float dir_pad_center_x = 0;
 		float dir_pad_center_y = 0;
 		get_dir_pad_center(aspect_ratio, &dir_pad_center_x, &dir_pad_center_y);
@@ -189,7 +192,7 @@ void lw_trigger_mouse_move(LWCONTEXT* pLwc, float x, float y) {
 	}
 }
 
-void lw_trigger_mouse_release(LWCONTEXT* pLwc, float x, float y) {
+void lw_trigger_mouse_release(LWCONTEXT* pLwc, float x, float y, int pointer_id) {
 	if (!pLwc) {
 		return;
 	}
@@ -222,9 +225,11 @@ void lw_trigger_mouse_release(LWCONTEXT* pLwc, float x, float y) {
 		return;
 	}
 
-	reset_dir_pad_position(pLwc);
+	if (pLwc->dir_pad_pointer_id == pointer_id) {
+		reset_dir_pad_position(pLwc);
+		pLwc->dir_pad_dragging = 0;
+	}
 
-	pLwc->dir_pad_dragging = 0;
 	pLwc->atk_pad_dragging = 0;
 	//LOGI("atk_pad_dragging OFF");
 
@@ -233,7 +238,7 @@ void lw_trigger_mouse_release(LWCONTEXT* pLwc, float x, float y) {
 	}
 }
 
-void lw_trigger_touch(LWCONTEXT* pLwc, float x, float y) {
+void lw_trigger_touch(LWCONTEXT* pLwc, float x, float y, int pointer_id) {
 	if (!pLwc) {
 		return;
 	}

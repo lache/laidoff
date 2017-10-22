@@ -7876,11 +7876,13 @@ static int _wrap_lw_trigger_touch(lua_State* L) {
   LWCONTEXT *arg1 = (LWCONTEXT *) 0 ;
   float arg2 ;
   float arg3 ;
+  int arg4 ;
   
-  SWIG_check_num_args("lw_trigger_touch",3,3)
+  SWIG_check_num_args("lw_trigger_touch",4,4)
   if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("lw_trigger_touch",1,"LWCONTEXT *");
   if(!lua_isnumber(L,2)) SWIG_fail_arg("lw_trigger_touch",2,"float");
   if(!lua_isnumber(L,3)) SWIG_fail_arg("lw_trigger_touch",3,"float");
+  if(!lua_isnumber(L,4)) SWIG_fail_arg("lw_trigger_touch",4,"int");
   
   if (!SWIG_IsOK(SWIG_ConvertPtr(L,1,(void**)&arg1,SWIGTYPE_p__LWCONTEXT,0))){
     SWIG_fail_ptr("lw_trigger_touch",1,SWIGTYPE_p__LWCONTEXT);
@@ -7888,7 +7890,8 @@ static int _wrap_lw_trigger_touch(lua_State* L) {
   
   arg2 = (float)lua_tonumber(L, 2);
   arg3 = (float)lua_tonumber(L, 3);
-  lw_trigger_touch(arg1,arg2,arg3);
+  arg4 = (int)lua_tonumber(L, 4);
+  lw_trigger_touch(arg1,arg2,arg3,arg4);
   
   return SWIG_arg;
   
@@ -7905,11 +7908,13 @@ static int _wrap_lw_trigger_mouse_press(lua_State* L) {
   LWCONTEXT *arg1 = (LWCONTEXT *) 0 ;
   float arg2 ;
   float arg3 ;
+  int arg4 ;
   
-  SWIG_check_num_args("lw_trigger_mouse_press",3,3)
+  SWIG_check_num_args("lw_trigger_mouse_press",4,4)
   if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("lw_trigger_mouse_press",1,"LWCONTEXT *");
   if(!lua_isnumber(L,2)) SWIG_fail_arg("lw_trigger_mouse_press",2,"float");
   if(!lua_isnumber(L,3)) SWIG_fail_arg("lw_trigger_mouse_press",3,"float");
+  if(!lua_isnumber(L,4)) SWIG_fail_arg("lw_trigger_mouse_press",4,"int");
   
   if (!SWIG_IsOK(SWIG_ConvertPtr(L,1,(void**)&arg1,SWIGTYPE_p__LWCONTEXT,0))){
     SWIG_fail_ptr("lw_trigger_mouse_press",1,SWIGTYPE_p__LWCONTEXT);
@@ -7917,7 +7922,8 @@ static int _wrap_lw_trigger_mouse_press(lua_State* L) {
   
   arg2 = (float)lua_tonumber(L, 2);
   arg3 = (float)lua_tonumber(L, 3);
-  lw_trigger_mouse_press(arg1,arg2,arg3);
+  arg4 = (int)lua_tonumber(L, 4);
+  lw_trigger_mouse_press(arg1,arg2,arg3,arg4);
   
   return SWIG_arg;
   
@@ -7934,11 +7940,13 @@ static int _wrap_lw_trigger_mouse_release(lua_State* L) {
   LWCONTEXT *arg1 = (LWCONTEXT *) 0 ;
   float arg2 ;
   float arg3 ;
+  int arg4 ;
   
-  SWIG_check_num_args("lw_trigger_mouse_release",3,3)
+  SWIG_check_num_args("lw_trigger_mouse_release",4,4)
   if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("lw_trigger_mouse_release",1,"LWCONTEXT *");
   if(!lua_isnumber(L,2)) SWIG_fail_arg("lw_trigger_mouse_release",2,"float");
   if(!lua_isnumber(L,3)) SWIG_fail_arg("lw_trigger_mouse_release",3,"float");
+  if(!lua_isnumber(L,4)) SWIG_fail_arg("lw_trigger_mouse_release",4,"int");
   
   if (!SWIG_IsOK(SWIG_ConvertPtr(L,1,(void**)&arg1,SWIGTYPE_p__LWCONTEXT,0))){
     SWIG_fail_ptr("lw_trigger_mouse_release",1,SWIGTYPE_p__LWCONTEXT);
@@ -7946,7 +7954,8 @@ static int _wrap_lw_trigger_mouse_release(lua_State* L) {
   
   arg2 = (float)lua_tonumber(L, 2);
   arg3 = (float)lua_tonumber(L, 3);
-  lw_trigger_mouse_release(arg1,arg2,arg3);
+  arg4 = (int)lua_tonumber(L, 4);
+  lw_trigger_mouse_release(arg1,arg2,arg3,arg4);
   
   return SWIG_arg;
   
@@ -7963,11 +7972,13 @@ static int _wrap_lw_trigger_mouse_move(lua_State* L) {
   LWCONTEXT *arg1 = (LWCONTEXT *) 0 ;
   float arg2 ;
   float arg3 ;
+  int arg4 ;
   
-  SWIG_check_num_args("lw_trigger_mouse_move",3,3)
+  SWIG_check_num_args("lw_trigger_mouse_move",4,4)
   if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("lw_trigger_mouse_move",1,"LWCONTEXT *");
   if(!lua_isnumber(L,2)) SWIG_fail_arg("lw_trigger_mouse_move",2,"float");
   if(!lua_isnumber(L,3)) SWIG_fail_arg("lw_trigger_mouse_move",3,"float");
+  if(!lua_isnumber(L,4)) SWIG_fail_arg("lw_trigger_mouse_move",4,"int");
   
   if (!SWIG_IsOK(SWIG_ConvertPtr(L,1,(void**)&arg1,SWIGTYPE_p__LWCONTEXT,0))){
     SWIG_fail_ptr("lw_trigger_mouse_move",1,SWIGTYPE_p__LWCONTEXT);
@@ -7975,7 +7986,8 @@ static int _wrap_lw_trigger_mouse_move(lua_State* L) {
   
   arg2 = (float)lua_tonumber(L, 2);
   arg3 = (float)lua_tonumber(L, 3);
-  lw_trigger_mouse_move(arg1,arg2,arg3);
+  arg4 = (int)lua_tonumber(L, 4);
+  lw_trigger_mouse_move(arg1,arg2,arg3,arg4);
   
   return SWIG_arg;
   
@@ -18441,6 +18453,56 @@ fail:
 }
 
 
+static int _wrap_LWCONTEXT_dir_pad_pointer_id_set(lua_State* L) {
+  int SWIG_arg = 0;
+  struct _LWCONTEXT *arg1 = (struct _LWCONTEXT *) 0 ;
+  int arg2 ;
+  
+  SWIG_check_num_args("_LWCONTEXT::dir_pad_pointer_id",2,2)
+  if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("_LWCONTEXT::dir_pad_pointer_id",1,"struct _LWCONTEXT *");
+  if(!lua_isnumber(L,2)) SWIG_fail_arg("_LWCONTEXT::dir_pad_pointer_id",2,"int");
+  
+  if (!SWIG_IsOK(SWIG_ConvertPtr(L,1,(void**)&arg1,SWIGTYPE_p__LWCONTEXT,0))){
+    SWIG_fail_ptr("LWCONTEXT_dir_pad_pointer_id_set",1,SWIGTYPE_p__LWCONTEXT);
+  }
+  
+  arg2 = (int)lua_tonumber(L, 2);
+  if (arg1) (arg1)->dir_pad_pointer_id = arg2;
+  
+  return SWIG_arg;
+  
+  if(0) SWIG_fail;
+  
+fail:
+  lua_error(L);
+  return SWIG_arg;
+}
+
+
+static int _wrap_LWCONTEXT_dir_pad_pointer_id_get(lua_State* L) {
+  int SWIG_arg = 0;
+  struct _LWCONTEXT *arg1 = (struct _LWCONTEXT *) 0 ;
+  int result;
+  
+  SWIG_check_num_args("_LWCONTEXT::dir_pad_pointer_id",1,1)
+  if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("_LWCONTEXT::dir_pad_pointer_id",1,"struct _LWCONTEXT *");
+  
+  if (!SWIG_IsOK(SWIG_ConvertPtr(L,1,(void**)&arg1,SWIGTYPE_p__LWCONTEXT,0))){
+    SWIG_fail_ptr("LWCONTEXT_dir_pad_pointer_id_get",1,SWIGTYPE_p__LWCONTEXT);
+  }
+  
+  result = (int) ((arg1)->dir_pad_pointer_id);
+  lua_pushnumber(L, (lua_Number) result); SWIG_arg++;
+  return SWIG_arg;
+  
+  if(0) SWIG_fail;
+  
+fail:
+  lua_error(L);
+  return SWIG_arg;
+}
+
+
 static int _wrap_LWCONTEXT_atk_pad_dragging_set(lua_State* L) {
   int SWIG_arg = 0;
   struct _LWCONTEXT *arg1 = (struct _LWCONTEXT *) 0 ;
@@ -21722,6 +21784,7 @@ static swig_lua_attribute swig_LWCONTEXT_attributes[] = {
     { "dir_pad_x", _wrap_LWCONTEXT_dir_pad_x_get, _wrap_LWCONTEXT_dir_pad_x_set },
     { "dir_pad_y", _wrap_LWCONTEXT_dir_pad_y_get, _wrap_LWCONTEXT_dir_pad_y_set },
     { "dir_pad_dragging", _wrap_LWCONTEXT_dir_pad_dragging_get, _wrap_LWCONTEXT_dir_pad_dragging_set },
+    { "dir_pad_pointer_id", _wrap_LWCONTEXT_dir_pad_pointer_id_get, _wrap_LWCONTEXT_dir_pad_pointer_id_set },
     { "atk_pad_dragging", _wrap_LWCONTEXT_atk_pad_dragging_get, _wrap_LWCONTEXT_atk_pad_dragging_set },
     { "field_event_id", _wrap_LWCONTEXT_field_event_id_get, _wrap_LWCONTEXT_field_event_id_set },
     { "next_field_event_id", _wrap_LWCONTEXT_next_field_event_id_get, _wrap_LWCONTEXT_next_field_event_id_set },
@@ -46943,6 +47006,8 @@ static swig_lua_const_info swig_SwigModule_constants[]= {
     {SWIG_LUA_CONSTTAB_INT("LAE_CRYSTAL_KTX", LAE_CRYSTAL_KTX)},
     {SWIG_LUA_CONSTTAB_INT("LAE_CIRCLE_SHADOW_KTX", LAE_CIRCLE_SHADOW_KTX)},
     {SWIG_LUA_CONSTTAB_INT("LAE_PUCK_KTX", LAE_PUCK_KTX)},
+    {SWIG_LUA_CONSTTAB_INT("LAE_PUCK_ENEMY_KTX", LAE_PUCK_ENEMY_KTX)},
+    {SWIG_LUA_CONSTTAB_INT("LAE_PUCK_PLAYER_KTX", LAE_PUCK_PLAYER_KTX)},
     {SWIG_LUA_CONSTTAB_INT("LAE_BB_CATAPULT", LAE_BB_CATAPULT)},
     {SWIG_LUA_CONSTTAB_INT("LAE_BB_CROSSBOW", LAE_BB_CROSSBOW)},
     {SWIG_LUA_CONSTTAB_INT("LAE_BB_GUNTOWER", LAE_BB_GUNTOWER)},
