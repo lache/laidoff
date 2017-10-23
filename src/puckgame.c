@@ -27,6 +27,7 @@ static void testgo_move_callback(dBodyID b) {
 	rot[3][3] = 1;
 
 	mat4x4_transpose(go->rot, rot);
+	go->speed = (float)dLENGTH(dBodyGetLinearVel(go->body));
 }
 
 static void create_go(LWPUCKGAME* puck_game, LW_PUCK_GAME_OBJECT lpgo, float mass, float radius, float x, float y) {
@@ -61,6 +62,7 @@ LWPUCKGAME* new_puck_game() {
 	puck_game->dash_speed_ratio = 8.0f;
 	puck_game->dash_shake_time = 0.3f;
 	puck_game->hp_shake_time = 0.3f;
+	puck_game->puck_damage_contact_speed_threshold = 1.1f;
 	puck_game->player.total_hp = 20;
 	puck_game->player.current_hp = 10;
 	// ------
@@ -95,6 +97,8 @@ LWPUCKGAME* new_puck_game() {
 
 	dBodySetKinematic(puck_game->go[LPGO_PUCK].body);
 
+	puck_game->go[LPGO_PUCK].red_overlay = 1;
+
 	return puck_game;
 }
 
@@ -128,7 +132,7 @@ static void near_puck_player(LWPUCKGAME* puck_game) {
 
 	const float puck_speed = (float)dLENGTH(dBodyGetLinearVel(puck->body));
 
-	if (puck_game->player.last_contact_puck_body != puck->body && puck_speed > 1.1f
+	if (puck_game->player.last_contact_puck_body != puck->body && puck_speed > puck_game->puck_damage_contact_speed_threshold
 		&& !puck_game_dashing(puck_game)) {
 		puck_game->player.last_contact_puck_body = puck->body;
 		puck_game->player.current_hp--;

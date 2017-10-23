@@ -34,11 +34,12 @@ static void render_go(const LWCONTEXT* pLwc, const mat4x4 view, const mat4x4 pro
 	mat4x4_identity(proj_view_model);
 	mat4x4_mul(proj_view_model, proj, view_model);
 
-	glUniform3f(pLwc->shader[shader_index].overlay_color_location, 1, 1, 1);
-	glUniform1f(pLwc->shader[shader_index].overlay_color_ratio_location, 0);
+	const float red_overlay_ratio = go->red_overlay ? LWMIN(1.0f, go->speed / go->puck_game->puck_damage_contact_speed_threshold) : 0;
+	const float red_overlay_logistic_ratio = 1 / (1 + powf(2.718f, -(20.0f * (red_overlay_ratio - 0.8f))));
+	glUniform3f(pLwc->shader[shader_index].overlay_color_location, 1, 0, 0);
+	glUniform1f(pLwc->shader[shader_index].overlay_color_ratio_location, red_overlay_logistic_ratio);
 
 	const LW_VBO_TYPE lvt = LVT_PUCK;
-	glUniform1f(pLwc->shader[shader_index].overlay_color_ratio_location, 0);
 	glBindBuffer(GL_ARRAY_BUFFER, pLwc->vertex_buffer[lvt].vertex_buffer);
 	bind_all_vertex_attrib(pLwc, lvt);
 	glActiveTexture(GL_TEXTURE0);

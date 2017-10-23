@@ -28,6 +28,8 @@ typedef struct _LWPUCKGAMEOBJECT {
 	mat4x4 rot;
 	LWPUCKGAME* puck_game;
 	int wall_hit_count;
+	float speed;
+	int red_overlay;
 } LWPUCKGAMEOBJECT;
 
 typedef struct _LWPUCKGAMEDASH {
@@ -56,6 +58,7 @@ typedef struct _LWPUCKGAME {
 	float dash_speed_ratio;
 	float dash_shake_time;
 	float hp_shake_time;
+	float puck_damage_contact_speed_threshold;
 	// ----
 	dWorldID world;
 	dSpaceID space;
