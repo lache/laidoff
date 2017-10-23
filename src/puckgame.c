@@ -58,6 +58,7 @@ LWPUCKGAME* new_puck_game() {
 	puck_game->dash_interval = 1.5f;
 	puck_game->dash_duration = 0.1f;
 	puck_game->dash_speed_ratio = 8.0f;
+	puck_game->dash_shake_time = 0.3f;
 	// ------
 
 	// Initialize OpenDE
@@ -225,7 +226,11 @@ void update_puck_game(LWCONTEXT* pLwc, LWPUCKGAME* puck_game, double delta_time)
 		dy = puck_game->dash.dir_y;
 		dJointSetLMotorParam(pcj, dParamVel1, player_speed * dx);
 		dJointSetLMotorParam(pcj, dParamVel2, player_speed * dy);
-		puck_game->dash.remain_time -= (float)delta_time;
+		puck_game->dash.remain_time = LWMAX(0, puck_game->dash.remain_time - (float)delta_time);
+	}
+	// Decrease shake remain time
+	if (puck_game->dash.shake_remain_time > 0) {
+		puck_game->dash.shake_remain_time = LWMAX(0, puck_game->dash.shake_remain_time - (float)delta_time);
 	}
 }
 
@@ -240,10 +245,6 @@ void puck_game_dash(LWCONTEXT* pLwc, LWPUCKGAME* puck_game) {
 	if (!pLwc || !puck_game) {
 		return;
 	}
-	// Check cooltime
-	if (puck_game_dash_cooltime(puck_game) < puck_game->dash_interval) {
-		return;
-	}
 	// Check already effective dash
 	if (puck_game->dash.remain_time > 0) {
 		return;
@@ -251,6 +252,11 @@ void puck_game_dash(LWCONTEXT* pLwc, LWPUCKGAME* puck_game) {
 	// Check effective move input
 	float dx, dy, dlen;
 	if (!lw_get_normalized_dir_pad_input(pLwc, &dx, &dy, &dlen)) {
+		return;
+	}
+	// Check cooltime
+	if (puck_game_dash_cooltime(puck_game) < puck_game->dash_interval) {
+		puck_game->dash.shake_remain_time = puck_game->dash_shake_time;
 		return;
 	}
 	// Start dash!

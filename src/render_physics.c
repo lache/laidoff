@@ -51,18 +51,23 @@ static void render_go(const LWCONTEXT* pLwc, const mat4x4 view, const mat4x4 pro
 
 static void render_dash_gauge(const LWCONTEXT* pLwc) {
 	const float aspect_ratio = (float)pLwc->width / pLwc->height;
-
 	const float margin_x = 0.3f;
 	const float margin_y = 0.2f * 5;
 	const float gauge_width = 0.75f;
 	const float gauge_height = 0.07f;
 	const float gauge_flush_height = 0.07f;
 	const float base_color = 0.3f;
-	const float x = aspect_ratio - margin_x;
-	const float y = -1 + margin_y;
+	float x = aspect_ratio - margin_x;
+	float y = -1 + margin_y;
 	const float boost_gauge_ratio = puck_game_dash_gauge_ratio(pLwc->puck_game);
-	
-	// Background
+	// Positioinal offset by shake
+	if (pLwc->puck_game->dash.shake_remain_time > 0) {
+		const float ratio = pLwc->puck_game->dash.shake_remain_time / pLwc->puck_game->dash_shake_time;
+		const float shake_magnitude = 0.02f;
+		x += ratio * (2 * rand() / (float)RAND_MAX - 1.0f) * shake_magnitude * aspect_ratio;
+		y += ratio * (2 * rand() / (float)RAND_MAX - 1.0f) * shake_magnitude;
+	}
+	// Render background (red)
 	if (boost_gauge_ratio < 1.0f) {
 		render_solid_vb_ui(pLwc,
 			x - gauge_width * boost_gauge_ratio, y, gauge_width * (1.0f - boost_gauge_ratio), gauge_height,
@@ -70,21 +75,21 @@ static void render_dash_gauge(const LWCONTEXT* pLwc) {
 			LVT_RIGHT_BOTTOM_ANCHORED_SQUARE,
 			1, 1, base_color, base_color, 1);
 	}
-	// Foreground
+	// Render foreground (green)
 	render_solid_vb_ui(pLwc,
 		x, y, gauge_width * boost_gauge_ratio, gauge_height,
 		0,
 		LVT_RIGHT_BOTTOM_ANCHORED_SQUARE,
 		1, base_color, 1, base_color, 1);
 	if (boost_gauge_ratio < 1.0f) {
-		// Flush
+		// Render flush gauge
 		render_solid_vb_ui(pLwc,
 			x, y + boost_gauge_ratio / 4.0f, gauge_width, gauge_height,
 			0,
 			LVT_RIGHT_BOTTOM_ANCHORED_SQUARE,
 			powf(1.0f - boost_gauge_ratio, 3.0f), base_color, 1, base_color, 1);
 	}
-	// Text
+	// Render text
 	LWTEXTBLOCK text_block;
 	text_block.align = LTBA_RIGHT_BOTTOM;
 	text_block.text_block_width = DEFAULT_TEXT_BLOCK_WIDTH;

@@ -35,6 +35,7 @@ typedef struct _LWPUCKGAMEDASH {
 	float remain_time;
 	float dir_x;
 	float dir_y;
+	float shake_remain_time;
 } LWPUCKGAMEDASH;
 
 typedef struct _LWPUCKGAME {
@@ -44,6 +45,7 @@ typedef struct _LWPUCKGAME {
 	float dash_interval;
 	float dash_duration;
 	float dash_speed_ratio;
+	float dash_shake_time;
 	// ----
 
 	dWorldID world;
