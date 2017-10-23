@@ -5,6 +5,7 @@
 //#include "lwdeltatime.h"
 #include "lwtimepoint.h"
 #include "lwlog.h"
+#include "lwudp.h"
 //#include "script.h"
 #if LW_PLATFORM_WIN32
 #include "scriptwatch.h"
@@ -73,7 +74,7 @@ static GLFWwindow* create_glfw_window()
 	return glfwCreateWindow(INITIAL_SCREEN_RESOLUTION_X, INITIAL_SCREEN_RESOLUTION_Y, "LAID OFF", NULL, NULL);
 }
 
-int main(void)
+int main(int argc, char* argv[])
 {
 	LOGI("LAIDOFF: Greetings.");
     

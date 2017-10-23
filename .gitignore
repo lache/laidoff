@@ -13,3 +13,4 @@ build-x86
 *.dir
 /imgui.ini
 *.swp
+/build-server

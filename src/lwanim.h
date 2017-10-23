@@ -4,7 +4,6 @@
 
 typedef struct _LWKEYFRAME LWKEYFRAME;
 typedef struct _LWCONTEXT LWCONTEXT;
-
 typedef void(*custom_render_proc)(const LWCONTEXT*, float, float, float);
 typedef void(*anim_finalized_proc)(LWCONTEXT*);
 

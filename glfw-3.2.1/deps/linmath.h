@@ -500,7 +500,7 @@ v' = v + q.w * t + cross(q.xyz, t)
 	vec3_add(r, v, t);
 	vec3_add(r, r, u);
 }
-static inline void mat4x4_from_quat(mat4x4 M, quat q)
+static inline void mat4x4_from_quat(mat4x4 M, const quat q)
 {
 	float a = q[3];
 	float b = q[0];

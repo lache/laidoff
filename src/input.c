@@ -8,7 +8,7 @@
 #include "mq.h"
 #include "logic.h"
 #include "lwbutton.h"
-#include "puckgame.h"
+#include "puckgameupdate.h"
 
 float get_dir_pad_size_radius() {
 	return 0.75f;

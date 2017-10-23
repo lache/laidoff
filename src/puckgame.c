@@ -1,8 +1,8 @@
 #include "puckgame.h"
 #include "lwmacro.h"
 #include "lwlog.h"
-#include "lwcontext.h"
-#include "input.h"
+//#include "lwcontext.h"
+//#include "input.h"
 
 static void testgo_move_callback(dBodyID b) {
 	LWPUCKGAMEOBJECT* go = (LWPUCKGAMEOBJECT*)dBodyGetData(b);
@@ -145,20 +145,20 @@ static void near_puck_player(LWPUCKGAME* puck_game) {
 	//LOGI("Contact puck velocity: %.2f", puck_speed);
 }
 
-static void near_callback(void *data, dGeomID o1, dGeomID o2)
+void puck_game_near_callback(void *data, dGeomID o1, dGeomID o2)
 {
 	LWPUCKGAME* puck_game = (LWPUCKGAME*)data;
 
 	if (dGeomIsSpace(o1) || dGeomIsSpace(o2)) {
 
 		// colliding a space with something :
-		dSpaceCollide2(o1, o2, data, &near_callback);
+		dSpaceCollide2(o1, o2, data, &puck_game_near_callback);
 
 		// collide all geoms internal to the space(s)
 		if (dGeomIsSpace(o1))
-			dSpaceCollide((dSpaceID)o1, data, &near_callback);
+			dSpaceCollide((dSpaceID)o1, data, &puck_game_near_callback);
 		if (dGeomIsSpace(o2))
-			dSpaceCollide((dSpaceID)o2, data, &near_callback);
+			dSpaceCollide((dSpaceID)o2, data, &puck_game_near_callback);
 
 	} else {
 		const int max_contacts = 5;
@@ -217,90 +217,10 @@ static void near_callback(void *data, dGeomID o1, dGeomID o2)
 	}
 }
 
-void update_puck_game(LWCONTEXT* pLwc, LWPUCKGAME* puck_game, double delta_time) {
-	if (!puck_game->world) {
-		return;
-	}
-	puck_game->time += (float)delta_time;
-	puck_game->player.puck_contacted = 0;
-	dSpaceCollide(puck_game->space, puck_game, near_callback);
-	//dWorldStep(puck_game->world, 0.005f);
-	dWorldQuickStep(puck_game->world, 0.02f);
-	dJointGroupEmpty(puck_game->contact_joint_group);
-	if (puck_game->player.puck_contacted == 0) {
-		puck_game->player.last_contact_puck_body = 0;
-	}
-	const dReal* p = dBodyGetPosition(puck_game->go[LPGO_PUCK].body);
-	
-	//LOGI("pos %.2f %.2f %.2f", p[0], p[1], p[2]);
-
-	dJointID pcj = puck_game->player_control_joint;
-	float player_speed = 0.5f;
-	//dJointSetLMotorParam(pcj, dParamVel1, player_speed * (pLwc->player_move_right - pLwc->player_move_left));
-	//dJointSetLMotorParam(pcj, dParamVel2, player_speed * (pLwc->player_move_up - pLwc->player_move_down));
-
-	//pLwc->player_pos_last_moved_dx
-	float dx, dy, dlen;
-	if (lw_get_normalized_dir_pad_input(pLwc, &dx, &dy, &dlen)) {
-		dJointSetLMotorParam(pcj, dParamVel1, player_speed * dx);
-		dJointSetLMotorParam(pcj, dParamVel2, player_speed * dy);
-		/*const float last_move_delta_len = sqrtf(pLwc->last_mouse_move_delta_x * pLwc->last_mouse_move_delta_x + pLwc->last_mouse_move_delta_y * pLwc->last_mouse_move_delta_y);
-		dJointSetLMotorParam(pcj, dParamVel1, player_speed * pLwc->last_mouse_move_delta_x / last_move_delta_len);
-		dJointSetLMotorParam(pcj, dParamVel2, player_speed * pLwc->last_mouse_move_delta_y / last_move_delta_len);*/
-	} else {
-		dJointSetLMotorParam(pcj, dParamVel1, 0);
-		dJointSetLMotorParam(pcj, dParamVel2, 0);
-	}
-
-	// Move direction fixed while dashing
-	if (puck_game->dash.remain_time > 0) {
-		player_speed *= puck_game->dash_speed_ratio;
-		dx = puck_game->dash.dir_x;
-		dy = puck_game->dash.dir_y;
-		dJointSetLMotorParam(pcj, dParamVel1, player_speed * dx);
-		dJointSetLMotorParam(pcj, dParamVel2, player_speed * dy);
-		puck_game->dash.remain_time = LWMAX(0, puck_game->dash.remain_time - (float)delta_time);
-	}
-	// Decrease shake remain time
-	if (puck_game->dash.shake_remain_time > 0) {
-		puck_game->dash.shake_remain_time = LWMAX(0, puck_game->dash.shake_remain_time - (float)delta_time);
-	}
-	// Decrease HP remain time
-	if (puck_game->player.hp_shake_remain_time > 0) {
-		puck_game->player.hp_shake_remain_time = LWMAX(0, puck_game->player.hp_shake_remain_time - (float)delta_time);
-	}
-}
-
 void puck_game_push(LWPUCKGAME* puck_game) {
 	//puck_game->push = 1;
 
 	dBodySetLinearVel(puck_game->go[LPGO_PUCK].body, 1, 1, 0);
-}
-
-void puck_game_dash(LWCONTEXT* pLwc, LWPUCKGAME* puck_game) {
-	// Check params
-	if (!pLwc || !puck_game) {
-		return;
-	}
-	// Check already effective dash
-	if (puck_game_dashing(puck_game)) {
-		return;
-	}
-	// Check effective move input
-	float dx, dy, dlen;
-	if (!lw_get_normalized_dir_pad_input(pLwc, &dx, &dy, &dlen)) {
-		return;
-	}
-	// Check cooltime
-	if (puck_game_dash_cooltime(puck_game) < puck_game->dash_interval) {
-		puck_game->dash.shake_remain_time = puck_game->dash_shake_time;
-		return;
-	}
-	// Start dash!
-	puck_game->dash.remain_time = puck_game->dash_duration;
-	puck_game->dash.dir_x = dx;
-	puck_game->dash.dir_y = dy;
-	puck_game->dash.last_time = puck_game->time;
 }
 
 float puck_game_dash_gauge_ratio(LWPUCKGAME* puck_game) {

@@ -5,7 +5,6 @@
 #include "lwanim.h"
 #include <ode/ode.h>
 
-typedef struct _LWCONTEXT LWCONTEXT;
 typedef struct _LWPUCKGAME LWPUCKGAME;
 
 typedef enum _LW_PUCK_GAME_BOUNDARY {
@@ -75,9 +74,8 @@ typedef struct _LWPUCKGAME {
 
 LWPUCKGAME* new_puck_game();
 void delete_puck_game(LWPUCKGAME** puck_game);
-void update_puck_game(LWCONTEXT* pLwc, LWPUCKGAME* puck_game, double delta_time);
 void puck_game_push(LWPUCKGAME* puck_game);
-void puck_game_dash(LWCONTEXT* pLwc, LWPUCKGAME* puck_game);
 float puck_game_dash_gauge_ratio(LWPUCKGAME* puck_game);
 float puck_game_dash_cooltime(LWPUCKGAME* puck_game);
 int puck_game_dashing(LWPUCKGAME* puck_game);
+void puck_game_near_callback(void *data, dGeomID o1, dGeomID o2);

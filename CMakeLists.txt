@@ -121,6 +121,9 @@ if (WIN32)
 		win32/lwimgui.cpp
 		win32/lwimgui.h
 		)
+	set(SERVER_WIN32_DEPS
+		win32/servermain.c
+		)
 elseif (APPLE)
     set(ICON osx/laidoff.icns)
     set_source_files_properties(osx/laidoff.icns PROPERTIES
@@ -181,6 +184,7 @@ set(TINYCTHREAD "${GLFW_SOURCE_DIR}/deps/tinycthread.h"
 file(GLOB LUA_LIB "lua-5.3.4/*.h" "lua-5.3.4/*.c")
 file(GLOB ODE_LIB "ode/ode/src/*.h" "ode/ode/src/*.c" "ode/ode/src/*.cpp" "ode/ode/src/joints/*.h" "ode/ode/src/joints/*.cpp" "ode/ou/src/ou/*.cpp" "ode/include/ode/*.h" "ode/ou/include/ou/*.h")
 file(GLOB LAIDOFF_LIB "src/*.h" "src/*.c" "src/*.cpp")
+file(GLOB LAIDOFF_SERVER_LIB "serversrc/*.h" "serversrc/*.c" "serversrc/*.cpp")
 file(GLOB DETOUR_LIB "recastnavigation/Detour/Include/*.h" "recastnavigation/Detour/Source/*.cpp")
 file(GLOB ZMQ_LIB "zmq/src/*.c" "zmq/src/*.hpp" "zmq/src/*.cpp" "zmq/include/*.h")
 
@@ -206,6 +210,7 @@ ${RPI_DEPS}
 ${UNIX_DEPS}
 ${ICON}
 ${GLAD})
+target_compile_definitions(laidoff PRIVATE _WINSOCK_DEPRECATED_NO_WARNINGS)
 
 target_link_libraries(laidoff
 	glfw
@@ -219,10 +224,23 @@ target_link_libraries(laidoff
 	${WINSOCK2}
 )
 
-set(WINDOWS_BINARIES laidoff)
+add_executable(laidoff-server
+	src/puckgame.c
+	src/puckgame.h
+	${LAIDOFF_SERVER_LIB}
+	${SERVER_WIN32_DEPS}
+	${ODE_LIB}
+	${ICON})
+target_compile_definitions(laidoff-server PRIVATE LW_IS_SERVER=1 _WINSOCK_DEPRECATED_NO_WARNINGS)
+
+target_link_libraries(laidoff-server
+	${WINSOCK2}
+)
+
+set(WINDOWS_BINARIES laidoff laidoff-server)
 
 if (MSVC)
-    # Tell MSVC to use main instead of WinMain for Windows subsystem executables
+    # Tell MSVC to use 'main' instead of 'WinMain' for Windows subsystem executables
     set_target_properties(${WINDOWS_BINARIES} PROPERTIES
                           LINK_FLAGS "/ENTRY:mainCRTStartup")
 elseif (APPLE)
@@ -231,7 +249,7 @@ endif()
 
 # 빌드 결과를 한곳으로 모은다. (DLL, EXE)
 
-set_target_properties(laidoff libzmq czmq
+set_target_properties(laidoff libzmq czmq laidoff-server
     PROPERTIES
     ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib"
     LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib"

@@ -19,7 +19,8 @@
 #include "laidoff.h"
 #include "lwbutton.h"
 #include "physics.h"
-#include "puckgame.h"
+#include "puckgameupdate.h"
+#include "lwudp.h"
 
 void toggle_font_texture_test_mode(LWCONTEXT* pLwc);
 
@@ -646,6 +647,10 @@ void lwc_update(LWCONTEXT* pLwc, double delta_time) {
 
 	if (pLwc->game_scene == LGS_PHYSICS) {
 		update_puck_game(pLwc, pLwc->puck_game, delta_time);
+	}
+
+	if (pLwc->udp) {
+		udp_update(pLwc, pLwc->udp);
 	}
 
 	//****//

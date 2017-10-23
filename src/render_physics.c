@@ -8,12 +8,14 @@
 #include "lwtextblock.h"
 #include "render_text_block.h"
 
-static void render_go(const LWCONTEXT* pLwc, const mat4x4 view, const mat4x4 proj, const LWPUCKGAMEOBJECT* go, int tex_index, float render_scale) {
+static void render_go(const LWCONTEXT* pLwc, const mat4x4 view, const mat4x4 proj, const LWPUCKGAMEOBJECT* go, int tex_index, float render_scale, const float* remote_pos, const mat4x4 remote_rot, int remote) {
 	int shader_index = LWST_DEFAULT;
 	mat4x4 rot;
 	mat4x4_identity(rot);
 	float sx = render_scale * go->radius, sy = render_scale * go->radius, sz = render_scale * go->radius;
-	float x = render_scale * go->pos[0], y = render_scale * go->pos[1], z = render_scale * go->pos[2];
+	float x = render_scale * (remote_pos ? remote_pos[0] : go->pos[0]);
+	float y = render_scale * (remote_pos ? remote_pos[1] : go->pos[1]);
+	float z = render_scale * (remote_pos ? remote_pos[2] : go->pos[2]);
 
 	mat4x4 model;
 	mat4x4_identity(model);
@@ -24,7 +26,7 @@ static void render_go(const LWCONTEXT* pLwc, const mat4x4 view, const mat4x4 pro
 	mat4x4 model_translate;
 	mat4x4_translate(model_translate, x, y, z);
 
-	mat4x4_mul(model, go->rot, model);
+	mat4x4_mul(model, remote ? remote_rot : go->rot, model);
 	mat4x4_mul(model, model_translate, model);
 
 	mat4x4 view_model;
@@ -252,9 +254,25 @@ void lwc_render_physics(const LWCONTEXT* pLwc) {
 		glDrawArrays(GL_TRIANGLES, 0, pLwc->vertex_buffer[lvt].vertex_count);
 	}
 
-	render_go(pLwc, view, proj, &puck_game->go[LPGO_PUCK], pLwc->tex_atlas[LAE_PUCK_KTX], puck_game->render_scale);
-	render_go(pLwc, view, proj, &puck_game->go[LPGO_PLAYER], pLwc->tex_atlas[LAE_PUCK_PLAYER_KTX], puck_game->render_scale);
-	render_go(pLwc, view, proj, &puck_game->go[LPGO_TARGET], pLwc->tex_atlas[LAE_PUCK_ENEMY_KTX], puck_game->render_scale);
+	int remote = 0;
+	const float* remote_player_pos = 0;
+	const float* remote_puck_pos = 0;
+	const float* remote_target_pos = 0;
+	mat4x4 remote_player_rot;
+	mat4x4 remote_puck_rot;
+	mat4x4 remote_target_rot;
+	if (remote) {
+		remote_player_pos = pLwc->puck_game_state.player;
+		remote_puck_pos = pLwc->puck_game_state.puck;
+		remote_target_pos = pLwc->puck_game_state.target;
+		
+		mat4x4_from_quat(remote_player_rot, pLwc->puck_game_state.player_rot);
+		mat4x4_from_quat(remote_puck_rot, pLwc->puck_game_state.puck_rot);
+		mat4x4_from_quat(remote_target_rot, pLwc->puck_game_state.target_rot);
+	}
+	render_go(pLwc, view, proj, &puck_game->go[LPGO_PUCK], pLwc->tex_atlas[LAE_PUCK_KTX], puck_game->render_scale, remote_puck_pos, remote_puck_rot, remote);
+	render_go(pLwc, view, proj, &puck_game->go[LPGO_PLAYER], pLwc->tex_atlas[LAE_PUCK_PLAYER_KTX], puck_game->render_scale, remote_player_pos, remote_player_rot, remote);
+	render_go(pLwc, view, proj, &puck_game->go[LPGO_TARGET], pLwc->tex_atlas[LAE_PUCK_ENEMY_KTX], puck_game->render_scale, remote_target_pos, remote_target_rot, remote);
 
 	render_dir_pad(pLwc);
 	render_fist_button(pLwc);

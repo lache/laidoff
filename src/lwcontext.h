@@ -26,6 +26,7 @@
 #include "lwfieldrendercommand.h"
 #include "lwbutton.h"
 #include "construct.h"
+#include "puckgamepacket.h"
 
 #define MAX_RENDER_QUEUE_CAPACITY (512)
 
@@ -77,6 +78,7 @@ extern const char* tex_font_atlas_filename[2];
 #define MAX_DELTA_TIME_HISTORY (60)
 
 typedef struct _LWPUCKGAME LWPUCKGAME;
+typedef struct _LWUDP LWUDP;
 
 typedef struct _LWCONTEXT {
 	// Window instance
@@ -310,6 +312,10 @@ typedef struct _LWCONTEXT {
 	LWCONSTRUCT construct;
 	// Puck game sub-context
 	LWPUCKGAME* puck_game;
+	// UDP context
+	LWUDP* udp;
+	// Puck game remote(server) state
+	LWPUCKGAMEPACKETSTATE puck_game_state;
 } LWCONTEXT;
 
 #ifdef __cplusplus

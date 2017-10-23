@@ -2,6 +2,10 @@
 #include <stdio.h>
 #include <locale.h>
 #include <string.h>
+#include "platform_detection.h"
+#if LW_PLATFORM_WIN32
+#include <WinSock2.h>
+#endif
 #include "lwgl.h"
 #include "laidoff.h"
 #include "lwbitmapcontext.h"
@@ -18,7 +22,6 @@
 #include "render_admin.h"
 #include "input.h"
 #include "field.h"
-#include "platform_detection.h"
 #include "lwpkm.h"
 #include "render_battle_result.h"
 #include "net.h"
@@ -41,6 +44,7 @@
 #include "render_splash.h"
 #include "lwbutton.h"
 #include "puckgame.h"
+#include "lwudp.h"
 // SWIG output file
 #include "lo_wrap.inl"
 
@@ -1393,6 +1397,8 @@ LWCONTEXT* lw_init_initial_size(int width, int height) {
 	lwparabola_test();
 
 	pLwc->puck_game = new_puck_game();
+
+	pLwc->udp = new_udp();
 
 	return pLwc;
 }
