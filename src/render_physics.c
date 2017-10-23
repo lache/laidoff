@@ -8,12 +8,12 @@
 #include "lwtextblock.h"
 #include "render_text_block.h"
 
-static void render_go(const LWCONTEXT* pLwc, const mat4x4 view, const mat4x4 proj, const LWPUCKGAMEOBJECT* go, int tex_index) {
+static void render_go(const LWCONTEXT* pLwc, const mat4x4 view, const mat4x4 proj, const LWPUCKGAMEOBJECT* go, int tex_index, float render_scale) {
 	int shader_index = LWST_DEFAULT;
 	mat4x4 rot;
 	mat4x4_identity(rot);
-	float sx = go->radius, sy = go->radius, sz = go->radius;
-	float x = go->pos[0], y = go->pos[1], z = go->pos[2];
+	float sx = render_scale * go->radius, sy = render_scale * go->radius, sz = render_scale * go->radius;
+	float x = render_scale * go->pos[0], y = render_scale * go->pos[1], z = render_scale * go->pos[2];
 
 	mat4x4 model;
 	mat4x4_identity(model);
@@ -47,6 +47,73 @@ static void render_go(const LWCONTEXT* pLwc, const mat4x4 view, const mat4x4 pro
 	//set_tex_filter(GL_NEAREST, GL_NEAREST);
 	glUniformMatrix4fv(pLwc->shader[shader_index].mvp_location, 1, GL_FALSE, (const GLfloat*)proj_view_model);
 	glDrawArrays(GL_TRIANGLES, 0, pLwc->vertex_buffer[lvt].vertex_count);
+}
+
+static void render_hp_gauge(const LWCONTEXT* pLwc) {
+	const float aspect_ratio = (float)pLwc->width / pLwc->height;
+	const float gauge_width = 1.2f;
+	const float gauge_height = 0.1f;
+	const float gauge_flush_height = 0.07f;
+	const float base_color = 0.1f;
+	float x = 0;
+	float y = 1.0f - 0.1f;
+	// Positioinal offset by shake
+	if (pLwc->puck_game->player.hp_shake_remain_time > 0) {
+		const float ratio = pLwc->puck_game->player.hp_shake_remain_time / pLwc->puck_game->hp_shake_time;
+		const float shake_magnitude = 0.02f;
+		x += ratio * (2 * rand() / (float)RAND_MAX - 1.0f) * shake_magnitude * aspect_ratio;
+		y += ratio * (2 * rand() / (float)RAND_MAX - 1.0f) * shake_magnitude;
+	}
+	// Render background (gray)
+	render_solid_vb_ui(pLwc,
+		x, y, gauge_width, gauge_height,
+		0,
+		LVT_CENTER_TOP_ANCHORED_SQUARE,
+		1, base_color, base_color, base_color, 1);
+	const float cell_border = 0.015f;
+	const int current_hp = pLwc->puck_game->player.current_hp;
+	const int total_hp = pLwc->puck_game->player.total_hp;
+	if (total_hp == 0) {
+		return;
+	}
+	const float cell_width = (gauge_width - cell_border * (total_hp + 1)) / total_hp;
+	const float cell_x_0 = x - gauge_width / 2 + cell_border;
+	const float cell_x_stride = cell_width + cell_border;
+	for (int i = 0; i < total_hp; i++) {
+		float r = base_color, g = base_color, b = base_color;
+		if (i < current_hp) {
+			g = 1;
+		}
+		else {
+			r = 1;
+		}
+		// Render background (green)
+		render_solid_vb_ui(pLwc,
+			cell_x_0 + cell_x_stride * i, y - gauge_height / 2, cell_width, gauge_height - cell_border * 2,
+			0,
+			LVT_LEFT_CENTER_ANCHORED_SQUARE,
+			1, r, g, b, 1);
+	}
+	// Render text
+	LWTEXTBLOCK text_block;
+	text_block.align = LTBA_CENTER_BOTTOM;
+	text_block.text_block_width = DEFAULT_TEXT_BLOCK_WIDTH;
+	text_block.text_block_line_height = DEFAULT_TEXT_BLOCK_LINE_HEIGHT_E;
+	text_block.size = DEFAULT_TEXT_BLOCK_SIZE_E;
+	text_block.multiline = 1;
+	SET_COLOR_RGBA_FLOAT(text_block.color_normal_glyph, 1, 1, 1, 1);
+	SET_COLOR_RGBA_FLOAT(text_block.color_normal_outline, 0, 0, 0, 1);
+	SET_COLOR_RGBA_FLOAT(text_block.color_emp_glyph, 1, 1, 0, 1);
+	SET_COLOR_RGBA_FLOAT(text_block.color_emp_outline, 0, 0, 0, 1);
+	char str[32];
+	sprintf(str, "%d/%d PLAYER HP", current_hp, total_hp);
+	text_block.text = str;
+	text_block.text_bytelen = (int)strlen(text_block.text);
+	text_block.begin_index = 0;
+	text_block.end_index = text_block.text_bytelen;
+	text_block.text_block_x = x;
+	text_block.text_block_y = y;
+	render_text_block(pLwc, &text_block);
 }
 
 static void render_dash_gauge(const LWCONTEXT* pLwc) {
@@ -149,7 +216,7 @@ void lwc_render_physics(const LWCONTEXT* pLwc) {
 		mat4x4 rot;
 		mat4x4_identity(rot);
 
-		float sx = 2.0f, sy = 2.0f, sz = 2.0f;
+		float sx = puck_game->render_scale * 2.0f, sy = puck_game->render_scale *2.0f, sz = puck_game->render_scale *2.0f;
 		float x = 0.0f, y = 0.0f, z = 0.0f;
 
 		mat4x4 model;
@@ -184,11 +251,12 @@ void lwc_render_physics(const LWCONTEXT* pLwc) {
 		glDrawArrays(GL_TRIANGLES, 0, pLwc->vertex_buffer[lvt].vertex_count);
 	}
 
-	render_go(pLwc, view, proj, &puck_game->go[LPGO_PUCK], pLwc->tex_atlas[LAE_PUCK_KTX]);
-	render_go(pLwc, view, proj, &puck_game->go[LPGO_PLAYER], pLwc->tex_atlas[LAE_PUCK_PLAYER_KTX]);
-	render_go(pLwc, view, proj, &puck_game->go[LPGO_TARGET], pLwc->tex_atlas[LAE_PUCK_ENEMY_KTX]);
+	render_go(pLwc, view, proj, &puck_game->go[LPGO_PUCK], pLwc->tex_atlas[LAE_PUCK_KTX], puck_game->render_scale);
+	render_go(pLwc, view, proj, &puck_game->go[LPGO_PLAYER], pLwc->tex_atlas[LAE_PUCK_PLAYER_KTX], puck_game->render_scale);
+	render_go(pLwc, view, proj, &puck_game->go[LPGO_TARGET], pLwc->tex_atlas[LAE_PUCK_ENEMY_KTX], puck_game->render_scale);
 
 	render_dir_pad(pLwc);
 	render_fist_button(pLwc);
 	render_dash_gauge(pLwc);
+	render_hp_gauge(pLwc);
 }

@@ -55,10 +55,14 @@ LWPUCKGAME* new_puck_game() {
 	memset(puck_game, 0, sizeof(LWPUCKGAME));
 	puck_game->world_size = 4.0f;
 	puck_game->world_size_half = puck_game->world_size / 2.0f;
+	puck_game->render_scale = 0.9f;
 	puck_game->dash_interval = 1.5f;
 	puck_game->dash_duration = 0.1f;
 	puck_game->dash_speed_ratio = 8.0f;
 	puck_game->dash_shake_time = 0.3f;
+	puck_game->hp_shake_time = 0.3f;
+	puck_game->player.total_hp = 20;
+	puck_game->player.current_hp = 10;
 	// ------
 
 	// Initialize OpenDE
@@ -119,6 +123,22 @@ static void near_puck_player(LWPUCKGAME* puck_game) {
 		const float fscale = 50.0f;
 		dBodyAddForce(puck->body, dx*fscale, dy*fscale, 0);
 	}
+
+	puck_game->player.puck_contacted = 1;
+
+	const float puck_speed = (float)dLENGTH(dBodyGetLinearVel(puck->body));
+
+	if (puck_game->player.last_contact_puck_body != puck->body && puck_speed > 1.1f
+		&& !puck_game_dashing(puck_game)) {
+		puck_game->player.last_contact_puck_body = puck->body;
+		puck_game->player.current_hp--;
+		if (puck_game->player.current_hp < 0) {
+			puck_game->player.current_hp = puck_game->player.total_hp;
+		}
+		puck_game->player.hp_shake_remain_time = puck_game->hp_shake_time;
+	}
+	
+	LOGI("Contact puck velocity: %.2f", puck_speed);
 }
 
 static void near_callback(void *data, dGeomID o1, dGeomID o2)
@@ -144,7 +164,7 @@ static void near_callback(void *data, dGeomID o1, dGeomID o2)
 		int num_contact = dCollide(o1, o2, max_contacts, &contact->geom, sizeof(dContact));
 		// add these contact points to the simulation ...
 		for (int i = 0; i < num_contact; i++) {
-
+			// All objects - ground contacts
 			if (o1 == puck_game->boundary[LPGB_GROUND] || o2 == puck_game->boundary[LPGB_GROUND]) {
 				contact[i].surface.mode = dContactSoftCFM | dContactRolling;// | dContactFDir1;
 				contact[i].surface.rho = 0.001f;
@@ -155,6 +175,7 @@ static void near_callback(void *data, dGeomID o1, dGeomID o2)
 				//contact[i].fdir1[2] = 0.0f;
 				contact[i].surface.mu = 100.9f;
 			}
+			// Player - puck contacts
 			else if (o1 == puck_game->go[LPGO_PUCK].geom && o2 == puck_game->go[LPGO_PLAYER].geom)
 			{
 				contact[i].surface.mode = dContactSoftCFM | dContactBounce;
@@ -169,6 +190,7 @@ static void near_callback(void *data, dGeomID o1, dGeomID o2)
 
 				near_puck_player(puck_game);
 			}
+			// others contacts
 			else {
 				contact[i].surface.mode = dContactSoftCFM | dContactBounce;
 				contact[i].surface.mu = 1.9f;
@@ -196,10 +218,14 @@ void update_puck_game(LWCONTEXT* pLwc, LWPUCKGAME* puck_game, double delta_time)
 		return;
 	}
 	puck_game->time += (float)delta_time;
+	puck_game->player.puck_contacted = 0;
 	dSpaceCollide(puck_game->space, puck_game, near_callback);
 	//dWorldStep(puck_game->world, 0.005f);
 	dWorldQuickStep(puck_game->world, 0.02f);
 	dJointGroupEmpty(puck_game->contact_joint_group);
+	if (puck_game->player.puck_contacted == 0) {
+		puck_game->player.last_contact_puck_body = 0;
+	}
 	const dReal* p = dBodyGetPosition(puck_game->go[LPGO_PUCK].body);
 	
 	//LOGI("pos %.2f %.2f %.2f", p[0], p[1], p[2]);
@@ -232,6 +258,10 @@ void update_puck_game(LWCONTEXT* pLwc, LWPUCKGAME* puck_game, double delta_time)
 	if (puck_game->dash.shake_remain_time > 0) {
 		puck_game->dash.shake_remain_time = LWMAX(0, puck_game->dash.shake_remain_time - (float)delta_time);
 	}
+	// Decrease HP remain time
+	if (puck_game->player.hp_shake_remain_time > 0) {
+		puck_game->player.hp_shake_remain_time = LWMAX(0, puck_game->player.hp_shake_remain_time - (float)delta_time);
+	}
 }
 
 void puck_game_push(LWPUCKGAME* puck_game) {
@@ -246,7 +276,7 @@ void puck_game_dash(LWCONTEXT* pLwc, LWPUCKGAME* puck_game) {
 		return;
 	}
 	// Check already effective dash
-	if (puck_game->dash.remain_time > 0) {
+	if (puck_game_dashing(puck_game)) {
 		return;
 	}
 	// Check effective move input
@@ -272,4 +302,8 @@ float puck_game_dash_gauge_ratio(LWPUCKGAME* puck_game) {
 
 float puck_game_dash_cooltime(LWPUCKGAME* puck_game) {
 	return puck_game->time - puck_game->dash.last_time;
+}
+
+int puck_game_dashing(LWPUCKGAME* puck_game) {
+	return puck_game->dash.remain_time > 0;
 }

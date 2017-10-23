@@ -38,16 +38,25 @@ typedef struct _LWPUCKGAMEDASH {
 	float shake_remain_time;
 } LWPUCKGAMEDASH;
 
+typedef struct _LWPUCKGAMEPLAYER {
+	int total_hp;
+	int current_hp;
+	dBodyID last_contact_puck_body;
+	int puck_contacted;
+	float hp_shake_remain_time;
+} LWPUCKGAMEPLAYER;
+
 typedef struct _LWPUCKGAME {
 	// Static game data
 	float world_size;
 	float world_size_half;
+	float render_scale;
 	float dash_interval;
 	float dash_duration;
 	float dash_speed_ratio;
 	float dash_shake_time;
+	float hp_shake_time;
 	// ----
-
 	dWorldID world;
 	dSpaceID space;
 	dGeomID boundary[LPGB_COUNT];
@@ -58,6 +67,7 @@ typedef struct _LWPUCKGAME {
 	int push;
 	float time;
 	LWPUCKGAMEDASH dash;
+	LWPUCKGAMEPLAYER player;
 } LWPUCKGAME;
 
 LWPUCKGAME* new_puck_game();
@@ -67,3 +77,4 @@ void puck_game_push(LWPUCKGAME* puck_game);
 void puck_game_dash(LWCONTEXT* pLwc, LWPUCKGAME* puck_game);
 float puck_game_dash_gauge_ratio(LWPUCKGAME* puck_game);
 float puck_game_dash_cooltime(LWPUCKGAME* puck_game);
+int puck_game_dashing(LWPUCKGAME* puck_game);
