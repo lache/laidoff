@@ -7,7 +7,7 @@
 LWUDP* new_udp() { return 0; }
 void destroy_udp(LWUDP** udp) {}
 void udp_send(LWUDP* udp, const char* data, int size) {}
-void udp_update(LWUDP* udp);
+void udp_update(LWCONTEXT* pLwc, LWUDP* udp) {}
 #else
 int make_socket_nonblocking(int sock) {
 #if defined(WIN32) || defined(_WIN32) || defined(IMN_PIM)
