@@ -399,6 +399,9 @@ void lw_press_key_down(LWCONTEXT* pLwc) {
 
 void lw_press_key_space(LWCONTEXT* pLwc) {
 	pLwc->player_space = 1;
+}
+
+void lw_press_key_z(LWCONTEXT* pLwc) {
 	puck_game_dash(pLwc, pLwc->puck_game);
 }
 
@@ -424,4 +427,7 @@ void lw_release_key_down(LWCONTEXT* pLwc) {
 
 void lw_release_key_space(LWCONTEXT* pLwc) {
 	pLwc->player_space = 0;
+}
+
+void lw_release_key_z(LWCONTEXT* pLwc) {
 }

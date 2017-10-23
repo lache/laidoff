@@ -5,6 +5,8 @@
 #include "lwlog.h"
 #include "puckgame.h"
 #include "render_field.h"
+#include "lwtextblock.h"
+#include "render_text_block.h"
 
 static void render_go(const LWCONTEXT* pLwc, const mat4x4 view, const mat4x4 proj, const LWPUCKGAMEOBJECT* go, int tex_index) {
 	int shader_index = LWST_DEFAULT;
@@ -47,7 +49,64 @@ static void render_go(const LWCONTEXT* pLwc, const mat4x4 view, const mat4x4 pro
 	glDrawArrays(GL_TRIANGLES, 0, pLwc->vertex_buffer[lvt].vertex_count);
 }
 
-void lwc_render_physics(const struct _LWCONTEXT* pLwc) {
+static void render_dash_gauge(const LWCONTEXT* pLwc) {
+	const float aspect_ratio = (float)pLwc->width / pLwc->height;
+
+	const float margin_x = 0.3f;
+	const float margin_y = 0.2f * 5;
+	const float gauge_width = 0.75f;
+	const float gauge_height = 0.07f;
+	const float gauge_flush_height = 0.07f;
+	const float base_color = 0.3f;
+	const float x = aspect_ratio - margin_x;
+	const float y = -1 + margin_y;
+	const float boost_gauge_ratio = puck_game_dash_gauge_ratio(pLwc->puck_game);
+	
+	// Background
+	if (boost_gauge_ratio < 1.0f) {
+		render_solid_vb_ui(pLwc,
+			x - gauge_width * boost_gauge_ratio, y, gauge_width * (1.0f - boost_gauge_ratio), gauge_height,
+			0,
+			LVT_RIGHT_BOTTOM_ANCHORED_SQUARE,
+			1, 1, base_color, base_color, 1);
+	}
+	// Foreground
+	render_solid_vb_ui(pLwc,
+		x, y, gauge_width * boost_gauge_ratio, gauge_height,
+		0,
+		LVT_RIGHT_BOTTOM_ANCHORED_SQUARE,
+		1, base_color, 1, base_color, 1);
+	if (boost_gauge_ratio < 1.0f) {
+		// Flush
+		render_solid_vb_ui(pLwc,
+			x, y + boost_gauge_ratio / 4.0f, gauge_width, gauge_height,
+			0,
+			LVT_RIGHT_BOTTOM_ANCHORED_SQUARE,
+			powf(1.0f - boost_gauge_ratio, 3.0f), base_color, 1, base_color, 1);
+	}
+	// Text
+	LWTEXTBLOCK text_block;
+	text_block.align = LTBA_RIGHT_BOTTOM;
+	text_block.text_block_width = DEFAULT_TEXT_BLOCK_WIDTH;
+	text_block.text_block_line_height = DEFAULT_TEXT_BLOCK_LINE_HEIGHT_E;
+	text_block.size = DEFAULT_TEXT_BLOCK_SIZE_F;
+	text_block.multiline = 1;
+	SET_COLOR_RGBA_FLOAT(text_block.color_normal_glyph, 1, 1, 1, 1);
+	SET_COLOR_RGBA_FLOAT(text_block.color_normal_outline, 0, 0, 0, 1);
+	SET_COLOR_RGBA_FLOAT(text_block.color_emp_glyph, 1, 1, 0, 1);
+	SET_COLOR_RGBA_FLOAT(text_block.color_emp_outline, 0, 0, 0, 1);
+	char str[32];
+	sprintf(str, "%.1f%% BOOST GAUGE", boost_gauge_ratio * 100);
+	text_block.text = str;
+	text_block.text_bytelen = (int)strlen(text_block.text);
+	text_block.begin_index = 0;
+	text_block.end_index = text_block.text_bytelen;
+	text_block.text_block_x = x;
+	text_block.text_block_y = y;
+	render_text_block(pLwc, &text_block);
+}
+
+void lwc_render_physics(const LWCONTEXT* pLwc) {
 	glViewport(0, 0, pLwc->width, pLwc->height);
 	lw_clear_color();
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -126,4 +185,5 @@ void lwc_render_physics(const struct _LWCONTEXT* pLwc) {
 
 	render_dir_pad(pLwc);
 	render_fist_button(pLwc);
+	render_dash_gauge(pLwc);
 }

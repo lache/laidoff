@@ -6,6 +6,7 @@
 #include "nav.h"
 #include "puckgame.h"
 #include "key.h"
+#include "input.h"
 #if LW_PLATFORM_WIN32
 #include "lwimgui.h"
 #endif
@@ -33,6 +34,10 @@ static void handle_move_key_press_release(LWCONTEXT* pLwc, int key, int action) 
 		lw_press_key_space(pLwc);
 	}
 
+	if (key == GLFW_KEY_Z && action == GLFW_PRESS) {
+		lw_press_key_z(pLwc);
+	}
+
 	if (key == GLFW_KEY_RIGHT && action == GLFW_RELEASE) {
 		lw_release_key_right(pLwc);
 	}
@@ -51,6 +56,10 @@ static void handle_move_key_press_release(LWCONTEXT* pLwc, int key, int action) 
 
 	if (key == GLFW_KEY_SPACE && action == GLFW_RELEASE) {
 		lw_release_key_space(pLwc);
+	}
+
+	if (key == GLFW_KEY_Z && action == GLFW_RELEASE) {
+		lw_release_key_z(pLwc);
 	}
 
 }

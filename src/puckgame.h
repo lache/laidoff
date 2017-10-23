@@ -63,3 +63,5 @@ void delete_puck_game(LWPUCKGAME** puck_game);
 void update_puck_game(LWCONTEXT* pLwc, LWPUCKGAME* puck_game, double delta_time);
 void puck_game_push(LWPUCKGAME* puck_game);
 void puck_game_dash(LWCONTEXT* pLwc, LWPUCKGAME* puck_game);
+float puck_game_dash_gauge_ratio(LWPUCKGAME* puck_game);
+float puck_game_dash_cooltime(LWPUCKGAME* puck_game);

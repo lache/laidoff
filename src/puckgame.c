@@ -241,7 +241,7 @@ void puck_game_dash(LWCONTEXT* pLwc, LWPUCKGAME* puck_game) {
 		return;
 	}
 	// Check cooltime
-	if (puck_game->time - puck_game->dash.last_time < puck_game->dash_interval) {
+	if (puck_game_dash_cooltime(puck_game) < puck_game->dash_interval) {
 		return;
 	}
 	// Check already effective dash
@@ -258,4 +258,12 @@ void puck_game_dash(LWCONTEXT* pLwc, LWPUCKGAME* puck_game) {
 	puck_game->dash.dir_x = dx;
 	puck_game->dash.dir_y = dy;
 	puck_game->dash.last_time = puck_game->time;
+}
+
+float puck_game_dash_gauge_ratio(LWPUCKGAME* puck_game) {
+	return LWMIN(1.0f, puck_game_dash_cooltime(puck_game) / puck_game->dash_interval);
+}
+
+float puck_game_dash_cooltime(LWPUCKGAME* puck_game) {
+	return puck_game->time - puck_game->dash.last_time;
 }
