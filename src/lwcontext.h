@@ -243,6 +243,10 @@ typedef struct _LWCONTEXT {
 	float last_mouse_move_x;
 	// Input: Last mouse move y coordinate
 	float last_mouse_move_y;
+	// Input: Last mouse move delta x
+	float last_mouse_move_delta_x;
+	// Input: Last mouse move delta y
+	float last_mouse_move_delta_y;
 	// Admin button command handler array
 	LWBUTTONCOMMAND admin_button_command[6 * 5];
 	// lua VM instance

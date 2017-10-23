@@ -142,7 +142,7 @@ static void near_puck_player(LWPUCKGAME* puck_game) {
 		puck_game->player.hp_shake_remain_time = puck_game->hp_shake_time;
 	}
 	
-	LOGI("Contact puck velocity: %.2f", puck_speed);
+	//LOGI("Contact puck velocity: %.2f", puck_speed);
 }
 
 static void near_callback(void *data, dGeomID o1, dGeomID o2)
@@ -244,6 +244,9 @@ void update_puck_game(LWCONTEXT* pLwc, LWPUCKGAME* puck_game, double delta_time)
 	if (lw_get_normalized_dir_pad_input(pLwc, &dx, &dy, &dlen)) {
 		dJointSetLMotorParam(pcj, dParamVel1, player_speed * dx);
 		dJointSetLMotorParam(pcj, dParamVel2, player_speed * dy);
+		/*const float last_move_delta_len = sqrtf(pLwc->last_mouse_move_delta_x * pLwc->last_mouse_move_delta_x + pLwc->last_mouse_move_delta_y * pLwc->last_mouse_move_delta_y);
+		dJointSetLMotorParam(pcj, dParamVel1, player_speed * pLwc->last_mouse_move_delta_x / last_move_delta_len);
+		dJointSetLMotorParam(pcj, dParamVel2, player_speed * pLwc->last_mouse_move_delta_y / last_move_delta_len);*/
 	} else {
 		dJointSetLMotorParam(pcj, dParamVel1, 0);
 		dJointSetLMotorParam(pcj, dParamVel2, 0);

@@ -158,6 +158,9 @@ void lw_trigger_mouse_move(LWCONTEXT* pLwc, float x, float y, int pointer_id) {
 
 	convert_touch_coord_to_ui_coord(pLwc, &x, &y);
 
+	pLwc->last_mouse_move_delta_x = x - pLwc->last_mouse_move_x;
+	pLwc->last_mouse_move_delta_y = y - pLwc->last_mouse_move_y;
+
 	pLwc->last_mouse_move_x = x;
 	pLwc->last_mouse_move_y = y;
 
