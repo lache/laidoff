@@ -2,22 +2,31 @@
 #include "platform_detection.h"
 #if LW_PLATFORM_WIN32
 #include <WinSock2.h>
+#else
+#include <fcntl.h>
+#include <sys/socket.h>
+#include <linux/in.h>
+#include <stdlib.h>
+#include <endian.h>
+#include <czmq_prelude.h>
 #endif
-#define LW_UDP_SERVER "127.0.0.1"
+#define LW_UDP_SERVER "192.168.0.28"
 #define LW_UDP_BUFLEN 512
 #define LW_UDP_PORT 19856
 
 typedef struct _LWUDP {
 #if LW_PLATFORM_WIN32
+	WSADATA wsa;
+#endif
 	struct sockaddr_in si_other;
 	int s, slen;
 	char buf[LW_UDP_BUFLEN];
 	char message[LW_UDP_BUFLEN];
-	WSADATA wsa;
 	fd_set readfds;
 	struct timeval tv;
 	int recv_len;
-#endif
+	int ready;
+
 } LWUDP;
 
 typedef struct _LWCONTEXT LWCONTEXT;

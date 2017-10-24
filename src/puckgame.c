@@ -234,3 +234,10 @@ float puck_game_dash_cooltime(LWPUCKGAME* puck_game) {
 int puck_game_dashing(LWPUCKGAME* puck_game) {
 	return puck_game->dash.remain_time > 0;
 }
+
+void puck_game_commit_dash(LWPUCKGAME* puck_game, float dx, float dy) {
+	puck_game->dash.remain_time = puck_game->dash_duration;
+	puck_game->dash.dir_x = dx;
+	puck_game->dash.dir_y = dy;
+	puck_game->dash.last_time = puck_game->time;
+}

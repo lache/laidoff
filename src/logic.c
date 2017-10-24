@@ -798,6 +798,11 @@ static void s_logic_worker(zsock_t *pipe, void *args) {
 	double delta_time_accum = 0;
 	pLwc->update_interval = 1 / 125.0;// 1 / 120.0;// 0.02; // seconds
 
+	// Create a new udp instance here since
+	// WSAStartup should be called within
+	// a thread which opens sockets.
+	pLwc->udp = new_udp();
+
 	zloop_t* loop = zloop_new();
 	pLwc->logic_loop = loop;
 	logic_start_logic_update_job(pLwc);

@@ -1398,8 +1398,6 @@ LWCONTEXT* lw_init_initial_size(int width, int height) {
 
 	pLwc->puck_game = new_puck_game();
 
-	pLwc->udp = new_udp();
-
 	return pLwc;
 }
 
