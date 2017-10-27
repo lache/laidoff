@@ -129,7 +129,7 @@ if (WIN32)
 		win32/lwimgui.h
 		)
 	set(SERVER_WIN32_DEPS
-		win32/servermain.c
+		
 		)
 elseif (APPLE)
     set(ICON osx/laidoff.icns)
