@@ -73,6 +73,10 @@ include_directories("imgui")
 
 include_directories(/opt/vc/include /opt/vc/include/interface/vcos/pthreads /opt/vc/include/interface/vmcs_host/linux /opt/vc/src/hello_pi/libs/ilclient /opt/vc/src/hello_pi/libs/vgfont)
 
+# pthread deps on Linux server build
+find_package (Threads)
+
+
 include(CheckIncludeFile)
 CHECK_INCLUDE_FILE(/opt/vc/include/bcm_host.h BCM_HOST_AVAILABLE)
 
@@ -240,6 +244,7 @@ target_compile_definitions(laidoff-server PRIVATE LW_IS_SERVER=1 _WINSOCK_DEPREC
 
 target_link_libraries(laidoff-server
 	${WINSOCK2}
+	${CMAKE_THREAD_LIBS_INIT} # pthread deps on Linux server build
 )
 
 set(WINDOWS_BINARIES laidoff laidoff-server)
