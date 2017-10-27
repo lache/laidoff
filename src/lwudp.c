@@ -3,7 +3,7 @@
 #include "puckgamepacket.h"
 #include "lwcontext.h"
 
-int make_socket_nonblocking(int sock) {
+static int make_socket_nonblocking(int sock) {
 #if defined(WIN32) || defined(_WIN32) || defined(IMN_PIM)
 	unsigned long arg = 1;
 	return ioctlsocket(sock, FIONBIO, &arg) == 0;
