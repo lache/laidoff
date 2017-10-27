@@ -14,7 +14,7 @@ set(CMAKE_C_STANDARD 11)
 
 if (NOT SERVER_ONLY)
     add_subdirectory(glfw-3.2.1)
-endif (UNIX)
+endif (NOT SERVER_ONLY)
 
 include_directories(${glfw_INCLUDE_DIRS})
 include_directories("${GLFW_SOURCE_DIR}/deps")
@@ -198,6 +198,7 @@ source_group(Zmq FILES ${ZMQ_LIB})
 source_group(Win32 FILES ${WIN32_DEPS} ${ICON})
 source_group(Imgui FILES ${IMGUI})
 
+if (NOT SERVER_ONLY)
 #add_executable(laidoff WIN32 MACOSX_BUNDLE laidoff.c ${ICON} ${GLAD})
 add_executable(laidoff
 MACOSX_BUNDLE
@@ -226,6 +227,7 @@ target_link_libraries(laidoff
 	${WINXAUDIO2}
 	${WINSOCK2}
 )
+endif (NOT SERVER_ONLY)
 
 add_executable(laidoff-server
 	src/puckgame.c
