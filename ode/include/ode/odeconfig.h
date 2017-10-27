@@ -32,7 +32,7 @@
 #include <math.h>
 #include <string.h>
 #include <float.h>
-
+#include <stdint.h>
 
 #include <ode/precision.h>
 
