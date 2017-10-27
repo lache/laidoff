@@ -253,8 +253,13 @@ elseif (APPLE)
 endif()
 
 # 빌드 결과를 한곳으로 모은다. (DLL, EXE)
+if (NOT SERVER_ONLY)
+set(OUTPUT_BINARIES laidoff libzmq czmq laidoff-server)
+else (NOT SERVER_ONLY)
+set(OUTPUT_BINARIES libzmq czmq laidoff-server)
+endif (NOT SERVER_ONLY)
 
-set_target_properties(laidoff libzmq czmq laidoff-server
+set_target_properties(${OUTPUT_BINARIES}
     PROPERTIES
     ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib"
     LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib"
