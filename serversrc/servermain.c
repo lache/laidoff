@@ -1,5 +1,19 @@
-#include <winsock2.h>
 #include "platform_detection.h"
+#if LW_PLATFORM_WIN32
+#include <winsock2.h>
+#else
+#include <fcntl.h>
+#include <sys/socket.h>
+#include <stdlib.h>
+#include <endian.h>
+#include <dirent.h>
+#include <stdio.h>
+#include <sys/types.h> 
+#include<arpa/inet.h> //inet_addr
+#include <unistd.h> // chdir
+#include <inttypes.h>
+#define __int64 int64_t
+#endif
 #include "lwlog.h"
 #include "puckgame.h"
 #include <inttypes.h>
@@ -11,6 +25,22 @@
 #define LwChangeDirectory(x) chdir(x)
 #endif
 
+#ifndef SOCKET
+#define SOCKET int
+#endif
+
+#ifndef BOOL
+#define BOOL int
+#endif
+
+#ifndef INVALID_SOCKET
+#define INVALID_SOCKET (~0)
+#endif
+
+#ifndef SOCKET_ERROR
+#define SOCKET_ERROR (-1)
+#endif
+
 #define BUFLEN 512  //Max length of buffer
 #define PORT 19856   //The port on which to listen for incoming data
 
@@ -19,8 +49,9 @@ typedef struct _LWSERVER {
 	struct sockaddr_in server, si_other;
 	int slen, recv_len;
 	char buf[BUFLEN];
+#if LW_PLATFORM_WIN32
 	WSADATA wsa;
-
+#endif
 	// Player command
 	int dir_pad_dragging;
 	float dx;
@@ -96,10 +127,18 @@ static void update_puck_game(LWSERVER* server, LWPUCKGAME* puck_game, double del
 	}
 }
 
+#if LW_PLATFORM_WIN32
+#else
+int WSAGetLastError() {
+	return -1;
+}
+#endif
+
 LWSERVER* new_server() {
 	LWSERVER* server = malloc(sizeof(LWSERVER));
 	memset(server, 0, sizeof(LWSERVER));
 	server->slen = sizeof(server->si_other);
+#if LW_PLATFORM_WIN32
 	//Initialise winsock
 	LOGI("Initialising Winsock...");
 	if (WSAStartup(MAKEWORD(2, 2), &server->wsa) != 0)
@@ -108,7 +147,7 @@ LWSERVER* new_server() {
 		exit(EXIT_FAILURE);
 	}
 	LOGI("Initialised.\n");
-
+#endif
 	//Create a socket
 	if ((server->s = socket(AF_INET, SOCK_DGRAM, 0)) == INVALID_SOCKET)
 	{
