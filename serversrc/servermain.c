@@ -90,7 +90,7 @@ static void update_puck_game(LWSERVER* server, LWPUCKGAME* puck_game, double del
 	puck_game->player.puck_contacted = 0;
 	dSpaceCollide(puck_game->space, puck_game, puck_game_near_callback);
 	//dWorldStep(puck_game->world, 0.005f);
-	dWorldQuickStep(puck_game->world, 0.02f);
+	dWorldQuickStep(puck_game->world, delta_time);
 	dJointGroupEmpty(puck_game->contact_joint_group);
 	if (puck_game->player.puck_contacted == 0) {
 		puck_game->player.last_contact_puck_body = 0;
@@ -205,7 +205,7 @@ int main(int argc, char* argv[]) {
 	fd_set readfds;
 	make_socket_nonblocking(server->s);
 	while (1) {
-		update_puck_game(server, puck_game, 1.0f / 125);
+		update_puck_game(server, puck_game, 1.0f / 1250);
 		update_tick++;
 		//LOGI("Update tick %"PRId64, update_tick);
 
