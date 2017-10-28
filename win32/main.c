@@ -10,6 +10,8 @@
 #if LW_PLATFORM_WIN32
 #include "scriptwatch.h"
 #include "lwimgui.h"
+#define GLFW_EXPOSE_NATIVE_WIN32
+#include "GLFW/glfw3native.h"
 #endif
 
 #ifndef BOOL
@@ -71,7 +73,16 @@ void window_size_callback(GLFWwindow* window, int width, int height)
 
 static GLFWwindow* create_glfw_window()
 {
-	return glfwCreateWindow(INITIAL_SCREEN_RESOLUTION_X, INITIAL_SCREEN_RESOLUTION_Y, "LAID OFF", NULL, NULL);
+	GLFWwindow* window = glfwCreateWindow(
+		INITIAL_SCREEN_RESOLUTION_X,
+		INITIAL_SCREEN_RESOLUTION_Y,
+		"LAID OFF", NULL, NULL);
+	HWND hwnd = glfwGetWin32Window(window);
+	int scaling_factor = GetDpiForWindow(hwnd) / 96;
+	glfwSetWindowSize(window,
+		INITIAL_SCREEN_RESOLUTION_X * scaling_factor,
+		INITIAL_SCREEN_RESOLUTION_Y * scaling_factor);
+	return window;
 }
 
 int main(int argc, char* argv[])
@@ -135,9 +146,22 @@ int main(int argc, char* argv[])
 			exit(EXIT_FAILURE);
 		}
 	}
-
+	HWND hwnd = glfwGetWin32Window(window);
+	int scaling_factor = GetDpiForWindow(hwnd) / 96;
+	RECT work_area;
+	SystemParametersInfo(SPI_GETWORKAREA, 0, &work_area, 0);
 	//glfwSetWindowPos(window, 600, 70);
-	glfwSetWindowPos(window, 20, 40);
+	RECT window_rect;
+	GetWindowRect(hwnd, &window_rect);
+	int window_rect_width = window_rect.right - window_rect.left;
+	int window_rect_height = window_rect.bottom - window_rect.top;
+	RECT client_rect;
+	GetClientRect(hwnd, &client_rect);
+	int client_rect_width = client_rect.right - client_rect.left;
+	int client_rect_height = client_rect.bottom - client_rect.top;
+	int window_rect_to_client_rect_dx = window_rect_width - client_rect_width;
+	int window_rect_to_client_rect_dy = window_rect_height - client_rect_height;
+	glfwSetWindowPos(window, work_area.left + window_rect_to_client_rect_dx, work_area.top + window_rect_to_client_rect_dy);
 	// Register glfw event callbacks
 	glfwSetKeyCallback(window, key_callback);
 	glfwSetMouseButtonCallback(window, mouse_button_callback);

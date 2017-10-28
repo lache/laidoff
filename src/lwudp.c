@@ -57,6 +57,7 @@ LWUDP* new_udp() {
 	udp->tv.tv_usec = 0;
 	make_socket_nonblocking(udp->s);
 	udp->ready = 1;
+	udp->master = 1;
 	return udp;
 }
 
