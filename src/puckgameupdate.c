@@ -95,8 +95,9 @@ void puck_game_dash(LWCONTEXT* pLwc, LWPUCKGAME* puck_game) {
 		return;
 	}
 	// Start dash!
-	puck_game->dash.remain_time = puck_game->dash_duration;
-	puck_game->dash.dir_x = dx;
-	puck_game->dash.dir_y = dy;
-	puck_game->dash.last_time = puck_game->time;
+	puck_game_commit_dash(puck_game, dx, dy);
+
+	LWPUCKGAMEPACKETDASH packet_dash;
+	packet_dash.type = LPGPT_DASH;
+	udp_send(pLwc->udp, (const char*)&packet_dash, sizeof(packet_dash));
 }

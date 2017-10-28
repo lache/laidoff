@@ -1,4 +1,6 @@
 #pragma once
+#include "linmath.h"
+
 typedef enum _LW_PUCK_GAME_PACKET_TYPE {
 	LPGPT_MOVE,
 	LPGPT_STOP,
@@ -23,9 +25,9 @@ typedef struct _LWPUCKGAMEPACKETDASH {
 typedef struct _LWPUCKGAMEPACKETSTATE {
 	int type;
 	float player[3];
-	float player_rot[4];
+	mat4x4 player_rot;
 	float puck[3];
-	float puck_rot[4];
+	mat4x4 puck_rot;
 	float target[3];
-	float target_rot[4];
+	mat4x4 target_rot;
 }LWPUCKGAMEPACKETSTATE;

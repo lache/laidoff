@@ -278,6 +278,7 @@ create_shader(const char *shader_name, LWSHADER *pShader, const GLchar *vst, con
 	pShader->vuvoffset_location = glGetUniformLocation(pShader->program, "vUvOffset");
 	pShader->vuvscale_location = glGetUniformLocation(pShader->program, "vUvScale");
 	pShader->vs9offset_location = glGetUniformLocation(pShader->program, "vS9Offset");
+	pShader->m_location = glGetUniformLocation(pShader->program, "M");
 	pShader->alpha_multiplier_location = glGetUniformLocation(pShader->program, "alpha_multiplier");
 	pShader->overlay_color_location = glGetUniformLocation(pShader->program, "overlay_color");
 	pShader->overlay_color_ratio_location = glGetUniformLocation(pShader->program, "overlay_color_ratio");
@@ -309,6 +310,9 @@ create_shader(const char *shader_name, LWSHADER *pShader, const GLchar *vst, con
 	pShader->u_TextureAlpha = glGetUniformLocation(pShader->program, "u_TextureAlpha");
 	pShader->time = glGetUniformLocation(pShader->program, "time");
 	pShader->resolution = glGetUniformLocation(pShader->program, "resolution");
+	pShader->sphere_pos = glGetUniformLocation(pShader->program, "sphere_pos");
+	pShader->sphere_col = glGetUniformLocation(pShader->program, "sphere_col");
+	pShader->sphere_col_ratio = glGetUniformLocation(pShader->program, "sphere_col_ratio");
 
 	// Attribs
 	pShader->vpos_location = glGetAttribLocation(pShader->program, "vPos");

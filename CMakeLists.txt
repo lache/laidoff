@@ -11,10 +11,13 @@ set(GLFW_BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
 
 set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_C_STANDARD 11)
-add_subdirectory(glfw-3.2.1)
+
+if (NOT SERVER_ONLY)
+    add_subdirectory(glfw-3.2.1)
+endif (NOT SERVER_ONLY)
 
 include_directories(${glfw_INCLUDE_DIRS})
-include_directories("${GLFW_SOURCE_DIR}/deps")
+include_directories("glfw-3.2.1/deps")
 
 # 컴파일 플래그 설정
 
@@ -70,6 +73,10 @@ include_directories("imgui")
 
 include_directories(/opt/vc/include /opt/vc/include/interface/vcos/pthreads /opt/vc/include/interface/vmcs_host/linux /opt/vc/src/hello_pi/libs/ilclient /opt/vc/src/hello_pi/libs/vgfont)
 
+# pthread deps on Linux server build
+find_package (Threads)
+
+
 include(CheckIncludeFile)
 CHECK_INCLUDE_FILE(/opt/vc/include/bcm_host.h BCM_HOST_AVAILABLE)
 
@@ -122,7 +129,7 @@ if (WIN32)
 		win32/lwimgui.h
 		)
 	set(SERVER_WIN32_DEPS
-		win32/servermain.c
+		
 		)
 elseif (APPLE)
     set(ICON osx/laidoff.icns)
@@ -195,6 +202,7 @@ source_group(Zmq FILES ${ZMQ_LIB})
 source_group(Win32 FILES ${WIN32_DEPS} ${ICON})
 source_group(Imgui FILES ${IMGUI})
 
+if (NOT SERVER_ONLY)
 #add_executable(laidoff WIN32 MACOSX_BUNDLE laidoff.c ${ICON} ${GLAD})
 add_executable(laidoff
 MACOSX_BUNDLE
@@ -223,6 +231,7 @@ target_link_libraries(laidoff
 	${WINXAUDIO2}
 	${WINSOCK2}
 )
+endif (NOT SERVER_ONLY)
 
 add_executable(laidoff-server
 	src/puckgame.c
@@ -235,9 +244,14 @@ target_compile_definitions(laidoff-server PRIVATE LW_IS_SERVER=1 _WINSOCK_DEPREC
 
 target_link_libraries(laidoff-server
 	${WINSOCK2}
+	${CMAKE_THREAD_LIBS_INIT} # pthread deps on Linux server build
 )
 
+if (NOT SERVER_ONLY)
 set(WINDOWS_BINARIES laidoff laidoff-server)
+else (NOT SERVER_ONLY)
+set(WINDOWS_BINARIES laidoff-server)
+endif (NOT SERVER_ONLY)
 
 if (MSVC)
     # Tell MSVC to use 'main' instead of 'WinMain' for Windows subsystem executables
@@ -248,8 +262,13 @@ elseif (APPLE)
 endif()
 
 # 빌드 결과를 한곳으로 모은다. (DLL, EXE)
+if (NOT SERVER_ONLY)
+set(OUTPUT_BINARIES laidoff libzmq czmq laidoff-server)
+else (NOT SERVER_ONLY)
+set(OUTPUT_BINARIES libzmq czmq laidoff-server)
+endif (NOT SERVER_ONLY)
 
-set_target_properties(laidoff libzmq czmq laidoff-server
+set_target_properties(${OUTPUT_BINARIES}
     PROPERTIES
     ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib"
     LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib"

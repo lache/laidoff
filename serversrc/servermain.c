@@ -1,5 +1,19 @@
-#include <winsock2.h>
 #include "platform_detection.h"
+#if LW_PLATFORM_WIN32
+#include <winsock2.h>
+#else
+#include <fcntl.h>
+#include <sys/socket.h>
+#include <stdlib.h>
+#include <endian.h>
+#include <dirent.h>
+#include <stdio.h>
+#include <sys/types.h> 
+#include<arpa/inet.h> //inet_addr
+#include <unistd.h> // chdir
+#include <inttypes.h>
+#define __int64 int64_t
+#endif
 #include "lwlog.h"
 #include "puckgame.h"
 #include <inttypes.h>
@@ -10,6 +24,39 @@
 #else
 #define LwChangeDirectory(x) chdir(x)
 #endif
+
+#ifndef SOCKET
+#define SOCKET int
+#endif
+
+#ifndef BOOL
+#define BOOL int
+#endif
+
+#ifndef INVALID_SOCKET
+#define INVALID_SOCKET (~0)
+#endif
+
+#ifndef SOCKET_ERROR
+#define SOCKET_ERROR (-1)
+#endif
+
+#define BUFLEN 512  //Max length of buffer
+#define PORT 19856   //The port on which to listen for incoming data
+
+typedef struct _LWSERVER {
+	SOCKET s;
+	struct sockaddr_in server, si_other;
+	int slen, recv_len;
+	char buf[BUFLEN];
+#if LW_PLATFORM_WIN32
+	WSADATA wsa;
+#endif
+	// Player command
+	int dir_pad_dragging;
+	float dx;
+	float dy;
+} LWSERVER;
 
 static BOOL directory_exists(const char* szPath)
 {
@@ -30,32 +77,68 @@ static BOOL directory_exists(const char* szPath)
 #endif
 }
 
-void update_puck_game(LWCONTEXT* pLwc, LWPUCKGAME* puck_game, double delta_time) {
+static int lw_get_normalized_dir_pad_input(const LWSERVER* server, float *dx, float *dy, float *dlen) {
+	if (server->dir_pad_dragging == 0) {
+		return 0;
+	}
+	*dx = server->dx;
+	*dy = server->dy;
+	return 1;
+}
+
+static void update_puck_game(LWSERVER* server, LWPUCKGAME* puck_game, double delta_time) {
 	puck_game->player.puck_contacted = 0;
 	dSpaceCollide(puck_game->space, puck_game, puck_game_near_callback);
-//dWorldStep(puck_game->world, 0.005f);
-dWorldQuickStep(puck_game->world, 0.02f);
-dJointGroupEmpty(puck_game->contact_joint_group);
-if (puck_game->player.puck_contacted == 0) {
-	puck_game->player.last_contact_puck_body = 0;
-}
+	//dWorldStep(puck_game->world, 0.005f);
+	dWorldQuickStep(puck_game->world, delta_time);
+	dJointGroupEmpty(puck_game->contact_joint_group);
+	if (puck_game->player.puck_contacted == 0) {
+		puck_game->player.last_contact_puck_body = 0;
+	}
+	
+	const dReal* p = dBodyGetPosition(puck_game->go[LPGO_PUCK].body);
+
+	//LOGI("pos %.2f %.2f %.2f", p[0], p[1], p[2]);
+
+	dJointID pcj = puck_game->player_control_joint;
+	float player_speed = 0.5f;
+	//dJointSetLMotorParam(pcj, dParamVel1, player_speed * (pLwc->player_move_right - pLwc->player_move_left));
+	//dJointSetLMotorParam(pcj, dParamVel2, player_speed * (pLwc->player_move_up - pLwc->player_move_down));
+
+	//pLwc->player_pos_last_moved_dx
+	float dx, dy, dlen;
+	if (lw_get_normalized_dir_pad_input(server, &dx, &dy, &dlen)) {
+		dJointSetLMotorParam(pcj, dParamVel1, player_speed * dx);
+		dJointSetLMotorParam(pcj, dParamVel2, player_speed * dy);
+	}
+	else {
+		dJointSetLMotorParam(pcj, dParamVel1, 0);
+		dJointSetLMotorParam(pcj, dParamVel2, 0);
+	}
+
+	// Move direction fixed while dashing
+	if (puck_game->dash.remain_time > 0) {
+		player_speed *= puck_game->dash_speed_ratio;
+		dx = puck_game->dash.dir_x;
+		dy = puck_game->dash.dir_y;
+		dJointSetLMotorParam(pcj, dParamVel1, player_speed * dx);
+		dJointSetLMotorParam(pcj, dParamVel2, player_speed * dy);
+		puck_game->dash.remain_time = LWMAX(0, puck_game->dash.remain_time - (float)delta_time);
+	}
 }
 
-#define BUFLEN 512  //Max length of buffer
-#define PORT 19856   //The port on which to listen for incoming data
-
-typedef struct _LWSERVER {
-	SOCKET s;
-	struct sockaddr_in server, si_other;
-	int slen, recv_len;
-	char buf[BUFLEN];
-	WSADATA wsa;
-} LWSERVER;
+#if LW_PLATFORM_WIN32
+#else
+int WSAGetLastError() {
+	return -1;
+}
+#endif
 
 LWSERVER* new_server() {
 	LWSERVER* server = malloc(sizeof(LWSERVER));
 	memset(server, 0, sizeof(LWSERVER));
 	server->slen = sizeof(server->si_other);
+#if LW_PLATFORM_WIN32
 	//Initialise winsock
 	LOGI("Initialising Winsock...");
 	if (WSAStartup(MAKEWORD(2, 2), &server->wsa) != 0)
@@ -64,7 +147,7 @@ LWSERVER* new_server() {
 		exit(EXIT_FAILURE);
 	}
 	LOGI("Initialised.\n");
-
+#endif
 	//Create a socket
 	if ((server->s = socket(AF_INET, SOCK_DGRAM, 0)) == INVALID_SOCKET)
 	{
@@ -100,6 +183,14 @@ int make_socket_nonblocking(int sock) {
 #endif
 }
 
+void normalize_quaternion(float* q) {
+	const float l = sqrtf(q[0] * q[0] + q[1] * q[1] + q[2] * q[2] + q[3] * q[3]);
+	q[0] /= l;
+	q[1] /= l;
+	q[2] /= l;
+	q[3] /= l;
+}
+
 int main(int argc, char* argv[]) {
 	LOGI("LAIDOFF-SERVER: Greetings.");
 	while (!directory_exists("assets") && LwChangeDirectory(".."))
@@ -114,7 +205,7 @@ int main(int argc, char* argv[]) {
 	fd_set readfds;
 	make_socket_nonblocking(server->s);
 	while (1) {
-		update_puck_game(0, puck_game, 0);
+		update_puck_game(server, puck_game, 1.0f / 60);
 		update_tick++;
 		//LOGI("Update tick %"PRId64, update_tick);
 
@@ -136,9 +227,6 @@ int main(int argc, char* argv[]) {
 				exit(EXIT_FAILURE);
 			}
 
-			dJointID pcj = puck_game->player_control_joint;
-			float player_speed = 0.5f;
-
 			//print details of the client/peer and the data received
 			printf("Received packet from %s:%d (size:%d)\n",
 				inet_ntoa(server->si_other.sin_addr),
@@ -150,22 +238,25 @@ int main(int argc, char* argv[]) {
 			{
 				LWPUCKGAMEPACKETMOVE* p = (LWPUCKGAMEPACKETMOVE*)server->buf;
 				LOGI("MOVE dx=%.2f dy=%.2f", p->dx, p->dy);
-				dJointSetLMotorParam(pcj, dParamVel1, player_speed * p->dx);
-				dJointSetLMotorParam(pcj, dParamVel2, player_speed * p->dy);
+				server->dir_pad_dragging = 1;
+				server->dx = p->dx;
+				server->dy = p->dy;
 				break;
 			}
 			case LPGPT_STOP:
 			{
 				LWPUCKGAMEPACKETSTOP* p = (LWPUCKGAMEPACKETSTOP*)server->buf;
 				LOGI("STOP");
-				dJointSetLMotorParam(pcj, dParamVel1, 0);
-				dJointSetLMotorParam(pcj, dParamVel2, 0);
+				server->dir_pad_dragging = 0;
 				break;
 			}
 			case LPGPT_DASH:
 			{
 				LWPUCKGAMEPACKETDASH* p = (LWPUCKGAMEPACKETDASH*)server->buf;
 				LOGI("DASH");
+				const dReal* player_vel = dBodyGetLinearVel(puck_game->go[LPGO_PLAYER].body);
+				puck_game_commit_dash(puck_game,
+					(float)player_vel[0], (float)player_vel[1]);
 				break;
 			}
 			default:
@@ -185,9 +276,9 @@ int main(int argc, char* argv[]) {
 			packet_state.target[0] = puck_game->go[LPGO_TARGET].pos[0];
 			packet_state.target[1] = puck_game->go[LPGO_TARGET].pos[1];
 			packet_state.target[2] = puck_game->go[LPGO_TARGET].pos[2];
-			quat_from_mat4x4(packet_state.puck_rot, puck_game->go[LPGO_PUCK].rot);
-			quat_from_mat4x4(packet_state.player_rot, puck_game->go[LPGO_PLAYER].rot);
-			quat_from_mat4x4(packet_state.target_rot, puck_game->go[LPGO_TARGET].rot);
+			memcpy(packet_state.puck_rot, puck_game->go[LPGO_PUCK].rot, sizeof(mat4x4));
+			memcpy(packet_state.player_rot, puck_game->go[LPGO_PLAYER].rot, sizeof(mat4x4));
+			memcpy(packet_state.target_rot, puck_game->go[LPGO_TARGET].rot, sizeof(mat4x4));
 			//now reply the client with the same data
 			if (sendto(server->s, (const char*)&packet_state, sizeof(packet_state), 0, (struct sockaddr*) &server->si_other, server->slen) == SOCKET_ERROR)
 			{

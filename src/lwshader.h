@@ -30,6 +30,7 @@ typedef struct _LWSHADER {
 	GLint vuvoffset_location;
 	GLint vuvscale_location;
 	GLint vs9offset_location;
+	GLint m_location;
 	GLint alpha_multiplier_location;
 	GLint overlay_color_location;
 	GLint overlay_color_ratio_location;
@@ -61,4 +62,7 @@ typedef struct _LWSHADER {
 	GLint u_TextureAlpha;
 	GLint time;
 	GLint resolution;
+	GLint sphere_pos;
+	GLint sphere_col;
+	GLint sphere_col_ratio;
 } LWSHADER;
