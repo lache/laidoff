@@ -118,7 +118,7 @@ int main(int argc, char* argv[])
 #endif
 
 	// Borderless or bordered window
-	glfwWindowHint(GLFW_DECORATED, GLFW_FALSE);
+	//glfwWindowHint(GLFW_DECORATED, GLFW_FALSE);
 
 	GLFWwindow* window = create_glfw_window();
 

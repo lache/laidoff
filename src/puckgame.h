@@ -65,11 +65,16 @@ typedef struct _LWPUCKGAME {
 	LWPUCKGAMEOBJECT go[LPGO_COUNT];
 	dJointGroupID contact_joint_group;
 	dJointGroupID  player_control_joint_group;
+	dJointGroupID  target_control_joint_group;
 	dJointID player_control_joint;
+	dJointID target_control_joint;
 	int push;
 	float time;
 	LWPUCKGAMEDASH dash;
+	LWPUCKGAMEDASH remote_dash;
 	LWPUCKGAMEPLAYER player;
+	float last_remote_dx;
+	float last_remote_dy;
 } LWPUCKGAME;
 
 LWPUCKGAME* new_puck_game();
@@ -79,4 +84,4 @@ float puck_game_dash_gauge_ratio(LWPUCKGAME* puck_game);
 float puck_game_dash_cooltime(LWPUCKGAME* puck_game);
 int puck_game_dashing(LWPUCKGAME* puck_game);
 void puck_game_near_callback(void *data, dGeomID o1, dGeomID o2);
-void puck_game_commit_dash(LWPUCKGAME* puck_game, float dx, float dy);
+void puck_game_commit_dash(LWPUCKGAME* puck_game, LWPUCKGAMEDASH* dash, float dx, float dy);

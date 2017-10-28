@@ -7,6 +7,7 @@
 #include "render_field.h"
 #include "lwtextblock.h"
 #include "render_text_block.h"
+#include "lwudp.h"
 
 static void render_go(const LWCONTEXT* pLwc, const mat4x4 view, const mat4x4 proj, const LWPUCKGAMEOBJECT* go, int tex_index, float render_scale, const float* remote_pos, const mat4x4 remote_rot, int remote) {
 	int shader_index = LWST_DEFAULT;
@@ -214,14 +215,28 @@ void lwc_render_physics(const LWCONTEXT* pLwc) {
 
 	const LWPUCKGAME* puck_game = pLwc->puck_game;
 
+	int remote = !pLwc->udp->master;
 	const float* player_pos = puck_game->go[LPGO_PLAYER].pos;
 	const float* target_pos = puck_game->go[LPGO_TARGET].pos;
 	const float* puck_pos = puck_game->go[LPGO_PUCK].pos;
+	const float* remote_player_pos = 0;
+	const float* remote_puck_pos = 0;
+	const float* remote_target_pos = 0;
+	if (remote) {
+		remote_player_pos = pLwc->puck_game_state.player;
+		remote_puck_pos = pLwc->puck_game_state.puck;
+		remote_target_pos = pLwc->puck_game_state.target;
+	}
+	else {
+		remote_player_pos = player_pos;
+		remote_puck_pos = puck_pos;
+		remote_target_pos = target_pos;
+	}
 	const float sphere_col_ratio[3] = { 1.0f, 1.0f, 1.0f };
 	const float sphere_pos[3][3] = {
-		{ player_pos[0], player_pos[1], player_pos[2] },
-		{ target_pos[0], target_pos[1], target_pos[2] },
-		{ puck_pos[0], puck_pos[1], puck_pos[2] }
+		{ remote_player_pos[0], remote_player_pos[1], remote_player_pos[2] },
+		{ remote_target_pos[0], remote_target_pos[1], remote_target_pos[2] },
+		{ remote_puck_pos[0], remote_puck_pos[1], remote_puck_pos[2] }
 	};
 	const float sphere_col[3][3] = {
 		{ 0.0f, 1.0f, 0.8f },
@@ -276,15 +291,6 @@ void lwc_render_physics(const LWCONTEXT* pLwc) {
 		glUniform1fv(pLwc->shader[shader_index].sphere_col_ratio, 3, sphere_col_ratio_zero);
 	}
 
-	int remote = 0;
-	const float* remote_player_pos = 0;
-	const float* remote_puck_pos = 0;
-	const float* remote_target_pos = 0;
-	if (remote) {
-		remote_player_pos = pLwc->puck_game_state.player;
-		remote_puck_pos = pLwc->puck_game_state.puck;
-		remote_target_pos = pLwc->puck_game_state.target;
-	}
 	render_go(pLwc, view, proj, &puck_game->go[LPGO_PUCK], pLwc->tex_atlas[LAE_PUCK_KTX], puck_game->render_scale, remote_puck_pos, pLwc->puck_game_state.puck_rot, remote);
 	render_go(pLwc, view, proj, &puck_game->go[LPGO_PLAYER], pLwc->tex_atlas[LAE_PUCK_PLAYER_KTX], puck_game->render_scale, remote_player_pos, pLwc->puck_game_state.player_rot, remote);
 	render_go(pLwc, view, proj, &puck_game->go[LPGO_TARGET], pLwc->tex_atlas[LAE_PUCK_ENEMY_KTX], puck_game->render_scale, remote_target_pos, pLwc->puck_game_state.target_rot, remote);
