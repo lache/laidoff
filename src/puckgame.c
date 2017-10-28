@@ -81,8 +81,12 @@ LWPUCKGAME* new_puck_game() {
 	
 	create_go(puck_game, LPGO_PUCK, 0.1f, 0.125f, 1.0f, 0.0f);
 	create_go(puck_game, LPGO_PLAYER, 0.1f, 0.125f, 0.0f, 0.0f);
-	create_go(puck_game, LPGO_TARGET, 0.1f, 0.125f, 0.0f, 1.0f);
+	create_go(puck_game, LPGO_TARGET, 0.1f, 0.125f, 0.0f, 0.0f);
 
+	puck_game->contact_joint_group = dJointGroupCreate(0);
+	puck_game->player_control_joint_group = dJointGroupCreate(0);
+
+	// Create player control joint
 	puck_game->player_control_joint = dJointCreateLMotor(puck_game->world, puck_game->player_control_joint_group);
 	dJointID pcj = puck_game->player_control_joint;
 	dJointSetLMotorNumAxes(pcj, 2);
@@ -92,10 +96,19 @@ LWPUCKGAME* new_puck_game() {
 	dJointSetLMotorParam(pcj, dParamFMax1, 10.0f);
 	dJointSetLMotorParam(pcj, dParamFMax2, 10.0f);
 
-	puck_game->contact_joint_group = dJointGroupCreate(0);
-	puck_game->player_control_joint_group = dJointGroupCreate(0);
+	// Create target control joint
+	puck_game->target_control_joint = dJointCreateLMotor(puck_game->world, puck_game->target_control_joint_group);
+	dJointID tcj = puck_game->target_control_joint;
+	dJointSetLMotorNumAxes(tcj, 2);
+	dJointSetLMotorAxis(tcj, 0, 0, 1, 0, 0); // x-axis actuator
+	dJointSetLMotorAxis(tcj, 1, 0, 0, 1, 0); // y-axis actuator
+	dJointAttach(tcj, puck_game->go[LPGO_TARGET].body, 0);
+	dJointSetLMotorParam(tcj, dParamFMax1, 10.0f);
+	dJointSetLMotorParam(tcj, dParamFMax2, 10.0f);
 
-	dBodySetKinematic(puck_game->go[LPGO_PUCK].body);
+	dBodySetPosition(puck_game->go[LPGO_TARGET].body, 0.0f, 1.0f, puck_game->go[LPGO_TARGET].radius);
+	
+	//dBodySetKinematic(puck_game->go[LPGO_PUCK].body);
 
 	puck_game->go[LPGO_PUCK].red_overlay = 1;
 
@@ -235,9 +248,9 @@ int puck_game_dashing(LWPUCKGAME* puck_game) {
 	return puck_game->dash.remain_time > 0;
 }
 
-void puck_game_commit_dash(LWPUCKGAME* puck_game, float dx, float dy) {
-	puck_game->dash.remain_time = puck_game->dash_duration;
-	puck_game->dash.dir_x = dx;
-	puck_game->dash.dir_y = dy;
-	puck_game->dash.last_time = puck_game->time;
+void puck_game_commit_dash(LWPUCKGAME* puck_game, LWPUCKGAMEDASH* dash, float dx, float dy) {
+	dash->remain_time = puck_game->dash_duration;
+	dash->dir_x = dx;
+	dash->dir_y = dy;
+	dash->last_time = puck_game->time;
 }

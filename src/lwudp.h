@@ -10,9 +10,20 @@
 #include <endian.h>
 #include <czmq_prelude.h>
 #endif
-#define LW_UDP_SERVER "127.0.0.1"
+#define LW_UDP_SERVER "192.168.219.109"
 #define LW_UDP_BUFLEN 512
-#define LW_UDP_PORT 19856
+#define LW_UDP_PORT 10288
+
+typedef enum _LW_UDP_STATE {
+	// Init
+	LUS_INIT,
+	// Before token received
+	LUS_GETTOKEN,
+	// Wait match
+	LUS_QUEUE,
+	// Battle started
+	LUS_MATCHED,
+} LW_UDP_STATE;
 
 typedef struct _LWUDP {
 #if LW_PLATFORM_WIN32
@@ -26,7 +37,12 @@ typedef struct _LWUDP {
 	struct timeval tv;
 	int recv_len;
 	int ready;
-
+	// State
+	LW_UDP_STATE state;
+	// Network session token
+	int token;
+	// 1 if master, 0 if slave
+	int master;
 } LWUDP;
 
 typedef struct _LWCONTEXT LWCONTEXT;

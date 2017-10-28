@@ -255,7 +255,7 @@ int main(int argc, char* argv[]) {
 				LWPUCKGAMEPACKETDASH* p = (LWPUCKGAMEPACKETDASH*)server->buf;
 				LOGI("DASH");
 				const dReal* player_vel = dBodyGetLinearVel(puck_game->go[LPGO_PLAYER].body);
-				puck_game_commit_dash(puck_game,
+				puck_game_commit_dash(puck_game, &puck_game->dash,
 					(float)player_vel[0], (float)player_vel[1]);
 				break;
 			}
