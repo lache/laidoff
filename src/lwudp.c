@@ -73,7 +73,7 @@ void udp_update(LWCONTEXT* pLwc, LWUDP* udp) {
 	if (rv == 1) {
 		if ((udp->recv_len = recvfrom(udp->s, udp->buf, LW_UDP_BUFLEN, 0, (struct sockaddr *) &udp->si_other, &udp->slen)) == SOCKET_ERROR) {
 			printf("recvfrom() failed with error code : %d", WSAGetLastError());
-			exit(EXIT_FAILURE);
+			//exit(EXIT_FAILURE);
 		}
 		const int packet_type = *(int*)udp->buf;
 		switch (packet_type) {

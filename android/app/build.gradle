@@ -39,7 +39,7 @@ android {
     defaultConfig {
         applicationId "com.popsongremix.laidoff"
         minSdkVersion   15
-        targetSdkVersion 15
+        targetSdkVersion 23
 
         versionCode versionProperties['versionCode'] as int
         versionName versionProperties['versionName']
