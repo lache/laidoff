@@ -205,7 +205,7 @@ int main(int argc, char* argv[]) {
 	fd_set readfds;
 	make_socket_nonblocking(server->s);
 	while (1) {
-		update_puck_game(server, puck_game, 1.0f / 1250);
+		update_puck_game(server, puck_game, 1.0f / 60);
 		update_tick++;
 		//LOGI("Update tick %"PRId64, update_tick);
 

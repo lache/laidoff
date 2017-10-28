@@ -194,7 +194,7 @@ void lwc_render_physics(const LWCONTEXT* pLwc) {
 	mat4x4_perspective(proj, (float)(LWDEG2RAD(49.134) / screen_aspect_ratio), screen_aspect_ratio, 1.0f, 500.0f);
 
 	mat4x4 view;
-	vec3 eye = { 0.0f, -2.0f, 8.5f };
+	vec3 eye = { 0.0f, 0.0f, 10.0f };
 
 	vec3 center = { 0, 0, 0 };
 
@@ -210,9 +210,27 @@ void lwc_render_physics(const LWCONTEXT* pLwc) {
 	glUniform1i(pLwc->shader[shader_index].alpha_only_location, 1); // 1 means GL_TEXTURE1
 	glUniform3f(pLwc->shader[shader_index].overlay_color_location, 1, 1, 1);
 	glUniform1f(pLwc->shader[shader_index].overlay_color_ratio_location, 0);
-	
+
 
 	const LWPUCKGAME* puck_game = pLwc->puck_game;
+
+	const float* player_pos = puck_game->go[LPGO_PLAYER].pos;
+	const float* target_pos = puck_game->go[LPGO_TARGET].pos;
+	const float* puck_pos = puck_game->go[LPGO_PUCK].pos;
+	const float sphere_col_ratio[3] = { 1.0f, 1.0f, 1.0f };
+	const float sphere_pos[3][3] = {
+		{ player_pos[0], player_pos[1], player_pos[2] },
+		{ target_pos[0], target_pos[1], target_pos[2] },
+		{ puck_pos[0], puck_pos[1], puck_pos[2] }
+	};
+	const float sphere_col[3][3] = {
+		{ 0.0f, 1.0f, 0.8f },
+		{ 1.0f, 0.0f, 0.0f },
+		{ 0.2f, 0.3f, 1.0f }
+	};
+	glUniform1fv(pLwc->shader[shader_index].sphere_col_ratio, 3, sphere_col_ratio);
+	glUniform3fv(pLwc->shader[shader_index].sphere_pos, 3, (const float*)sphere_pos);
+	glUniform3fv(pLwc->shader[shader_index].sphere_col, 3, (const float*)sphere_col);
 
 	{
 		const int tex_index = 0;
@@ -251,7 +269,11 @@ void lwc_render_physics(const LWCONTEXT* pLwc) {
 		set_tex_filter(GL_LINEAR, GL_LINEAR);
 		//set_tex_filter(GL_NEAREST, GL_NEAREST);
 		glUniformMatrix4fv(pLwc->shader[shader_index].mvp_location, 1, GL_FALSE, (const GLfloat*)proj_view_model);
+		glUniformMatrix4fv(pLwc->shader[shader_index].m_location, 1, GL_FALSE, (const GLfloat*)model);
 		glDrawArrays(GL_TRIANGLES, 0, pLwc->vertex_buffer[lvt].vertex_count);
+
+		const float sphere_col_ratio_zero[3] = { 0.0f, 0.0f, 0.0f };
+		glUniform1fv(pLwc->shader[shader_index].sphere_col_ratio, 3, sphere_col_ratio_zero);
 	}
 
 	int remote = 0;

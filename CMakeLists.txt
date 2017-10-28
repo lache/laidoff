@@ -17,7 +17,7 @@ if (NOT SERVER_ONLY)
 endif (NOT SERVER_ONLY)
 
 include_directories(${glfw_INCLUDE_DIRS})
-include_directories("${GLFW_SOURCE_DIR}/deps")
+include_directories("glfw-3.2.1/deps")
 
 # 컴파일 플래그 설정
 
