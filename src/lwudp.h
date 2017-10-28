@@ -10,7 +10,7 @@
 #include <endian.h>
 #include <czmq_prelude.h>
 #endif
-#define LW_UDP_SERVER "192.168.0.28"
+#define LW_UDP_SERVER "52.231.31.72"
 #define LW_UDP_BUFLEN 512
 #define LW_UDP_PORT 19856
 

@@ -247,7 +247,11 @@ target_link_libraries(laidoff-server
 	${CMAKE_THREAD_LIBS_INIT} # pthread deps on Linux server build
 )
 
+if (NOT SERVER_ONLY)
 set(WINDOWS_BINARIES laidoff laidoff-server)
+else (NOT SERVER_ONLY)
+set(WINDOWS_BINARIES laidoff-server)
+endif (NOT SERVER_ONLY)
 
 if (MSVC)
     # Tell MSVC to use 'main' instead of 'WinMain' for Windows subsystem executables

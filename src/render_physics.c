@@ -254,7 +254,7 @@ void lwc_render_physics(const LWCONTEXT* pLwc) {
 		glDrawArrays(GL_TRIANGLES, 0, pLwc->vertex_buffer[lvt].vertex_count);
 	}
 
-	int remote = 1;
+	int remote = 0;
 	const float* remote_player_pos = 0;
 	const float* remote_puck_pos = 0;
 	const float* remote_target_pos = 0;

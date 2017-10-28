@@ -19,7 +19,9 @@
 #define LW_TCP_PORT 19856
 
 typedef struct _LWTCP {
+#if LW_PLATFORM_WIN32
 	WSADATA wsaData;
+#endif
 	SOCKET ConnectSocket;
 	struct addrinfo* result;
 	struct addrinfo* ptr;

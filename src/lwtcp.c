@@ -17,6 +17,7 @@ static int make_socket_nonblocking(int sock) {
 }
 
 LWTCP* new_tcp() {
+#if 0
 	LWTCP* tcp = (LWTCP*)malloc(sizeof(LWTCP));
 	memset(tcp, 0, sizeof(LWTCP));
 	tcp->ConnectSocket = INVALID_SOCKET;
@@ -76,11 +77,16 @@ LWTCP* new_tcp() {
 	}
 
 	return tcp;
+#else
+    return 0;
+#endif
 }
 
 void destroy_tcp(LWTCP** tcp) {
-	free(*tcp);
-	*tcp = 0;
+	if (*tcp) {
+		free(*tcp);
+		*tcp = 0;
+	}
 }
 
 void tcp_send(LWTCP* tcp, const char* data, int size) {
