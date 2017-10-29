@@ -1,10 +1,26 @@
+#include "platform_detection.h"
 #include <stdio.h>      /* for printf(), fprintf() */
+#if LW_PLATFORM_WIN32
 #include <winsock.h>    /* for socket(),... */
+#else
+#include <fcntl.h>
+#include <sys/socket.h>
+#if !LW_PLATFORM_OSX
+#include <linux/in.h>
+#include <endian.h>
+#endif
+#include <stdlib.h>
+#include <czmq_prelude.h>
+#endif
 #include <stdlib.h>     /* for exit() */
 #include "net.h"
 #include "lwlog.h"
 
 #define ECHOMAX 255     /* Longest string to echo */
+
+#ifndef UINT_PTR
+#define UINT_PTR unsigned int *
+#endif
 
 UINT_PTR sock;                        /* Socket descriptor */
 struct sockaddr_in echoServAddr; /* Echo server address */
@@ -16,7 +32,9 @@ char *echoString;                /* String to send to echo server */
 char echoBuffer[ECHOMAX];        /* Buffer for echo string */
 int echoStringLen;               /* Length of string to echo */
 int respStringLen;               /* Length of response string */
+#if LW_PLATFORM_WIN32
 WSADATA wsaData;                 /* Structure for WinSock setup communication */
+#endif
 
 void DieWithError(char *errorMessage) {
 	LOGE("NET ERROR: %s", errorMessage);
@@ -27,13 +45,13 @@ void init_net(struct _LWCONTEXT* pLwc) {
 	echoString = "desktop!!";
 	echoServPort = 10001;
 	echoStringLen = (int)strlen(echoString);
-
+#if LW_PLATFORM_WIN32
 	/* Load Winsock 2.0 DLL */
 	if (WSAStartup(MAKEWORD(2, 0), &wsaData) != 0) {
 		fprintf(stderr, "WSAStartup() failed");
 		exit(1);
 	}
-
+#endif
 	/* Create a best-effort datagram socket using UDP */
 	sock = socket(PF_INET, SOCK_DGRAM, IPPROTO_UDP);
 	if (sock == 0) {
@@ -49,7 +67,9 @@ void init_net(struct _LWCONTEXT* pLwc) {
 
 void deinit_net(struct _LWCONTEXT* pLwc) {
 	closesocket(sock);
+#if LW_PLATFORM_WIN32
 	WSACleanup();  /* Cleanup Winsock */
+#endif
 }
 
 void net_rtt_test(struct _LWCONTEXT* pLwc) {

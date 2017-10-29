@@ -1,9 +1,11 @@
-#if GL_ES
+#ifdef GL_ES
 #define fragColor gl_FragColor
 #define FRAG_COLOR_OUTPUT_DECL
+#define TEX texture2D
 #else
 #define FRAG_COLOR_OUTPUT_DECL out vec4 fragColor;
 #define varying in
+#define TEX texture
 #endif
 
 precision highp float;
@@ -22,7 +24,7 @@ FRAG_COLOR_OUTPUT_DECL
 
 void main()
 {
-    float t = texture2D(diffuse, uv).r;
+    float t = TEX(diffuse, uv).r;
     float glyph_alpha = smoothstep(0.5 - GLYPH_OUTLINE_MIX_THICKNESS, 1.0, t);
     float outline_and_glyph_alpha = smoothstep(0.0, 0.5 + GLYPH_OUTLINE_MIX_THICKNESS, t);
     float outline_alpha = outline_and_glyph_alpha - glyph_alpha;

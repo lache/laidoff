@@ -5,7 +5,9 @@
 #include <fcntl.h>
 #include <sys/socket.h>
 #include <stdlib.h>
+#if !LW_PLATFORM_OSX
 #include <endian.h>
+#endif
 #include <dirent.h>
 #include <stdio.h>
 #include <sys/types.h> 
