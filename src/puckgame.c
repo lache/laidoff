@@ -56,7 +56,6 @@ LWPUCKGAME* new_puck_game() {
 	memset(puck_game, 0, sizeof(LWPUCKGAME));
 	puck_game->world_size = 4.0f;
 	puck_game->world_size_half = puck_game->world_size / 2.0f;
-	puck_game->render_scale = 1.0f;
 	puck_game->dash_interval = 1.5f;
 	puck_game->dash_duration = 0.1f;
 	puck_game->dash_speed_ratio = 8.0f;
@@ -145,8 +144,10 @@ static void near_puck_player(LWPUCKGAME* puck_game) {
 
 	const float puck_speed = (float)dLENGTH(dBodyGetLinearVel(puck->body));
 
-	if (puck_game->player.last_contact_puck_body != puck->body && puck_speed > puck_game->puck_damage_contact_speed_threshold
+	if (puck_game->player.last_contact_puck_body != puck->body
+        && puck_speed > puck_game->puck_damage_contact_speed_threshold
 		&& !puck_game_dashing(puck_game)) {
+        // Decrease player hp
 		puck_game->player.last_contact_puck_body = puck->body;
 		puck_game->player.current_hp--;
 		if (puck_game->player.current_hp < 0) {
