@@ -9,9 +9,11 @@
 #else
 #include <fcntl.h>
 #include <sys/socket.h>
+#if !LW_PLATFORM_OSX
 #include <linux/in.h>
-#include <stdlib.h>
 #include <endian.h>
+#endif
+#include <stdlib.h>
 #include <czmq_prelude.h>
 #endif
 #define LW_TCP_SERVER "192.168.0.28"

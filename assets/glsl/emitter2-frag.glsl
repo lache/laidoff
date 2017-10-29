@@ -1,9 +1,11 @@
-#if GL_ES
+#ifdef GL_ES
 #define fragColor gl_FragColor
 #define FRAG_COLOR_OUTPUT_DECL
+#define TEX texture2D
 #else
 #define FRAG_COLOR_OUTPUT_DECL out vec4 fragColor;
 #define varying in
+#define TEX texture
 #endif
 
 precision highp float;
@@ -22,8 +24,8 @@ FRAG_COLOR_OUTPUT_DECL
 
 void main()
 {
-    highp vec4 texture = texture2D(u_Texture, gl_PointCoord);
-    highp vec4 textureAlpha = texture2D(u_TextureAlpha, gl_PointCoord);
+    highp vec4 texture1 = TEX(u_Texture, gl_PointCoord);
+    highp vec4 textureAlpha = TEX(u_TextureAlpha, gl_PointCoord);
 
     // Color
     highp vec4 color = vec4(1.0);
@@ -47,6 +49,6 @@ void main()
     color.rgb = clamp(color.rgb, vec3(0.0), vec3(1.0));
     
     // Required OpenGL ES 2.0 outputs
-    fragColor = texture * color;
+    fragColor = texture1 * color;
     fragColor.a = textureAlpha.r;
 }
