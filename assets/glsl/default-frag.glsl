@@ -31,9 +31,9 @@ void main()
 	
 	float power = 15.0f;
 	float offset = 0.1f;
-	float d0 = distance(v, vec3(sphere_pos[0].xy, 0));
-	float d1 = distance(v, vec3(sphere_pos[1].xy, 0));
-	float d2 = distance(v, vec3(sphere_pos[2].xy, 0));
+	float d0 = distance(v, sphere_pos[0]);
+	float d1 = distance(v, sphere_pos[1]);
+	float d2 = distance(v, sphere_pos[2]);
 	
 	float r0 = 1.0f / (1.0f + exp(power * (d0 - offset)));
 	float r1 = 1.0f / (1.0f + exp(power * (d1 - offset)));
