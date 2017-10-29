@@ -214,7 +214,16 @@ namespace zmq
                 struct timespec timeout;
 
 #if defined ZMQ_HAVE_OSX && __MAC_OS_X_VERSION_MIN_REQUIRED < 101200 // less than macOS 10.12
+#if !__CLOCK_AVAILABILITY
+                //  Use POSIX gettimeofday function to get precise time.
+                struct timeval tv;
+                int rc = gettimeofday (&tv, NULL);
+                errno_assert (rc == 0);
+                timeout.tv_sec = tv.tv_sec;
+                timeout.tv_nsec = tv.tv_usec * 1000;
+#else
                 alt_clock_gettime(CLOCK_REALTIME, &timeout);
+#endif
 #else
                 clock_gettime(CLOCK_REALTIME, &timeout);
 #endif

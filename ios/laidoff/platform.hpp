@@ -82,6 +82,8 @@
 
 #if defined __APPLE__
   #define ZMQ_HAVE_OSX
+
+#include <net/if.h>
 #endif
 
 #if defined __QNXNTO__

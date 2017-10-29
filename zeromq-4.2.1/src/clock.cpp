@@ -60,12 +60,14 @@
 
 int alt_clock_gettime (int clock_id, timespec *ts)
 {
+#if __CLOCK_AVAILABILITY
     // The clock_id specified is not supported on this system.
     if (clock_id != CLOCK_REALTIME) {
         errno = EINVAL;
         return -1;
     }
-
+#endif
+    
     clock_serv_t cclock;
     mach_timespec_t mts;
     host_get_clock_service (mach_host_self (), CALENDAR_CLOCK, &cclock);
@@ -148,7 +150,7 @@ uint64_t zmq::clock_t::now_us ()
     double ticks_div = ticksPerSecond.QuadPart / 1000000.0;
     return (uint64_t) (tick.QuadPart / ticks_div);
 
-#elif defined HAVE_CLOCK_GETTIME && defined CLOCK_MONOTONIC
+#elif defined HAVE_CLOCK_GETTIME && defined CLOCK_MONOTONIC && __CLOCK_AVAILABILITY
 
     //  Use POSIX clock_gettime function to get precise monotonic time.
     struct timespec tv;

@@ -20,7 +20,6 @@
 		267BFC3D1F5E23DE008D0821 /* render_ui.c in Sources */ = {isa = PBXBuildFile; fileRef = 267BFC391F5E23DE008D0821 /* render_ui.c */; };
 		267BFC401F5E2453008D0821 /* splash.c in Sources */ = {isa = PBXBuildFile; fileRef = 267BFC3E1F5E2453008D0821 /* splash.c */; };
 		267BFC471F5E248D008D0821 /* render_splash.c in Sources */ = {isa = PBXBuildFile; fileRef = 267BFC411F5E248D008D0821 /* render_splash.c */; };
-		267BFC481F5E248D008D0821 /* splash.c in Sources */ = {isa = PBXBuildFile; fileRef = 267BFC431F5E248D008D0821 /* splash.c */; };
 		267BFC491F5E248D008D0821 /* ui.c in Sources */ = {isa = PBXBuildFile; fileRef = 267BFC451F5E248D008D0821 /* ui.c */; };
 		562DAF601ED1920300208E62 /* playersm.c in Sources */ = {isa = PBXBuildFile; fileRef = 562DAF5E1ED1920300208E62 /* playersm.c */; };
 		5633AC321EADDF98003F1549 /* net.c in Sources */ = {isa = PBXBuildFile; fileRef = 5633AC311EADDF98003F1549 /* net.c */; };
@@ -323,6 +322,11 @@
 		56F189BA1EC751950019312F /* ztimerset.c in Sources */ = {isa = PBXBuildFile; fileRef = 56F1897D1EC751950019312F /* ztimerset.c */; };
 		56F189BB1EC751950019312F /* ztrie.c in Sources */ = {isa = PBXBuildFile; fileRef = 56F1897E1EC751950019312F /* ztrie.c */; };
 		56F189BC1EC751950019312F /* zuuid.c in Sources */ = {isa = PBXBuildFile; fileRef = 56F1897F1EC751950019312F /* zuuid.c */; };
+		6C28F14D1FA6472D00F4FBC1 /* puckgameupdate.c in Sources */ = {isa = PBXBuildFile; fileRef = 6C28F1491FA6472D00F4FBC1 /* puckgameupdate.c */; };
+		6C28F14E1FA6472D00F4FBC1 /* puckgame.c in Sources */ = {isa = PBXBuildFile; fileRef = 6C28F14A1FA6472D00F4FBC1 /* puckgame.c */; };
+		6C28F1531FA6473D00F4FBC1 /* lwtcp.c in Sources */ = {isa = PBXBuildFile; fileRef = 6C28F14F1FA6473C00F4FBC1 /* lwtcp.c */; };
+		6C28F1541FA6473D00F4FBC1 /* lwudp.c in Sources */ = {isa = PBXBuildFile; fileRef = 6C28F1511FA6473C00F4FBC1 /* lwudp.c */; };
+		6C28F1571FA6478300F4FBC1 /* physics.c in Sources */ = {isa = PBXBuildFile; fileRef = 6C28F1561FA6478300F4FBC1 /* physics.c */; };
 		6CA16CD81EA20B5600DB7AF0 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 6CA16CD71EA20B5600DB7AF0 /* main.m */; };
 		6CA16CDB1EA20B5600DB7AF0 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 6CA16CDA1EA20B5600DB7AF0 /* AppDelegate.m */; };
 		6CA16CDD1EA20B5600DB7AF0 /* Shader.fsh in Resources */ = {isa = PBXBuildFile; fileRef = 6CA16CDC1EA20B5600DB7AF0 /* Shader.fsh */; };
@@ -1063,6 +1067,18 @@
 		56F1897D1EC751950019312F /* ztimerset.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = ztimerset.c; sourceTree = "<group>"; };
 		56F1897E1EC751950019312F /* ztrie.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = ztrie.c; sourceTree = "<group>"; };
 		56F1897F1EC751950019312F /* zuuid.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = zuuid.c; sourceTree = "<group>"; };
+		6C28F1471FA6472C00F4FBC1 /* puckgamepacket.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = puckgamepacket.h; sourceTree = "<group>"; };
+		6C28F1481FA6472C00F4FBC1 /* puckgame.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = puckgame.h; sourceTree = "<group>"; };
+		6C28F1491FA6472D00F4FBC1 /* puckgameupdate.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = puckgameupdate.c; sourceTree = "<group>"; };
+		6C28F14A1FA6472D00F4FBC1 /* puckgame.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = puckgame.c; sourceTree = "<group>"; };
+		6C28F14B1FA6472D00F4FBC1 /* puckgameupdate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = puckgameupdate.h; sourceTree = "<group>"; };
+		6C28F14C1FA6472D00F4FBC1 /* spherebattlepacket.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = spherebattlepacket.h; sourceTree = "<group>"; };
+		6C28F14F1FA6473C00F4FBC1 /* lwtcp.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = lwtcp.c; sourceTree = "<group>"; };
+		6C28F1501FA6473C00F4FBC1 /* lwtcp.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = lwtcp.h; sourceTree = "<group>"; };
+		6C28F1511FA6473C00F4FBC1 /* lwudp.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = lwudp.c; sourceTree = "<group>"; };
+		6C28F1521FA6473C00F4FBC1 /* lwudp.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = lwudp.h; sourceTree = "<group>"; };
+		6C28F1551FA6478200F4FBC1 /* physics.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = physics.h; sourceTree = "<group>"; };
+		6C28F1561FA6478300F4FBC1 /* physics.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = physics.c; sourceTree = "<group>"; };
 		6CA16CD31EA20B5600DB7AF0 /* laidoff.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = laidoff.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		6CA16CD71EA20B5600DB7AF0 /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
 		6CA16CD91EA20B5600DB7AF0 /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
@@ -1960,6 +1976,18 @@
 		6CA16CF41EA20CA700DB7AF0 /* src */ = {
 			isa = PBXGroup;
 			children = (
+				6C28F1561FA6478300F4FBC1 /* physics.c */,
+				6C28F1551FA6478200F4FBC1 /* physics.h */,
+				6C28F14F1FA6473C00F4FBC1 /* lwtcp.c */,
+				6C28F1501FA6473C00F4FBC1 /* lwtcp.h */,
+				6C28F1511FA6473C00F4FBC1 /* lwudp.c */,
+				6C28F1521FA6473C00F4FBC1 /* lwudp.h */,
+				6C28F14A1FA6472D00F4FBC1 /* puckgame.c */,
+				6C28F1481FA6472C00F4FBC1 /* puckgame.h */,
+				6C28F1471FA6472C00F4FBC1 /* puckgamepacket.h */,
+				6C28F1491FA6472D00F4FBC1 /* puckgameupdate.c */,
+				6C28F14B1FA6472D00F4FBC1 /* puckgameupdate.h */,
+				6C28F14C1FA6472D00F4FBC1 /* spherebattlepacket.h */,
 				565676A51EAFB4F800FF64B3 /* armature.c */,
 				565676A61EAFB4F800FF64B3 /* armature.h */,
 				5644E9FB1EA91D9E00EAA658 /* battle_result.c */,
@@ -2092,7 +2120,6 @@
 				5644E9DA1EA8B69000EAA658 /* skill.c */,
 				5633AC301EADDF62003F1549 /* sound.h */,
 				267BFC431F5E248D008D0821 /* splash.c */,
-				267BFC3F1F5E2453008D0821 /* splash.h */,
 				5644E9DB1EA8B69000EAA658 /* sprite_data.h */,
 				5644E9DC1EA8B69000EAA658 /* sprite.h */,
 				56F1866F1EC74D430019312F /* sysmsg.c */,
@@ -2209,12 +2236,12 @@
 		6CA16CCB1EA20B5600DB7AF0 /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastUpgradeCheck = 0830;
+				LastUpgradeCheck = 0900;
 				ORGANIZATIONNAME = "KIMGEO YEOB";
 				TargetAttributes = {
 					6CA16CD21EA20B5600DB7AF0 = {
 						CreatedOnToolsVersion = 8.1;
-						DevelopmentTeam = ZKFTRLF4W9;
+						DevelopmentTeam = TG9MHV97AH;
 						ProvisioningStyle = Automatic;
 					};
 				};
@@ -2307,6 +2334,7 @@
 				5663736E1EBA52D4001DA3F4 /* odeou.cpp in Sources */,
 				56F188F21EC74DB60019312F /* sub.cpp in Sources */,
 				56F189091EC74DB60019312F /* xpub.cpp in Sources */,
+				6C28F1571FA6478300F4FBC1 /* physics.c in Sources */,
 				56ED77A11EBB9C0900FABA64 /* nav.cpp in Sources */,
 				566373751EBA52D4001DA3F4 /* step.cpp in Sources */,
 				56F189B01EC751950019312F /* zpoller.c in Sources */,
@@ -2323,7 +2351,9 @@
 				56F188BA1EC74DB60019312F /* io_thread.cpp in Sources */,
 				6CA16D9D1EA210BB00DB7AF0 /* lua.c in Sources */,
 				56F188F51EC74DB60019312F /* tcp_connecter.cpp in Sources */,
+				6C28F1531FA6473D00F4FBC1 /* lwtcp.c in Sources */,
 				5663736B1EBA52D4001DA3F4 /* ode.cpp in Sources */,
+				6C28F14E1FA6472D00F4FBC1 /* puckgame.c in Sources */,
 				56F189A81EC751950019312F /* zhashx.c in Sources */,
 				5644E9F91EA8B69000EAA658 /* tex.c in Sources */,
 				56F188D71EC74DB60019312F /* poll.cpp in Sources */,
@@ -2438,6 +2468,7 @@
 				56F189061EC74DB60019312F /* vmci_address.cpp in Sources */,
 				26304DE41F2DB4DD006D9D3D /* lwparabola.c in Sources */,
 				6CA16D971EA210BB00DB7AF0 /* lstate.c in Sources */,
+				6C28F1541FA6473D00F4FBC1 /* lwudp.c in Sources */,
 				6CA16D951EA210BB00DB7AF0 /* loslib.c in Sources */,
 				5663735A1EBA52D4001DA3F4 /* piston.cpp in Sources */,
 				564CA1C11EDB10550082B778 /* lwdeltatime.c in Sources */,
@@ -2516,7 +2547,6 @@
 				267BFC401F5E2453008D0821 /* splash.c in Sources */,
 				56F189BA1EC751950019312F /* ztimerset.c in Sources */,
 				562DAF601ED1920300208E62 /* playersm.c in Sources */,
-				267BFC481F5E248D008D0821 /* splash.c in Sources */,
 				56F189AA1EC751950019312F /* zlist.c in Sources */,
 				56F189981EC751950019312F /* zchunk.c in Sources */,
 				56F188CA1EC74DB60019312F /* norm_engine.cpp in Sources */,
@@ -2603,6 +2633,7 @@
 				5644E9F71EA8B69000EAA658 /* script.c in Sources */,
 				5663733E1EBA52D4001DA3F4 /* collision_trimesh_opcode.cpp in Sources */,
 				566373731EBA52D4001DA3F4 /* rotation.cpp in Sources */,
+				6C28F14D1FA6472D00F4FBC1 /* puckgameupdate.c in Sources */,
 				56F188FA1EC74DB60019312F /* tipc_connecter.cpp in Sources */,
 				565676AC1EB0E96100FF64B3 /* lwanim.c in Sources */,
 				5644E9ED1EA8B69000EAA658 /* lwenemy.c in Sources */,
@@ -2643,7 +2674,9 @@
 				CLANG_CXX_LIBRARY = "libc++";
 				CLANG_ENABLE_MODULES = YES;
 				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
 				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
 				CLANG_WARN_CONSTANT_CONVERSION = YES;
 				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
 				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
@@ -2651,7 +2684,11 @@
 				CLANG_WARN_ENUM_CONVERSION = YES;
 				CLANG_WARN_INFINITE_RECURSION = YES;
 				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
 				CLANG_WARN_SUSPICIOUS_MOVE = YES;
 				CLANG_WARN_SUSPICIOUS_MOVES = YES;
 				CLANG_WARN_UNREACHABLE_CODE = YES;
@@ -2692,7 +2729,9 @@
 				CLANG_CXX_LIBRARY = "libc++";
 				CLANG_ENABLE_MODULES = YES;
 				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
 				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
 				CLANG_WARN_CONSTANT_CONVERSION = YES;
 				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
 				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
@@ -2700,7 +2739,11 @@
 				CLANG_WARN_ENUM_CONVERSION = YES;
 				CLANG_WARN_INFINITE_RECURSION = YES;
 				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
 				CLANG_WARN_SUSPICIOUS_MOVE = YES;
 				CLANG_WARN_SUSPICIOUS_MOVES = YES;
 				CLANG_WARN_UNREACHABLE_CODE = YES;
@@ -2731,7 +2774,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
-				DEVELOPMENT_TEAM = ZKFTRLF4W9;
+				DEVELOPMENT_TEAM = TG9MHV97AH;
 				GCC_C_LANGUAGE_STANDARD = c11;
 				HEADER_SEARCH_PATHS = "";
 				INFOPLIST_FILE = laidoff/Info.plist;
@@ -2751,7 +2794,7 @@
 					"-I../czmq/include",
 					"-DCZMQ_BUILD_DRAFT_API",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.popsongremix.laidoff.dev;
+				PRODUCT_BUNDLE_IDENTIFIER = com.popsongremix.laidoff.dev2;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 			};
@@ -2762,7 +2805,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
-				DEVELOPMENT_TEAM = ZKFTRLF4W9;
+				DEVELOPMENT_TEAM = TG9MHV97AH;
 				GCC_C_LANGUAGE_STANDARD = c11;
 				HEADER_SEARCH_PATHS = "";
 				INFOPLIST_FILE = laidoff/Info.plist;
@@ -2782,7 +2825,7 @@
 					"-I../czmq/include",
 					"-DCZMQ_BUILD_DRAFT_API",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.popsongremix.laidoff.dev;
+				PRODUCT_BUNDLE_IDENTIFIER = com.popsongremix.laidoff.dev2;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 			};

@@ -5,7 +5,7 @@
 #else
 #include <fcntl.h>
 #include <sys/socket.h>
-#if !LW_PLATFORM_OSX
+#if !LW_PLATFORM_OSX && !LW_PLATFORM_IOS
 #include <linux/in.h>
 #include <endian.h>
 #endif

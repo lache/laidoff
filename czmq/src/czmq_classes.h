@@ -19,7 +19,7 @@
 #define CZMQ_CLASSES_H_INCLUDED
 
 //  Platform definitions, must come first
-#include "platform.h"
+#include "platform.hpp"
 
 //  External API
 #include "../include/czmq.h"
