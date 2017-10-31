@@ -352,6 +352,8 @@ void init_gl_shaders(LWCONTEXT* pLwc) {
 		GLSL_DIR_NAME PATH_SEPARATOR "emitter-vert.glsl");
 	char *emitter2_vert_glsl = create_string_from_file(ASSETS_BASE_PATH
 		GLSL_DIR_NAME PATH_SEPARATOR "emitter2-vert.glsl");
+	char *sphere_reflect_vert_glsl = create_string_from_file(ASSETS_BASE_PATH
+		GLSL_DIR_NAME PATH_SEPARATOR "sphere-reflect-vert.glsl");
 
 	// Fragment Shader
 	char *default_frag_glsl = create_string_from_file(ASSETS_BASE_PATH
@@ -370,6 +372,8 @@ void init_gl_shaders(LWCONTEXT* pLwc) {
 		GLSL_DIR_NAME PATH_SEPARATOR "emitter-frag.glsl");
 	char *emitter2_frag_glsl = create_string_from_file(ASSETS_BASE_PATH
 		GLSL_DIR_NAME PATH_SEPARATOR "emitter2-frag.glsl");
+	char *sphere_reflect_frag_glsl = create_string_from_file(ASSETS_BASE_PATH
+		GLSL_DIR_NAME PATH_SEPARATOR "sphere-reflect-frag.glsl");
 
 	if (!default_vert_glsl) {
 		LOGE("init_gl_shaders: default-vert.glsl not loaded. Abort...");
@@ -391,8 +395,8 @@ void init_gl_shaders(LWCONTEXT* pLwc) {
 		return;
 	}
 
-	if (!emitter2_vert_glsl) {
-		LOGE("init_gl_shaders: emitter2-vert.glsl not loaded. Abort...");
+	if (!sphere_reflect_vert_glsl) {
+		LOGE("init_gl_shaders: sphere-reflect-vert.glsl not loaded. Abort...");
 		return;
 	}
 
@@ -436,6 +440,11 @@ void init_gl_shaders(LWCONTEXT* pLwc) {
 		return;
 	}
 
+	if (!sphere_reflect_frag_glsl) {
+		LOGE("init_gl_shaders: sphere-reflect-frag.glsl not loaded. Abort...");
+		return;
+	}
+
 	create_shader("Default Shader", &pLwc->shader[LWST_DEFAULT], default_vert_glsl, default_frag_glsl);
 	create_shader("Font Shader", &pLwc->shader[LWST_FONT], default_vert_glsl, font_frag_glsl);
 	create_shader("ETC1 with Alpha Shader", &pLwc->shader[LWST_ETC1], default_vert_glsl, etc1_frag_glsl);
@@ -445,12 +454,14 @@ void init_gl_shaders(LWCONTEXT* pLwc) {
 	create_shader("Emitter2 Shader", &pLwc->shader[LWST_EMITTER2], emitter2_vert_glsl, emitter2_frag_glsl);
 	create_shader("Color Shader", &pLwc->shader[LWST_COLOR], default_vert_glsl, color_frag_glsl);
 	create_shader("Panel Shader", &pLwc->shader[LWST_PANEL], default_vert_glsl, panel_frag_glsl);
+	create_shader("Sphere Reflect Shader", &pLwc->shader[LWST_SPHERE_REFLECT], sphere_reflect_vert_glsl, sphere_reflect_frag_glsl);
 
 	release_string(default_vert_glsl);
 	release_string(skin_vert_glsl);
 	release_string(fan_vert_glsl);
 	release_string(emitter_vert_glsl);
 	release_string(emitter2_vert_glsl);
+	release_string(sphere_reflect_vert_glsl);
 	release_string(default_frag_glsl);
 	release_string(color_frag_glsl);
 	release_string(panel_frag_glsl);
@@ -459,6 +470,7 @@ void init_gl_shaders(LWCONTEXT* pLwc) {
 	release_string(fan_frag_glsl);
 	release_string(emitter_frag_glsl);
 	release_string(emitter2_frag_glsl);
+	release_string(sphere_reflect_frag_glsl);
 }
 
 static void load_vbo(LWCONTEXT* pLwc, const char *filename, LWVBO *pVbo) {
