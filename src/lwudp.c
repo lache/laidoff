@@ -73,9 +73,9 @@ void udp_send(LWUDP* udp, const char* data, int size) {
 #if LW_PLATFORM_WIN32
 		LOGE("sendto() failed with error code : %d", WSAGetLastError());
 #else
-		LOGE("sendto() failed with error...");
+		//LOGE("sendto() failed with error...");
 #endif
-		exit(EXIT_FAILURE);
+		//exit(EXIT_FAILURE);
 	}
 }
 

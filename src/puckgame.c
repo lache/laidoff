@@ -68,6 +68,8 @@ LWPUCKGAME* new_puck_game() {
 	puck_game->puck_damage_contact_speed_threshold = 1.1f;
 	puck_game->player.total_hp = 20;
 	puck_game->player.current_hp = 10;
+    puck_game->sphere_mass = 0.1f;
+    puck_game->sphere_radius = 0.16f; //0.125f;
 	// ------
 
 	// Initialize OpenDE
@@ -82,9 +84,9 @@ LWPUCKGAME* new_puck_game() {
 	dWorldSetGravity(puck_game->world, 0, 0, -9.81f);
 	dWorldSetCFM(puck_game->world, 1e-5f);
 	
-	create_go(puck_game, LPGO_PUCK, 0.1f, 0.125f, 1.0f, 0.0f);
-	create_go(puck_game, LPGO_PLAYER, 0.1f, 0.125f, 0.0f, 0.0f);
-	create_go(puck_game, LPGO_TARGET, 0.1f, 0.125f, 0.0f, 0.0f);
+	create_go(puck_game, LPGO_PUCK, puck_game->sphere_mass, puck_game->sphere_radius, 1.0f, 0.0f);
+	create_go(puck_game, LPGO_PLAYER, puck_game->sphere_mass, puck_game->sphere_radius, 0.0f, 0.0f);
+	create_go(puck_game, LPGO_TARGET, puck_game->sphere_mass, puck_game->sphere_radius, 0.0f, 0.0f);
 
 	puck_game->contact_joint_group = dJointGroupCreate(0);
 	puck_game->player_control_joint_group = dJointGroupCreate(0);

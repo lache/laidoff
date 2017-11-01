@@ -58,6 +58,8 @@ typedef struct _LWPUCKGAME {
 	float dash_shake_time;
 	float hp_shake_time;
 	float puck_damage_contact_speed_threshold;
+    float sphere_mass;
+    float sphere_radius;
 	// ----
 	dWorldID world;
 	dSpaceID space;
