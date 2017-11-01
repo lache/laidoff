@@ -76,6 +76,7 @@ typedef enum _LW_ATLAS_ENUM
 	LAE_PUCK_KTX,
 	LAE_PUCK_ENEMY_KTX,
 	LAE_PUCK_PLAYER_KTX,
+	LAE_PUCK_FLOOR_KTX,
 
 	LAE_BB_CATAPULT,
 	LAE_BB_CROSSBOW,
@@ -163,6 +164,7 @@ static const char *tex_atlas_filename[] = {
 	ASSETS_BASE_PATH "ktx" PATH_SEPARATOR "puck.ktx",
 	ASSETS_BASE_PATH "ktx" PATH_SEPARATOR "puck-enemy.ktx",
 	ASSETS_BASE_PATH "ktx" PATH_SEPARATOR "puck-player.ktx",
+	ASSETS_BASE_PATH "ktx" PATH_SEPARATOR "puck-floor.ktx",
 
 	ASSETS_BASE_PATH "ktx" PATH_SEPARATOR "bb-catapult.ktx",
 	ASSETS_BASE_PATH "ktx" PATH_SEPARATOR "bb-crossbow.ktx",

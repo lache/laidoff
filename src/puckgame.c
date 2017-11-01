@@ -30,7 +30,7 @@ static void testgo_move_callback(dBodyID b) {
 	const dReal* vel = dBodyGetLinearVel(go->body);
 	go->speed = (float)dLENGTH(vel);
 	if (vel[0]) {
-		go->move_rad = atan2f((float)vel[1], (float)vel[0]) + M_PI / 2;
+		go->move_rad = atan2f((float)vel[1], (float)vel[0]) + (float)M_PI / 2;
 	}
 }
 

@@ -267,7 +267,8 @@ static void render_floor(const LWCONTEXT *pLwc, vec4 *proj, const LWPUCKGAME *pu
 	const LWSHADER* shader = &pLwc->shader[shader_index];
 	glUseProgram(shader->program);
 	glUniform2fv(shader->vuvoffset_location, 1, default_uv_offset);
-	glUniform2fv(shader->vuvscale_location, 1, default_uv_scale);
+	const float uv_scale[2] = { 5, 5 };
+	glUniform2fv(shader->vuvscale_location, 1, uv_scale);
 	glUniform2fv(shader->vs9offset_location, 1, default_uv_offset);
 	glUniform1f(shader->alpha_multiplier_location, 1.0f);
 	glUniform1i(shader->diffuse_location, 0); // 0 means GL_TEXTURE0
@@ -280,7 +281,7 @@ static void render_floor(const LWCONTEXT *pLwc, vec4 *proj, const LWPUCKGAME *pu
 	glUniform1fv(shader->sphere_speed, 3, (const float*)sphere_render_uniform->sphere_speed);
 	glUniform1fv(shader->sphere_move_rad, 3, (const float*)sphere_render_uniform->sphere_move_rad);
 
-    const int tex_index = 0;
+	const int tex_index = pLwc->tex_atlas[LAE_PUCK_FLOOR_KTX];
     mat4x4 rot;
     mat4x4_identity(rot);
     
@@ -305,7 +306,7 @@ static void render_floor(const LWCONTEXT *pLwc, vec4 *proj, const LWPUCKGAME *pu
     mat4x4_mul(proj_view_model, proj, view_model);
     
     glUniform3f(shader->overlay_color_location, 0.5f, 0.5f, 0.5f);
-    glUniform1f(shader->overlay_color_ratio_location, 1.0f);
+    glUniform1f(shader->overlay_color_ratio_location, 0.0f);
     
     //glUniformMatrix4fv(shader->mvp_location, 1, GL_FALSE, (const GLfloat*)proj_view_model);
     
