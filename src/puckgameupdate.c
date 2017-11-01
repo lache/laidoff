@@ -124,7 +124,19 @@ void update_puck_game(LWCONTEXT* pLwc, LWPUCKGAME* puck_game, double delta_time)
 		puck_game->player.hp_shake_remain_time = LWMAX(0, puck_game->player.hp_shake_remain_time - (float)delta_time);
 	}
 
-
+	if (puck_game->pull_puck) {
+		const dReal* puck_pos = dBodyGetPosition(puck_game->go[LPGO_PUCK].body);
+		const dReal* player_pos = dBodyGetPosition(puck_game->go[LPGO_PLAYER].body);
+		const dVector3 f = {
+			player_pos[0] - puck_pos[0],
+			player_pos[1] - puck_pos[1],
+			player_pos[2] - puck_pos[2]
+		};
+		const dReal flen = dLENGTH(f);
+		const dReal power = 0.1f;
+		const dReal scale = power / flen;
+		dBodyAddForce(puck_game->go[LPGO_PUCK].body, f[0] * scale, f[1] * scale, f[2] * scale);
+	}
 }
 
 void puck_game_dash(LWCONTEXT* pLwc, LWPUCKGAME* puck_game) {
@@ -137,15 +149,24 @@ void puck_game_dash(LWCONTEXT* pLwc, LWPUCKGAME* puck_game) {
 		return;
 	}
 	// Check effective move input
-	float dx, dy, dlen;
-	if (!lw_get_normalized_dir_pad_input(pLwc, &dx, &dy, &dlen)) {
+	float dx, dy;
+	//float dlen;
+	/*if (!lw_get_normalized_dir_pad_input(pLwc, &dx, &dy, &dlen)) {
 		return;
-	}
+	}*/
+
 	// Check cooltime
 	if (puck_game_dash_cooltime(puck_game) < puck_game->dash_interval) {
 		puck_game->dash.shake_remain_time = puck_game->dash_shake_time;
 		return;
 	}
+
+	dx = puck_game->go[LPGO_PUCK].pos[0] - puck_game->go[LPGO_PLAYER].pos[0];
+	dy = puck_game->go[LPGO_PUCK].pos[1] - puck_game->go[LPGO_PLAYER].pos[1];
+	const float ddlen = sqrtf(dx * dx + dy * dy);
+	dx /= ddlen;
+	dy /= ddlen;
+
 	// Start dash!
 	puck_game_commit_dash(puck_game, &puck_game->dash, dx, dy);
 
@@ -175,4 +196,12 @@ void puck_game_target_stop(LWPUCKGAME* puck_game) {
 
 void puck_game_target_dash(LWPUCKGAME* puck_game) {
 	puck_game_commit_dash(puck_game, &puck_game->remote_dash, puck_game->last_remote_dx, puck_game->last_remote_dy);
+}
+
+void puck_game_pull_puck_start(LWCONTEXT* pLwc, LWPUCKGAME* puck_game) {
+	puck_game->pull_puck = 1;
+}
+
+void puck_game_pull_puck_stop(LWCONTEXT* pLwc, LWPUCKGAME* puck_game) {
+	puck_game->pull_puck = 0;
 }
