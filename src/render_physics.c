@@ -13,6 +13,8 @@ typedef struct _LWSPHERERENDERUNIFORM {
 	float sphere_col_ratio[3];
 	float sphere_pos[3][3];
 	float sphere_col[3][3];
+	float sphere_speed[3];
+	float sphere_move_rad[3];
 } LWSPHERERENDERUNIFORM;
 
 static void render_go(const LWCONTEXT* pLwc, const mat4x4 view, const mat4x4 proj, const LWPUCKGAMEOBJECT* go, int tex_index, float render_scale, const float* remote_pos, const mat4x4 remote_rot, int remote) {
@@ -215,6 +217,8 @@ static void render_wall(const LWCONTEXT *pLwc, vec4 *proj, const LWPUCKGAME *puc
 	glUniform1fv(shader->sphere_col_ratio, 3, sphere_render_uniform->sphere_col_ratio);
 	glUniform3fv(shader->sphere_pos, 3, (const float*)sphere_render_uniform->sphere_pos);
 	glUniform3fv(shader->sphere_col, 3, (const float*)sphere_render_uniform->sphere_col);
+	glUniform1fv(shader->sphere_speed, 3, (const float*)sphere_render_uniform->sphere_speed);
+	glUniform1fv(shader->sphere_move_rad, 3, (const float*)sphere_render_uniform->sphere_move_rad);
 
     const int tex_index = 0;
     mat4x4 rot_x;
@@ -273,6 +277,8 @@ static void render_floor(const LWCONTEXT *pLwc, vec4 *proj, const LWPUCKGAME *pu
 	glUniform1fv(shader->sphere_col_ratio, 3, sphere_render_uniform->sphere_col_ratio);
 	glUniform3fv(shader->sphere_pos, 3, (const float*)sphere_render_uniform->sphere_pos);
 	glUniform3fv(shader->sphere_col, 3, (const float*)sphere_render_uniform->sphere_col);
+	glUniform1fv(shader->sphere_speed, 3, (const float*)sphere_render_uniform->sphere_speed);
+	glUniform1fv(shader->sphere_move_rad, 3, (const float*)sphere_render_uniform->sphere_move_rad);
 
     const int tex_index = 0;
     mat4x4 rot;
@@ -330,7 +336,7 @@ void lwc_render_physics(const LWCONTEXT* pLwc) {
 	mat4x4_perspective(proj, (float)(LWDEG2RAD(49.134) / screen_aspect_ratio), screen_aspect_ratio, 1.0f, 500.0f);
 
 	mat4x4 view;
-	vec3 eye = { 0.0f, 0.0f, 10.0f };
+	vec3 eye = { 0.0f, 0.0f, 12.0f };
 
 	vec3 center = { 0, 0, 0 };
 
@@ -357,16 +363,31 @@ void lwc_render_physics(const LWCONTEXT* pLwc) {
 		remote_target_pos = target_pos;
 	}
 	LWSPHERERENDERUNIFORM sphere_render_uniform = {
+		// float sphere_col_ratio[3];
 		{ 1.0f, 1.0f, 1.0f },
+		// float sphere_pos[3][3];
 		{
 			{ remote_player_pos[0], remote_player_pos[1], remote_player_pos[2] },
 			{ remote_target_pos[0], remote_target_pos[1], remote_target_pos[2] },
 			{ remote_puck_pos[0], remote_puck_pos[1], remote_puck_pos[2] }
 		},
+		// float sphere_col[3][3];
 		{
 			{ 0.0f, 1.0f, 0.8f },
 			{ 1.0f, 0.0f, 0.0f },
 			{ 0.2f, 0.3f, 1.0f }
+		},
+		// float sphere_speed[3];
+		{
+			puck_game->go[LPGO_PLAYER].speed,
+			puck_game->go[LPGO_TARGET].speed,
+			puck_game->go[LPGO_PUCK].speed
+		},
+		// float sphere_move_rad[3];
+		{
+			puck_game->go[LPGO_PLAYER].move_rad,
+			puck_game->go[LPGO_TARGET].move_rad,
+			puck_game->go[LPGO_PUCK].move_rad
 		},
 	};
     const float wall_height = 0.8f;
@@ -394,6 +415,7 @@ void lwc_render_physics(const LWCONTEXT* pLwc) {
 
 	render_dir_pad(pLwc);
 	render_fist_button(pLwc);
+	render_top_button(pLwc);
 	render_dash_gauge(pLwc);
 	render_hp_gauge(pLwc);
 }

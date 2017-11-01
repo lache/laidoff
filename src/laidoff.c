@@ -313,6 +313,8 @@ create_shader(const char *shader_name, LWSHADER *pShader, const GLchar *vst, con
 	pShader->sphere_pos = glGetUniformLocation(pShader->program, "sphere_pos");
 	pShader->sphere_col = glGetUniformLocation(pShader->program, "sphere_col");
 	pShader->sphere_col_ratio = glGetUniformLocation(pShader->program, "sphere_col_ratio");
+	pShader->sphere_speed = glGetUniformLocation(pShader->program, "sphere_speed");
+	pShader->sphere_move_rad = glGetUniformLocation(pShader->program, "sphere_move_rad");
 
 	// Attribs
 	pShader->vpos_location = glGetAttribLocation(pShader->program, "vPos");

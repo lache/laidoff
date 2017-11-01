@@ -65,4 +65,6 @@ typedef struct _LWSHADER {
 	GLint sphere_pos;
 	GLint sphere_col;
 	GLint sphere_col_ratio;
+	GLint sphere_speed;
+	GLint sphere_move_rad;
 } LWSHADER;

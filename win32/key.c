@@ -38,6 +38,10 @@ static void handle_move_key_press_release(LWCONTEXT* pLwc, int key, int action) 
 		lw_press_key_z(pLwc);
 	}
 
+	if (key == GLFW_KEY_X && action == GLFW_PRESS) {
+		lw_press_key_x(pLwc);
+	}
+
 	if (key == GLFW_KEY_RIGHT && action == GLFW_RELEASE) {
 		lw_release_key_right(pLwc);
 	}
@@ -62,6 +66,10 @@ static void handle_move_key_press_release(LWCONTEXT* pLwc, int key, int action) 
 		lw_release_key_z(pLwc);
 	}
 
+	if (key == GLFW_KEY_X && action == GLFW_RELEASE) {
+		lw_release_key_x(pLwc);
+	}
+
 }
 
 void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods) {
@@ -82,7 +90,7 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
 		lw_trigger_touch(pLwc, 0, 0, 0);
 	}
 
-	if (key == GLFW_KEY_S && action == GLFW_PRESS) {
+	if (key == GLFW_KEY_S && action == GLFW_PRESS && pLwc->game_scene == LGS_FIELD) {
 		float player_x = 0, player_y = 0, player_z = 0;
 		get_field_player_position(pLwc->field, &player_x, &player_y, &player_z);
 		nav_set_path_query_spos(field_nav(pLwc->field), player_x, player_y, player_z);

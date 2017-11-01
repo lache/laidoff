@@ -23,6 +23,7 @@ typedef struct _LWPUCKGAMEOBJECT {
 	dGeomID geom;
 	dBodyID body;
 	float pos[3]; // read-only
+	float move_rad; // angle on x-y plane
 	float radius;
 	mat4x4 rot;
 	LWPUCKGAME* puck_game;
@@ -65,8 +66,10 @@ typedef struct _LWPUCKGAME {
 	dJointGroupID contact_joint_group;
 	dJointGroupID  player_control_joint_group;
 	dJointGroupID  target_control_joint_group;
+	dJointGroupID  puck_pull_control_joint_group;
 	dJointID player_control_joint;
 	dJointID target_control_joint;
+	dJointID puck_pull_control_joint;
 	int push;
 	float time;
 	LWPUCKGAMEDASH dash;
@@ -74,6 +77,7 @@ typedef struct _LWPUCKGAME {
 	LWPUCKGAMEPLAYER player;
 	float last_remote_dx;
 	float last_remote_dy;
+	int pull_puck;
 } LWPUCKGAME;
 
 LWPUCKGAME* new_puck_game();

@@ -104,12 +104,28 @@ void lw_trigger_mouse_press(LWCONTEXT* pLwc, float x, float y, int pointer_id) {
 		pLwc->dir_pad_pointer_id = pointer_id;
 	}
 
-	if (pLwc->game_scene == LGS_PHYSICS && fabs(aspect_ratio - 0.3f - 0.75f / 2 - x) < 0.75f && fabs(-1 + 0.75f / 2 - y) < 0.75f
+	const float fist_button_w = 0.75f;
+	const float fist_button_h = 0.75f;
+	const float fist_button_x_center = aspect_ratio - 0.3f - fist_button_w / 2;
+	const float fist_button_y_center = -1 + fist_button_h / 2;
+	
+	const float top_button_w = fist_button_w;
+	const float top_button_h = fist_button_h;
+	const float top_button_x_center = fist_button_x_center;
+	const float top_button_y_center = -fist_button_y_center;
+	
+
+	if (pLwc->game_scene == LGS_PHYSICS
+		&& fabs(fist_button_x_center - x) < fist_button_w
+		&& fabs(fist_button_y_center - y) < fist_button_h
 		&& (!pLwc->dir_pad_dragging || (pLwc->dir_pad_pointer_id != pointer_id))) {
+
 		puck_game_dash(pLwc, pLwc->puck_game);
 	}
 
-	if (pLwc->game_scene == LGS_FIELD && fabs(aspect_ratio - 0.3f - 0.75f/2 - x) < 0.75f && fabs(-1 + 0.75f/2 - y) < 0.75f) {
+	if (pLwc->game_scene == LGS_FIELD
+		&& fabs(fist_button_x_center - x) < fist_button_w
+		&& fabs(fist_button_y_center - y) < fist_button_h) {
 		//field_attack(pLwc);
 
 		//pLwc->hide_field = !pLwc->hide_field;
@@ -120,10 +136,16 @@ void lw_trigger_mouse_press(LWCONTEXT* pLwc, float x, float y, int pointer_id) {
 		//pLwc->atk_pad_dragging = 1;
 	}
 
-
-
-	if (pLwc->game_scene == LGS_FIELD && fabs(aspect_ratio - 0.3f - 0.75f / 2 - x) < 0.75f && fabs(1 - 0.75f / 2 - y) < 0.75f) {
+	if (pLwc->game_scene == LGS_FIELD
+		&& fabs(top_button_x_center - x) < top_button_w
+		&& fabs(top_button_y_center - y) < top_button_h) {
 		//pLwc->fps_mode = !pLwc->fps_mode;
+	}
+
+	if (pLwc->game_scene == LGS_PHYSICS
+		&& fabs(top_button_x_center - x) < top_button_w
+		&& fabs(top_button_y_center - y) < top_button_h) {
+		puck_game_pull_puck_start(pLwc, pLwc->puck_game);
 	}
 
 	if (pLwc->game_scene == LGS_BATTLE && pLwc->battle_state != LBS_COMMAND_IN_PROGRESS && pLwc->player_turn_creature_index >= 0) {
@@ -210,6 +232,16 @@ void lw_trigger_mouse_release(LWCONTEXT* pLwc, float x, float y, int pointer_id)
 
 	const float aspect_ratio = (float)pLwc->width / pLwc->height;
 
+	const float fist_button_x_center = aspect_ratio - 0.3f - 0.75f / 2;
+	const float fist_button_y_center = -1 + 0.75f / 2;
+	const float fist_button_w = 0.75f;
+	const float fist_button_h = 0.75f;
+
+	const float top_button_x_center = fist_button_x_center;
+	const float top_button_y_center = -fist_button_y_center;
+	const float top_button_w = 0.75f;
+	const float top_button_h = 0.75f;
+
 	// Touch left top corner of the screen
 	if (pLwc->game_scene != LGS_ADMIN
 		&& x < -aspect_ratio + 0.25f
@@ -226,6 +258,12 @@ void lw_trigger_mouse_release(LWCONTEXT* pLwc, float x, float y, int pointer_id)
 
 		reset_time(pLwc);
 		return;
+	}
+
+	if (pLwc->game_scene == LGS_PHYSICS
+		&& fabs(top_button_x_center - x) < top_button_w
+		&& fabs(top_button_y_center - y) < top_button_h) {
+		puck_game_pull_puck_stop(pLwc, pLwc->puck_game);
 	}
 
 	if (pLwc->dir_pad_pointer_id == pointer_id) {
@@ -408,6 +446,10 @@ void lw_press_key_z(LWCONTEXT* pLwc) {
 	puck_game_dash(pLwc, pLwc->puck_game);
 }
 
+void lw_press_key_x(LWCONTEXT* pLwc) {
+	puck_game_pull_puck_start(pLwc, pLwc->puck_game);
+}
+
 void lw_release_key_left(LWCONTEXT* pLwc) {
 	pLwc->player_move_left = 0;
 	simulate_dir_pad_touch_input(pLwc);
@@ -433,4 +475,8 @@ void lw_release_key_space(LWCONTEXT* pLwc) {
 }
 
 void lw_release_key_z(LWCONTEXT* pLwc) {
+}
+
+void lw_release_key_x(LWCONTEXT* pLwc) {
+	puck_game_pull_puck_stop(pLwc, pLwc->puck_game);
 }
