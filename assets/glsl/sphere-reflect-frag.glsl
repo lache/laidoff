@@ -40,7 +40,7 @@ void main()
 	float d0_dx = v[0] - sphere_pos[0][0];
 	float d0_dy = v[1] - sphere_pos[0][1];
 	float d0_dz = v[2] - sphere_pos[0][2];
-	float d0_density = 1 + sphere_speed[0] * sphere_speed[0];
+	float d0_density = 1.0 + sphere_speed[0] * sphere_speed[0];
 	float d0_dx_r = d0_dx * cA0 + d0_dy * sA0;
 	float d0_dy_r = d0_dx * sA0 - d0_dy * cA0;
 	float d0 = sqrt(d0_density * d0_dx_r * d0_dx_r + d0_dy_r * d0_dy_r + d0_dz * d0_dz);
