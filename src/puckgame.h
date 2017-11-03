@@ -51,7 +51,6 @@ typedef struct _LWPUCKGAME {
 	// Static game data
 	float world_size;
 	float world_size_half;
-	float render_scale;
 	float dash_interval;
 	float dash_duration;
 	float dash_speed_ratio;

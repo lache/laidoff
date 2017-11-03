@@ -1,4 +1,4 @@
-#if GL_ES
+#ifdef GL_ES
 #else
 #define attribute in
 #define varying out
@@ -17,8 +17,9 @@ attribute vec3 vCol;
 attribute vec2 vUv;
 attribute vec4 vBw;
 attribute vec4 vBm;
-varying vec3 color;
+//varying vec3 color;
 varying vec2 uv;
+varying vec3 v;
 
 void main()
 {
@@ -27,6 +28,8 @@ void main()
 	int bmy = int(vBm.y);
 	int bmz = int(vBm.z);
 	int bmw = int(vBm.w);
+    
+    v = vec3(p);
 
 	float weight_sum = vBw.x + vBw.y + vBw.z + vBw.w;
 
@@ -38,6 +41,6 @@ void main()
 	
     gl_Position = MVP * ps;
 	
-    color = vCol;
+    //color = vCol;
     uv = vUvOffset + vUvScale * vUv;
 }

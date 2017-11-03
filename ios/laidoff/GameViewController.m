@@ -112,11 +112,12 @@ static CGPoint getNormalizedPoint(UIView* view, CGPoint locationInView)
 {
     [super touchesBegan:touches withEvent:event];
     UITouch* touchEvent = [touches anyObject];
+    
     CGPoint locationInView = [touchEvent locationInView:self.view];
     CGPoint normalizedPoint = getNormalizedPoint(self.view, locationInView);
     //on_touch_press(normalizedPoint.x, normalizedPoint.y);
-    lw_trigger_touch(self.pLwc, normalizedPoint.x, normalizedPoint.y);
-    lw_trigger_mouse_press(self.pLwc, normalizedPoint.x, normalizedPoint.y);
+    lw_trigger_touch(self.pLwc, normalizedPoint.x, normalizedPoint.y, 0);
+    lw_trigger_mouse_press(self.pLwc, normalizedPoint.x, normalizedPoint.y, 0);
 }
 
 - (void)touchesMoved:(NSSet *)touches withEvent:(UIEvent *)event
@@ -126,7 +127,7 @@ static CGPoint getNormalizedPoint(UIView* view, CGPoint locationInView)
     CGPoint locationInView = [touchEvent locationInView:self.view];
     CGPoint normalizedPoint = getNormalizedPoint(self.view, locationInView);
     //on_touch_drag(normalizedPoint.x, normalizedPoint.y);
-    lw_trigger_mouse_move(self.pLwc, normalizedPoint.x, normalizedPoint.y);
+    lw_trigger_mouse_move(self.pLwc, normalizedPoint.x, normalizedPoint.y, 0);
 }
 
 - (void)touchesEnded:(NSSet *)touches withEvent:(UIEvent *)event
@@ -135,7 +136,7 @@ static CGPoint getNormalizedPoint(UIView* view, CGPoint locationInView)
     UITouch* touchEvent = [touches anyObject];
     CGPoint locationInView = [touchEvent locationInView:self.view];
     CGPoint normalizedPoint = getNormalizedPoint(self.view, locationInView);
-    lw_trigger_mouse_release(self.pLwc, normalizedPoint.x, normalizedPoint.y);
+    lw_trigger_mouse_release(self.pLwc, normalizedPoint.x, normalizedPoint.y, 0);
 }
 
 - (void)touchesCancelled:(NSSet *)touches withEvent:(UIEvent *)event

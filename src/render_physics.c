@@ -182,6 +182,93 @@ static void render_dash_gauge(const LWCONTEXT* pLwc) {
 	render_text_block(pLwc, &text_block);
 }
 
+static void render_wall(const LWCONTEXT *pLwc, vec4 *proj, const LWPUCKGAME *puck_game,
+                        int shader_index, vec4 *view, float x, float y, float z,
+                        float x_rot, float y_rot, LW_VBO_TYPE lvt, float sx, float sy, float sz) {
+    const int tex_index = 0;
+    mat4x4 rot_x;
+    mat4x4_identity(rot_x);
+    mat4x4_rotate_X(rot_x, rot_x, x_rot);
+    mat4x4 rot_y;
+    mat4x4_identity(rot_y);
+    mat4x4_rotate_Y(rot_y, rot_y, y_rot);
+    mat4x4 rot;
+    mat4x4_mul(rot, rot_x, rot_y);
+    
+    mat4x4 model;
+    mat4x4_identity(model);
+    mat4x4_mul(model, model, rot);
+    mat4x4_scale_aniso(model, model, sx, sy, sz);
+    mat4x4 model_translate;
+    mat4x4_translate(model_translate, x, y, z);
+    mat4x4_mul(model, model_translate, model);
+    
+    mat4x4 view_model;
+    mat4x4_mul(view_model, view, model);
+    
+    mat4x4 proj_view_model;
+    mat4x4_identity(proj_view_model);
+    mat4x4_mul(proj_view_model, proj, view_model);
+    
+    glUniform3f(pLwc->shader[shader_index].overlay_color_location, 0.2f, 0.2f, 0.2f);
+    glUniform1f(pLwc->shader[shader_index].overlay_color_ratio_location, 1.0f);
+    
+    //glUniformMatrix4fv(pLwc->shader[shader_index].mvp_location, 1, GL_FALSE, (const GLfloat*)proj_view_model);
+    
+    glBindBuffer(GL_ARRAY_BUFFER, pLwc->vertex_buffer[lvt].vertex_buffer);
+    bind_all_vertex_attrib(pLwc, lvt);
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D, tex_index);
+    set_tex_filter(GL_LINEAR, GL_LINEAR);
+    //set_tex_filter(GL_NEAREST, GL_NEAREST);
+    glUniformMatrix4fv(pLwc->shader[shader_index].mvp_location, 1, GL_FALSE, (const GLfloat*)proj_view_model);
+    glUniformMatrix4fv(pLwc->shader[shader_index].m_location, 1, GL_FALSE, (const GLfloat*)model);
+    glDrawArrays(GL_TRIANGLES, 0, pLwc->vertex_buffer[lvt].vertex_count);
+}
+
+static void render_floor(const LWCONTEXT *pLwc, vec4 *proj, const LWPUCKGAME *puck_game, int shader_index, vec4 *view) {
+    const int tex_index = 0;
+    mat4x4 rot;
+    mat4x4_identity(rot);
+    
+    float sx = 2.0f;
+    float sy = 2.0f;
+    float sz = 2.0f;
+    float x = 0.0f, y = 0.0f, z = 0.0f;
+    
+    mat4x4 model;
+    mat4x4_identity(model);
+    mat4x4_mul(model, model, rot);
+    mat4x4_scale_aniso(model, model, sx, sy, sz);
+    mat4x4 model_translate;
+    mat4x4_translate(model_translate, x, y, z);
+    mat4x4_mul(model, model_translate, model);
+    
+    mat4x4 view_model;
+    mat4x4_mul(view_model, view, model);
+    
+    mat4x4 proj_view_model;
+    mat4x4_identity(proj_view_model);
+    mat4x4_mul(proj_view_model, proj, view_model);
+    
+    glUniform3f(pLwc->shader[shader_index].overlay_color_location, 0.5f, 0.5f, 0.5f);
+    glUniform1f(pLwc->shader[shader_index].overlay_color_ratio_location, 1.0f);
+    
+    //glUniformMatrix4fv(pLwc->shader[shader_index].mvp_location, 1, GL_FALSE, (const GLfloat*)proj_view_model);
+    
+    const LW_VBO_TYPE lvt = LVT_CENTER_CENTER_ANCHORED_SQUARE;
+    
+    glBindBuffer(GL_ARRAY_BUFFER, pLwc->vertex_buffer[lvt].vertex_buffer);
+    bind_all_vertex_attrib(pLwc, lvt);
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D, tex_index);
+    set_tex_filter(GL_LINEAR, GL_LINEAR);
+    //set_tex_filter(GL_NEAREST, GL_NEAREST);
+    glUniformMatrix4fv(pLwc->shader[shader_index].mvp_location, 1, GL_FALSE, (const GLfloat*)proj_view_model);
+    glUniformMatrix4fv(pLwc->shader[shader_index].m_location, 1, GL_FALSE, (const GLfloat*)model);
+    glDrawArrays(GL_TRIANGLES, 0, pLwc->vertex_buffer[lvt].vertex_count);
+}
+
 void lwc_render_physics(const LWCONTEXT* pLwc) {
 	glViewport(0, 0, pLwc->width, pLwc->height);
 	lw_clear_color();
@@ -246,54 +333,31 @@ void lwc_render_physics(const LWCONTEXT* pLwc) {
 	glUniform1fv(pLwc->shader[shader_index].sphere_col_ratio, 3, sphere_col_ratio);
 	glUniform3fv(pLwc->shader[shader_index].sphere_pos, 3, (const float*)sphere_pos);
 	glUniform3fv(pLwc->shader[shader_index].sphere_col, 3, (const float*)sphere_col);
-
-	{
-		const int tex_index = 0;
-		mat4x4 rot;
-		mat4x4_identity(rot);
-
-		float sx = puck_game->render_scale * 2.0f, sy = puck_game->render_scale *2.0f, sz = puck_game->render_scale *2.0f;
-		float x = 0.0f, y = 0.0f, z = 0.0f;
-
-		mat4x4 model;
-		mat4x4_identity(model);
-		mat4x4_mul(model, model, rot);
-		mat4x4_scale_aniso(model, model, sx, sy, sz);
-		mat4x4 model_translate;
-		mat4x4_translate(model_translate, x, y, z);
-		mat4x4_mul(model, model_translate, model);
-
-		mat4x4 view_model;
-		mat4x4_mul(view_model, view, model);
-
-		mat4x4 proj_view_model;
-		mat4x4_identity(proj_view_model);
-		mat4x4_mul(proj_view_model, proj, view_model);
-
-		glUniform3f(pLwc->shader[shader_index].overlay_color_location, 0.5f, 0.5f, 0.5f);
-		glUniform1f(pLwc->shader[shader_index].overlay_color_ratio_location, 1.0f);
-
-		//glUniformMatrix4fv(pLwc->shader[shader_index].mvp_location, 1, GL_FALSE, (const GLfloat*)proj_view_model);
-
-		const LW_VBO_TYPE lvt = LVT_CENTER_CENTER_ANCHORED_SQUARE;
-		
-		glBindBuffer(GL_ARRAY_BUFFER, pLwc->vertex_buffer[lvt].vertex_buffer);
-		bind_all_vertex_attrib(pLwc, lvt);
-		glActiveTexture(GL_TEXTURE0);
-		glBindTexture(GL_TEXTURE_2D, tex_index);
-		set_tex_filter(GL_LINEAR, GL_LINEAR);
-		//set_tex_filter(GL_NEAREST, GL_NEAREST);
-		glUniformMatrix4fv(pLwc->shader[shader_index].mvp_location, 1, GL_FALSE, (const GLfloat*)proj_view_model);
-		glUniformMatrix4fv(pLwc->shader[shader_index].m_location, 1, GL_FALSE, (const GLfloat*)model);
-		glDrawArrays(GL_TRIANGLES, 0, pLwc->vertex_buffer[lvt].vertex_count);
-
-		const float sphere_col_ratio_zero[3] = { 0.0f, 0.0f, 0.0f };
-		glUniform1fv(pLwc->shader[shader_index].sphere_col_ratio, 3, sphere_col_ratio_zero);
-	}
-
-	render_go(pLwc, view, proj, &puck_game->go[LPGO_PUCK], pLwc->tex_atlas[LAE_PUCK_KTX], puck_game->render_scale, remote_puck_pos, pLwc->puck_game_state.puck_rot, remote);
-	render_go(pLwc, view, proj, &puck_game->go[LPGO_PLAYER], pLwc->tex_atlas[LAE_PUCK_PLAYER_KTX], puck_game->render_scale, remote_player_pos, pLwc->puck_game_state.player_rot, remote);
-	render_go(pLwc, view, proj, &puck_game->go[LPGO_TARGET], pLwc->tex_atlas[LAE_PUCK_ENEMY_KTX], puck_game->render_scale, remote_target_pos, pLwc->puck_game_state.target_rot, remote);
+    const float wall_height = 0.8f;
+    // Floor
+	render_floor(pLwc, proj, puck_game, shader_index, view);
+    // North wall
+    render_wall(pLwc, proj, puck_game, shader_index, view, 0, 2, 0, LWDEG2RAD(90), 0,
+                LVT_CENTER_BOTTOM_ANCHORED_SQUARE, 2.0f, wall_height, 2.0f);
+    // South wall
+    render_wall(pLwc, proj, puck_game, shader_index, view, 0, -2, 0, LWDEG2RAD(-90), 0,
+                LVT_CENTER_TOP_ANCHORED_SQUARE, 2.0f, wall_height, 2.0f);
+    // East wall
+    render_wall(pLwc, proj, puck_game, shader_index, view, 2, 0, 0, 0, LWDEG2RAD(90),
+                LVT_LEFT_CENTER_ANCHORED_SQUARE, wall_height, 2.0f, 2.0f);
+    // West wall
+    render_wall(pLwc, proj, puck_game, shader_index, view, -2, 0, 0, 0, LWDEG2RAD(-90),
+                LVT_RIGHT_CENTER_ANCHORED_SQUARE, wall_height, 2.0f, 2.0f);
+    // Clear sphere col ratio to zero
+    const float sphere_col_ratio_zero[3] = { 0.0f, 0.0f, 0.0f };
+    glUniform1fv(pLwc->shader[shader_index].sphere_col_ratio, 3, sphere_col_ratio_zero);
+    
+	render_go(pLwc, view, proj, &puck_game->go[LPGO_PUCK], pLwc->tex_atlas[LAE_PUCK_KTX],
+              1.0f, remote_puck_pos, pLwc->puck_game_state.puck_rot, remote);
+	render_go(pLwc, view, proj, &puck_game->go[LPGO_PLAYER], pLwc->tex_atlas[LAE_PUCK_PLAYER_KTX],
+              1.0f, remote_player_pos, pLwc->puck_game_state.player_rot, remote);
+	render_go(pLwc, view, proj, &puck_game->go[LPGO_TARGET], pLwc->tex_atlas[LAE_PUCK_ENEMY_KTX],
+              1.0f, remote_target_pos, pLwc->puck_game_state.target_rot, remote);
 
 	render_dir_pad(pLwc);
 	render_fist_button(pLwc);

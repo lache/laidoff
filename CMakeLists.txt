@@ -144,6 +144,7 @@ elseif (APPLE)
             win32/main.c
             win32/mouse.c
             win32/sound.cpp
+            win32/net.c
             osx/osx_image.m
             )
 elseif (RPI)

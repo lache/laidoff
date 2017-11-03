@@ -5,9 +5,11 @@
 #else
 #include <fcntl.h>
 #include <sys/socket.h>
+#if !LW_PLATFORM_OSX && !LW_PLATFORM_IOS
 #include <linux/in.h>
-#include <stdlib.h>
 #include <endian.h>
+#endif
+#include <stdlib.h>
 #include <czmq_prelude.h>
 #endif
 #define LW_UDP_SERVER "192.168.219.109"

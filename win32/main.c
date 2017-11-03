@@ -1,4 +1,4 @@
-﻿#include <time.h>
+#include <time.h>
 #include "lwgl.h"
 #include "laidoff.h"
 #include "czmq.h"
@@ -77,11 +77,13 @@ static GLFWwindow* create_glfw_window()
 		INITIAL_SCREEN_RESOLUTION_X,
 		INITIAL_SCREEN_RESOLUTION_Y,
 		"LAID OFF", NULL, NULL);
+#if LW_PLATFORM_WIN32
 	HWND hwnd = glfwGetWin32Window(window);
 	int scaling_factor = GetDpiForWindow(hwnd) / 96;
 	glfwSetWindowSize(window,
 		INITIAL_SCREEN_RESOLUTION_X * scaling_factor,
 		INITIAL_SCREEN_RESOLUTION_Y * scaling_factor);
+#endif
 	return window;
 }
 
@@ -146,11 +148,11 @@ int main(int argc, char* argv[])
 			exit(EXIT_FAILURE);
 		}
 	}
+#if LW_PLATFORM_WIN32
 	HWND hwnd = glfwGetWin32Window(window);
 	int scaling_factor = GetDpiForWindow(hwnd) / 96;
 	RECT work_area;
 	SystemParametersInfo(SPI_GETWORKAREA, 0, &work_area, 0);
-	//glfwSetWindowPos(window, 600, 70);
 	RECT window_rect;
 	GetWindowRect(hwnd, &window_rect);
 	int window_rect_width = window_rect.right - window_rect.left;
@@ -162,6 +164,9 @@ int main(int argc, char* argv[])
 	int window_rect_to_client_rect_dx = window_rect_width - client_rect_width;
 	int window_rect_to_client_rect_dy = window_rect_height - client_rect_height;
 	glfwSetWindowPos(window, work_area.left + window_rect_to_client_rect_dx, work_area.top + window_rect_to_client_rect_dy);
+#elif LW_PLATFORM_OSX
+    glfwSetWindowPos(window, 0, 0);
+#endif
 	// Register glfw event callbacks
 	glfwSetKeyCallback(window, key_callback);
 	glfwSetMouseButtonCallback(window, mouse_button_callback);

@@ -1,4 +1,4 @@
-#if GL_ES
+#ifdef GL_ES
 #else
 #define attribute in
 #define varying out
