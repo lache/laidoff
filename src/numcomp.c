@@ -3,7 +3,7 @@
 #include <math.h>
 #include <string.h>
 
-// v valid range : [-32.0f, 31.0f]
+// v valid range : [-32.0f, 32.0f)
 // compressed output: 11-bit (sign 1-bit, integral part 5-bit, fractional part 5-bit)
 int v_comp_11bit(float v) {
 	if (v > 31.0f) {

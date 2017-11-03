@@ -77,7 +77,7 @@ extern const char* tex_font_atlas_filename[2];
 #define FAN_VERTEX_BUFFER_COUNT LFVT_COUNT
 #define PS_VERTEX_BUFFER_COUNT LPVT_COUNT
 #define MAX_DELTA_TIME_HISTORY (60)
-
+#define PUCK_GAME_STATE_RING_BUFFER_SIZE ()
 typedef struct _LWPUCKGAME LWPUCKGAME;
 typedef struct _LWUDP LWUDP;
 
@@ -315,8 +315,10 @@ typedef struct _LWCONTEXT {
 	LWPUCKGAME* puck_game;
 	// UDP context
 	LWUDP* udp;
-	// Puck game remote(server) state
+	// Puck game remote(server) state queue
 	LWPUCKGAMEPACKETSTATE puck_game_state;
+	// Puck game remote state last received time (sec)
+	double puck_game_state_last_received;
 } LWCONTEXT;
 
 #ifdef __cplusplus

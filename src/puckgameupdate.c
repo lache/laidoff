@@ -41,7 +41,7 @@ void update_puck_game(LWCONTEXT* pLwc, LWPUCKGAME* puck_game, double delta_time)
 		p.type = LSBPT_GETTOKEN;
 		udp_send(pLwc->udp, (const char*)&p, sizeof(p));
 		break;
-	}	
+	}
 	case LUS_QUEUE:
 	{
 		LWSPHEREBATTLEPACKETQUEUE p;
