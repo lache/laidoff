@@ -14,3 +14,4 @@ build-x86
 /imgui.ini
 *.swp
 /build*
+ios/laidoff.xcodeproj/xcuserdata

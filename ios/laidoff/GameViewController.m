@@ -36,10 +36,10 @@
     GLKView *view = (GLKView *)self.view;
     view.context = self.context;
     view.drawableDepthFormat = GLKViewDrawableDepthFormat16;
-    
     view.userInteractionEnabled = YES;
-    self.preferredFramesPerSecond = 60;
+    view.multipleTouchEnabled = YES;
     
+    self.preferredFramesPerSecond = 60;
     [self setupGL];
     
     CGRect screenRect = [[UIScreen mainScreen] bounds];
@@ -108,40 +108,94 @@ static CGPoint getNormalizedPoint(UIView* view, CGPoint locationInView)
     return CGPointMake(normalizedX, normalizedY);
 }
 
+const int MAX_TOUCHES = 11;
+
+void* g_touchTracker[MAX_TOUCHES];
+
+int AddNewTouch(void *touch)
+{
+    for (int i = 0; i < MAX_TOUCHES; i++)
+    {
+        if (!g_touchTracker[i])
+        {
+            g_touchTracker[i] = touch;
+            return i;
+        }
+    }
+    return -1;
+}
+
+void RemoveTouch(void *touch)
+{
+    int trackId = GetFingerTrackId(touch);
+    if (trackId >= 0 && trackId < MAX_TOUCHES)
+    {
+        g_touchTracker[trackId] = NULL;
+    }
+}
+
+int GetFingerTrackId(void *touch)
+{
+    for (int i = 0; i < MAX_TOUCHES; i++)
+    {
+        if (g_touchTracker[i] == touch)
+        {
+            return i;
+        }
+    }
+    return -1;
+}
+
 - (void)touchesBegan:(NSSet *)touches withEvent:(UIEvent *)event
 {
-    [super touchesBegan:touches withEvent:event];
-    UITouch* touchEvent = [touches anyObject];
-    
-    CGPoint locationInView = [touchEvent locationInView:self.view];
-    CGPoint normalizedPoint = getNormalizedPoint(self.view, locationInView);
-    //on_touch_press(normalizedPoint.x, normalizedPoint.y);
-    lw_trigger_touch(self.pLwc, normalizedPoint.x, normalizedPoint.y, 0);
-    lw_trigger_mouse_press(self.pLwc, normalizedPoint.x, normalizedPoint.y, 0);
+    //[super touchesBegan:touches withEvent:event];
+    for (UITouch *touchEvent in touches)
+    {
+        int fingerId = AddNewTouch((__bridge void*)touchEvent);
+        CGPoint locationInView = [touchEvent locationInView:self.view];
+        CGPoint normalizedPoint = getNormalizedPoint(self.view, locationInView);
+        //on_touch_press(normalizedPoint.x, normalizedPoint.y);
+        lw_trigger_touch(self.pLwc, normalizedPoint.x, normalizedPoint.y, fingerId);
+        lw_trigger_mouse_press(self.pLwc, normalizedPoint.x, normalizedPoint.y, fingerId);
+        NSLog(@"BEGAN Touch count: %d", [[event allTouches]count]);
+    }
 }
 
 - (void)touchesMoved:(NSSet *)touches withEvent:(UIEvent *)event
 {
-    [super touchesMoved:touches withEvent:event];
-    UITouch* touchEvent = [touches anyObject];
-    CGPoint locationInView = [touchEvent locationInView:self.view];
-    CGPoint normalizedPoint = getNormalizedPoint(self.view, locationInView);
-    //on_touch_drag(normalizedPoint.x, normalizedPoint.y);
-    lw_trigger_mouse_move(self.pLwc, normalizedPoint.x, normalizedPoint.y, 0);
+    //[super touchesMoved:touches withEvent:event];
+    for (UITouch *touchEvent in touches)
+    {
+        int fingerId = GetFingerTrackId((__bridge void*)touchEvent);
+        CGPoint locationInView = [touchEvent locationInView:self.view];
+        CGPoint normalizedPoint = getNormalizedPoint(self.view, locationInView);
+        //on_touch_drag(normalizedPoint.x, normalizedPoint.y);
+        lw_trigger_mouse_move(self.pLwc, normalizedPoint.x, normalizedPoint.y, fingerId);
+        NSLog(@"MOVED Touch count: %d", [[event allTouches]count]);
+    }
 }
 
 - (void)touchesEnded:(NSSet *)touches withEvent:(UIEvent *)event
 {
-    [super touchesEnded:touches withEvent:event];
-    UITouch* touchEvent = [touches anyObject];
-    CGPoint locationInView = [touchEvent locationInView:self.view];
-    CGPoint normalizedPoint = getNormalizedPoint(self.view, locationInView);
-    lw_trigger_mouse_release(self.pLwc, normalizedPoint.x, normalizedPoint.y, 0);
+    //[super touchesEnded:touches withEvent:event];
+    for (UITouch *touchEvent in touches)
+    {
+        int fingerId = GetFingerTrackId((__bridge void*)touchEvent);
+        CGPoint locationInView = [touchEvent locationInView:self.view];
+        CGPoint normalizedPoint = getNormalizedPoint(self.view, locationInView);
+        lw_trigger_mouse_release(self.pLwc, normalizedPoint.x, normalizedPoint.y, fingerId);
+        NSLog(@"ENDED Touch count: %d", [[event allTouches]count]);
+        RemoveTouch((__bridge void*)touchEvent);
+    }
 }
 
 - (void)touchesCancelled:(NSSet *)touches withEvent:(UIEvent *)event
 {
     [super touchesCancelled:touches withEvent:event];
+    for (UITouch *touchEvent in touches)
+    {
+        RemoveTouch((__bridge void*)touchEvent);
+    }
 }
 
 - (void)glkView:(GLKView *)view drawInRect:(CGRect)rect

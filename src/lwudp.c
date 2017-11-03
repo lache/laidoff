@@ -4,6 +4,7 @@
 #include "spherebattlepacket.h"
 #include "lwcontext.h"
 #include "puckgameupdate.h"
+#include "lwtimepoint.h"
 
 static int make_socket_nonblocking(int sock) {
 #if defined(WIN32) || defined(_WIN32) || defined(IMN_PIM)
@@ -73,9 +74,31 @@ void udp_send(LWUDP* udp, const char* data, int size) {
 #if LW_PLATFORM_WIN32
 		LOGE("sendto() failed with error code : %d", WSAGetLastError());
 #else
-		LOGE("sendto() failed with error...");
+		//LOGE("sendto() failed with error...");
 #endif
-		exit(EXIT_FAILURE);
+		//exit(EXIT_FAILURE);
+	}
+}
+
+void queue_state_even_odd(LWUDP* udp, const LWPUCKGAMEPACKETSTATE* p,
+	LWPUCKGAMEPACKETSTATE* dst, const LWPUCKGAMEPACKETSTATE* src) {
+
+	memcpy(dst, src + 1, sizeof(LWPUCKGAMEPACKETSTATE) * (LW_STATE_BUFFER_SIZE - 1));
+	memcpy(dst + LW_STATE_BUFFER_SIZE - 1, p, sizeof(LWPUCKGAMEPACKETSTATE));
+}
+
+void queue_state(LWUDP* udp, const LWPUCKGAMEPACKETSTATE* p) {
+	if (udp->puck_game_state_buffer_index == 0) {
+		queue_state_even_odd(udp, p,
+			udp->puck_game_state_buffer[0],
+			udp->puck_game_state_buffer[1]);
+		udp->puck_game_state_buffer_index = 1;
+	}
+	else {
+		queue_state_even_odd(udp, p,
+			udp->puck_game_state_buffer[1],
+			udp->puck_game_state_buffer[0]);
+		udp->puck_game_state_buffer_index = 0;
 	}
 }
 
@@ -186,7 +209,19 @@ void udp_update(LWCONTEXT* pLwc, LWUDP* udp) {
 				if (udp->recv_len != sizeof(LWPUCKGAMEPACKETSTATE)) {
 					LOGE("LWPUCKGAMEPACKETSTATE: Size error %d (%d expected)", udp->recv_len, sizeof(LWPUCKGAMEPACKETSTATE));
 				}
-				memcpy(&pLwc->puck_game_state, p, sizeof(LWPUCKGAMEPACKETSTATE));
+				int tick_diff = p->update_tick - pLwc->puck_game_state.update_tick;
+				if (tick_diff > 0) {
+					if (tick_diff != 1) {
+						LOGI("Packet jitter");
+					}
+					memcpy(&pLwc->puck_game_state, p, sizeof(LWPUCKGAMEPACKETSTATE));
+					double last_received = lwtimepoint_now_seconds();
+					double state_packet_interval = last_received - pLwc->puck_game_state_last_received;
+					pLwc->puck_game_state_last_received = last_received;
+					LOGI("State packet interval: %.3f ms", state_packet_interval * 1000);
+
+					queue_state(pLwc->udp, p);
+				}
 			}
 			break;
 		}

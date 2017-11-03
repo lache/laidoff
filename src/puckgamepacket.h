@@ -28,6 +28,7 @@ typedef struct _LWPUCKGAMEPACKETDASH {
 typedef struct _LWPUCKGAMEPACKETSTATE {
 	int type;
 	int token;
+	int update_tick;
 	float player[3];
 	mat4x4 player_rot;
 	float puck[3];

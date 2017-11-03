@@ -2781,17 +2781,18 @@
 				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				OTHER_CFLAGS = (
+					"-Ilaidoff",
 					"-I../glfw-3.2.1/deps",
 					"-I../lua-5.3.4",
 					"-I../ode/ode/src",
 					"-I../ode/ou/include",
 					"-I../ode/include",
 					"-I../zeromq-4.2.1/include",
+					"-I../recastnavigation/Detour/Include",
+					"-I../czmq/include",
 					"-DdDOUBLE",
 					"-miphoneos-version-min=8.0",
 					"-Werror=partial-availability",
-					"-I../recastnavigation/Detour/Include",
-					"-I../czmq/include",
 					"-DCZMQ_BUILD_DRAFT_API",
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.popsongremix.laidoff.dev2;
@@ -2812,17 +2813,18 @@
 				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				OTHER_CFLAGS = (
+					"-Ilaidoff",
 					"-I../glfw-3.2.1/deps",
 					"-I../lua-5.3.4",
 					"-I../ode/ode/src",
 					"-I../ode/ou/include",
 					"-I../ode/include",
 					"-I../zeromq-4.2.1/include",
+					"-I../recastnavigation/Detour/Include",
+					"-I../czmq/include",
 					"-DdDOUBLE",
 					"-miphoneos-version-min=8.0",
 					"-Werror=partial-availability",
-					"-I../recastnavigation/Detour/Include",
-					"-I../czmq/include",
 					"-DCZMQ_BUILD_DRAFT_API",
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.popsongremix.laidoff.dev2;
