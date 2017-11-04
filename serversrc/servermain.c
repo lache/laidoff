@@ -14,7 +14,6 @@
 #include<arpa/inet.h> //inet_addr
 #include <unistd.h> // chdir
 #include <inttypes.h>
-#define __int64 int64_t
 #endif
 #include "lwlog.h"
 #include "puckgame.h"
@@ -27,6 +26,8 @@
 #else
 #define LwChangeDirectory(x) chdir(x)
 #endif
+
+#include "lwtimepoint.h"
 
 #ifndef SOCKET
 #define SOCKET int
@@ -59,6 +60,7 @@ typedef struct _LWSERVER {
 	int dir_pad_dragging;
 	float dx;
 	float dy;
+	double last_broadcast_sent;
 } LWSERVER;
 
 static BOOL directory_exists(const char* szPath)
@@ -104,7 +106,7 @@ static void update_puck_game(LWSERVER* server, LWPUCKGAME* puck_game, double del
 	//LOGI("pos %.2f %.2f %.2f", p[0], p[1], p[2]);
 
 	dJointID pcj = puck_game->player_control_joint;
-	float player_speed = 0.5f;
+	float player_speed = 2.5f;
 	//dJointSetLMotorParam(pcj, dParamVel1, player_speed * (pLwc->player_move_right - pLwc->player_move_left));
 	//dJointSetLMotorParam(pcj, dParamVel2, player_speed * (pLwc->player_move_up - pLwc->player_move_down));
 
@@ -200,63 +202,24 @@ void server_send(LWSERVER* server, const char* p, int s) {
 
 #define SERVER_SEND(server, packet) server_send(server, (const char*)&packet, sizeof(packet))
 
-#if LW_PLATFORM_WIN32
-double PCFreq = 0.0;
-__int64 CounterStart = 0;
-
-void init_counter()
-{
-	LARGE_INTEGER li;
-	if (!QueryPerformanceFrequency(&li)) {
-		exit(EXIT_FAILURE);
-	}
-	PCFreq = (double)li.QuadPart / 1000.0;
-}
-void start_counter()
-{
-	LARGE_INTEGER li;
-	QueryPerformanceCounter(&li);
-	CounterStart = li.QuadPart;
-}
-
-__int64 get_abs_counter()
-{
-	LARGE_INTEGER li;
-	QueryPerformanceCounter(&li);
-	return li.QuadPart;
-}
-
-
-double get_counter_ms()
-{
-	LARGE_INTEGER li;
-	QueryPerformanceCounter(&li);
-	return (double)(li.QuadPart - CounterStart) / PCFreq;
-}
-#else
-
-#endif
-
-double elapsed_ms = 0;
-
 typedef struct _LWCONN {
-	unsigned __int64 ipport;
+	unsigned long long ipport;
 	struct sockaddr_in si;
-	__int64 last_ingress;
+	double last_ingress_timepoint;
 } LWCONN;
 
 #define LW_CONN_CAPACITY (32)
 
-unsigned __int64 to_ipport(unsigned int ip, unsigned short port) {
-	return ((unsigned __int64)port << 32) | ip;
+unsigned long long to_ipport(unsigned int ip, unsigned short port) {
+	return ((unsigned long long)port << 32) | ip;
 }
 
 void add_conn(LWCONN* conn, int conn_capacity, struct sockaddr_in* si) {
-	unsigned __int64 ipport = to_ipport(si->sin_addr.S_un.S_addr, si->sin_port);
+	unsigned long long ipport = to_ipport(si->sin_addr.s_addr, si->sin_port);
 	// Update last ingress for existing element
 	for (int i = 0; i < conn_capacity; i++) {
 		if (conn[i].ipport == ipport) {
-			conn[i].last_ingress = get_abs_counter();
+			conn[i].last_ingress_timepoint = lwtimepoint_now_seconds();
 			return;
 		}
 	}
@@ -264,7 +227,7 @@ void add_conn(LWCONN* conn, int conn_capacity, struct sockaddr_in* si) {
 	for (int i = 0; i < conn_capacity; i++) {
 		if (conn[i].ipport == 0) {
 			conn[i].ipport = ipport;
-			conn[i].last_ingress = get_abs_counter();
+			conn[i].last_ingress_timepoint = lwtimepoint_now_seconds();
 			memcpy(&conn[i].si, si, sizeof(struct sockaddr_in));
 			return;
 		}
@@ -272,10 +235,10 @@ void add_conn(LWCONN* conn, int conn_capacity, struct sockaddr_in* si) {
 	LOGE("add_conn: maximum capacity exceeded.");
 }
 
-void invalidate_dead_conn(LWCONN* conn, int conn_capacity, __int64 current_counter, __int64 life) {
+void invalidate_dead_conn(LWCONN* conn, int conn_capacity, double current_timepoint, double life) {
 	for (int i = 0; i < conn_capacity; i++) {
 		if (conn[i].ipport) {
-			if (current_counter - conn[i].last_ingress > life) {
+			if (current_timepoint - conn[i].last_ingress_timepoint > life) {
 				conn[i].ipport = 0;
 			}
 		}
@@ -283,11 +246,21 @@ void invalidate_dead_conn(LWCONN* conn, int conn_capacity, __int64 current_count
 }
 
 void broadcast_packet(LWSERVER* server, const LWCONN* conn, int conn_capacity, const char* p, int s) {
+	int sent = 0;
 	for (int i = 0; i < conn_capacity; i++) {
 		if (conn[i].ipport) {
+			double tp = lwtimepoint_now_seconds();
 			sendto(server->s, p, s, 0, (struct sockaddr*)&conn[i].si, server->slen);
+			double elapsed = lwtimepoint_now_seconds() - tp;
+			//LOGI("Broadcast sendto elapsed: %.3f ms", elapsed * 1000);
+			sent = 1;
 		}
-	}	
+	}
+	if (sent) {
+		double tp = lwtimepoint_now_seconds();
+		//LOGI("Broadcast interval: %.3f ms", (tp - server->last_broadcast_sent) * 1000);
+		server->last_broadcast_sent = tp;
+	}
 }
 
 int main(int argc, char* argv[]) {
@@ -301,46 +274,49 @@ int main(int argc, char* argv[]) {
 	const double sim_timestep = 1.0f / 60; // sec
 	struct timeval tv;
 	tv.tv_sec = 0;
-	tv.tv_usec = 1000;// sim_timestep * 1000 * 1000;
+	tv.tv_usec = 0;// sim_timestep * 1000 * 1000;
 	fd_set readfds;
 	make_socket_nonblocking(server->s);
 	int token_counter = 0;
-
-	init_counter();
 	LWCONN conn[LW_CONN_CAPACITY];
+	double elapsed_ms = 0;
 	while (1) {
-		start_counter();
+		const double loop_start = lwtimepoint_now_seconds();
 		if (elapsed_ms > 0) {
+			double sim_tp = lwtimepoint_now_seconds();
 			int iter = (int)(elapsed_ms / (sim_timestep * 1000));
 			for (int i = 0; i < iter; i++) {
 				update_puck_game(server, puck_game, sim_timestep);
 				update_tick++;
 			}
+			double sim_elapsed = lwtimepoint_now_seconds() - sim_tp;
+			//LOGI("Sim elapsed: %.3f ms", sim_elapsed * 1000);
 			elapsed_ms = fmod(elapsed_ms, (sim_timestep * 1000));
-
-			// Broadcast state to clients
-			LWPUCKGAMEPACKETSTATE packet_state;
-			packet_state.type = LPGPT_STATE;
-			packet_state.token = 0;
-			packet_state.update_tick = update_tick;
-			packet_state.puck[0] = puck_game->go[LPGO_PUCK].pos[0];
-			packet_state.puck[1] = puck_game->go[LPGO_PUCK].pos[1];
-			packet_state.puck[2] = puck_game->go[LPGO_PUCK].pos[2];
-			packet_state.player[0] = puck_game->go[LPGO_PLAYER].pos[0];
-			packet_state.player[1] = puck_game->go[LPGO_PLAYER].pos[1];
-			packet_state.player[2] = puck_game->go[LPGO_PLAYER].pos[2];
-			packet_state.target[0] = puck_game->go[LPGO_TARGET].pos[0];
-			packet_state.target[1] = puck_game->go[LPGO_TARGET].pos[1];
-			packet_state.target[2] = puck_game->go[LPGO_TARGET].pos[2];
-			memcpy(packet_state.puck_rot, puck_game->go[LPGO_PUCK].rot, sizeof(mat4x4));
-			memcpy(packet_state.player_rot, puck_game->go[LPGO_PLAYER].rot, sizeof(mat4x4));
-			memcpy(packet_state.target_rot, puck_game->go[LPGO_TARGET].rot, sizeof(mat4x4));
-			broadcast_packet(server, conn, LW_CONN_CAPACITY, (const char*)&packet_state, sizeof(packet_state));
+			if (iter) {
+				// Broadcast state to clients
+				LWPUCKGAMEPACKETSTATE packet_state;
+				packet_state.type = LPGPT_STATE;
+				packet_state.token = 0;
+				packet_state.update_tick = update_tick;
+				packet_state.puck[0] = puck_game->go[LPGO_PUCK].pos[0];
+				packet_state.puck[1] = puck_game->go[LPGO_PUCK].pos[1];
+				packet_state.puck[2] = puck_game->go[LPGO_PUCK].pos[2];
+				packet_state.player[0] = puck_game->go[LPGO_PLAYER].pos[0];
+				packet_state.player[1] = puck_game->go[LPGO_PLAYER].pos[1];
+				packet_state.player[2] = puck_game->go[LPGO_PLAYER].pos[2];
+				packet_state.target[0] = puck_game->go[LPGO_TARGET].pos[0];
+				packet_state.target[1] = puck_game->go[LPGO_TARGET].pos[1];
+				packet_state.target[2] = puck_game->go[LPGO_TARGET].pos[2];
+				memcpy(packet_state.puck_rot, puck_game->go[LPGO_PUCK].rot, sizeof(mat4x4));
+				memcpy(packet_state.player_rot, puck_game->go[LPGO_PLAYER].rot, sizeof(mat4x4));
+				memcpy(packet_state.target_rot, puck_game->go[LPGO_TARGET].rot, sizeof(mat4x4));
+				broadcast_packet(server, conn, LW_CONN_CAPACITY, (const char*)&packet_state, sizeof(packet_state));
+			}
 		}
 		
 		//LOGI("Update tick %"PRId64, update_tick);
 
-		invalidate_dead_conn(conn, LW_CONN_CAPACITY, get_abs_counter(), (__int64)(PCFreq * 2000) /* 2000 ms life */);
+		invalidate_dead_conn(conn, LW_CONN_CAPACITY, lwtimepoint_now_seconds(), 2.0);
 
 		//LOGI("Waiting for data...");
 		fflush(stdout);
@@ -356,72 +332,77 @@ int main(int argc, char* argv[]) {
 		//try to receive some data, this is a blocking call
 		if (rv == 1) {
 			if ((server->recv_len = recvfrom(server->s, server->buf, BUFLEN, 0, (struct sockaddr *) &server->si_other, &server->slen)) == SOCKET_ERROR) {
-				printf("recvfrom() failed with error code : %d", WSAGetLastError());
-				exit(EXIT_FAILURE);
+				//printf("recvfrom() failed with error code : %d", WSAGetLastError());
+				//exit(EXIT_FAILURE);
+			}
+			else {
+				add_conn(conn, LW_CONN_CAPACITY, &server->si_other);
+
+				//print details of the client/peer and the data received
+				/*printf("Received packet from %s:%d (size:%d)\n",
+					inet_ntoa(server->si_other.sin_addr),
+					ntohs(server->si_other.sin_port),
+					server->recv_len);*/
+
+				const int packet_type = *(int*)server->buf;
+				switch (packet_type) {
+				case LSBPT_GETTOKEN:
+				{
+					LWSPHEREBATTLEPACKETTOKEN p;
+					p.type = LSBPT_TOKEN;
+					++token_counter;
+					p.token = token_counter;
+					SERVER_SEND(server, p);
+					break;
+				}
+				case LSBPT_QUEUE:
+				{
+					LWSPHEREBATTLEPACKETMATCHED p;
+					p.type = LSBPT_MATCHED;
+					p.master = 0;
+					SERVER_SEND(server, p);
+					break;
+				}
+				case LPGPT_MOVE:
+				{
+					LWPUCKGAMEPACKETMOVE* p = (LWPUCKGAMEPACKETMOVE*)server->buf;
+					//LOGI("MOVE dx=%.2f dy=%.2f", p->dx, p->dy);
+					server->dir_pad_dragging = 1;
+					server->dx = p->dx;
+					server->dy = p->dy;
+					break;
+				}
+				case LPGPT_STOP:
+				{
+					LWPUCKGAMEPACKETSTOP* p = (LWPUCKGAMEPACKETSTOP*)server->buf;
+					//LOGI("STOP");
+					server->dir_pad_dragging = 0;
+					break;
+				}
+				case LPGPT_DASH:
+				{
+					LWPUCKGAMEPACKETDASH* p = (LWPUCKGAMEPACKETDASH*)server->buf;
+					//LOGI("DASH");
+					const dReal* player_vel = dBodyGetLinearVel(puck_game->go[LPGO_PLAYER].body);
+					puck_game_commit_dash(puck_game, &puck_game->dash,
+						(float)player_vel[0], (float)player_vel[1]);
+					break;
+				}
+				default:
+				{
+					break;
+				}
+				}
 			}
 
-			add_conn(conn, LW_CONN_CAPACITY, &server->si_other);
-
-			//print details of the client/peer and the data received
-			printf("Received packet from %s:%d (size:%d)\n",
-				inet_ntoa(server->si_other.sin_addr),
-				ntohs(server->si_other.sin_port),
-				server->recv_len);
-
-			const int packet_type = *(int*)server->buf;
-			switch (packet_type) {
-			case LSBPT_GETTOKEN:
-			{
-				LWSPHEREBATTLEPACKETTOKEN p;
-				p.type = LSBPT_TOKEN;
-				++token_counter;
-				p.token = token_counter;
-				SERVER_SEND(server, p);
-				break;
-			}
-			case LSBPT_QUEUE:
-			{
-				LWSPHEREBATTLEPACKETMATCHED p;
-				p.type = LSBPT_MATCHED;
-				p.master = 0;
-				SERVER_SEND(server, p);
-				break;
-			}
-			case LPGPT_MOVE:
-			{
-				LWPUCKGAMEPACKETMOVE* p = (LWPUCKGAMEPACKETMOVE*)server->buf;
-				LOGI("MOVE dx=%.2f dy=%.2f", p->dx, p->dy);
-				server->dir_pad_dragging = 1;
-				server->dx = p->dx;
-				server->dy = p->dy;
-				break;
-			}
-			case LPGPT_STOP:
-			{
-				LWPUCKGAMEPACKETSTOP* p = (LWPUCKGAMEPACKETSTOP*)server->buf;
-				LOGI("STOP");
-				server->dir_pad_dragging = 0;
-				break;
-			}
-			case LPGPT_DASH:
-			{
-				LWPUCKGAMEPACKETDASH* p = (LWPUCKGAMEPACKETDASH*)server->buf;
-				LOGI("DASH");
-				const dReal* player_vel = dBodyGetLinearVel(puck_game->go[LPGO_PLAYER].body);
-				puck_game_commit_dash(puck_game, &puck_game->dash,
-					(float)player_vel[0], (float)player_vel[1]);
-				break;
-			}
-			default:
-			{
-				break;
-			}
-			}
+			
 		}
 		else {
 			//LOGI("EMPTY");
 		}
-		elapsed_ms += get_counter_ms();
+		double loop_time = lwtimepoint_now_seconds() - loop_start;
+		elapsed_ms += loop_time * 1000;
+		//LOGI("Loop time: %.3f ms", loop_time * 1000);
 	}
 	delete_puck_game(&puck_game);
 	return 0;

@@ -21,6 +21,7 @@ void lwc_update(LWCONTEXT* pLwc, double delta_time);
 void lw_set_size(LWCONTEXT* pLwc, int w, int h);
 void lw_set_window(LWCONTEXT* pLwc, struct GLFWwindow* window);
 GLFWwindow* lw_get_window(const LWCONTEXT* pLwc);
+void lwc_prerender_mutable_context(LWCONTEXT* pLwc);
 void lwc_render(const LWCONTEXT* pLwc);
 
 void lw_trigger_touch(LWCONTEXT* pLwc, float xpos, float ypos, int pointer_id);

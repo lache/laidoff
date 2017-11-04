@@ -315,10 +315,12 @@ typedef struct _LWCONTEXT {
 	LWPUCKGAME* puck_game;
 	// UDP context
 	LWUDP* udp;
-	// Puck game remote(server) state queue
+	// Puck game remote(server) state
 	LWPUCKGAMEPACKETSTATE puck_game_state;
 	// Puck game remote state last received time (sec)
 	double puck_game_state_last_received;
+	// Last state packet reception interval (msec)
+	double puck_game_state_last_received_interval;
 } LWCONTEXT;
 
 #ifdef __cplusplus

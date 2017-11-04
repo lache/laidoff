@@ -12,10 +12,12 @@
 #include <stdlib.h>
 #include <czmq_prelude.h>
 #endif
-#define LW_UDP_SERVER "192.168.0.28"
+#define LW_UDP_SERVER "puck.popsongremix.com"
+//#define LW_UDP_SERVER "192.168.0.28"
 #define LW_UDP_BUFLEN 512
 #define LW_UDP_PORT 10288
 #include "puckgamepacket.h"
+#include "lwringbuffer.h"
 
 typedef enum _LW_UDP_STATE {
 	// Init
@@ -28,7 +30,7 @@ typedef enum _LW_UDP_STATE {
 	LUS_MATCHED,
 } LW_UDP_STATE;
 
-#define LW_STATE_BUFFER_SIZE (16)
+#define LW_STATE_RING_BUFFER_CAPACITY (16)
 
 typedef struct _LWUDP {
 #if LW_PLATFORM_WIN32
@@ -48,10 +50,13 @@ typedef struct _LWUDP {
 	int token;
 	// 1 if master, 0 if slave
 	int master;
-	// State buffer (even, odd)
-	LWPUCKGAMEPACKETSTATE puck_game_state_buffer[2][LW_STATE_BUFFER_SIZE];
-	// State buffer (even, odd) index (should be 0 or 1)
-	int puck_game_state_buffer_index;
+	// State ring buffer
+	LWPUCKGAMEPACKETSTATE state_buffer[LW_STATE_RING_BUFFER_CAPACITY];
+	LWRINGBUFFER state_ring_buffer;
+	double puck_state_sync_server_timepoint;
+	double puck_state_sync_client_timepoint;
+	int state_count;
+	double state_start_timepoint;
 } LWUDP;
 
 typedef struct _LWCONTEXT LWCONTEXT;
