@@ -104,7 +104,7 @@ static void update_puck_game(LWSERVER* server, LWPUCKGAME* puck_game, double del
 	//LOGI("pos %.2f %.2f %.2f", p[0], p[1], p[2]);
 
 	dJointID pcj = puck_game->player_control_joint;
-	float player_speed = 0.5f;
+	float player_speed = 2.5f;
 	//dJointSetLMotorParam(pcj, dParamVel1, player_speed * (pLwc->player_move_right - pLwc->player_move_left));
 	//dJointSetLMotorParam(pcj, dParamVel2, player_speed * (pLwc->player_move_up - pLwc->player_move_down));
 
@@ -317,25 +317,26 @@ int main(int argc, char* argv[]) {
 				update_tick++;
 			}
 			elapsed_ms = fmod(elapsed_ms, (sim_timestep * 1000));
-
-			// Broadcast state to clients
-			LWPUCKGAMEPACKETSTATE packet_state;
-			packet_state.type = LPGPT_STATE;
-			packet_state.token = 0;
-			packet_state.update_tick = update_tick;
-			packet_state.puck[0] = puck_game->go[LPGO_PUCK].pos[0];
-			packet_state.puck[1] = puck_game->go[LPGO_PUCK].pos[1];
-			packet_state.puck[2] = puck_game->go[LPGO_PUCK].pos[2];
-			packet_state.player[0] = puck_game->go[LPGO_PLAYER].pos[0];
-			packet_state.player[1] = puck_game->go[LPGO_PLAYER].pos[1];
-			packet_state.player[2] = puck_game->go[LPGO_PLAYER].pos[2];
-			packet_state.target[0] = puck_game->go[LPGO_TARGET].pos[0];
-			packet_state.target[1] = puck_game->go[LPGO_TARGET].pos[1];
-			packet_state.target[2] = puck_game->go[LPGO_TARGET].pos[2];
-			memcpy(packet_state.puck_rot, puck_game->go[LPGO_PUCK].rot, sizeof(mat4x4));
-			memcpy(packet_state.player_rot, puck_game->go[LPGO_PLAYER].rot, sizeof(mat4x4));
-			memcpy(packet_state.target_rot, puck_game->go[LPGO_TARGET].rot, sizeof(mat4x4));
-			broadcast_packet(server, conn, LW_CONN_CAPACITY, (const char*)&packet_state, sizeof(packet_state));
+			if (iter) {
+				// Broadcast state to clients
+				LWPUCKGAMEPACKETSTATE packet_state;
+				packet_state.type = LPGPT_STATE;
+				packet_state.token = 0;
+				packet_state.update_tick = update_tick;
+				packet_state.puck[0] = puck_game->go[LPGO_PUCK].pos[0];
+				packet_state.puck[1] = puck_game->go[LPGO_PUCK].pos[1];
+				packet_state.puck[2] = puck_game->go[LPGO_PUCK].pos[2];
+				packet_state.player[0] = puck_game->go[LPGO_PLAYER].pos[0];
+				packet_state.player[1] = puck_game->go[LPGO_PLAYER].pos[1];
+				packet_state.player[2] = puck_game->go[LPGO_PLAYER].pos[2];
+				packet_state.target[0] = puck_game->go[LPGO_TARGET].pos[0];
+				packet_state.target[1] = puck_game->go[LPGO_TARGET].pos[1];
+				packet_state.target[2] = puck_game->go[LPGO_TARGET].pos[2];
+				memcpy(packet_state.puck_rot, puck_game->go[LPGO_PUCK].rot, sizeof(mat4x4));
+				memcpy(packet_state.player_rot, puck_game->go[LPGO_PLAYER].rot, sizeof(mat4x4));
+				memcpy(packet_state.target_rot, puck_game->go[LPGO_TARGET].rot, sizeof(mat4x4));
+				broadcast_packet(server, conn, LW_CONN_CAPACITY, (const char*)&packet_state, sizeof(packet_state));
+			}
 		}
 		
 		//LOGI("Update tick %"PRId64, update_tick);
@@ -357,66 +358,69 @@ int main(int argc, char* argv[]) {
 		if (rv == 1) {
 			if ((server->recv_len = recvfrom(server->s, server->buf, BUFLEN, 0, (struct sockaddr *) &server->si_other, &server->slen)) == SOCKET_ERROR) {
 				printf("recvfrom() failed with error code : %d", WSAGetLastError());
-				exit(EXIT_FAILURE);
+				//exit(EXIT_FAILURE);
+			}
+			else {
+				add_conn(conn, LW_CONN_CAPACITY, &server->si_other);
+
+				//print details of the client/peer and the data received
+				printf("Received packet from %s:%d (size:%d)\n",
+					inet_ntoa(server->si_other.sin_addr),
+					ntohs(server->si_other.sin_port),
+					server->recv_len);
+
+				const int packet_type = *(int*)server->buf;
+				switch (packet_type) {
+				case LSBPT_GETTOKEN:
+				{
+					LWSPHEREBATTLEPACKETTOKEN p;
+					p.type = LSBPT_TOKEN;
+					++token_counter;
+					p.token = token_counter;
+					SERVER_SEND(server, p);
+					break;
+				}
+				case LSBPT_QUEUE:
+				{
+					LWSPHEREBATTLEPACKETMATCHED p;
+					p.type = LSBPT_MATCHED;
+					p.master = 0;
+					SERVER_SEND(server, p);
+					break;
+				}
+				case LPGPT_MOVE:
+				{
+					LWPUCKGAMEPACKETMOVE* p = (LWPUCKGAMEPACKETMOVE*)server->buf;
+					LOGI("MOVE dx=%.2f dy=%.2f", p->dx, p->dy);
+					server->dir_pad_dragging = 1;
+					server->dx = p->dx;
+					server->dy = p->dy;
+					break;
+				}
+				case LPGPT_STOP:
+				{
+					LWPUCKGAMEPACKETSTOP* p = (LWPUCKGAMEPACKETSTOP*)server->buf;
+					LOGI("STOP");
+					server->dir_pad_dragging = 0;
+					break;
+				}
+				case LPGPT_DASH:
+				{
+					LWPUCKGAMEPACKETDASH* p = (LWPUCKGAMEPACKETDASH*)server->buf;
+					LOGI("DASH");
+					const dReal* player_vel = dBodyGetLinearVel(puck_game->go[LPGO_PLAYER].body);
+					puck_game_commit_dash(puck_game, &puck_game->dash,
+						(float)player_vel[0], (float)player_vel[1]);
+					break;
+				}
+				default:
+				{
+					break;
+				}
+				}
 			}
 
-			add_conn(conn, LW_CONN_CAPACITY, &server->si_other);
-
-			//print details of the client/peer and the data received
-			printf("Received packet from %s:%d (size:%d)\n",
-				inet_ntoa(server->si_other.sin_addr),
-				ntohs(server->si_other.sin_port),
-				server->recv_len);
-
-			const int packet_type = *(int*)server->buf;
-			switch (packet_type) {
-			case LSBPT_GETTOKEN:
-			{
-				LWSPHEREBATTLEPACKETTOKEN p;
-				p.type = LSBPT_TOKEN;
-				++token_counter;
-				p.token = token_counter;
-				SERVER_SEND(server, p);
-				break;
-			}
-			case LSBPT_QUEUE:
-			{
-				LWSPHEREBATTLEPACKETMATCHED p;
-				p.type = LSBPT_MATCHED;
-				p.master = 0;
-				SERVER_SEND(server, p);
-				break;
-			}
-			case LPGPT_MOVE:
-			{
-				LWPUCKGAMEPACKETMOVE* p = (LWPUCKGAMEPACKETMOVE*)server->buf;
-				LOGI("MOVE dx=%.2f dy=%.2f", p->dx, p->dy);
-				server->dir_pad_dragging = 1;
-				server->dx = p->dx;
-				server->dy = p->dy;
-				break;
-			}
-			case LPGPT_STOP:
-			{
-				LWPUCKGAMEPACKETSTOP* p = (LWPUCKGAMEPACKETSTOP*)server->buf;
-				LOGI("STOP");
-				server->dir_pad_dragging = 0;
-				break;
-			}
-			case LPGPT_DASH:
-			{
-				LWPUCKGAMEPACKETDASH* p = (LWPUCKGAMEPACKETDASH*)server->buf;
-				LOGI("DASH");
-				const dReal* player_vel = dBodyGetLinearVel(puck_game->go[LPGO_PLAYER].body);
-				puck_game_commit_dash(puck_game, &puck_game->dash,
-					(float)player_vel[0], (float)player_vel[1]);
-				break;
-			}
-			default:
-			{
-				break;
-			}
-			}
+			
 		}
 		else {
 			//LOGI("EMPTY");

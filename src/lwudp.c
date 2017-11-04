@@ -59,6 +59,7 @@ LWUDP* new_udp() {
 	make_socket_nonblocking(udp->s);
 	udp->ready = 1;
 	udp->master = 1;
+	ringbuffer_init(&udp->state_ring_buffer, udp->state_buffer, sizeof(LWPUCKGAMEPACKETSTATE), LW_STATE_RING_BUFFER_CAPACITY);
 	return udp;
 }
 
@@ -80,26 +81,12 @@ void udp_send(LWUDP* udp, const char* data, int size) {
 	}
 }
 
-void queue_state_even_odd(LWUDP* udp, const LWPUCKGAMEPACKETSTATE* p,
-	LWPUCKGAMEPACKETSTATE* dst, const LWPUCKGAMEPACKETSTATE* src) {
-
-	memcpy(dst, src + 1, sizeof(LWPUCKGAMEPACKETSTATE) * (LW_STATE_BUFFER_SIZE - 1));
-	memcpy(dst + LW_STATE_BUFFER_SIZE - 1, p, sizeof(LWPUCKGAMEPACKETSTATE));
+void queue_state(LWUDP* udp, const LWPUCKGAMEPACKETSTATE* p) {
+	ringbuffer_queue(&udp->state_ring_buffer, p);
 }
 
-void queue_state(LWUDP* udp, const LWPUCKGAMEPACKETSTATE* p) {
-	if (udp->puck_game_state_buffer_index == 0) {
-		queue_state_even_odd(udp, p,
-			udp->puck_game_state_buffer[0],
-			udp->puck_game_state_buffer[1]);
-		udp->puck_game_state_buffer_index = 1;
-	}
-	else {
-		queue_state_even_odd(udp, p,
-			udp->puck_game_state_buffer[1],
-			udp->puck_game_state_buffer[0]);
-		udp->puck_game_state_buffer_index = 0;
-	}
+const LWPUCKGAMEPACKETSTATE* dequeue_state(LWUDP* udp) {
+	return ringbuffer_dequeue(&udp->state_ring_buffer);
 }
 
 void udp_update(LWCONTEXT* pLwc, LWUDP* udp) {
@@ -209,18 +196,20 @@ void udp_update(LWCONTEXT* pLwc, LWUDP* udp) {
 				if (udp->recv_len != sizeof(LWPUCKGAMEPACKETSTATE)) {
 					LOGE("LWPUCKGAMEPACKETSTATE: Size error %d (%d expected)", udp->recv_len, sizeof(LWPUCKGAMEPACKETSTATE));
 				}
-				int tick_diff = p->update_tick - pLwc->puck_game_state.update_tick;
-				if (tick_diff > 0) {
-					if (tick_diff != 1) {
+				//int tick_diff = p->update_tick - pLwc->puck_game_state.update_tick;
+				/*if (tick_diff > 0)*/ {
+					/*if (tick_diff != 1) {
 						LOGI("Packet jitter");
-					}
-					memcpy(&pLwc->puck_game_state, p, sizeof(LWPUCKGAMEPACKETSTATE));
+					}*/
+					//memcpy(&pLwc->puck_game_state, p, sizeof(LWPUCKGAMEPACKETSTATE));
 					double last_received = lwtimepoint_now_seconds();
 					double state_packet_interval = last_received - pLwc->puck_game_state_last_received;
 					pLwc->puck_game_state_last_received = last_received;
-					LOGI("State packet interval: %.3f ms", state_packet_interval * 1000);
+					pLwc->puck_game_state_last_received_interval = state_packet_interval * 1000;
 
 					queue_state(pLwc->udp, p);
+					int rb_size = ringbuffer_size(&pLwc->udp->state_ring_buffer);
+					//LOGI("State packet interval: %.3f ms (rb size=%d)", pLwc->puck_game_state_last_received_interval, rb_size);
 				}
 			}
 			break;

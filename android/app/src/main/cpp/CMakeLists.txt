@@ -103,5 +103,6 @@ target_link_libraries(native-activity
                       libzmq
                       czmq)
 
-					  
+
+
 					  

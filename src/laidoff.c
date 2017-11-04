@@ -1093,6 +1093,22 @@ static void read_all_rmsgs(LWCONTEXT* pLwc) {
 	}
 }
 
+void lwc_prerender_mutable_context(LWCONTEXT* pLwc) {
+	int size = ringbuffer_size(&pLwc->udp->state_ring_buffer);
+	if (size >= 2) {
+		while (ringbuffer_size(&pLwc->udp->state_ring_buffer) >= 6) {
+			ringbuffer_dequeue(&pLwc->udp->state_ring_buffer);
+		}
+		const LWPUCKGAMEPACKETSTATE* p = ringbuffer_dequeue(&pLwc->udp->state_ring_buffer);
+		if (p) {
+			memcpy(&pLwc->puck_game_state, p, sizeof(LWPUCKGAMEPACKETSTATE));
+		}
+	}
+	else {
+		LOGE("Puck game state buffer underrun");
+	}
+}
+
 void lwc_render(const LWCONTEXT* pLwc) {
 	// Busy wait for rendering okay sign
 	while (!lwcontext_safe_to_start_render(pLwc)) {}

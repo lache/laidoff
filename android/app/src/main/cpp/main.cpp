@@ -359,6 +359,7 @@ static void engine_draw_frame(struct engine* engine) {
 
     if (engine->pLwc)
     {
+        lwc_prerender_mutable_context(engine->pLwc);
         lwc_render(engine->pLwc);
     }
 
