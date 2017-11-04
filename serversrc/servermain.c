@@ -271,7 +271,7 @@ int main(int argc, char* argv[]) {
 	const double sim_timestep = 1.0f / 60; // sec
 	struct timeval tv;
 	tv.tv_sec = 0;
-	tv.tv_usec = 1000;// sim_timestep * 1000 * 1000;
+	tv.tv_usec = 0;// sim_timestep * 1000 * 1000;
 	fd_set readfds;
 	make_socket_nonblocking(server->s);
 	int token_counter = 0;
