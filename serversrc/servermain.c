@@ -249,7 +249,10 @@ void broadcast_packet(LWSERVER* server, const LWCONN* conn, int conn_capacity, c
 	int sent = 0;
 	for (int i = 0; i < conn_capacity; i++) {
 		if (conn[i].ipport) {
+			double tp = lwtimepoint_now_seconds();
 			sendto(server->s, p, s, 0, (struct sockaddr*)&conn[i].si, server->slen);
+			double elapsed = lwtimepoint_now_seconds() - tp;
+			LOGI("Broadcast sendto elapsed: %.3f ms", elapsed * 1000);
 			sent = 1;
 		}
 	}
