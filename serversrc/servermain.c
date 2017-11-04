@@ -60,6 +60,7 @@ typedef struct _LWSERVER {
 	int dir_pad_dragging;
 	float dx;
 	float dy;
+	double last_broadcast_sent;
 } LWSERVER;
 
 static BOOL directory_exists(const char* szPath)
@@ -245,11 +246,18 @@ void invalidate_dead_conn(LWCONN* conn, int conn_capacity, double current_timepo
 }
 
 void broadcast_packet(LWSERVER* server, const LWCONN* conn, int conn_capacity, const char* p, int s) {
+	int sent = 0;
 	for (int i = 0; i < conn_capacity; i++) {
 		if (conn[i].ipport) {
 			sendto(server->s, p, s, 0, (struct sockaddr*)&conn[i].si, server->slen);
+			sent = 1;
 		}
-	}	
+	}
+	if (sent) {
+		double tp = lwtimepoint_now_seconds();
+		LOGI("Broadcast interval: %.3f ms", (tp - server->last_broadcast_sent) * 1000);
+		server->last_broadcast_sent = tp;
+	}
 }
 
 int main(int argc, char* argv[]) {
@@ -269,7 +277,6 @@ int main(int argc, char* argv[]) {
 	int token_counter = 0;
 	LWCONN conn[LW_CONN_CAPACITY];
 	double elapsed_ms = 0;
-	double last_broadcast_sent = 0;
 	while (1) {
 		const double loop_start = lwtimepoint_now_seconds();
 		if (elapsed_ms > 0) {
@@ -298,9 +305,6 @@ int main(int argc, char* argv[]) {
 				memcpy(packet_state.player_rot, puck_game->go[LPGO_PLAYER].rot, sizeof(mat4x4));
 				memcpy(packet_state.target_rot, puck_game->go[LPGO_TARGET].rot, sizeof(mat4x4));
 				broadcast_packet(server, conn, LW_CONN_CAPACITY, (const char*)&packet_state, sizeof(packet_state));
-				double tp = lwtimepoint_now_seconds();
-				LOGI("Broadcast interval: %.3f ms", (tp - last_broadcast_sent) * 1000);
-				last_broadcast_sent = tp;
 			}
 		}
 		
