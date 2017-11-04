@@ -80,6 +80,9 @@ typedef struct _LWPUCKGAME {
 	float last_remote_dx;
 	float last_remote_dy;
 	int pull_puck;
+	int remote;
+	void(*on_player_damaged)(LWPUCKGAME*);
+	void* server;
 } LWPUCKGAME;
 
 LWPUCKGAME* new_puck_game();
@@ -90,3 +93,5 @@ float puck_game_dash_cooltime(LWPUCKGAME* puck_game);
 int puck_game_dashing(LWPUCKGAME* puck_game);
 void puck_game_near_callback(void *data, dGeomID o1, dGeomID o2);
 void puck_game_commit_dash(LWPUCKGAME* puck_game, LWPUCKGAMEDASH* dash, float dx, float dy);
+void puck_game_commit_dash_to_puck(LWPUCKGAME* puck_game, LWPUCKGAMEDASH* dash);
+void puck_game_player_decrease_hp_test(LWPUCKGAME* puck_game);

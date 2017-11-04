@@ -17,7 +17,7 @@ typedef struct _LWSPHERERENDERUNIFORM {
 	float sphere_move_rad[3];
 } LWSPHERERENDERUNIFORM;
 
-static void render_go(const LWCONTEXT* pLwc, const mat4x4 view, const mat4x4 proj, const LWPUCKGAMEOBJECT* go, int tex_index, float render_scale, const float* remote_pos, const mat4x4 remote_rot, int remote) {
+static void render_go(const LWCONTEXT* pLwc, const mat4x4 view, const mat4x4 proj, const LWPUCKGAMEOBJECT* go, int tex_index, float render_scale, const float* remote_pos, const mat4x4 remote_rot, int remote, float speed) {
 	int shader_index = LWST_DEFAULT;
 	const LWSHADER* shader = &pLwc->shader[shader_index];
 	glUseProgram(shader->program);
@@ -56,7 +56,7 @@ static void render_go(const LWCONTEXT* pLwc, const mat4x4 view, const mat4x4 pro
 	mat4x4_identity(proj_view_model);
 	mat4x4_mul(proj_view_model, proj, view_model);
 
-	const float red_overlay_ratio = go->red_overlay ? LWMIN(1.0f, go->speed / go->puck_game->puck_damage_contact_speed_threshold) : 0;
+	const float red_overlay_ratio = go->red_overlay ? LWMIN(1.0f, speed / go->puck_game->puck_damage_contact_speed_threshold) : 0;
 	const float red_overlay_logistic_ratio = 1 / (1 + powf(2.718f, -(20.0f * (red_overlay_ratio - 0.8f))));
 	glUniform3f(shader->overlay_color_location, 1, 0, 0);
 	glUniform1f(shader->overlay_color_ratio_location, red_overlay_logistic_ratio);
@@ -380,15 +380,15 @@ void lwc_render_physics(const LWCONTEXT* pLwc) {
 		},
 		// float sphere_speed[3];
 		{
-			puck_game->go[LPGO_PLAYER].speed,
-			puck_game->go[LPGO_TARGET].speed,
-			puck_game->go[LPGO_PUCK].speed
+			!remote ? puck_game->go[LPGO_PLAYER].speed : pLwc->puck_game_state.player_speed,
+			!remote ? puck_game->go[LPGO_TARGET].speed : pLwc->puck_game_state.target_speed,
+			!remote ? puck_game->go[LPGO_PUCK].speed : pLwc->puck_game_state.puck_speed
 		},
 		// float sphere_move_rad[3];
 		{
-			puck_game->go[LPGO_PLAYER].move_rad,
-			puck_game->go[LPGO_TARGET].move_rad,
-			puck_game->go[LPGO_PUCK].move_rad
+			!remote ? puck_game->go[LPGO_PLAYER].move_rad : pLwc->puck_game_state.player_move_rad,
+			!remote ? puck_game->go[LPGO_TARGET].move_rad : pLwc->puck_game_state.target_move_rad,
+			!remote ? puck_game->go[LPGO_PUCK].move_rad : pLwc->puck_game_state.puck_move_rad
 		},
 	};
     const float wall_height = 0.8f;
@@ -408,11 +408,11 @@ void lwc_render_physics(const LWCONTEXT* pLwc) {
                 LVT_RIGHT_CENTER_ANCHORED_SQUARE, wall_height, 2.0f, 2.0f, &sphere_render_uniform);
     
 	render_go(pLwc, view, proj, &puck_game->go[LPGO_PUCK], pLwc->tex_atlas[LAE_PUCK_KTX],
-              1.0f, remote_puck_pos, pLwc->puck_game_state.puck_rot, remote);
+              1.0f, remote_puck_pos, pLwc->puck_game_state.puck_rot, remote, !remote ? puck_game->go[LPGO_PUCK].speed : pLwc->puck_game_state.puck_speed);
 	render_go(pLwc, view, proj, &puck_game->go[LPGO_PLAYER], pLwc->tex_atlas[LAE_PUCK_PLAYER_KTX],
-              1.0f, remote_player_pos, pLwc->puck_game_state.player_rot, remote);
+              1.0f, remote_player_pos, pLwc->puck_game_state.player_rot, remote, 0);
 	render_go(pLwc, view, proj, &puck_game->go[LPGO_TARGET], pLwc->tex_atlas[LAE_PUCK_ENEMY_KTX],
-              1.0f, remote_target_pos, pLwc->puck_game_state.target_rot, remote);
+              1.0f, remote_target_pos, pLwc->puck_game_state.target_rot, remote, 0);
 
 	render_dir_pad(pLwc);
 	render_fist_button(pLwc);

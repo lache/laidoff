@@ -1188,29 +1188,33 @@ void lwc_prerender_mutable_context(LWCONTEXT* pLwc) {
     }
 	int size = ringbuffer_size(&pLwc->udp->state_ring_buffer);
 	const int state_sync_hz = 60;
-	if (size >= 2) {
+	if (size >= 1) {
 		while (ringbuffer_size(&pLwc->udp->state_ring_buffer) >= 6) {
-			ringbuffer_dequeue(&pLwc->udp->state_ring_buffer);
+			LWPUCKGAMEPACKETSTATE pout_unused;
+			ringbuffer_dequeue(&pLwc->udp->state_ring_buffer, &pout_unused);
 		}
 
-		const LWPUCKGAMEPACKETSTATE* p = ringbuffer_dequeue(&pLwc->udp->state_ring_buffer);
-		if (p) {
+		LWPUCKGAMEPACKETSTATE p;
+		if (ringbuffer_dequeue(&pLwc->udp->state_ring_buffer, &p) == 0) {
 			double client_elapsed = lwtimepoint_now_seconds() - pLwc->udp->puck_state_sync_client_timepoint;
 			double sample_update_tick = (pLwc->udp->puck_state_sync_server_timepoint + client_elapsed) * state_sync_hz;
 			LWPUCKGAMEPACKETSTATE sampled_state;
 			linear_interpolate_state(&sampled_state, pLwc->udp->state_buffer, LW_STATE_RING_BUFFER_CAPACITY, sample_update_tick);
 			//memcpy(&pLwc->puck_game_state, &sampled_state, sizeof(LWPUCKGAMEPACKETSTATE));
-			memcpy(&pLwc->puck_game_state, p, sizeof(LWPUCKGAMEPACKETSTATE));
+			memcpy(&pLwc->puck_game_state, &p, sizeof(LWPUCKGAMEPACKETSTATE));
+		}
+		else {
+			LOGE("State buffer dequeue failed.");
 		}
 	}
-	else if (size == 3)
+	/*else if (size == 3)
 	{
 		const LWPUCKGAMEPACKETSTATE* p = ringbuffer_peek(&pLwc->udp->state_ring_buffer);
 		if (p) {
 			pLwc->udp->puck_state_sync_server_timepoint = p->update_tick * 1.0 / state_sync_hz;
 			pLwc->udp->puck_state_sync_client_timepoint = lwtimepoint_now_seconds() + (1.0 / state_sync_hz) * 8;
 		}
-	}
+	}*/
 	else {
 		LOGE("Puck game state buffer underrun");
 	}

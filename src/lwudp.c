@@ -5,6 +5,7 @@
 #include "lwcontext.h"
 #include "puckgameupdate.h"
 #include "lwtimepoint.h"
+#include "puckgame.h"
 
 static int make_socket_nonblocking(int sock) {
 #if defined(WIN32) || defined(_WIN32) || defined(IMN_PIM)
@@ -82,10 +83,6 @@ void queue_state(LWUDP* udp, const LWPUCKGAMEPACKETSTATE* p) {
 	ringbuffer_queue(&udp->state_ring_buffer, p);
 }
 
-const LWPUCKGAMEPACKETSTATE* dequeue_state(LWUDP* udp) {
-	return ringbuffer_dequeue(&udp->state_ring_buffer);
-}
-
 void udp_update(LWCONTEXT* pLwc, LWUDP* udp) {
 	if (udp->ready == 0) {
 		return;
@@ -100,6 +97,8 @@ void udp_update(LWCONTEXT* pLwc, LWUDP* udp) {
 			int wsa_error_code = WSAGetLastError();
 			if (wsa_error_code == WSAECONNRESET) {
 				// UDP server not ready?
+				// Go back to single play mode
+				udp->master = 1;
 				return;
 			}
 			else {
@@ -139,6 +138,11 @@ void udp_update(LWCONTEXT* pLwc, LWUDP* udp) {
 			LOGI("LWSPHEREBATTLEPACKETMATCHED: Matched! I'm %s", p->master ? "master." : "slave.");
 			udp->state = LUS_MATCHED;
 			udp->master = p->master;
+			break;
+		}
+		case LSBPT_PLAYER_DAMAGED:
+		{
+			puck_game_player_decrease_hp_test(pLwc->puck_game);
 			break;
 		}
 		// Battle packets
@@ -211,7 +215,7 @@ void udp_update(LWCONTEXT* pLwc, LWUDP* udp) {
 					}
 					pLwc->udp->state_count++;
 					double elapsed_from_start = lwtimepoint_now_seconds() - pLwc->udp->state_start_timepoint;
-					//LOGI("State packet interval: %.3f ms (rb size=%d) (%.2f pps)", pLwc->puck_game_state_last_received_interval, rb_size, (float)pLwc->udp->state_count / elapsed_from_start);
+					LOGI("State packet interval: %.3f ms (rb size=%d) (%.2f pps)", pLwc->puck_game_state_last_received_interval, rb_size, (float)pLwc->udp->state_count / elapsed_from_start);
 
 				}
 			}

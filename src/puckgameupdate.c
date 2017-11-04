@@ -15,11 +15,16 @@ void update_puck_game(LWCONTEXT* pLwc, LWPUCKGAME* puck_game, double delta_time)
 	if (!puck_game->world) {
 		return;
 	}
+	if (!pLwc->udp) {
+		return;
+	}
+	puck_game->remote = !pLwc->udp->master;
+	puck_game->on_player_damaged = puck_game->remote ? 0 : puck_game_player_decrease_hp_test;
 	puck_game->time += (float)delta_time;
 	puck_game->player.puck_contacted = 0;
 	dSpaceCollide(puck_game->space, puck_game, puck_game_near_callback);
 	//dWorldStep(puck_game->world, 0.005f);
-	dWorldQuickStep(puck_game->world, 0.02f);
+	dWorldQuickStep(puck_game->world, 1.0f / 60);
 	dJointGroupEmpty(puck_game->contact_joint_group);
 	if (puck_game->player.puck_contacted == 0) {
 		puck_game->player.last_contact_puck_body = 0;
@@ -136,6 +141,17 @@ void update_puck_game(LWCONTEXT* pLwc, LWPUCKGAME* puck_game, double delta_time)
 		const dReal power = 0.1f;
 		const dReal scale = power / flen;
 		dBodyAddForce(puck_game->go[LPGO_PUCK].body, f[0] * scale, f[1] * scale, f[2] * scale);
+
+		LWPUCKGAMEPACKETPULLSTART p;
+		p.type = LPGPT_PULL_START;
+		p.token = pLwc->udp->token;
+		udp_send(pLwc->udp, (const char*)&p, sizeof(p));
+	}
+	else {
+		LWPUCKGAMEPACKETPULLSTOP p;
+		p.type = LPGPT_PULL_STOP;
+		p.token = pLwc->udp->token;
+		udp_send(pLwc->udp, (const char*)&p, sizeof(p));
 	}
 }
 
@@ -149,8 +165,7 @@ void puck_game_dash(LWCONTEXT* pLwc, LWPUCKGAME* puck_game) {
 		return;
 	}
 	// Check effective move input
-	float dx, dy;
-	//float dlen;
+	//float dx, dy, dlen;
 	/*if (!lw_get_normalized_dir_pad_input(pLwc, &dx, &dy, &dlen)) {
 		return;
 	}*/
@@ -161,14 +176,9 @@ void puck_game_dash(LWCONTEXT* pLwc, LWPUCKGAME* puck_game) {
 		return;
 	}
 
-	dx = puck_game->go[LPGO_PUCK].pos[0] - puck_game->go[LPGO_PLAYER].pos[0];
-	dy = puck_game->go[LPGO_PUCK].pos[1] - puck_game->go[LPGO_PLAYER].pos[1];
-	const float ddlen = sqrtf(dx * dx + dy * dy);
-	dx /= ddlen;
-	dy /= ddlen;
-
 	// Start dash!
-	puck_game_commit_dash(puck_game, &puck_game->dash, dx, dy);
+	puck_game_commit_dash_to_puck(puck_game, &puck_game->dash);
+	//puck_game_commit_dash(puck_game, &puck_game->dash, dx, dy);
 
 	if (!pLwc->udp->master) {
 		LWPUCKGAMEPACKETDASH packet_dash;

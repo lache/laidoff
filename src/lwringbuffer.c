@@ -21,10 +21,18 @@ int ringbuffer_init(LWRINGBUFFER* rb, void* buf0, int stride, int capacity) {
 	rb->buf0 = buf0;
 	rb->stride = stride;
 	rb->capacity = capacity;
+	ZMUTEX_INIT(rb->mutex);
 	return 0;
 }
 
-void ringbuffer_queue(LWRINGBUFFER* rb, const void* p) {
+int ringbuffer_queue(LWRINGBUFFER* rb, const void* p) {
+	if (rb == 0) {
+		return -1;
+	}
+	if (p == 0) {
+		return -2;
+	}
+	ZMUTEX_LOCK(rb->mutex);
 	memcpy((char*)rb->buf0 + rb->tail * rb->stride, p, rb->stride);
 	if (rb->full) {
 		rb->head = (rb->head + 1) % rb->capacity;
@@ -33,36 +41,72 @@ void ringbuffer_queue(LWRINGBUFFER* rb, const void* p) {
 	if (rb->full == 0 && rb->head == rb->tail) {
 		rb->full = 1;
 	}
+	ZMUTEX_UNLOCK(rb->mutex);
+	return 0;
 }
 
-const void* ringbuffer_peek(LWRINGBUFFER* rb) {
-	if (rb->full == 0 && rb->head == rb->tail) {
-		return 0;
+int ringbuffer_peek(LWRINGBUFFER* rb, void* pout) {
+	if (rb == 0) {
+		return -1;
 	}
-	return (char*)rb->buf0 + rb->head * rb->stride;
+	if (pout == 0) {
+		return -2;
+	}
+	ZMUTEX_LOCK(rb->mutex);
+	if (rb->full == 0 && rb->head == rb->tail) {
+		ZMUTEX_UNLOCK(rb->mutex);
+		return -3;
+	}
+	memcpy(pout, (char*)rb->buf0 + rb->head * rb->stride, rb->stride);
+	ZMUTEX_UNLOCK(rb->mutex);
+	return 0;
 }
 
-const void* ringbuffer_dequeue(LWRINGBUFFER* rb) {
+int ringbuffer_dequeue(LWRINGBUFFER* rb, void* pout) {
+	if (rb == 0) {
+		return -1;
+	}
+	if (pout == 0) {
+		return -2;
+	}
+	ZMUTEX_LOCK(rb->mutex);
 	if (rb->full == 0 && rb->head == rb->tail) {
-		return 0;
+		ZMUTEX_UNLOCK(rb->mutex);
+		return -3;
 	}
 	void* p = (char*)rb->buf0 + rb->head * rb->stride;
 	rb->head = (rb->head + 1) % rb->capacity;
 	rb->full = 0;
-	return p;
+	memcpy(pout, p, rb->stride);
+	ZMUTEX_UNLOCK(rb->mutex);
+	return 0;
 }
 
 int ringbuffer_size(LWRINGBUFFER* rb) {
+	if (rb == 0) {
+		return -1;
+	}
+	ZMUTEX_LOCK(rb->mutex);
+	int ret = 0;
 	if (rb->full) {
-		return rb->capacity;
+		ret = rb->capacity;
 	}
 	else if (rb->head <= rb->tail) {
-		return rb->tail - rb->head;
+		ret = rb->tail - rb->head;
 	}
-	return rb->capacity - (rb->head - rb->tail);
+	else {
+		ret = rb->capacity - (rb->head - rb->tail);
+	}
+	ZMUTEX_UNLOCK(rb->mutex);
+	return ret;
 }
 
 int ringbuffer_capacity(LWRINGBUFFER* rb) {
-	return rb->capacity;
+	if (rb == 0) {
+		return -1;
+	}
+	ZMUTEX_LOCK(rb->mutex);
+	int ret = rb->capacity;
+	ZMUTEX_UNLOCK(rb->mutex);
+	return ret;
 }
-

@@ -151,6 +151,24 @@ void delete_puck_game(LWPUCKGAME** puck_game) {
 	*puck_game = 0;
 }
 
+void puck_game_player_decrease_hp_test(LWPUCKGAME* puck_game) {
+	LWPUCKGAMEOBJECT* puck = &puck_game->go[LPGO_PUCK];
+	LWPUCKGAMEOBJECT* player = &puck_game->go[LPGO_PLAYER];
+	const float puck_speed = (float)dLENGTH(dBodyGetLinearVel(puck->body));
+
+	if (puck_game->player.last_contact_puck_body != puck->body
+		&& puck_speed > puck_game->puck_damage_contact_speed_threshold
+		&& !puck_game_dashing(puck_game)) {
+		// Decrease player hp
+		puck_game->player.last_contact_puck_body = puck->body;
+		puck_game->player.current_hp--;
+		if (puck_game->player.current_hp < 0) {
+			puck_game->player.current_hp = puck_game->player.total_hp;
+		}
+		puck_game->player.hp_shake_remain_time = puck_game->hp_shake_time;
+	}
+}
+
 static void near_puck_player(LWPUCKGAME* puck_game) {
 	LWPUCKGAMEOBJECT* puck = &puck_game->go[LPGO_PUCK];
 	LWPUCKGAMEOBJECT* player = &puck_game->go[LPGO_PLAYER];
@@ -166,20 +184,11 @@ static void near_puck_player(LWPUCKGAME* puck_game) {
 
 	puck_game->player.puck_contacted = 1;
 
-	const float puck_speed = (float)dLENGTH(dBodyGetLinearVel(puck->body));
-
-	if (puck_game->player.last_contact_puck_body != puck->body
-        && puck_speed > puck_game->puck_damage_contact_speed_threshold
-		&& !puck_game_dashing(puck_game)) {
-        // Decrease player hp
-		puck_game->player.last_contact_puck_body = puck->body;
-		puck_game->player.current_hp--;
-		if (puck_game->player.current_hp < 0) {
-			puck_game->player.current_hp = puck_game->player.total_hp;
-		}
-		puck_game->player.hp_shake_remain_time = puck_game->hp_shake_time;
+	if (puck_game->on_player_damaged) {
+		puck_game->on_player_damaged(puck_game);
 	}
-	
+
+	const float puck_speed = (float)dLENGTH(dBodyGetLinearVel(puck->body));
 	//LOGI("Contact puck velocity: %.2f", puck_speed);
 }
 
@@ -278,4 +287,13 @@ void puck_game_commit_dash(LWPUCKGAME* puck_game, LWPUCKGAMEDASH* dash, float dx
 	dash->dir_x = dx;
 	dash->dir_y = dy;
 	dash->last_time = puck_game->time;
+}
+
+void puck_game_commit_dash_to_puck(LWPUCKGAME* puck_game, LWPUCKGAMEDASH* dash) {
+	float dx = puck_game->go[LPGO_PUCK].pos[0] - puck_game->go[LPGO_PLAYER].pos[0];
+	float dy = puck_game->go[LPGO_PUCK].pos[1] - puck_game->go[LPGO_PLAYER].pos[1];
+	const float ddlen = sqrtf(dx * dx + dy * dy);
+	dx /= ddlen;
+	dy /= ddlen;
+	puck_game_commit_dash(puck_game, &puck_game->dash, dx, dy);
 }

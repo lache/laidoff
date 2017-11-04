@@ -211,10 +211,7 @@ int main(int argc, char* argv[])
 	while (!glfwWindowShouldClose(window))
 	{
 		glfwPollEvents();
-		if (pLwc->update_count % 2) {
-			lwc_prerender_mutable_context(pLwc);
-		}
-		
+		lwc_prerender_mutable_context(pLwc);
 		lwc_render(pLwc);
 #if LW_PLATFORM_WIN32
 		lwimgui_render(window);

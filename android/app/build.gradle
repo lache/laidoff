@@ -24,7 +24,7 @@ if (project.hasProperty('versionCode')) {
 }
 
 android {
-    compileSdkVersion 23
+    compileSdkVersion 26
     buildToolsVersion '26.0.2'
 
     signingConfigs {
@@ -39,7 +39,7 @@ android {
     defaultConfig {
         applicationId "com.popsongremix.laidoff"
         minSdkVersion   15
-        targetSdkVersion 23
+        targetSdkVersion 26
 
         versionCode versionProperties['versionCode'] as int
         versionName versionProperties['versionName']
