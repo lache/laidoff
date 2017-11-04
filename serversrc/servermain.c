@@ -214,7 +214,7 @@ unsigned long long to_ipport(unsigned int ip, unsigned short port) {
 }
 
 void add_conn(LWCONN* conn, int conn_capacity, struct sockaddr_in* si) {
-	unsigned long long ipport = to_ipport(si->sin_addr.S_un.S_addr, si->sin_port);
+	unsigned long long ipport = to_ipport(si->sin_addr.s_addr, si->sin_port);
 	// Update last ingress for existing element
 	for (int i = 0; i < conn_capacity; i++) {
 		if (conn[i].ipport == ipport) {
