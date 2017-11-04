@@ -394,7 +394,9 @@ int main(int argc, char* argv[]) {
 		else {
 			//LOGI("EMPTY");
 		}
-		elapsed_ms += (lwtimepoint_now_seconds() - loop_start) * 1000;
+		double loop_time = lwtimepoint_now_seconds() - loop_start;
+		elapsed_ms += loop_time * 1000;
+		LOGI("Loop time: %.3f ms", loop_time * 1000);
 	}
 	delete_puck_game(&puck_game);
 	return 0;
