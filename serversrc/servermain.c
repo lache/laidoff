@@ -28,6 +28,8 @@
 #define LwChangeDirectory(x) chdir(x)
 #endif
 
+#include "lwtimepoint.h"
+
 #ifndef SOCKET
 #define SOCKET int
 #endif
@@ -200,49 +202,10 @@ void server_send(LWSERVER* server, const char* p, int s) {
 
 #define SERVER_SEND(server, packet) server_send(server, (const char*)&packet, sizeof(packet))
 
-#if LW_PLATFORM_WIN32
-double PCFreq = 0.0;
-__int64 CounterStart = 0;
-
-void init_counter()
-{
-	LARGE_INTEGER li;
-	if (!QueryPerformanceFrequency(&li)) {
-		exit(EXIT_FAILURE);
-	}
-	PCFreq = (double)li.QuadPart / 1000.0;
-}
-void start_counter()
-{
-	LARGE_INTEGER li;
-	QueryPerformanceCounter(&li);
-	CounterStart = li.QuadPart;
-}
-
-__int64 get_abs_counter()
-{
-	LARGE_INTEGER li;
-	QueryPerformanceCounter(&li);
-	return li.QuadPart;
-}
-
-
-double get_counter_ms()
-{
-	LARGE_INTEGER li;
-	QueryPerformanceCounter(&li);
-	return (double)(li.QuadPart - CounterStart) / PCFreq;
-}
-#else
-
-#endif
-
-double elapsed_ms = 0;
-
 typedef struct _LWCONN {
 	unsigned __int64 ipport;
 	struct sockaddr_in si;
-	__int64 last_ingress;
+	double last_ingress_timepoint;
 } LWCONN;
 
 #define LW_CONN_CAPACITY (32)
@@ -256,7 +219,7 @@ void add_conn(LWCONN* conn, int conn_capacity, struct sockaddr_in* si) {
 	// Update last ingress for existing element
 	for (int i = 0; i < conn_capacity; i++) {
 		if (conn[i].ipport == ipport) {
-			conn[i].last_ingress = get_abs_counter();
+			conn[i].last_ingress_timepoint = lwtimepoint_now_seconds();
 			return;
 		}
 	}
@@ -264,7 +227,7 @@ void add_conn(LWCONN* conn, int conn_capacity, struct sockaddr_in* si) {
 	for (int i = 0; i < conn_capacity; i++) {
 		if (conn[i].ipport == 0) {
 			conn[i].ipport = ipport;
-			conn[i].last_ingress = get_abs_counter();
+			conn[i].last_ingress_timepoint = lwtimepoint_now_seconds();
 			memcpy(&conn[i].si, si, sizeof(struct sockaddr_in));
 			return;
 		}
@@ -272,10 +235,10 @@ void add_conn(LWCONN* conn, int conn_capacity, struct sockaddr_in* si) {
 	LOGE("add_conn: maximum capacity exceeded.");
 }
 
-void invalidate_dead_conn(LWCONN* conn, int conn_capacity, __int64 current_counter, __int64 life) {
+void invalidate_dead_conn(LWCONN* conn, int conn_capacity, double current_timepoint, double life) {
 	for (int i = 0; i < conn_capacity; i++) {
 		if (conn[i].ipport) {
-			if (current_counter - conn[i].last_ingress > life) {
+			if (current_timepoint - conn[i].last_ingress_timepoint > life) {
 				conn[i].ipport = 0;
 			}
 		}
@@ -305,11 +268,10 @@ int main(int argc, char* argv[]) {
 	fd_set readfds;
 	make_socket_nonblocking(server->s);
 	int token_counter = 0;
-
-	init_counter();
 	LWCONN conn[LW_CONN_CAPACITY];
+	double elapsed_ms = 0;
 	while (1) {
-		start_counter();
+		const double loop_start = lwtimepoint_now_seconds();
 		if (elapsed_ms > 0) {
 			int iter = (int)(elapsed_ms / (sim_timestep * 1000));
 			for (int i = 0; i < iter; i++) {
@@ -341,7 +303,7 @@ int main(int argc, char* argv[]) {
 		
 		//LOGI("Update tick %"PRId64, update_tick);
 
-		invalidate_dead_conn(conn, LW_CONN_CAPACITY, get_abs_counter(), (__int64)(PCFreq * 2000) /* 2000 ms life */);
+		invalidate_dead_conn(conn, LW_CONN_CAPACITY, lwtimepoint_now_seconds(), 2.0);
 
 		//LOGI("Waiting for data...");
 		fflush(stdout);
@@ -425,7 +387,7 @@ int main(int argc, char* argv[]) {
 		else {
 			//LOGI("EMPTY");
 		}
-		elapsed_ms += get_counter_ms();
+		elapsed_ms += (lwtimepoint_now_seconds() - loop_start) * 1000;
 	}
 	delete_puck_game(&puck_game);
 	return 0;
