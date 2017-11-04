@@ -252,13 +252,13 @@ void broadcast_packet(LWSERVER* server, const LWCONN* conn, int conn_capacity, c
 			double tp = lwtimepoint_now_seconds();
 			sendto(server->s, p, s, 0, (struct sockaddr*)&conn[i].si, server->slen);
 			double elapsed = lwtimepoint_now_seconds() - tp;
-			LOGI("Broadcast sendto elapsed: %.3f ms", elapsed * 1000);
+			//LOGI("Broadcast sendto elapsed: %.3f ms", elapsed * 1000);
 			sent = 1;
 		}
 	}
 	if (sent) {
 		double tp = lwtimepoint_now_seconds();
-		LOGI("Broadcast interval: %.3f ms", (tp - server->last_broadcast_sent) * 1000);
+		//LOGI("Broadcast interval: %.3f ms", (tp - server->last_broadcast_sent) * 1000);
 		server->last_broadcast_sent = tp;
 	}
 }
@@ -290,7 +290,7 @@ int main(int argc, char* argv[]) {
 				update_tick++;
 			}
 			double sim_elapsed = lwtimepoint_now_seconds() - sim_tp;
-			LOGI("Sim elapsed: %.3f ms", sim_elapsed * 1000);
+			//LOGI("Sim elapsed: %.3f ms", sim_elapsed * 1000);
 			elapsed_ms = fmod(elapsed_ms, (sim_timestep * 1000));
 			if (iter) {
 				// Broadcast state to clients
