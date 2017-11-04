@@ -1175,10 +1175,10 @@ void linear_interpolate_state(LWPUCKGAMEPACKETSTATE* p, LWPUCKGAMEPACKETSTATE* s
 		vec3_lerp(p->player, state_buffer[sample1_idx].player, state_buffer[sample2_idx].player, (float)ratio);
 		vec3_lerp(p->puck, state_buffer[sample1_idx].puck, state_buffer[sample2_idx].puck, (float)ratio);
 		vec3_lerp(p->target, state_buffer[sample1_idx].target, state_buffer[sample2_idx].target, (float)ratio);
-		LOGI("Interpolate state ratio: %.3f", ratio);
+		//LOGI("Interpolate state ratio: %.3f", ratio);
 	}
 	else {
-		LOGE("Error in logic");
+		//LOGE("Error in logic");
 	}
 }
 
@@ -1188,24 +1188,19 @@ void lwc_prerender_mutable_context(LWCONTEXT* pLwc) {
     }
 	int size = ringbuffer_size(&pLwc->udp->state_ring_buffer);
 	const int state_sync_hz = 60;
-	if (size >= 11) {
-		/*while (ringbuffer_size(&pLwc->udp->state_ring_buffer) >= 8) {
+	if (size >= 2) {
+		while (ringbuffer_size(&pLwc->udp->state_ring_buffer) >= 6) {
 			ringbuffer_dequeue(&pLwc->udp->state_ring_buffer);
-		}*/
+		}
 
-		const LWPUCKGAMEPACKETSTATE* p = ringbuffer_peek(&pLwc->udp->state_ring_buffer);
-
+		const LWPUCKGAMEPACKETSTATE* p = ringbuffer_dequeue(&pLwc->udp->state_ring_buffer);
 		if (p) {
-
-			//double server_elapsed = p->update_tick * 1.0 / 60 - pLwc->udp->puck_state_sync_server_timepoint;
 			double client_elapsed = lwtimepoint_now_seconds() - pLwc->udp->puck_state_sync_client_timepoint;
-
 			double sample_update_tick = (pLwc->udp->puck_state_sync_server_timepoint + client_elapsed) * state_sync_hz;
-
 			LWPUCKGAMEPACKETSTATE sampled_state;
 			linear_interpolate_state(&sampled_state, pLwc->udp->state_buffer, LW_STATE_RING_BUFFER_CAPACITY, sample_update_tick);
-
-			memcpy(&pLwc->puck_game_state, &sampled_state, sizeof(LWPUCKGAMEPACKETSTATE));
+			//memcpy(&pLwc->puck_game_state, &sampled_state, sizeof(LWPUCKGAMEPACKETSTATE));
+			memcpy(&pLwc->puck_game_state, p, sizeof(LWPUCKGAMEPACKETSTATE));
 		}
 	}
 	else if (size == 3)
@@ -1215,7 +1210,6 @@ void lwc_prerender_mutable_context(LWCONTEXT* pLwc) {
 			pLwc->udp->puck_state_sync_server_timepoint = p->update_tick * 1.0 / state_sync_hz;
 			pLwc->udp->puck_state_sync_client_timepoint = lwtimepoint_now_seconds() + (1.0 / state_sync_hz) * 8;
 		}
-		// wait...
 	}
 	else {
 		LOGE("Puck game state buffer underrun");

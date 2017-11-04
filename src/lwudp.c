@@ -206,7 +206,13 @@ void udp_update(LWCONTEXT* pLwc, LWUDP* udp) {
 
 					queue_state(pLwc->udp, p);
 					int rb_size = ringbuffer_size(&pLwc->udp->state_ring_buffer);
-					LOGI("State packet interval: %.3f ms (rb size=%d)", pLwc->puck_game_state_last_received_interval, rb_size);
+					if (pLwc->udp->state_count == 0) {
+						pLwc->udp->state_start_timepoint = lwtimepoint_now_seconds();
+					}
+					pLwc->udp->state_count++;
+					double elapsed_from_start = lwtimepoint_now_seconds() - pLwc->udp->state_start_timepoint;
+					//LOGI("State packet interval: %.3f ms (rb size=%d) (%.2f pps)", pLwc->puck_game_state_last_received_interval, rb_size, (float)pLwc->udp->state_count / elapsed_from_start);
+
 				}
 			}
 			break;
