@@ -35,6 +35,13 @@ void ringbuffer_queue(LWRINGBUFFER* rb, const void* p) {
 	}
 }
 
+const void* ringbuffer_peek(LWRINGBUFFER* rb) {
+	if (rb->full == 0 && rb->head == rb->tail) {
+		return 0;
+	}
+	return (char*)rb->buf0 + rb->head * rb->stride;
+}
+
 const void* ringbuffer_dequeue(LWRINGBUFFER* rb) {
 	if (rb->full == 0 && rb->head == rb->tail) {
 		return 0;
@@ -58,3 +65,4 @@ int ringbuffer_size(LWRINGBUFFER* rb) {
 int ringbuffer_capacity(LWRINGBUFFER* rb) {
 	return rb->capacity;
 }
+

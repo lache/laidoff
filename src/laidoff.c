@@ -1093,16 +1093,129 @@ static void read_all_rmsgs(LWCONTEXT* pLwc) {
 	}
 }
 
+void vec3_lerp(vec3 vm, vec3 va, vec3 vb, float t) {
+	for (int i = 0; i < 3; i++) {
+		vm[i] = va[i] * (1.0f - t) + vb[i] * t;
+	}
+}
+
+void slerp(quat qm, const quat qa, const quat qb, float t) {
+	// Calculate angle between them.
+	float cosHalfTheta = qa[0] * qb[0] + qa[1] * qb[1] + qa[2] * qb[2] + qa[3] * qb[3];
+	// if qa=qb or qa=-qb then theta = 0 and we can return qa
+	if (fabsf(cosHalfTheta) >= 1.0) {
+		qm[0] = qa[0]; qm[1] = qa[1]; qm[2] = qa[2]; qm[3] = qa[3];
+		return;
+	}
+	// Calculate temporary values.
+	float halfTheta = acosf(cosHalfTheta);
+	float sinHalfTheta = sqrtf(1.0f - cosHalfTheta*cosHalfTheta);
+	// if theta = 180 degrees then result is not fully defined
+	// we could rotate around any axis normal to qa or qb
+	if (fabsf(sinHalfTheta) < 0.001f) { // fabs is floating point absolute
+		qm[0] = (qa[0] * 0.5f + qb[0] * 0.5f);
+		qm[1] = (qa[1] * 0.5f + qb[1] * 0.5f);
+		qm[2] = (qa[2] * 0.5f + qb[2] * 0.5f);
+		qm[3] = (qa[3] * 0.5f + qb[3] * 0.5f);
+		return;
+	}
+	float ratioA = sinf((1 - t) * halfTheta) / sinHalfTheta;
+	float ratioB = sinf(t * halfTheta) / sinHalfTheta;
+	//calculate Quaternion.
+	qm[0] = (qa[0] * ratioA + qb[0] * ratioB);
+	qm[1] = (qa[1] * ratioA + qb[1] * ratioB);
+	qm[2] = (qa[2] * ratioA + qb[2] * ratioB);
+	qm[3] = (qa[3] * ratioA + qb[3] * ratioB);
+}
+
+void linear_interpolate_state(LWPUCKGAMEPACKETSTATE* p, LWPUCKGAMEPACKETSTATE* state_buffer, int state_buffer_len, double sample_update_tick) {
+	int sample1_idx = 0;
+	double sample1_diff = DBL_MAX;
+	int sample2_idx = 0;
+	double sample2_diff = DBL_MAX;
+
+	for (int i = 0; i < state_buffer_len; i++) {
+		double d = state_buffer[i].update_tick - sample_update_tick;
+		if (d >= 0) {
+			if (sample2_diff > d) {
+				sample2_diff = d;
+				sample2_idx = i;
+			}
+		}
+		else {
+			if (sample1_diff > fabs(d)) {
+				sample1_diff = fabs(d);
+				sample1_idx = i;
+			}
+		}
+	}
+	if (sample1_idx != sample2_idx
+		&& state_buffer[sample1_idx].update_tick <= sample_update_tick && sample_update_tick <= state_buffer[sample2_idx].update_tick) {
+
+		int update_tick_diff = state_buffer[sample2_idx].update_tick - state_buffer[sample1_idx].update_tick;
+		double dist = sample_update_tick - state_buffer[sample1_idx].update_tick;
+
+		double ratio = dist / update_tick_diff;
+
+		quat player_quat1, puck_quat1, target_quat1;
+		quat_from_mat4x4(player_quat1, state_buffer[sample1_idx].player_rot);
+		quat_from_mat4x4(puck_quat1, state_buffer[sample1_idx].puck_rot);
+		quat_from_mat4x4(target_quat1, state_buffer[sample1_idx].target_rot);
+		quat player_quat2, puck_quat2, target_quat2;
+		quat_from_mat4x4(player_quat2, state_buffer[sample2_idx].player_rot);
+		quat_from_mat4x4(puck_quat2, state_buffer[sample2_idx].puck_rot);
+		quat_from_mat4x4(target_quat2, state_buffer[sample2_idx].target_rot);
+		quat player_quatm, puck_quatm, target_quatm;
+		slerp(player_quatm, player_quat1, player_quat2, (float)ratio);
+		slerp(puck_quatm, puck_quat1, puck_quat2, (float)ratio);
+		slerp(target_quatm, target_quat1, target_quat2, (float)ratio);
+		mat4x4_from_quat(p->player_rot, player_quatm);
+		mat4x4_from_quat(p->puck_rot, puck_quatm);
+		mat4x4_from_quat(p->target_rot, target_quatm);
+		vec3_lerp(p->player, state_buffer[sample1_idx].player, state_buffer[sample2_idx].player, (float)ratio);
+		vec3_lerp(p->puck, state_buffer[sample1_idx].puck, state_buffer[sample2_idx].puck, (float)ratio);
+		vec3_lerp(p->target, state_buffer[sample1_idx].target, state_buffer[sample2_idx].target, (float)ratio);
+		LOGI("Interpolate state ratio: %.3f", ratio);
+	}
+	else {
+		LOGE("Error in logic");
+	}
+}
+
 void lwc_prerender_mutable_context(LWCONTEXT* pLwc) {
+    if (pLwc->udp == 0 || pLwc->udp->ready == 0) {
+        return;
+    }
 	int size = ringbuffer_size(&pLwc->udp->state_ring_buffer);
-	if (size >= 2) {
-		while (ringbuffer_size(&pLwc->udp->state_ring_buffer) >= 6) {
+	const int state_sync_hz = 60;
+	if (size >= 11) {
+		/*while (ringbuffer_size(&pLwc->udp->state_ring_buffer) >= 8) {
 			ringbuffer_dequeue(&pLwc->udp->state_ring_buffer);
-		}
-		const LWPUCKGAMEPACKETSTATE* p = ringbuffer_dequeue(&pLwc->udp->state_ring_buffer);
+		}*/
+
+		const LWPUCKGAMEPACKETSTATE* p = ringbuffer_peek(&pLwc->udp->state_ring_buffer);
+
 		if (p) {
-			memcpy(&pLwc->puck_game_state, p, sizeof(LWPUCKGAMEPACKETSTATE));
+
+			//double server_elapsed = p->update_tick * 1.0 / 60 - pLwc->udp->puck_state_sync_server_timepoint;
+			double client_elapsed = lwtimepoint_now_seconds() - pLwc->udp->puck_state_sync_client_timepoint;
+
+			double sample_update_tick = (pLwc->udp->puck_state_sync_server_timepoint + client_elapsed) * state_sync_hz;
+
+			LWPUCKGAMEPACKETSTATE sampled_state;
+			linear_interpolate_state(&sampled_state, pLwc->udp->state_buffer, LW_STATE_RING_BUFFER_CAPACITY, sample_update_tick);
+
+			memcpy(&pLwc->puck_game_state, &sampled_state, sizeof(LWPUCKGAMEPACKETSTATE));
 		}
+	}
+	else if (size == 3)
+	{
+		const LWPUCKGAMEPACKETSTATE* p = ringbuffer_peek(&pLwc->udp->state_ring_buffer);
+		if (p) {
+			pLwc->udp->puck_state_sync_server_timepoint = p->update_tick * 1.0 / state_sync_hz;
+			pLwc->udp->puck_state_sync_client_timepoint = lwtimepoint_now_seconds() + (1.0 / state_sync_hz) * 8;
+		}
+		// wait...
 	}
 	else {
 		LOGE("Puck game state buffer underrun");

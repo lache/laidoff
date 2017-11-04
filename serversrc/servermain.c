@@ -269,6 +269,7 @@ int main(int argc, char* argv[]) {
 	int token_counter = 0;
 	LWCONN conn[LW_CONN_CAPACITY];
 	double elapsed_ms = 0;
+	double last_broadcast_sent = 0;
 	while (1) {
 		const double loop_start = lwtimepoint_now_seconds();
 		if (elapsed_ms > 0) {
@@ -297,6 +298,9 @@ int main(int argc, char* argv[]) {
 				memcpy(packet_state.player_rot, puck_game->go[LPGO_PLAYER].rot, sizeof(mat4x4));
 				memcpy(packet_state.target_rot, puck_game->go[LPGO_TARGET].rot, sizeof(mat4x4));
 				broadcast_packet(server, conn, LW_CONN_CAPACITY, (const char*)&packet_state, sizeof(packet_state));
+				double tp = lwtimepoint_now_seconds();
+				LOGI("Broadcast interval: %.3f ms", (tp - last_broadcast_sent) * 1000);
+				last_broadcast_sent = tp;
 			}
 		}
 		
@@ -318,17 +322,17 @@ int main(int argc, char* argv[]) {
 		//try to receive some data, this is a blocking call
 		if (rv == 1) {
 			if ((server->recv_len = recvfrom(server->s, server->buf, BUFLEN, 0, (struct sockaddr *) &server->si_other, &server->slen)) == SOCKET_ERROR) {
-				printf("recvfrom() failed with error code : %d", WSAGetLastError());
+				//printf("recvfrom() failed with error code : %d", WSAGetLastError());
 				//exit(EXIT_FAILURE);
 			}
 			else {
 				add_conn(conn, LW_CONN_CAPACITY, &server->si_other);
 
 				//print details of the client/peer and the data received
-				printf("Received packet from %s:%d (size:%d)\n",
+				/*printf("Received packet from %s:%d (size:%d)\n",
 					inet_ntoa(server->si_other.sin_addr),
 					ntohs(server->si_other.sin_port),
-					server->recv_len);
+					server->recv_len);*/
 
 				const int packet_type = *(int*)server->buf;
 				switch (packet_type) {
@@ -352,7 +356,7 @@ int main(int argc, char* argv[]) {
 				case LPGPT_MOVE:
 				{
 					LWPUCKGAMEPACKETMOVE* p = (LWPUCKGAMEPACKETMOVE*)server->buf;
-					LOGI("MOVE dx=%.2f dy=%.2f", p->dx, p->dy);
+					//LOGI("MOVE dx=%.2f dy=%.2f", p->dx, p->dy);
 					server->dir_pad_dragging = 1;
 					server->dx = p->dx;
 					server->dy = p->dy;
@@ -361,14 +365,14 @@ int main(int argc, char* argv[]) {
 				case LPGPT_STOP:
 				{
 					LWPUCKGAMEPACKETSTOP* p = (LWPUCKGAMEPACKETSTOP*)server->buf;
-					LOGI("STOP");
+					//LOGI("STOP");
 					server->dir_pad_dragging = 0;
 					break;
 				}
 				case LPGPT_DASH:
 				{
 					LWPUCKGAMEPACKETDASH* p = (LWPUCKGAMEPACKETDASH*)server->buf;
-					LOGI("DASH");
+					//LOGI("DASH");
 					const dReal* player_vel = dBodyGetLinearVel(puck_game->go[LPGO_PLAYER].body);
 					puck_game_commit_dash(puck_game, &puck_game->dash,
 						(float)player_vel[0], (float)player_vel[1]);

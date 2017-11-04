@@ -48,12 +48,9 @@ LWUDP* new_udp() {
 	memset((char *)&udp->si_other, 0, sizeof(udp->si_other));
 	udp->si_other.sin_family = AF_INET;
 	udp->si_other.sin_port = htons(LW_UDP_PORT);
-#if LW_PLATFORM_WIN32
-	udp->si_other.sin_addr.S_un.S_addr = inet_addr(LW_UDP_SERVER);
-#else
-	udp->si_other.sin_addr.s_addr = inet_addr(LW_UDP_SERVER);
-#endif
-	
+	struct hostent* he = gethostbyname(LW_UDP_SERVER);
+	struct in_addr** addr_list = (struct in_addr **) he->h_addr_list;
+	udp->si_other.sin_addr.s_addr = addr_list[0]->s_addr;
 	udp->tv.tv_sec = 0;
 	udp->tv.tv_usec = 0;
 	make_socket_nonblocking(udp->s);
@@ -209,7 +206,7 @@ void udp_update(LWCONTEXT* pLwc, LWUDP* udp) {
 
 					queue_state(pLwc->udp, p);
 					int rb_size = ringbuffer_size(&pLwc->udp->state_ring_buffer);
-					//LOGI("State packet interval: %.3f ms (rb size=%d)", pLwc->puck_game_state_last_received_interval, rb_size);
+					LOGI("State packet interval: %.3f ms (rb size=%d)", pLwc->puck_game_state_last_received_interval, rb_size);
 				}
 			}
 			break;
