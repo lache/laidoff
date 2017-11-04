@@ -14,7 +14,6 @@
 #include<arpa/inet.h> //inet_addr
 #include <unistd.h> // chdir
 #include <inttypes.h>
-#define __int64 int64_t
 #endif
 #include "lwlog.h"
 #include "puckgame.h"
@@ -203,19 +202,19 @@ void server_send(LWSERVER* server, const char* p, int s) {
 #define SERVER_SEND(server, packet) server_send(server, (const char*)&packet, sizeof(packet))
 
 typedef struct _LWCONN {
-	unsigned __int64 ipport;
+	unsigned long long ipport;
 	struct sockaddr_in si;
 	double last_ingress_timepoint;
 } LWCONN;
 
 #define LW_CONN_CAPACITY (32)
 
-unsigned __int64 to_ipport(unsigned int ip, unsigned short port) {
-	return ((unsigned __int64)port << 32) | ip;
+unsigned long long to_ipport(unsigned int ip, unsigned short port) {
+	return ((unsigned long long)port << 32) | ip;
 }
 
 void add_conn(LWCONN* conn, int conn_capacity, struct sockaddr_in* si) {
-	unsigned __int64 ipport = to_ipport(si->sin_addr.S_un.S_addr, si->sin_port);
+	unsigned long long ipport = to_ipport(si->sin_addr.S_un.S_addr, si->sin_port);
 	// Update last ingress for existing element
 	for (int i = 0; i < conn_capacity; i++) {
 		if (conn[i].ipport == ipport) {
