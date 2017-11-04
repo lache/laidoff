@@ -157,7 +157,7 @@ int GetFingerTrackId(void *touch)
         //on_touch_press(normalizedPoint.x, normalizedPoint.y);
         lw_trigger_touch(self.pLwc, normalizedPoint.x, normalizedPoint.y, fingerId);
         lw_trigger_mouse_press(self.pLwc, normalizedPoint.x, normalizedPoint.y, fingerId);
-        NSLog(@"BEGAN Touch count: %d", [[event allTouches]count]);
+        //NSLog(@"BEGAN Touch count: %d", [[event allTouches]count]);
     }
 }
 
@@ -171,7 +171,7 @@ int GetFingerTrackId(void *touch)
         CGPoint normalizedPoint = getNormalizedPoint(self.view, locationInView);
         //on_touch_drag(normalizedPoint.x, normalizedPoint.y);
         lw_trigger_mouse_move(self.pLwc, normalizedPoint.x, normalizedPoint.y, fingerId);
-        NSLog(@"MOVED Touch count: %d", [[event allTouches]count]);
+        //NSLog(@"MOVED Touch count: %d", [[event allTouches]count]);
     }
 }
 
@@ -184,7 +184,7 @@ int GetFingerTrackId(void *touch)
         CGPoint locationInView = [touchEvent locationInView:self.view];
         CGPoint normalizedPoint = getNormalizedPoint(self.view, locationInView);
         lw_trigger_mouse_release(self.pLwc, normalizedPoint.x, normalizedPoint.y, fingerId);
-        NSLog(@"ENDED Touch count: %d", [[event allTouches]count]);
+        //NSLog(@"ENDED Touch count: %d", [[event allTouches]count]);
         RemoveTouch((__bridge void*)touchEvent);
     }
 }
@@ -200,6 +200,7 @@ int GetFingerTrackId(void *touch)
 
 - (void)glkView:(GLKView *)view drawInRect:(CGRect)rect
 {
+    lwc_prerender_mutable_context(self.pLwc);
     lwc_render(self.pLwc);
 }
 
