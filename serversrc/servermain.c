@@ -283,11 +283,14 @@ int main(int argc, char* argv[]) {
 	while (1) {
 		const double loop_start = lwtimepoint_now_seconds();
 		if (elapsed_ms > 0) {
+			double sim_tp = lwtimepoint_now_seconds();
 			int iter = (int)(elapsed_ms / (sim_timestep * 1000));
 			for (int i = 0; i < iter; i++) {
 				update_puck_game(server, puck_game, sim_timestep);
 				update_tick++;
 			}
+			double sim_elapsed = lwtimepoint_now_seconds() - sim_tp;
+			LOGI("Sim elapsed: %.3f ms", sim_elapsed * 1000);
 			elapsed_ms = fmod(elapsed_ms, (sim_timestep * 1000));
 			if (iter) {
 				// Broadcast state to clients
