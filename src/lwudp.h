@@ -12,10 +12,10 @@
 #include <stdlib.h>
 #include <czmq_prelude.h>
 #endif
-//#define LW_UDP_SERVER "puck.popsongremix.com"
+#define LW_UDP_SERVER "puck.popsongremix.com"
 //#define LW_UDP_SERVER "192.168.0.28" // Site A
 //#define LW_UDP_SERVER "118.33.89.239" // Site B
-#define LW_UDP_SERVER "puck-highend.popsongremix.com"
+//#define LW_UDP_SERVER "puck-highend.popsongremix.com"
 #define LW_UDP_BUFLEN 512
 #define LW_UDP_PORT 10288
 #include "puckgamepacket.h"
