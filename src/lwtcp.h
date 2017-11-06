@@ -16,7 +16,8 @@
 #include <stdlib.h>
 #include <czmq_prelude.h>
 #endif
-#define LW_TCP_SERVER "192.168.0.28"
+//#define LW_TCP_SERVER "192.168.0.28"
+#define LW_TCP_SERVER "puck-highend.popsongremix.com"
 #define LW_TCP_BUFLEN 512
 #define LW_TCP_PORT 19856
 
