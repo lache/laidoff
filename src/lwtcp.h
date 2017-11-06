@@ -16,9 +16,13 @@
 #include <stdlib.h>
 #include <czmq_prelude.h>
 #endif
-#define LW_TCP_SERVER "192.168.0.28"
+#include "lwringbuffer.h"
+
+//#define LW_TCP_SERVER "192.168.0.28"
+#define LW_TCP_SERVER "puck.popsongremix.com"
+#define LW_TCP_PORT_STR "19856"
 #define LW_TCP_BUFLEN 512
-#define LW_TCP_PORT 19856
+
 
 typedef struct _LWTCP {
 #if LW_PLATFORM_WIN32
@@ -32,6 +36,7 @@ typedef struct _LWTCP {
 	char recvbuf[LW_TCP_BUFLEN];
 	int iResult;
 	int recvbuflen;
+	int recvbufnotparsed;
 } LWTCP;
 
 typedef struct _LWCONTEXT LWCONTEXT;

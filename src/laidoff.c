@@ -1216,7 +1216,9 @@ void lwc_prerender_mutable_context(LWCONTEXT* pLwc) {
 		}
 	}*/
 	else {
+#if !LW_PLATFORM_WIN32
 		LOGE("Puck game state buffer underrun");
+#endif
 	}
 }
 
