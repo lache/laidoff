@@ -21,6 +21,7 @@
 #include "physics.h"
 #include "puckgameupdate.h"
 #include "lwudp.h"
+#include "lwtcp.h"
 
 void toggle_font_texture_test_mode(LWCONTEXT* pLwc);
 
@@ -653,6 +654,10 @@ void lwc_update(LWCONTEXT* pLwc, double delta_time) {
 		udp_update(pLwc, pLwc->udp);
 	}
 
+	if (pLwc->tcp) {
+		tcp_update(pLwc, pLwc->tcp);
+	}
+
 	//****//
 	// fix delta time
 	//lwcontext_delta_time(pLwc) = 1.0f / 60;
@@ -802,6 +807,8 @@ static void s_logic_worker(zsock_t *pipe, void *args) {
 	// WSAStartup should be called within
 	// a thread which opens sockets.
 	pLwc->udp = new_udp();
+
+	pLwc->tcp = new_tcp();
 
 	zloop_t* loop = zloop_new();
 	pLwc->logic_loop = loop;

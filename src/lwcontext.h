@@ -80,6 +80,7 @@ extern const char* tex_font_atlas_filename[2];
 #define PUCK_GAME_STATE_RING_BUFFER_SIZE ()
 typedef struct _LWPUCKGAME LWPUCKGAME;
 typedef struct _LWUDP LWUDP;
+typedef struct _LWTCP LWTCP;
 
 typedef struct _LWCONTEXT {
 	// Window instance
@@ -315,6 +316,8 @@ typedef struct _LWCONTEXT {
 	LWPUCKGAME* puck_game;
 	// UDP context
 	LWUDP* udp;
+	// TCP context
+	LWTCP* tcp;
 	// Puck game remote(server) state
 	LWPUCKGAMEPACKETSTATE puck_game_state;
 	// Puck game remote state last received time (sec)

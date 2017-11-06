@@ -15,3 +15,4 @@ build-x86
 *.swp
 /build*
 ios/laidoff.xcodeproj/xcuserdata
+ios/laidoff.xcodeproj/project.xcworkspace/xcuserdata

@@ -306,11 +306,11 @@ int main(int argc, char* argv[]) {
 	const int rendering_hz = 60;
 	const double sim_timestep = 0.02; // 1.0f / rendering_hz; // sec
 	const double sync_timestep = 1.0 / 70;
-	struct timeval tv;
-	tv.tv_sec = 0;
-	tv.tv_usec = 0;// sim_timestep * 1000 * 1000;
+	//struct timeval tv;
+	//tv.tv_sec = 10;
+	//tv.tv_usec = 8000;// sim_timestep * 1000 * 1000;
 	fd_set readfds;
-	make_socket_nonblocking(server->s);
+	//make_socket_nonblocking(server->s);
 	int token_counter = 0;
 	LWCONN conn[LW_CONN_CAPACITY];
 	double logic_elapsed_ms = 0;
@@ -367,13 +367,15 @@ int main(int argc, char* argv[]) {
 
 		FD_ZERO(&readfds);
 		FD_SET(server->s, &readfds);
-
+		struct timeval tv;
+		tv.tv_sec = 0;
+		tv.tv_usec = 5000;
 		int rv = select(server->s + 1, &readfds, NULL, NULL, &tv);
-
+		//printf("rv");
 		//try to receive some data, this is a blocking call
 		if (rv == 1) {
 			if ((server->recv_len = recvfrom(server->s, server->buf, BUFLEN, 0, (struct sockaddr *) &server->si_other, &server->slen)) == SOCKET_ERROR) {
-				//printf("recvfrom() failed with error code : %d", WSAGetLastError());
+				printf("recvfrom() failed with error code : %d", WSAGetLastError());
 				//exit(EXIT_FAILURE);
 			}
 			else {
