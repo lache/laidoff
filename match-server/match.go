@@ -4,7 +4,26 @@ import (
 	"log"
 	"net"
 	"encoding/binary"
+	"bytes"
 )
+
+// #include "../src/spherebattlepacket.h"
+import "C"
+
+// typedef enum {
+//     NONE = 0,
+//     ONE = 1,
+//     TWO = 2,
+//     THREE = 3
+// } numbers;
+// const int cone = 2;
+// int enum_to_int (numbers enu) {
+//     return (int) enu;
+// }
+// int return_int (int num) {
+//     return num;
+// }
+import "C"
 
 const (
 	CONN_HOST = "0.0.0.0"
@@ -28,6 +47,12 @@ const (
 )
 
 func main() {
+	log.Printf("%d\n", C.LSBPT_LWSPHEREBATTLEPACKETCREATEBATTLEOK)
+	tt := C.LWSPHEREBATTLEPACKETCREATEBATTLE{1, 2}
+	ttBuf := &bytes.Buffer{}
+	binary.Write(ttBuf, binary.LittleEndian, tt)
+	log.Println(tt)
+	log.Printf("ttBuf %+v len: %v", ttBuf, ttBuf.Len())
 	log.Println("Hello", "My", "Friend")
 	matchQueue := make(chan net.Conn)
 	l, err := net.Listen(CONN_TYPE, CONN_HOST + ":" + CONN_PORT)

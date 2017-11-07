@@ -1,5 +1,4 @@
 #pragma once
-#include "linmath.h"
 
 typedef enum _LW_SPHERE_BATTLE_PACKET_TYPE {
 	LSBPT_GETTOKEN,
