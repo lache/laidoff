@@ -11,7 +11,8 @@ const (
 	CONN_PORT = "19856"
 	CONN_TYPE = "tcp"
 
-	BATTLE_SERVICE_HOST = "192.168.0.28"
+	//BATTLE_SERVICE_HOST = "192.168.0.28"
+	BATTLE_SERVICE_HOST = "221.147.71.76"
 	BATTLE_SERVICE_PORT = "29856"
 	BATTLE_SERVICE_CONN_TYPE = "tcp"
 	BATTLE_SERVICE_USER_PORT = 10288 // udp
@@ -70,10 +71,12 @@ func createBattleInstance(c1 net.Conn, c2 net.Conn) {
 	readBuf := make([]byte, readBufSize)
 	readBufLen, err := conn.Read(readBuf)
 	if err != nil {
-		log.Fatalf("Recv LSBPT_LWSPHEREBATTLEPACKETCREATEBATTLE reply failed")
+		log.Printf("Recv LSBPT_LWSPHEREBATTLEPACKETCREATEBATTLE reply failed")
+		return
 	}
 	if readBufLen != 8 {
-		log.Fatalf("Recv LSBPT_LWSPHEREBATTLEPACKETCREATEBATTLE reply size error")
+		log.Printf("Recv LSBPT_LWSPHEREBATTLEPACKETCREATEBATTLE reply size error")
+		return
 	}
 	replyLen := binary.LittleEndian.Uint16(readBuf[0:2])
 	replyType := binary.LittleEndian.Uint16(readBuf[2:4])

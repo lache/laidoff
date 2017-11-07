@@ -28,6 +28,9 @@
 #endif
 
 #include "lwtimepoint.h"
+#include <tinycthread.h>
+
+_Thread_local int thread_local_var;
 
 #ifndef SOCKET
 #define SOCKET int
@@ -66,6 +69,7 @@ typedef struct _LWSERVER {
 	double server_start_tp;
 	int broadcast_count;
 	int token_counter;
+	int battle_counter;
 } LWSERVER;
 
 typedef struct _LWTCPSERVER {
@@ -228,6 +232,8 @@ LWTCPSERVER* new_tcp_server() {
 		exit(EXIT_FAILURE);
 	}
 	LOGI("TCP Bind done");
+	listen(server->s, 3);
+	LOGI("TCP Listening...");
 	return server;
 }
 
@@ -465,13 +471,39 @@ void select_server(LWSERVER* server, LWPUCKGAME* puck_game, LWCONN* conn, int co
 	}
 }
 
+int tcp_server_entry(void* context) {
+	LWTCPSERVER* tcp_server = new_tcp_server();
+	LWSERVER* server = context;
+	while (1) {
+		int c = sizeof(struct sockaddr_in);
+		SOCKET client_sock = accept(tcp_server->s, (struct sockaddr*)&tcp_server->server, &c);
+		char recv_buf[512];
+		int recv_len = recv(client_sock, recv_buf, 512, 0);
+		LOGI("Admin TCP recv len: %d", recv_len);
+		LWSPHEREBATTLEPACKETCREATEBATTLE* p = (LWSPHEREBATTLEPACKETCREATEBATTLE*)recv_buf;
+		if (p->type == LSBPT_LWSPHEREBATTLEPACKETCREATEBATTLE && p->size == sizeof(LWSPHEREBATTLEPACKETCREATEBATTLE) && recv_len == p->size) {
+			LWSPHEREBATTLEPACKETCREATEBATTLEOK reply_p;
+			reply_p.type = LSBPT_LWSPHEREBATTLEPACKETCREATEBATTLEOK;
+			reply_p.size = sizeof(LWSPHEREBATTLEPACKETCREATEBATTLEOK);
+			server->battle_counter++;
+			reply_p.battle_id = server->battle_counter;
+			send(client_sock, &reply_p, sizeof(LWSPHEREBATTLEPACKETCREATEBATTLEOK), 0);
+		}
+		else {
+			LOGE("Admin TCP unexpected packet");
+		}
+	}
+	return 0;
+}
+
 int main(int argc, char* argv[]) {
 	LOGI("LAIDOFF-SERVER: Greetings.");
 	while (!directory_exists("assets") && LwChangeDirectory(".."))
 	{
 	}
 	LWSERVER* server = new_server();
-	LWTCPSERVER* tcp_server = new_tcp_server();
+	thrd_t thr;
+	thrd_create(&thr, tcp_server_entry, server);
 	LWPUCKGAME* puck_game = new_puck_game();
 	puck_game->server = server;
 	puck_game->on_player_damaged = on_player_damaged;
@@ -536,8 +568,6 @@ int main(int argc, char* argv[]) {
 		fflush(stdout);
 
 		select_server(server, puck_game, conn, LW_CONN_CAPACITY);
-
-		select_tcp_server(tcp_server);
 
 		double loop_time = lwtimepoint_now_seconds() - loop_start;
 		logic_elapsed_ms += loop_time * 1000;

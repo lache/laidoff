@@ -11,9 +11,11 @@ set(GLFW_BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
 
 set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_C_STANDARD 11)
-
+add_subdirectory(tinycthread)
 if (NOT SERVER_ONLY)
     add_subdirectory(glfw-3.2.1)
+else (NOT SERVER_ONLY)
+	
 endif (NOT SERVER_ONLY)
 
 include_directories(${glfw_INCLUDE_DIRS})
@@ -245,6 +247,7 @@ target_compile_definitions(laidoff-server PRIVATE LW_IS_SERVER=1 _WINSOCK_DEPREC
 
 target_link_libraries(laidoff-server
 	${WINSOCK2}
+	tinycthread
 	${CMAKE_THREAD_LIBS_INIT} # pthread deps on Linux server build
 )
 
