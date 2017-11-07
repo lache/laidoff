@@ -16,3 +16,4 @@ build-x86
 /build*
 ios/laidoff.xcodeproj/xcuserdata
 ios/laidoff.xcodeproj/project.xcworkspace/xcuserdata
+/match-server/.idea/workspace.xml
