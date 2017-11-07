@@ -48,6 +48,8 @@
 #define BUFLEN 512  //Max length of buffer
 #define PORT 10288   //The port on which to listen for incoming data
 
+#define TCP_INTERNAL_PORT 29856
+
 typedef struct _LWSERVER {
 	SOCKET s;
 	struct sockaddr_in server, si_other;
@@ -63,7 +65,18 @@ typedef struct _LWSERVER {
 	double last_broadcast_sent;
 	double server_start_tp;
 	int broadcast_count;
+	int token_counter;
 } LWSERVER;
+
+typedef struct _LWTCPSERVER {
+	SOCKET s;
+	struct sockaddr_in server, si_other;
+	int slen, recv_len;
+	char buf[BUFLEN];
+#if LW_PLATFORM_WIN32
+	WSADATA wsa;
+#endif
+} LWTCPSERVER;
 
 static BOOL directory_exists(const char* szPath)
 {
@@ -192,6 +205,32 @@ LWSERVER* new_server() {
 	return server;
 }
 
+LWTCPSERVER* new_tcp_server() {
+	LWTCPSERVER* server = malloc(sizeof(LWTCPSERVER));
+	memset(server, 0, sizeof(LWTCPSERVER));
+	server->slen = sizeof(server->si_other);
+	//Create a socket
+	if ((server->s = socket(AF_INET, SOCK_STREAM, 0)) == INVALID_SOCKET)
+	{
+		LOGE("Could not create tcp socket : %d", WSAGetLastError());
+	}
+	LOGI("TCP Socket created.\n");
+
+	//Prepare the sockaddr_in structure
+	server->server.sin_family = AF_INET;
+	server->server.sin_addr.s_addr = INADDR_ANY;
+	server->server.sin_port = htons(TCP_INTERNAL_PORT);
+
+	//Bind
+	if (bind(server->s, (struct sockaddr *)&server->server, sizeof(server->server)) == SOCKET_ERROR)
+	{
+		LOGE("TCP Bind failed with error code : %d", WSAGetLastError());
+		exit(EXIT_FAILURE);
+	}
+	LOGI("TCP Bind done");
+	return server;
+}
+
 int make_socket_nonblocking(int sock) {
 #if defined(WIN32) || defined(_WIN32) || defined(IMN_PIM)
 	unsigned long arg = 1;
@@ -291,12 +330,148 @@ void on_player_damaged(LWPUCKGAME* puck_game) {
 	SERVER_SEND(server, p);
 }
 
+void select_tcp_server(LWTCPSERVER* server) {
+	memset(server->buf, '\0', BUFLEN);
+	fd_set readfds;
+	FD_ZERO(&readfds);
+	FD_SET(server->s, &readfds);
+	struct timeval tv;
+	tv.tv_sec = 0;
+	tv.tv_usec = 2500;
+	int rv = select(server->s + 1, &readfds, NULL, NULL, &tv);
+	//printf("rv");
+	//try to receive some data, this is a blocking call
+	if (rv == 1) {
+		if ((server->recv_len = recvfrom(server->s, server->buf, BUFLEN, 0, (struct sockaddr *) &server->si_other, &server->slen)) == SOCKET_ERROR) {
+			LOGE("recvfrom() failed with error code : %d", WSAGetLastError());
+			//exit(EXIT_FAILURE);
+		}
+		else {
+			const int packet_type = *(int*)server->buf;
+			switch (packet_type) {
+			case LSBPT_LWSPHEREBATTLEPACKETCREATEBATTLE:
+			{
+				LOGI("LSBPT_LWSPHEREBATTLEPACKETCREATEBATTLE received");
+				break;
+			}
+			default:
+			{
+				LOGE("UNKNOWN INTERNAL PACKET RECEIVED");
+				break;
+			}
+			}
+		}
+
+
+	}
+	else {
+		//LOGI("EMPTY");
+	}
+}
+
+void select_server(LWSERVER* server, LWPUCKGAME* puck_game, LWCONN* conn, int conn_capacity) {
+	//clear the buffer by filling null, it might have previously received data
+	memset(server->buf, '\0', BUFLEN);
+	fd_set readfds;
+	FD_ZERO(&readfds);
+	FD_SET(server->s, &readfds);
+	struct timeval tv;
+	tv.tv_sec = 0;
+	tv.tv_usec = 2500;
+	int rv = select(server->s + 1, &readfds, NULL, NULL, &tv);
+	//printf("rv");
+	//try to receive some data, this is a blocking call
+	if (rv == 1) {
+		if ((server->recv_len = recvfrom(server->s, server->buf, BUFLEN, 0, (struct sockaddr *) &server->si_other, &server->slen)) == SOCKET_ERROR) {
+			printf("recvfrom() failed with error code : %d", WSAGetLastError());
+			//exit(EXIT_FAILURE);
+		}
+		else {
+			add_conn(conn, LW_CONN_CAPACITY, &server->si_other);
+
+			//print details of the client/peer and the data received
+			/*printf("Received packet from %s:%d (size:%d)\n",
+			inet_ntoa(server->si_other.sin_addr),
+			ntohs(server->si_other.sin_port),
+			server->recv_len);*/
+
+			const int packet_type = *(int*)server->buf;
+			switch (packet_type) {
+			case LSBPT_GETTOKEN:
+			{
+				LWSPHEREBATTLEPACKETTOKEN p;
+				p.type = LSBPT_TOKEN;
+				++server->token_counter;
+				p.token = server->token_counter;
+				SERVER_SEND(server, p);
+				break;
+			}
+			case LSBPT_QUEUE:
+			{
+				LWSPHEREBATTLEPACKETMATCHED p;
+				p.type = LSBPT_MATCHED;
+				p.master = 0;
+				SERVER_SEND(server, p);
+				break;
+			}
+			case LPGPT_MOVE:
+			{
+				LWPUCKGAMEPACKETMOVE* p = (LWPUCKGAMEPACKETMOVE*)server->buf;
+				//LOGI("MOVE dx=%.2f dy=%.2f", p->dx, p->dy);
+				server->dir_pad_dragging = 1;
+				server->dx = p->dx;
+				server->dy = p->dy;
+				break;
+			}
+			case LPGPT_STOP:
+			{
+				LWPUCKGAMEPACKETSTOP* p = (LWPUCKGAMEPACKETSTOP*)server->buf;
+				//LOGI("STOP");
+				server->dir_pad_dragging = 0;
+				break;
+			}
+			case LPGPT_DASH:
+			{
+				LWPUCKGAMEPACKETDASH* p = (LWPUCKGAMEPACKETDASH*)server->buf;
+				//LOGI("DASH");
+				puck_game_commit_dash_to_puck(puck_game, &puck_game->dash);
+				break;
+			}
+			case LPGPT_PULL_START:
+			{
+				LWPUCKGAMEPACKETPULLSTART* p = (LWPUCKGAMEPACKETPULLSTART*)server->buf;
+				//LOGI("PULL START");
+				puck_game->pull_puck = 1;
+				break;
+			}
+			case LPGPT_PULL_STOP:
+			{
+				LWPUCKGAMEPACKETPULLSTOP* p = (LWPUCKGAMEPACKETPULLSTOP*)server->buf;
+				//LOGI("PULL STOP");
+				puck_game->pull_puck = 0;
+				break;
+			}
+			default:
+			{
+				break;
+			}
+			}
+		}
+
+
+	}
+	else {
+		//LOGI("EMPTY");
+	}
+}
+
 int main(int argc, char* argv[]) {
 	LOGI("LAIDOFF-SERVER: Greetings.");
 	while (!directory_exists("assets") && LwChangeDirectory(".."))
 	{
 	}
 	LWSERVER* server = new_server();
+	LWTCPSERVER* tcp_server = new_tcp_server();
 	LWPUCKGAME* puck_game = new_puck_game();
 	puck_game->server = server;
 	puck_game->on_player_damaged = on_player_damaged;
@@ -309,9 +484,7 @@ int main(int argc, char* argv[]) {
 	//struct timeval tv;
 	//tv.tv_sec = 10;
 	//tv.tv_usec = 8000;// sim_timestep * 1000 * 1000;
-	fd_set readfds;
 	//make_socket_nonblocking(server->s);
-	int token_counter = 0;
 	LWCONN conn[LW_CONN_CAPACITY];
 	double logic_elapsed_ms = 0;
 	double sync_elapsed_ms = 0;
@@ -362,99 +535,10 @@ int main(int argc, char* argv[]) {
 		//LOGI("Waiting for data...");
 		fflush(stdout);
 
-		//clear the buffer by filling null, it might have previously received data
-		memset(server->buf, '\0', BUFLEN);
+		select_server(server, puck_game, conn, LW_CONN_CAPACITY);
 
-		FD_ZERO(&readfds);
-		FD_SET(server->s, &readfds);
-		struct timeval tv;
-		tv.tv_sec = 0;
-		tv.tv_usec = 5000;
-		int rv = select(server->s + 1, &readfds, NULL, NULL, &tv);
-		//printf("rv");
-		//try to receive some data, this is a blocking call
-		if (rv == 1) {
-			if ((server->recv_len = recvfrom(server->s, server->buf, BUFLEN, 0, (struct sockaddr *) &server->si_other, &server->slen)) == SOCKET_ERROR) {
-				printf("recvfrom() failed with error code : %d", WSAGetLastError());
-				//exit(EXIT_FAILURE);
-			}
-			else {
-				add_conn(conn, LW_CONN_CAPACITY, &server->si_other);
+		select_tcp_server(tcp_server);
 
-				//print details of the client/peer and the data received
-				/*printf("Received packet from %s:%d (size:%d)\n",
-					inet_ntoa(server->si_other.sin_addr),
-					ntohs(server->si_other.sin_port),
-					server->recv_len);*/
-
-				const int packet_type = *(int*)server->buf;
-				switch (packet_type) {
-				case LSBPT_GETTOKEN:
-				{
-					LWSPHEREBATTLEPACKETTOKEN p;
-					p.type = LSBPT_TOKEN;
-					++token_counter;
-					p.token = token_counter;
-					SERVER_SEND(server, p);
-					break;
-				}
-				case LSBPT_QUEUE:
-				{
-					LWSPHEREBATTLEPACKETMATCHED p;
-					p.type = LSBPT_MATCHED;
-					p.master = 0;
-					SERVER_SEND(server, p);
-					break;
-				}
-				case LPGPT_MOVE:
-				{
-					LWPUCKGAMEPACKETMOVE* p = (LWPUCKGAMEPACKETMOVE*)server->buf;
-					//LOGI("MOVE dx=%.2f dy=%.2f", p->dx, p->dy);
-					server->dir_pad_dragging = 1;
-					server->dx = p->dx;
-					server->dy = p->dy;
-					break;
-				}
-				case LPGPT_STOP:
-				{
-					LWPUCKGAMEPACKETSTOP* p = (LWPUCKGAMEPACKETSTOP*)server->buf;
-					//LOGI("STOP");
-					server->dir_pad_dragging = 0;
-					break;
-				}
-				case LPGPT_DASH:
-				{
-					LWPUCKGAMEPACKETDASH* p = (LWPUCKGAMEPACKETDASH*)server->buf;
-					//LOGI("DASH");
-					puck_game_commit_dash_to_puck(puck_game, &puck_game->dash);
-					break;
-				}
-				case LPGPT_PULL_START:
-				{
-					LWPUCKGAMEPACKETPULLSTART* p = (LWPUCKGAMEPACKETPULLSTART*)server->buf;
-					//LOGI("PULL START");
-					puck_game->pull_puck = 1;
-					break;
-				}
-				case LPGPT_PULL_STOP:
-				{
-					LWPUCKGAMEPACKETPULLSTOP* p = (LWPUCKGAMEPACKETPULLSTOP*)server->buf;
-					//LOGI("PULL STOP");
-					puck_game->pull_puck = 0;
-					break;
-				}
-				default:
-				{
-					break;
-				}
-				}
-			}
-
-			
-		}
-		else {
-			//LOGI("EMPTY");
-		}
 		double loop_time = lwtimepoint_now_seconds() - loop_start;
 		logic_elapsed_ms += loop_time * 1000;
 		sync_elapsed_ms += loop_time * 1000;
