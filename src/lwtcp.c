@@ -31,6 +31,11 @@ vartype varname; \
 varname.size = sizeof(vartype); \
 varname.type = LPGP_##vartype
 
+#define NEW_TCP_PACKET_CAPITAL(vartype, varname) \
+vartype varname; \
+varname.Size = sizeof(vartype); \
+varname.Type = LPGP_##vartype
+
 
 LWTCP* new_tcp() {
 	LWTCP* tcp = (LWTCP*)malloc(sizeof(LWTCP));
@@ -73,9 +78,8 @@ LWTCP* new_tcp() {
 		free(tcp);
 		return 0;
 	}
-	NEW_TCP_PACKET(LWPQUEUE2, p);
-	memcpy(tcp->sendbuf, &p, sizeof(p));
-	tcp->iResult = send(tcp->ConnectSocket, tcp->sendbuf, (int)sizeof(p), 0);
+	// Send QUEUE2
+	tcp->iResult = tcp_send_queue2(tcp);
 	if (tcp->iResult == SOCKET_ERROR) {
 		LOGE("send failed with error: %d", WSAGetLastError());
 		closesocket(tcp->ConnectSocket);
@@ -139,9 +143,7 @@ int parse_recv_packets(LWCONTEXT* pLwc, LWTCP* tcp) {
 			LOGI("LWPRETRYQUEUE received");
 			//show_sys_msg(pLwc->def_sys_msg, "LWPRETRYQUEUE received");
 			// Resend QUEUE2
-			NEW_TCP_PACKET(LWPQUEUE2, p);
-			memcpy(tcp->sendbuf, &p, sizeof(p));
-			send(tcp->ConnectSocket, tcp->sendbuf, (int)sizeof(p), 0);
+			tcp_send_queue2(tcp);
 		} else if (CHECK_PACKET(packet_type, packet_size, LWPMAYBEMATCHED)) {
 			LOGI("LWPMAYBEMATCHED received");
 			//show_sys_msg(pLwc->def_sys_msg, "LWPMAYBEMATCHED received");
@@ -173,4 +175,18 @@ void tcp_update(LWCONTEXT* pLwc, LWTCP* tcp) {
 			tcp->recvbufnotparsed -= parsed_bytes;
 		}
 	}
+}
+
+int tcp_send_queue2(LWTCP* tcp) {
+	NEW_TCP_PACKET(LWPQUEUE2, p);
+	memcpy(tcp->sendbuf, &p, sizeof(p));
+	return send(tcp->ConnectSocket, tcp->sendbuf, (int)sizeof(p), 0);
+}
+
+int tcp_send_suddendeath(LWTCP* tcp, int battle_id, unsigned int token) {
+	NEW_TCP_PACKET_CAPITAL(LWPSUDDENDEATH, p);
+	p.Battle_id = battle_id;
+	p.Token = token;
+	memcpy(tcp->sendbuf, &p, sizeof(p));
+	return send(tcp->ConnectSocket, tcp->sendbuf, (int)sizeof(p), 0);
 }

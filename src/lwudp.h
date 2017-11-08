@@ -12,12 +12,13 @@
 #include <stdlib.h>
 #include <czmq_prelude.h>
 #endif
-#if LW_PLATFORM_ANDROID
+#if LW_PLATFORM_ANDROID || LW_PLATFORM_IOS
 #define LW_UDP_SERVER "puck-highend.popsongremix.com"
 #else
-//#define LW_UDP_SERVER "puck.popsongremix.com"
-#define LW_UDP_SERVER "192.168.0.28" // Site A
+#define LW_UDP_SERVER "221.147.71.76" // Site C
+//#define LW_UDP_SERVER "192.168.0.28" // Site A
 //#define LW_UDP_SERVER "118.33.89.239" // Site B
+//#define LW_UDP_SERVER "puck.popsongremix.com"
 #endif
 #define LW_UDP_BUFLEN 512
 #define LW_UDP_PORT 10288

@@ -58,6 +58,7 @@ LWPUCKGAME* new_puck_game() {
 	// Static game data
 	LWPUCKGAME* puck_game = malloc(sizeof(LWPUCKGAME));
 	memset(puck_game, 0, sizeof(LWPUCKGAME));
+	const int hp = 10;
 	puck_game->world_size = 4.0f;
 	puck_game->world_size_half = puck_game->world_size / 2.0f;
 	puck_game->dash_interval = 1.5f;
@@ -66,10 +67,10 @@ LWPUCKGAME* new_puck_game() {
 	puck_game->dash_shake_time = 0.3f;
 	puck_game->hp_shake_time = 0.3f;
 	puck_game->puck_damage_contact_speed_threshold = 1.1f;
-	puck_game->player.total_hp = 20;
-	puck_game->player.current_hp = 10;
-	puck_game->target.total_hp = 20;
-	puck_game->target.current_hp = 10;
+	puck_game->player.total_hp = hp;
+	puck_game->player.current_hp = hp;
+	puck_game->target.total_hp = hp;
+	puck_game->target.current_hp = hp;
     puck_game->sphere_mass = 0.1f;
     puck_game->sphere_radius = 0.16f; //0.125f;
 	// ------
@@ -153,22 +154,29 @@ void delete_puck_game(LWPUCKGAME** puck_game) {
 	*puck_game = 0;
 }
 
-void puck_game_player_decrease_hp_test(LWPUCKGAME* puck_game) {
+void puck_game_go_decrease_hp_test(LWPUCKGAME* puck_game, LWPUCKGAMEPLAYER* go, LWPUCKGAMEDASH* dash) {
 	LWPUCKGAMEOBJECT* puck = &puck_game->go[LPGO_PUCK];
-	LWPUCKGAMEOBJECT* player = &puck_game->go[LPGO_PLAYER];
 	const float puck_speed = (float)dLENGTH(dBodyGetLinearVel(puck->body));
 
-	if (puck_game->player.last_contact_puck_body != puck->body
+	if (go->last_contact_puck_body != puck->body
 		&& puck_speed > puck_game->puck_damage_contact_speed_threshold
-		&& !puck_game_dashing(puck_game)) {
+		&& !puck_game_dashing(dash)) {
 		// Decrease player hp
-		puck_game->player.last_contact_puck_body = puck->body;
-		puck_game->player.current_hp--;
-		if (puck_game->player.current_hp < 0) {
-			puck_game->player.current_hp = puck_game->player.total_hp;
+		go->last_contact_puck_body = puck->body;
+		go->current_hp--;
+		if (go->current_hp < 0) {
+			//go->current_hp = go->total_hp;
 		}
-		puck_game->player.hp_shake_remain_time = puck_game->hp_shake_time;
+		go->hp_shake_remain_time = puck_game->hp_shake_time;
 	}
+}
+
+void puck_game_player_decrease_hp_test(LWPUCKGAME* puck_game) {
+	puck_game_go_decrease_hp_test(puck_game, &puck_game->player, &puck_game->remote_dash[0]);
+}
+
+void puck_game_target_decrease_hp_test(LWPUCKGAME* puck_game) {
+	puck_game_go_decrease_hp_test(puck_game, &puck_game->target, &puck_game->remote_dash[1]);
 }
 
 static void near_puck_player(LWPUCKGAME* puck_game) {
@@ -188,6 +196,18 @@ static void near_puck_player(LWPUCKGAME* puck_game) {
 
 	if (puck_game->on_player_damaged) {
 		puck_game->on_player_damaged(puck_game);
+	}
+
+	const float puck_speed = (float)dLENGTH(dBodyGetLinearVel(puck->body));
+	//LOGI("Contact puck velocity: %.2f", puck_speed);
+}
+
+static void near_puck_target(LWPUCKGAME* puck_game) {
+	LWPUCKGAMEOBJECT* puck = &puck_game->go[LPGO_PUCK];
+	LWPUCKGAMEOBJECT* target = &puck_game->go[LPGO_TARGET];
+	puck_game->target.puck_contacted = 1;
+	if (puck_game->on_target_damaged) {
+		puck_game->on_target_damaged(puck_game);
 	}
 
 	const float puck_speed = (float)dLENGTH(dBodyGetLinearVel(puck->body));
@@ -248,6 +268,11 @@ void puck_game_near_callback(void *data, dGeomID o1, dGeomID o2)
 				contact[i].surface.mode = dContactSoftCFM | dContactBounce;
 				contact[i].surface.mu = 1.9f;
 			}
+
+			if ((o1 == puck_game->go[LPGO_PUCK].geom && o2 == puck_game->go[LPGO_TARGET].geom)
+				|| (o1 == puck_game->go[LPGO_PUCK].geom && o2 == puck_game->go[LPGO_TARGET].geom)) {
+				near_puck_target(puck_game);
+			}
 			
 
 			// bounce is the amount of "bouncyness".
@@ -280,8 +305,8 @@ float puck_game_dash_cooltime(LWPUCKGAME* puck_game) {
 	return puck_game->time - puck_game->dash.last_time;
 }
 
-int puck_game_dashing(LWPUCKGAME* puck_game) {
-	return puck_game->dash.remain_time > 0;
+int puck_game_dashing(LWPUCKGAMEDASH* dash) {
+	return dash->remain_time > 0;
 }
 
 void puck_game_commit_dash(LWPUCKGAME* puck_game, LWPUCKGAMEDASH* dash, float dx, float dy) {
@@ -298,4 +323,8 @@ void puck_game_commit_dash_to_puck(LWPUCKGAME* puck_game, LWPUCKGAMEDASH* dash, 
 	dx /= ddlen;
 	dy /= ddlen;
 	puck_game_commit_dash(puck_game, dash, dx, dy);
+}
+
+float puck_game_remain_time(int update_tick) {
+	return ceilf(LWMAX(0, 80.0f - update_tick * 1.0f / 125));
 }

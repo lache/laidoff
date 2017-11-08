@@ -127,8 +127,8 @@ void udp_update(LWCONTEXT* pLwc, LWUDP* udp) {
 				LOGE("LWPTOKEN: Size error %d (%d expected)", udp->recv_len, sizeof(LWPTOKEN));
 			}
 			LWPTOKEN* p = (LWPTOKEN*)udp->buf;
-			LOGI("LWPTOKEN: Change token from 0x%08x to 0x%08x", udp->token, p->token);
-			//udp->token = p->token;
+			//LOGI("LWPTOKEN: Change token from 0x%08x to 0x%08x", udp->token, p->token);
+			udp->token = p->token;
 			udp->state = LUS_QUEUE;
 			break;
 		}
@@ -138,7 +138,7 @@ void udp_update(LWCONTEXT* pLwc, LWUDP* udp) {
 				LOGE("LWPMATCHED: Size error %d (%d expected)", udp->recv_len, sizeof(LWPMATCHED));
 			}
 			LWPMATCHED* p = (LWPMATCHED*)udp->buf;
-			LOGI("LWPMATCHED: Matched! I'm %s", p->master ? "master." : "slave.");
+			//LOGI("LWPMATCHED: Matched! I'm %s", p->master ? "master." : "slave.");
 			udp->state = LUS_MATCHED;
 			udp->master = p->master;
 			break;

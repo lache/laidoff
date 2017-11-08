@@ -1,3 +1,4 @@
+#include "lwtcp.h"
 #include "lwlog.h"
 #include "lwcontext.h"
 #include "battle.h"
@@ -9,6 +10,7 @@
 #include "logic.h"
 #include "lwbutton.h"
 #include "puckgameupdate.h"
+#include "puckgame.h"
 
 float get_dir_pad_size_radius() {
 	return 0.75f;
@@ -450,6 +452,12 @@ void lw_press_key_x(LWCONTEXT* pLwc) {
 	puck_game_pull_puck_start(pLwc, pLwc->puck_game);
 }
 
+void lw_press_key_q(LWCONTEXT* pLwc) {
+	if (pLwc->tcp && pLwc->puck_game) {
+		tcp_send_suddendeath(pLwc->tcp, pLwc->puck_game->battle_id, pLwc->puck_game->token);
+	}
+}
+
 void lw_release_key_left(LWCONTEXT* pLwc) {
 	pLwc->player_move_left = 0;
 	simulate_dir_pad_touch_input(pLwc);
@@ -479,4 +487,7 @@ void lw_release_key_z(LWCONTEXT* pLwc) {
 
 void lw_release_key_x(LWCONTEXT* pLwc) {
 	puck_game_pull_puck_stop(pLwc, pLwc->puck_game);
+}
+
+void lw_release_key_q(LWCONTEXT* pLwc) {
 }

@@ -72,7 +72,7 @@ static void render_go(const LWCONTEXT* pLwc, const mat4x4 view, const mat4x4 pro
 	glDrawArrays(GL_TRIANGLES, 0, pLwc->vertex_buffer[lvt].vertex_count);
 }
 
-static void render_timer(const LWCONTEXT* pLwc) {
+static void render_timer(const LWCONTEXT* pLwc, float remain_sec) {
 	// Render text
 	LWTEXTBLOCK text_block;
 	text_block.align = LTBA_CENTER_TOP;
@@ -85,7 +85,7 @@ static void render_timer(const LWCONTEXT* pLwc) {
 	SET_COLOR_RGBA_FLOAT(text_block.color_emp_glyph, 1, 1, 0, 1);
 	SET_COLOR_RGBA_FLOAT(text_block.color_emp_outline, 0, 0, 0, 1);
 	char str[32];
-	sprintf(str, u8"50");
+	sprintf(str, u8"%.0f", remain_sec);
 	text_block.text = str;
 	text_block.text_bytelen = (int)strlen(text_block.text);
 	text_block.begin_index = 0;
@@ -109,7 +109,7 @@ static void render_match_state(const LWCONTEXT* pLwc) {
 	SET_COLOR_RGBA_FLOAT(text_block.color_emp_outline, 0, 0, 0, 1);
 	char str[32];
 	if (pLwc->puck_game->token) {
-		sprintf(str, u8"전투중...");
+		sprintf(str, u8"전투중...BID:%d", pLwc->puck_game->battle_id);
 	}
 	else {
 		sprintf(str, u8"대전 상대 찾는중...");
@@ -123,19 +123,19 @@ static void render_match_state(const LWCONTEXT* pLwc) {
 	render_text_block(pLwc, &text_block);
 }
 
-static void render_hp_gauge(const LWCONTEXT* pLwc, float x, float y, const LWPUCKGAMEPLAYER* player) {
+static void render_hp_gauge(const LWCONTEXT* pLwc, float x, float y, int current_hp, int total_hp, int right) {
 	const float aspect_ratio = (float)pLwc->width / pLwc->height;
 	const float gauge_width = 1.2f;
 	const float gauge_height = 0.1f;
 	const float gauge_flush_height = 0.07f;
 	const float base_color = 0.1f;
 	// Positioinal offset by shake
-	if (player->hp_shake_remain_time > 0) {
+	/*if (player->hp_shake_remain_time > 0) {
 		const float ratio = player->hp_shake_remain_time / pLwc->puck_game->hp_shake_time;
 		const float shake_magnitude = 0.02f;
 		x += ratio * (2 * rand() / (float)RAND_MAX - 1.0f) * shake_magnitude * aspect_ratio;
 		y += ratio * (2 * rand() / (float)RAND_MAX - 1.0f) * shake_magnitude;
-	}
+	}*/
 	// Render background (gray)
 	render_solid_vb_ui(pLwc,
 		x, y, gauge_width, gauge_height,
@@ -143,8 +143,6 @@ static void render_hp_gauge(const LWCONTEXT* pLwc, float x, float y, const LWPUC
 		LVT_CENTER_TOP_ANCHORED_SQUARE,
 		1, base_color, base_color, base_color, 1);
 	const float cell_border = 0.015f;
-	const int current_hp = player->current_hp;
-	const int total_hp = player->total_hp;
 	if (total_hp == 0) {
 		return;
 	}
@@ -153,12 +151,23 @@ static void render_hp_gauge(const LWCONTEXT* pLwc, float x, float y, const LWPUC
 	const float cell_x_stride = cell_width + cell_border;
 	for (int i = 0; i < total_hp; i++) {
 		float r = base_color, g = base_color, b = base_color;
-		if (i < current_hp) {
-			g = 1;
+		if (right) {
+			if (total_hp - current_hp > i) {
+				r = 1;
+			}
+			else {
+				g = 1;
+			}
 		}
 		else {
-			r = 1;
+			if (i < current_hp) {
+				g = 1;
+			}
+			else {
+				r = 1;
+			}
 		}
+		
 		// Render background (green)
 		render_solid_vb_ui(pLwc,
 			cell_x_0 + cell_x_stride * i, y - gauge_height / 2, cell_width, gauge_height - cell_border * 2,
@@ -167,25 +176,27 @@ static void render_hp_gauge(const LWCONTEXT* pLwc, float x, float y, const LWPUC
 			1, r, g, b, 1);
 	}
 	// Render text
-	LWTEXTBLOCK text_block;
-	text_block.align = LTBA_CENTER_BOTTOM;
-	text_block.text_block_width = DEFAULT_TEXT_BLOCK_WIDTH;
-	text_block.text_block_line_height = DEFAULT_TEXT_BLOCK_LINE_HEIGHT_E;
-	text_block.size = DEFAULT_TEXT_BLOCK_SIZE_E;
-	text_block.multiline = 1;
-	SET_COLOR_RGBA_FLOAT(text_block.color_normal_glyph, 1, 1, 1, 1);
-	SET_COLOR_RGBA_FLOAT(text_block.color_normal_outline, 0, 0, 0, 1);
-	SET_COLOR_RGBA_FLOAT(text_block.color_emp_glyph, 1, 1, 0, 1);
-	SET_COLOR_RGBA_FLOAT(text_block.color_emp_outline, 0, 0, 0, 1);
-	char str[32];
-	sprintf(str, "%d/%d PLAYER HP", current_hp, total_hp);
-	text_block.text = str;
-	text_block.text_bytelen = (int)strlen(text_block.text);
-	text_block.begin_index = 0;
-	text_block.end_index = text_block.text_bytelen;
-	text_block.text_block_x = x;
-	text_block.text_block_y = y;
-	render_text_block(pLwc, &text_block);
+	if (0) {
+		LWTEXTBLOCK text_block;
+		text_block.align = LTBA_CENTER_BOTTOM;
+		text_block.text_block_width = DEFAULT_TEXT_BLOCK_WIDTH;
+		text_block.text_block_line_height = DEFAULT_TEXT_BLOCK_LINE_HEIGHT_E;
+		text_block.size = DEFAULT_TEXT_BLOCK_SIZE_E;
+		text_block.multiline = 1;
+		SET_COLOR_RGBA_FLOAT(text_block.color_normal_glyph, 1, 1, 1, 1);
+		SET_COLOR_RGBA_FLOAT(text_block.color_normal_outline, 0, 0, 0, 1);
+		SET_COLOR_RGBA_FLOAT(text_block.color_emp_glyph, 1, 1, 0, 1);
+		SET_COLOR_RGBA_FLOAT(text_block.color_emp_outline, 0, 0, 0, 1);
+		char str[32];
+		sprintf(str, "%d/%d PLAYER HP", current_hp, total_hp);
+		text_block.text = str;
+		text_block.text_bytelen = (int)strlen(text_block.text);
+		text_block.begin_index = 0;
+		text_block.end_index = text_block.text_bytelen;
+		text_block.text_block_x = x;
+		text_block.text_block_y = y;
+		render_text_block(pLwc, &text_block);
+	}
 }
 
 static void render_dash_gauge(const LWCONTEXT* pLwc) {
@@ -441,34 +452,36 @@ void lwc_render_physics(const LWCONTEXT* pLwc) {
 		},
 	};
     const float wall_height = 0.8f;
-    // Floor
-	render_floor(pLwc, proj, puck_game, wall_shader_index, view, &sphere_render_uniform);
-    // North wall
-    render_wall(pLwc, proj, puck_game, wall_shader_index, view, 0, 2, 0, (float)LWDEG2RAD(90), 0,
-                LVT_CENTER_BOTTOM_ANCHORED_SQUARE, 2.0f, wall_height, 2.0f, &sphere_render_uniform);
-    // South wall
-    render_wall(pLwc, proj, puck_game, wall_shader_index, view, 0, -2, 0, (float)LWDEG2RAD(-90), 0,
-                LVT_CENTER_TOP_ANCHORED_SQUARE, 2.0f, wall_height, 2.0f, &sphere_render_uniform);
-    // East wall
-    render_wall(pLwc, proj, puck_game, wall_shader_index, view, 2, 0, 0, 0, (float)LWDEG2RAD(90),
-                LVT_LEFT_CENTER_ANCHORED_SQUARE, wall_height, 2.0f, 2.0f, &sphere_render_uniform);
-    // West wall
-    render_wall(pLwc, proj, puck_game, wall_shader_index, view, -2, 0, 0, 0, (float)LWDEG2RAD(-90),
-                LVT_RIGHT_CENTER_ANCHORED_SQUARE, wall_height, 2.0f, 2.0f, &sphere_render_uniform);
-    
-	render_go(pLwc, view, proj, &puck_game->go[LPGO_PUCK], pLwc->tex_atlas[LAE_PUCK_KTX],
-              1.0f, remote_puck_pos, pLwc->puck_game_state.puck_rot, remote, !remote ? puck_game->go[LPGO_PUCK].speed : pLwc->puck_game_state.puck_speed);
-	render_go(pLwc, view, proj, &puck_game->go[LPGO_PLAYER], pLwc->tex_atlas[LAE_PUCK_PLAYER_KTX],
-              1.0f, remote_player_pos, pLwc->puck_game_state.player_rot, remote, 0);
-	render_go(pLwc, view, proj, &puck_game->go[LPGO_TARGET], pLwc->tex_atlas[LAE_PUCK_ENEMY_KTX],
-              1.0f, remote_target_pos, pLwc->puck_game_state.target_rot, remote, 0);
+	if (puck_game->battle_id) {
+		// Floor
+		render_floor(pLwc, proj, puck_game, wall_shader_index, view, &sphere_render_uniform);
+		// North wall
+		render_wall(pLwc, proj, puck_game, wall_shader_index, view, 0, 2, 0, (float)LWDEG2RAD(90), 0,
+			LVT_CENTER_BOTTOM_ANCHORED_SQUARE, 2.0f, wall_height, 2.0f, &sphere_render_uniform);
+		// South wall
+		render_wall(pLwc, proj, puck_game, wall_shader_index, view, 0, -2, 0, (float)LWDEG2RAD(-90), 0,
+			LVT_CENTER_TOP_ANCHORED_SQUARE, 2.0f, wall_height, 2.0f, &sphere_render_uniform);
+		// East wall
+		render_wall(pLwc, proj, puck_game, wall_shader_index, view, 2, 0, 0, 0, (float)LWDEG2RAD(90),
+			LVT_LEFT_CENTER_ANCHORED_SQUARE, wall_height, 2.0f, 2.0f, &sphere_render_uniform);
+		// West wall
+		render_wall(pLwc, proj, puck_game, wall_shader_index, view, -2, 0, 0, 0, (float)LWDEG2RAD(-90),
+			LVT_RIGHT_CENTER_ANCHORED_SQUARE, wall_height, 2.0f, 2.0f, &sphere_render_uniform);
 
-	render_dir_pad(pLwc);
-	render_fist_button(pLwc);
-	render_top_button(pLwc);
-	render_dash_gauge(pLwc);
-	render_hp_gauge(pLwc, -0.8f, 1.0f - 0.1f, &pLwc->puck_game->player);
-	render_hp_gauge(pLwc, +0.8f, 1.0f - 0.1f, &pLwc->puck_game->target);
-	render_timer(pLwc);
+		render_go(pLwc, view, proj, &puck_game->go[LPGO_PUCK], pLwc->tex_atlas[LAE_PUCK_KTX],
+			1.0f, remote_puck_pos, pLwc->puck_game_state.puck_rot, remote, !remote ? puck_game->go[LPGO_PUCK].speed : pLwc->puck_game_state.puck_speed);
+		render_go(pLwc, view, proj, &puck_game->go[LPGO_PLAYER], pLwc->tex_atlas[LAE_PUCK_PLAYER_KTX],
+			1.0f, remote_player_pos, pLwc->puck_game_state.player_rot, remote, 0);
+		render_go(pLwc, view, proj, &puck_game->go[LPGO_TARGET], pLwc->tex_atlas[LAE_PUCK_ENEMY_KTX],
+			1.0f, remote_target_pos, pLwc->puck_game_state.target_rot, remote, 0);
+
+		render_dir_pad(pLwc);
+		render_fist_button(pLwc);
+		render_top_button(pLwc);
+		render_dash_gauge(pLwc);
+		render_hp_gauge(pLwc, -0.8f, 1.0f - 0.1f, pLwc->puck_game_state.player_current_hp, pLwc->puck_game_state.player_total_hp, 1);
+		render_hp_gauge(pLwc, +0.8f, 1.0f - 0.1f, pLwc->puck_game_state.target_current_hp, pLwc->puck_game_state.target_total_hp, 0);
+		render_timer(pLwc, puck_game_remain_time(pLwc->puck_game_state.update_tick));
+	}
 	render_match_state(pLwc);
 }

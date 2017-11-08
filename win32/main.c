@@ -87,6 +87,36 @@ static GLFWwindow* create_glfw_window()
 	return window;
 }
 
+#if LW_PLATFORM_WIN32
+static void make_multiple_instances_nonoverlapping(GLFWwindow* window, const RECT* work_area, int window_rect_to_client_rect_dx, int window_rect_to_client_rect_dy, int width, int height) {
+	HANDLE first_mutex = CreateMutex(NULL, TRUE, "laidoff-win32-client-mutex-1");
+	int first_window_exists = GetLastError() == ERROR_ALREADY_EXISTS;
+	if (first_window_exists) {
+		CloseHandle(first_mutex);
+		HANDLE second_mutex = CreateMutex(NULL, TRUE, "laidoff-win32-client-mutex-2");
+		int second_window_exists = GetLastError() == ERROR_ALREADY_EXISTS;
+		if (second_window_exists) {
+			CloseHandle(second_mutex);
+			HANDLE third_mutex = CreateMutex(NULL, TRUE, "laidoff-win32-client-mutex-3");
+			int third_window_exists = GetLastError() == ERROR_ALREADY_EXISTS;
+			if (third_window_exists) {
+				CloseHandle(third_mutex);
+				// fourth position
+				glfwSetWindowPos(window, work_area->left + window_rect_to_client_rect_dx + width + window_rect_to_client_rect_dx, work_area->top + window_rect_to_client_rect_dy + height + window_rect_to_client_rect_dy);
+			}
+			else {
+				// third position
+				glfwSetWindowPos(window, work_area->left + window_rect_to_client_rect_dx, work_area->top + window_rect_to_client_rect_dy + height + window_rect_to_client_rect_dy);
+			}
+		}
+		else {
+			// second position
+			glfwSetWindowPos(window, work_area->left + window_rect_to_client_rect_dx + width + window_rect_to_client_rect_dx, work_area->top + window_rect_to_client_rect_dy);
+		}
+	}
+}
+#endif
+
 int main(int argc, char* argv[])
 {
 	LOGI("LAIDOFF: Greetings.");
@@ -163,6 +193,7 @@ int main(int argc, char* argv[])
 	int client_rect_height = client_rect.bottom - client_rect.top;
 	int window_rect_to_client_rect_dx = window_rect_width - client_rect_width;
 	int window_rect_to_client_rect_dy = window_rect_height - client_rect_height;
+
 	glfwSetWindowPos(window, work_area.left + window_rect_to_client_rect_dx, work_area.top + window_rect_to_client_rect_dy);
 #elif LW_PLATFORM_OSX
     glfwSetWindowPos(window, 0, 0);
@@ -192,7 +223,9 @@ int main(int argc, char* argv[])
 	int width = 0;
 	int height = 0;
 	glfwGetFramebufferSize(window, &width, &height);
-
+#if LW_PLATFORM_WIN32
+	make_multiple_instances_nonoverlapping(window, &work_area, window_rect_to_client_rect_dx, window_rect_to_client_rect_dy, width, height);
+#endif
 	LWCONTEXT* pLwc = lw_init_initial_size(width, height);
 
 	lw_set_window(pLwc, window);

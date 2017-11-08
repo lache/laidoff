@@ -110,13 +110,20 @@ static int lw_get_normalized_dir_pad_input(const LWREMOTEPLAYERCONTROL* control,
 
 static void update_puck_game(LWSERVER* server, LWPUCKGAME* puck_game, double delta_time) {
 	puck_game->time += (float)delta_time;
+	if (puck_game->player.current_hp <= 0 || puck_game->target.current_hp <= 0) {
+		return;
+	}
 	puck_game->player.puck_contacted = 0;
+	puck_game->target.puck_contacted = 0;
 	dSpaceCollide(puck_game->space, puck_game, puck_game_near_callback);
 	//dWorldStep(puck_game->world, 0.005f);
 	dWorldQuickStep(puck_game->world, 1.0f / 60);
 	dJointGroupEmpty(puck_game->contact_joint_group);
 	if (puck_game->player.puck_contacted == 0) {
 		puck_game->player.last_contact_puck_body = 0;
+	}
+	if (puck_game->target.puck_contacted == 0) {
+		puck_game->target.last_contact_puck_body = 0;
 	}
 	
 	const dReal* p = dBodyGetPosition(puck_game->go[LPGO_PUCK].body);
@@ -351,10 +358,11 @@ void broadcast_packet(LWSERVER* server, const LWCONN* conn, int conn_capacity, c
 }
 
 void on_player_damaged(LWPUCKGAME* puck_game) {
-	LWSERVER* server = puck_game->server;
-	LWPPLAYERDAMAGED p;
-	p.type = LPGP_LWPPLAYERDAMAGED;
-	SERVER_SEND(server, p);
+	puck_game_go_decrease_hp_test(puck_game, &puck_game->player, &puck_game->remote_dash[0]);
+}
+
+void on_target_damaged(LWPUCKGAME* puck_game) {
+	puck_game_go_decrease_hp_test(puck_game, &puck_game->target, &puck_game->remote_dash[1]);
 }
 
 void select_tcp_server(LWTCPSERVER* server) {
@@ -398,7 +406,12 @@ void select_tcp_server(LWTCPSERVER* server) {
 
 int check_token(LWSERVER* server, LWPUDPHEADER* p, LWPUCKGAME** puck_game) {
 	if (p->battle_id < 1 || p->battle_id > LW_PUCK_GAME_POOL_CAPACITY) {
-		LOGE("Invalid battle id range: %d", p->battle_id);
+		if (p->battle_id != 0) {
+			LOGE("Invalid battle id range: %d", p->battle_id);
+		}
+		else {
+			// p->battle_id == 0 everytime client runs
+		}
 		return -1;
 	}
 	LWPUCKGAME* pg = server->puck_game_pool[p->battle_id - 1];
@@ -564,30 +577,55 @@ int tcp_server_entry(void* context) {
 		char recv_buf[512];
 		int recv_len = recv(client_sock, recv_buf, 512, 0);
 		LOGI("Admin TCP recv len: %d", recv_len);
-		LWPCREATEBATTLE* p = (LWPCREATEBATTLE*)recv_buf;
-		if (p->type == LPGP_LWPCREATEBATTLE && p->size == sizeof(LWPCREATEBATTLE) && recv_len == p->size) {
+		LWPBASE* base = (LWPBASE*)recv_buf;
+		if (base->type == LPGP_LWPCREATEBATTLE && base->size == sizeof(LWPCREATEBATTLE)) {
 			LWPCREATEBATTLEOK reply_p;
-			LOGI("Create a new puck game instance");
-			server->puck_game_pool[server->battle_counter] = new_puck_game();
-			server->puck_game_pool[server->battle_counter]->c1_token = pcg32_random();
-			server->puck_game_pool[server->battle_counter]->c2_token = pcg32_random();
+			LOGI("LWPCREATEBATTLE: Create a new puck game instance");
+			LWPUCKGAME* puck_game = new_puck_game();
+			const int battle_id = server->battle_counter + 1; // battle id is 1-based index
+			puck_game->server = server;
+			puck_game->battle_id = battle_id;
+			puck_game->on_player_damaged = on_player_damaged;
+			puck_game->on_target_damaged = on_target_damaged;
+			puck_game->c1_token = pcg32_random();
+			puck_game->c2_token = pcg32_random();
 			// Build reply packet
 			reply_p.Type = LPGP_LWPCREATEBATTLEOK;
 			reply_p.Size = sizeof(LWPCREATEBATTLEOK);
-			reply_p.Battle_id = server->battle_counter + 1;
-			reply_p.C1_token = server->puck_game_pool[server->battle_counter]->c1_token;
-			reply_p.C2_token = server->puck_game_pool[server->battle_counter]->c2_token;
+			reply_p.Battle_id = battle_id;
+			reply_p.C1_token = puck_game->c1_token;
+			reply_p.C2_token = puck_game->c2_token;
 			reply_p.IpAddr[0] = 192;
 			reply_p.IpAddr[1] = 168;
 			reply_p.IpAddr[2] = 0;
 			reply_p.IpAddr[3] = 28;
 			reply_p.Port = 10288;
+			server->puck_game_pool[server->battle_counter] = puck_game;
+			// send reply to client
 			send(client_sock, (const char*)&reply_p, sizeof(LWPCREATEBATTLEOK), 0);
-			// Increment and wrap battle counter
+			// Increment and wrap battle counter (XXX)
 			server->battle_counter++;
 			if (server->battle_counter >= LW_PUCK_GAME_POOL_CAPACITY) {
 				server->battle_counter = 0;
+				if (server->puck_game_pool[server->battle_counter]) {
+					delete_puck_game(&server->puck_game_pool[server->battle_counter]);
+				}
 			}
+		}
+		else if (base->type == LPGP_LWPSUDDENDEATH && base->size == sizeof(LWPSUDDENDEATH)) {
+			LOGI("LWPSUDDENDEATH!");
+			LWPSUDDENDEATH* p = (LWPSUDDENDEATH*)base;
+			if (p->Battle_id < 1 || p->Battle_id > LW_PUCK_GAME_POOL_CAPACITY) {
+
+			}
+			else {
+				LWPUCKGAME* pg = server->puck_game_pool[p->Battle_id - 1];
+				if (pg->c1_token == p->Token || pg->c2_token == p->Token) {
+					pg->player.current_hp = 1;
+					pg->target.current_hp = 1;
+				}
+			}
+
 		}
 		else {
 			LOGE("Admin TCP unexpected packet");
@@ -626,6 +664,10 @@ void broadcast_state_packet(LWSERVER* server, const LWCONN* conn, int conn_capac
 				packet_state.puck_move_rad = puck_game->go[LPGO_PUCK].move_rad;
 				packet_state.player_move_rad = puck_game->go[LPGO_PLAYER].move_rad;
 				packet_state.target_move_rad = puck_game->go[LPGO_TARGET].move_rad;
+				packet_state.player_current_hp = puck_game->player.current_hp;
+				packet_state.player_total_hp = puck_game->player.total_hp;
+				packet_state.target_current_hp = puck_game->target.current_hp;
+				packet_state.target_total_hp = puck_game->target.total_hp;
 
 				double tp = lwtimepoint_now_seconds();
 				sendto(server->s, (const char*)&packet_state, sizeof(packet_state), 0, (struct sockaddr*)&conn[i].si, server->slen);
@@ -657,6 +699,7 @@ int main(int argc, char* argv[]) {
 	LWPUCKGAME* puck_game = new_puck_game();
 	puck_game->server = server;
 	puck_game->on_player_damaged = on_player_damaged;
+	puck_game->on_target_damaged = on_target_damaged;
 	const int logic_hz = 125;
 	const double logic_timestep = 1.0 / logic_hz;
 	const int rendering_hz = 60;

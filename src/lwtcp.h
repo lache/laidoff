@@ -18,12 +18,13 @@
 #endif
 #include "lwringbuffer.h"
 
-#if LW_PLATFORM_ANDROID
+#if LW_PLATFORM_ANDROID || LW_PLATFORM_IOS
 #define LW_TCP_SERVER "puck-highend.popsongremix.com"
 #else
-#define LW_TCP_SERVER "192.168.0.28"
-//#define LW_TCP_SERVER "puck.popsongremix.com"
+#define LW_TCP_SERVER "221.147.71.76" // Site C
+//#define LW_TCP_SERVER "192.168.0.28"
 //#define LW_TCP_SERVER "221.147.71.76"
+//#define LW_TCP_SERVER "puck.popsongremix.com"
 #endif
 #define LW_TCP_PORT_STR "19856"
 #define LW_TCP_BUFLEN 512
@@ -50,3 +51,5 @@ LWTCP* new_tcp();
 void destroy_tcp(LWTCP** tcp);
 void tcp_send(LWTCP* tcp, const char* data, int size);
 void tcp_update(LWCONTEXT* pLwc, LWTCP* tcp);
+int tcp_send_queue2(LWTCP* tcp);
+int tcp_send_suddendeath(LWTCP* tcp, int battle_id, unsigned int token);

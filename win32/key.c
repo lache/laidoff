@@ -42,6 +42,10 @@ static void handle_move_key_press_release(LWCONTEXT* pLwc, int key, int action) 
 		lw_press_key_x(pLwc);
 	}
 
+	if (key == GLFW_KEY_Q && action == GLFW_PRESS) {
+		lw_press_key_q(pLwc);
+	}
+
 	if (key == GLFW_KEY_RIGHT && action == GLFW_RELEASE) {
 		lw_release_key_right(pLwc);
 	}
@@ -68,6 +72,10 @@ static void handle_move_key_press_release(LWCONTEXT* pLwc, int key, int action) 
 
 	if (key == GLFW_KEY_X && action == GLFW_RELEASE) {
 		lw_release_key_x(pLwc);
+	}
+
+	if (key == GLFW_KEY_Q && action == GLFW_RELEASE) {
+		lw_release_key_q(pLwc);
 	}
 
 }

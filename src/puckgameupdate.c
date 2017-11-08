@@ -9,6 +9,7 @@
 #include "input.h"
 #include "lwudp.h"
 #include "puckgamepacket.h"
+#include "lwtcp.h"
 
 void update_puck_game(LWCONTEXT* pLwc, LWPUCKGAME* puck_game, double delta_time) {
 	if (!puck_game->world) {
@@ -19,6 +20,7 @@ void update_puck_game(LWCONTEXT* pLwc, LWPUCKGAME* puck_game, double delta_time)
 	}
 	puck_game->remote = !pLwc->udp->master;
 	puck_game->on_player_damaged = puck_game->remote ? 0 : puck_game_player_decrease_hp_test;
+	puck_game->on_target_damaged = puck_game->remote ? 0 : puck_game_target_decrease_hp_test;
 	puck_game->time += (float)delta_time;
 	puck_game->player.puck_contacted = 0;
 	dSpaceCollide(puck_game->space, puck_game, puck_game_near_callback);
@@ -163,7 +165,7 @@ void puck_game_dash(LWCONTEXT* pLwc, LWPUCKGAME* puck_game) {
 		return;
 	}
 	// Check already effective dash
-	if (puck_game_dashing(puck_game)) {
+	if (puck_game_dashing(&puck_game->dash)) {
 		return;
 	}
 	// Check effective move input
@@ -213,6 +215,14 @@ void puck_game_target_dash(LWPUCKGAME* puck_game, int player_no) {
 
 void puck_game_pull_puck_start(LWCONTEXT* pLwc, LWPUCKGAME* puck_game) {
 	puck_game->pull_puck = 1;
+	// queue again after game ended
+	if (puck_game->battle_id
+		&& pLwc->tcp
+		&& (pLwc->puck_game_state.player_current_hp <= 0 || pLwc->puck_game_state.target_current_hp <= 0)) {
+		puck_game->battle_id = 0;
+		puck_game->token = 0;
+		tcp_send_queue2(pLwc->tcp);
+	}
 }
 
 void puck_game_pull_puck_stop(LWCONTEXT* pLwc, LWPUCKGAME* puck_game) {

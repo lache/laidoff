@@ -52,7 +52,7 @@ func main() {
 		if err != nil {
 			log.Println("Error accepting: ", err.Error())
 		} else {
-			go handleRequest(conn, matchQueue)
+			go handleRequest(conf, conn, matchQueue)
 		}
 	}
 }
@@ -176,7 +176,7 @@ func sendRetryQueue(conn net.Conn) {
 	}
 }
 
-func handleRequest(conn net.Conn, matchQueue chan<- net.Conn) {
+func handleRequest(conf ServerConfig, conn net.Conn, matchQueue chan<- net.Conn) {
 	log.Printf("Accepting from %v", conn.RemoteAddr())
 	for {
 		buf := make([]byte, 1024)
@@ -203,6 +203,20 @@ func handleRequest(conn net.Conn, matchQueue chan<- net.Conn) {
 				C.LPGP_LWPQUEUEOK,
 			})
 			conn.Write(queueOkBuf)
+		case C.LPGP_LWPSUDDENDEATH:
+			log.Printf("SUDDENDEATH received")
+			tcpAddr, err := net.ResolveTCPAddr(conf.BattleServiceConnType, conf.BattleServiceHost + ":" + conf.BattleServicePort)
+			if err != nil {
+				log.Fatalf("ResolveTCPAddr error! - %v", err.Error())
+			}
+			conn, err := net.DialTCP("tcp", nil, tcpAddr)
+			if err != nil {
+				log.Fatalf("DialTCP error! - %v", err.Error())
+			}
+			_, err = conn.Write(buf)
+			if err != nil {
+				log.Fatalf("Send SUDDENDEATH failed")
+			}
 		}
 	}
 	conn.Close()

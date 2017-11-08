@@ -6,6 +6,7 @@ enum _LW_PUCK_GAME_PACKET {
 	LPGP_LWPQUEUE,
 	LPGP_LWPMATCHED,
 	LPGP_LWPPLAYERDAMAGED,
+	LPGP_LWPTARGETDAMAGED,
 	
 	LPGP_LWPMOVE = 100,
 	LPGP_LWPSTOP,
@@ -20,6 +21,7 @@ enum _LW_PUCK_GAME_PACKET {
 	LPGP_LWPMATCHED2 = 202,
 	LPGP_LWPQUEUEOK = 203,
 	LPGP_LWPRETRYQUEUE = 204,
+	LPGP_LWPSUDDENDEATH = 205,
 
 	// internal admin tcp
 	LPGP_LWPCREATEBATTLE = 1000,
@@ -52,6 +54,10 @@ typedef struct _LWPMATCHED {
 typedef struct _LWPPLAYERDAMAGED {
 	int type;
 } LWPPLAYERDAMAGED;
+
+typedef struct _LWPTARGETDAMAGED {
+	int type;
+} LWPTARGETDAMAGED;
 
 typedef struct _LWPUDPHEADER {
 	int type;
@@ -115,6 +121,11 @@ typedef struct _LWPSTATE {
 	float target_rot[4][4];
 	float target_speed;
 	float target_move_rad;
+	// HP
+	int player_current_hp;
+	int player_total_hp;
+	int target_current_hp;
+	int target_total_hp;
 } LWPSTATE;
 
 // should be 4-byte aligned...
@@ -150,6 +161,11 @@ typedef struct _LWPMATCHED2 {
 	unsigned int token;
 } LWPMATCHED2;
 
+typedef struct _LWPBASE {
+	unsigned short size;
+	unsigned short type;
+} LWPBASE;
+
 typedef struct _LWPCREATEBATTLE {
 	unsigned short size;
 	unsigned short type;
@@ -165,5 +181,12 @@ typedef struct _LWPCREATEBATTLEOK {
 	unsigned short Port;
 	unsigned short Padding_unused;
 } LWPCREATEBATTLEOK;
+
+typedef struct _LWPSUDDENDEATH {
+	unsigned short Size;
+	unsigned short Type;
+	int Battle_id;
+	unsigned int Token;
+} LWPSUDDENDEATH;
 
 //#pragma pack(pop)
