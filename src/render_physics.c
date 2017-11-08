@@ -1,4 +1,4 @@
-#include "lwcontext.h"
+ï»¿#include "lwcontext.h"
 #include "render_physics.h"
 #include "render_solid.h"
 #include "laidoff.h"
@@ -109,10 +109,10 @@ static void render_match_state(const LWCONTEXT* pLwc) {
 	SET_COLOR_RGBA_FLOAT(text_block.color_emp_outline, 0, 0, 0, 1);
 	char str[32];
 	if (pLwc->puck_game->token) {
-		sprintf(str, u8"ÀüÅõÁß...");
+		sprintf(str, u8"ì „íˆ¬ì¤‘...");
 	}
 	else {
-		sprintf(str, u8"´ëÀü »ó´ë Ã£´ÂÁß...");
+		sprintf(str, u8"ëŒ€ì „ ìƒëŒ€ ì°¾ëŠ”ì¤‘...");
 	}
 	text_block.text = str;
 	text_block.text_bytelen = (int)strlen(text_block.text);

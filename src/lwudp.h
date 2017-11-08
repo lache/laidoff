@@ -13,7 +13,7 @@
 #include <czmq_prelude.h>
 #endif
 #if LW_PLATFORM_ANDROID
-/#define LW_UDP_SERVER "puck-highend.popsongremix.com"
+#define LW_UDP_SERVER "puck-highend.popsongremix.com"
 #else
 //#define LW_UDP_SERVER "puck.popsongremix.com"
 #define LW_UDP_SERVER "192.168.0.28" // Site A
