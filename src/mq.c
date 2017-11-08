@@ -91,7 +91,7 @@ void* init_mq(const char* addr, void* sm) {
 
 	char sys_msg[128];
 	sprintf(sys_msg, LWU("Connecting %s"), addr);
-	show_sys_msg(sm, sys_msg);
+	//show_sys_msg(sm, sys_msg);
 
 	// First we request a time sync:
 	mq->start_req_time_mono = zclock_mono();

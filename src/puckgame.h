@@ -48,6 +48,13 @@ typedef struct _LWPUCKGAMEPLAYER {
 	float hp_shake_remain_time;
 } LWPUCKGAMEPLAYER;
 
+typedef struct _LWREMOTEPLAYERCONTROL {
+	int dir_pad_dragging;
+	float dx;
+	float dy;
+	int pull_puck;
+} LWREMOTEPLAYERCONTROL;
+
 typedef struct _LWPUCKGAME {
 	// Static game data
 	float world_size;
@@ -69,20 +76,28 @@ typedef struct _LWPUCKGAME {
 	dJointGroupID  player_control_joint_group;
 	dJointGroupID  target_control_joint_group;
 	dJointGroupID  puck_pull_control_joint_group;
-	dJointID player_control_joint;
-	dJointID target_control_joint;
+	dJointID player_control_joint; // player 1
+	dJointID target_control_joint; // player 2
 	dJointID puck_pull_control_joint;
 	int push;
 	float time;
 	LWPUCKGAMEDASH dash;
-	LWPUCKGAMEDASH remote_dash;
 	LWPUCKGAMEPLAYER player;
+	LWPUCKGAMEPLAYER target;
 	float last_remote_dx;
 	float last_remote_dy;
 	int pull_puck;
 	int remote;
 	void(*on_player_damaged)(LWPUCKGAME*);
 	void* server;
+	int battle_id;
+	unsigned int token;
+	unsigned int c1_token;
+	unsigned int c2_token;
+	LWREMOTEPLAYERCONTROL remote_control[2];
+	LWPUCKGAMEDASH remote_dash[2];
+	int init_ready;
+	int update_tick;
 } LWPUCKGAME;
 
 LWPUCKGAME* new_puck_game();
@@ -93,5 +108,5 @@ float puck_game_dash_cooltime(LWPUCKGAME* puck_game);
 int puck_game_dashing(LWPUCKGAME* puck_game);
 void puck_game_near_callback(void *data, dGeomID o1, dGeomID o2);
 void puck_game_commit_dash(LWPUCKGAME* puck_game, LWPUCKGAMEDASH* dash, float dx, float dy);
-void puck_game_commit_dash_to_puck(LWPUCKGAME* puck_game, LWPUCKGAMEDASH* dash);
+void puck_game_commit_dash_to_puck(LWPUCKGAME* puck_game, LWPUCKGAMEDASH* dash, int player_no);
 void puck_game_player_decrease_hp_test(LWPUCKGAME* puck_game);

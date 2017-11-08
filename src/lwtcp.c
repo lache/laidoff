@@ -3,6 +3,8 @@
 #include "puckgamepacket.h"
 #include "lwcontext.h"
 #include "sysmsg.h"
+#include "puckgame.h"
+#include "lwudp.h"
 
 #if LW_PLATFORM_WIN32
 #else
@@ -120,23 +122,29 @@ int parse_recv_packets(LWCONTEXT* pLwc, LWTCP* tcp) {
 		unsigned short packet_size = *(unsigned short*)(cursor + 0);
 		// still incomplete packet
 		if (packet_size == 0 || packet_size > tcp->recvbufnotparsed - parsed_bytes) {
-			return -2;
+			return parsed_bytes;
 		}
 		unsigned short packet_type = *(unsigned short*)(cursor + 2);
 		if (CHECK_PACKET(packet_type, packet_size, LWPMATCHED2)) {
-			LOGI("LWPMATCHED2 received");
-			show_sys_msg(pLwc->def_sys_msg, "LWPMATCHED2 received");
+			LWPMATCHED2* p = (LWPMATCHED2*)cursor;
+			LOGI("LWPMATCHED2 - bid:%d", p->battle_id);
+			pLwc->puck_game->battle_id = p->battle_id;
+			pLwc->puck_game->token = p->token;
+			udp_update_addr(pLwc->udp, *(unsigned long*)p->ipaddr, p->port);
+			//show_sys_msg(pLwc->def_sys_msg, "LWPMATCHED2 received");
 		} else if (CHECK_PACKET(packet_type, packet_size, LWPQUEUEOK)) {
 			LOGI("LWPQUEUEOK received");
-			show_sys_msg(pLwc->def_sys_msg, "LWPQUEUEOK received");
-		}
-		else if (CHECK_PACKET(packet_type, packet_size, LWPRETRYQUEUE)) {
+			//show_sys_msg(pLwc->def_sys_msg, "LWPQUEUEOK received");
+		} else if (CHECK_PACKET(packet_type, packet_size, LWPRETRYQUEUE)) {
 			LOGI("LWPRETRYQUEUE received");
-			show_sys_msg(pLwc->def_sys_msg, "LWPRETRYQUEUE received");
-		}
-		else if (CHECK_PACKET(packet_type, packet_size, LWPMAYBEMATCHED)) {
+			//show_sys_msg(pLwc->def_sys_msg, "LWPRETRYQUEUE received");
+			// Resend QUEUE2
+			NEW_TCP_PACKET(LWPQUEUE2, p);
+			memcpy(tcp->sendbuf, &p, sizeof(p));
+			send(tcp->ConnectSocket, tcp->sendbuf, (int)sizeof(p), 0);
+		} else if (CHECK_PACKET(packet_type, packet_size, LWPMAYBEMATCHED)) {
 			LOGI("LWPMAYBEMATCHED received");
-			show_sys_msg(pLwc->def_sys_msg, "LWPMAYBEMATCHED received");
+			//show_sys_msg(pLwc->def_sys_msg, "LWPMAYBEMATCHED received");
 		} else {
 			LOGE("Unknown TCP packet");
 		}

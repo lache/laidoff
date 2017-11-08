@@ -47,10 +47,9 @@ LWUDP* new_udp() {
 	//setup address structure
 	memset((char *)&udp->si_other, 0, sizeof(udp->si_other));
 	udp->si_other.sin_family = AF_INET;
-	udp->si_other.sin_port = htons(LW_UDP_PORT);
 	struct hostent* he = gethostbyname(LW_UDP_SERVER);
 	struct in_addr** addr_list = (struct in_addr **) he->h_addr_list;
-	udp->si_other.sin_addr.s_addr = addr_list[0]->s_addr;
+	udp_update_addr(udp, addr_list[0]->s_addr, LW_UDP_PORT);
 	udp->tv.tv_sec = 0;
 	udp->tv.tv_usec = 0;
 	make_socket_nonblocking(udp->s);
@@ -58,6 +57,11 @@ LWUDP* new_udp() {
 	udp->master = 1;
 	ringbuffer_init(&udp->state_ring_buffer, udp->state_buffer, sizeof(LWPSTATE), LW_STATE_RING_BUFFER_CAPACITY);
 	return udp;
+}
+
+void udp_update_addr(LWUDP* udp, unsigned long ip, unsigned short port) {
+	udp->si_other.sin_addr.s_addr = ip;
+	udp->si_other.sin_port = htons(port);
 }
 
 void destroy_udp(LWUDP** udp) {
@@ -124,7 +128,7 @@ void udp_update(LWCONTEXT* pLwc, LWUDP* udp) {
 			}
 			LWPTOKEN* p = (LWPTOKEN*)udp->buf;
 			LOGI("LWPTOKEN: Change token from 0x%08x to 0x%08x", udp->token, p->token);
-			udp->token = p->token;
+			//udp->token = p->token;
 			udp->state = LUS_QUEUE;
 			break;
 		}
@@ -181,7 +185,7 @@ void udp_update(LWCONTEXT* pLwc, LWUDP* udp) {
 				if (udp->recv_len != sizeof(LWPDASH)) {
 					LOGE("LWPDASH: Size error %d (%d expected)", udp->recv_len, sizeof(LWPDASH));
 				}
-				puck_game_target_dash(pLwc->puck_game);
+				puck_game_target_dash(pLwc->puck_game, 1);
 				//LOGI("DASH");
 				/*const dReal* player_vel = dBodyGetLinearVel(puck_game->go[LPGO_PLAYER].body);
 				puck_game_commit_dash(puck_game,

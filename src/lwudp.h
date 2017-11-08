@@ -12,10 +12,13 @@
 #include <stdlib.h>
 #include <czmq_prelude.h>
 #endif
+#if LW_PLATFORM_ANDROID
+/#define LW_UDP_SERVER "puck-highend.popsongremix.com"
+#else
 //#define LW_UDP_SERVER "puck.popsongremix.com"
-//#define LW_UDP_SERVER "192.168.0.28" // Site A
+#define LW_UDP_SERVER "192.168.0.28" // Site A
 //#define LW_UDP_SERVER "118.33.89.239" // Site B
-#define LW_UDP_SERVER "puck-highend.popsongremix.com"
+#endif
 #define LW_UDP_BUFLEN 512
 #define LW_UDP_PORT 10288
 #include "puckgamepacket.h"
@@ -64,6 +67,7 @@ typedef struct _LWUDP {
 typedef struct _LWCONTEXT LWCONTEXT;
 
 LWUDP* new_udp();
+void udp_update_addr(LWUDP* udp, unsigned long ip, unsigned short port);
 void destroy_udp(LWUDP** udp);
 void udp_send(LWUDP* udp, const char* data, int size);
 void udp_update(LWCONTEXT* pLwc, LWUDP* udp);

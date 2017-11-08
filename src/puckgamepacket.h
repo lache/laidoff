@@ -53,39 +53,52 @@ typedef struct _LWPPLAYERDAMAGED {
 	int type;
 } LWPPLAYERDAMAGED;
 
+typedef struct _LWPUDPHEADER {
+	int type;
+	int battle_id;
+	int token;
+} LWPUDPHEADER;
 
-
-
+// UDP
 typedef struct _LWPMOVE {
 	int type;
+	int battle_id;
 	int token;
 	float dx;
 	float dy;
 } LWPMOVE;
 
+// UDP
 typedef struct _LWPSTOP {
 	int type;
+	int battle_id;
 	int token;
 } LWPSTOP;
 
+// UDP
 typedef struct _LWPDASH {
 	int type;
+	int battle_id;
 	int token;
 } LWPDASH;
 
+// UDP
 typedef struct _LWPPULLSTART {
 	int type;
+	int battle_id;
 	int token;
 } LWPPULLSTART;
 
+// UDP
 typedef struct _LWPPULLSTOP {
 	int type;
+	int battle_id;
 	int token;
 } LWPPULLSTOP;
 
+// UDP
 typedef struct _LWPSTATE {
 	int type;
-	int token;
 	int update_tick;
 	// player
 	float player[3];
@@ -103,8 +116,6 @@ typedef struct _LWPSTATE {
 	float target_speed;
 	float target_move_rad;
 } LWPSTATE;
-
-
 
 // should be 4-byte aligned...
 // (Cgo compatability issue)
@@ -133,11 +144,11 @@ typedef struct _LWPMATCHED2 {
 	unsigned short size;
 	unsigned short type;
 	unsigned short port;
-	unsigned short __padding_unused;
+	unsigned short padding_unused;
 	unsigned char ipaddr[4];
 	int battle_id;
+	unsigned int token;
 } LWPMATCHED2;
-
 
 typedef struct _LWPCREATEBATTLE {
 	unsigned short size;
@@ -148,6 +159,11 @@ typedef struct _LWPCREATEBATTLEOK {
 	unsigned short Size;
 	unsigned short Type;
 	int Battle_id;
+	unsigned int C1_token;
+	unsigned int C2_token;
+	unsigned char IpAddr[4];
+	unsigned short Port;
+	unsigned short Padding_unused;
 } LWPCREATEBATTLEOK;
 
 //#pragma pack(pop)

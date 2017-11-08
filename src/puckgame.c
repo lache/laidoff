@@ -68,6 +68,8 @@ LWPUCKGAME* new_puck_game() {
 	puck_game->puck_damage_contact_speed_threshold = 1.1f;
 	puck_game->player.total_hp = 20;
 	puck_game->player.current_hp = 10;
+	puck_game->target.total_hp = 20;
+	puck_game->target.current_hp = 10;
     puck_game->sphere_mass = 0.1f;
     puck_game->sphere_radius = 0.16f; //0.125f;
 	// ------
@@ -134,7 +136,7 @@ LWPUCKGAME* new_puck_game() {
 	//dBodySetKinematic(puck_game->go[LPGO_PUCK].body);
 
 	puck_game->go[LPGO_PUCK].red_overlay = 1;
-
+	puck_game->init_ready = 1;
 	return puck_game;
 }
 
@@ -289,11 +291,11 @@ void puck_game_commit_dash(LWPUCKGAME* puck_game, LWPUCKGAMEDASH* dash, float dx
 	dash->last_time = puck_game->time;
 }
 
-void puck_game_commit_dash_to_puck(LWPUCKGAME* puck_game, LWPUCKGAMEDASH* dash) {
-	float dx = puck_game->go[LPGO_PUCK].pos[0] - puck_game->go[LPGO_PLAYER].pos[0];
-	float dy = puck_game->go[LPGO_PUCK].pos[1] - puck_game->go[LPGO_PLAYER].pos[1];
+void puck_game_commit_dash_to_puck(LWPUCKGAME* puck_game, LWPUCKGAMEDASH* dash, int player_no) {
+	float dx = puck_game->go[LPGO_PUCK].pos[0] - puck_game->go[player_no == 1 ? LPGO_PLAYER : LPGO_TARGET].pos[0];
+	float dy = puck_game->go[LPGO_PUCK].pos[1] - puck_game->go[player_no == 1 ? LPGO_PLAYER : LPGO_TARGET].pos[1];
 	const float ddlen = sqrtf(dx * dx + dy * dy);
 	dx /= ddlen;
 	dy /= ddlen;
-	puck_game_commit_dash(puck_game, &puck_game->dash, dx, dy);
+	puck_game_commit_dash(puck_game, dash, dx, dy);
 }

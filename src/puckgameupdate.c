@@ -59,7 +59,6 @@ void update_puck_game(LWCONTEXT* pLwc, LWPUCKGAME* puck_game, double delta_time)
 		if (pLwc->udp->master) {
 			LWPSTATE p;
 			p.type = LPGP_LWPSTATE;
-			p.token = pLwc->udp->token;
 			p.puck[0] = puck_game->go[LPGO_PUCK].pos[0];
 			p.puck[1] = puck_game->go[LPGO_PUCK].pos[1];
 			p.puck[2] = puck_game->go[LPGO_PUCK].pos[2];
@@ -91,7 +90,8 @@ void update_puck_game(LWCONTEXT* pLwc, LWPUCKGAME* puck_game, double delta_time)
 		if (!pLwc->udp->master && pLwc->udp->state == LUS_MATCHED) {
 			LWPMOVE packet_move;
 			packet_move.type = LPGP_LWPMOVE;
-			packet_move.token = pLwc->udp->token;
+			packet_move.battle_id = pLwc->puck_game->battle_id;
+			packet_move.token = pLwc->puck_game->token;
 			packet_move.dx = dx;
 			packet_move.dy = dy;
 			udp_send(pLwc->udp, (const char*)&packet_move, sizeof(packet_move));
@@ -104,7 +104,8 @@ void update_puck_game(LWCONTEXT* pLwc, LWPUCKGAME* puck_game, double delta_time)
 		if (!pLwc->udp->master && pLwc->udp->state == LUS_MATCHED) {
 			LWPSTOP packet_stop;
 			packet_stop.type = LPGP_LWPSTOP;
-			packet_stop.token = pLwc->udp->token;
+			packet_stop.battle_id = pLwc->puck_game->battle_id;
+			packet_stop.token = pLwc->puck_game->token;
 			udp_send(pLwc->udp, (const char*)&packet_stop, sizeof(packet_stop));
 		}
 		
@@ -143,13 +144,15 @@ void update_puck_game(LWCONTEXT* pLwc, LWPUCKGAME* puck_game, double delta_time)
 
 		LWPPULLSTART p;
 		p.type = LPGP_LWPPULLSTART;
-		p.token = pLwc->udp->token;
+		p.battle_id = pLwc->puck_game->battle_id;
+		p.token = pLwc->puck_game->token;
 		udp_send(pLwc->udp, (const char*)&p, sizeof(p));
 	}
 	else {
 		LWPPULLSTOP p;
 		p.type = LPGP_LWPPULLSTOP;
-		p.token = pLwc->udp->token;
+		p.battle_id = pLwc->puck_game->battle_id;
+		p.token = pLwc->puck_game->token;
 		udp_send(pLwc->udp, (const char*)&p, sizeof(p));
 	}
 }
@@ -176,13 +179,14 @@ void puck_game_dash(LWCONTEXT* pLwc, LWPUCKGAME* puck_game) {
 	}
 
 	// Start dash!
-	puck_game_commit_dash_to_puck(puck_game, &puck_game->dash);
+	puck_game_commit_dash_to_puck(puck_game, &puck_game->dash, 1);
 	//puck_game_commit_dash(puck_game, &puck_game->dash, dx, dy);
 
 	if (!pLwc->udp->master) {
 		LWPDASH packet_dash;
 		packet_dash.type = LPGP_LWPDASH;
-		packet_dash.token = pLwc->udp->token;
+		packet_dash.battle_id = pLwc->puck_game->battle_id;
+		packet_dash.token = pLwc->puck_game->token;
 		udp_send(pLwc->udp, (const char*)&packet_dash, sizeof(packet_dash));
 	}
 }
@@ -203,8 +207,8 @@ void puck_game_target_stop(LWPUCKGAME* puck_game) {
 	dJointSetLMotorParam(tcj, dParamVel2, 0);
 }
 
-void puck_game_target_dash(LWPUCKGAME* puck_game) {
-	puck_game_commit_dash(puck_game, &puck_game->remote_dash, puck_game->last_remote_dx, puck_game->last_remote_dy);
+void puck_game_target_dash(LWPUCKGAME* puck_game, int player_no) {
+	puck_game_commit_dash(puck_game, &puck_game->remote_dash[player_no - 1], puck_game->last_remote_dx, puck_game->last_remote_dy);
 }
 
 void puck_game_pull_puck_start(LWCONTEXT* pLwc, LWPUCKGAME* puck_game) {

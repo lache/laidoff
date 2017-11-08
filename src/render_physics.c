@@ -72,17 +72,66 @@ static void render_go(const LWCONTEXT* pLwc, const mat4x4 view, const mat4x4 pro
 	glDrawArrays(GL_TRIANGLES, 0, pLwc->vertex_buffer[lvt].vertex_count);
 }
 
-static void render_hp_gauge(const LWCONTEXT* pLwc) {
+static void render_timer(const LWCONTEXT* pLwc) {
+	// Render text
+	LWTEXTBLOCK text_block;
+	text_block.align = LTBA_CENTER_TOP;
+	text_block.text_block_width = DEFAULT_TEXT_BLOCK_WIDTH;
+	text_block.text_block_line_height = DEFAULT_TEXT_BLOCK_LINE_HEIGHT_E;
+	text_block.size = DEFAULT_TEXT_BLOCK_SIZE_A;
+	text_block.multiline = 1;
+	SET_COLOR_RGBA_FLOAT(text_block.color_normal_glyph, 1, 1, 1, 1);
+	SET_COLOR_RGBA_FLOAT(text_block.color_normal_outline, 0, 0, 0, 1);
+	SET_COLOR_RGBA_FLOAT(text_block.color_emp_glyph, 1, 1, 0, 1);
+	SET_COLOR_RGBA_FLOAT(text_block.color_emp_outline, 0, 0, 0, 1);
+	char str[32];
+	sprintf(str, u8"50");
+	text_block.text = str;
+	text_block.text_bytelen = (int)strlen(text_block.text);
+	text_block.begin_index = 0;
+	text_block.end_index = text_block.text_bytelen;
+	text_block.text_block_x = 0.0f;
+	text_block.text_block_y = 1.0f - 0.05f;
+	render_text_block(pLwc, &text_block);
+}
+
+static void render_match_state(const LWCONTEXT* pLwc) {
+	// Render text
+	LWTEXTBLOCK text_block;
+	text_block.align = LTBA_CENTER_BOTTOM;
+	text_block.text_block_width = DEFAULT_TEXT_BLOCK_WIDTH;
+	text_block.text_block_line_height = DEFAULT_TEXT_BLOCK_LINE_HEIGHT_E;
+	text_block.size = DEFAULT_TEXT_BLOCK_SIZE_C;
+	text_block.multiline = 1;
+	SET_COLOR_RGBA_FLOAT(text_block.color_normal_glyph, 1, 1, 1, 1);
+	SET_COLOR_RGBA_FLOAT(text_block.color_normal_outline, 0, 0, 0, 1);
+	SET_COLOR_RGBA_FLOAT(text_block.color_emp_glyph, 1, 1, 0, 1);
+	SET_COLOR_RGBA_FLOAT(text_block.color_emp_outline, 0, 0, 0, 1);
+	char str[32];
+	if (pLwc->puck_game->token) {
+		sprintf(str, u8"전투중...");
+	}
+	else {
+		sprintf(str, u8"대전 상대 찾는중...");
+	}
+	text_block.text = str;
+	text_block.text_bytelen = (int)strlen(text_block.text);
+	text_block.begin_index = 0;
+	text_block.end_index = text_block.text_bytelen;
+	text_block.text_block_x = 0;
+	text_block.text_block_y = -0.9f;
+	render_text_block(pLwc, &text_block);
+}
+
+static void render_hp_gauge(const LWCONTEXT* pLwc, float x, float y, const LWPUCKGAMEPLAYER* player) {
 	const float aspect_ratio = (float)pLwc->width / pLwc->height;
 	const float gauge_width = 1.2f;
 	const float gauge_height = 0.1f;
 	const float gauge_flush_height = 0.07f;
 	const float base_color = 0.1f;
-	float x = 0;
-	float y = 1.0f - 0.1f;
 	// Positioinal offset by shake
-	if (pLwc->puck_game->player.hp_shake_remain_time > 0) {
-		const float ratio = pLwc->puck_game->player.hp_shake_remain_time / pLwc->puck_game->hp_shake_time;
+	if (player->hp_shake_remain_time > 0) {
+		const float ratio = player->hp_shake_remain_time / pLwc->puck_game->hp_shake_time;
 		const float shake_magnitude = 0.02f;
 		x += ratio * (2 * rand() / (float)RAND_MAX - 1.0f) * shake_magnitude * aspect_ratio;
 		y += ratio * (2 * rand() / (float)RAND_MAX - 1.0f) * shake_magnitude;
@@ -94,8 +143,8 @@ static void render_hp_gauge(const LWCONTEXT* pLwc) {
 		LVT_CENTER_TOP_ANCHORED_SQUARE,
 		1, base_color, base_color, base_color, 1);
 	const float cell_border = 0.015f;
-	const int current_hp = pLwc->puck_game->player.current_hp;
-	const int total_hp = pLwc->puck_game->player.total_hp;
+	const int current_hp = player->current_hp;
+	const int total_hp = player->total_hp;
 	if (total_hp == 0) {
 		return;
 	}
@@ -418,5 +467,8 @@ void lwc_render_physics(const LWCONTEXT* pLwc) {
 	render_fist_button(pLwc);
 	render_top_button(pLwc);
 	render_dash_gauge(pLwc);
-	render_hp_gauge(pLwc);
+	render_hp_gauge(pLwc, -0.8f, 1.0f - 0.1f, &pLwc->puck_game->player);
+	render_hp_gauge(pLwc, +0.8f, 1.0f - 0.1f, &pLwc->puck_game->target);
+	render_timer(pLwc);
+	render_match_state(pLwc);
 }

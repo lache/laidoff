@@ -239,6 +239,8 @@ endif (NOT SERVER_ONLY)
 add_executable(laidoff-server
 	src/puckgame.c
 	src/puckgame.h
+	src/pcg_basic.c
+	src/pcg_basic.h
 	${LAIDOFF_SERVER_LIB}
 	${SERVER_WIN32_DEPS}
 	${ODE_LIB}
