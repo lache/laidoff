@@ -2,7 +2,6 @@
 #include "lwlog.h"
 #include "puckgamepacket.h"
 #include "lwcontext.h"
-#include "spherebattlepacket.h"
 #include "sysmsg.h"
 
 #if LW_PLATFORM_WIN32
@@ -28,7 +27,7 @@ static int make_socket_nonblocking(int sock) {
 #define NEW_TCP_PACKET(vartype, varname) \
 vartype varname; \
 varname.size = sizeof(vartype); \
-varname.type = LSBPT_##vartype
+varname.type = LPGP_##vartype
 
 
 LWTCP* new_tcp() {
@@ -72,7 +71,7 @@ LWTCP* new_tcp() {
 		free(tcp);
 		return 0;
 	}
-	NEW_TCP_PACKET(LWSPHEREBATTLEPACKETQUEUE2, p);
+	NEW_TCP_PACKET(LWPQUEUE2, p);
 	memcpy(tcp->sendbuf, &p, sizeof(p));
 	tcp->iResult = send(tcp->ConnectSocket, tcp->sendbuf, (int)sizeof(p), 0);
 	if (tcp->iResult == SOCKET_ERROR) {
@@ -108,7 +107,7 @@ void tcp_send(LWTCP* tcp, const char* data, int size) {
 }
 
 #define CHECK_PACKET(packet_type, packet_size, type) \
-packet_type == LSBPT_##type && packet_size == sizeof(type)
+packet_type == LPGP_##type && packet_size == sizeof(type)
 
 int parse_recv_packets(LWCONTEXT* pLwc, LWTCP* tcp) {
 	// too small for parsing
@@ -124,20 +123,20 @@ int parse_recv_packets(LWCONTEXT* pLwc, LWTCP* tcp) {
 			return -2;
 		}
 		unsigned short packet_type = *(unsigned short*)(cursor + 2);
-		if (CHECK_PACKET(packet_type, packet_size, LWSPHEREBATTLEPACKETMATCHED2)) {
-			LOGI("LWSPHEREBATTLEPACKETMATCHED2 received");
-			show_sys_msg(pLwc->def_sys_msg, "LWSPHEREBATTLEPACKETMATCHED2 received");
-		} else if (CHECK_PACKET(packet_type, packet_size, LWSPHEREBATTLEPACKETQUEUEOK)) {
-			LOGI("LWSPHEREBATTLEPACKETQUEUEOK received");
-			show_sys_msg(pLwc->def_sys_msg, "LWSPHEREBATTLEPACKETQUEUEOK received");
+		if (CHECK_PACKET(packet_type, packet_size, LWPMATCHED2)) {
+			LOGI("LWPMATCHED2 received");
+			show_sys_msg(pLwc->def_sys_msg, "LWPMATCHED2 received");
+		} else if (CHECK_PACKET(packet_type, packet_size, LWPQUEUEOK)) {
+			LOGI("LWPQUEUEOK received");
+			show_sys_msg(pLwc->def_sys_msg, "LWPQUEUEOK received");
 		}
-		else if (CHECK_PACKET(packet_type, packet_size, LWSPHEREBATTLEPACKETRETRYQUEUE)) {
-			LOGI("LWSPHEREBATTLEPACKETRETRYQUEUE received");
-			show_sys_msg(pLwc->def_sys_msg, "LWSPHEREBATTLEPACKETRETRYQUEUE received");
+		else if (CHECK_PACKET(packet_type, packet_size, LWPRETRYQUEUE)) {
+			LOGI("LWPRETRYQUEUE received");
+			show_sys_msg(pLwc->def_sys_msg, "LWPRETRYQUEUE received");
 		}
-		else if (CHECK_PACKET(packet_type, packet_size, LWSPHEREBATTLEPACKETMAYBEMATCHED)) {
-			LOGI("LWSPHEREBATTLEPACKETMAYBEMATCHED received");
-			show_sys_msg(pLwc->def_sys_msg, "LWSPHEREBATTLEPACKETMAYBEMATCHED received");
+		else if (CHECK_PACKET(packet_type, packet_size, LWPMAYBEMATCHED)) {
+			LOGI("LWPMAYBEMATCHED received");
+			show_sys_msg(pLwc->def_sys_msg, "LWPMAYBEMATCHED received");
 		} else {
 			LOGE("Unknown TCP packet");
 		}

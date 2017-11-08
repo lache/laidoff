@@ -236,7 +236,7 @@ static int timespec_compare (struct timespec* a, struct timespec* b)
 {
   if (a->tv_sec != b->tv_sec)
   {
-    return a->tv_sec - b->tv_sec;
+    return (int)(a->tv_sec - b->tv_sec);
   }
   else if (a->tv_nsec != b->tv_nsec)
   {
@@ -650,13 +650,18 @@ static void test_run(const Test* test, unsigned int seed)
 
 static int tests_run(const Test* tests, int argc, char** argv)
 {
+#if !defined(_TTHREAD_WIN32_)
   int opt;
+#endif
   unsigned long int seed;
+#if !defined(_TTHREAD_WIN32_)
   char* endptr;
+#endif
   struct timespec tv;
   int test_n;
+#if !defined(_TTHREAD_WIN32_)
   int found;
-
+#endif
   timespec_get(&tv, TIME_UTC);
   srand(tv.tv_nsec);
   seed = rand();

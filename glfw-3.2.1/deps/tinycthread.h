@@ -333,7 +333,7 @@ typedef int (*thrd_start_t)(void *arg);
 * @return @ref thrd_success on success, or @ref thrd_nomem if no memory could
 * be allocated for the thread requested, or @ref thrd_error if the request
 * could not be honored.
-* @note A thread’s identifier may be reused for a different thread once the
+* @note A thread's identifier may be reused for a different thread once the
 * original thread has exited and either been detached or joined to another
 * thread.
 */
@@ -438,4 +438,3 @@ int tss_set(tss_t key, void *val);
 
 
 #endif /* _TINYTHREAD_H_ */
-

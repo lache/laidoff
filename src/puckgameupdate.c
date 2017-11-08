@@ -9,7 +9,6 @@
 #include "input.h"
 #include "lwudp.h"
 #include "puckgamepacket.h"
-#include "spherebattlepacket.h"
 
 void update_puck_game(LWCONTEXT* pLwc, LWPUCKGAME* puck_game, double delta_time) {
 	if (!puck_game->world) {
@@ -42,15 +41,15 @@ void update_puck_game(LWCONTEXT* pLwc, LWPUCKGAME* puck_game, double delta_time)
 	case LUS_INIT:
 	case LUS_GETTOKEN:
 	{
-		LWSPHEREBATTLEPACKETGETTOKEN p;
-		p.type = LSBPT_GETTOKEN;
+		LWPGETTOKEN p;
+		p.type = LPGP_LWPGETTOKEN;
 		udp_send(pLwc->udp, (const char*)&p, sizeof(p));
 		break;
 	}
 	case LUS_QUEUE:
 	{
-		LWSPHEREBATTLEPACKETQUEUE p;
-		p.type = LSBPT_QUEUE;
+		LWPQUEUE p;
+		p.type = LPGP_LWPQUEUE;
 		p.token = pLwc->udp->token;
 		udp_send(pLwc->udp, (const char*)&p, sizeof(p));
 		break;
@@ -58,8 +57,8 @@ void update_puck_game(LWCONTEXT* pLwc, LWPUCKGAME* puck_game, double delta_time)
 	case LUS_MATCHED:
 	{
 		if (pLwc->udp->master) {
-			LWPUCKGAMEPACKETSTATE p;
-			p.type = LPGPT_STATE;
+			LWPSTATE p;
+			p.type = LPGP_LWPSTATE;
 			p.token = pLwc->udp->token;
 			p.puck[0] = puck_game->go[LPGO_PUCK].pos[0];
 			p.puck[1] = puck_game->go[LPGO_PUCK].pos[1];
@@ -90,8 +89,8 @@ void update_puck_game(LWCONTEXT* pLwc, LWPUCKGAME* puck_game, double delta_time)
 		dJointSetLMotorParam(pcj, dParamVel2, player_speed * pLwc->last_mouse_move_delta_y / last_move_delta_len);*/
 
 		if (!pLwc->udp->master && pLwc->udp->state == LUS_MATCHED) {
-			LWPUCKGAMEPACKETMOVE packet_move;
-			packet_move.type = LPGPT_MOVE;
+			LWPMOVE packet_move;
+			packet_move.type = LPGP_LWPMOVE;
 			packet_move.token = pLwc->udp->token;
 			packet_move.dx = dx;
 			packet_move.dy = dy;
@@ -103,8 +102,8 @@ void update_puck_game(LWCONTEXT* pLwc, LWPUCKGAME* puck_game, double delta_time)
 		dJointSetLMotorParam(pcj, dParamVel2, 0);
 
 		if (!pLwc->udp->master && pLwc->udp->state == LUS_MATCHED) {
-			LWPUCKGAMEPACKETSTOP packet_stop;
-			packet_stop.type = LPGPT_STOP;
+			LWPSTOP packet_stop;
+			packet_stop.type = LPGP_LWPSTOP;
 			packet_stop.token = pLwc->udp->token;
 			udp_send(pLwc->udp, (const char*)&packet_stop, sizeof(packet_stop));
 		}
@@ -142,14 +141,14 @@ void update_puck_game(LWCONTEXT* pLwc, LWPUCKGAME* puck_game, double delta_time)
 		const dReal scale = power / flen;
 		dBodyAddForce(puck_game->go[LPGO_PUCK].body, f[0] * scale, f[1] * scale, f[2] * scale);
 
-		LWPUCKGAMEPACKETPULLSTART p;
-		p.type = LPGPT_PULL_START;
+		LWPPULLSTART p;
+		p.type = LPGP_LWPPULLSTART;
 		p.token = pLwc->udp->token;
 		udp_send(pLwc->udp, (const char*)&p, sizeof(p));
 	}
 	else {
-		LWPUCKGAMEPACKETPULLSTOP p;
-		p.type = LPGPT_PULL_STOP;
+		LWPPULLSTOP p;
+		p.type = LPGP_LWPPULLSTOP;
 		p.token = pLwc->udp->token;
 		udp_send(pLwc->udp, (const char*)&p, sizeof(p));
 	}
@@ -181,8 +180,8 @@ void puck_game_dash(LWCONTEXT* pLwc, LWPUCKGAME* puck_game) {
 	//puck_game_commit_dash(puck_game, &puck_game->dash, dx, dy);
 
 	if (!pLwc->udp->master) {
-		LWPUCKGAMEPACKETDASH packet_dash;
-		packet_dash.type = LPGPT_DASH;
+		LWPDASH packet_dash;
+		packet_dash.type = LPGP_LWPDASH;
 		packet_dash.token = pLwc->udp->token;
 		udp_send(pLwc->udp, (const char*)&packet_dash, sizeof(packet_dash));
 	}

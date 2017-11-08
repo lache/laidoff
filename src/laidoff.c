@@ -1128,7 +1128,7 @@ void slerp(quat qm, const quat qa, const quat qb, float t) {
 	qm[3] = (qa[3] * ratioA + qb[3] * ratioB);
 }
 
-void linear_interpolate_state(LWPUCKGAMEPACKETSTATE* p, LWPUCKGAMEPACKETSTATE* state_buffer, int state_buffer_len, double sample_update_tick) {
+void linear_interpolate_state(LWPSTATE* p, LWPSTATE* state_buffer, int state_buffer_len, double sample_update_tick) {
 	int sample1_idx = 0;
 	double sample1_diff = DBL_MAX;
 	int sample2_idx = 0;
@@ -1190,18 +1190,18 @@ void lwc_prerender_mutable_context(LWCONTEXT* pLwc) {
 	const int state_sync_hz = 60;
 	if (size >= 1) {
 		while (ringbuffer_size(&pLwc->udp->state_ring_buffer) >= 6) {
-			LWPUCKGAMEPACKETSTATE pout_unused;
+			LWPSTATE pout_unused;
 			ringbuffer_dequeue(&pLwc->udp->state_ring_buffer, &pout_unused);
 		}
 
-		LWPUCKGAMEPACKETSTATE p;
+		LWPSTATE p;
 		if (ringbuffer_dequeue(&pLwc->udp->state_ring_buffer, &p) == 0) {
 			double client_elapsed = lwtimepoint_now_seconds() - pLwc->udp->puck_state_sync_client_timepoint;
 			double sample_update_tick = (pLwc->udp->puck_state_sync_server_timepoint + client_elapsed) * state_sync_hz;
-			LWPUCKGAMEPACKETSTATE sampled_state;
+			LWPSTATE sampled_state;
 			linear_interpolate_state(&sampled_state, pLwc->udp->state_buffer, LW_STATE_RING_BUFFER_CAPACITY, sample_update_tick);
-			//memcpy(&pLwc->puck_game_state, &sampled_state, sizeof(LWPUCKGAMEPACKETSTATE));
-			memcpy(&pLwc->puck_game_state, &p, sizeof(LWPUCKGAMEPACKETSTATE));
+			//memcpy(&pLwc->puck_game_state, &sampled_state, sizeof(LWPSTATE));
+			memcpy(&pLwc->puck_game_state, &p, sizeof(LWPSTATE));
 		}
 		else {
 			LOGE("State buffer dequeue failed.");
@@ -1209,7 +1209,7 @@ void lwc_prerender_mutable_context(LWCONTEXT* pLwc) {
 	}
 	/*else if (size == 3)
 	{
-		const LWPUCKGAMEPACKETSTATE* p = ringbuffer_peek(&pLwc->udp->state_ring_buffer);
+		const LWPSTATE* p = ringbuffer_peek(&pLwc->udp->state_ring_buffer);
 		if (p) {
 			pLwc->udp->puck_state_sync_server_timepoint = p->update_tick * 1.0 / state_sync_hz;
 			pLwc->udp->puck_state_sync_client_timepoint = lwtimepoint_now_seconds() + (1.0 / state_sync_hz) * 8;

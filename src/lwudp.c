@@ -1,7 +1,6 @@
 #include "lwudp.h"
 #include "lwlog.h"
 #include "puckgamepacket.h"
-#include "spherebattlepacket.h"
 #include "lwcontext.h"
 #include "puckgameupdate.h"
 #include "lwtimepoint.h"
@@ -57,7 +56,7 @@ LWUDP* new_udp() {
 	make_socket_nonblocking(udp->s);
 	udp->ready = 1;
 	udp->master = 1;
-	ringbuffer_init(&udp->state_ring_buffer, udp->state_buffer, sizeof(LWPUCKGAMEPACKETSTATE), LW_STATE_RING_BUFFER_CAPACITY);
+	ringbuffer_init(&udp->state_ring_buffer, udp->state_buffer, sizeof(LWPSTATE), LW_STATE_RING_BUFFER_CAPACITY);
 	return udp;
 }
 
@@ -79,7 +78,7 @@ void udp_send(LWUDP* udp, const char* data, int size) {
 	}
 }
 
-void queue_state(LWUDP* udp, const LWPUCKGAMEPACKETSTATE* p) {
+void queue_state(LWUDP* udp, const LWPSTATE* p) {
 	ringbuffer_queue(&udp->state_ring_buffer, p);
 }
 
@@ -110,48 +109,48 @@ void udp_update(LWCONTEXT* pLwc, LWUDP* udp) {
 		}
 		const int packet_type = *(int*)udp->buf;
 		switch (packet_type) {
-		//case LPGPT_STATE:
+		//case LPGP_LWSTATE:
 		//{
-		//	LWPUCKGAMEPACKETSTATE* p = (LWPUCKGAMEPACKETSTATE*)udp->buf;
+		//	LWPSTATE* p = (LWPSTATE*)udp->buf;
 		//	/*LOGI("Network player pos %.2f, %.2f, %.2f",
 		//		p->player[0], p->player[1], p->player[2]);*/
-		//	memcpy(&pLwc->puck_game_state, p, sizeof(LWPUCKGAMEPACKETSTATE));
+		//	memcpy(&pLwc->puck_game_state, p, sizeof(LWPSTATE));
 		//	break;
 		//}
-		case LSBPT_TOKEN:
+		case LPGP_LWPTOKEN:
 		{
-			if (udp->recv_len != sizeof(LWSPHEREBATTLEPACKETTOKEN)) {
-				LOGE("LWSPHEREBATTLEPACKETTOKEN: Size error %d (%d expected)", udp->recv_len, sizeof(LWSPHEREBATTLEPACKETTOKEN));
+			if (udp->recv_len != sizeof(LWPTOKEN)) {
+				LOGE("LWPTOKEN: Size error %d (%d expected)", udp->recv_len, sizeof(LWPTOKEN));
 			}
-			LWSPHEREBATTLEPACKETTOKEN* p = (LWSPHEREBATTLEPACKETTOKEN*)udp->buf;
-			LOGI("LWSPHEREBATTLEPACKETTOKEN: Change token from 0x%08x to 0x%08x", udp->token, p->token);
+			LWPTOKEN* p = (LWPTOKEN*)udp->buf;
+			LOGI("LWPTOKEN: Change token from 0x%08x to 0x%08x", udp->token, p->token);
 			udp->token = p->token;
 			udp->state = LUS_QUEUE;
 			break;
 		}
-		case LSBPT_MATCHED:
+		case LPGP_LWPMATCHED:
 		{
-			if (udp->recv_len != sizeof(LWSPHEREBATTLEPACKETMATCHED)) {
-				LOGE("LWSPHEREBATTLEPACKETMATCHED: Size error %d (%d expected)", udp->recv_len, sizeof(LWSPHEREBATTLEPACKETMATCHED));
+			if (udp->recv_len != sizeof(LWPMATCHED)) {
+				LOGE("LWPMATCHED: Size error %d (%d expected)", udp->recv_len, sizeof(LWPMATCHED));
 			}
-			LWSPHEREBATTLEPACKETMATCHED* p = (LWSPHEREBATTLEPACKETMATCHED*)udp->buf;
-			LOGI("LWSPHEREBATTLEPACKETMATCHED: Matched! I'm %s", p->master ? "master." : "slave.");
+			LWPMATCHED* p = (LWPMATCHED*)udp->buf;
+			LOGI("LWPMATCHED: Matched! I'm %s", p->master ? "master." : "slave.");
 			udp->state = LUS_MATCHED;
 			udp->master = p->master;
 			break;
 		}
-		case LSBPT_PLAYER_DAMAGED:
+		case LPGP_LWPPLAYERDAMAGED:
 		{
 			puck_game_player_decrease_hp_test(pLwc->puck_game);
 			break;
 		}
 		// Battle packets
-		case LPGPT_MOVE:
+		case LPGP_LWPMOVE:
 		{
 			if (udp->master) {
-				LWPUCKGAMEPACKETMOVE* p = (LWPUCKGAMEPACKETMOVE*)udp->buf;
-				if (udp->recv_len != sizeof(LWPUCKGAMEPACKETMOVE)) {
-					LOGE("LWPUCKGAMEPACKETMOVE: Size error %d (%d expected)", udp->recv_len, sizeof(LWPUCKGAMEPACKETMOVE));
+				LWPMOVE* p = (LWPMOVE*)udp->buf;
+				if (udp->recv_len != sizeof(LWPMOVE)) {
+					LOGE("LWPMOVE: Size error %d (%d expected)", udp->recv_len, sizeof(LWPMOVE));
 				}
 				puck_game_target_move(pLwc->puck_game, p->dx, p->dy);
 				//LOGI("MOVE dx=%.2f dy=%.2f", p->dx, p->dy);
@@ -161,12 +160,12 @@ void udp_update(LWCONTEXT* pLwc, LWUDP* udp) {
 			}
 			break;
 		}
-		case LPGPT_STOP:
+		case LPGP_LWPSTOP:
 		{
 			if (udp->master) {
-				LWPUCKGAMEPACKETSTOP* p = (LWPUCKGAMEPACKETSTOP*)udp->buf;
-				if (udp->recv_len != sizeof(LWPUCKGAMEPACKETSTOP)) {
-					LOGE("LWPUCKGAMEPACKETSTOP: Size error %d (%d expected)", udp->recv_len, sizeof(LWPUCKGAMEPACKETSTOP));
+				LWPSTOP* p = (LWPSTOP*)udp->buf;
+				if (udp->recv_len != sizeof(LWPSTOP)) {
+					LOGE("LWPSTOP: Size error %d (%d expected)", udp->recv_len, sizeof(LWPSTOP));
 				}
 				puck_game_target_stop(pLwc->puck_game);
 				//LOGI("STOP");
@@ -175,12 +174,12 @@ void udp_update(LWCONTEXT* pLwc, LWUDP* udp) {
 			
 			break;
 		}
-		case LPGPT_DASH:
+		case LPGP_LWPDASH:
 		{
 			if (udp->master) {
-				LWPUCKGAMEPACKETDASH* p = (LWPUCKGAMEPACKETDASH*)udp->buf;
-				if (udp->recv_len != sizeof(LWPUCKGAMEPACKETDASH)) {
-					LOGE("LWPUCKGAMEPACKETDASH: Size error %d (%d expected)", udp->recv_len, sizeof(LWPUCKGAMEPACKETDASH));
+				LWPDASH* p = (LWPDASH*)udp->buf;
+				if (udp->recv_len != sizeof(LWPDASH)) {
+					LOGE("LWPDASH: Size error %d (%d expected)", udp->recv_len, sizeof(LWPDASH));
 				}
 				puck_game_target_dash(pLwc->puck_game);
 				//LOGI("DASH");
@@ -190,19 +189,19 @@ void udp_update(LWCONTEXT* pLwc, LWUDP* udp) {
 			}
 			break;
 		}
-		case LPGPT_STATE:
+		case LPGP_LWPSTATE:
 		{
 			if (!udp->master) {
-				LWPUCKGAMEPACKETSTATE* p = (LWPUCKGAMEPACKETSTATE*)udp->buf;
-				if (udp->recv_len != sizeof(LWPUCKGAMEPACKETSTATE)) {
-					LOGE("LWPUCKGAMEPACKETSTATE: Size error %d (%d expected)", udp->recv_len, sizeof(LWPUCKGAMEPACKETSTATE));
+				LWPSTATE* p = (LWPSTATE*)udp->buf;
+				if (udp->recv_len != sizeof(LWPSTATE)) {
+					LOGE("LWPSTATE: Size error %d (%d expected)", udp->recv_len, sizeof(LWPSTATE));
 				}
 				//int tick_diff = p->update_tick - pLwc->puck_game_state.update_tick;
 				/*if (tick_diff > 0)*/ {
 					/*if (tick_diff != 1) {
 						LOGI("Packet jitter");
 					}*/
-					//memcpy(&pLwc->puck_game_state, p, sizeof(LWPUCKGAMEPACKETSTATE));
+					//memcpy(&pLwc->puck_game_state, p, sizeof(LWPSTATE));
 					double last_received = lwtimepoint_now_seconds();
 					double state_packet_interval = last_received - pLwc->puck_game_state_last_received;
 					pLwc->puck_game_state_last_received = last_received;

@@ -20,7 +20,6 @@
 #include <inttypes.h>
 #include <fcntl.h>
 #include "puckgamepacket.h"
-#include "spherebattlepacket.h"
 #if LW_PLATFORM_WIN32
 #define LwChangeDirectory(x) SetCurrentDirectory(x)
 #else
@@ -331,8 +330,8 @@ void broadcast_packet(LWSERVER* server, const LWCONN* conn, int conn_capacity, c
 
 void on_player_damaged(LWPUCKGAME* puck_game) {
 	LWSERVER* server = puck_game->server;
-	LWSPHEREBATTLEPACKETPLAYERDAMAGED p;
-	p.type = LSBPT_PLAYER_DAMAGED;
+	LWPPLAYERDAMAGED p;
+	p.type = LPGP_LWPPLAYERDAMAGED;
 	SERVER_SEND(server, p);
 }
 
@@ -355,9 +354,9 @@ void select_tcp_server(LWTCPSERVER* server) {
 		else {
 			const int packet_type = *(int*)server->buf;
 			switch (packet_type) {
-			case LSBPT_LWSPHEREBATTLEPACKETCREATEBATTLE:
+			case LPGP_LWPCREATEBATTLE:
 			{
-				LOGI("LSBPT_LWSPHEREBATTLEPACKETCREATEBATTLE received");
+				LOGI("LSBPT_LWPCREATEBATTLE received");
 				break;
 			}
 			default:
@@ -403,56 +402,56 @@ void select_server(LWSERVER* server, LWPUCKGAME* puck_game, LWCONN* conn, int co
 
 			const int packet_type = *(int*)server->buf;
 			switch (packet_type) {
-			case LSBPT_GETTOKEN:
+			case LPGP_LWPGETTOKEN:
 			{
-				LWSPHEREBATTLEPACKETTOKEN p;
-				p.type = LSBPT_TOKEN;
+				LWPTOKEN p;
+				p.type = LPGP_LWPTOKEN;
 				++server->token_counter;
 				p.token = server->token_counter;
 				SERVER_SEND(server, p);
 				break;
 			}
-			case LSBPT_QUEUE:
+			case LPGP_LWPQUEUE:
 			{
-				LWSPHEREBATTLEPACKETMATCHED p;
-				p.type = LSBPT_MATCHED;
+				LWPMATCHED p;
+				p.type = LPGP_LWPMATCHED;
 				p.master = 0;
 				SERVER_SEND(server, p);
 				break;
 			}
-			case LPGPT_MOVE:
+			case LPGP_LWPMOVE:
 			{
-				LWPUCKGAMEPACKETMOVE* p = (LWPUCKGAMEPACKETMOVE*)server->buf;
+				LWPMOVE* p = (LWPMOVE*)server->buf;
 				//LOGI("MOVE dx=%.2f dy=%.2f", p->dx, p->dy);
 				server->dir_pad_dragging = 1;
 				server->dx = p->dx;
 				server->dy = p->dy;
 				break;
 			}
-			case LPGPT_STOP:
+			case LPGP_LWPSTOP:
 			{
-				LWPUCKGAMEPACKETSTOP* p = (LWPUCKGAMEPACKETSTOP*)server->buf;
+				LWPSTOP* p = (LWPSTOP*)server->buf;
 				//LOGI("STOP");
 				server->dir_pad_dragging = 0;
 				break;
 			}
-			case LPGPT_DASH:
+			case LPGP_LWPDASH:
 			{
-				LWPUCKGAMEPACKETDASH* p = (LWPUCKGAMEPACKETDASH*)server->buf;
+				LWPDASH* p = (LWPDASH*)server->buf;
 				//LOGI("DASH");
 				puck_game_commit_dash_to_puck(puck_game, &puck_game->dash);
 				break;
 			}
-			case LPGPT_PULL_START:
+			case LPGP_LWPPULLSTART:
 			{
-				LWPUCKGAMEPACKETPULLSTART* p = (LWPUCKGAMEPACKETPULLSTART*)server->buf;
+				LWPPULLSTART* p = (LWPPULLSTART*)server->buf;
 				//LOGI("PULL START");
 				puck_game->pull_puck = 1;
 				break;
 			}
-			case LPGPT_PULL_STOP:
+			case LPGP_LWPPULLSTOP:
 			{
-				LWPUCKGAMEPACKETPULLSTOP* p = (LWPUCKGAMEPACKETPULLSTOP*)server->buf;
+				LWPPULLSTOP* p = (LWPPULLSTOP*)server->buf;
 				//LOGI("PULL STOP");
 				puck_game->pull_puck = 0;
 				break;
@@ -480,14 +479,14 @@ int tcp_server_entry(void* context) {
 		char recv_buf[512];
 		int recv_len = recv(client_sock, recv_buf, 512, 0);
 		LOGI("Admin TCP recv len: %d", recv_len);
-		LWSPHEREBATTLEPACKETCREATEBATTLE* p = (LWSPHEREBATTLEPACKETCREATEBATTLE*)recv_buf;
-		if (p->type == LSBPT_LWSPHEREBATTLEPACKETCREATEBATTLE && p->size == sizeof(LWSPHEREBATTLEPACKETCREATEBATTLE) && recv_len == p->size) {
-			LWSPHEREBATTLEPACKETCREATEBATTLEOK reply_p;
-			reply_p.type = LSBPT_LWSPHEREBATTLEPACKETCREATEBATTLEOK;
-			reply_p.size = sizeof(LWSPHEREBATTLEPACKETCREATEBATTLEOK);
+		LWPCREATEBATTLE* p = (LWPCREATEBATTLE*)recv_buf;
+		if (p->type == LPGP_LWPCREATEBATTLE && p->size == sizeof(LWPCREATEBATTLE) && recv_len == p->size) {
+			LWPCREATEBATTLEOK reply_p;
+			reply_p.Type = LPGP_LWPCREATEBATTLEOK;
+			reply_p.Size = sizeof(LWPCREATEBATTLEOK);
 			server->battle_counter++;
-			reply_p.battle_id = server->battle_counter;
-			send(client_sock, &reply_p, sizeof(LWSPHEREBATTLEPACKETCREATEBATTLEOK), 0);
+			reply_p.Battle_id = server->battle_counter;
+			send(client_sock, (const char*)&reply_p, sizeof(LWPCREATEBATTLEOK), 0);
 		}
 		else {
 			LOGE("Admin TCP unexpected packet");
@@ -534,8 +533,8 @@ int main(int argc, char* argv[]) {
 		if (sync_elapsed_ms > sync_timestep * 1000) {
 			sync_elapsed_ms = fmod(sync_elapsed_ms, (sync_timestep * 1000));
 			// Broadcast state to clients
-			LWPUCKGAMEPACKETSTATE packet_state;
-			packet_state.type = LPGPT_STATE;
+			LWPSTATE packet_state;
+			packet_state.type = LPGP_LWPSTATE;
 			packet_state.token = 0;
 			packet_state.update_tick = update_tick;
 			packet_state.puck[0] = puck_game->go[LPGO_PUCK].pos[0];

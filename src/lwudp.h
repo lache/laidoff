@@ -53,7 +53,7 @@ typedef struct _LWUDP {
 	// 1 if master, 0 if slave
 	int master;
 	// State ring buffer
-	LWPUCKGAMEPACKETSTATE state_buffer[LW_STATE_RING_BUFFER_CAPACITY];
+	LWPSTATE state_buffer[LW_STATE_RING_BUFFER_CAPACITY];
 	LWRINGBUFFER state_ring_buffer;
 	double puck_state_sync_server_timepoint;
 	double puck_state_sync_client_timepoint;

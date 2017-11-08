@@ -319,7 +319,7 @@ typedef struct _LWCONTEXT {
 	// TCP context
 	LWTCP* tcp;
 	// Puck game remote(server) state
-	LWPUCKGAMEPACKETSTATE puck_game_state;
+	LWPSTATE puck_game_state;
 	// Puck game remote state last received time (sec)
 	double puck_game_state_last_received;
 	// Last state packet reception interval (msec)
