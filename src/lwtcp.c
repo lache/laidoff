@@ -77,20 +77,30 @@ LWTCP* new_tcp(const char* path_prefix) {
 			free(tcp);
 			return 0;
 		}
-		// Connect to server
-		tcp->iResult = connect(tcp->ConnectSocket, tcp->ptr->ai_addr, (int)tcp->ptr->ai_addrlen);
-		if (tcp->iResult == SOCKET_ERROR) {
-			closesocket(tcp->ConnectSocket);
-			tcp->ConnectSocket = INVALID_SOCKET;
-			continue;
-		}
+
+		make_socket_nonblocking(tcp->ConnectSocket);
+
+        fd_set fdset;
+        // Connect to server
+		connect(tcp->ConnectSocket, tcp->ptr->ai_addr, (int)tcp->ptr->ai_addrlen);
+        FD_ZERO(&fdset);
+        FD_SET(tcp->ConnectSocket, &fdset);
+        struct timeval connect_timeout;
+        connect_timeout.tv_sec = 3;
+        connect_timeout.tv_usec = 0;
+        if (select(tcp->ConnectSocket+1, NULL, &fdset, NULL, &connect_timeout) != 1) {
+            LOGE("TCP connect timeout");
+            closesocket(tcp->ConnectSocket);
+            tcp->ConnectSocket = INVALID_SOCKET;
+            continue;
+        }
 		break;
 	}
 	freeaddrinfo(tcp->result);
 	if (tcp->ConnectSocket == INVALID_SOCKET) {
 		LOGE("Unable to connect to server!");
-		free(tcp);
-		return 0;
+		//free(tcp);
+		return tcp;
 	}
 
 	if (get_cached_user_id(path_prefix, &tcp->user_id) == 0) {
@@ -102,7 +112,7 @@ LWTCP* new_tcp(const char* path_prefix) {
 		tcp_send_newuser(tcp);
 	}
 
-	make_socket_nonblocking(tcp->ConnectSocket);
+
 	return tcp;
 }
 
