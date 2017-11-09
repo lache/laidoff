@@ -126,9 +126,13 @@ void update_puck_game(LWCONTEXT* pLwc, LWPUCKGAME* puck_game, double delta_time)
 	if (puck_game->dash.shake_remain_time > 0) {
 		puck_game->dash.shake_remain_time = LWMAX(0, puck_game->dash.shake_remain_time - (float)delta_time);
 	}
-	// Decrease HP remain time
+	// Decrease HP remain time (player)
 	if (puck_game->player.hp_shake_remain_time > 0) {
 		puck_game->player.hp_shake_remain_time = LWMAX(0, puck_game->player.hp_shake_remain_time - (float)delta_time);
+	}
+	// Decrease HP remain time (target)
+	if (puck_game->target.hp_shake_remain_time > 0) {
+		puck_game->target.hp_shake_remain_time = LWMAX(0, puck_game->target.hp_shake_remain_time - (float)delta_time);
 	}
 
 	if (puck_game->pull_puck) {

@@ -128,7 +128,7 @@ static void render_match_state(const LWCONTEXT* pLwc) {
 			sprintf(str, u8"대전 상대 찾는중...");
 		}
 	}
-	
+
 	text_block.text = str;
 	text_block.text_bytelen = (int)strlen(text_block.text);
 	text_block.begin_index = 0;
@@ -138,25 +138,26 @@ static void render_match_state(const LWCONTEXT* pLwc) {
 	render_text_block(pLwc, &text_block);
 }
 
-static void render_hp_gauge(const LWCONTEXT* pLwc, float x, float y, int current_hp, int total_hp, int right, const char* str) {
+static void render_hp_gauge(const LWCONTEXT* pLwc,
+							float x, float y, int current_hp, int total_hp, float hp_shake_remain_time, int right, const char* str) {
 	const float aspect_ratio = (float)pLwc->width / pLwc->height;
 	const float gauge_width = 1.2f;
 	const float gauge_height = 0.1f;
 	const float gauge_flush_height = 0.07f;
 	const float base_color = 0.1f;
 	// Positioinal offset by shake
-	/*if (player->hp_shake_remain_time > 0) {
-		const float ratio = player->hp_shake_remain_time / pLwc->puck_game->hp_shake_time;
+	if (hp_shake_remain_time > 0) {
+		const float ratio = hp_shake_remain_time / pLwc->puck_game->hp_shake_time;
 		const float shake_magnitude = 0.02f;
 		x += ratio * (2 * rand() / (float)RAND_MAX - 1.0f) * shake_magnitude * aspect_ratio;
 		y += ratio * (2 * rand() / (float)RAND_MAX - 1.0f) * shake_magnitude;
-	}*/
+	}
 	// Render background (gray)
 	render_solid_vb_ui(pLwc,
-		x, y, gauge_width, gauge_height,
-		0,
-		LVT_CENTER_TOP_ANCHORED_SQUARE,
-		1, base_color, base_color, base_color, 1);
+					   x, y, gauge_width, gauge_height,
+					   0,
+					   LVT_CENTER_TOP_ANCHORED_SQUARE,
+					   1, base_color, base_color, base_color, 1);
 	const float cell_border = 0.015f;
 	if (total_hp > 0) {
 		const float cell_width = (gauge_width - cell_border * (total_hp + 1)) / total_hp;
@@ -180,10 +181,10 @@ static void render_hp_gauge(const LWCONTEXT* pLwc, float x, float y, int current
 
 			// Render background (green)
 			render_solid_vb_ui(pLwc,
-				cell_x_0 + cell_x_stride * i, y - gauge_height / 2, cell_width, gauge_height - cell_border * 2,
-				0,
-				LVT_LEFT_CENTER_ANCHORED_SQUARE,
-				1, r, g, b, 1);
+							   cell_x_0 + cell_x_stride * i, y - gauge_height / 2, cell_width, gauge_height - cell_border * 2,
+							   0,
+							   LVT_LEFT_CENTER_ANCHORED_SQUARE,
+							   1, r, g, b, 1);
 		}
 	}
 	// Render text
@@ -227,24 +228,24 @@ static void render_dash_gauge(const LWCONTEXT* pLwc) {
 	// Render background (red)
 	if (boost_gauge_ratio < 1.0f) {
 		render_solid_vb_ui(pLwc,
-			x - gauge_width * boost_gauge_ratio, y, gauge_width * (1.0f - boost_gauge_ratio), gauge_height,
-			0,
-			LVT_RIGHT_BOTTOM_ANCHORED_SQUARE,
-			1, 1, base_color, base_color, 1);
+						   x - gauge_width * boost_gauge_ratio, y, gauge_width * (1.0f - boost_gauge_ratio), gauge_height,
+						   0,
+						   LVT_RIGHT_BOTTOM_ANCHORED_SQUARE,
+						   1, 1, base_color, base_color, 1);
 	}
 	// Render foreground (green)
 	render_solid_vb_ui(pLwc,
-		x, y, gauge_width * boost_gauge_ratio, gauge_height,
-		0,
-		LVT_RIGHT_BOTTOM_ANCHORED_SQUARE,
-		1, base_color, 1, base_color, 1);
+					   x, y, gauge_width * boost_gauge_ratio, gauge_height,
+					   0,
+					   LVT_RIGHT_BOTTOM_ANCHORED_SQUARE,
+					   1, base_color, 1, base_color, 1);
 	if (boost_gauge_ratio < 1.0f) {
 		// Render flush gauge
 		render_solid_vb_ui(pLwc,
-			x, y + boost_gauge_ratio / 4.0f, gauge_width, gauge_height,
-			0,
-			LVT_RIGHT_BOTTOM_ANCHORED_SQUARE,
-			powf(1.0f - boost_gauge_ratio, 3.0f), base_color, 1, base_color, 1);
+						   x, y + boost_gauge_ratio / 4.0f, gauge_width, gauge_height,
+						   0,
+						   LVT_RIGHT_BOTTOM_ANCHORED_SQUARE,
+						   powf(1.0f - boost_gauge_ratio, 3.0f), base_color, 1, base_color, 1);
 	}
 	// Render text
 	LWTEXTBLOCK text_block;
@@ -269,8 +270,8 @@ static void render_dash_gauge(const LWCONTEXT* pLwc) {
 }
 
 static void render_wall(const LWCONTEXT *pLwc, vec4 *proj, const LWPUCKGAME *puck_game,
-                        int shader_index, vec4 *view, float x, float y, float z,
-                        float x_rot, float y_rot, LW_VBO_TYPE lvt, float sx, float sy, float sz, const LWSPHERERENDERUNIFORM* sphere_render_uniform) {
+						int shader_index, vec4 *view, float x, float y, float z,
+						float x_rot, float y_rot, LW_VBO_TYPE lvt, float sx, float sy, float sz, const LWSPHERERENDERUNIFORM* sphere_render_uniform) {
 	const LWSHADER* shader = &pLwc->shader[shader_index];
 	glUseProgram(shader->program);
 	glUniform2fv(shader->vuvoffset_location, 1, default_uv_offset);
@@ -287,49 +288,49 @@ static void render_wall(const LWCONTEXT *pLwc, vec4 *proj, const LWPUCKGAME *puc
 	glUniform1fv(shader->sphere_speed, 3, (const float*)sphere_render_uniform->sphere_speed);
 	glUniform1fv(shader->sphere_move_rad, 3, (const float*)sphere_render_uniform->sphere_move_rad);
 
-    const int tex_index = 0;
-    mat4x4 rot_x;
-    mat4x4_identity(rot_x);
-    mat4x4_rotate_X(rot_x, rot_x, x_rot);
-    mat4x4 rot_y;
-    mat4x4_identity(rot_y);
-    mat4x4_rotate_Y(rot_y, rot_y, y_rot);
-    mat4x4 rot;
-    mat4x4_mul(rot, rot_x, rot_y);
-    
-    mat4x4 model;
-    mat4x4_identity(model);
-    mat4x4_mul(model, model, rot);
-    mat4x4_scale_aniso(model, model, sx, sy, sz);
-    mat4x4 model_translate;
-    mat4x4_translate(model_translate, x, y, z);
-    mat4x4_mul(model, model_translate, model);
-    
-    mat4x4 view_model;
-    mat4x4_mul(view_model, view, model);
-    
-    mat4x4 proj_view_model;
-    mat4x4_identity(proj_view_model);
-    mat4x4_mul(proj_view_model, proj, view_model);
-    
-    glUniform3f(shader->overlay_color_location, 0.2f, 0.2f, 0.2f);
-    glUniform1f(shader->overlay_color_ratio_location, 1.0f);
-    
-    //glUniformMatrix4fv(shader->mvp_location, 1, GL_FALSE, (const GLfloat*)proj_view_model);
-    
-    glBindBuffer(GL_ARRAY_BUFFER, pLwc->vertex_buffer[lvt].vertex_buffer);
-    bind_all_vertex_attrib(pLwc, lvt);
-    glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, tex_index);
-    set_tex_filter(GL_LINEAR, GL_LINEAR);
-    //set_tex_filter(GL_NEAREST, GL_NEAREST);
-    glUniformMatrix4fv(shader->mvp_location, 1, GL_FALSE, (const GLfloat*)proj_view_model);
-    glUniformMatrix4fv(shader->m_location, 1, GL_FALSE, (const GLfloat*)model);
-    glDrawArrays(GL_TRIANGLES, 0, pLwc->vertex_buffer[lvt].vertex_count);
+	const int tex_index = 0;
+	mat4x4 rot_x;
+	mat4x4_identity(rot_x);
+	mat4x4_rotate_X(rot_x, rot_x, x_rot);
+	mat4x4 rot_y;
+	mat4x4_identity(rot_y);
+	mat4x4_rotate_Y(rot_y, rot_y, y_rot);
+	mat4x4 rot;
+	mat4x4_mul(rot, rot_x, rot_y);
+
+	mat4x4 model;
+	mat4x4_identity(model);
+	mat4x4_mul(model, model, rot);
+	mat4x4_scale_aniso(model, model, sx, sy, sz);
+	mat4x4 model_translate;
+	mat4x4_translate(model_translate, x, y, z);
+	mat4x4_mul(model, model_translate, model);
+
+	mat4x4 view_model;
+	mat4x4_mul(view_model, view, model);
+
+	mat4x4 proj_view_model;
+	mat4x4_identity(proj_view_model);
+	mat4x4_mul(proj_view_model, proj, view_model);
+
+	glUniform3f(shader->overlay_color_location, 0.2f, 0.2f, 0.2f);
+	glUniform1f(shader->overlay_color_ratio_location, 1.0f);
+
+	//glUniformMatrix4fv(shader->mvp_location, 1, GL_FALSE, (const GLfloat*)proj_view_model);
+
+	glBindBuffer(GL_ARRAY_BUFFER, pLwc->vertex_buffer[lvt].vertex_buffer);
+	bind_all_vertex_attrib(pLwc, lvt);
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, tex_index);
+	set_tex_filter(GL_LINEAR, GL_LINEAR);
+	//set_tex_filter(GL_NEAREST, GL_NEAREST);
+	glUniformMatrix4fv(shader->mvp_location, 1, GL_FALSE, (const GLfloat*)proj_view_model);
+	glUniformMatrix4fv(shader->m_location, 1, GL_FALSE, (const GLfloat*)model);
+	glDrawArrays(GL_TRIANGLES, 0, pLwc->vertex_buffer[lvt].vertex_count);
 }
 
 static void render_floor(const LWCONTEXT *pLwc, vec4 *proj, const LWPUCKGAME *puck_game, int shader_index, vec4 *view,
-	const LWSPHERERENDERUNIFORM* sphere_render_uniform) {
+						 const LWSPHERERENDERUNIFORM* sphere_render_uniform) {
 
 	const LWSHADER* shader = &pLwc->shader[shader_index];
 	glUseProgram(shader->program);
@@ -349,48 +350,50 @@ static void render_floor(const LWCONTEXT *pLwc, vec4 *proj, const LWPUCKGAME *pu
 	glUniform1fv(shader->sphere_move_rad, 3, (const float*)sphere_render_uniform->sphere_move_rad);
 
 	const int tex_index = pLwc->tex_atlas[LAE_PUCK_FLOOR_KTX];
-    mat4x4 rot;
-    mat4x4_identity(rot);
-    
-    float sx = 2.0f;
-    float sy = 2.0f;
-    float sz = 2.0f;
-    float x = 0.0f, y = 0.0f, z = 0.0f;
-    
-    mat4x4 model;
-    mat4x4_identity(model);
-    mat4x4_mul(model, model, rot);
-    mat4x4_scale_aniso(model, model, sx, sy, sz);
-    mat4x4 model_translate;
-    mat4x4_translate(model_translate, x, y, z);
-    mat4x4_mul(model, model_translate, model);
-    
-    mat4x4 view_model;
-    mat4x4_mul(view_model, view, model);
-    
-    mat4x4 proj_view_model;
-    mat4x4_identity(proj_view_model);
-    mat4x4_mul(proj_view_model, proj, view_model);
-    
-    glUniform3f(shader->overlay_color_location, 0.5f, 0.5f, 0.5f);
-    glUniform1f(shader->overlay_color_ratio_location, 0.0f);
-    
-    //glUniformMatrix4fv(shader->mvp_location, 1, GL_FALSE, (const GLfloat*)proj_view_model);
-    
-    const LW_VBO_TYPE lvt = LVT_CENTER_CENTER_ANCHORED_SQUARE;
-    
-    glBindBuffer(GL_ARRAY_BUFFER, pLwc->vertex_buffer[lvt].vertex_buffer);
-    bind_all_vertex_attrib(pLwc, lvt);
-    glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, tex_index);
-    set_tex_filter(GL_LINEAR, GL_LINEAR);
-    //set_tex_filter(GL_NEAREST, GL_NEAREST);
-    glUniformMatrix4fv(shader->mvp_location, 1, GL_FALSE, (const GLfloat*)proj_view_model);
-    glUniformMatrix4fv(shader->m_location, 1, GL_FALSE, (const GLfloat*)model);
-    glDrawArrays(GL_TRIANGLES, 0, pLwc->vertex_buffer[lvt].vertex_count);
+	mat4x4 rot;
+	mat4x4_identity(rot);
+
+	float sx = 2.0f;
+	float sy = 2.0f;
+	float sz = 2.0f;
+	float x = 0.0f, y = 0.0f, z = 0.0f;
+
+	mat4x4 model;
+	mat4x4_identity(model);
+	mat4x4_mul(model, model, rot);
+	mat4x4_scale_aniso(model, model, sx, sy, sz);
+	mat4x4 model_translate;
+	mat4x4_translate(model_translate, x, y, z);
+	mat4x4_mul(model, model_translate, model);
+
+	mat4x4 view_model;
+	mat4x4_mul(view_model, view, model);
+
+	mat4x4 proj_view_model;
+	mat4x4_identity(proj_view_model);
+	mat4x4_mul(proj_view_model, proj, view_model);
+
+	glUniform3f(shader->overlay_color_location, 0.5f, 0.5f, 0.5f);
+	glUniform1f(shader->overlay_color_ratio_location, 0.0f);
+
+	//glUniformMatrix4fv(shader->mvp_location, 1, GL_FALSE, (const GLfloat*)proj_view_model);
+
+	const LW_VBO_TYPE lvt = LVT_CENTER_CENTER_ANCHORED_SQUARE;
+
+	glBindBuffer(GL_ARRAY_BUFFER, pLwc->vertex_buffer[lvt].vertex_buffer);
+	bind_all_vertex_attrib(pLwc, lvt);
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, tex_index);
+	set_tex_filter(GL_LINEAR, GL_LINEAR);
+	//set_tex_filter(GL_NEAREST, GL_NEAREST);
+	glUniformMatrix4fv(shader->mvp_location, 1, GL_FALSE, (const GLfloat*)proj_view_model);
+	glUniformMatrix4fv(shader->m_location, 1, GL_FALSE, (const GLfloat*)model);
+	glDrawArrays(GL_TRIANGLES, 0, pLwc->vertex_buffer[lvt].vertex_count);
 }
 
 void lwc_render_physics(const LWCONTEXT* pLwc) {
+	const LWPUCKGAME* puck_game = pLwc->puck_game;
+	const LWPSTATE* state = &pLwc->puck_game_state;
 	glViewport(0, 0, pLwc->width, pLwc->height);
 	lw_clear_color();
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -409,12 +412,10 @@ void lwc_render_physics(const LWCONTEXT* pLwc) {
 	vec3 center = { 0, 0, 0 };
 
 	vec3 up = { 0, 1, 0 };
-	if (pLwc->puck_game->player_no == 2) {
+	if (puck_game->player_no == 2) {
 		up[1] = -1.0f;
 	}
 	mat4x4_look_at(view, eye, center, up);
-
-	const LWPUCKGAME* puck_game = pLwc->puck_game;
 
 	int remote = !pLwc->udp->master;
 	const float* player_pos = puck_game->go[LPGO_PLAYER].pos;
@@ -424,15 +425,15 @@ void lwc_render_physics(const LWCONTEXT* pLwc) {
 	const float* remote_puck_pos = 0;
 	const float* remote_target_pos = 0;
 	if (remote) {
-		remote_player_pos = pLwc->puck_game_state.player;
-		remote_puck_pos = pLwc->puck_game_state.puck;
-		remote_target_pos = pLwc->puck_game_state.target;
-	}
-	else {
+		remote_player_pos = state->player;
+		remote_puck_pos = state->puck;
+		remote_target_pos = state->target;
+	} else {
 		remote_player_pos = player_pos;
 		remote_puck_pos = puck_pos;
 		remote_target_pos = target_pos;
 	}
+
 	LWSPHERERENDERUNIFORM sphere_render_uniform = {
 		// float sphere_col_ratio[3];
 		{ 1.0f, 1.0f, 1.0f },
@@ -450,18 +451,19 @@ void lwc_render_physics(const LWCONTEXT* pLwc) {
 		},
 		// float sphere_speed[3];
 		{
-			!remote ? puck_game->go[LPGO_PLAYER].speed : pLwc->puck_game_state.player_speed,
-			!remote ? puck_game->go[LPGO_TARGET].speed : pLwc->puck_game_state.target_speed,
-			!remote ? puck_game->go[LPGO_PUCK].speed : pLwc->puck_game_state.puck_speed
+			!remote ? puck_game->go[LPGO_PLAYER].speed : state->player_speed,
+			!remote ? puck_game->go[LPGO_TARGET].speed : state->target_speed,
+			!remote ? puck_game->go[LPGO_PUCK].speed : state->puck_speed
 		},
 		// float sphere_move_rad[3];
 		{
-			!remote ? puck_game->go[LPGO_PLAYER].move_rad : pLwc->puck_game_state.player_move_rad,
-			!remote ? puck_game->go[LPGO_TARGET].move_rad : pLwc->puck_game_state.target_move_rad,
-			!remote ? puck_game->go[LPGO_PUCK].move_rad : pLwc->puck_game_state.puck_move_rad
+			!remote ? puck_game->go[LPGO_PLAYER].move_rad : state->player_move_rad,
+			!remote ? puck_game->go[LPGO_TARGET].move_rad : state->target_move_rad,
+			!remote ? puck_game->go[LPGO_PUCK].move_rad : state->puck_move_rad
 		},
 	};
-	if (pLwc->puck_game->player_no == 2) {
+
+	if (puck_game->player_no == 2) {
 		sphere_render_uniform.sphere_col[0][0] = 1.0f;
 		sphere_render_uniform.sphere_col[0][1] = 0.0f;
 		sphere_render_uniform.sphere_col[0][2] = 0.0f;
@@ -470,43 +472,44 @@ void lwc_render_physics(const LWCONTEXT* pLwc) {
 		sphere_render_uniform.sphere_col[1][1] = 1.0f;
 		sphere_render_uniform.sphere_col[1][2] = 0.8f;
 	}
-    const float wall_height = 0.8f;
-	
+	const float wall_height = 0.8f;
+
+	const LWPUCKGAMEPLAYER* player = &puck_game->player;
+	const LWPUCKGAMEPLAYER* target = &puck_game->target;
+
 	if (puck_game->battle_id) {
 		// Floor
 		render_floor(pLwc, proj, puck_game, wall_shader_index, view, &sphere_render_uniform);
 		// North wall
 		render_wall(pLwc, proj, puck_game, wall_shader_index, view, 0, 2, 0, (float)LWDEG2RAD(90), 0,
-			LVT_CENTER_BOTTOM_ANCHORED_SQUARE, 2.0f, wall_height, 2.0f, &sphere_render_uniform);
+					LVT_CENTER_BOTTOM_ANCHORED_SQUARE, 2.0f, wall_height, 2.0f, &sphere_render_uniform);
 		// South wall
 		render_wall(pLwc, proj, puck_game, wall_shader_index, view, 0, -2, 0, (float)LWDEG2RAD(-90), 0,
-			LVT_CENTER_TOP_ANCHORED_SQUARE, 2.0f, wall_height, 2.0f, &sphere_render_uniform);
+					LVT_CENTER_TOP_ANCHORED_SQUARE, 2.0f, wall_height, 2.0f, &sphere_render_uniform);
 		// East wall
 		render_wall(pLwc, proj, puck_game, wall_shader_index, view, 2, 0, 0, 0, (float)LWDEG2RAD(90),
-			LVT_LEFT_CENTER_ANCHORED_SQUARE, wall_height, 2.0f, 2.0f, &sphere_render_uniform);
+					LVT_LEFT_CENTER_ANCHORED_SQUARE, wall_height, 2.0f, 2.0f, &sphere_render_uniform);
 		// West wall
 		render_wall(pLwc, proj, puck_game, wall_shader_index, view, -2, 0, 0, 0, (float)LWDEG2RAD(-90),
-			LVT_RIGHT_CENTER_ANCHORED_SQUARE, wall_height, 2.0f, 2.0f, &sphere_render_uniform);
+					LVT_RIGHT_CENTER_ANCHORED_SQUARE, wall_height, 2.0f, 2.0f, &sphere_render_uniform);
 
 		const int player_no = pLwc->puck_game->player_no;
 
 		render_go(pLwc, view, proj, &puck_game->go[LPGO_PUCK], pLwc->tex_atlas[LAE_PUCK_KTX],
-			1.0f, remote_puck_pos, pLwc->puck_game_state.puck_rot, remote, !remote ? puck_game->go[LPGO_PUCK].speed : pLwc->puck_game_state.puck_speed);
+				  1.0f, remote_puck_pos, state->puck_rot, remote, !remote ? puck_game->go[LPGO_PUCK].speed : state->puck_speed);
 		render_go(pLwc, view, proj, &puck_game->go[LPGO_PLAYER], pLwc->tex_atlas[player_no == 2 ? LAE_PUCK_ENEMY_KTX : LAE_PUCK_PLAYER_KTX],
-			1.0f, remote_player_pos, pLwc->puck_game_state.player_rot, remote, 0);
+				  1.0f, remote_player_pos, state->player_rot, remote, 0);
 		render_go(pLwc, view, proj, &puck_game->go[LPGO_TARGET], pLwc->tex_atlas[player_no == 2 ? LAE_PUCK_PLAYER_KTX : LAE_PUCK_ENEMY_KTX],
-			1.0f, remote_target_pos, pLwc->puck_game_state.target_rot, remote, 0);
+				  1.0f, remote_target_pos, state->target_rot, remote, 0);
 
 		render_dir_pad(pLwc);
 		render_fist_button(pLwc);
 		render_top_button(pLwc);
 		render_dash_gauge(pLwc);
-		render_hp_gauge(pLwc, -0.8f, 1.0f - 0.1f, pLwc->puck_game_state.player_current_hp, pLwc->puck_game_state.player_total_hp, 1, puck_game->nickname);
-		render_hp_gauge(pLwc, +0.8f, 1.0f - 0.1f, pLwc->puck_game_state.target_current_hp, pLwc->puck_game_state.target_total_hp, 0, puck_game->target_nickname);
-	} else {
-		render_hp_gauge(pLwc, -0.8f, 1.0f - 0.1f, pLwc->puck_game_state.player_current_hp, pLwc->puck_game_state.player_total_hp, 1, puck_game->nickname);
-		render_hp_gauge(pLwc, +0.8f, 1.0f - 0.1f, pLwc->puck_game_state.target_current_hp, pLwc->puck_game_state.target_total_hp, 0, "? ? ?");
 	}
-	render_timer(pLwc, puck_game_remain_time(pLwc->puck_game->total_time, pLwc->puck_game_state.update_tick));
+	const char* target_nickname = puck_game->battle_id ? puck_game->target_nickname : "? ? ?";
+	render_hp_gauge(pLwc, -0.8f, 1.0f - 0.1f, state->player_current_hp, state->player_total_hp, player->hp_shake_remain_time, 1, puck_game->nickname);
+	render_hp_gauge(pLwc, +0.8f, 1.0f - 0.1f, state->target_current_hp, state->target_total_hp, target->hp_shake_remain_time, 0, target_nickname);
+	render_timer(pLwc, puck_game_remain_time(pLwc->puck_game->total_time, state->update_tick));
 	render_match_state(pLwc);
 }

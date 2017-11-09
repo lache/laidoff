@@ -1201,6 +1201,12 @@ void lwc_prerender_mutable_context(LWCONTEXT* pLwc) {
 			LWPSTATE sampled_state;
 			linear_interpolate_state(&sampled_state, pLwc->udp->state_buffer, LW_STATE_RING_BUFFER_CAPACITY, sample_update_tick);
 			//memcpy(&pLwc->puck_game_state, &sampled_state, sizeof(LWPSTATE));
+			if (pLwc->puck_game_state.player_current_hp > p.player_current_hp) {
+				pLwc->puck_game->player.hp_shake_remain_time = pLwc->puck_game->hp_shake_time;
+			}
+			if (pLwc->puck_game_state.target_current_hp > p.target_current_hp) {
+				pLwc->puck_game->target.hp_shake_remain_time = pLwc->puck_game->hp_shake_time;
+			}
 			memcpy(&pLwc->puck_game_state, &p, sizeof(LWPSTATE));
 		}
 		else {

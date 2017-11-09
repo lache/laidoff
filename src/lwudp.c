@@ -11,8 +11,9 @@
 #else
 //#define LW_UDP_SERVER "puck.popsongremix.com"
 //#define LW_UDP_SERVER "puck-highend.popsongremix.com"
-#define LW_UDP_SERVER "192.168.0.28" // Site A
+//#define LW_UDP_SERVER "192.168.0.28" // Site A
 //#define LW_UDP_SERVER "118.33.89.239" // Site B
+#define LW_UDP_SERVER "221.147.71.76"
 #endif
 
 #define LW_UDP_PORT 10288

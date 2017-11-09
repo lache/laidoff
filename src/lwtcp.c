@@ -10,10 +10,10 @@
 #if LW_AUTO_BUILD
 #define LW_TCP_SERVER "puck-highend.popsongremix.com"
 #else
-#define LW_TCP_SERVER "192.168.0.28"
+//#define LW_TCP_SERVER "192.168.0.28"
 //#define LW_TCP_SERVER "puck-highend.popsongremix.com"
 //#define LW_TCP_SERVER "puck.popsongremix.com"
-//#define LW_TCP_SERVER "221.147.71.76"
+#define LW_TCP_SERVER "221.147.71.76"
 #endif
 #define LW_TCP_PORT_STR "19856"
 
