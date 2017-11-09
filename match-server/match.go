@@ -8,7 +8,7 @@ import (
 	"unsafe"
 	"os"
 	"encoding/json"
-	"./Nickdb"
+	"./nickdb"
 	"time"
 	"io"
 	"fmt"
