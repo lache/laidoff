@@ -112,12 +112,23 @@ static void render_match_state(const LWCONTEXT* pLwc) {
 	SET_COLOR_RGBA_FLOAT(text_block.color_emp_glyph, 1, 1, 0, 1);
 	SET_COLOR_RGBA_FLOAT(text_block.color_emp_outline, 0, 0, 0, 1);
 	char str[32];
-	if (pLwc->puck_game->token) {
-		sprintf(str, u8"전투중...BID:%d", pLwc->puck_game->battle_id);
+	if (pLwc->puck_game_state.finished) {
+		int hp_diff = pLwc->puck_game_state.player_current_hp - pLwc->puck_game_state.target_current_hp;
+		if (hp_diff == 0) {
+			sprintf(str, u8"종료! 무승부..BID:%d", pLwc->puck_game->battle_id);
+		} else if (hp_diff > 0) {
+			sprintf(str, u8"~~~승리~~~BID:%d", pLwc->puck_game->battle_id);
+		} else {
+			sprintf(str, u8"패배...BID:%d", pLwc->puck_game->battle_id);
+		}
+	} else {
+		if (pLwc->puck_game->token) {
+			sprintf(str, u8"전투중...BID:%d", pLwc->puck_game->battle_id);
+		} else {
+			sprintf(str, u8"대전 상대 찾는중...");
+		}
 	}
-	else {
-		sprintf(str, u8"대전 상대 찾는중...");
-	}
+	
 	text_block.text = str;
 	text_block.text_bytelen = (int)strlen(text_block.text);
 	text_block.begin_index = 0;

@@ -327,5 +327,5 @@ void puck_game_commit_dash_to_puck(LWPUCKGAME* puck_game, LWPUCKGAMEDASH* dash, 
 }
 
 float puck_game_remain_time(float total_time, int update_tick) {
-	return ceilf(LWMAX(0, total_time - update_tick * 1.0f / 125));
+	return floorf(LWMAX(0, total_time - update_tick * 1.0f / 125));
 }

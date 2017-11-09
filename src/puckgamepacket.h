@@ -130,6 +130,8 @@ typedef struct _LWPSTATE {
 	int player_total_hp;
 	int target_current_hp;
 	int target_total_hp;
+	// state
+	int finished;
 } LWPSTATE;
 
 // should be 4-byte aligned...

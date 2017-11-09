@@ -108,12 +108,12 @@ static int lw_get_normalized_dir_pad_input(const LWREMOTEPLAYERCONTROL* control,
 	return 1;
 }
 
-static void update_puck_game(LWSERVER* server, LWPUCKGAME* puck_game, double delta_time) {
+static int update_puck_game(LWSERVER* server, LWPUCKGAME* puck_game, double delta_time) {
 	puck_game->time += (float)delta_time;
 	if (puck_game->player.current_hp <= 0
 		|| puck_game->target.current_hp <= 0
 		|| puck_game->time >= puck_game->total_time) {
-		return;
+		return -1;
 	}
 	puck_game->player.puck_contacted = 0;
 	puck_game->target.puck_contacted = 0;
@@ -177,6 +177,7 @@ static void update_puck_game(LWSERVER* server, LWPUCKGAME* puck_game, double del
 		}
 	}
 	puck_game->update_tick++;
+	return 0;
 }
 
 #if LW_PLATFORM_WIN32
@@ -686,7 +687,7 @@ void broadcast_state_packet(LWSERVER* server, const LWCONN* conn, int conn_capac
 				packet_state.player_total_hp = player->total_hp;
 				packet_state.target_current_hp = target->current_hp;
 				packet_state.target_total_hp = target->total_hp;
-
+				packet_state.finished = puck_game->finished;
 				double tp = lwtimepoint_now_seconds();
 				sendto(server->s, (const char*)&packet_state, sizeof(packet_state), 0, (struct sockaddr*)&conn[i].si, server->slen);
 				double elapsed = lwtimepoint_now_seconds() - tp;
@@ -740,7 +741,10 @@ int main(int argc, char* argv[]) {
 				for (int j = 0; j < LW_PUCK_GAME_POOL_CAPACITY; j++) {
 					if (server->puck_game_pool[j]
 						&& server->puck_game_pool[j]->init_ready) {
-						update_puck_game(server, server->puck_game_pool[j], logic_timestep);
+						if (server->puck_game_pool[j]->finished == 0
+							&& update_puck_game(server, server->puck_game_pool[j], logic_timestep) < 0) {
+							server->puck_game_pool[j]->finished = 1;
+						}
 					}
 				}
 			}

@@ -101,6 +101,7 @@ typedef struct _LWPUCKGAME {
 	LWREMOTEPLAYERCONTROL remote_control[2];
 	LWPUCKGAMEDASH remote_dash[2];
 	int init_ready;
+	int finished;
 	int update_tick;
 	char nickname[LW_NICKNAME_MAX_LEN];
 	char target_nickname[LW_NICKNAME_MAX_LEN];
