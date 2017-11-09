@@ -111,21 +111,29 @@ static void render_match_state(const LWCONTEXT* pLwc) {
 	SET_COLOR_RGBA_FLOAT(text_block.color_normal_outline, 0, 0, 0, 1);
 	SET_COLOR_RGBA_FLOAT(text_block.color_emp_glyph, 1, 1, 0, 1);
 	SET_COLOR_RGBA_FLOAT(text_block.color_emp_outline, 0, 0, 0, 1);
-	char str[32];
+	char str[128];
 	if (pLwc->puck_game_state.finished) {
 		int hp_diff = pLwc->puck_game_state.player_current_hp - pLwc->puck_game_state.target_current_hp;
 		if (hp_diff == 0) {
-			sprintf(str, u8"종료! 무승부..BID:%d", pLwc->puck_game->battle_id);
+			sprintf(str, u8"종료! 무승부..BID:%d (대시버튼 눌러서 다시하기)", pLwc->puck_game->battle_id);
 		} else if (hp_diff > 0) {
-			sprintf(str, u8"~~~승리~~~BID:%d", pLwc->puck_game->battle_id);
+			if (pLwc->puck_game->battle_id == 0) {
+				sprintf(str, u8"[연습중]~~~승리~~~BID:%d (대전상대 찾고 있다)", pLwc->puck_game->battle_id);
+			} else {
+				sprintf(str, u8"~~~승리~~~BID:%d (대시버튼 눌러서 다시하기)", pLwc->puck_game->battle_id);
+			}
 		} else {
-			sprintf(str, u8"패배...BID:%d", pLwc->puck_game->battle_id);
+			if (pLwc->puck_game->battle_id == 0) {
+				sprintf(str, u8"[연습중]패배...BID:%d (대전상대 찾고 있다)", pLwc->puck_game->battle_id);
+			} else {
+				sprintf(str, u8"패배...BID:%d (대시버튼 눌러서 다시하기)", pLwc->puck_game->battle_id);
+			}
 		}
 	} else {
 		if (pLwc->puck_game->token) {
 			sprintf(str, u8"전투중...BID:%d", pLwc->puck_game->battle_id);
 		} else {
-			sprintf(str, u8"대전 상대 찾는중...");
+			sprintf(str, u8"[연습중] --- (대전 상대를 찾고 있다능...)");
 		}
 	}
 
@@ -417,7 +425,8 @@ void lwc_render_physics(const LWCONTEXT* pLwc) {
 	}
 	mat4x4_look_at(view, eye, center, up);
 
-	int remote = !pLwc->udp->master;
+	int single_play = pLwc->puck_game->battle_id == 0;
+	int remote = !single_play && !pLwc->udp->master;
 	const float* player_pos = puck_game->go[LPGO_PLAYER].pos;
 	const float* target_pos = puck_game->go[LPGO_TARGET].pos;
 	const float* puck_pos = puck_game->go[LPGO_PUCK].pos;
@@ -477,7 +486,7 @@ void lwc_render_physics(const LWCONTEXT* pLwc) {
 	const LWPUCKGAMEPLAYER* player = &puck_game->player;
 	const LWPUCKGAMEPLAYER* target = &puck_game->target;
 
-	if (puck_game->battle_id) {
+	if (single_play || puck_game->battle_id) {
 		// Floor
 		render_floor(pLwc, proj, puck_game, wall_shader_index, view, &sphere_render_uniform);
 		// North wall

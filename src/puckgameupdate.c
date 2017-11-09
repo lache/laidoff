@@ -225,6 +225,7 @@ void puck_game_pull_puck_start(LWCONTEXT* pLwc, LWPUCKGAME* puck_game) {
 		&& pLwc->puck_game_state.finished) {
 		puck_game->battle_id = 0;
 		puck_game->token = 0;
+		puck_game->player_no = 1;
 		tcp_send_queue2(pLwc->tcp, &pLwc->tcp->user_id);
 	}
 }
