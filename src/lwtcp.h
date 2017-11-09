@@ -18,13 +18,13 @@
 #endif
 #include "lwringbuffer.h"
 
-#if LW_PLATFORM_ANDROID || LW_PLATFORM_IOS
+#if LW_PLATFORM_ANDROID
 #define LW_TCP_SERVER "puck-highend.popsongremix.com"
 #else
-#define LW_TCP_SERVER "221.147.71.76" // Site C
 //#define LW_TCP_SERVER "192.168.0.28"
-//#define LW_TCP_SERVER "221.147.71.76"
+#define LW_TCP_SERVER "puck-highend.popsongremix.com"
 //#define LW_TCP_SERVER "puck.popsongremix.com"
+//#define LW_TCP_SERVER "221.147.71.76"
 #endif
 #define LW_TCP_PORT_STR "19856"
 #define LW_TCP_BUFLEN 512
