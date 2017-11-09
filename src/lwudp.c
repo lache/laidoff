@@ -244,3 +244,11 @@ void udp_update(LWCONTEXT* pLwc, LWUDP* udp) {
 		}
 	}
 }
+
+const char* udp_addr() {
+    return LW_UDP_SERVER;
+}
+
+int udp_port() {
+    return LW_UDP_PORT;
+}

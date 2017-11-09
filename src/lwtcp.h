@@ -47,3 +47,5 @@ int tcp_send_queue2(LWTCP* tcp, const LWUNIQUEID* id);
 int tcp_send_suddendeath(LWTCP* tcp, int battle_id, unsigned int token);
 int tcp_send_newuser(LWTCP* tcp);
 int tcp_send_querynick(LWTCP* tcp, const LWUNIQUEID* id);
+const char* tcp_addr(void);
+int tcp_port(void);

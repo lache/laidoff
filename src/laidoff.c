@@ -1,4 +1,4 @@
-﻿#include <stdlib.h>
+#include <stdlib.h>
 #include <stdio.h>
 #include <locale.h>
 #include <string.h>
@@ -45,6 +45,7 @@
 #include "lwbutton.h"
 #include "puckgame.h"
 #include "lwudp.h"
+#include "lwtcp.h"
 // SWIG output file
 #include "lo_wrap.inl"
 
@@ -937,7 +938,7 @@ void render_stat(const LWCONTEXT* pLwc) {
 	SET_COLOR_RGBA_FLOAT(text_block.color_emp_glyph, 1, 1, 0, 1);
 	SET_COLOR_RGBA_FLOAT(text_block.color_emp_outline, 0, 0, 0, 1);
 	char msg[128];
-	sprintf(msg, "L:%.1f\nR:%.1f\nRMSG:%d(%d-%d)",
+    sprintf(msg, "L:%.1f\nR:%.1f\nRMSG:%d(%d-%d)",
 		(float)(1.0 / deltatime_history_avg(pLwc->update_dt)),
 		(float)(1.0 / deltatime_history_avg(pLwc->render_dt)),
 		pLwc->rmsg_send_count - pLwc->rmsg_recv_count,
@@ -952,6 +953,34 @@ void render_stat(const LWCONTEXT* pLwc) {
 	text_block.text_block_y = 1.0f;
 	text_block.multiline = 1;
 	render_text_block(pLwc, &text_block);
+}
+
+void render_addr(const LWCONTEXT* pLwc) {
+    
+    const float aspect_ratio = (float)pLwc->width / pLwc->height;
+    
+    LWTEXTBLOCK text_block;
+    text_block.align = LTBA_LEFT_BOTTOM;
+    text_block.text_block_width = DEFAULT_TEXT_BLOCK_WIDTH;
+    text_block.text_block_line_height = DEFAULT_TEXT_BLOCK_LINE_HEIGHT_F;
+    text_block.size = DEFAULT_TEXT_BLOCK_SIZE_F;
+    SET_COLOR_RGBA_FLOAT(text_block.color_normal_glyph, 1, 1, 1, 1);
+    SET_COLOR_RGBA_FLOAT(text_block.color_normal_outline, 0, 0, 0, 1);
+    SET_COLOR_RGBA_FLOAT(text_block.color_emp_glyph, 1, 1, 0, 1);
+    SET_COLOR_RGBA_FLOAT(text_block.color_emp_outline, 0, 0, 0, 1);
+    char msg[128];
+    sprintf(msg, "T:%s:%d / U:%s:%d",
+            tcp_addr(), tcp_port(),
+            udp_addr(), udp_port()
+            );
+    text_block.text = msg;
+    text_block.text_bytelen = (int)strlen(text_block.text);
+    text_block.begin_index = 0;
+    text_block.end_index = text_block.text_bytelen;
+    text_block.text_block_x = -aspect_ratio;
+    text_block.text_block_y = -1.0f;
+    text_block.multiline = 1;
+    render_text_block(pLwc, &text_block);
 }
 
 void handle_rmsg_spawn(LWCONTEXT* pLwc, const LWFIELDRENDERCOMMAND* cmd) {
@@ -1269,6 +1298,7 @@ void lwc_render(const LWCONTEXT* pLwc) {
 	render_sys_msg(pLwc, pLwc->def_sys_msg);
 	// Rendering stats
 	render_stat(pLwc);
+    render_addr(pLwc);
 	// Set rendering flag to 0 (ignoring const-ness......)
 	lwcontext_set_rendering((LWCONTEXT*)pLwc, 0);
 }

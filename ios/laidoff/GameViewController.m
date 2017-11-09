@@ -23,6 +23,8 @@
 
 @implementation GameViewController
 
+char internal_data_path[1024];
+
 - (void)viewDidLoad
 {
     [super viewDidLoad];
@@ -47,9 +49,12 @@
     CGFloat screenWidth = screenScale * screenRect.size.width;
     CGFloat screenHeight = screenScale * screenRect.size.height;
     
-    
     self.pLwc = lw_init_initial_size((int)screenWidth, (int)screenHeight);
     lw_set_size(self.pLwc, (int)screenWidth, (int)screenHeight);
+    self.pLwc->internal_data_path = internal_data_path;
+    strcpy(internal_data_path, getenv("HOME"));
+    strcat(internal_data_path, "/Documents");
+    NSLog(@"Internal data path: %s", internal_data_path);
     lwc_start_logic_thread(self.pLwc);
 }
 

@@ -1,6 +1,6 @@
 #pragma once
 
-enum _LW_PUCK_GAME_PACKET {
+typedef enum _LW_PUCK_GAME_PACKET {
 	LPGP_LWPGETTOKEN = 0,
 	LPGP_LWPTOKEN,
 	LPGP_LWPQUEUE,

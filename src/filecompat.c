@@ -2,6 +2,7 @@
 #include "lwlog.h"
 #include "lwuniqueid.h"
 #include "lwmacro.h"
+#include <string.h>
 
 void concat_path(char* path, const char* path1, const char* path2) {
 	if (path1) {

@@ -15,7 +15,10 @@
 //#define LW_TCP_SERVER "puck.popsongremix.com"
 #define LW_TCP_SERVER "221.147.71.76"
 #endif
-#define LW_TCP_PORT_STR "19856"
+#define STR_HELPER(x) #x
+#define STR(x) STR_HELPER(x)
+#define LW_TCP_PORT 19856
+#define LW_TCP_PORT_STR STR(LW_TCP_PORT)
 
 #if LW_PLATFORM_WIN32
 #else
@@ -225,4 +228,12 @@ int tcp_send_suddendeath(LWTCP* tcp, int battle_id, unsigned int token) {
 	p.Token = token;
 	memcpy(tcp->sendbuf, &p, sizeof(p));
 	return send(tcp->ConnectSocket, tcp->sendbuf, (int)sizeof(p), 0);
+}
+
+const char* tcp_addr() {
+    return LW_TCP_SERVER;
+}
+
+int tcp_port() {
+    return LW_TCP_PORT;
 }
