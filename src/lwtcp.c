@@ -7,7 +7,7 @@
 #include "lwudp.h"
 #include "file.h"
 
-#if LW_AUTO_BUILD
+#if LW_AUTO_BUILD || LW_PLATFORM_IOS
 #define LW_TCP_SERVER "puck-highend.popsongremix.com"
 #else
 //#define LW_TCP_SERVER "192.168.0.28"
