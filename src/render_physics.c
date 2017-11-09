@@ -491,12 +491,11 @@ void lwc_render_physics(const LWCONTEXT* pLwc) {
 		render_top_button(pLwc);
 		render_dash_gauge(pLwc);
 		render_hp_gauge(pLwc, -0.8f, 1.0f - 0.1f, pLwc->puck_game_state.player_current_hp, pLwc->puck_game_state.player_total_hp, 1, puck_game->nickname);
-		render_hp_gauge(pLwc, +0.8f, 1.0f - 0.1f, pLwc->puck_game_state.target_current_hp, pLwc->puck_game_state.target_total_hp, 0, "* ENEMY *");
-		render_timer(pLwc, puck_game_remain_time(pLwc->puck_game_state.update_tick));
+		render_hp_gauge(pLwc, +0.8f, 1.0f - 0.1f, pLwc->puck_game_state.target_current_hp, pLwc->puck_game_state.target_total_hp, 0, puck_game->target_nickname);
 	} else {
 		render_hp_gauge(pLwc, -0.8f, 1.0f - 0.1f, pLwc->puck_game_state.player_current_hp, pLwc->puck_game_state.player_total_hp, 1, puck_game->nickname);
 		render_hp_gauge(pLwc, +0.8f, 1.0f - 0.1f, pLwc->puck_game_state.target_current_hp, pLwc->puck_game_state.target_total_hp, 0, "? ? ?");
-		render_timer(pLwc, puck_game_remain_time(pLwc->puck_game_state.update_tick));
 	}
+	render_timer(pLwc, puck_game_remain_time(pLwc->puck_game->total_time, pLwc->puck_game_state.update_tick));
 	render_match_state(pLwc);
 }

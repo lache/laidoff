@@ -34,7 +34,7 @@ typedef struct _LWTCP {
 	int iResult;
 	int recvbuflen;
 	int recvbufnotparsed;
-	LWUNIQUEID uid;
+	LWUNIQUEID user_id;
 } LWTCP;
 
 typedef struct _LWCONTEXT LWCONTEXT;
@@ -43,7 +43,7 @@ LWTCP* new_tcp(const char* path_prefix);
 void destroy_tcp(LWTCP** tcp);
 void tcp_send(LWTCP* tcp, const char* data, int size);
 void tcp_update(LWCONTEXT* pLwc, LWTCP* tcp);
-int tcp_send_queue2(LWTCP* tcp);
+int tcp_send_queue2(LWTCP* tcp, const LWUNIQUEID* id);
 int tcp_send_suddendeath(LWTCP* tcp, int battle_id, unsigned int token);
 int tcp_send_newuser(LWTCP* tcp);
 int tcp_send_querynick(LWTCP* tcp, const LWUNIQUEID* id);

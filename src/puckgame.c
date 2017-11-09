@@ -72,7 +72,8 @@ LWPUCKGAME* new_puck_game() {
 	puck_game->target.total_hp = hp;
 	puck_game->target.current_hp = hp;
     puck_game->sphere_mass = 0.1f;
-    puck_game->sphere_radius = 0.16f; //0.125f;
+    puck_game->sphere_radius = 0.16f;
+	puck_game->total_time = 80.0f;
 	// ------
 
 	// Initialize OpenDE
@@ -325,6 +326,6 @@ void puck_game_commit_dash_to_puck(LWPUCKGAME* puck_game, LWPUCKGAMEDASH* dash, 
 	puck_game_commit_dash(puck_game, dash, dx, dy);
 }
 
-float puck_game_remain_time(int update_tick) {
-	return ceilf(LWMAX(0, 80.0f - update_tick * 1.0f / 125));
+float puck_game_remain_time(float total_time, int update_tick) {
+	return ceilf(LWMAX(0, total_time - update_tick * 1.0f / 125));
 }

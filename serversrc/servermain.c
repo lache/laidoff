@@ -110,7 +110,9 @@ static int lw_get_normalized_dir_pad_input(const LWREMOTEPLAYERCONTROL* control,
 
 static void update_puck_game(LWSERVER* server, LWPUCKGAME* puck_game, double delta_time) {
 	puck_game->time += (float)delta_time;
-	if (puck_game->player.current_hp <= 0 || puck_game->target.current_hp <= 0) {
+	if (puck_game->player.current_hp <= 0
+		|| puck_game->target.current_hp <= 0
+		|| puck_game->time >= puck_game->total_time) {
 		return;
 	}
 	puck_game->player.puck_contacted = 0;
@@ -174,6 +176,7 @@ static void update_puck_game(LWSERVER* server, LWPUCKGAME* puck_game, double del
 			dBodyAddForce(puck_game->go[LPGO_PUCK].body, f[0] * scale, f[1] * scale, f[2] * scale);
 		}
 	}
+	puck_game->update_tick++;
 }
 
 #if LW_PLATFORM_WIN32
@@ -733,12 +736,11 @@ int main(int argc, char* argv[]) {
 		if (logic_elapsed_ms > 0) {
 			int iter = (int)(logic_elapsed_ms / (logic_timestep * 1000));
 			for (int i = 0; i < iter; i++) {
-				update_puck_game(server, puck_game, logic_timestep);
+				//update_puck_game(server, puck_game, logic_timestep);
 				for (int j = 0; j < LW_PUCK_GAME_POOL_CAPACITY; j++) {
 					if (server->puck_game_pool[j]
 						&& server->puck_game_pool[j]->init_ready) {
 						update_puck_game(server, server->puck_game_pool[j], logic_timestep);
-						server->puck_game_pool[j]->update_tick++;
 					}
 				}
 			}

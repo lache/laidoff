@@ -162,8 +162,9 @@ typedef struct _LWPNEWUSERDATA {
 } LWPNEWUSERDATA;
 
 typedef struct _LWPQUEUE2 {
-	unsigned short size;
-	unsigned short type;
+	unsigned short Size;
+	unsigned short Type;
+	unsigned int Id[4];
 } LWPQUEUE2;
 
 typedef struct _LWPQUEUEOK {
@@ -190,6 +191,7 @@ typedef struct _LWPMATCHED2 {
 	int battle_id;
 	unsigned int token;
 	int player_no;
+	char target_nickname[LW_NICKNAME_MAX_LEN];
 } LWPMATCHED2;
 
 typedef struct _LWPBASE {

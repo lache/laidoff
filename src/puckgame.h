@@ -68,6 +68,7 @@ typedef struct _LWPUCKGAME {
 	float puck_damage_contact_speed_threshold;
     float sphere_mass;
     float sphere_radius;
+	float total_time;
 	// ----
 	dWorldID world;
 	dSpaceID space;
@@ -102,6 +103,7 @@ typedef struct _LWPUCKGAME {
 	int init_ready;
 	int update_tick;
 	char nickname[LW_NICKNAME_MAX_LEN];
+	char target_nickname[LW_NICKNAME_MAX_LEN];
 } LWPUCKGAME;
 
 LWPUCKGAME* new_puck_game();
@@ -115,5 +117,5 @@ void puck_game_commit_dash(LWPUCKGAME* puck_game, LWPUCKGAMEDASH* dash, float dx
 void puck_game_commit_dash_to_puck(LWPUCKGAME* puck_game, LWPUCKGAMEDASH* dash, int player_no);
 void puck_game_player_decrease_hp_test(LWPUCKGAME* puck_game);
 void puck_game_target_decrease_hp_test(LWPUCKGAME* puck_game);
-float puck_game_remain_time(int update_tick);
+float puck_game_remain_time(float total_time, int update_tick);
 void puck_game_go_decrease_hp_test(LWPUCKGAME* puck_game, LWPUCKGAMEPLAYER* go, LWPUCKGAMEDASH* dash);

@@ -325,7 +325,6 @@ typedef struct _LWCONTEXT {
 	double puck_game_state_last_received;
 	// Last state packet reception interval (msec)
 	double puck_game_state_last_received_interval;
-	LWUNIQUEID user_id;
 	const char* internal_data_path;
 } LWCONTEXT;
 
