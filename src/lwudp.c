@@ -6,6 +6,17 @@
 #include "lwtimepoint.h"
 #include "puckgame.h"
 
+#if LW_AUTO_BUILD
+#define LW_UDP_SERVER "puck-highend.popsongremix.com"
+#else
+//#define LW_UDP_SERVER "puck.popsongremix.com"
+//#define LW_UDP_SERVER "puck-highend.popsongremix.com"
+#define LW_UDP_SERVER "192.168.0.28" // Site A
+//#define LW_UDP_SERVER "118.33.89.239" // Site B
+#endif
+
+#define LW_UDP_PORT 10288
+
 static int make_socket_nonblocking(int sock) {
 #if defined(WIN32) || defined(_WIN32) || defined(IMN_PIM)
 	unsigned long arg = 1;

@@ -18,3 +18,5 @@ ios/laidoff.xcodeproj/xcuserdata
 ios/laidoff.xcodeproj/project.xcworkspace/xcuserdata
 /match-server/.idea/workspace.xml
 /match-server/conf.json
+/match-server/db
+/user_id.dat

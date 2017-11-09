@@ -8,6 +8,13 @@ import (
 	"unsafe"
 	"os"
 	"encoding/json"
+	"./Nickdb"
+	"time"
+	"io"
+	"fmt"
+	mathrand "math/rand"
+	cryptorand "crypto/rand"
+	"encoding/gob"
 )
 
 // #include "../src/puckgamepacket.h"
@@ -18,17 +25,21 @@ type ServerConfig struct {
 	ConnPort string
 	ConnType string
 
-	BattleServiceHost string
-	BattleServicePort string
+	BattleServiceHost     string
+	BattleServicePort     string
 	BattleServiceConnType string
 
-	BattlePublicServiceHost string
-	BattlePublicServicePort string
+	BattlePublicServiceHost     string
+	BattlePublicServicePort     string
 	BattlePublicServiceConnType string
 }
 
 func main() {
 	log.Println("Greetings from match server")
+	os.MkdirAll("db", os.ModePerm)
+	mathrand.Seed(time.Now().Unix())
+	nickDb := Nickdb.LoadNickDb()
+	log.Printf("Sample nick: %v", Nickdb.PickRandomNick(&nickDb))
 	confFile, err := os.Open("conf.json")
 	if err != nil {
 		log.Fatalf("conf.json open error:%v", err.Error())
@@ -40,7 +51,7 @@ func main() {
 		log.Fatalf("conf.json parse error:%v", err.Error())
 	}
 	matchQueue := make(chan net.Conn)
-	l, err := net.Listen(conf.ConnType, conf.ConnHost + ":" + conf.ConnPort)
+	l, err := net.Listen(conf.ConnType, conf.ConnHost+":"+conf.ConnPort)
 	if err != nil {
 		log.Fatalln("Error listening:", err.Error())
 	}
@@ -52,7 +63,7 @@ func main() {
 		if err != nil {
 			log.Println("Error accepting: ", err.Error())
 		} else {
-			go handleRequest(conf, conn, matchQueue)
+			go handleRequest(conf, &nickDb, conn, matchQueue)
 		}
 	}
 }
@@ -65,7 +76,7 @@ func int2ByteArray(v C.int) [4]byte {
 
 func createBattleInstance(conf ServerConfig, c1 net.Conn, c2 net.Conn) {
 	// Connect to battle service
-	tcpAddr, err := net.ResolveTCPAddr(conf.BattleServiceConnType, conf.BattleServiceHost + ":" + conf.BattleServicePort)
+	tcpAddr, err := net.ResolveTCPAddr(conf.BattleServiceConnType, conf.BattleServiceHost+":"+conf.BattleServicePort)
 	if err != nil {
 		log.Fatalf("ResolveTCPAddr error! - %v", err.Error())
 	}
@@ -110,7 +121,7 @@ func createBattleInstance(conf ServerConfig, c1 net.Conn, c2 net.Conn) {
 	}
 }
 func createMatched2Buf(conf ServerConfig, createBattleOk C.LWPCREATEBATTLEOK, token C.uint) []byte {
-	publicAddr, err := net.ResolveTCPAddr(conf.BattlePublicServiceConnType, conf.BattlePublicServiceHost + ":" + conf.BattlePublicServicePort)
+	publicAddr, err := net.ResolveTCPAddr(conf.BattlePublicServiceConnType, conf.BattlePublicServiceHost+":"+conf.BattlePublicServicePort)
 	if err != nil {
 		log.Panicf("BattlePublicService conf parse error: %v", err.Error())
 	}
@@ -119,8 +130,8 @@ func createMatched2Buf(conf ServerConfig, createBattleOk C.LWPCREATEBATTLEOK, to
 		C.ushort(unsafe.Sizeof(C.LWPMATCHED2{})),
 		C.LPGP_LWPMATCHED2,
 		C.ushort(publicAddr.Port), // createBattleOk.Port
-		C.ushort(0), // padding
-		[4]C.uchar{C.uchar(publicAddrIpv4[0]),C.uchar(publicAddrIpv4[1]),C.uchar(publicAddrIpv4[2]),C.uchar(publicAddrIpv4[3]),},
+		C.ushort(0),               // padding
+		[4]C.uchar{C.uchar(publicAddrIpv4[0]), C.uchar(publicAddrIpv4[1]), C.uchar(publicAddrIpv4[2]), C.uchar(publicAddrIpv4[3]),},
 		createBattleOk.Battle_id,
 		token,
 	})
@@ -133,8 +144,8 @@ func packet2Buf(packet interface{}) []byte {
 
 func matchWorker(conf ServerConfig, matchQueue <-chan net.Conn) {
 	for {
-		c1 := <- matchQueue
-		c2 := <- matchQueue
+		c1 := <-matchQueue
+		c2 := <-matchQueue
 		if c1 == c2 {
 			sendRetryQueue(c1)
 		} else {
@@ -176,7 +187,27 @@ func sendRetryQueue(conn net.Conn) {
 	}
 }
 
-func handleRequest(conf ServerConfig, conn net.Conn, matchQueue chan<- net.Conn) {
+func newUuid() ([]byte, string, error) {
+	uuid := make([]byte, 16)
+
+	n, err := io.ReadFull(cryptorand.Reader, uuid)
+	if n != len(uuid) || err != nil {
+		return nil, "", err
+	}
+	// variant bits; see section 4.1.1
+	uuid[8] = uuid[8]&^0xc0 | 0x80
+	// version 4 (pseudo-random); see section 4.1.3
+	uuid[6] = uuid[6]&^0xf0 | 0x40
+	return uuid, fmt.Sprintf("%08x-%08x-%08x-%08x", uuid[0:4], uuid[4:8], uuid[8:12], uuid[12:16]), nil
+}
+
+type UserDb struct {
+	Id       []byte
+	Created  time.Time
+	Nickname string
+}
+
+func handleRequest(conf ServerConfig, nickDb *Nickdb.NickDb, conn net.Conn, matchQueue chan<- net.Conn) {
 	log.Printf("Accepting from %v", conn.RemoteAddr())
 	for {
 		buf := make([]byte, 1024)
@@ -205,7 +236,7 @@ func handleRequest(conf ServerConfig, conn net.Conn, matchQueue chan<- net.Conn)
 			conn.Write(queueOkBuf)
 		case C.LPGP_LWPSUDDENDEATH:
 			log.Printf("SUDDENDEATH received")
-			tcpAddr, err := net.ResolveTCPAddr(conf.BattleServiceConnType, conf.BattleServiceHost + ":" + conf.BattleServicePort)
+			tcpAddr, err := net.ResolveTCPAddr(conf.BattleServiceConnType, conf.BattleServiceHost+":"+conf.BattleServicePort)
 			if err != nil {
 				log.Fatalf("ResolveTCPAddr error! - %v", err.Error())
 			}
@@ -217,8 +248,94 @@ func handleRequest(conf ServerConfig, conn net.Conn, matchQueue chan<- net.Conn)
 			if err != nil {
 				log.Fatalf("Send SUDDENDEATH failed")
 			}
+		case C.LPGP_LWPNEWUSER:
+			handleNewUser(nickDb, conn)
+		case C.LPGP_LWPQUERYNICK:
+			handleQueryNick(buf, conn)
 		}
 	}
 	conn.Close()
 	log.Printf("Conn closed %v", conn.RemoteAddr())
+}
+func handleNewUser(nickDb *Nickdb.NickDb, conn net.Conn) {
+	log.Printf("NEWUSER received")
+	uuid, uuidStr, err := newUuid()
+	if err != nil {
+		log.Fatalf("new uuid failed: %v", err.Error())
+	}
+	log.Printf("  - New user guid: %v", uuidStr)
+	newNick := Nickdb.PickRandomNick(nickDb)
+	newNickBytes := []byte(newNick)
+	const maxNickLen = 32
+	var cNewNickBytes [maxNickLen]C.char
+	for i, v := range newNickBytes {
+		if i >= maxNickLen {
+			break
+		}
+		cNewNickBytes[i] = C.char(v)
+	}
+	cNewNickBytes[maxNickLen-1] = 0
+	newUserDataBuf := packet2Buf(&C.LWPNEWUSERDATA{
+		C.ushort(unsafe.Sizeof(C.LWPNEWUSERDATA{})),
+		C.LPGP_LWPNEWUSERDATA,
+		[4]C.uint{C.uint(binary.BigEndian.Uint32(uuid[0:4])), C.uint(binary.BigEndian.Uint32(uuid[4:8])), C.uint(binary.BigEndian.Uint32(uuid[8:12])), C.uint(binary.BigEndian.Uint32(uuid[12:16]))},
+		cNewNickBytes,
+	})
+	// Write to disk
+	userDb := UserDb{
+		uuid,
+		time.Now(),
+		newNick,
+	}
+	userDbFile, err := os.Create("db/" + uuidStr)
+	if err != nil {
+		log.Fatalf("User db file creation failed: %v", err.Error())
+	}
+	encoder := gob.NewEncoder(userDbFile)
+	encoder.Encode(userDb)
+	userDbFile.Close()
+	_, err = conn.Write(newUserDataBuf)
+	if err != nil {
+		log.Fatalf("NEWUSERDATA send failed: %v", err.Error())
+	}
+}
+func handleQueryNick(buf []byte, conn net.Conn) {
+	log.Printf("QUERYNICK received")
+	recvPacketBufReader := bytes.NewReader(buf)
+	recvPacket := C.LWPQUERYNICK{}
+	err := binary.Read(recvPacketBufReader, binary.LittleEndian, &recvPacket)
+	if err != nil {
+		log.Printf("binary.Read fail: %v", err.Error())
+		return
+	}
+	uuidStr := fmt.Sprintf("%08x-%08x-%08x-%08x", recvPacket.Id[0], recvPacket.Id[1], recvPacket.Id[2], recvPacket.Id[3])
+	userDbFile, err := os.Open("db/" + uuidStr)
+	if err != nil {
+		log.Printf("disk open failed: %v", err.Error())
+	} else {
+		defer userDbFile.Close()
+		decoder := gob.NewDecoder(userDbFile)
+		userDb := &UserDb{}
+		decoder.Decode(userDb)
+		log.Printf("User nick: %v", userDb.Nickname)
+		// Send a reply
+		const maxNickLen = 32
+		var cNewNickBytes [maxNickLen]C.char
+		for i, v := range []byte(userDb.Nickname) {
+			if i >= maxNickLen {
+				break
+			}
+			cNewNickBytes[i] = C.char(v)
+		}
+		cNewNickBytes[maxNickLen-1] = 0
+		nickBuf := packet2Buf(&C.LWPNICK{
+			C.ushort(unsafe.Sizeof(C.LWPNICK{})),
+			C.LPGP_LWPNICK,
+			cNewNickBytes,
+		})
+		_, err = conn.Write(nickBuf)
+		if err != nil {
+			log.Fatalf("LWPNICK send failed: %v", err.Error())
+		}
+	}
 }

@@ -17,18 +17,9 @@
 #include <czmq_prelude.h>
 #endif
 #include "lwringbuffer.h"
+#include "lwuniqueid.h"
 
-#if LW_PLATFORM_ANDROID
-#define LW_TCP_SERVER "puck-highend.popsongremix.com"
-#else
-//#define LW_TCP_SERVER "192.168.0.28"
-#define LW_TCP_SERVER "puck-highend.popsongremix.com"
-//#define LW_TCP_SERVER "puck.popsongremix.com"
-//#define LW_TCP_SERVER "221.147.71.76"
-#endif
-#define LW_TCP_PORT_STR "19856"
 #define LW_TCP_BUFLEN 512
-
 
 typedef struct _LWTCP {
 #if LW_PLATFORM_WIN32
@@ -43,13 +34,16 @@ typedef struct _LWTCP {
 	int iResult;
 	int recvbuflen;
 	int recvbufnotparsed;
+	LWUNIQUEID uid;
 } LWTCP;
 
 typedef struct _LWCONTEXT LWCONTEXT;
 
-LWTCP* new_tcp();
+LWTCP* new_tcp(const char* path_prefix);
 void destroy_tcp(LWTCP** tcp);
 void tcp_send(LWTCP* tcp, const char* data, int size);
 void tcp_update(LWCONTEXT* pLwc, LWTCP* tcp);
 int tcp_send_queue2(LWTCP* tcp);
 int tcp_send_suddendeath(LWTCP* tcp, int battle_id, unsigned int token);
+int tcp_send_newuser(LWTCP* tcp);
+int tcp_send_querynick(LWTCP* tcp, const LWUNIQUEID* id);

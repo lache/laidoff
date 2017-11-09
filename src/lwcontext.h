@@ -27,6 +27,7 @@
 #include "lwbutton.h"
 #include "construct.h"
 #include "puckgamepacket.h"
+#include "lwuniqueid.h"
 
 #define MAX_RENDER_QUEUE_CAPACITY (512)
 
@@ -324,6 +325,8 @@ typedef struct _LWCONTEXT {
 	double puck_game_state_last_received;
 	// Last state packet reception interval (msec)
 	double puck_game_state_last_received_interval;
+	LWUNIQUEID user_id;
+	const char* internal_data_path;
 } LWCONTEXT;
 
 #ifdef __cplusplus

@@ -8,6 +8,11 @@ add_library(app-glue STATIC
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=gnu++11 -DdDOUBLE")
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -DdDOUBLE")
 
+if(DEFINED ENV{autoBuild})
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DLW_AUTO_BUILD")
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -DLW_AUTO_BUILD")
+endif()
+
 # Android Studio에서 CMake 빌드 오류나는 부분 수정
 set(ZMQ_HAVE_EVENTFD_CLOEXEC_EXITCODE 0)
 set(ZMQ_HAVE_SO_KEEPALIVE_EXITCODE 0)
@@ -102,7 +107,3 @@ target_link_libraries(native-activity
                       log
                       libzmq
                       czmq)
-
-
-
-					  

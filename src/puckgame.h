@@ -3,6 +3,7 @@
 #include "lwvbotype.h"
 #include "armature.h"
 #include "lwanim.h"
+#include "puckgamepacket.h"
 #include <ode/ode.h>
 
 typedef struct _LWPUCKGAME LWPUCKGAME;
@@ -99,6 +100,7 @@ typedef struct _LWPUCKGAME {
 	LWPUCKGAMEDASH remote_dash[2];
 	int init_ready;
 	int update_tick;
+	char nickname[LW_NICKNAME_MAX_LEN];
 } LWPUCKGAME;
 
 LWPUCKGAME* new_puck_game();

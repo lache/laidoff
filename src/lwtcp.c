@@ -5,6 +5,17 @@
 #include "sysmsg.h"
 #include "puckgame.h"
 #include "lwudp.h"
+#include "file.h"
+
+#if LW_AUTO_BUILD
+#define LW_TCP_SERVER "puck-highend.popsongremix.com"
+#else
+#define LW_TCP_SERVER "192.168.0.28"
+//#define LW_TCP_SERVER "puck-highend.popsongremix.com"
+//#define LW_TCP_SERVER "puck.popsongremix.com"
+//#define LW_TCP_SERVER "221.147.71.76"
+#endif
+#define LW_TCP_PORT_STR "19856"
 
 #if LW_PLATFORM_WIN32
 #else
@@ -37,7 +48,7 @@ varname.Size = sizeof(vartype); \
 varname.Type = LPGP_##vartype
 
 
-LWTCP* new_tcp() {
+LWTCP* new_tcp(const char* path_prefix) {
 	LWTCP* tcp = (LWTCP*)malloc(sizeof(LWTCP));
 	memset(tcp, 0, sizeof(LWTCP));
 	tcp->ConnectSocket = INVALID_SOCKET;
@@ -45,7 +56,7 @@ LWTCP* new_tcp() {
 	tcp->hints.ai_family = AF_UNSPEC;
 	tcp->hints.ai_socktype = SOCK_STREAM;
 	tcp->hints.ai_protocol = IPPROTO_TCP;
-	
+
 	tcp->iResult = getaddrinfo(LW_TCP_SERVER, LW_TCP_PORT_STR, &tcp->hints, &tcp->result);
 	if (tcp->iResult != 0) {
 		LOGE("getaddrinfo failed with error: %d", tcp->iResult);
@@ -78,6 +89,16 @@ LWTCP* new_tcp() {
 		free(tcp);
 		return 0;
 	}
+
+	if (get_cached_user_id(path_prefix, &tcp->uid) == 0) {
+		LOGI("Cached user id: %08x-%08x-%08x-%08x",
+			tcp->uid.v[0], tcp->uid.v[1], tcp->uid.v[2], tcp->uid.v[3]);
+		tcp_send_querynick(tcp, &tcp->uid);
+	} else {
+		// Request a new user to be created
+		tcp_send_newuser(tcp);
+	}
+
 	// Send QUEUE2
 	tcp->iResult = tcp_send_queue2(tcp);
 	if (tcp->iResult == SOCKET_ERROR) {
@@ -147,6 +168,20 @@ int parse_recv_packets(LWCONTEXT* pLwc, LWTCP* tcp) {
 		} else if (CHECK_PACKET(packet_type, packet_size, LWPMAYBEMATCHED)) {
 			LOGI("LWPMAYBEMATCHED received");
 			//show_sys_msg(pLwc->def_sys_msg, "LWPMAYBEMATCHED received");
+		} else if (CHECK_PACKET(packet_type, packet_size, LWPNEWUSERDATA)) {
+			LOGI("LWPNEWUSERDATA received");
+			LWPNEWUSERDATA* p = (LWPNEWUSERDATA*)cursor;
+			save_cached_user_id(pLwc->internal_data_path, (LWUNIQUEID*)p->id);
+			get_cached_user_id(pLwc->internal_data_path, &pLwc->user_id);
+			LOGI("[NEW] Cached user nick: %s, id: %08x-%08x-%08x-%08x",
+				p->nickname,
+				pLwc->user_id.v[0], pLwc->user_id.v[1], pLwc->user_id.v[2], pLwc->user_id.v[3]);
+			memcpy(pLwc->puck_game->nickname, p->nickname, sizeof(char) * LW_NICKNAME_MAX_LEN);
+		} else if (CHECK_PACKET(packet_type, packet_size, LWPNICK)) {
+			LOGI("LWPNICK received");
+			LWPNICK* p = (LWPNICK*)cursor;
+			LOGI("Cached user nick: %s", p->nickname);
+			memcpy(pLwc->puck_game->nickname, p->nickname, sizeof(char) * LW_NICKNAME_MAX_LEN);
 		} else {
 			LOGE("Unknown TCP packet");
 		}
@@ -175,6 +210,19 @@ void tcp_update(LWCONTEXT* pLwc, LWTCP* tcp) {
 			tcp->recvbufnotparsed -= parsed_bytes;
 		}
 	}
+}
+
+int tcp_send_newuser(LWTCP* tcp) {
+	NEW_TCP_PACKET(LWPNEWUSER, p);
+	memcpy(tcp->sendbuf, &p, sizeof(p));
+	return send(tcp->ConnectSocket, tcp->sendbuf, (int)sizeof(p), 0);
+}
+
+int tcp_send_querynick(LWTCP* tcp, const LWUNIQUEID* id) {
+	NEW_TCP_PACKET_CAPITAL(LWPQUERYNICK, p);
+	memcpy(p.Id, id->v, sizeof(LWUNIQUEID));
+	memcpy(tcp->sendbuf, &p, sizeof(p));
+	return send(tcp->ConnectSocket, tcp->sendbuf, (int)sizeof(p), 0);
 }
 
 int tcp_send_queue2(LWTCP* tcp) {

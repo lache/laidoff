@@ -22,6 +22,10 @@ enum _LW_PUCK_GAME_PACKET {
 	LPGP_LWPQUEUEOK = 203,
 	LPGP_LWPRETRYQUEUE = 204,
 	LPGP_LWPSUDDENDEATH = 205,
+	LPGP_LWPNEWUSER = 206,
+	LPGP_LWPNEWUSERDATA = 207,
+	LPGP_LWPQUERYNICK = 208,
+	LPGP_LWPNICK = 209,
 
 	// internal admin tcp
 	LPGP_LWPCREATEBATTLE = 1000,
@@ -131,6 +135,32 @@ typedef struct _LWPSTATE {
 // should be 4-byte aligned...
 // (Cgo compatability issue)
 //#pragma pack(push, 1)
+typedef struct _LWPNEWUSER {
+	unsigned short size;
+	unsigned short type;
+} LWPNEWUSER;
+
+typedef struct _LWPQUERYNICK {
+	unsigned short Size;
+	unsigned short Type;
+	unsigned int Id[4];
+} LWPQUERYNICK;
+
+#define LW_NICKNAME_MAX_LEN (32)
+
+typedef struct _LWPNICK {
+	unsigned short size;
+	unsigned short type;
+	char nickname[LW_NICKNAME_MAX_LEN];
+} LWPNICK;
+
+typedef struct _LWPNEWUSERDATA {
+	unsigned short size;
+	unsigned short type;
+	unsigned int id[4];
+	char nickname[32];
+} LWPNEWUSERDATA;
+
 typedef struct _LWPQUEUE2 {
 	unsigned short size;
 	unsigned short type;

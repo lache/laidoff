@@ -43,4 +43,3 @@ void release_binary(char* d)
 {
 	free(d);
 }
-

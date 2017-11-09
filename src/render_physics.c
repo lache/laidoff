@@ -85,7 +85,11 @@ static void render_timer(const LWCONTEXT* pLwc, float remain_sec) {
 	SET_COLOR_RGBA_FLOAT(text_block.color_emp_glyph, 1, 1, 0, 1);
 	SET_COLOR_RGBA_FLOAT(text_block.color_emp_outline, 0, 0, 0, 1);
 	char str[32];
-	sprintf(str, u8"%.0f", remain_sec);
+	if (remain_sec < 0) {
+		sprintf(str, u8"--");
+	} else {
+		sprintf(str, u8"%.0f", remain_sec);
+	}
 	text_block.text = str;
 	text_block.text_bytelen = (int)strlen(text_block.text);
 	text_block.begin_index = 0;
@@ -123,7 +127,7 @@ static void render_match_state(const LWCONTEXT* pLwc) {
 	render_text_block(pLwc, &text_block);
 }
 
-static void render_hp_gauge(const LWCONTEXT* pLwc, float x, float y, int current_hp, int total_hp, int right) {
+static void render_hp_gauge(const LWCONTEXT* pLwc, float x, float y, int current_hp, int total_hp, int right, const char* str) {
 	const float aspect_ratio = (float)pLwc->width / pLwc->height;
 	const float gauge_width = 1.2f;
 	const float gauge_height = 0.1f;
@@ -143,60 +147,52 @@ static void render_hp_gauge(const LWCONTEXT* pLwc, float x, float y, int current
 		LVT_CENTER_TOP_ANCHORED_SQUARE,
 		1, base_color, base_color, base_color, 1);
 	const float cell_border = 0.015f;
-	if (total_hp == 0) {
-		return;
-	}
-	const float cell_width = (gauge_width - cell_border * (total_hp + 1)) / total_hp;
-	const float cell_x_0 = x - gauge_width / 2 + cell_border;
-	const float cell_x_stride = cell_width + cell_border;
-	for (int i = 0; i < total_hp; i++) {
-		float r = base_color, g = base_color, b = base_color;
-		if (right) {
-			if (total_hp - current_hp > i) {
-				r = 1;
+	if (total_hp > 0) {
+		const float cell_width = (gauge_width - cell_border * (total_hp + 1)) / total_hp;
+		const float cell_x_0 = x - gauge_width / 2 + cell_border;
+		const float cell_x_stride = cell_width + cell_border;
+		for (int i = 0; i < total_hp; i++) {
+			float r = base_color, g = base_color, b = base_color;
+			if (right) {
+				if (total_hp - current_hp > i) {
+					r = 1;
+				} else {
+					g = 1;
+				}
+			} else {
+				if (i < current_hp) {
+					g = 1;
+				} else {
+					r = 1;
+				}
 			}
-			else {
-				g = 1;
-			}
+
+			// Render background (green)
+			render_solid_vb_ui(pLwc,
+				cell_x_0 + cell_x_stride * i, y - gauge_height / 2, cell_width, gauge_height - cell_border * 2,
+				0,
+				LVT_LEFT_CENTER_ANCHORED_SQUARE,
+				1, r, g, b, 1);
 		}
-		else {
-			if (i < current_hp) {
-				g = 1;
-			}
-			else {
-				r = 1;
-			}
-		}
-		
-		// Render background (green)
-		render_solid_vb_ui(pLwc,
-			cell_x_0 + cell_x_stride * i, y - gauge_height / 2, cell_width, gauge_height - cell_border * 2,
-			0,
-			LVT_LEFT_CENTER_ANCHORED_SQUARE,
-			1, r, g, b, 1);
 	}
 	// Render text
-	if (0) {
-		LWTEXTBLOCK text_block;
-		text_block.align = LTBA_CENTER_BOTTOM;
-		text_block.text_block_width = DEFAULT_TEXT_BLOCK_WIDTH;
-		text_block.text_block_line_height = DEFAULT_TEXT_BLOCK_LINE_HEIGHT_E;
-		text_block.size = DEFAULT_TEXT_BLOCK_SIZE_E;
-		text_block.multiline = 1;
-		SET_COLOR_RGBA_FLOAT(text_block.color_normal_glyph, 1, 1, 1, 1);
-		SET_COLOR_RGBA_FLOAT(text_block.color_normal_outline, 0, 0, 0, 1);
-		SET_COLOR_RGBA_FLOAT(text_block.color_emp_glyph, 1, 1, 0, 1);
-		SET_COLOR_RGBA_FLOAT(text_block.color_emp_outline, 0, 0, 0, 1);
-		char str[32];
-		sprintf(str, "%d/%d PLAYER HP", current_hp, total_hp);
-		text_block.text = str;
-		text_block.text_bytelen = (int)strlen(text_block.text);
-		text_block.begin_index = 0;
-		text_block.end_index = text_block.text_bytelen;
-		text_block.text_block_x = x;
-		text_block.text_block_y = y;
-		render_text_block(pLwc, &text_block);
-	}
+	LWTEXTBLOCK text_block;
+	text_block.align = LTBA_CENTER_BOTTOM;
+	text_block.text_block_width = DEFAULT_TEXT_BLOCK_WIDTH;
+	text_block.text_block_line_height = DEFAULT_TEXT_BLOCK_LINE_HEIGHT_E;
+	text_block.size = DEFAULT_TEXT_BLOCK_SIZE_E;
+	text_block.multiline = 1;
+	SET_COLOR_RGBA_FLOAT(text_block.color_normal_glyph, 1, 1, 1, 1);
+	SET_COLOR_RGBA_FLOAT(text_block.color_normal_outline, 0, 0, 0, 1);
+	SET_COLOR_RGBA_FLOAT(text_block.color_emp_glyph, 1, 1, 0, 1);
+	SET_COLOR_RGBA_FLOAT(text_block.color_emp_outline, 0, 0, 0, 1);
+	text_block.text = str;
+	text_block.text_bytelen = (int)strlen(text_block.text);
+	text_block.begin_index = 0;
+	text_block.end_index = text_block.text_bytelen;
+	text_block.text_block_x = x;
+	text_block.text_block_y = y;
+	render_text_block(pLwc, &text_block);
 }
 
 static void render_dash_gauge(const LWCONTEXT* pLwc) {
@@ -452,6 +448,7 @@ void lwc_render_physics(const LWCONTEXT* pLwc) {
 		},
 	};
     const float wall_height = 0.8f;
+	
 	if (puck_game->battle_id) {
 		// Floor
 		render_floor(pLwc, proj, puck_game, wall_shader_index, view, &sphere_render_uniform);
@@ -479,8 +476,12 @@ void lwc_render_physics(const LWCONTEXT* pLwc) {
 		render_fist_button(pLwc);
 		render_top_button(pLwc);
 		render_dash_gauge(pLwc);
-		render_hp_gauge(pLwc, -0.8f, 1.0f - 0.1f, pLwc->puck_game_state.player_current_hp, pLwc->puck_game_state.player_total_hp, 1);
-		render_hp_gauge(pLwc, +0.8f, 1.0f - 0.1f, pLwc->puck_game_state.target_current_hp, pLwc->puck_game_state.target_total_hp, 0);
+		render_hp_gauge(pLwc, -0.8f, 1.0f - 0.1f, pLwc->puck_game_state.player_current_hp, pLwc->puck_game_state.player_total_hp, 1, puck_game->nickname);
+		render_hp_gauge(pLwc, +0.8f, 1.0f - 0.1f, pLwc->puck_game_state.target_current_hp, pLwc->puck_game_state.target_total_hp, 0, "* ENEMY *");
+		render_timer(pLwc, puck_game_remain_time(pLwc->puck_game_state.update_tick));
+	} else {
+		render_hp_gauge(pLwc, -0.8f, 1.0f - 0.1f, pLwc->puck_game_state.player_current_hp, pLwc->puck_game_state.player_total_hp, 1, puck_game->nickname);
+		render_hp_gauge(pLwc, +0.8f, 1.0f - 0.1f, pLwc->puck_game_state.target_current_hp, pLwc->puck_game_state.target_total_hp, 0, "? ? ?");
 		render_timer(pLwc, puck_game_remain_time(pLwc->puck_game_state.update_tick));
 	}
 	render_match_state(pLwc);

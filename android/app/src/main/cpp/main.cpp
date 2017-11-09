@@ -649,8 +649,9 @@ void android_main(struct android_app* state) {
     struct engine engine;
 
     LOGI("android_main");
+	LOGI("internal data path: %s", state->activity->internalDataPath);
 
-    // Make sure glue isn't stripped.
+	// Make sure glue isn't stripped.
     app_dummy();
 
     memset(&engine, 0, sizeof(engine));
@@ -715,6 +716,7 @@ void android_main(struct android_app* state) {
                 lw_deinit(engine.pLwc);
             }
             engine.pLwc = lw_init_initial_size(engine.width, engine.height);
+			engine.pLwc->internal_data_path = state->activity->internalDataPath;
             lw_set_size(engine.pLwc, engine.width, engine.height);
             engine.inited = true;
             lwc_start_logic_thread(engine.pLwc);
