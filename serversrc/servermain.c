@@ -643,31 +643,46 @@ void broadcast_state_packet(LWSERVER* server, const LWCONN* conn, int conn_capac
 			&& conn[i].battle_id <= LW_PUCK_GAME_POOL_CAPACITY) {
 			const LWPUCKGAME* puck_game = server->puck_game_pool[conn[i].battle_id - 1];
 			if (puck_game) {
+				float xscale = 1.0f;
+				float yscale = 1.0f;
+				LW_PUCK_GAME_OBJECT player_go_enum = LPGO_PLAYER;
+				LW_PUCK_GAME_OBJECT target_go_enum = LPGO_TARGET;
+				const LWPUCKGAMEPLAYER* player = &puck_game->player;
+				const LWPUCKGAMEPLAYER* target = &puck_game->target;
+				if (conn[i].player_no == 2) {
+					/*player_go_enum = LPGO_TARGET;
+					target_go_enum = LPGO_PLAYER;
+					xscale = -1.0f;
+					yscale = -1.0f;*/
+					player = &puck_game->target;
+					target = &puck_game->player;
+				}
+
 				LWPSTATE packet_state;
 				packet_state.type = LPGP_LWPSTATE;
 				packet_state.update_tick = puck_game->update_tick;
-				packet_state.puck[0] = puck_game->go[LPGO_PUCK].pos[0];
-				packet_state.puck[1] = puck_game->go[LPGO_PUCK].pos[1];
+				packet_state.puck[0] = xscale * puck_game->go[LPGO_PUCK].pos[0];
+				packet_state.puck[1] = yscale * puck_game->go[LPGO_PUCK].pos[1];
 				packet_state.puck[2] = puck_game->go[LPGO_PUCK].pos[2];
-				packet_state.player[0] = puck_game->go[LPGO_PLAYER].pos[0];
-				packet_state.player[1] = puck_game->go[LPGO_PLAYER].pos[1];
-				packet_state.player[2] = puck_game->go[LPGO_PLAYER].pos[2];
-				packet_state.target[0] = puck_game->go[LPGO_TARGET].pos[0];
-				packet_state.target[1] = puck_game->go[LPGO_TARGET].pos[1];
-				packet_state.target[2] = puck_game->go[LPGO_TARGET].pos[2];
+				packet_state.player[0] = xscale * puck_game->go[player_go_enum].pos[0];
+				packet_state.player[1] = yscale * puck_game->go[player_go_enum].pos[1];
+				packet_state.player[2] = puck_game->go[player_go_enum].pos[2];
+				packet_state.target[0] = xscale * puck_game->go[target_go_enum].pos[0];
+				packet_state.target[1] = yscale * puck_game->go[target_go_enum].pos[1];
+				packet_state.target[2] = puck_game->go[target_go_enum].pos[2];
 				memcpy(packet_state.puck_rot, puck_game->go[LPGO_PUCK].rot, sizeof(mat4x4));
-				memcpy(packet_state.player_rot, puck_game->go[LPGO_PLAYER].rot, sizeof(mat4x4));
-				memcpy(packet_state.target_rot, puck_game->go[LPGO_TARGET].rot, sizeof(mat4x4));
+				memcpy(packet_state.player_rot, puck_game->go[player_go_enum].rot, sizeof(mat4x4));
+				memcpy(packet_state.target_rot, puck_game->go[target_go_enum].rot, sizeof(mat4x4));
 				packet_state.puck_speed = puck_game->go[LPGO_PUCK].speed;
-				packet_state.player_speed = puck_game->go[LPGO_PLAYER].speed;
-				packet_state.target_speed = puck_game->go[LPGO_TARGET].speed;
+				packet_state.player_speed = puck_game->go[player_go_enum].speed;
+				packet_state.target_speed = puck_game->go[target_go_enum].speed;
 				packet_state.puck_move_rad = puck_game->go[LPGO_PUCK].move_rad;
-				packet_state.player_move_rad = puck_game->go[LPGO_PLAYER].move_rad;
-				packet_state.target_move_rad = puck_game->go[LPGO_TARGET].move_rad;
-				packet_state.player_current_hp = puck_game->player.current_hp;
-				packet_state.player_total_hp = puck_game->player.total_hp;
-				packet_state.target_current_hp = puck_game->target.current_hp;
-				packet_state.target_total_hp = puck_game->target.total_hp;
+				packet_state.player_move_rad = puck_game->go[player_go_enum].move_rad;
+				packet_state.target_move_rad = puck_game->go[target_go_enum].move_rad;
+				packet_state.player_current_hp = player->current_hp;
+				packet_state.player_total_hp = player->total_hp;
+				packet_state.target_current_hp = target->current_hp;
+				packet_state.target_total_hp = target->total_hp;
 
 				double tp = lwtimepoint_now_seconds();
 				sendto(server->s, (const char*)&packet_state, sizeof(packet_state), 0, (struct sockaddr*)&conn[i].si, server->slen);

@@ -398,6 +398,9 @@ void lwc_render_physics(const LWCONTEXT* pLwc) {
 	vec3 center = { 0, 0, 0 };
 
 	vec3 up = { 0, 1, 0 };
+	if (pLwc->puck_game->player_no == 2) {
+		up[1] = -1.0f;
+	}
 	mat4x4_look_at(view, eye, center, up);
 
 	const LWPUCKGAME* puck_game = pLwc->puck_game;
@@ -447,6 +450,15 @@ void lwc_render_physics(const LWCONTEXT* pLwc) {
 			!remote ? puck_game->go[LPGO_PUCK].move_rad : pLwc->puck_game_state.puck_move_rad
 		},
 	};
+	if (pLwc->puck_game->player_no == 2) {
+		sphere_render_uniform.sphere_col[0][0] = 1.0f;
+		sphere_render_uniform.sphere_col[0][1] = 0.0f;
+		sphere_render_uniform.sphere_col[0][2] = 0.0f;
+
+		sphere_render_uniform.sphere_col[1][0] = 0.0f;
+		sphere_render_uniform.sphere_col[1][1] = 1.0f;
+		sphere_render_uniform.sphere_col[1][2] = 0.8f;
+	}
     const float wall_height = 0.8f;
 	
 	if (puck_game->battle_id) {
@@ -465,11 +477,13 @@ void lwc_render_physics(const LWCONTEXT* pLwc) {
 		render_wall(pLwc, proj, puck_game, wall_shader_index, view, -2, 0, 0, 0, (float)LWDEG2RAD(-90),
 			LVT_RIGHT_CENTER_ANCHORED_SQUARE, wall_height, 2.0f, 2.0f, &sphere_render_uniform);
 
+		const int player_no = pLwc->puck_game->player_no;
+
 		render_go(pLwc, view, proj, &puck_game->go[LPGO_PUCK], pLwc->tex_atlas[LAE_PUCK_KTX],
 			1.0f, remote_puck_pos, pLwc->puck_game_state.puck_rot, remote, !remote ? puck_game->go[LPGO_PUCK].speed : pLwc->puck_game_state.puck_speed);
-		render_go(pLwc, view, proj, &puck_game->go[LPGO_PLAYER], pLwc->tex_atlas[LAE_PUCK_PLAYER_KTX],
+		render_go(pLwc, view, proj, &puck_game->go[LPGO_PLAYER], pLwc->tex_atlas[player_no == 2 ? LAE_PUCK_ENEMY_KTX : LAE_PUCK_PLAYER_KTX],
 			1.0f, remote_player_pos, pLwc->puck_game_state.player_rot, remote, 0);
-		render_go(pLwc, view, proj, &puck_game->go[LPGO_TARGET], pLwc->tex_atlas[LAE_PUCK_ENEMY_KTX],
+		render_go(pLwc, view, proj, &puck_game->go[LPGO_TARGET], pLwc->tex_atlas[player_no == 2 ? LAE_PUCK_PLAYER_KTX : LAE_PUCK_ENEMY_KTX],
 			1.0f, remote_target_pos, pLwc->puck_game_state.target_rot, remote, 0);
 
 		render_dir_pad(pLwc);

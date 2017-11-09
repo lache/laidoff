@@ -155,6 +155,7 @@ int parse_recv_packets(LWCONTEXT* pLwc, LWTCP* tcp) {
 			LOGI("LWPMATCHED2 - bid:%d", p->battle_id);
 			pLwc->puck_game->battle_id = p->battle_id;
 			pLwc->puck_game->token = p->token;
+			pLwc->puck_game->player_no = p->player_no;
 			udp_update_addr(pLwc->udp, *(unsigned long*)p->ipaddr, p->port);
 			//show_sys_msg(pLwc->def_sys_msg, "LWPMATCHED2 received");
 		} else if (CHECK_PACKET(packet_type, packet_size, LWPQUEUEOK)) {

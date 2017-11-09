@@ -94,8 +94,8 @@ void update_puck_game(LWCONTEXT* pLwc, LWPUCKGAME* puck_game, double delta_time)
 			packet_move.type = LPGP_LWPMOVE;
 			packet_move.battle_id = pLwc->puck_game->battle_id;
 			packet_move.token = pLwc->puck_game->token;
-			packet_move.dx = dx;
-			packet_move.dy = dy;
+			packet_move.dx = pLwc->puck_game->player_no == 2 ? -dx : dx;
+			packet_move.dy = pLwc->puck_game->player_no == 2 ? -dy : dy;
 			udp_send(pLwc->udp, (const char*)&packet_move, sizeof(packet_move));
 		}
 	}

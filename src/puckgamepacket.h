@@ -189,6 +189,7 @@ typedef struct _LWPMATCHED2 {
 	unsigned char ipaddr[4];
 	int battle_id;
 	unsigned int token;
+	int player_no;
 } LWPMATCHED2;
 
 typedef struct _LWPBASE {

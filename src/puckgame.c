@@ -87,9 +87,9 @@ LWPUCKGAME* new_puck_game() {
 	dWorldSetGravity(puck_game->world, 0, 0, -9.81f);
 	dWorldSetCFM(puck_game->world, 1e-5f);
 	
-	create_go(puck_game, LPGO_PUCK, puck_game->sphere_mass, puck_game->sphere_radius, 1.0f, 0.0f);
-	create_go(puck_game, LPGO_PLAYER, puck_game->sphere_mass, puck_game->sphere_radius, 0.0f, 0.0f);
-	create_go(puck_game, LPGO_TARGET, puck_game->sphere_mass, puck_game->sphere_radius, 0.0f, 0.0f);
+	create_go(puck_game, LPGO_PUCK, puck_game->sphere_mass, puck_game->sphere_radius, 0.0f, 0.0f);
+	create_go(puck_game, LPGO_PLAYER, puck_game->sphere_mass, puck_game->sphere_radius, -1.0f, 0.0f);
+	create_go(puck_game, LPGO_TARGET, puck_game->sphere_mass, puck_game->sphere_radius, 1.0f, 0.0f);
 
 	puck_game->contact_joint_group = dJointGroupCreate(0);
 	puck_game->player_control_joint_group = dJointGroupCreate(0);
@@ -114,7 +114,7 @@ LWPUCKGAME* new_puck_game() {
 	dJointSetLMotorParam(pcj, dParamFMax1, 10.0f);
 	dJointSetLMotorParam(pcj, dParamFMax2, 10.0f);
 
-	dBodySetPosition(puck_game->go[LPGO_TARGET].body, 0.0f, 1.0f, puck_game->go[LPGO_TARGET].radius);
+	//dBodySetPosition(puck_game->go[LPGO_TARGET].body, 0.0f, 0.0f, puck_game->go[LPGO_TARGET].radius);
 
 	// Create puck pull control joint
 	/*puck_game->puck_pull_control_joint = dJointCreateSlider(puck_game->world, puck_game->puck_pull_control_joint_group);

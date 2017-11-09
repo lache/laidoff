@@ -94,6 +94,7 @@ typedef struct _LWPUCKGAME {
 	void* server;
 	int battle_id;
 	unsigned int token;
+	unsigned int player_no;
 	unsigned int c1_token;
 	unsigned int c2_token;
 	LWREMOTEPLAYERCONTROL remote_control[2];

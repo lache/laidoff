@@ -114,13 +114,13 @@ func createBattleInstance(conf ServerConfig, c1 net.Conn, c2 net.Conn) {
 	if createBattleOk.Size == C.ushort(unsafe.Sizeof(C.LWPCREATEBATTLEOK{})) && createBattleOk.Type == C.LPGP_LWPCREATEBATTLEOK {
 		// No error! so far ... proceed battle
 		log.Printf("MATCH %v and %v matched successfully!", c1.RemoteAddr(), c2.RemoteAddr())
-		c1.Write(createMatched2Buf(conf, createBattleOk, createBattleOk.C1_token))
-		c2.Write(createMatched2Buf(conf, createBattleOk, createBattleOk.C2_token))
+		c1.Write(createMatched2Buf(conf, createBattleOk, createBattleOk.C1_token, 1))
+		c2.Write(createMatched2Buf(conf, createBattleOk, createBattleOk.C2_token, 2))
 	} else {
 		log.Printf("Recv LSBPT_LWSPHEREBATTLEPACKETCREATEBATTLE reply corrupted")
 	}
 }
-func createMatched2Buf(conf ServerConfig, createBattleOk C.LWPCREATEBATTLEOK, token C.uint) []byte {
+func createMatched2Buf(conf ServerConfig, createBattleOk C.LWPCREATEBATTLEOK, token C.uint, playerNo C.int) []byte {
 	publicAddr, err := net.ResolveTCPAddr(conf.BattlePublicServiceConnType, conf.BattlePublicServiceHost+":"+conf.BattlePublicServicePort)
 	if err != nil {
 		log.Panicf("BattlePublicService conf parse error: %v", err.Error())
@@ -134,6 +134,7 @@ func createMatched2Buf(conf ServerConfig, createBattleOk C.LWPCREATEBATTLEOK, to
 		[4]C.uchar{C.uchar(publicAddrIpv4[0]), C.uchar(publicAddrIpv4[1]), C.uchar(publicAddrIpv4[2]), C.uchar(publicAddrIpv4[3]),},
 		createBattleOk.Battle_id,
 		token,
+		playerNo,
 	})
 }
 func packet2Buf(packet interface{}) []byte {
