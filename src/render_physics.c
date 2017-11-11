@@ -8,6 +8,7 @@
 #include "lwtextblock.h"
 #include "render_text_block.h"
 #include "lwudp.h"
+#include "lwdamagetext.h"
 
 typedef struct _LWSPHERERENDERUNIFORM {
 	float sphere_col_ratio[3];
@@ -399,7 +400,7 @@ static void render_floor(const LWCONTEXT *pLwc, vec4 *proj, const LWPUCKGAME *pu
 	glDrawArrays(GL_TRIANGLES, 0, pLwc->vertex_buffer[lvt].vertex_count);
 }
 
-void lwc_render_physics(const LWCONTEXT* pLwc) {
+void lwc_render_physics(const LWCONTEXT* pLwc, const mat4x4 view, const mat4x4 proj) {
 	const LWPUCKGAME* puck_game = pLwc->puck_game;
 	const LWPSTATE* state = &pLwc->puck_game_state;
 	glViewport(0, 0, pLwc->width, pLwc->height);
@@ -408,22 +409,6 @@ void lwc_render_physics(const LWCONTEXT* pLwc) {
 
 	int shader_index = LWST_DEFAULT;
 	int wall_shader_index = LWST_SPHERE_REFLECT;
-
-	const float screen_aspect_ratio = (float)pLwc->width / pLwc->height;
-
-	mat4x4 proj;
-	mat4x4_perspective(proj, (float)(LWDEG2RAD(49.134) / screen_aspect_ratio), screen_aspect_ratio, 1.0f, 500.0f);
-
-	mat4x4 view;
-	vec3 eye = { 0.0f, 0.0f, 12.0f };
-
-	vec3 center = { 0, 0, 0 };
-
-	vec3 up = { 0, 1, 0 };
-	if (puck_game->player_no == 2) {
-		up[1] = -1.0f;
-	}
-	mat4x4_look_at(view, eye, center, up);
 
 	int single_play = pLwc->puck_game->battle_id == 0;
 	int remote = !single_play && !pLwc->udp->master;
@@ -486,39 +471,40 @@ void lwc_render_physics(const LWCONTEXT* pLwc) {
 	const LWPUCKGAMEPLAYER* player = &puck_game->player;
 	const LWPUCKGAMEPLAYER* target = &puck_game->target;
 
-	if (single_play || puck_game->battle_id) {
-		// Floor
-		render_floor(pLwc, proj, puck_game, wall_shader_index, view, &sphere_render_uniform);
-		// North wall
-		render_wall(pLwc, proj, puck_game, wall_shader_index, view, 0, 2, 0, (float)LWDEG2RAD(90), 0,
-					LVT_CENTER_BOTTOM_ANCHORED_SQUARE, 2.0f, wall_height, 2.0f, &sphere_render_uniform);
-		// South wall
-		render_wall(pLwc, proj, puck_game, wall_shader_index, view, 0, -2, 0, (float)LWDEG2RAD(-90), 0,
-					LVT_CENTER_TOP_ANCHORED_SQUARE, 2.0f, wall_height, 2.0f, &sphere_render_uniform);
-		// East wall
-		render_wall(pLwc, proj, puck_game, wall_shader_index, view, 2, 0, 0, 0, (float)LWDEG2RAD(90),
-					LVT_LEFT_CENTER_ANCHORED_SQUARE, wall_height, 2.0f, 2.0f, &sphere_render_uniform);
-		// West wall
-		render_wall(pLwc, proj, puck_game, wall_shader_index, view, -2, 0, 0, 0, (float)LWDEG2RAD(-90),
-					LVT_RIGHT_CENTER_ANCHORED_SQUARE, wall_height, 2.0f, 2.0f, &sphere_render_uniform);
+	// Floor
+	render_floor(pLwc, proj, puck_game, wall_shader_index, view, &sphere_render_uniform);
+	// North wall
+	render_wall(pLwc, proj, puck_game, wall_shader_index, view, 0, 2, 0, (float)LWDEG2RAD(90), 0,
+		LVT_CENTER_BOTTOM_ANCHORED_SQUARE, 2.0f, wall_height, 2.0f, &sphere_render_uniform);
+	// South wall
+	render_wall(pLwc, proj, puck_game, wall_shader_index, view, 0, -2, 0, (float)LWDEG2RAD(-90), 0,
+		LVT_CENTER_TOP_ANCHORED_SQUARE, 2.0f, wall_height, 2.0f, &sphere_render_uniform);
+	// East wall
+	render_wall(pLwc, proj, puck_game, wall_shader_index, view, 2, 0, 0, 0, (float)LWDEG2RAD(90),
+		LVT_LEFT_CENTER_ANCHORED_SQUARE, wall_height, 2.0f, 2.0f, &sphere_render_uniform);
+	// West wall
+	render_wall(pLwc, proj, puck_game, wall_shader_index, view, -2, 0, 0, 0, (float)LWDEG2RAD(-90),
+		LVT_RIGHT_CENTER_ANCHORED_SQUARE, wall_height, 2.0f, 2.0f, &sphere_render_uniform);
 
-		const int player_no = pLwc->puck_game->player_no;
+	const int player_no = pLwc->puck_game->player_no;
 
-		render_go(pLwc, view, proj, &puck_game->go[LPGO_PUCK], pLwc->tex_atlas[LAE_PUCK_KTX],
-				  1.0f, remote_puck_pos, state->puck_rot, remote, !remote ? puck_game->go[LPGO_PUCK].speed : state->puck_speed);
-		render_go(pLwc, view, proj, &puck_game->go[LPGO_PLAYER], pLwc->tex_atlas[player_no == 2 ? LAE_PUCK_ENEMY_KTX : LAE_PUCK_PLAYER_KTX],
-				  1.0f, remote_player_pos, state->player_rot, remote, 0);
-		render_go(pLwc, view, proj, &puck_game->go[LPGO_TARGET], pLwc->tex_atlas[player_no == 2 ? LAE_PUCK_PLAYER_KTX : LAE_PUCK_ENEMY_KTX],
-				  1.0f, remote_target_pos, state->target_rot, remote, 0);
+	render_go(pLwc, view, proj, &puck_game->go[LPGO_PUCK], pLwc->tex_atlas[LAE_PUCK_KTX],
+		1.0f, remote_puck_pos, state->puck_rot, remote, !remote ? puck_game->go[LPGO_PUCK].speed : state->puck_speed);
+	render_go(pLwc, view, proj, &puck_game->go[LPGO_PLAYER], pLwc->tex_atlas[player_no == 2 ? LAE_PUCK_ENEMY_KTX : LAE_PUCK_PLAYER_KTX],
+		1.0f, remote_player_pos, state->player_rot, remote, 0);
+	render_go(pLwc, view, proj, &puck_game->go[LPGO_TARGET], pLwc->tex_atlas[player_no == 2 ? LAE_PUCK_PLAYER_KTX : LAE_PUCK_ENEMY_KTX],
+		1.0f, remote_target_pos, state->target_rot, remote, 0);
 
-		render_dir_pad(pLwc, pLwc->dir_pad_x, pLwc->dir_pad_y);
-		if (pLwc->dir_pad_dragging) {
-			render_dir_pad(pLwc, pLwc->dir_pad_touch_start_x, pLwc->dir_pad_touch_start_y);
-		}
-		render_fist_button(pLwc);
-		render_top_button(pLwc);
-		render_dash_gauge(pLwc);
+	render_damage_text(pLwc, view, proj, pLwc->proj);
+
+	render_dir_pad(pLwc, pLwc->dir_pad_x, pLwc->dir_pad_y);
+	if (pLwc->dir_pad_dragging) {
+		render_dir_pad(pLwc, pLwc->dir_pad_touch_start_x, pLwc->dir_pad_touch_start_y);
 	}
+	render_fist_button(pLwc);
+	render_top_button(pLwc);
+	render_dash_gauge(pLwc);
+
 	const char* target_nickname = puck_game->battle_id ? puck_game->target_nickname : "? ? ?";
 	render_hp_gauge(pLwc, -0.8f, 1.0f - 0.1f, state->player_current_hp, state->player_total_hp, player->hp_shake_remain_time, 1, puck_game->nickname);
 	render_hp_gauge(pLwc, +0.8f, 1.0f - 0.1f, state->target_current_hp, state->target_total_hp, target->hp_shake_remain_time, 0, target_nickname);

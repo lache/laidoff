@@ -22677,6 +22677,134 @@ fail:
 }
 
 
+static int _wrap_LWCONTEXT_puck_game_view_set(lua_State* L) {
+  int SWIG_arg = 0;
+  struct _LWCONTEXT *arg1 = (struct _LWCONTEXT *) 0 ;
+  vec4 *arg2 ;
+  
+  SWIG_check_num_args("_LWCONTEXT::puck_game_view",2,2)
+  if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("_LWCONTEXT::puck_game_view",1,"struct _LWCONTEXT *");
+  if(!SWIG_isptrtype(L,2)) SWIG_fail_arg("_LWCONTEXT::puck_game_view",2,"mat4x4");
+  
+  if (!SWIG_IsOK(SWIG_ConvertPtr(L,1,(void**)&arg1,SWIGTYPE_p__LWCONTEXT,0))){
+    SWIG_fail_ptr("LWCONTEXT_puck_game_view_set",1,SWIGTYPE_p__LWCONTEXT);
+  }
+  
+  
+  if (!SWIG_IsOK(SWIG_ConvertPtr(L,2,(void**)&arg2,SWIGTYPE_p_a_4__float,0))){
+    SWIG_fail_ptr("LWCONTEXT_puck_game_view_set",2,SWIGTYPE_p_a_4__float);
+  }
+  
+  {
+    float (*inp)[4] = (float (*)[4])(arg2);
+    float (*dest)[4] = (float (*)[4])(arg1->puck_game_view);
+    size_t ii = 0;
+    for (; ii < 4; ++ii) {
+      float *ip = inp[ii];
+      float *dp = dest[ii];
+      size_t jj = 0;
+      for (; jj < 4; ++jj) dp[jj] = ip[jj];
+    }
+  }
+  
+  return SWIG_arg;
+  
+  if(0) SWIG_fail;
+  
+fail:
+  lua_error(L);
+  return SWIG_arg;
+}
+
+
+static int _wrap_LWCONTEXT_puck_game_view_get(lua_State* L) {
+  int SWIG_arg = 0;
+  struct _LWCONTEXT *arg1 = (struct _LWCONTEXT *) 0 ;
+  vec4 *result = 0 ;
+  
+  SWIG_check_num_args("_LWCONTEXT::puck_game_view",1,1)
+  if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("_LWCONTEXT::puck_game_view",1,"struct _LWCONTEXT *");
+  
+  if (!SWIG_IsOK(SWIG_ConvertPtr(L,1,(void**)&arg1,SWIGTYPE_p__LWCONTEXT,0))){
+    SWIG_fail_ptr("LWCONTEXT_puck_game_view_get",1,SWIGTYPE_p__LWCONTEXT);
+  }
+  
+  result = (vec4 *) ((arg1)->puck_game_view);
+  SWIG_NewPointerObj(L,result,SWIGTYPE_p_a_4__float,0); SWIG_arg++; 
+  return SWIG_arg;
+  
+  if(0) SWIG_fail;
+  
+fail:
+  lua_error(L);
+  return SWIG_arg;
+}
+
+
+static int _wrap_LWCONTEXT_puck_game_proj_set(lua_State* L) {
+  int SWIG_arg = 0;
+  struct _LWCONTEXT *arg1 = (struct _LWCONTEXT *) 0 ;
+  vec4 *arg2 ;
+  
+  SWIG_check_num_args("_LWCONTEXT::puck_game_proj",2,2)
+  if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("_LWCONTEXT::puck_game_proj",1,"struct _LWCONTEXT *");
+  if(!SWIG_isptrtype(L,2)) SWIG_fail_arg("_LWCONTEXT::puck_game_proj",2,"mat4x4");
+  
+  if (!SWIG_IsOK(SWIG_ConvertPtr(L,1,(void**)&arg1,SWIGTYPE_p__LWCONTEXT,0))){
+    SWIG_fail_ptr("LWCONTEXT_puck_game_proj_set",1,SWIGTYPE_p__LWCONTEXT);
+  }
+  
+  
+  if (!SWIG_IsOK(SWIG_ConvertPtr(L,2,(void**)&arg2,SWIGTYPE_p_a_4__float,0))){
+    SWIG_fail_ptr("LWCONTEXT_puck_game_proj_set",2,SWIGTYPE_p_a_4__float);
+  }
+  
+  {
+    float (*inp)[4] = (float (*)[4])(arg2);
+    float (*dest)[4] = (float (*)[4])(arg1->puck_game_proj);
+    size_t ii = 0;
+    for (; ii < 4; ++ii) {
+      float *ip = inp[ii];
+      float *dp = dest[ii];
+      size_t jj = 0;
+      for (; jj < 4; ++jj) dp[jj] = ip[jj];
+    }
+  }
+  
+  return SWIG_arg;
+  
+  if(0) SWIG_fail;
+  
+fail:
+  lua_error(L);
+  return SWIG_arg;
+}
+
+
+static int _wrap_LWCONTEXT_puck_game_proj_get(lua_State* L) {
+  int SWIG_arg = 0;
+  struct _LWCONTEXT *arg1 = (struct _LWCONTEXT *) 0 ;
+  vec4 *result = 0 ;
+  
+  SWIG_check_num_args("_LWCONTEXT::puck_game_proj",1,1)
+  if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("_LWCONTEXT::puck_game_proj",1,"struct _LWCONTEXT *");
+  
+  if (!SWIG_IsOK(SWIG_ConvertPtr(L,1,(void**)&arg1,SWIGTYPE_p__LWCONTEXT,0))){
+    SWIG_fail_ptr("LWCONTEXT_puck_game_proj_get",1,SWIGTYPE_p__LWCONTEXT);
+  }
+  
+  result = (vec4 *) ((arg1)->puck_game_proj);
+  SWIG_NewPointerObj(L,result,SWIGTYPE_p_a_4__float,0); SWIG_arg++; 
+  return SWIG_arg;
+  
+  if(0) SWIG_fail;
+  
+fail:
+  lua_error(L);
+  return SWIG_arg;
+}
+
+
 static int _wrap_new_LWCONTEXT(lua_State* L) {
   int SWIG_arg = 0;
   struct _LWCONTEXT *result = 0 ;
@@ -22831,6 +22959,8 @@ static swig_lua_attribute swig_LWCONTEXT_attributes[] = {
     { "puck_game_state_last_received", _wrap_LWCONTEXT_puck_game_state_last_received_get, _wrap_LWCONTEXT_puck_game_state_last_received_set },
     { "puck_game_state_last_received_interval", _wrap_LWCONTEXT_puck_game_state_last_received_interval_get, _wrap_LWCONTEXT_puck_game_state_last_received_interval_set },
     { "internal_data_path", _wrap_LWCONTEXT_internal_data_path_get, _wrap_LWCONTEXT_internal_data_path_set },
+    { "puck_game_view", _wrap_LWCONTEXT_puck_game_view_get, _wrap_LWCONTEXT_puck_game_view_set },
+    { "puck_game_proj", _wrap_LWCONTEXT_puck_game_proj_get, _wrap_LWCONTEXT_puck_game_proj_set },
     {0,0,0}
 };
 static swig_lua_method swig_LWCONTEXT_methods[]= {
@@ -23616,6 +23746,151 @@ static swig_lua_namespace swig_LWDAMAGETEXT_Sf_SwigStatic = {
 static swig_lua_class *swig_LWDAMAGETEXT_bases[] = {0};
 static const char *swig_LWDAMAGETEXT_base_names[] = {0};
 static swig_lua_class _wrap_class_LWDAMAGETEXT = { "LWDAMAGETEXT", "LWDAMAGETEXT", &SWIGTYPE_p__LWDAMAGETEXT,_proxy__wrap_new_LWDAMAGETEXT, swig_delete_LWDAMAGETEXT, swig_LWDAMAGETEXT_methods, swig_LWDAMAGETEXT_attributes, &swig_LWDAMAGETEXT_Sf_SwigStatic, swig_LWDAMAGETEXT_meta, swig_LWDAMAGETEXT_bases, swig_LWDAMAGETEXT_base_names };
+
+static int _wrap_spawn_damage_text(lua_State* L) {
+  int SWIG_arg = 0;
+  LWCONTEXT *arg1 = (LWCONTEXT *) 0 ;
+  float arg2 ;
+  float arg3 ;
+  float arg4 ;
+  char *arg5 = (char *) 0 ;
+  LW_DAMAGE_TEXT_COORD arg6 ;
+  int result;
+  
+  SWIG_check_num_args("spawn_damage_text",6,6)
+  if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("spawn_damage_text",1,"LWCONTEXT *");
+  if(!lua_isnumber(L,2)) SWIG_fail_arg("spawn_damage_text",2,"float");
+  if(!lua_isnumber(L,3)) SWIG_fail_arg("spawn_damage_text",3,"float");
+  if(!lua_isnumber(L,4)) SWIG_fail_arg("spawn_damage_text",4,"float");
+  if(!SWIG_lua_isnilstring(L,5)) SWIG_fail_arg("spawn_damage_text",5,"char const *");
+  if(!lua_isnumber(L,6)) SWIG_fail_arg("spawn_damage_text",6,"LW_DAMAGE_TEXT_COORD");
+  
+  if (!SWIG_IsOK(SWIG_ConvertPtr(L,1,(void**)&arg1,SWIGTYPE_p__LWCONTEXT,0))){
+    SWIG_fail_ptr("spawn_damage_text",1,SWIGTYPE_p__LWCONTEXT);
+  }
+  
+  arg2 = (float)lua_tonumber(L, 2);
+  arg3 = (float)lua_tonumber(L, 3);
+  arg4 = (float)lua_tonumber(L, 4);
+  arg5 = (char *)lua_tostring(L, 5);
+  arg6 = (LW_DAMAGE_TEXT_COORD)(int)lua_tonumber(L, 6);
+  result = (int)spawn_damage_text(arg1,arg2,arg3,arg4,(char const *)arg5,arg6);
+  lua_pushnumber(L, (lua_Number) result); SWIG_arg++;
+  return SWIG_arg;
+  
+  if(0) SWIG_fail;
+  
+fail:
+  lua_error(L);
+  return SWIG_arg;
+}
+
+
+static int _wrap_spawn_exp_text(lua_State* L) {
+  int SWIG_arg = 0;
+  LWCONTEXT *arg1 = (LWCONTEXT *) 0 ;
+  float arg2 ;
+  float arg3 ;
+  float arg4 ;
+  char *arg5 = (char *) 0 ;
+  LW_DAMAGE_TEXT_COORD arg6 ;
+  int result;
+  
+  SWIG_check_num_args("spawn_exp_text",6,6)
+  if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("spawn_exp_text",1,"LWCONTEXT *");
+  if(!lua_isnumber(L,2)) SWIG_fail_arg("spawn_exp_text",2,"float");
+  if(!lua_isnumber(L,3)) SWIG_fail_arg("spawn_exp_text",3,"float");
+  if(!lua_isnumber(L,4)) SWIG_fail_arg("spawn_exp_text",4,"float");
+  if(!SWIG_lua_isnilstring(L,5)) SWIG_fail_arg("spawn_exp_text",5,"char const *");
+  if(!lua_isnumber(L,6)) SWIG_fail_arg("spawn_exp_text",6,"LW_DAMAGE_TEXT_COORD");
+  
+  if (!SWIG_IsOK(SWIG_ConvertPtr(L,1,(void**)&arg1,SWIGTYPE_p__LWCONTEXT,0))){
+    SWIG_fail_ptr("spawn_exp_text",1,SWIGTYPE_p__LWCONTEXT);
+  }
+  
+  arg2 = (float)lua_tonumber(L, 2);
+  arg3 = (float)lua_tonumber(L, 3);
+  arg4 = (float)lua_tonumber(L, 4);
+  arg5 = (char *)lua_tostring(L, 5);
+  arg6 = (LW_DAMAGE_TEXT_COORD)(int)lua_tonumber(L, 6);
+  result = (int)spawn_exp_text(arg1,arg2,arg3,arg4,(char const *)arg5,arg6);
+  lua_pushnumber(L, (lua_Number) result); SWIG_arg++;
+  return SWIG_arg;
+  
+  if(0) SWIG_fail;
+  
+fail:
+  lua_error(L);
+  return SWIG_arg;
+}
+
+
+static int _wrap_update_damage_text(lua_State* L) {
+  int SWIG_arg = 0;
+  LWCONTEXT *arg1 = (LWCONTEXT *) 0 ;
+  
+  SWIG_check_num_args("update_damage_text",1,1)
+  if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("update_damage_text",1,"LWCONTEXT *");
+  
+  if (!SWIG_IsOK(SWIG_ConvertPtr(L,1,(void**)&arg1,SWIGTYPE_p__LWCONTEXT,0))){
+    SWIG_fail_ptr("update_damage_text",1,SWIGTYPE_p__LWCONTEXT);
+  }
+  
+  update_damage_text(arg1);
+  
+  return SWIG_arg;
+  
+  if(0) SWIG_fail;
+  
+fail:
+  lua_error(L);
+  return SWIG_arg;
+}
+
+
+static int _wrap_render_damage_text(lua_State* L) {
+  int SWIG_arg = 0;
+  LWCONTEXT *arg1 = (LWCONTEXT *) 0 ;
+  vec4 *arg2 ;
+  vec4 *arg3 ;
+  vec4 *arg4 ;
+  
+  SWIG_check_num_args("render_damage_text",4,4)
+  if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("render_damage_text",1,"LWCONTEXT const *");
+  if(!SWIG_isptrtype(L,2)) SWIG_fail_arg("render_damage_text",2,"mat4x4 const");
+  if(!SWIG_isptrtype(L,3)) SWIG_fail_arg("render_damage_text",3,"mat4x4 const");
+  if(!SWIG_isptrtype(L,4)) SWIG_fail_arg("render_damage_text",4,"mat4x4 const");
+  
+  if (!SWIG_IsOK(SWIG_ConvertPtr(L,1,(void**)&arg1,SWIGTYPE_p__LWCONTEXT,0))){
+    SWIG_fail_ptr("render_damage_text",1,SWIGTYPE_p__LWCONTEXT);
+  }
+  
+  
+  if (!SWIG_IsOK(SWIG_ConvertPtr(L,2,(void**)&arg2,SWIGTYPE_p_a_4__float,0))){
+    SWIG_fail_ptr("render_damage_text",2,SWIGTYPE_p_a_4__float);
+  }
+  
+  
+  if (!SWIG_IsOK(SWIG_ConvertPtr(L,3,(void**)&arg3,SWIGTYPE_p_a_4__float,0))){
+    SWIG_fail_ptr("render_damage_text",3,SWIGTYPE_p_a_4__float);
+  }
+  
+  
+  if (!SWIG_IsOK(SWIG_ConvertPtr(L,4,(void**)&arg4,SWIGTYPE_p_a_4__float,0))){
+    SWIG_fail_ptr("render_damage_text",4,SWIGTYPE_p_a_4__float);
+  }
+  
+  render_damage_text((struct _LWCONTEXT const *)arg1,(float const (*)[4])arg2,(float const (*)[4])arg3,(float const (*)[4])arg4);
+  
+  return SWIG_arg;
+  
+  if(0) SWIG_fail;
+  
+fail:
+  lua_error(L);
+  return SWIG_arg;
+}
+
 
 static int _wrap_deltatime_new(lua_State* L) {
   int SWIG_arg = 0;
@@ -39810,29 +40085,6 @@ fail:
 }
 
 
-static int _wrap_render_damage_text(lua_State* L) {
-  int SWIG_arg = 0;
-  LWCONTEXT *arg1 = (LWCONTEXT *) 0 ;
-  
-  SWIG_check_num_args("render_damage_text",1,1)
-  if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("render_damage_text",1,"LWCONTEXT const *");
-  
-  if (!SWIG_IsOK(SWIG_ConvertPtr(L,1,(void**)&arg1,SWIGTYPE_p__LWCONTEXT,0))){
-    SWIG_fail_ptr("render_damage_text",1,SWIGTYPE_p__LWCONTEXT);
-  }
-  
-  render_damage_text((struct _LWCONTEXT const *)arg1);
-  
-  return SWIG_arg;
-  
-  if(0) SWIG_fail;
-  
-fail:
-  lua_error(L);
-  return SWIG_arg;
-}
-
-
 static int _wrap_lwc_render_battle_result(lua_State* L) {
   int SWIG_arg = 0;
   struct _LWCONTEXT *arg1 = (struct _LWCONTEXT *) 0 ;
@@ -40134,16 +40386,30 @@ fail:
 
 static int _wrap_lwc_render_physics(lua_State* L) {
   int SWIG_arg = 0;
-  struct _LWCONTEXT *arg1 = (struct _LWCONTEXT *) 0 ;
+  LWCONTEXT *arg1 = (LWCONTEXT *) 0 ;
+  vec4 *arg2 ;
+  vec4 *arg3 ;
   
-  SWIG_check_num_args("lwc_render_physics",1,1)
-  if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("lwc_render_physics",1,"struct _LWCONTEXT const *");
+  SWIG_check_num_args("lwc_render_physics",3,3)
+  if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("lwc_render_physics",1,"LWCONTEXT const *");
+  if(!SWIG_isptrtype(L,2)) SWIG_fail_arg("lwc_render_physics",2,"mat4x4 const");
+  if(!SWIG_isptrtype(L,3)) SWIG_fail_arg("lwc_render_physics",3,"mat4x4 const");
   
   if (!SWIG_IsOK(SWIG_ConvertPtr(L,1,(void**)&arg1,SWIGTYPE_p__LWCONTEXT,0))){
     SWIG_fail_ptr("lwc_render_physics",1,SWIGTYPE_p__LWCONTEXT);
   }
   
-  lwc_render_physics((struct _LWCONTEXT const *)arg1);
+  
+  if (!SWIG_IsOK(SWIG_ConvertPtr(L,2,(void**)&arg2,SWIGTYPE_p_a_4__float,0))){
+    SWIG_fail_ptr("lwc_render_physics",2,SWIGTYPE_p_a_4__float);
+  }
+  
+  
+  if (!SWIG_IsOK(SWIG_ConvertPtr(L,3,(void**)&arg3,SWIGTYPE_p_a_4__float,0))){
+    SWIG_fail_ptr("lwc_render_physics",3,SWIGTYPE_p_a_4__float);
+  }
+  
+  lwc_render_physics((struct _LWCONTEXT const *)arg1,(float const (*)[4])arg2,(float const (*)[4])arg3);
   
   return SWIG_arg;
   
@@ -46502,84 +46768,6 @@ fail:
 }
 
 
-static int _wrap_spawn_damage_text(lua_State* L) {
-  int SWIG_arg = 0;
-  LWCONTEXT *arg1 = (LWCONTEXT *) 0 ;
-  float arg2 ;
-  float arg3 ;
-  float arg4 ;
-  char *arg5 = (char *) 0 ;
-  LW_DAMAGE_TEXT_COORD arg6 ;
-  int result;
-  
-  SWIG_check_num_args("spawn_damage_text",6,6)
-  if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("spawn_damage_text",1,"LWCONTEXT *");
-  if(!lua_isnumber(L,2)) SWIG_fail_arg("spawn_damage_text",2,"float");
-  if(!lua_isnumber(L,3)) SWIG_fail_arg("spawn_damage_text",3,"float");
-  if(!lua_isnumber(L,4)) SWIG_fail_arg("spawn_damage_text",4,"float");
-  if(!SWIG_lua_isnilstring(L,5)) SWIG_fail_arg("spawn_damage_text",5,"char const *");
-  if(!lua_isnumber(L,6)) SWIG_fail_arg("spawn_damage_text",6,"LW_DAMAGE_TEXT_COORD");
-  
-  if (!SWIG_IsOK(SWIG_ConvertPtr(L,1,(void**)&arg1,SWIGTYPE_p__LWCONTEXT,0))){
-    SWIG_fail_ptr("spawn_damage_text",1,SWIGTYPE_p__LWCONTEXT);
-  }
-  
-  arg2 = (float)lua_tonumber(L, 2);
-  arg3 = (float)lua_tonumber(L, 3);
-  arg4 = (float)lua_tonumber(L, 4);
-  arg5 = (char *)lua_tostring(L, 5);
-  arg6 = (LW_DAMAGE_TEXT_COORD)(int)lua_tonumber(L, 6);
-  result = (int)spawn_damage_text(arg1,arg2,arg3,arg4,(char const *)arg5,arg6);
-  lua_pushnumber(L, (lua_Number) result); SWIG_arg++;
-  return SWIG_arg;
-  
-  if(0) SWIG_fail;
-  
-fail:
-  lua_error(L);
-  return SWIG_arg;
-}
-
-
-static int _wrap_spawn_exp_text(lua_State* L) {
-  int SWIG_arg = 0;
-  LWCONTEXT *arg1 = (LWCONTEXT *) 0 ;
-  float arg2 ;
-  float arg3 ;
-  float arg4 ;
-  char *arg5 = (char *) 0 ;
-  LW_DAMAGE_TEXT_COORD arg6 ;
-  int result;
-  
-  SWIG_check_num_args("spawn_exp_text",6,6)
-  if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("spawn_exp_text",1,"LWCONTEXT *");
-  if(!lua_isnumber(L,2)) SWIG_fail_arg("spawn_exp_text",2,"float");
-  if(!lua_isnumber(L,3)) SWIG_fail_arg("spawn_exp_text",3,"float");
-  if(!lua_isnumber(L,4)) SWIG_fail_arg("spawn_exp_text",4,"float");
-  if(!SWIG_lua_isnilstring(L,5)) SWIG_fail_arg("spawn_exp_text",5,"char const *");
-  if(!lua_isnumber(L,6)) SWIG_fail_arg("spawn_exp_text",6,"LW_DAMAGE_TEXT_COORD");
-  
-  if (!SWIG_IsOK(SWIG_ConvertPtr(L,1,(void**)&arg1,SWIGTYPE_p__LWCONTEXT,0))){
-    SWIG_fail_ptr("spawn_exp_text",1,SWIGTYPE_p__LWCONTEXT);
-  }
-  
-  arg2 = (float)lua_tonumber(L, 2);
-  arg3 = (float)lua_tonumber(L, 3);
-  arg4 = (float)lua_tonumber(L, 4);
-  arg5 = (char *)lua_tostring(L, 5);
-  arg6 = (LW_DAMAGE_TEXT_COORD)(int)lua_tonumber(L, 6);
-  result = (int)spawn_exp_text(arg1,arg2,arg3,arg4,(char const *)arg5,arg6);
-  lua_pushnumber(L, (lua_Number) result); SWIG_arg++;
-  return SWIG_arg;
-  
-  if(0) SWIG_fail;
-  
-fail:
-  lua_error(L);
-  return SWIG_arg;
-}
-
-
 static int _wrap_update_attack_trail(lua_State* L) {
   int SWIG_arg = 0;
   LWCONTEXT *arg1 = (LWCONTEXT *) 0 ;
@@ -46592,29 +46780,6 @@ static int _wrap_update_attack_trail(lua_State* L) {
   }
   
   update_attack_trail(arg1);
-  
-  return SWIG_arg;
-  
-  if(0) SWIG_fail;
-  
-fail:
-  lua_error(L);
-  return SWIG_arg;
-}
-
-
-static int _wrap_update_damage_text(lua_State* L) {
-  int SWIG_arg = 0;
-  LWCONTEXT *arg1 = (LWCONTEXT *) 0 ;
-  
-  SWIG_check_num_args("update_damage_text",1,1)
-  if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("update_damage_text",1,"LWCONTEXT *");
-  
-  if (!SWIG_IsOK(SWIG_ConvertPtr(L,1,(void**)&arg1,SWIGTYPE_p__LWCONTEXT,0))){
-    SWIG_fail_ptr("update_damage_text",1,SWIGTYPE_p__LWCONTEXT);
-  }
-  
-  update_damage_text(arg1);
   
   return SWIG_arg;
   
@@ -48936,6 +49101,10 @@ static swig_lua_method swig_SwigModule_methods[]= {
     { "lwcontext_field", _wrap_lwcontext_field},
     { "lwcontext_inc_rmsg_send", _wrap_lwcontext_inc_rmsg_send},
     { "lwcontext_inc_rmsg_recv", _wrap_lwcontext_inc_rmsg_recv},
+    { "spawn_damage_text", _wrap_spawn_damage_text},
+    { "spawn_exp_text", _wrap_spawn_exp_text},
+    { "update_damage_text", _wrap_update_damage_text},
+    { "render_damage_text", _wrap_render_damage_text},
     { "deltatime_new", _wrap_deltatime_new},
     { "deltatime_destroy", _wrap_deltatime_destroy},
     { "deltatime_tick_delta", _wrap_deltatime_tick_delta},
@@ -49031,7 +49200,6 @@ static swig_lua_method swig_SwigModule_methods[]= {
     { "render_solid_box_ui", _wrap_render_solid_box_ui},
     { "render_solid_vb_ui", _wrap_render_solid_vb_ui},
     { "get_player_creature_ui_box", _wrap_get_player_creature_ui_box},
-    { "render_damage_text", _wrap_render_damage_text},
     { "lwc_render_battle_result", _wrap_lwc_render_battle_result},
     { "get_player_creature_result_ui_box", _wrap_get_player_creature_result_ui_box},
     { "get_battle_result_next_button_dim", _wrap_get_battle_result_next_button_dim},
@@ -49096,10 +49264,7 @@ static swig_lua_method swig_SwigModule_methods[]= {
     { "update_battle", _wrap_update_battle},
     { "exec_attack_p2e_with_screen_point", _wrap_exec_attack_p2e_with_screen_point},
     { "exec_attack_p2e", _wrap_exec_attack_p2e},
-    { "spawn_damage_text", _wrap_spawn_damage_text},
-    { "spawn_exp_text", _wrap_spawn_exp_text},
     { "update_attack_trail", _wrap_update_attack_trail},
-    { "update_damage_text", _wrap_update_damage_text},
     { "update_battle_result", _wrap_update_battle_result},
     { "process_touch_battle_result", _wrap_process_touch_battle_result},
     { "calculate_battle_command_result", _wrap_calculate_battle_command_result},

@@ -222,7 +222,7 @@ void lwc_render_battle_result(const struct _LWCONTEXT* pLwc) {
 		render_player_creature_battle_result_ui(pLwc, e, i);
 	} ARRAY_ITERATE_VALID_END();
 
-	render_damage_text(pLwc);
+	render_damage_text(pLwc, pLwc->battle_view, pLwc->battle_proj, pLwc->proj);
 
 	render_footer_button(pLwc);
 }

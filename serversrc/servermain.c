@@ -421,7 +421,7 @@ int check_token(LWSERVER* server, LWPUDPHEADER* p, LWPUCKGAME** puck_game) {
 	}
 	LWPUCKGAME* pg = server->puck_game_pool[p->battle_id - 1];
 	if (!pg) {
-		LOGE("Battle id %d is null.", p->battle_id);
+		//LOGE("Battle id %d is null.", p->battle_id);
 		return -2;
 	}
 	if (pg->c1_token == p->token) {

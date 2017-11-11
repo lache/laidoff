@@ -386,14 +386,6 @@ void render_attack_trail_3d(
 	glUseProgram(pLwc->shader[0].program);
 }
 
-void render_damage_text_3d(
-	const LWCONTEXT* pLwc,
-	const LWDAMAGETEXT* damage_text,
-	const mat4x4 view,
-	const mat4x4 proj) {
-	render_text_block(pLwc, &damage_text->text_block);
-}
-
 static void render_battle_twirl(const LWCONTEXT* pLwc, const mat4x4 view, const mat4x4 proj) {
 	int shader_index = LWST_DEFAULT;
 
@@ -884,20 +876,6 @@ void render_center_image(const LWCONTEXT* pLwc) {
 	}
 }
 
-void render_damage_text(const LWCONTEXT* pLwc) {
-	ARRAY_ITERATE_VALID(const LWDAMAGETEXT, pLwc->damage_text) {
-		if (e->coord == LDTC_3D) {
-			render_damage_text_3d(pLwc, &pLwc->damage_text[i], pLwc->battle_view, pLwc->battle_proj);
-		} else if (e->coord == LDTC_UI) {
-			mat4x4 identity;
-			mat4x4_identity(identity);
-			render_damage_text_3d(pLwc, &pLwc->damage_text[i], identity, pLwc->proj);
-		} else {
-			LOGE("Unknown LWDAMAGETEXT coord value: %d", e->coord);
-		}
-	} ARRAY_ITERATE_VALID_END();
-}
-
 void lwc_render_battle(const LWCONTEXT* pLwc) {
 	glViewport(0, 0, pLwc->width, pLwc->height);
 	lw_clear_color();
@@ -977,7 +955,7 @@ void lwc_render_battle(const LWCONTEXT* pLwc) {
 	} ARRAY_ITERATE_VALID_END();
 
 	// Attack damage_text
-	render_damage_text(pLwc);
+	render_damage_text(pLwc, pLwc->battle_view, pLwc->battle_proj, pLwc->proj);
 
 	// Command palette
 	if (pLwc->battle_state != LBS_COMMAND_IN_PROGRESS) {

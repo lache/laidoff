@@ -3,6 +3,7 @@
 #include "lwmacro.h"
 #include "lwcontext.h"
 #include "lwsimpleanim.h"
+#include "lwmath.h"
 
 const LWENEMY ENEMY_DATA_LIST[LET_COUNT] = {
 	ENEMY_ICECREAM,
@@ -16,13 +17,12 @@ const LWENEMY ENEMY_DATA_LIST[LET_COUNT] = {
 	ENEMY_TEST_PLAYER_4,
 };
 
-float get_battle_enemy_x_center(int enemy_slot_index)
-{
+float get_battle_enemy_x_center(int enemy_slot_index) {
 	return -1.6f + 0.8f * enemy_slot_index;
 }
 
 void update_render_enemy_position(const struct _LWCONTEXT* pLwc, int enemy_slot_index, const LWENEMY* enemy, vec3 pos) {
-	
+
 	// base position
 	pos[0] = get_battle_enemy_x_center(enemy_slot_index);
 	pos[1] = 0;
@@ -43,22 +43,6 @@ void update_render_enemy_position(const struct _LWCONTEXT* pLwc, int enemy_slot_
 	const float T = (float)M_PI;
 	const float osc = (float)sin((2 * M_PI) * (pLwc->app_time + enemy->time_offset) / T);
 	pos[2] += 0.015f * osc;
-}
-
-void calculate_ui_point_from_world_point(
-	const float aspect_ratio, const mat4x4 proj_view, const vec4 world_point, vec2 ui_point) {
-
-	vec4 clip_space_point;
-	mat4x4_mul_vec4(clip_space_point, proj_view, world_point);
-
-	const vec3 ndc_pos = {
-		clip_space_point[0] / clip_space_point[3],
-		clip_space_point[1] / clip_space_point[3],
-		clip_space_point[2] / clip_space_point[3]
-	};
-
-	ui_point[0] = ndc_pos[0] * aspect_ratio;
-	ui_point[1] = ndc_pos[1];
 }
 
 void update_enemy_scope_ui_point(const LWCONTEXT* pLwc, LWENEMY* enemy) {
