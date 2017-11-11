@@ -6,7 +6,7 @@
 #include "lwtimepoint.h"
 #include "puckgame.h"
 
-#if LW_AUTO_BUILD || LW_PLATFORM_IOS
+#if LW_AUTO_BUILD
 #define LW_UDP_SERVER "puck-highend.popsongremix.com"
 #else
 //#define LW_UDP_SERVER "puck.popsongremix.com"

@@ -10,6 +10,7 @@
 #include "lwudp.h"
 #include "puckgamepacket.h"
 #include "lwtcp.h"
+#include "puckgameupdate.h"
 
 void update_puck_game(LWCONTEXT* pLwc, LWPUCKGAME* puck_game, double delta_time) {
 	if (!puck_game->world) {
@@ -227,6 +228,7 @@ void puck_game_pull_puck_start(LWCONTEXT* pLwc, LWPUCKGAME* puck_game) {
 		puck_game->battle_id = 0;
 		puck_game->token = 0;
 		puck_game->player_no = 1;
+        puck_game_reset_view_proj(pLwc, puck_game);
 		tcp_send_queue2(pLwc->tcp, &pLwc->tcp->user_id);
 	}
 }

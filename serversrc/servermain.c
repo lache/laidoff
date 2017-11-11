@@ -234,6 +234,10 @@ LWTCPSERVER* new_tcp_server() {
 	}
 	LOGI("TCP Socket created.\n");
 
+    if (setsockopt(server->s, SOL_SOCKET, SO_REUSEADDR, &(int){ 1 }, sizeof(int)) < 0) {
+        LOGE("setsockopt(SO_REUSEADDR) failed");
+    }
+
 	//Prepare the sockaddr_in structure
 	server->server.sin_family = AF_INET;
 	server->server.sin_addr.s_addr = INADDR_ANY;
@@ -733,7 +737,8 @@ int main(int argc, char* argv[]) {
 	double logic_elapsed_ms = 0;
 	double sync_elapsed_ms = 0;
 	server->server_start_tp = lwtimepoint_now_seconds();
-	while (1) {
+    int forever = 1;
+	while (forever) {
 		const double loop_start = lwtimepoint_now_seconds();
 		if (logic_elapsed_ms > 0) {
 			int iter = (int)(logic_elapsed_ms / (logic_timestep * 1000));

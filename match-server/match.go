@@ -42,6 +42,7 @@ type UserAgent struct {
 }
 
 func main() {
+	log.SetFlags(log.Lshortfile | log.LstdFlags)
 	log.Println("Greetings from match server")
 	os.MkdirAll("db", os.ModePerm)
 	mathrand.Seed(time.Now().Unix())
@@ -242,7 +243,7 @@ func handleRequest(conf ServerConfig, nickDb *Nickdb.NickDb, conn net.Conn, matc
 		case C.LPGP_LWPNEWUSER:
 			handleNewUser(nickDb, conn)
 		case C.LPGP_LWPQUERYNICK:
-			handleQueryNick(buf, conn)
+			handleQueryNick(buf, conn, nickDb)
 		}
 	}
 	conn.Close()
@@ -289,6 +290,25 @@ func handleSuddenDeath(conf ServerConfig, buf []byte) {
 		log.Fatalf("Send SUDDENDEATH failed")
 	}
 }
+
+func createNewUser(uuid []byte, nickname string) (*UserDb, *os.File, error) {
+	userDb := &UserDb{
+		uuid,
+		time.Now(),
+		nickname,
+	}
+	uuidStr := IdByteArrayToString(uuid)
+	userDbFile, err := os.Create("db/" + uuidStr)
+	if err != nil {
+		log.Fatalf("User db file creation failed: %v", err.Error())
+		return nil, nil, err
+	}
+	encoder := gob.NewEncoder(userDbFile)
+	encoder.Encode(userDb)
+	userDbFile.Close()
+	return userDb, userDbFile, nil
+}
+
 func handleNewUser(nickDb *Nickdb.NickDb, conn net.Conn) {
 	log.Printf("NEWUSER received")
 	uuid, uuidStr, err := newUuid()
@@ -305,25 +325,26 @@ func handleNewUser(nickDb *Nickdb.NickDb, conn net.Conn) {
 		cNewNickBytes,
 	})
 	// Write to disk
-	userDb := UserDb{
-		uuid,
-		time.Now(),
-		newNick,
-	}
-	userDbFile, err := os.Create("db/" + uuidStr)
+	_, _, err = createNewUser(uuid, newNick)
 	if err != nil {
-		log.Fatalf("User db file creation failed: %v", err.Error())
+		log.Fatalf("createNewUser failed: %v", err.Error())
 	}
-	encoder := gob.NewEncoder(userDbFile)
-	encoder.Encode(userDb)
-	userDbFile.Close()
 	_, err = conn.Write(newUserDataBuf)
 	if err != nil {
 		log.Fatalf("NEWUSERDATA send failed: %v", err.Error())
 	}
 }
 
-func handleQueryNick(buf []byte, conn net.Conn) {
+func IdCuintToByteArray(id [4]C.uint) []byte {
+	b := make([]byte, 16)
+	binary.BigEndian.PutUint32(b[0:], uint32(id[0]))
+	binary.BigEndian.PutUint32(b[4:], uint32(id[1]))
+	binary.BigEndian.PutUint32(b[8:], uint32(id[2]))
+	binary.BigEndian.PutUint32(b[12:], uint32(id[3]))
+	return b
+}
+
+func handleQueryNick(buf []byte, conn net.Conn, ndb *Nickdb.NickDb) {
 	log.Printf("QUERYNICK received")
 	recvPacketBufReader := bytes.NewReader(buf)
 	recvPacket := C.LWPQUERYNICK{}
@@ -334,21 +355,28 @@ func handleQueryNick(buf []byte, conn net.Conn) {
 	}
 	userDb, err := loadUserDb(recvPacket.Id)
 	if err != nil {
-		log.Printf("load user db failed: %v", err)
-	} else {
-		log.Printf("User nick: %v", userDb.Nickname)
-		// Send a reply
-		nickname := userDb.Nickname
-		cNewNickBytes := NicknameToCArray(nickname)
-		nickBuf := packet2Buf(&C.LWPNICK{
-			C.ushort(unsafe.Sizeof(C.LWPNICK{})),
-			C.LPGP_LWPNICK,
-			cNewNickBytes,
-		})
-		_, err = conn.Write(nickBuf)
-		if err != nil {
-			log.Fatalf("LWPNICK send failed: %v", err.Error())
+		if os.IsNotExist(err) {
+			userDb, _, err = createNewUser(IdCuintToByteArray(recvPacket.Id), Nickdb.PickRandomNick(ndb))
+			if err != nil {
+				log.Fatalf("load user db failed -> create new user failed")
+			}
+		} else {
+			log.Fatalf("load user db failed: %v", err)
 		}
+	}
+
+	log.Printf("User nick: %v", userDb.Nickname)
+	// Send a reply
+	nickname := userDb.Nickname
+	cNewNickBytes := NicknameToCArray(nickname)
+	nickBuf := packet2Buf(&C.LWPNICK{
+		C.ushort(unsafe.Sizeof(C.LWPNICK{})),
+		C.LPGP_LWPNICK,
+		cNewNickBytes,
+	})
+	_, err = conn.Write(nickBuf)
+	if err != nil {
+		log.Fatalf("LWPNICK send failed: %v", err.Error())
 	}
 }
 func loadUserDb(id [4]C.uint) (*UserDb, error) {
@@ -376,6 +404,11 @@ func NicknameToCArray(nickname string) [MaxNickLen]C.char {
 	nicknameCchar[MaxNickLen-1] = 0
 	return nicknameCchar
 }
+
 func IdArrayToString(id [4]C.uint) string {
 	return fmt.Sprintf("%08x-%08x-%08x-%08x", id[0], id[1], id[2], id[3])
+}
+
+func IdByteArrayToString(id []byte) string {
+	return fmt.Sprintf("%08x-%08x-%08x-%08x", id[0:4], id[4:8], id[8:12], id[12:16])
 }
