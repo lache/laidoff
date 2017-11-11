@@ -182,6 +182,8 @@ typedef struct _LWCONTEXT {
 	const LWANIMACTION* player_action;
 	//float player_aim_theta;
 	LWPLAYERSTATEDATA player_state_data;
+	float dir_pad_touch_start_x;
+	float dir_pad_touch_start_y;
 	// Current Dir pad x coordinate (screen coordinate)
 	float dir_pad_x;
 	// Current Dir pad y coordinate (screen coordinate)

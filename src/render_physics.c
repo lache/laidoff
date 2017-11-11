@@ -511,7 +511,10 @@ void lwc_render_physics(const LWCONTEXT* pLwc) {
 		render_go(pLwc, view, proj, &puck_game->go[LPGO_TARGET], pLwc->tex_atlas[player_no == 2 ? LAE_PUCK_PLAYER_KTX : LAE_PUCK_ENEMY_KTX],
 				  1.0f, remote_target_pos, state->target_rot, remote, 0);
 
-		render_dir_pad(pLwc);
+		render_dir_pad(pLwc, pLwc->dir_pad_x, pLwc->dir_pad_y);
+		if (pLwc->dir_pad_dragging) {
+			render_dir_pad(pLwc, pLwc->dir_pad_touch_start_x, pLwc->dir_pad_touch_start_y);
+		}
 		render_fist_button(pLwc);
 		render_top_button(pLwc);
 		render_dash_gauge(pLwc);
