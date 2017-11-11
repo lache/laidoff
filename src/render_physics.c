@@ -218,14 +218,14 @@ static void render_hp_gauge(const LWCONTEXT* pLwc,
 
 static void render_dash_gauge(const LWCONTEXT* pLwc) {
 	const float aspect_ratio = (float)pLwc->width / pLwc->height;
-	const float margin_x = 0.3f;
-	const float margin_y = 0.2f * 5;
+	const float margin_x = 1.5f;
+	const float margin_y = 0.3f;
 	const float gauge_width = 0.75f;
 	const float gauge_height = 0.07f;
 	const float gauge_flush_height = 0.07f;
 	const float base_color = 0.3f;
-	float x = aspect_ratio - margin_x;
-	float y = -1 + margin_y;
+	float x = -aspect_ratio + margin_x;
+	float y = 1 - margin_y;
 	const float boost_gauge_ratio = puck_game_dash_gauge_ratio(pLwc->puck_game);
 	// Positioinal offset by shake
 	if (pLwc->puck_game->dash.shake_remain_time > 0) {

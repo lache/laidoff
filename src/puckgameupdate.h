@@ -10,3 +10,4 @@ void puck_game_target_stop(LWPUCKGAME* puck_game);
 void puck_game_target_dash(LWPUCKGAME* puck_game, int player_no);
 void puck_game_pull_puck_start(LWCONTEXT* pLwc, LWPUCKGAME* puck_game);
 void puck_game_pull_puck_stop(LWCONTEXT* pLwc, LWPUCKGAME* puck_game);
+void puck_game_reset_view_proj(LWCONTEXT* pLwc, LWPUCKGAME* puck_game);

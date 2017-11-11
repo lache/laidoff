@@ -48,6 +48,7 @@
 #include "lwtcp.h"
 #include "lwdamagetext.h"
 #include "lwmath.h"
+#include "puckgameupdate.h"
 // SWIG output file
 #include "lo_wrap.inl"
 
@@ -1630,6 +1631,8 @@ void lw_set_size(LWCONTEXT* pLwc, int w, int h) {
 	lwc_render_font_test_fbo(pLwc);
 	// Reset dir pad input state
 	reset_dir_pad_position(pLwc);
+
+	puck_game_reset_view_proj(pLwc, pLwc->puck_game);
 }
 
 void lw_set_window(LWCONTEXT* pLwc, struct GLFWwindow *window) {
