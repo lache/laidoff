@@ -6,7 +6,7 @@
 #include "puckgame.h"
 #include "lwudp.h"
 #include "file.h"
-
+#include "puckgameupdate.h"
 #if LW_AUTO_BUILD || LW_PLATFORM_IOS
 #define LW_TCP_SERVER "puck-highend.popsongremix.com"
 #else
@@ -151,6 +151,8 @@ int parse_recv_packets(LWCONTEXT* pLwc, LWTCP* tcp) {
 			pLwc->puck_game->player_no = p->player_no;
 			memcpy(pLwc->puck_game->target_nickname, p->target_nickname, sizeof(p->target_nickname));
 			udp_update_addr(pLwc->udp, *(unsigned long*)p->ipaddr, p->port);
+			// Since player_no updated
+			puck_game_reset_view_proj(pLwc, pLwc->puck_game);
 			//show_sys_msg(pLwc->def_sys_msg, "LWPMATCHED2 received");
 		} else if (CHECK_PACKET(packet_type, packet_size, LWPQUEUEOK)) {
 			LOGI("LWPQUEUEOK received");
