@@ -2,6 +2,7 @@
 #include "lwcontext.h"
 #include "lwlog.h"
 #include "render_text_block.h"
+#include <string.h>
 
 int spawn_damage_text_color(LWCONTEXT* pLwc, float x, float y, float z, const char *text, LW_DAMAGE_TEXT_COORD coord, float r, float g, float b) {
 	for (int i = 0; i < MAX_DAMAGE_TEXT; i++) {
