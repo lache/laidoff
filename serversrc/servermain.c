@@ -334,6 +334,7 @@ void invalidate_dead_conn(LWCONN* conn, int conn_capacity, double current_timepo
 		if (conn[i].ipport) {
 			if (current_timepoint - conn[i].last_ingress_timepoint > life) {
 				conn[i].ipport = 0;
+				conn[i].battle_id = 0;
 			}
 		}
 	}
