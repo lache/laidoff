@@ -20,3 +20,5 @@ ios/laidoff.xcodeproj/project.xcworkspace/xcuserdata
 /match-server/conf.json
 /match-server/db
 /user_id.dat
+cmake-build-debug
+workspace.xml

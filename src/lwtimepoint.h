@@ -2,7 +2,7 @@
 
 #include "platform_detection.h"
 
-#define LW_TIMESPEC_AVAILABLE !(LW_PLATFORM_WIN32 || LW_PLATFORM_OSX)
+#define LW_TIMESPEC_AVAILABLE !(LW_PLATFORM_WIN32)
 
 #if LW_TIMESPEC_AVAILABLE
 #include <time.h> // ios struct timespec

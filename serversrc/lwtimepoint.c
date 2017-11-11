@@ -8,7 +8,8 @@
 #   include "GLFW/glfw3.h"
 #endif
 
-#if LW_IS_SERVER && LW_PLATFORM_WIN32
+#if LW_IS_SERVER
+#if LW_PLATFORM_WIN32
 #include <Windows.h>
 double glfwGetTime() {
 	LARGE_INTEGER frequency;
@@ -17,6 +18,11 @@ double glfwGetTime() {
 	QueryPerformanceCounter(&counter);
 	return (double)counter.QuadPart / frequency.QuadPart;
 }
+#elif LW_PLATFORM_OSX
+double glfwGetTime() {
+	return lwtimepoint_now_seconds();
+}
+#endif
 #endif
 
 
