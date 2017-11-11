@@ -16,7 +16,7 @@ float get_dir_pad_size_radius() {
 	return 0.75f;
 }
 
-void get_dir_pad_center(float aspect_ratio, float *x, float *y) {
+void get_dir_pad_original_center(float aspect_ratio, float *x, float *y) {
 	const float sr = get_dir_pad_size_radius();
 	if (aspect_ratio > 1) {
 		*x = -1 * aspect_ratio + sr;
@@ -35,10 +35,10 @@ int lw_get_normalized_dir_pad_input(const LWCONTEXT* pLwc, float *dx, float *dy,
 	const float aspect_ratio = (float)pLwc->width / pLwc->height;
 	float dir_pad_center_x = 0;
 	float dir_pad_center_y = 0;
-	get_dir_pad_center(aspect_ratio, &dir_pad_center_x, &dir_pad_center_y);
+	get_dir_pad_original_center(aspect_ratio, &dir_pad_center_x, &dir_pad_center_y);
 
-	*dx = pLwc->dir_pad_x - dir_pad_center_x;
-	*dy = pLwc->dir_pad_y - dir_pad_center_y;
+	*dx = pLwc->dir_pad_x - pLwc->dir_pad_touch_start_x;
+	*dy = pLwc->dir_pad_y - pLwc->dir_pad_touch_start_y;
 
 	*dlen = sqrtf(*dx * *dx + *dy * *dy);
 	
@@ -59,7 +59,7 @@ void reset_dir_pad_position(LWCONTEXT* pLwc) {
 
 	float dir_pad_center_x = 0;
 	float dir_pad_center_y = 0;
-	get_dir_pad_center(aspect_ratio, &dir_pad_center_x, &dir_pad_center_y);
+	get_dir_pad_original_center(aspect_ratio, &dir_pad_center_x, &dir_pad_center_y);
 
 	pLwc->dir_pad_x = dir_pad_center_x;
 	pLwc->dir_pad_y = dir_pad_center_y;
@@ -93,13 +93,15 @@ void lw_trigger_mouse_press(LWCONTEXT* pLwc, float x, float y, int pointer_id) {
 
 	float dir_pad_center_x = 0;
 	float dir_pad_center_y = 0;
-	get_dir_pad_center(aspect_ratio, &dir_pad_center_x, &dir_pad_center_y);
+	get_dir_pad_original_center(aspect_ratio, &dir_pad_center_x, &dir_pad_center_y);
 
 	const float sr = get_dir_pad_size_radius();
 
 	if ((pLwc->game_scene == LGS_FIELD || pLwc->game_scene == LGS_PHYSICS)
 		&& fabs(dir_pad_center_x - x) < sr && fabs(dir_pad_center_y - y) < sr
 		&& !pLwc->dir_pad_dragging) {
+		pLwc->dir_pad_touch_start_x = x;
+		pLwc->dir_pad_touch_start_y = y;
 		pLwc->dir_pad_x = x;
 		pLwc->dir_pad_y = y;
 		pLwc->dir_pad_dragging = 1;
@@ -194,7 +196,7 @@ void lw_trigger_mouse_move(LWCONTEXT* pLwc, float x, float y, int pointer_id) {
 		&& pLwc->dir_pad_dragging && pLwc->dir_pad_pointer_id == pointer_id) {
 		float dir_pad_center_x = 0;
 		float dir_pad_center_y = 0;
-		get_dir_pad_center(aspect_ratio, &dir_pad_center_x, &dir_pad_center_y);
+		get_dir_pad_original_center(aspect_ratio, &dir_pad_center_x, &dir_pad_center_y);
 
 		const float sr = get_dir_pad_size_radius();
 
@@ -414,7 +416,7 @@ static void simulate_dir_pad_touch_input(LWCONTEXT* pLwc) {
 	const float aspect_ratio = (float)pLwc->width / pLwc->height;
 	float dir_pad_center_x = 0;
 	float dir_pad_center_y = 0;
-	get_dir_pad_center(aspect_ratio, &dir_pad_center_x, &dir_pad_center_y);
+	get_dir_pad_original_center(aspect_ratio, &dir_pad_center_x, &dir_pad_center_y);
 
 	pLwc->dir_pad_x = dir_pad_center_x + (pLwc->player_move_right - pLwc->player_move_left) / 5.0f;
 	pLwc->dir_pad_y = dir_pad_center_y + (pLwc->player_move_up - pLwc->player_move_down) / 5.0f;

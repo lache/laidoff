@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		2641822E1FB6FD0300BF2D42 /* lwdamagetext.c in Sources */ = {isa = PBXBuildFile; fileRef = 2641822D1FB6FD0300BF2D42 /* lwdamagetext.c */; };
+		264182301FB6FD0900BF2D42 /* lwmath.c in Sources */ = {isa = PBXBuildFile; fileRef = 2641822F1FB6FD0900BF2D42 /* lwmath.c */; };
 		5633AC321EADDF98003F1549 /* net.c in Sources */ = {isa = PBXBuildFile; fileRef = 5633AC311EADDF98003F1549 /* net.c */; };
 		5663732C1EBA52D3001DA3F4 /* array.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 566372811EBA52D3001DA3F4 /* array.cpp */; };
 		5663732D1EBA52D3001DA3F4 /* box.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 566372831EBA52D3001DA3F4 /* box.cpp */; };
@@ -378,6 +380,8 @@
 
 /* Begin PBXFileReference section */
 		2601AFFC1EE1549700989AA6 /* platform.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = platform.h; path = ../build/include/platform.h; sourceTree = "<group>"; };
+		2641822D1FB6FD0300BF2D42 /* lwdamagetext.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = lwdamagetext.c; sourceTree = "<group>"; };
+		2641822F1FB6FD0900BF2D42 /* lwmath.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = lwmath.c; sourceTree = "<group>"; };
 		5633AC311EADDF98003F1549 /* net.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = net.c; sourceTree = "<group>"; };
 		566372651EBA52D3001DA3F4 /* collision.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = collision.h; sourceTree = "<group>"; };
 		566372661EBA52D3001DA3F4 /* collision_space.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = collision_space.h; sourceTree = "<group>"; };
@@ -1984,6 +1988,8 @@
 		6CA16CF41EA20CA700DB7AF0 /* src */ = {
 			isa = PBXGroup;
 			children = (
+				2641822F1FB6FD0900BF2D42 /* lwmath.c */,
+				2641822D1FB6FD0300BF2D42 /* lwdamagetext.c */,
 				6C7739891FB4B5A5001014DE /* armature.c */,
 				6C7739561FB4B5A1001014DE /* armature.h */,
 				6C7739A21FB4B5A7001014DE /* battle_result.c */,
@@ -2370,6 +2376,7 @@
 				56F188F51EC74DB60019312F /* tcp_connecter.cpp in Sources */,
 				5663736B1EBA52D4001DA3F4 /* ode.cpp in Sources */,
 				56F189A81EC751950019312F /* zhashx.c in Sources */,
+				2641822E1FB6FD0300BF2D42 /* lwdamagetext.c in Sources */,
 				56F188D71EC74DB60019312F /* poll.cpp in Sources */,
 				566373721EBA52D4001DA3F4 /* ray.cpp in Sources */,
 				56F188DF1EC74DB60019312F /* radio.cpp in Sources */,
@@ -2501,6 +2508,7 @@
 				6CA16D8B1EA210BB00DB7AF0 /* lfunc.c in Sources */,
 				5663733D1EBA52D3001DA3F4 /* collision_trimesh_internal.cpp in Sources */,
 				6C7739D21FB4B5AA001014DE /* battlelogic.c in Sources */,
+				264182301FB6FD0900BF2D42 /* lwmath.c in Sources */,
 				5663735B1EBA52D4001DA3F4 /* plane2d.cpp in Sources */,
 				56F189A21EC751950019312F /* zgossip_engine.inc in Sources */,
 				56F188EC1EC74DB60019312F /* socket_base.cpp in Sources */,

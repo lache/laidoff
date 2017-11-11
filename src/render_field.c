@@ -110,7 +110,7 @@ void render_top_button(const LWCONTEXT* pLwc) {
 		LVT_RIGHT_TOP_ANCHORED_SQUARE, 1, 0, 0, 0, 0);
 }
 
-void render_dir_pad(const LWCONTEXT* pLwc) {
+void render_dir_pad(const LWCONTEXT* pLwc, float x, float y) {
 	int shader_index = LWST_DEFAULT;
 	const int vbo_index = LVT_CENTER_CENTER_ANCHORED_SQUARE;
 
@@ -122,7 +122,7 @@ void render_dir_pad(const LWCONTEXT* pLwc) {
 	mat4x4_rotate_X(model, model, 0);
 	mat4x4_scale_aniso(model, model, 0.05f, 0.05f, 0.05f);
 	mat4x4 model_translate;
-	mat4x4_translate(model_translate, pLwc->dir_pad_x, pLwc->dir_pad_y, 0);
+	mat4x4_translate(model_translate, x, y, 0);
 	mat4x4_mul(model, model_translate, model);
 
 	mat4x4 view_model;
@@ -144,7 +144,7 @@ void render_dir_pad(const LWCONTEXT* pLwc) {
 }
 
 static void s_render_ui(const LWCONTEXT* pLwc) {
-	render_dir_pad(pLwc);
+	render_dir_pad(pLwc, pLwc->dir_pad_x, pLwc->dir_pad_y);
 	render_basic_field_ui(pLwc);
 }
 

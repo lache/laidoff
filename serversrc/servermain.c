@@ -334,6 +334,7 @@ void invalidate_dead_conn(LWCONN* conn, int conn_capacity, double current_timepo
 		if (conn[i].ipport) {
 			if (current_timepoint - conn[i].last_ingress_timepoint > life) {
 				conn[i].ipport = 0;
+				conn[i].battle_id = 0;
 			}
 		}
 	}
@@ -420,7 +421,7 @@ int check_token(LWSERVER* server, LWPUDPHEADER* p, LWPUCKGAME** puck_game) {
 	}
 	LWPUCKGAME* pg = server->puck_game_pool[p->battle_id - 1];
 	if (!pg) {
-		LOGE("Battle id %d is null.", p->battle_id);
+		//LOGE("Battle id %d is null.", p->battle_id);
 		return -2;
 	}
 	if (pg->c1_token == p->token) {

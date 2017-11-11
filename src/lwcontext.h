@@ -182,6 +182,8 @@ typedef struct _LWCONTEXT {
 	const LWANIMACTION* player_action;
 	//float player_aim_theta;
 	LWPLAYERSTATEDATA player_state_data;
+	float dir_pad_touch_start_x;
+	float dir_pad_touch_start_y;
 	// Current Dir pad x coordinate (screen coordinate)
 	float dir_pad_x;
 	// Current Dir pad y coordinate (screen coordinate)
@@ -326,6 +328,8 @@ typedef struct _LWCONTEXT {
 	// Last state packet reception interval (msec)
 	double puck_game_state_last_received_interval;
 	const char* internal_data_path;
+	mat4x4 puck_game_view;
+	mat4x4 puck_game_proj;
 } LWCONTEXT;
 
 #ifdef __cplusplus

@@ -18,6 +18,7 @@ void update_puck_game(LWCONTEXT* pLwc, LWPUCKGAME* puck_game, double delta_time)
 	if (!pLwc->udp) {
 		return;
 	}
+	
 	puck_game->remote = !pLwc->udp->master;
 	puck_game->on_player_damaged = puck_game->remote ? 0 : puck_game_player_decrease_hp_test;
 	puck_game->on_target_damaged = puck_game->remote ? 0 : puck_game_target_decrease_hp_test;
@@ -232,4 +233,17 @@ void puck_game_pull_puck_start(LWCONTEXT* pLwc, LWPUCKGAME* puck_game) {
 
 void puck_game_pull_puck_stop(LWCONTEXT* pLwc, LWPUCKGAME* puck_game) {
 	puck_game->pull_puck = 0;
+}
+
+void puck_game_reset_view_proj(LWCONTEXT* pLwc, LWPUCKGAME* puck_game) {
+	// Setup puck game view, proj matrices
+	const float screen_aspect_ratio = (float)pLwc->width / pLwc->height;
+	mat4x4_perspective(pLwc->puck_game_proj, (float)(LWDEG2RAD(49.134) / screen_aspect_ratio), screen_aspect_ratio, 1.0f, 500.0f);
+	vec3 eye = { 0.0f, 0.0f, 12.0f };
+	vec3 center = { 0, 0, 0 };
+	vec3 up = { 0, 1, 0 };
+	if (puck_game->player_no == 2) {
+		up[1] = -1.0f;
+	}
+	mat4x4_look_at(pLwc->puck_game_view, eye, center, up);
 }

@@ -115,29 +115,8 @@ LWPUCKGAME* new_puck_game() {
 	dJointSetLMotorParam(pcj, dParamFMax1, 10.0f);
 	dJointSetLMotorParam(pcj, dParamFMax2, 10.0f);
 
-	//dBodySetPosition(puck_game->go[LPGO_TARGET].body, 0.0f, 0.0f, puck_game->go[LPGO_TARGET].radius);
-
-	// Create puck pull control joint
-	/*puck_game->puck_pull_control_joint = dJointCreateSlider(puck_game->world, puck_game->puck_pull_control_joint_group);
-	dJointID ppcj = puck_game->puck_pull_control_joint;
-	const dReal* player_pos = dBodyGetPosition(puck_game->go[LPGO_PLAYER].body);
-	const dReal* puck_pos = dBodyGetPosition(puck_game->go[LPGO_PUCK].body);
-	dJointSetSliderAxis(ppcj,
-		puck_pos[0] - player_pos[0],
-		puck_pos[1] - player_pos[1],
-		puck_pos[2] - player_pos[2]
-	);
-	dJointAttach(ppcj, puck_game->go[LPGO_PLAYER].body, puck_game->go[LPGO_PUCK].body);*/
-	//dJointSetSliderParam(ppcj, dParamFMax, 10.0f);
-
-	// Create target pull control joint
-
-
-	
-	
-	//dBodySetKinematic(puck_game->go[LPGO_PUCK].body);
-
 	puck_game->go[LPGO_PUCK].red_overlay = 1;
+
 	puck_game->init_ready = 1;
 	return puck_game;
 }

@@ -46,6 +46,9 @@
 #include "puckgame.h"
 #include "lwudp.h"
 #include "lwtcp.h"
+#include "lwdamagetext.h"
+#include "lwmath.h"
+#include "puckgameupdate.h"
 // SWIG output file
 #include "lo_wrap.inl"
 
@@ -1230,11 +1233,40 @@ void lwc_prerender_mutable_context(LWCONTEXT* pLwc) {
 			LWPSTATE sampled_state;
 			linear_interpolate_state(&sampled_state, pLwc->udp->state_buffer, LW_STATE_RING_BUFFER_CAPACITY, sample_update_tick);
 			//memcpy(&pLwc->puck_game_state, &sampled_state, sizeof(LWPSTATE));
-			if (pLwc->puck_game_state.player_current_hp > p.player_current_hp) {
-				pLwc->puck_game->player.hp_shake_remain_time = pLwc->puck_game->hp_shake_time;
+			const int player_damage = pLwc->puck_game_state.player_current_hp - p.player_current_hp;
+			vec4 world_point_1 = {
+				p.player[0], p.player[1], p.player[2], 1.0f,
+			};
+			vec4 world_point_2 = {
+				p.target[0], p.target[1], p.target[2], 1.0f,
+			};
+			float* player_world_point = world_point_1;
+			float* target_world_point = world_point_2;
+			if (pLwc->puck_game->player_no == 2) {
+				player_world_point = world_point_2;
+				target_world_point = world_point_1;
 			}
-			if (pLwc->puck_game_state.target_current_hp > p.target_current_hp) {
+			if (player_damage > 0) {
+				pLwc->puck_game->player.hp_shake_remain_time = pLwc->puck_game->hp_shake_time;
+				const float aspect_ratio = (float)pLwc->width / pLwc->height;
+				mat4x4 proj_view;
+				mat4x4_identity(proj_view);
+				mat4x4_mul(proj_view, pLwc->puck_game_proj, pLwc->puck_game_view);
+				vec2 ui_point;
+				calculate_ui_point_from_world_point(aspect_ratio, proj_view, player_world_point, ui_point);
+				spawn_damage_text(pLwc, ui_point[0], ui_point[1], 0, "1", LDTC_UI);
+			}
+			const int target_damage = pLwc->puck_game_state.target_current_hp - p.target_current_hp;
+			if (target_damage > 0) {
 				pLwc->puck_game->target.hp_shake_remain_time = pLwc->puck_game->hp_shake_time;
+				const float aspect_ratio = (float)pLwc->width / pLwc->height;
+				mat4x4 proj_view;
+				mat4x4_identity(proj_view);
+				mat4x4_mul(proj_view, pLwc->puck_game_proj, pLwc->puck_game_view);
+				
+				vec2 ui_point;
+				calculate_ui_point_from_world_point(aspect_ratio, proj_view, target_world_point, ui_point);
+				spawn_damage_text(pLwc, ui_point[0], ui_point[1], 0, "1", LDTC_UI);
 			}
 			memcpy(&pLwc->puck_game_state, &p, sizeof(LWPSTATE));
 		}
@@ -1286,7 +1318,7 @@ void lwc_render(const LWCONTEXT* pLwc) {
 	} else if (pLwc->game_scene == LGS_SKIN) {
 		lwc_render_skin(pLwc);
 	} else if (pLwc->game_scene == LGS_PHYSICS) {
-		lwc_render_physics(pLwc);
+		lwc_render_physics(pLwc, pLwc->puck_game_view, pLwc->puck_game_proj);
 	} else if (pLwc->game_scene == LGS_PARTICLE_SYSTEM) {
 		lwc_render_ps(pLwc);
 	} else if (pLwc->game_scene == LGS_UI) {
@@ -1599,6 +1631,8 @@ void lw_set_size(LWCONTEXT* pLwc, int w, int h) {
 	lwc_render_font_test_fbo(pLwc);
 	// Reset dir pad input state
 	reset_dir_pad_position(pLwc);
+
+	puck_game_reset_view_proj(pLwc, pLwc->puck_game);
 }
 
 void lw_set_window(LWCONTEXT* pLwc, struct GLFWwindow *window) {
