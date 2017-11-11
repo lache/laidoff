@@ -22,7 +22,7 @@ SetConsoleTextAttribute(hConsole, saved_attributes); \
 }
 #define LOGF(...) LOGE(__VA_ARGS__);abort()
 #define LOGA(...) (void)printf(__VA_ARGS__);(void)printf("\n")
-#elif LW_PLATFORM_IOS
+#elif LW_PLATFORM_IOS || LW_PLATFORM_OSX
 #include <stdio.h>
 #define LOGV(...) //((void)printf(__VA_ARGS__))
 #define LOGD(...) (void)printf(__VA_ARGS__);(void)printf("\n")
@@ -31,7 +31,7 @@ SetConsoleTextAttribute(hConsole, saved_attributes); \
 #define LOGE(...) (void)printf(__VA_ARGS__);(void)printf("\n")
 #define LOGF(...) (void)printf(__VA_ARGS__);(void)printf("\n");abort()
 #define LOGA(...) (void)printf(__VA_ARGS__);(void)printf("\n")
-#elif LW_PLATFORM_OSX || LW_PLATFORM_IOS_SIMULATOR || LW_PLATFORM_RPI || LW_PLATFORM_LINUX
+#elif LW_PLATFORM_IOS_SIMULATOR || LW_PLATFORM_RPI || LW_PLATFORM_LINUX
 #include <stdio.h>
 #define LOGV(...) //((void)printf(__VA_ARGS__))
 #define LOGD(...) (void)printf(__VA_ARGS__);(void)printf("\n")

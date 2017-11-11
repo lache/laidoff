@@ -1,9 +1,11 @@
-#if GL_ES
+#ifdef GL_ES
 #define fragColor gl_FragColor
 #define FRAG_COLOR_OUTPUT_DECL
+#define TEX texture2D
 #else
 #define FRAG_COLOR_OUTPUT_DECL out vec4 fragColor;
 #define varying in
+#define TEX texture
 #endif
 
 precision mediump float;
@@ -19,7 +21,7 @@ FRAG_COLOR_OUTPUT_DECL
 
 void main()
 {
-    vec4 t = texture2D(diffuse, uv); // + vec4(color, 0.0);
+    vec4 t = TEX(diffuse, uv); // + vec4(color, 0.0);
     fragColor = (1.0 - overlay_color_ratio) * t + overlay_color_ratio * vec4(overlay_color, t.a);
     fragColor.a *= alpha_multiplier;
 }

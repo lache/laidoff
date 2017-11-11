@@ -13,7 +13,8 @@
 //#define LW_TCP_SERVER "192.168.0.28"
 //#define LW_TCP_SERVER "puck-highend.popsongremix.com"
 //#define LW_TCP_SERVER "puck.popsongremix.com"
-#define LW_TCP_SERVER "221.147.71.76"
+//#define LW_TCP_SERVER "221.147.71.76"
+#define LW_TCP_SERVER "14.39.208.86"
 #endif
 #define STR_HELPER(x) #x
 #define STR(x) STR_HELPER(x)
