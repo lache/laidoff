@@ -92,6 +92,7 @@
 #include "rmsg.h"
 #include "lwparabola.h"
 #include "construct.h"
+#include "puckgameupdate.h"
 #ifdef WIN32
 #pragma warning(pop)
 #endif
@@ -186,6 +187,7 @@
 %include "rmsg.h"
 %include "lwparabola.h"
 %include "construct.h"
+%include "puckgameupdate.h"
 
 // using the C-array
 %include <carrays.i>

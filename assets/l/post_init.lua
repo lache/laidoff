@@ -85,6 +85,19 @@ function on_ui_event(id)
 	elseif id == 'seltower1' then gtid = 'crossbow'
 	elseif id == 'seltower2' then gtid = 'guntower'
 	elseif id == 'seltower3' then gtid = 'pyro'
+	elseif id == 'pull_button' then
+		print('[script]button_pull')
+		lo.puck_game_pull_puck_toggle(c, c.puck_game)
+		return 0
+	elseif id == 'dash_button' then
+		print('[script]button_dash')
+		lo.puck_game_dash(c, c.puck_game)
+		return 0
+	elseif id == 'jump_button' then
+		print('[script]button_jump')
+		-- temporarily for rematch
+		lo.puck_game_rematch(c, c.puck_game)
+		return 0
 	else 
 		lo.construct_set_preview_enable(c.construct, 0)
 		return 0

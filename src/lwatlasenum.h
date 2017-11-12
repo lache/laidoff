@@ -88,6 +88,13 @@ typedef enum _LW_ATLAS_ENUM
 
 	LAE_BEAM_KTX,
     
+    LAE_BUTTON_PULL,
+    LAE_BUTTON_PULL_ALPHA,
+    LAE_BUTTON_DASH,
+    LAE_BUTTON_DASH_ALPHA,
+    LAE_BUTTON_JUMP,
+    LAE_BUTTON_JUMP_ALPHA,
+    
     LAE_COUNT,
 } LW_ATLAS_ENUM;
 
@@ -175,6 +182,13 @@ static const char *tex_atlas_filename[] = {
 	ASSETS_BASE_PATH "ktx" PATH_SEPARATOR "splash512512.ktx",
 
 	ASSETS_BASE_PATH "ktx" PATH_SEPARATOR "fx-beam.ktx",
+    
+    ASSETS_BASE_PATH "ktx" PATH_SEPARATOR "button-pull-a.ktx",
+    ASSETS_BASE_PATH "ktx" PATH_SEPARATOR "button-pull-a_alpha.ktx",
+    ASSETS_BASE_PATH "ktx" PATH_SEPARATOR "button-dash-a.ktx",
+    ASSETS_BASE_PATH "ktx" PATH_SEPARATOR "button-dash-a_alpha.ktx",
+    ASSETS_BASE_PATH "ktx" PATH_SEPARATOR "button-jump-a.ktx",
+    ASSETS_BASE_PATH "ktx" PATH_SEPARATOR "button-jump-a_alpha.ktx",
 };
 
 #define MAX_TEX_ATLAS LAE_COUNT

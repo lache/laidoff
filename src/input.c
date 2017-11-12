@@ -123,8 +123,8 @@ void lw_trigger_mouse_press(LWCONTEXT* pLwc, float x, float y, int pointer_id) {
 		&& fabs(fist_button_x_center - x) < fist_button_w
 		&& fabs(fist_button_y_center - y) < fist_button_h
 		&& (!pLwc->dir_pad_dragging || (pLwc->dir_pad_pointer_id != pointer_id))) {
-
-		puck_game_dash(pLwc, pLwc->puck_game);
+        // this event handled by lua script
+		//puck_game_dash(pLwc, pLwc->puck_game);
 	}
 
 	if (pLwc->game_scene == LGS_FIELD
@@ -149,7 +149,8 @@ void lw_trigger_mouse_press(LWCONTEXT* pLwc, float x, float y, int pointer_id) {
 	if (pLwc->game_scene == LGS_PHYSICS
 		&& fabs(top_button_x_center - x) < top_button_w
 		&& fabs(top_button_y_center - y) < top_button_h) {
-		puck_game_pull_puck_start(pLwc, pLwc->puck_game);
+        // controlled by LWBUTTONLIST and lua script
+		//puck_game_pull_puck_start(pLwc, pLwc->puck_game);
 	}
 
 	if (pLwc->game_scene == LGS_BATTLE && pLwc->battle_state != LBS_COMMAND_IN_PROGRESS && pLwc->player_turn_creature_index >= 0) {
@@ -267,7 +268,8 @@ void lw_trigger_mouse_release(LWCONTEXT* pLwc, float x, float y, int pointer_id)
 	if (pLwc->game_scene == LGS_PHYSICS
 		&& fabs(top_button_x_center - x) < top_button_w
 		&& fabs(top_button_y_center - y) < top_button_h) {
-		puck_game_pull_puck_stop(pLwc, pLwc->puck_game);
+        // controlled by LWBUTTONLIST and lua script
+		//puck_game_pull_puck_stop(pLwc, pLwc->puck_game);
 	}
 
 	if (pLwc->dir_pad_pointer_id == pointer_id) {

@@ -116,18 +116,18 @@ static void render_match_state(const LWCONTEXT* pLwc) {
     if (pLwc->puck_game_state.finished) {
         int hp_diff = pLwc->puck_game_state.player_current_hp - pLwc->puck_game_state.target_current_hp;
         if (hp_diff == 0) {
-            sprintf(str, u8"DRAW (BID:%d) (TOUCH DASH TO REMATCH)", pLwc->puck_game->battle_id);
+            sprintf(str, u8"DRAW (BID:%d) (TOUCH 'JUMP' TO REMATCH)", pLwc->puck_game->battle_id);
         } else if (hp_diff > 0) {
             if (pLwc->puck_game->battle_id == 0) {
                 sprintf(str, "YOU WON (BID:%d) (Searching...) [PRACTICE MODE]", pLwc->puck_game->battle_id);
             } else {
-                sprintf(str, "YOU WON (BID:%d) (TOUCH DASH TO REMATCH)", pLwc->puck_game->battle_id);
+                sprintf(str, "YOU WON (BID:%d) (TOUCH 'JUMP' TO REMATCH)", pLwc->puck_game->battle_id);
             }
         } else {
             if (pLwc->puck_game->battle_id == 0) {
                 sprintf(str, "YOU LOSE (BID:%d) (Searching...) [PRACTICE MODE]", pLwc->puck_game->battle_id);
             } else {
-                sprintf(str, "YOU LOSE (BID:%d) (TOUCH DASH TO REMATCH)", pLwc->puck_game->battle_id);
+                sprintf(str, "YOU LOSE (BID:%d) (TOUCH 'JUMP' TO REMATCH)", pLwc->puck_game->battle_id);
             }
         }
     } else {
@@ -268,7 +268,7 @@ static void render_dash_gauge(const LWCONTEXT* pLwc) {
     SET_COLOR_RGBA_FLOAT(text_block.color_emp_glyph, 1, 1, 0, 1);
     SET_COLOR_RGBA_FLOAT(text_block.color_emp_outline, 0, 0, 0, 1);
     char str[32];
-    sprintf(str, "%.1f%% BOOST GAUGE", boost_gauge_ratio * 100);
+    sprintf(str, "%.1f%% DASH GAUGE", boost_gauge_ratio * 100);
     text_block.text = str;
     text_block.text_bytelen = (int)strlen(text_block.text);
     text_block.begin_index = 0;
@@ -402,17 +402,27 @@ static void render_floor(const LWCONTEXT *pLwc, const mat4x4 proj, const LWPUCKG
 
 static void render_lwbutton(const LWCONTEXT* pLwc, const LWBUTTONLIST* button_list) {
     for (int i = 0; i < button_list->button_count; i++) {
-        render_solid_vb_ui(pLwc,
+        LW_ATLAS_ENUM lae = LAE_BUTTON_PULL + 2 * i;
+        LW_ATLAS_ENUM lae_alpha = LAE_BUTTON_PULL_ALPHA + 2 * i;
+        float or = 1.0f;
+        float og = 1.0f;
+        float ob = 1.0f;
+        if (i == 0 && pLwc->puck_game->pull_puck) {
+            or = 0.2f;
+            ob = 0.2f;
+        }
+        render_solid_vb_ui_alpha(pLwc,
                            button_list->button[i].x,
                            button_list->button[i].y,
                            button_list->button[i].w,
                            button_list->button[i].h,
-                           pLwc->tex_atlas[LAE_BG_ROAD_PNG],
+                           pLwc->tex_atlas[lae],
+                           pLwc->tex_atlas[lae_alpha],
                            LVT_LEFT_TOP_ANCHORED_SQUARE,
                            1.0f,
-                           1.0f,
-                           1.0f,
-                           1.0f,
+                           or,
+                           og,
+                           ob,
                            1.0f);
     }
 }
@@ -519,9 +529,9 @@ void lwc_render_physics(const LWCONTEXT* pLwc, const mat4x4 view, const mat4x4 p
         render_dir_pad(pLwc, pLwc->dir_pad_touch_start_x, pLwc->dir_pad_touch_start_y);
     }
     // Dash button
-    render_fist_button(pLwc);
+    //render_fist_button(pLwc);
     // Pull button
-    render_top_button(pLwc);
+    //render_top_button(pLwc);
     // Dash cooltime gauge
     render_dash_gauge(pLwc);
     // HP gauges (player & target)
@@ -534,8 +544,14 @@ void lwc_render_physics(const LWCONTEXT* pLwc, const mat4x4 view, const mat4x4 p
     render_match_state(pLwc);
     
     // Register as a button
-    lwbutton_append(&(((LWCONTEXT*)pLwc)->button_list), "pull_button", 0.525f * 1 - 0.35f, -0.40f, 0.5f, 0.5f);
-    lwbutton_append(&(((LWCONTEXT*)pLwc)->button_list), "dash_button", 0.525f * 2 - 0.35f, -0.15f, 0.5f, 0.5f);
-    lwbutton_append(&(((LWCONTEXT*)pLwc)->button_list), "jump_button", 0.525f * 3 - 0.35f, +0.10f, 0.5f, 0.5f);
+    const float button_size = 0.35f;
+    const float button_margin_x = 0.025f;
+    const float button_x_interval = button_size + button_margin_x;
+    const float button_x_0 = 0.15f;
+    const float button_y_interval = 0.25f;
+    const float button_y_0 = -0.50f;
+    lwbutton_append(&(((LWCONTEXT*)pLwc)->button_list), "pull_button", button_x_interval * 1 + button_x_0, button_y_0 + button_y_interval * 0, button_size, button_size);
+    lwbutton_append(&(((LWCONTEXT*)pLwc)->button_list), "dash_button", button_x_interval * 2 + button_x_0, button_y_0 + button_y_interval * 1, button_size, button_size);
+    lwbutton_append(&(((LWCONTEXT*)pLwc)->button_list), "jump_button", button_x_interval * 3 + button_x_0, button_y_0 + button_y_interval * 2, button_size, button_size);
     render_lwbutton(pLwc, &pLwc->button_list);
 }
