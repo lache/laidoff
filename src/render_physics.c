@@ -116,25 +116,25 @@ static void render_match_state(const LWCONTEXT* pLwc) {
 	if (pLwc->puck_game_state.finished) {
 		int hp_diff = pLwc->puck_game_state.player_current_hp - pLwc->puck_game_state.target_current_hp;
 		if (hp_diff == 0) {
-			sprintf(str, u8"종료! 무승부..BID:%d (대시버튼 눌러서 다시하기)", pLwc->puck_game->battle_id);
+			sprintf(str, u8"DRAW (BID:%d) (TOUCH DASH TO REMATCH)", pLwc->puck_game->battle_id);
 		} else if (hp_diff > 0) {
 			if (pLwc->puck_game->battle_id == 0) {
-				sprintf(str, u8"[연습중]~~~승리~~~BID:%d (대전상대 찾고 있다)", pLwc->puck_game->battle_id);
+				sprintf(str, "YOU WON (BID:%d) (Searching...) [PRACTICE MODE]", pLwc->puck_game->battle_id);
 			} else {
-				sprintf(str, u8"~~~승리~~~BID:%d (대시버튼 눌러서 다시하기)", pLwc->puck_game->battle_id);
+				sprintf(str, "YOU WON (BID:%d) (TOUCH DASH TO REMATCH)", pLwc->puck_game->battle_id);
 			}
 		} else {
 			if (pLwc->puck_game->battle_id == 0) {
-				sprintf(str, u8"[연습중]패배...BID:%d (대전상대 찾고 있다)", pLwc->puck_game->battle_id);
+				sprintf(str, "YOU LOSE (BID:%d) (Searching...)", pLwc->puck_game->battle_id);
 			} else {
-				sprintf(str, u8"패배...BID:%d (대시버튼 눌러서 다시하기)", pLwc->puck_game->battle_id);
+				sprintf(str, "YOU LOSE (BID:%d) (TOUCH DASH TO REMATCH)", pLwc->puck_game->battle_id);
 			}
 		}
 	} else {
 		if (pLwc->puck_game->token) {
-			sprintf(str, u8"전투중...BID:%d", pLwc->puck_game->battle_id);
+			sprintf(str, "FIGHT!!! (BID:%d)", pLwc->puck_game->battle_id);
 		} else {
-			sprintf(str, u8"[연습중] --- (대전 상대를 찾고 있다능...)");
+			sprintf(str, "Searching ... [PRACTICE MODE]");
 		}
 	}
 
