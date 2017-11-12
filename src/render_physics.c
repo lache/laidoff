@@ -125,7 +125,7 @@ static void render_match_state(const LWCONTEXT* pLwc) {
 			}
 		} else {
 			if (pLwc->puck_game->battle_id == 0) {
-				sprintf(str, "YOU LOSE (BID:%d) (Searching...)", pLwc->puck_game->battle_id);
+				sprintf(str, "YOU LOSE (BID:%d) (Searching...) [PRACTICE MODE]", pLwc->puck_game->battle_id);
 			} else {
 				sprintf(str, "YOU LOSE (BID:%d) (TOUCH DASH TO REMATCH)", pLwc->puck_game->battle_id);
 			}
@@ -134,7 +134,7 @@ static void render_match_state(const LWCONTEXT* pLwc) {
 		if (pLwc->puck_game->token) {
 			sprintf(str, "FIGHT!!! (BID:%d)", pLwc->puck_game->battle_id);
 		} else {
-			sprintf(str, "Searching ... [PRACTICE MODE]");
+			sprintf(str, "Searching... [PRACTICE MODE]");
 		}
 	}
 

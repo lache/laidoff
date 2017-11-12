@@ -709,7 +709,7 @@ void lwc_update(LWCONTEXT* pLwc, double delta_time) {
 	if (pLwc->dir_pad_dragging) {
 		const float dx = pLwc->dir_pad_x - pLwc->dir_pad_touch_start_x;
 		const float dy = pLwc->dir_pad_y - pLwc->dir_pad_touch_start_y;
-		const float max_dist = 0.2f;
+		const float max_dist = 0.05f;
 		const float cur_dist = sqrtf(dx*dx + dy*dy);
 		if (cur_dist > max_dist) {
 			pLwc->dir_pad_touch_start_x = pLwc->dir_pad_x + (-dx) / cur_dist * max_dist;
