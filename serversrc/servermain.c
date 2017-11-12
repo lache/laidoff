@@ -140,8 +140,8 @@ static int update_puck_game(LWSERVER* server, LWPUCKGAME* puck_game, double delt
 		LPGO_PLAYER,
 		LPGO_TARGET,
 	};
-	float player_speed = 0.5f;
 	for (int i = 0; i < 2; i++) {
+        float player_speed = 0.5f;
 		float dx, dy, dlen;
 		if (lw_get_normalized_dir_pad_input(&puck_game->remote_control[i], &dx, &dy, &dlen)) {
 			dJointSetLMotorParam(pcj[i], dParamVel1, player_speed * dx);
