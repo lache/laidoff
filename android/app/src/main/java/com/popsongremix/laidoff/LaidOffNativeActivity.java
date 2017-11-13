@@ -114,8 +114,8 @@ public class LaidOffNativeActivity extends NativeActivity
         }
         */
 
-        Intent intent = new Intent(this, LoginActivity.class);
-        startActivity(intent);
+        //Intent intent = new Intent(this, TextInputActivity.class);
+        //startActivity(intent);
     }
 
     private void downloadResFromServer() {
@@ -134,6 +134,7 @@ public class LaidOffNativeActivity extends NativeActivity
         UpdateResTaskParam urtp = new UpdateResTaskParam();
         urtp.fileAbsolutePath = files.getAbsolutePath();
         urtp.remoteAssetsBasePath = "http://sky.popsongremix.com/laidoff/assets";
+        //urtp.remoteAssetsBasePath = "http://192.168.0.28:19876/assets";
         urtp.remoteApkBasePath = "http://sky.popsongremix.com/laidoff/apk";
         //urtp.remoteAssetsBasePath = "http://222.110.4.119:18080";
         urtp.remoteListFilePath = "list.txt";

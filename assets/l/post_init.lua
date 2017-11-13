@@ -97,7 +97,6 @@ function on_ui_event(id)
 		print('[script]button_jump')
 		-- temporarily for rematch
 		lo.puck_game_rematch(c, c.puck_game)
-		lo.lw_start_text_input_activity()
 		return 0
 	else 
 		lo.construct_set_preview_enable(c.construct, 0)

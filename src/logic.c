@@ -532,6 +532,10 @@ void toggle_network_poll(LWCONTEXT* pLwc) {
 	field_set_network(pLwc->field, !field_network(pLwc->field));
 }
 
+void start_text_input_activity(LWCONTEXT* pLwc) {
+	lw_start_text_input_activity();
+}
+
 void reset_runtime_context(LWCONTEXT* pLwc) {
 	// Stop new frame of rendering
 	lwcontext_set_safe_to_start_render(pLwc, 0);
@@ -579,6 +583,7 @@ void reset_runtime_context(LWCONTEXT* pLwc) {
 		{ LWU("Server #1"), connect_to_server_1 },
 		{ LWU("레이테스트토글"), toggle_ray_test },
 		{ LWU("네트워크토글"), toggle_network_poll },
+		{ LWU("텍스트 입력"), start_text_input_activity },
 	};
 	for (int i = 0; i < ARRAY_SIZE(handler_array); i++) {
 		pLwc->admin_button_command[i].name = handler_array[i].name;

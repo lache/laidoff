@@ -22,3 +22,5 @@ ios/laidoff.xcodeproj/project.xcworkspace/xcuserdata
 /user_id.dat
 cmake-build-debug
 workspace.xml
+/android/app/release/app-release
+/android/app/release

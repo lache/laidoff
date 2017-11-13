@@ -40,39 +40,32 @@ void mouse_pos_callback(GLFWwindow* window, double x, double y);
 void char_callback(GLFWwindow* window, unsigned int c);
 void destroy_ext_sound_lib();
 
-static void error_callback(int error, const char* description)
-{
+static void error_callback(int error, const char* description) {
 	fprintf(stderr, "Error: %s\n", description);
 }
 
-static BOOL directory_exists(const char* szPath)
-{
+static BOOL directory_exists(const char* szPath) {
 #if LW_PLATFORM_WIN32
 	DWORD dwAttrib = GetFileAttributes(szPath);
 
 	return (dwAttrib != INVALID_FILE_ATTRIBUTES && (dwAttrib & FILE_ATTRIBUTE_DIRECTORY));
 #else
-    DIR* dir = opendir(szPath);
-    if (dir)
-    {
-        return 1;
-    }
-    else
-    {
-        return 0;
-    }
+	DIR* dir = opendir(szPath);
+	if (dir) {
+		return 1;
+	} else {
+		return 0;
+	}
 #endif
 }
 
-void window_size_callback(GLFWwindow* window, int width, int height)
-{
+void window_size_callback(GLFWwindow* window, int width, int height) {
 	LWCONTEXT* pLwc = (LWCONTEXT*)glfwGetWindowUserPointer(window);
 
 	lw_set_size(pLwc, width, height);
 }
 
-static GLFWwindow* create_glfw_window()
-{
+static GLFWwindow* create_glfw_window() {
 	GLFWwindow* window = glfwCreateWindow(
 		INITIAL_SCREEN_RESOLUTION_X,
 		INITIAL_SCREEN_RESOLUTION_Y,
@@ -81,8 +74,8 @@ static GLFWwindow* create_glfw_window()
 	HWND hwnd = glfwGetWin32Window(window);
 	int scaling_factor = GetDpiForWindow(hwnd) / 96;
 	glfwSetWindowSize(window,
-		INITIAL_SCREEN_RESOLUTION_X * scaling_factor,
-		INITIAL_SCREEN_RESOLUTION_Y * scaling_factor);
+					  INITIAL_SCREEN_RESOLUTION_X * scaling_factor,
+					  INITIAL_SCREEN_RESOLUTION_Y * scaling_factor);
 #endif
 	return window;
 }
@@ -103,13 +96,11 @@ static void make_multiple_instances_nonoverlapping(GLFWwindow* window, const REC
 				CloseHandle(third_mutex);
 				// fourth position
 				glfwSetWindowPos(window, work_area->left + window_rect_to_client_rect_dx + width + window_rect_to_client_rect_dx, work_area->top + window_rect_to_client_rect_dy + height + window_rect_to_client_rect_dy);
-			}
-			else {
+			} else {
 				// third position
 				glfwSetWindowPos(window, work_area->left + window_rect_to_client_rect_dx, work_area->top + window_rect_to_client_rect_dy + height + window_rect_to_client_rect_dy);
 			}
-		}
-		else {
+		} else {
 			// second position
 			glfwSetWindowPos(window, work_area->left + window_rect_to_client_rect_dx + width + window_rect_to_client_rect_dx, work_area->top + window_rect_to_client_rect_dy);
 		}
@@ -117,12 +108,10 @@ static void make_multiple_instances_nonoverlapping(GLFWwindow* window, const REC
 }
 #endif
 
-int main(int argc, char* argv[])
-{
+int main(int argc, char* argv[]) {
 	LOGI("LAIDOFF: Greetings.");
-    
-    while (!directory_exists("assets") && LwChangeDirectory(".."))
-	{
+
+	while (!directory_exists("assets") && LwChangeDirectory("..")) {
 	}
 
 	glfwSetErrorCallback(error_callback);
@@ -147,8 +136,8 @@ int main(int argc, char* argv[])
 #if (!LW_PLATFORM_RPI && !LW_PLATFORM_LINUX)
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 2);
-    glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GLFW_TRUE);
-    glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+	glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GLFW_TRUE);
+	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 	//glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_COMPAT_PROFILE);
 #endif
 
@@ -165,15 +154,13 @@ int main(int argc, char* argv[])
 
 	GLFWwindow* window = create_glfw_window();
 
-	if (!window)
-	{
+	if (!window) {
 		// Try with OpenGL API again
 		glfwWindowHint(GLFW_CLIENT_API, GLFW_OPENGL_API);
 
 		window = create_glfw_window();
 
-		if (!window)
-		{
+		if (!window) {
 			glfwTerminate();
 			exit(EXIT_FAILURE);
 		}
@@ -196,7 +183,7 @@ int main(int argc, char* argv[])
 
 	glfwSetWindowPos(window, work_area.left + window_rect_to_client_rect_dx, work_area.top + window_rect_to_client_rect_dy);
 #elif LW_PLATFORM_OSX
-    glfwSetWindowPos(window, 0, 0);
+	glfwSetWindowPos(window, 0, 0);
 #endif
 	// Register glfw event callbacks
 	glfwSetKeyCallback(window, key_callback);
@@ -241,8 +228,7 @@ int main(int argc, char* argv[])
 	lwimgui_init(window);
 #endif
 
-	while (!glfwWindowShouldClose(window))
-	{
+	while (!glfwWindowShouldClose(window)) {
 		glfwPollEvents();
 		lwc_prerender_mutable_context(pLwc);
 		lwc_render(pLwc);
@@ -250,7 +236,7 @@ int main(int argc, char* argv[])
 		lwimgui_render(window);
 #endif
 		glfwSwapBuffers(window);
-		
+
 	}
 	// If glfw loop is terminated without calling 'lw_app_quit'
 	// (i.e., by clicking 'X' button on the window)
@@ -265,19 +251,22 @@ int main(int argc, char* argv[])
 	glfwDestroyWindow(window);
 
 	glfwTerminate();
-	
+
 	destroy_ext_sound_lib();
 
 	lw_on_destroy(pLwc);
-	
+
 	LOGI("LAIDOFF: Goodbye.");
 
 	exit(EXIT_SUCCESS);
 }
 
-void lw_app_quit(LWCONTEXT* pLwc)
-{
+void lw_app_quit(LWCONTEXT* pLwc) {
 	pLwc->quit_request = 1;
 	zsock_wait(pLwc->logic_actor);
 	glfwSetWindowShouldClose(lw_get_window(pLwc), GLFW_TRUE);
+}
+
+void lw_start_text_input_activity() {
+	LOGE(LWLOGPOS "Sould not be called in win32");
 }

@@ -46,9 +46,14 @@
         </activity>
         -->
         <activity
-            android:name=".LoginActivity"
+            android:name=".TextInputActivity"
             android:label="@string/title_activity_login"
-            android:theme="@style/AppTheme"></activity>
+            android:theme="@style/AppTheme">
+            <intent-filter>
+                <action android:name="com.popsongremix.laidoff.TextInputActivity" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
     </application>
 
 </manifest>

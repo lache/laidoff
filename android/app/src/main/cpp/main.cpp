@@ -1,11 +1,8 @@
 #include <initializer_list>
 #include <memory>
 #include <jni.h>
-#include <errno.h>
-#include <cassert>
 #include <EGL/egl.h>
 #include <GLES2/gl2.h>
-#include <GLES2/gl2ext.h>
 #include <android/sensor.h>
 #include <android/log.h>
 #include <android_native_app_glue.h>
@@ -66,7 +63,8 @@ static jobject s_obj_from_cpp;
 static ALooper* s_looper_from_cpp;
 static bool s_java_activity_created;
 
-const static char* JAVA_NATIVE_ACTIVITY_NAME = "com.popsongremix.laidoff.LaidOffNativeActivity";
+#define JAVA_NATIVE_ACTIVITY_NAME "com.popsongremix.laidoff.LaidOffNativeActivity"
+#define TEXT_INPUT_ACTIVITY_NAME "com.popsongremix.laidoff.TextInputActivity"
 
 const char* egl_get_error_string(EGLint error)
 {
@@ -866,21 +864,23 @@ extern "C" void lw_app_quit(struct _LWCONTEXT* pLwc)
     exit(0);
 }
 
-void lw_start_text_input_activity() {
+extern "C" void lw_start_text_input_activity() {
 	JNIEnv *env;
 	s_vm_from_cpp->AttachCurrentThread(&env, NULL);
 	jobject lNativeActivity = s_obj_from_cpp;
 	jclass intentClass = env->FindClass("android/content/Intent");
-	jstring actionString =env->NewStringUTF("com.popsongremix.laidoff.LoginActivity");
+	jstring actionString = env->NewStringUTF(TEXT_INPUT_ACTIVITY_NAME);
 	jmethodID newIntent = env->GetMethodID(intentClass, "<init>", "()V");
 	jobject intent = env->AllocObject(intentClass);
 	env->CallVoidMethod(intent, newIntent);
-	jmethodID setAction = env->GetMethodID(intentClass, "setAction","(Ljava/lang/String;)Landroid/content/Intent;");
+	jmethodID setAction = env->GetMethodID(intentClass, "setAction",
+										   "(Ljava/lang/String;)Landroid/content/Intent;");
 	env->CallObjectMethod(intent, setAction, actionString);
 	jclass activityClass = env->FindClass("android/app/Activity");
-	jmethodID startActivity = env->GetMethodID(activityClass,"startActivity", "(Landroid/content/Intent;)V");
+	jmethodID startActivity = env->GetMethodID(activityClass, "startActivity",
+											   "(Landroid/content/Intent;)V");
 	jobject intentObject = env->NewObject(intentClass,newIntent);
-	env->CallVoidMethod(intentObject, setAction,actionString);
+	env->CallVoidMethod(intentObject, setAction, actionString);
 	env->CallVoidMethod(lNativeActivity, startActivity, intentObject);
 	s_vm_from_cpp->DetachCurrentThread();
 }
