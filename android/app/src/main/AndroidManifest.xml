@@ -1,30 +1,36 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-      package="com.popsongremix.laidoff"
-      android:versionCode="1"
-      android:versionName="1.0">
+    package="com.popsongremix.laidoff"
+    android:versionCode="1"
+    android:versionName="1.0">
 
     <uses-feature android:glEsVersion="0x00020000" />
     <!-- For server API -->
     <uses-permission android:name="android.permission.INTERNET" />
 
-    <application android:label="@string/app_name"
+    <!-- To auto-complete the email text field in the login form with the user's emails -->
+    <uses-permission android:name="android.permission.GET_ACCOUNTS" />
+    <uses-permission android:name="android.permission.READ_PROFILE" />
+    <uses-permission android:name="android.permission.READ_CONTACTS" />
+
+    <application
         android:icon="@drawable/laidoff"
-        >
+        android:label="@string/app_name">
 
         <!-- android.app.NativeActivity -->
-        <activity android:name=".LaidOffNativeActivity"
-                  android:label="@string/app_name"
-            android:theme="@android:style/Theme.NoTitleBar.Fullscreen"
-            android:screenOrientation="landscape"
+        <activity
+            android:name=".LaidOffNativeActivity"
             android:configChanges="keyboardHidden|keyboard|orientation|screenSize"
-                    >
-
-            <meta-data android:name="android.app.lib_name"
+            android:label="@string/app_name"
+            android:screenOrientation="landscape"
+            android:theme="@android:style/Theme.NoTitleBar.Fullscreen">
+            <meta-data
+                android:name="android.app.lib_name"
                 android:value="native-activity" />
 
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
@@ -39,5 +45,10 @@
             </intent-filter>
         </activity>
         -->
+        <activity
+            android:name=".LoginActivity"
+            android:label="@string/title_activity_login"
+            android:theme="@style/AppTheme"></activity>
     </application>
-</manifest> 
+
+</manifest>

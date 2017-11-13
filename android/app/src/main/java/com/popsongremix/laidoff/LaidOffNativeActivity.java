@@ -2,6 +2,7 @@ package com.popsongremix.laidoff;
 
 import android.app.NativeActivity;
 import android.content.Context;
+import android.content.Intent;
 import android.content.res.AssetManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -13,6 +14,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.WindowManager;
+import android.widget.EditText;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -111,6 +113,9 @@ public class LaidOffNativeActivity extends NativeActivity
             loadBitmap(assetName);
         }
         */
+
+        Intent intent = new Intent(this, LoginActivity.class);
+        startActivity(intent);
     }
 
     private void downloadResFromServer() {

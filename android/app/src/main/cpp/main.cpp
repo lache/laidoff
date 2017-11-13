@@ -865,3 +865,22 @@ extern "C" void lw_app_quit(struct _LWCONTEXT* pLwc)
 {
     exit(0);
 }
+
+void lw_start_text_input_activity() {
+	JNIEnv *env;
+	s_vm_from_cpp->AttachCurrentThread(&env, NULL);
+	jobject lNativeActivity = s_obj_from_cpp;
+	jclass intentClass = env->FindClass("android/content/Intent");
+	jstring actionString =env->NewStringUTF("com.popsongremix.laidoff.LoginActivity");
+	jmethodID newIntent = env->GetMethodID(intentClass, "<init>", "()V");
+	jobject intent = env->AllocObject(intentClass);
+	env->CallVoidMethod(intent, newIntent);
+	jmethodID setAction = env->GetMethodID(intentClass, "setAction","(Ljava/lang/String;)Landroid/content/Intent;");
+	env->CallObjectMethod(intent, setAction, actionString);
+	jclass activityClass = env->FindClass("android/app/Activity");
+	jmethodID startActivity = env->GetMethodID(activityClass,"startActivity", "(Landroid/content/Intent;)V");
+	jobject intentObject = env->NewObject(intentClass,newIntent);
+	env->CallVoidMethod(intentObject, setAction,actionString);
+	env->CallVoidMethod(lNativeActivity, startActivity, intentObject);
+	s_vm_from_cpp->DetachCurrentThread();
+}

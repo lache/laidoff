@@ -97,10 +97,14 @@ repositories {
     flatDir {
         dirs 'libs'
     }
+    google()
 }
 
 dependencies {
     compile fileTree(include: ['*.jar'], dir: 'libs')
+    compile "com.android.support:appcompat-v7:27.0.1"
+    compile 'com.android.support:design:27.0.1'
+
     //compile(name: 'game_api_v0.0.1', ext: 'aar')
 
     //compile 'com.squareup.retrofit2:retrofit:2.2.0'
