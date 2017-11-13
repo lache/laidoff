@@ -86,7 +86,7 @@ unsigned long hash(const unsigned char *str);
 void reset_battle_context(LWCONTEXT* pLwc);
 void lwc_start_logic_thread(LWCONTEXT* pLwc);
 void delete_all_rmsgs(LWCONTEXT* pLwc);
-void lw_start_text_input_activity(); // Android text input activity
+void lw_start_text_input_activity(LWCONTEXT* pLwc); // Android text input activity
 
 extern const float default_uv_offset[2];
 extern const float default_uv_scale[2];

@@ -9406,9 +9406,16 @@ fail:
 
 static int _wrap_lw_start_text_input_activity(lua_State* L) {
   int SWIG_arg = 0;
+  LWCONTEXT *arg1 = (LWCONTEXT *) 0 ;
   
-  SWIG_check_num_args("lw_start_text_input_activity",0,0)
-  lw_start_text_input_activity();
+  SWIG_check_num_args("lw_start_text_input_activity",1,1)
+  if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("lw_start_text_input_activity",1,"LWCONTEXT *");
+  
+  if (!SWIG_IsOK(SWIG_ConvertPtr(L,1,(void**)&arg1,SWIGTYPE_p__LWCONTEXT,0))){
+    SWIG_fail_ptr("lw_start_text_input_activity",1,SWIGTYPE_p__LWCONTEXT);
+  }
+  
+  lw_start_text_input_activity(arg1);
   
   return SWIG_arg;
   
@@ -23214,6 +23221,56 @@ fail:
 }
 
 
+static int _wrap_LWCONTEXT_last_text_input_seq_set(lua_State* L) {
+  int SWIG_arg = 0;
+  struct _LWCONTEXT *arg1 = (struct _LWCONTEXT *) 0 ;
+  int arg2 ;
+  
+  SWIG_check_num_args("_LWCONTEXT::last_text_input_seq",2,2)
+  if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("_LWCONTEXT::last_text_input_seq",1,"struct _LWCONTEXT *");
+  if(!lua_isnumber(L,2)) SWIG_fail_arg("_LWCONTEXT::last_text_input_seq",2,"int");
+  
+  if (!SWIG_IsOK(SWIG_ConvertPtr(L,1,(void**)&arg1,SWIGTYPE_p__LWCONTEXT,0))){
+    SWIG_fail_ptr("LWCONTEXT_last_text_input_seq_set",1,SWIGTYPE_p__LWCONTEXT);
+  }
+  
+  arg2 = (int)lua_tonumber(L, 2);
+  if (arg1) (arg1)->last_text_input_seq = arg2;
+  
+  return SWIG_arg;
+  
+  if(0) SWIG_fail;
+  
+fail:
+  lua_error(L);
+  return SWIG_arg;
+}
+
+
+static int _wrap_LWCONTEXT_last_text_input_seq_get(lua_State* L) {
+  int SWIG_arg = 0;
+  struct _LWCONTEXT *arg1 = (struct _LWCONTEXT *) 0 ;
+  int result;
+  
+  SWIG_check_num_args("_LWCONTEXT::last_text_input_seq",1,1)
+  if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("_LWCONTEXT::last_text_input_seq",1,"struct _LWCONTEXT *");
+  
+  if (!SWIG_IsOK(SWIG_ConvertPtr(L,1,(void**)&arg1,SWIGTYPE_p__LWCONTEXT,0))){
+    SWIG_fail_ptr("LWCONTEXT_last_text_input_seq_get",1,SWIGTYPE_p__LWCONTEXT);
+  }
+  
+  result = (int) ((arg1)->last_text_input_seq);
+  lua_pushnumber(L, (lua_Number) result); SWIG_arg++;
+  return SWIG_arg;
+  
+  if(0) SWIG_fail;
+  
+fail:
+  lua_error(L);
+  return SWIG_arg;
+}
+
+
 static int _wrap_new_LWCONTEXT(lua_State* L) {
   int SWIG_arg = 0;
   struct _LWCONTEXT *result = 0 ;
@@ -23372,6 +23429,7 @@ static swig_lua_attribute swig_LWCONTEXT_attributes[] = {
     { "puck_game_proj", _wrap_LWCONTEXT_puck_game_proj_get, _wrap_LWCONTEXT_puck_game_proj_set },
     { "tcp_host_addr", _wrap_LWCONTEXT_tcp_host_addr_get, _wrap_LWCONTEXT_tcp_host_addr_set },
     { "udp_host_addr", _wrap_LWCONTEXT_udp_host_addr_get, _wrap_LWCONTEXT_udp_host_addr_set },
+    { "last_text_input_seq", _wrap_LWCONTEXT_last_text_input_seq_get, _wrap_LWCONTEXT_last_text_input_seq_set },
     {0,0,0}
 };
 static swig_lua_method swig_LWCONTEXT_methods[]= {
@@ -49176,7 +49234,7 @@ static swig_lua_const_info swig_SwigModule_constants[]= {
     {SWIG_LUA_CONSTTAB_FLOAT("M_PI", (3.14159265358979323846))},
     {SWIG_LUA_CONSTTAB_FLOAT("LWEPSILON", (1e-3))},
     {SWIG_LUA_CONSTTAB_STRING("__LW_STRING_LINE__", "87")},
-    {SWIG_LUA_CONSTTAB_STRING("LWLOGPOS", "src\\lwmacro.h(88): ")},
+    {SWIG_LUA_CONSTTAB_STRING("LWLOGPOS", "src/lwmacro.h(88): ")},
     {SWIG_LUA_CONSTTAB_INT("MAX_FIELD_SPHERE", (50))},
     {SWIG_LUA_CONSTTAB_INT("MAX_FIELD_REMOTE_SPHERE", (50))},
     {SWIG_LUA_CONSTTAB_INT("MAX_USER_GEOM", (16))},

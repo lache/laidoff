@@ -14,6 +14,7 @@
 #include "lwlog.h"
 #include "czmq.h"
 #include "logic.h"
+#include "sysmsg.h"
 /**
  * Our saved state data.
  */
@@ -65,6 +66,9 @@ static bool s_java_activity_created;
 
 #define JAVA_NATIVE_ACTIVITY_NAME "com.popsongremix.laidoff.LaidOffNativeActivity"
 #define TEXT_INPUT_ACTIVITY_NAME "com.popsongremix.laidoff.TextInputActivity"
+
+extern "C" int lw_get_text_input_seq();
+extern "C" const char* lw_get_text_input();
 
 const char* egl_get_error_string(EGLint error)
 {
@@ -735,6 +739,11 @@ void android_main(struct android_app* state) {
              engine.resumed);
         */
 
+        if (engine.pLwc && engine.pLwc->last_text_input_seq != lw_get_text_input_seq()) {
+            show_sys_msg(engine.pLwc->def_sys_msg, lw_get_text_input());
+            engine.pLwc->last_text_input_seq = lw_get_text_input_seq();
+        }
+
         while ((ident=ALooper_pollAll(poll_without_timeout ? 0 : -1, NULL, &events, (void**)&source)) >= 0) {
             // Process this event.
             if (source != NULL) {
@@ -864,23 +873,7 @@ extern "C" void lw_app_quit(struct _LWCONTEXT* pLwc)
     exit(0);
 }
 
-extern "C" void lw_start_text_input_activity() {
-	JNIEnv *env;
-	s_vm_from_cpp->AttachCurrentThread(&env, NULL);
-	jobject lNativeActivity = s_obj_from_cpp;
-	jclass intentClass = env->FindClass("android/content/Intent");
-	jstring actionString = env->NewStringUTF(TEXT_INPUT_ACTIVITY_NAME);
-	jmethodID newIntent = env->GetMethodID(intentClass, "<init>", "()V");
-	jobject intent = env->AllocObject(intentClass);
-	env->CallVoidMethod(intent, newIntent);
-	jmethodID setAction = env->GetMethodID(intentClass, "setAction",
-										   "(Ljava/lang/String;)Landroid/content/Intent;");
-	env->CallObjectMethod(intent, setAction, actionString);
-	jclass activityClass = env->FindClass("android/app/Activity");
-	jmethodID startActivity = env->GetMethodID(activityClass, "startActivity",
-											   "(Landroid/content/Intent;)V");
-	jobject intentObject = env->NewObject(intentClass,newIntent);
-	env->CallVoidMethod(intentObject, setAction, actionString);
-	env->CallVoidMethod(lNativeActivity, startActivity, intentObject);
-	s_vm_from_cpp->DetachCurrentThread();
+extern "C" void lw_start_text_input_activity(LWCONTEXT* pLwc) {
+    pLwc->last_text_input_seq = lw_get_text_input_seq();
+    request_void_string_command("startTextInputActivity", "dummy");
 }

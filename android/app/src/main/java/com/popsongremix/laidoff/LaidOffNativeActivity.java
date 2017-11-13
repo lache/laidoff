@@ -218,4 +218,14 @@ public class LaidOffNativeActivity extends NativeActivity
 
         Log.d(LOG_TAG, "onResume()");
     }
+
+
+    public static void startTextInputActivity(String dummy) {
+        Intent intent = new Intent(INSTANCE, TextInputActivity.class);
+//        EditText editText = (EditText) findViewById(R.id.editText);
+//        String message = editText.getText().toString();
+//        intent.putExtra(EXTRA_MESSAGE, message);
+        INSTANCE.startActivity(intent);
+    }
+
 }

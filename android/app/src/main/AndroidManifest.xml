@@ -48,7 +48,8 @@
         <activity
             android:name=".TextInputActivity"
             android:label="@string/title_activity_login"
-            android:theme="@style/AppTheme">
+            android:windowSoftInputMode="stateVisible"
+            android:theme="@android:style/Theme.Translucent.NoTitleBar.Fullscreen">
             <intent-filter>
                 <action android:name="com.popsongremix.laidoff.TextInputActivity" />
                 <category android:name="android.intent.category.DEFAULT" />

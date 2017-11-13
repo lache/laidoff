@@ -1575,32 +1575,42 @@ static int jsoneq(const char *json, jsmntok_t *tok, const char *s) {
 	return -1;
 }
 
+#define ALIGNED_STR(S) ((const union { char s[sizeof S]; int align; }){ S }.s)
+
 static void parse_conf(LWCONTEXT* pLwc) {
 #define LW_CONF_FILE_NAME "conf.json"
+	const char *conf_path = ASSETS_BASE_PATH "conf" PATH_SEPARATOR LW_CONF_FILE_NAME;
 	jsmn_parser conf_parser;
 	jsmn_init(&conf_parser);
 	jsmntok_t conf_token[LW_MAX_CONF_TOKEN];
-	const char* conf_path = ASSETS_BASE_PATH "conf" PATH_SEPARATOR LW_CONF_FILE_NAME;
+	LOGI("sizeof(char) == %d", sizeof(char));
 	char *conf_str = create_string_from_file(conf_path);
-	int token_count = jsmn_parse(&conf_parser, conf_str, strlen(conf_str), conf_token, ARRAY_SIZE(conf_token));
-	jsmntok_t* t = conf_token;
-	if (token_count < 1 || t[0].type != JSMN_OBJECT) {
-		LOGE("Conf file broken...");
-		exit(-1);
-	}
-	LOGI("Conf file: %s", conf_path);
-	for (int i = 1; i < token_count; i++) {
-		if (jsoneq(conf_str, &t[i], "ClientTcpHost") == 0) {
-			LOGI("ClientTcpHost: %.*s", t[i + 1].end - t[i + 1].start, conf_str + t[i + 1].start);
-			strncpy(pLwc->tcp_host_addr.host, conf_str + t[i + 1].start, t[i + 1].end - t[i + 1].start);
-		} else if (jsoneq(conf_str, &t[i], "ConnPort") == 0) {
-			LOGI("ConnPort: %.*s", t[i + 1].end - t[i + 1].start, conf_str + t[i + 1].start);
-			strncpy(pLwc->tcp_host_addr.port_str, conf_str + t[i + 1].start, t[i + 1].end - t[i + 1].start);
-			pLwc->tcp_host_addr.port = atoi(pLwc->tcp_host_addr.port_str);
+	if (conf_str) {
+		int token_count = jsmn_parse(&conf_parser, conf_str, strlen(conf_str), conf_token, ARRAY_SIZE(conf_token));
+		jsmntok_t* t = conf_token;
+		if (token_count < 1 || t[0].type != JSMN_OBJECT) {
+			LOGE("Conf file broken...");
+            fflush(stdout);
+			exit(-1);
 		}
+		LOGI("Conf file: %s", conf_path);
+		for (int i = 1; i < token_count; i++) {
+			if (jsoneq(conf_str, &t[i], "ClientTcpHost") == 0) {
+				LOGI("ClientTcpHost: %.*s", t[i + 1].end - t[i + 1].start, conf_str + t[i + 1].start);
+				strncpy(pLwc->tcp_host_addr.host, conf_str + t[i + 1].start, t[i + 1].end - t[i + 1].start);
+			} else if (jsoneq(conf_str, &t[i], "ConnPort") == 0) {
+				LOGI("ConnPort: %.*s", t[i + 1].end - t[i + 1].start, conf_str + t[i + 1].start);
+				strncpy(pLwc->tcp_host_addr.port_str, conf_str + t[i + 1].start, t[i + 1].end - t[i + 1].start);
+				pLwc->tcp_host_addr.port = atoi(pLwc->tcp_host_addr.port_str);
+			}
+		}
+		release_string(conf_str);
+		conf_str = 0;
+	} else {
+		LOGE("Conf file not found!");
+        fflush(stdout);
+		exit(-2);
 	}
-	release_string(conf_str);
-	conf_str = 0;
 }
 
 LWCONTEXT* lw_init_initial_size(int width, int height) {

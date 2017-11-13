@@ -98,6 +98,10 @@ char* create_asset_file_from_downloaded(const char* filename, size_t* size, int 
 	strcat(download_path, get_filename_only(filename));
 
 	FILE* f = fopen(download_path, binary ? "rb" : "r");
+    if (f == 0) {
+        LOGE("create_asset_file_from_downloaded fopen failed! %s", download_path);
+        return 0;
+    }
 	int fseekResult = fseek(f, 0, SEEK_END);
 	*size = ftell(f);
 	fseek(f, 0, SEEK_SET);
@@ -136,7 +140,7 @@ char* create_binary_from_file(const char* filename, size_t* size)
 
 char* create_string_from_file(const char* filename)
 {
-	//LOGI("create_string_from_file: %s", filename);
+	LOGI("create_string_from_file: %s", filename);
 	int from_downloaded = 1;
 	size_t size;
 	if (from_downloaded) {

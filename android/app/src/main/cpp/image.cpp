@@ -81,6 +81,18 @@ extern "C" JNIEXPORT void JNICALL Java_com_popsongremix_laidoff_LaidOffNativeAct
     env->ReleaseStringUTFChars(assetpath, buffer);
 }
 
+// Global scope shared storage for native IME input text
+static char text_input[512];
+static int text_input_seq = 0;
+extern "C" JNIEXPORT void JNICALL Java_com_popsongremix_laidoff_TextInputActivity_sendInputText(JNIEnv * env, jclass cls, jstring text) {
+    const char *buffer = env->GetStringUTFChars(text, JNI_FALSE);
+
+    strcpy(text_input, buffer);
+    text_input_seq++;
+
+    env->ReleaseStringUTFChars(text, buffer);
+}
+
 extern "C" JNIEXPORT void JNICALL Java_com_popsongremix_laidoff_LaidOffNativeActivity_sendApkPath(JNIEnv * env, jclass cls, jstring apkPath, jstring filesPath) {
     const char *apkPathBuffer = env->GetStringUTFChars(apkPath, JNI_FALSE);
     set_apk_path(apkPathBuffer);
@@ -89,4 +101,12 @@ extern "C" JNIEXPORT void JNICALL Java_com_popsongremix_laidoff_LaidOffNativeAct
     const char *filesPathBuffer = env->GetStringUTFChars(filesPath, JNI_FALSE);
     set_files_path(filesPathBuffer);
     env->ReleaseStringUTFChars(filesPath, filesPathBuffer);
+}
+
+extern "C" const char* lw_get_text_input() {
+    return text_input;
+}
+
+extern "C" int lw_get_text_input_seq() {
+    return text_input_seq;
 }

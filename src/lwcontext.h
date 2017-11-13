@@ -339,6 +339,7 @@ typedef struct _LWCONTEXT {
 	mat4x4 puck_game_proj;
 	LWHOSTADDR tcp_host_addr;
 	LWHOSTADDR udp_host_addr;
+	int last_text_input_seq;
 } LWCONTEXT;
 
 #ifdef __cplusplus

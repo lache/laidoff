@@ -47,21 +47,19 @@ class DownloadTask extends AsyncTask<DownloadTaskParams, Void, GetFileResult> {
         urlConnection.setRequestMethod("HEAD");
         urlConnection.setDoOutput(false);
         urlConnection.connect();
-        boolean doDownload = false;
-        String etag = urlConnection.getHeaderField("Etag");
-        String etagServer = "";
-        if (etag != null) {
-            etagServer = etag.trim();
+        String etagServer = urlConnection.getHeaderField("Etag").trim();
             Log.i(LaidOffNativeActivity.LOG_TAG, String.format("%s - server Etag: %s", remotePath, etagServer));
-        }
 
         File etagFile = new File(fileAbsolutePath, localFilename + ".Etag");
 
+        boolean doDownload = false;
         if (etagFile.exists()) {
             String etagLocal = DownloadTask.getStringFromFile(etagFile).trim();
             if (etagLocal.compareTo(etagServer) != 0) {
                 doDownload = true;
             }
+        } else {
+            doDownload = true;
         }
 
         //set the path where we want to save the file

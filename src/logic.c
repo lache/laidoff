@@ -533,7 +533,7 @@ void toggle_network_poll(LWCONTEXT* pLwc) {
 }
 
 void start_text_input_activity(LWCONTEXT* pLwc) {
-	lw_start_text_input_activity();
+	lw_start_text_input_activity(pLwc);
 }
 
 void reset_runtime_context(LWCONTEXT* pLwc) {
