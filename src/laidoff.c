@@ -154,7 +154,7 @@ unsigned int swap_4_bytes(unsigned int num) {
 }
 
 void set_texture_parameter_values(const LWCONTEXT* pLwc, float x, float y, float w, float h,
-	float atlas_w, float atlas_h, int shader_index) {
+								  float atlas_w, float atlas_h, int shader_index) {
 
 	const float offset[2] = {
 		x / atlas_w,
@@ -341,7 +341,7 @@ create_shader(const char *shader_name, LWSHADER *pShader, const GLchar *vst, con
 
 void init_gl_shaders(LWCONTEXT* pLwc) {
 
-//#if LW_PLATFORM_WIN32 || LW_PLATFORM_OSX
+	//#if LW_PLATFORM_WIN32 || LW_PLATFORM_OSX
 #define GLSL_DIR_NAME "glsl"
 //#else
 //#define GLSL_DIR_NAME "glsles"
@@ -349,37 +349,37 @@ void init_gl_shaders(LWCONTEXT* pLwc) {
 
 	// Vertex Shader
 	char *default_vert_glsl = create_string_from_file(ASSETS_BASE_PATH
-		GLSL_DIR_NAME PATH_SEPARATOR "default-vert.glsl");
+													  GLSL_DIR_NAME PATH_SEPARATOR "default-vert.glsl");
 	char *skin_vert_glsl = create_string_from_file(ASSETS_BASE_PATH
-		GLSL_DIR_NAME PATH_SEPARATOR "skin-vert.glsl");
+												   GLSL_DIR_NAME PATH_SEPARATOR "skin-vert.glsl");
 	char *fan_vert_glsl = create_string_from_file(ASSETS_BASE_PATH
-		GLSL_DIR_NAME PATH_SEPARATOR "fan-vert.glsl");
+												  GLSL_DIR_NAME PATH_SEPARATOR "fan-vert.glsl");
 	char *emitter_vert_glsl = create_string_from_file(ASSETS_BASE_PATH
-		GLSL_DIR_NAME PATH_SEPARATOR "emitter-vert.glsl");
+													  GLSL_DIR_NAME PATH_SEPARATOR "emitter-vert.glsl");
 	char *emitter2_vert_glsl = create_string_from_file(ASSETS_BASE_PATH
-		GLSL_DIR_NAME PATH_SEPARATOR "emitter2-vert.glsl");
+													   GLSL_DIR_NAME PATH_SEPARATOR "emitter2-vert.glsl");
 	char *sphere_reflect_vert_glsl = create_string_from_file(ASSETS_BASE_PATH
-		GLSL_DIR_NAME PATH_SEPARATOR "sphere-reflect-vert.glsl");
+															 GLSL_DIR_NAME PATH_SEPARATOR "sphere-reflect-vert.glsl");
 
 	// Fragment Shader
 	char *default_frag_glsl = create_string_from_file(ASSETS_BASE_PATH
-		GLSL_DIR_NAME PATH_SEPARATOR "default-frag.glsl");
+													  GLSL_DIR_NAME PATH_SEPARATOR "default-frag.glsl");
 	char *color_frag_glsl = create_string_from_file(ASSETS_BASE_PATH
-		GLSL_DIR_NAME PATH_SEPARATOR "color-frag.glsl");
+													GLSL_DIR_NAME PATH_SEPARATOR "color-frag.glsl");
 	char *panel_frag_glsl = create_string_from_file(ASSETS_BASE_PATH
-		GLSL_DIR_NAME PATH_SEPARATOR "panel-frag.glsl");
+													GLSL_DIR_NAME PATH_SEPARATOR "panel-frag.glsl");
 	char *font_frag_glsl = create_string_from_file(ASSETS_BASE_PATH
-		GLSL_DIR_NAME PATH_SEPARATOR "font-frag.glsl");
+												   GLSL_DIR_NAME PATH_SEPARATOR "font-frag.glsl");
 	char *etc1_frag_glsl = create_string_from_file(ASSETS_BASE_PATH
-		GLSL_DIR_NAME PATH_SEPARATOR "etc1-frag.glsl");
+												   GLSL_DIR_NAME PATH_SEPARATOR "etc1-frag.glsl");
 	char *fan_frag_glsl = create_string_from_file(ASSETS_BASE_PATH
-		GLSL_DIR_NAME PATH_SEPARATOR "fan-frag.glsl");
+												  GLSL_DIR_NAME PATH_SEPARATOR "fan-frag.glsl");
 	char *emitter_frag_glsl = create_string_from_file(ASSETS_BASE_PATH
-		GLSL_DIR_NAME PATH_SEPARATOR "emitter-frag.glsl");
+													  GLSL_DIR_NAME PATH_SEPARATOR "emitter-frag.glsl");
 	char *emitter2_frag_glsl = create_string_from_file(ASSETS_BASE_PATH
-		GLSL_DIR_NAME PATH_SEPARATOR "emitter2-frag.glsl");
+													   GLSL_DIR_NAME PATH_SEPARATOR "emitter2-frag.glsl");
 	char *sphere_reflect_frag_glsl = create_string_from_file(ASSETS_BASE_PATH
-		GLSL_DIR_NAME PATH_SEPARATOR "sphere-reflect-frag.glsl");
+															 GLSL_DIR_NAME PATH_SEPARATOR "sphere-reflect-frag.glsl");
 
 	if (!default_vert_glsl) {
 		LOGE("init_gl_shaders: default-vert.glsl not loaded. Abort...");
@@ -525,7 +525,7 @@ static void load_fan_vbo(LWCONTEXT* pLwc) {
 	glGenBuffers(1, &pLwc->fan_vertex_buffer[LFVT_DEFAULT].vertex_buffer);
 	glBindBuffer(GL_ARRAY_BUFFER, pLwc->fan_vertex_buffer[LFVT_DEFAULT].vertex_buffer);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(LWFANVERTEX) * FAN_VERTEX_COUNT_PER_ARRAY,
-		fan_vertices, GL_STATIC_DRAW);
+				 fan_vertices, GL_STATIC_DRAW);
 	pLwc->fan_vertex_buffer[LFVT_DEFAULT].vertex_count = FAN_VERTEX_COUNT_PER_ARRAY;
 }
 
@@ -535,94 +535,94 @@ static void init_vbo(LWCONTEXT* pLwc) {
 
 	// LVT_BATTLE_BOWL_OUTER
 	load_vbo(pLwc, ASSETS_BASE_PATH "vbo" PATH_SEPARATOR "Bowl_Outer.vbo",
-		&pLwc->vertex_buffer[LVT_BATTLE_BOWL_OUTER]);
+			 &pLwc->vertex_buffer[LVT_BATTLE_BOWL_OUTER]);
 
 	// LVT_BATTLE_BOWL_INNER
 	load_vbo(pLwc, ASSETS_BASE_PATH "vbo" PATH_SEPARATOR "Bowl_Inner.vbo",
-		&pLwc->vertex_buffer[LVT_BATTLE_BOWL_INNER]);
+			 &pLwc->vertex_buffer[LVT_BATTLE_BOWL_INNER]);
 
 	// LVT_ENEMY_SCOPE
 	load_vbo(pLwc, ASSETS_BASE_PATH "vbo" PATH_SEPARATOR "EnemyScope.vbo",
-		&pLwc->vertex_buffer[LVT_ENEMY_SCOPE]);
+			 &pLwc->vertex_buffer[LVT_ENEMY_SCOPE]);
 
 	// LVT_PLAYER
 	load_vbo(pLwc, ASSETS_BASE_PATH "vbo" PATH_SEPARATOR "Player.vbo",
-		&pLwc->vertex_buffer[LVT_PLAYER]);
+			 &pLwc->vertex_buffer[LVT_PLAYER]);
 
 	// LVT_CUBE_WALL
 	load_vbo(pLwc, ASSETS_BASE_PATH "vbo" PATH_SEPARATOR "CubeWall.vbo",
-		&pLwc->vertex_buffer[LVT_CUBE_WALL]);
+			 &pLwc->vertex_buffer[LVT_CUBE_WALL]);
 
 	// LVT_HOME
 	load_vbo(pLwc, ASSETS_BASE_PATH "vbo" PATH_SEPARATOR "Home.vbo",
-		&pLwc->vertex_buffer[LVT_HOME]);
+			 &pLwc->vertex_buffer[LVT_HOME]);
 
 	// LVT_TRAIL
 	load_vbo(pLwc, ASSETS_BASE_PATH "vbo" PATH_SEPARATOR "Trail.vbo",
-		&pLwc->vertex_buffer[LVT_TRAIL]);
+			 &pLwc->vertex_buffer[LVT_TRAIL]);
 
 	// LVT_FLOOR
 	load_vbo(pLwc, ASSETS_BASE_PATH "vbo" PATH_SEPARATOR "Floor.vbo",
-		&pLwc->vertex_buffer[LVT_FLOOR]);
+			 &pLwc->vertex_buffer[LVT_FLOOR]);
 
 	// LVT_FLOOR2
 	load_vbo(pLwc, ASSETS_BASE_PATH "vbo" PATH_SEPARATOR "Floor2.vbo",
-		&pLwc->vertex_buffer[LVT_FLOOR2]);
+			 &pLwc->vertex_buffer[LVT_FLOOR2]);
 
 	// LVT_ROOM
 	load_vbo(pLwc, ASSETS_BASE_PATH "vbo" PATH_SEPARATOR "room.vbo",
-		&pLwc->vertex_buffer[LVT_ROOM]);
+			 &pLwc->vertex_buffer[LVT_ROOM]);
 
 	// LVT_BATTLEGROUND_FLOOR
 	load_vbo(pLwc, ASSETS_BASE_PATH "vbo" PATH_SEPARATOR "battleground-floor.vbo",
-		&pLwc->vertex_buffer[LVT_BATTLEGROUND_FLOOR]);
+			 &pLwc->vertex_buffer[LVT_BATTLEGROUND_FLOOR]);
 
 	// LVT_BATTLEGROUND_WALL
 	load_vbo(pLwc, ASSETS_BASE_PATH "vbo" PATH_SEPARATOR "battleground-wall.vbo",
-		&pLwc->vertex_buffer[LVT_BATTLEGROUND_WALL]);
+			 &pLwc->vertex_buffer[LVT_BATTLEGROUND_WALL]);
 
 	// LVT_SPHERE
 	load_vbo(pLwc, ASSETS_BASE_PATH "vbo" PATH_SEPARATOR "Sphere.vbo",
-		&pLwc->vertex_buffer[LVT_SPHERE]);
+			 &pLwc->vertex_buffer[LVT_SPHERE]);
 
 	// LVT_APT
 	load_vbo(pLwc, ASSETS_BASE_PATH "vbo" PATH_SEPARATOR "Apt.vbo",
-		&pLwc->vertex_buffer[LVT_APT]);
+			 &pLwc->vertex_buffer[LVT_APT]);
 
 	// LVT_BEAM
 	load_vbo(pLwc, ASSETS_BASE_PATH "vbo" PATH_SEPARATOR "Beam.vbo",
-		&pLwc->vertex_buffer[LVT_BEAM]);
+			 &pLwc->vertex_buffer[LVT_BEAM]);
 
 	// LVT_PUMP
 	load_vbo(pLwc, ASSETS_BASE_PATH "vbo" PATH_SEPARATOR "Pump.vbo",
-		&pLwc->vertex_buffer[LVT_PUMP]);
+			 &pLwc->vertex_buffer[LVT_PUMP]);
 
 	// LVT_OIL_TRUCK
 	load_vbo(pLwc, ASSETS_BASE_PATH "vbo" PATH_SEPARATOR "OilTruck.vbo",
-		&pLwc->vertex_buffer[LVT_OIL_TRUCK]);
+			 &pLwc->vertex_buffer[LVT_OIL_TRUCK]);
 
 	// LVT_CROSSBOW_ARROW
 	load_vbo(pLwc, ASSETS_BASE_PATH "vbo" PATH_SEPARATOR "crossbow-arrow.vbo",
-		&pLwc->vertex_buffer[LVT_CROSSBOW_ARROW]);
+			 &pLwc->vertex_buffer[LVT_CROSSBOW_ARROW]);
 
 	// LVT_CATAPULT_BALL
 	load_vbo(pLwc, ASSETS_BASE_PATH "vbo" PATH_SEPARATOR "catapult-ball.vbo",
-		&pLwc->vertex_buffer[LVT_CATAPULT_BALL]);
+			 &pLwc->vertex_buffer[LVT_CATAPULT_BALL]);
 
 	// LVT_DEVIL
 	load_vbo(pLwc, ASSETS_BASE_PATH "vbo" PATH_SEPARATOR "devil.vbo",
-		&pLwc->vertex_buffer[LVT_DEVIL]);
+			 &pLwc->vertex_buffer[LVT_DEVIL]);
 
 	// LVT_CRYSTAL
 	load_vbo(pLwc, ASSETS_BASE_PATH "vbo" PATH_SEPARATOR "crystal.vbo",
-		&pLwc->vertex_buffer[LVT_CRYSTAL]);
+			 &pLwc->vertex_buffer[LVT_CRYSTAL]);
 
 	// LVT_SPIRAL
 	load_vbo(pLwc, ASSETS_BASE_PATH "vbo" PATH_SEPARATOR "spiral.vbo",
-		&pLwc->vertex_buffer[LVT_SPIRAL]);
+			 &pLwc->vertex_buffer[LVT_SPIRAL]);
 	// LVT_PUCK
 	load_vbo(pLwc, ASSETS_BASE_PATH "vbo" PATH_SEPARATOR "puck.vbo",
-		&pLwc->vertex_buffer[LVT_PUCK]);
+			 &pLwc->vertex_buffer[LVT_PUCK]);
 
 	// LVT_LEFT_TOP_ANCHORED_SQUARE ~ LVT_RIGHT_BOTTOM_ANCHORED_SQUARE
 	// 9 anchored squares...
@@ -644,7 +644,7 @@ static void init_vbo(LWCONTEXT* pLwc) {
 		glGenBuffers(1, &pLwc->vertex_buffer[lvt].vertex_buffer);
 		glBindBuffer(GL_ARRAY_BUFFER, pLwc->vertex_buffer[lvt].vertex_buffer);
 		glBufferData(GL_ARRAY_BUFFER, sizeof(LWVERTEX) * VERTEX_COUNT_PER_ARRAY,
-			square_vertices, GL_STATIC_DRAW);
+					 square_vertices, GL_STATIC_DRAW);
 		pLwc->vertex_buffer[lvt].vertex_count = VERTEX_COUNT_PER_ARRAY;
 	}
 
@@ -652,39 +652,39 @@ static void init_vbo(LWCONTEXT* pLwc) {
 
 	// LSVT_TRIANGLE
 	load_skin_vbo(pLwc, ASSETS_BASE_PATH "svbo" PATH_SEPARATOR "Triangle.svbo",
-		&pLwc->skin_vertex_buffer[LSVT_TRIANGLE]);
+				  &pLwc->skin_vertex_buffer[LSVT_TRIANGLE]);
 
 	// LSVT_TREEPLANE
 	load_skin_vbo(pLwc, ASSETS_BASE_PATH "svbo" PATH_SEPARATOR "TreePlane.svbo",
-		&pLwc->skin_vertex_buffer[LSVT_TREEPLANE]);
+				  &pLwc->skin_vertex_buffer[LSVT_TREEPLANE]);
 
 	// LSVT_HUMAN
 	load_skin_vbo(pLwc, ASSETS_BASE_PATH "svbo" PATH_SEPARATOR "Human.svbo",
-		&pLwc->skin_vertex_buffer[LSVT_HUMAN]);
+				  &pLwc->skin_vertex_buffer[LSVT_HUMAN]);
 
 	// LSVT_DETACHPLANE
 	load_skin_vbo(pLwc, ASSETS_BASE_PATH "svbo" PATH_SEPARATOR "DetachPlane.svbo",
-		&pLwc->skin_vertex_buffer[LSVT_DETACHPLANE]);
+				  &pLwc->skin_vertex_buffer[LSVT_DETACHPLANE]);
 
 	// LSVT_GUNTOWER
 	load_skin_vbo(pLwc, ASSETS_BASE_PATH "svbo" PATH_SEPARATOR "guntower.svbo",
-		&pLwc->skin_vertex_buffer[LSVT_GUNTOWER]);
+				  &pLwc->skin_vertex_buffer[LSVT_GUNTOWER]);
 
 	// LSVT_TURRET
 	load_skin_vbo(pLwc, ASSETS_BASE_PATH "svbo" PATH_SEPARATOR "turret.svbo",
-		&pLwc->skin_vertex_buffer[LSVT_TURRET]);
+				  &pLwc->skin_vertex_buffer[LSVT_TURRET]);
 
 	// LSVT_CROSSBOW
 	load_skin_vbo(pLwc, ASSETS_BASE_PATH "svbo" PATH_SEPARATOR "crossbow.svbo",
-		&pLwc->skin_vertex_buffer[LSVT_CROSSBOW]);
+				  &pLwc->skin_vertex_buffer[LSVT_CROSSBOW]);
 
 	// LSVT_CATAPULT
 	load_skin_vbo(pLwc, ASSETS_BASE_PATH "svbo" PATH_SEPARATOR "catapult.svbo",
-		&pLwc->skin_vertex_buffer[LSVT_CATAPULT]);
+				  &pLwc->skin_vertex_buffer[LSVT_CATAPULT]);
 
 	// LSVT_PYRO
 	load_skin_vbo(pLwc, ASSETS_BASE_PATH "svbo" PATH_SEPARATOR "pyro.svbo",
-		&pLwc->skin_vertex_buffer[LSVT_PYRO]);
+				  &pLwc->skin_vertex_buffer[LSVT_PYRO]);
 
 	// === STATIC MESHES (FAN TYPE) ===
 	load_fan_vbo(pLwc);
@@ -695,40 +695,40 @@ static void init_vbo(LWCONTEXT* pLwc) {
 void set_vertex_attrib_pointer(const LWCONTEXT* pLwc, int shader_index) {
 	glEnableVertexAttribArray(pLwc->shader[shader_index].vpos_location);
 	glVertexAttribPointer(pLwc->shader[shader_index].vpos_location, 3, GL_FLOAT, GL_FALSE,
-		stride_in_bytes, (void *)0);
+						  stride_in_bytes, (void *)0);
 	glEnableVertexAttribArray(pLwc->shader[shader_index].vcol_location);
 	glVertexAttribPointer(pLwc->shader[shader_index].vcol_location, 3, GL_FLOAT, GL_FALSE,
-		stride_in_bytes, (void *)(sizeof(float) * 3));
+						  stride_in_bytes, (void *)(sizeof(float) * 3));
 	glEnableVertexAttribArray(pLwc->shader[shader_index].vuv_location);
 	glVertexAttribPointer(pLwc->shader[shader_index].vuv_location, 2, GL_FLOAT, GL_FALSE,
-		stride_in_bytes, (void *)(sizeof(float) * (3 + 3)));
+						  stride_in_bytes, (void *)(sizeof(float) * (3 + 3)));
 	glEnableVertexAttribArray(pLwc->shader[shader_index].vs9_location);
 	glVertexAttribPointer(pLwc->shader[shader_index].vs9_location, 2, GL_FLOAT, GL_FALSE,
-		stride_in_bytes, (void *)(sizeof(float) * (3 + 3 + 2)));
+						  stride_in_bytes, (void *)(sizeof(float) * (3 + 3 + 2)));
 }
 
 void set_skin_vertex_attrib_pointer(const LWCONTEXT* pLwc, int shader_index) {
 	glEnableVertexAttribArray(pLwc->shader[shader_index].vpos_location);
 	glVertexAttribPointer(pLwc->shader[shader_index].vpos_location, 3, GL_FLOAT, GL_FALSE,
-		skin_stride_in_bytes, (void *)0);
+						  skin_stride_in_bytes, (void *)0);
 	glEnableVertexAttribArray(pLwc->shader[shader_index].vcol_location);
 	glVertexAttribPointer(pLwc->shader[shader_index].vcol_location, 3, GL_FLOAT, GL_FALSE,
-		skin_stride_in_bytes, (void *)(sizeof(float) * 3));
+						  skin_stride_in_bytes, (void *)(sizeof(float) * 3));
 	glEnableVertexAttribArray(pLwc->shader[shader_index].vuv_location);
 	glVertexAttribPointer(pLwc->shader[shader_index].vuv_location, 2, GL_FLOAT, GL_FALSE,
-		skin_stride_in_bytes, (void *)(sizeof(float) * (3 + 3)));
+						  skin_stride_in_bytes, (void *)(sizeof(float) * (3 + 3)));
 	glEnableVertexAttribArray(pLwc->shader[shader_index].vbweight_location);
 	glVertexAttribPointer(pLwc->shader[shader_index].vbweight_location, 4, GL_FLOAT, GL_FALSE,
-		skin_stride_in_bytes, (void *)(sizeof(float) * (3 + 3 + 2)));
+						  skin_stride_in_bytes, (void *)(sizeof(float) * (3 + 3 + 2)));
 	glEnableVertexAttribArray(pLwc->shader[shader_index].vbmat_location);
 	glVertexAttribPointer(pLwc->shader[shader_index].vbmat_location, 4, GL_FLOAT, GL_FALSE,
-		skin_stride_in_bytes, (void *)(sizeof(float) * (3 + 3 + 2 + 4)));
+						  skin_stride_in_bytes, (void *)(sizeof(float) * (3 + 3 + 2 + 4)));
 }
 
 void set_fan_vertex_attrib_pointer(const LWCONTEXT* pLwc, int shader_index) {
 	glEnableVertexAttribArray(pLwc->shader[shader_index].vpos_location);
 	glVertexAttribPointer(pLwc->shader[shader_index].vpos_location, 3, GL_FLOAT, GL_FALSE,
-		fan_stride_in_bytes, (void *)0);
+						  fan_stride_in_bytes, (void *)0);
 }
 
 void set_ps_vertex_attrib_pointer(const LWCONTEXT* pLwc, int shader_index) {
@@ -941,12 +941,12 @@ void render_stat(const LWCONTEXT* pLwc) {
 	SET_COLOR_RGBA_FLOAT(text_block.color_emp_glyph, 1, 1, 0, 1);
 	SET_COLOR_RGBA_FLOAT(text_block.color_emp_outline, 0, 0, 0, 1);
 	char msg[128];
-    sprintf(msg, "L:%.1f\nR:%.1f\nRMSG:%d(%d-%d)",
+	sprintf(msg, "L:%.1f\nR:%.1f\nRMSG:%d(%d-%d)",
 		(float)(1.0 / deltatime_history_avg(pLwc->update_dt)),
-		(float)(1.0 / deltatime_history_avg(pLwc->render_dt)),
-		pLwc->rmsg_send_count - pLwc->rmsg_recv_count,
-		pLwc->rmsg_send_count,
-		pLwc->rmsg_recv_count
+			(float)(1.0 / deltatime_history_avg(pLwc->render_dt)),
+			pLwc->rmsg_send_count - pLwc->rmsg_recv_count,
+			pLwc->rmsg_send_count,
+			pLwc->rmsg_recv_count
 	);
 	text_block.text = msg;
 	text_block.text_bytelen = (int)strlen(text_block.text);
@@ -959,31 +959,31 @@ void render_stat(const LWCONTEXT* pLwc) {
 }
 
 void render_addr(const LWCONTEXT* pLwc) {
-    
-    const float aspect_ratio = (float)pLwc->width / pLwc->height;
-    
-    LWTEXTBLOCK text_block;
-    text_block.align = LTBA_LEFT_BOTTOM;
-    text_block.text_block_width = DEFAULT_TEXT_BLOCK_WIDTH;
-    text_block.text_block_line_height = DEFAULT_TEXT_BLOCK_LINE_HEIGHT_F;
-    text_block.size = DEFAULT_TEXT_BLOCK_SIZE_F;
-    SET_COLOR_RGBA_FLOAT(text_block.color_normal_glyph, 1, 1, 1, 1);
-    SET_COLOR_RGBA_FLOAT(text_block.color_normal_outline, 0, 0, 0, 1);
-    SET_COLOR_RGBA_FLOAT(text_block.color_emp_glyph, 1, 1, 0, 1);
-    SET_COLOR_RGBA_FLOAT(text_block.color_emp_outline, 0, 0, 0, 1);
-    char msg[128];
-    sprintf(msg, "T:%s:%d / U:%s:%d",
-            tcp_addr(), tcp_port(),
-            udp_addr(), udp_port()
-            );
-    text_block.text = msg;
-    text_block.text_bytelen = (int)strlen(text_block.text);
-    text_block.begin_index = 0;
-    text_block.end_index = text_block.text_bytelen;
-    text_block.text_block_x = -aspect_ratio;
-    text_block.text_block_y = -1.0f;
-    text_block.multiline = 1;
-    render_text_block(pLwc, &text_block);
+
+	const float aspect_ratio = (float)pLwc->width / pLwc->height;
+
+	LWTEXTBLOCK text_block;
+	text_block.align = LTBA_LEFT_BOTTOM;
+	text_block.text_block_width = DEFAULT_TEXT_BLOCK_WIDTH;
+	text_block.text_block_line_height = DEFAULT_TEXT_BLOCK_LINE_HEIGHT_F;
+	text_block.size = DEFAULT_TEXT_BLOCK_SIZE_F;
+	SET_COLOR_RGBA_FLOAT(text_block.color_normal_glyph, 1, 1, 1, 1);
+	SET_COLOR_RGBA_FLOAT(text_block.color_normal_outline, 0, 0, 0, 1);
+	SET_COLOR_RGBA_FLOAT(text_block.color_emp_glyph, 1, 1, 0, 1);
+	SET_COLOR_RGBA_FLOAT(text_block.color_emp_outline, 0, 0, 0, 1);
+	char msg[128];
+	sprintf(msg, "T:%s:%d / U:%s:%d",
+			lw_tcp_addr(pLwc), lw_tcp_port(pLwc),
+			lw_udp_addr(pLwc), lw_udp_port(pLwc)
+	);
+	text_block.text = msg;
+	text_block.text_bytelen = (int)strlen(text_block.text);
+	text_block.begin_index = 0;
+	text_block.end_index = text_block.text_bytelen;
+	text_block.text_block_x = -aspect_ratio;
+	text_block.text_block_y = -1.0f;
+	text_block.multiline = 1;
+	render_text_block(pLwc, &text_block);
 }
 
 void handle_rmsg_spawn(LWCONTEXT* pLwc, const LWFIELDRENDERCOMMAND* cmd) {
@@ -1067,7 +1067,7 @@ void handle_rmsg_rparams(LWCONTEXT* pLwc, const LWFIELDRENDERCOMMAND* cmd) {
 void handle_rmsg_bulletspawnheight(LWCONTEXT* pLwc, const LWFIELDRENDERCOMMAND* cmd) {
 	for (int i = 0; i < MAX_RENDER_QUEUE_CAPACITY; i++) {
 		if (pLwc->render_command[i].key == cmd->key) {
-			pLwc->render_command[i].bullet_spawn_height= cmd->bullet_spawn_height;
+			pLwc->render_command[i].bullet_spawn_height = cmd->bullet_spawn_height;
 			return;
 		}
 	}
@@ -1173,8 +1173,7 @@ void linear_interpolate_state(LWPSTATE* p, LWPSTATE* state_buffer, int state_buf
 				sample2_diff = d;
 				sample2_idx = i;
 			}
-		}
-		else {
+		} else {
 			if (sample1_diff > fabs(d)) {
 				sample1_diff = fabs(d);
 				sample1_idx = i;
@@ -1208,16 +1207,15 @@ void linear_interpolate_state(LWPSTATE* p, LWPSTATE* state_buffer, int state_buf
 		vec3_lerp(p->puck, state_buffer[sample1_idx].puck, state_buffer[sample2_idx].puck, (float)ratio);
 		vec3_lerp(p->target, state_buffer[sample1_idx].target, state_buffer[sample2_idx].target, (float)ratio);
 		//LOGI("Interpolate state ratio: %.3f", ratio);
-	}
-	else {
+	} else {
 		//LOGE("Error in logic");
 	}
 }
 
 void lwc_prerender_mutable_context(LWCONTEXT* pLwc) {
-    if (pLwc->udp == 0 || pLwc->udp->ready == 0) {
-        return;
-    }
+	if (pLwc->udp == 0 || pLwc->udp->ready == 0) {
+		return;
+	}
 	int size = ringbuffer_size(&pLwc->udp->state_ring_buffer);
 	const int state_sync_hz = 60;
 	if (size >= 1) {
@@ -1263,14 +1261,13 @@ void lwc_prerender_mutable_context(LWCONTEXT* pLwc) {
 				mat4x4 proj_view;
 				mat4x4_identity(proj_view);
 				mat4x4_mul(proj_view, pLwc->puck_game_proj, pLwc->puck_game_view);
-				
+
 				vec2 ui_point;
 				calculate_ui_point_from_world_point(aspect_ratio, proj_view, target_world_point, ui_point);
 				spawn_damage_text(pLwc, ui_point[0], ui_point[1], 0, "1", LDTC_UI);
 			}
 			memcpy(&pLwc->puck_game_state, &p, sizeof(LWPSTATE));
-		}
-		else {
+		} else {
 			LOGE("State buffer dequeue failed.");
 		}
 	}
@@ -1330,7 +1327,7 @@ void lwc_render(const LWCONTEXT* pLwc) {
 	render_sys_msg(pLwc, pLwc->def_sys_msg);
 	// Rendering stats
 	render_stat(pLwc);
-    render_addr(pLwc);
+	render_addr(pLwc);
 	// Set rendering flag to 0 (ignoring const-ness......)
 	lwcontext_set_rendering((LWCONTEXT*)pLwc, 0);
 }
@@ -1411,23 +1408,23 @@ static void load_pkm_hw_decoding(const char *tex_atlas_filename) {
 	u32 dataLength = ((extended_width >> 2) * (extended_height >> 2)) << 3;
 
 	glCompressedTexImage2D(GL_TEXTURE_2D, 0, GL_ETC1_RGB8_OES, extended_width, extended_height, 0,
-		dataLength, b + sizeof(LWPKM));
+						   dataLength, b + sizeof(LWPKM));
 #else
 	LWBITMAPCONTEXT bitmap_context;
 	create_image(tex_atlas_filename, &bitmap_context, 0);
 
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, bitmap_context.width, bitmap_context.height, 0,
-		GL_RGBA, GL_UNSIGNED_BYTE, bitmap_context.data);
+				 GL_RGBA, GL_UNSIGNED_BYTE, bitmap_context.data);
 	error_enum = glGetError();
 	LOGI("glTexImage2D (ETC1 software decompression) result (%dx%d): %d", bitmap_context.width, bitmap_context.height,
-		error_enum);
+		 error_enum);
 
 	release_image(&bitmap_context);
 #endif
 
 	error_enum = glGetError();
 	LOGI("glCompressedTexImage2D result (%dx%d): %d", extended_width, extended_height,
-		error_enum);
+		 error_enum);
 
 	release_binary(b);
 }
@@ -1439,11 +1436,11 @@ static void load_png_pkm_sw_decoding(LWCONTEXT* pLwc, int i) {
 
 	if (bitmap_context.width > 0 && bitmap_context.height > 0) {
 		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, bitmap_context.width, bitmap_context.height,
-			0,
-			GL_RGBA, GL_UNSIGNED_BYTE, bitmap_context.data);
+					 0,
+					 GL_RGBA, GL_UNSIGNED_BYTE, bitmap_context.data);
 		GLenum error_enum = glGetError();
 		LOGI("glTexImage2D result (%dx%d): %d", bitmap_context.width, bitmap_context.height,
-			error_enum);
+			 error_enum);
 
 		release_image(&bitmap_context);
 
@@ -1456,7 +1453,7 @@ static void load_png_pkm_sw_decoding(LWCONTEXT* pLwc, int i) {
 		LOGI("glGenerateMipmap result: %d", error_enum);
 	} else {
 		LOGE("create_image: %s not loaded. Width=%d, height=%d", tex_atlas_filename[i],
-			bitmap_context.width, bitmap_context.height);
+			 bitmap_context.width, bitmap_context.height);
 	}
 }
 
@@ -1541,13 +1538,13 @@ void load_test_font(LWCONTEXT* pLwc) {
 
 		//glTexImage2D(GL_TEXTURE_2D, 0, GL_R8, tga_header->width, tga_header->height, 0, GL_RED, GL_UNSIGNED_BYTE, b + sizeof(TGAHEADER));
 		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, tga_header->width, tga_header->height, 0, GL_RGBA,
-			GL_UNSIGNED_BYTE, tex_data);
+					 GL_UNSIGNED_BYTE, tex_data);
 
 		free(tex_data);
 
 		GLenum error_enum = glGetError();
 		LOGI("font glTexImage2D result (%dx%d): %d", tga_header->width, tga_header->height,
-			error_enum);
+			 error_enum);
 		glGenerateMipmap(GL_TEXTURE_2D);
 		error_enum = glGetError();
 		LOGI("font glGenerateMipmap result: %d", error_enum);
@@ -1570,6 +1567,48 @@ void init_action(LWCONTEXT* pLwc) {
 	}
 }
 
+static int jsoneq(const char *json, jsmntok_t *tok, const char *s) {
+	if (tok->type == JSMN_STRING && (int)strlen(s) == tok->end - tok->start &&
+		strncmp(json + tok->start, s, tok->end - tok->start) == 0) {
+		return 0;
+	}
+	return -1;
+}
+
+static void parse_conf(LWCONTEXT* pLwc) {
+#if LW_PLATFORM_ANDROID
+#define LW_CONF_FILE_NAME "conf.android.json"
+#elif LW_PLATFORM_IOS
+#define LW_CONF_FILE_NAME "conf.ios.json"
+#else
+#define LW_CONF_FILE_NAME "conf.json"
+#endif
+	jsmn_parser conf_parser;
+	jsmn_init(&conf_parser);
+	jsmntok_t conf_token[LW_MAX_CONF_TOKEN];
+	const char* conf_path = ASSETS_BASE_PATH "conf" PATH_SEPARATOR LW_CONF_FILE_NAME;
+	char *conf_str = create_string_from_file(conf_path);
+	int token_count = jsmn_parse(&conf_parser, conf_str, strlen(conf_str), conf_token, ARRAY_SIZE(conf_token));
+	jsmntok_t* t = conf_token;
+	if (token_count < 1 || t[0].type != JSMN_OBJECT) {
+		LOGE("Conf file broken...");
+		exit(-1);
+	}
+	LOGI("Conf file: %s", conf_path);
+	for (int i = 1; i < token_count; i++) {
+		if (jsoneq(conf_str, &t[i], "ClientTcpHost") == 0) {
+			LOGI("ClientTcpHost: %.*s", t[i + 1].end - t[i + 1].start, conf_str + t[i + 1].start);
+			strncpy(pLwc->tcp_host_addr.host, conf_str + t[i + 1].start, t[i + 1].end - t[i + 1].start);
+		} else if (jsoneq(conf_str, &t[i], "ConnPort") == 0) {
+			LOGI("ConnPort: %.*s", t[i + 1].end - t[i + 1].start, conf_str + t[i + 1].start);
+			strncpy(pLwc->tcp_host_addr.port_str, conf_str + t[i + 1].start, t[i + 1].end - t[i + 1].start);
+			pLwc->tcp_host_addr.port = atoi(pLwc->tcp_host_addr.port_str);
+		}
+	}
+	release_string(conf_str);
+	conf_str = 0;
+}
+
 LWCONTEXT* lw_init_initial_size(int width, int height) {
 
 	init_ext_image_lib();
@@ -1579,6 +1618,8 @@ LWCONTEXT* lw_init_initial_size(int width, int height) {
 	//test_image();
 
 	LWCONTEXT* pLwc = (LWCONTEXT *)calloc(1, sizeof(LWCONTEXT));
+
+	parse_conf(pLwc);
 
 	pLwc->width = width;
 	pLwc->height = height;

@@ -28,7 +28,7 @@
 #include "construct.h"
 #include "puckgamepacket.h"
 #include "lwuniqueid.h"
-
+#include "jsmn.h"
 #define MAX_RENDER_QUEUE_CAPACITY (512)
 
 typedef enum _LW_SHADER_TYPE {
@@ -78,10 +78,17 @@ extern const char* tex_font_atlas_filename[2];
 #define FAN_VERTEX_BUFFER_COUNT LFVT_COUNT
 #define PS_VERTEX_BUFFER_COUNT LPVT_COUNT
 #define MAX_DELTA_TIME_HISTORY (60)
-#define PUCK_GAME_STATE_RING_BUFFER_SIZE ()
+#define LW_MAX_CONF_TOKEN (128)
 typedef struct _LWPUCKGAME LWPUCKGAME;
 typedef struct _LWUDP LWUDP;
 typedef struct _LWTCP LWTCP;
+
+typedef struct _LWHOSTADDR {
+	char host[128];
+	char port_str[16];
+	unsigned long host_resolved;
+	int port;
+} LWHOSTADDR;
 
 typedef struct _LWCONTEXT {
 	// Window instance
@@ -330,6 +337,8 @@ typedef struct _LWCONTEXT {
 	const char* internal_data_path;
 	mat4x4 puck_game_view;
 	mat4x4 puck_game_proj;
+	LWHOSTADDR tcp_host_addr;
+	LWHOSTADDR udp_host_addr;
 } LWCONTEXT;
 
 #ifdef __cplusplus

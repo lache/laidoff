@@ -7,19 +7,20 @@
 #include "lwudp.h"
 #include "file.h"
 #include "puckgameupdate.h"
-#if LW_AUTO_BUILD || LW_PLATFORM_IOS
-#define LW_TCP_SERVER "puck-highend.popsongremix.com"
-#else
-//#define LW_TCP_SERVER "192.168.0.28"
+
+//#if LW_AUTO_BUILD || LW_PLATFORM_IOS
 //#define LW_TCP_SERVER "puck-highend.popsongremix.com"
-//#define LW_TCP_SERVER "puck.popsongremix.com"
-//#define LW_TCP_SERVER "221.147.71.76"
-#define LW_TCP_SERVER "14.39.208.86"
-#endif
-#define STR_HELPER(x) #x
-#define STR(x) STR_HELPER(x)
-#define LW_TCP_PORT 19856
-#define LW_TCP_PORT_STR STR(LW_TCP_PORT)
+//#else
+////#define LW_TCP_SERVER "192.168.0.28"
+////#define LW_TCP_SERVER "puck-highend.popsongremix.com"
+////#define LW_TCP_SERVER "puck.popsongremix.com"
+////#define LW_TCP_SERVER "221.147.71.76"
+//#define LW_TCP_SERVER "14.39.208.86"
+//#endif
+//#define STR_HELPER(x) #x
+//#define STR(x) STR_HELPER(x)
+//#define LW_TCP_PORT 19856
+//#define LW_TCP_PORT_STR STR(LW_TCP_PORT)
 
 #if LW_PLATFORM_WIN32
 #else
@@ -52,7 +53,7 @@ varname.Size = sizeof(vartype); \
 varname.Type = LPGP_##vartype
 
 
-LWTCP* new_tcp(const char* path_prefix) {
+LWTCP* new_tcp(const LWCONTEXT* pLwc, const char* path_prefix) {
 	LWTCP* tcp = (LWTCP*)malloc(sizeof(LWTCP));
 	memset(tcp, 0, sizeof(LWTCP));
 	tcp->ConnectSocket = INVALID_SOCKET;
@@ -61,7 +62,7 @@ LWTCP* new_tcp(const char* path_prefix) {
 	tcp->hints.ai_socktype = SOCK_STREAM;
 	tcp->hints.ai_protocol = IPPROTO_TCP;
 
-	tcp->iResult = getaddrinfo(LW_TCP_SERVER, LW_TCP_PORT_STR, &tcp->hints, &tcp->result);
+	tcp->iResult = getaddrinfo(lw_tcp_addr(pLwc), lw_tcp_port_str(pLwc), &tcp->hints, &tcp->result);
 	if (tcp->iResult != 0) {
 		LOGE("getaddrinfo failed with error: %d", tcp->iResult);
 		free(tcp);
@@ -151,7 +152,16 @@ int parse_recv_packets(LWCONTEXT* pLwc, LWTCP* tcp) {
 			pLwc->puck_game->token = p->token;
 			pLwc->puck_game->player_no = p->player_no;
 			memcpy(pLwc->puck_game->target_nickname, p->target_nickname, sizeof(p->target_nickname));
-			udp_update_addr(pLwc->udp, *(unsigned long*)p->ipaddr, p->port);
+			pLwc->udp_host_addr.host_resolved = *(unsigned long*)p->ipaddr;
+			sprintf(pLwc->udp_host_addr.host, "%d.%d.%d.%d",
+					(pLwc->udp_host_addr.host_resolved >> 0) & 0xff,
+					(pLwc->udp_host_addr.host_resolved >> 8) & 0xff ,
+					(pLwc->udp_host_addr.host_resolved >> 16) & 0xff,
+					(pLwc->udp_host_addr.host_resolved >> 24) & 0xff);
+			pLwc->udp_host_addr.port = p->port;
+			udp_update_addr(pLwc->udp,
+							pLwc->udp_host_addr.host_resolved,
+							pLwc->udp_host_addr.port);
 			// Since player_no updated
 			puck_game_reset_view_proj(pLwc, pLwc->puck_game);
 			//show_sys_msg(pLwc->def_sys_msg, "LWPMATCHED2 received");
@@ -243,10 +253,14 @@ int tcp_send_suddendeath(LWTCP* tcp, int battle_id, unsigned int token) {
 	return send(tcp->ConnectSocket, tcp->sendbuf, (int)sizeof(p), 0);
 }
 
-const char* tcp_addr() {
-    return LW_TCP_SERVER;
+const char* lw_tcp_addr(const LWCONTEXT* pLwc) {
+    return pLwc->tcp_host_addr.host;
 }
 
-int tcp_port() {
-    return LW_TCP_PORT;
+const char* lw_tcp_port_str(const LWCONTEXT* pLwc) {
+	return pLwc->tcp_host_addr.port_str;
+}
+
+int lw_tcp_port(const LWCONTEXT* pLwc) {
+    return pLwc->tcp_host_addr.port;
 }

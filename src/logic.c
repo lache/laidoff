@@ -823,7 +823,7 @@ static void s_logic_worker(zsock_t *pipe, void *args) {
 	// a thread which opens sockets.
 	pLwc->udp = new_udp();
 
-	pLwc->tcp = new_tcp(pLwc->internal_data_path);
+	pLwc->tcp = new_tcp(pLwc, pLwc->internal_data_path);
 
 	zloop_t* loop = zloop_new();
 	pLwc->logic_loop = loop;

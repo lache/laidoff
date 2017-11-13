@@ -6,19 +6,6 @@
 #include "lwtimepoint.h"
 #include "puckgame.h"
 
-#if LW_AUTO_BUILD || LW_PLATFORM_IOS
-#define LW_UDP_SERVER "puck-highend.popsongremix.com"
-#else
-//#define LW_UDP_SERVER "puck.popsongremix.com"
-//#define LW_UDP_SERVER "puck-highend.popsongremix.com"
-//#define LW_UDP_SERVER "192.168.0.28" // Site A
-//#define LW_UDP_SERVER "118.33.89.239" // Site B
-//#define LW_UDP_SERVER "221.147.71.76"
-#define LW_UDP_SERVER "14.39.208.86"
-#endif
-
-#define LW_UDP_PORT 10288
-
 static int make_socket_nonblocking(int sock) {
 #if defined(WIN32) || defined(_WIN32) || defined(IMN_PIM)
 	unsigned long arg = 1;
@@ -60,9 +47,9 @@ LWUDP* new_udp() {
 	//setup address structure
 	memset((char *)&udp->si_other, 0, sizeof(udp->si_other));
 	udp->si_other.sin_family = AF_INET;
-	struct hostent* he = gethostbyname(LW_UDP_SERVER);
-	struct in_addr** addr_list = (struct in_addr **) he->h_addr_list;
-	udp_update_addr(udp, addr_list[0]->s_addr, LW_UDP_PORT);
+	//struct hostent* he = gethostbyname(LW_UDP_SERVER);
+	//struct in_addr** addr_list = (struct in_addr **) he->h_addr_list;
+	//udp_update_addr(udp, addr_list[0]->s_addr, LW_UDP_PORT);
 	udp->tv.tv_sec = 0;
 	udp->tv.tv_usec = 0;
 	make_socket_nonblocking(udp->s);
@@ -87,7 +74,7 @@ void udp_send(LWUDP* udp, const char* data, int size) {
 	if (sendto(udp->s, data, size, 0, (struct sockaddr *) &udp->si_other, udp->slen) == SOCKET_ERROR)
 	{
 #if LW_PLATFORM_WIN32
-		LOGE("sendto() failed with error code : %d", WSAGetLastError());
+		//LOGE("sendto() failed with error code : %d", WSAGetLastError());
 #else
 		//LOGE("sendto() failed with error...");
 #endif
@@ -246,10 +233,14 @@ void udp_update(LWCONTEXT* pLwc, LWUDP* udp) {
 	}
 }
 
-const char* udp_addr() {
-    return LW_UDP_SERVER;
+const char* lw_udp_addr(const LWCONTEXT* pLwc) {
+    return pLwc->udp_host_addr.host;
 }
 
-int udp_port() {
-    return LW_UDP_PORT;
+unsigned long lw_udp_addr_resolved(const LWCONTEXT* pLwc) {
+	return pLwc->udp_host_addr.host_resolved;
+}
+
+int lw_udp_port(const LWCONTEXT* pLwc) {
+    return pLwc->udp_host_addr.port;
 }
