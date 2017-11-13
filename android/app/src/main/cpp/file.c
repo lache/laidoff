@@ -136,6 +136,7 @@ char* create_binary_from_file(const char* filename, size_t* size)
 
 char* create_string_from_file(const char* filename)
 {
+	LOGI("create_string_from_file: %s", filename);
 	int from_downloaded = 1;
 	size_t size;
 	if (from_downloaded) {

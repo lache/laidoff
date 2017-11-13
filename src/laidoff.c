@@ -1576,13 +1576,7 @@ static int jsoneq(const char *json, jsmntok_t *tok, const char *s) {
 }
 
 static void parse_conf(LWCONTEXT* pLwc) {
-#if LW_PLATFORM_ANDROID
-#define LW_CONF_FILE_NAME "conf.android.json"
-#elif LW_PLATFORM_IOS
-#define LW_CONF_FILE_NAME "conf.ios.json"
-#else
 #define LW_CONF_FILE_NAME "conf.json"
-#endif
 	jsmn_parser conf_parser;
 	jsmn_init(&conf_parser);
 	jsmntok_t conf_token[LW_MAX_CONF_TOKEN];
