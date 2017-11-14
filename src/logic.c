@@ -22,6 +22,7 @@
 #include "puckgameupdate.h"
 #include "lwudp.h"
 #include "lwtcp.h"
+#include "lwime.h"
 
 void toggle_font_texture_test_mode(LWCONTEXT* pLwc);
 
@@ -583,7 +584,7 @@ void reset_runtime_context(LWCONTEXT* pLwc) {
 		{ LWU("Server #1"), connect_to_server_1 },
 		{ LWU("레이테스트토글"), toggle_ray_test },
 		{ LWU("네트워크토글"), toggle_network_poll },
-		{ LWU("텍스트 입력"), start_text_input_activity },
+		{ LWU("닉네임 변경"), start_text_input_activity },
 	};
 	for (int i = 0; i < ARRAY_SIZE(handler_array); i++) {
 		pLwc->admin_button_command[i].name = handler_array[i].name;
@@ -723,6 +724,11 @@ void lwc_update(LWCONTEXT* pLwc, double delta_time) {
 	}
 
 	script_emit_logic_frame_finish(pLwc->L, (float)delta_time);
+
+	if (pLwc->last_text_input_seq != lw_get_text_input_seq()) {
+		show_sys_msg(pLwc->def_sys_msg, lw_get_text_input());
+		pLwc->last_text_input_seq = lw_get_text_input_seq();
+	}
 
 	((LWCONTEXT *)pLwc)->update_count++;
 

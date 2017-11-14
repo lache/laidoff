@@ -739,11 +739,6 @@ void android_main(struct android_app* state) {
              engine.resumed);
         */
 
-        if (engine.pLwc && engine.pLwc->last_text_input_seq != lw_get_text_input_seq()) {
-            show_sys_msg(engine.pLwc->def_sys_msg, lw_get_text_input());
-            engine.pLwc->last_text_input_seq = lw_get_text_input_seq();
-        }
-
         while ((ident=ALooper_pollAll(poll_without_timeout ? 0 : -1, NULL, &events, (void**)&source)) >= 0) {
             // Process this event.
             if (source != NULL) {

@@ -13,6 +13,7 @@
 #define LOGE(...) ((void)__android_log_print(ANDROID_LOG_ERROR, "native-activity", __VA_ARGS__))
 #define LOGA(...) ((void)__android_log_print(ANDROID_LOG_ASSERT, "native-activity", __VA_ARGS__))
 #endif
+#include "lwime.h"
 
 extern "C" void register_asset(const char* asset_path, int start_offset, int length);
 extern "C" void set_apk_path(const char* apk_path);
@@ -81,14 +82,11 @@ extern "C" JNIEXPORT void JNICALL Java_com_popsongremix_laidoff_LaidOffNativeAct
     env->ReleaseStringUTFChars(assetpath, buffer);
 }
 
-// Global scope shared storage for native IME input text
-static char text_input[512];
-static int text_input_seq = 0;
 extern "C" JNIEXPORT void JNICALL Java_com_popsongremix_laidoff_TextInputActivity_sendInputText(JNIEnv * env, jclass cls, jstring text) {
     const char *buffer = env->GetStringUTFChars(text, JNI_FALSE);
 
-    strcpy(text_input, buffer);
-    text_input_seq++;
+    strcpy(lw_get_text_input_for_writing(), buffer);
+    lw_increase_text_input_seq();
 
     env->ReleaseStringUTFChars(text, buffer);
 }
@@ -101,12 +99,4 @@ extern "C" JNIEXPORT void JNICALL Java_com_popsongremix_laidoff_LaidOffNativeAct
     const char *filesPathBuffer = env->GetStringUTFChars(filesPath, JNI_FALSE);
     set_files_path(filesPathBuffer);
     env->ReleaseStringUTFChars(filesPath, filesPathBuffer);
-}
-
-extern "C" const char* lw_get_text_input() {
-    return text_input;
-}
-
-extern "C" int lw_get_text_input_seq() {
-    return text_input_seq;
 }
