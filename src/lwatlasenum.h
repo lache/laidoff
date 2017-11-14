@@ -94,6 +94,8 @@ typedef enum _LW_ATLAS_ENUM
     LAE_BUTTON_DASH_ALPHA,
     LAE_BUTTON_JUMP,
     LAE_BUTTON_JUMP_ALPHA,
+
+    LAE_ARROW,
     
     LAE_COUNT,
 } LW_ATLAS_ENUM;
@@ -189,6 +191,8 @@ static const char *tex_atlas_filename[] = {
     ASSETS_BASE_PATH "ktx" PATH_SEPARATOR "button-dash-a_alpha.ktx",
     ASSETS_BASE_PATH "ktx" PATH_SEPARATOR "button-jump-a.ktx",
     ASSETS_BASE_PATH "ktx" PATH_SEPARATOR "button-jump-a_alpha.ktx",
+
+    ASSETS_BASE_PATH "ktx" PATH_SEPARATOR "arrow.ktx",
 };
 
 #define MAX_TEX_ATLAS LAE_COUNT

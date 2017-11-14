@@ -357,8 +357,15 @@ static void render_floor(const LWCONTEXT *pLwc, const mat4x4 proj, const LWPUCKG
     glUniform3fv(shader->sphere_col, 3, (const float*)sphere_render_uniform->sphere_col);
     glUniform1fv(shader->sphere_speed, 3, (const float*)sphere_render_uniform->sphere_speed);
     glUniform1fv(shader->sphere_move_rad, 3, (const float*)sphere_render_uniform->sphere_move_rad);
+
+    float arrow_center[2] = {
+        (sphere_render_uniform->sphere_pos[0][0] * 5 / 4.0f + 4.0f / 10 * 5),
+        -(sphere_render_uniform->sphere_pos[0][1] * 5 / 4.0f - 4.0f / 10 * 5),
+    };
+    glUniform2fv(shader->arrow_center, 1, arrow_center);
     
     const int tex_index = pLwc->tex_atlas[LAE_PUCK_FLOOR_KTX];
+    const int arrow_tex_index = pLwc->tex_atlas[LAE_ARROW];
     mat4x4 rot;
     mat4x4_identity(rot);
     
@@ -391,9 +398,19 @@ static void render_floor(const LWCONTEXT *pLwc, const mat4x4 proj, const LWPUCKG
     
     glBindBuffer(GL_ARRAY_BUFFER, pLwc->vertex_buffer[lvt].vertex_buffer);
     bind_all_vertex_attrib(pLwc, lvt);
+    
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, tex_index);
+    glUniform1i(pLwc->shader[shader_index].diffuse_location, 0);
     set_tex_filter(GL_LINEAR, GL_LINEAR);
+
+    glActiveTexture(GL_TEXTURE1);
+    glBindTexture(GL_TEXTURE_2D, arrow_tex_index);
+    glUniform1i(pLwc->shader[shader_index].diffuse_arrow_location, 1);
+    set_tex_filter(GL_LINEAR, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
+
     //set_tex_filter(GL_NEAREST, GL_NEAREST);
     glUniformMatrix4fv(shader->mvp_location, 1, GL_FALSE, (const GLfloat*)proj_view_model);
     glUniformMatrix4fv(shader->m_location, 1, GL_FALSE, (const GLfloat*)model);
@@ -436,6 +453,7 @@ void lwc_render_physics(const LWCONTEXT* pLwc, const mat4x4 view, const mat4x4 p
     
     //int shader_index = LWST_DEFAULT;
     int wall_shader_index = LWST_SPHERE_REFLECT;
+    int floor_shader_index = LWST_SPHERE_REFLECT_FLOOR;
     
     int single_play = pLwc->puck_game->battle_id == 0;
     int remote = !single_play && !pLwc->udp->master;
@@ -497,7 +515,7 @@ void lwc_render_physics(const LWCONTEXT* pLwc, const mat4x4 view, const mat4x4 p
     const LWPUCKGAMEPLAYER* player = &puck_game->player;
     const LWPUCKGAMEPLAYER* target = &puck_game->target;
     // Floor
-    render_floor(pLwc, proj, puck_game, wall_shader_index, view, &sphere_render_uniform);
+    render_floor(pLwc, proj, puck_game, floor_shader_index, view, &sphere_render_uniform);
     // North wall
     render_wall(pLwc, proj, puck_game, wall_shader_index, view, 0, 2, 0, (float)LWDEG2RAD(90), 0,
                 LVT_CENTER_BOTTOM_ANCHORED_SQUARE, 2.0f, wall_height, 2.0f, &sphere_render_uniform);
