@@ -322,6 +322,8 @@ create_shader(const char *shader_name, LWSHADER *pShader, const GLchar *vst, con
     pShader->sphere_move_rad = glGetUniformLocation(pShader->program, "sphere_move_rad");
     pShader->arrow_center = glGetUniformLocation(pShader->program, "arrow_center");
     pShader->arrow_angle = glGetUniformLocation(pShader->program, "arrow_angle");
+    pShader->arrow_scale = glGetUniformLocation(pShader->program, "arrow_scale");
+    pShader->arrowRotMat2 = glGetUniformLocation(pShader->program, "arrowRotMat2");
 
     // Attribs
     pShader->vpos_location = glGetAttribLocation(pShader->program, "vPos");

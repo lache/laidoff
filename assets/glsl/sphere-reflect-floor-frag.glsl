@@ -22,8 +22,10 @@ uniform float sphere_speed[3];
 uniform float sphere_move_rad[3];
 uniform vec2 arrow_center;
 uniform float arrow_angle;
+uniform float arrow_scale;
 varying vec3 color;
 varying vec2 uv;
+varying vec2 uvArrow;
 varying vec3 v;
 // Outputs
 FRAG_COLOR_OUTPUT_DECL
@@ -31,7 +33,7 @@ FRAG_COLOR_OUTPUT_DECL
 void main()
 {
     vec4 t = TEX(diffuse, uv); // + vec4(color, 0.0);
-	t += TEX(diffuse_arrow, (uv - arrow_center) / 1);
+	t += TEX(diffuse_arrow, uvArrow);
     fragColor = (1.0 - overlay_color_ratio) * t + overlay_color_ratio * vec4(overlay_color, t.a);
     fragColor.a *= alpha_multiplier;
 	

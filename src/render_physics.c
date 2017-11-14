@@ -16,6 +16,9 @@ typedef struct _LWSPHERERENDERUNIFORM {
     float sphere_col[3][3];
     float sphere_speed[3];
     float sphere_move_rad[3];
+    float arrowRotMat2[2][2];
+    float arrow_center[2];
+    float arrow_scale;
 } LWSPHERERENDERUNIFORM;
 
 static void render_go(const LWCONTEXT* pLwc, const mat4x4 view, const mat4x4 proj, const LWPUCKGAMEOBJECT* go, int tex_index, float render_scale, const float* remote_pos, const mat4x4 remote_rot, int remote, float speed) {
@@ -357,12 +360,9 @@ static void render_floor(const LWCONTEXT *pLwc, const mat4x4 proj, const LWPUCKG
     glUniform3fv(shader->sphere_col, 3, (const float*)sphere_render_uniform->sphere_col);
     glUniform1fv(shader->sphere_speed, 3, (const float*)sphere_render_uniform->sphere_speed);
     glUniform1fv(shader->sphere_move_rad, 3, (const float*)sphere_render_uniform->sphere_move_rad);
-
-    float arrow_center[2] = {
-        (sphere_render_uniform->sphere_pos[0][0] * 5 / 4.0f + 4.0f / 10 * 5),
-        -(sphere_render_uniform->sphere_pos[0][1] * 5 / 4.0f - 4.0f / 10 * 5),
-    };
-    glUniform2fv(shader->arrow_center, 1, arrow_center);
+    glUniformMatrix2fv(shader->arrowRotMat2, 1, 0, (const float*)sphere_render_uniform->arrowRotMat2);
+    glUniform2fv(shader->arrow_center, 1, sphere_render_uniform->arrow_center);
+    glUniform1f(shader->arrow_scale, sphere_render_uniform->arrow_scale);
     
     const int tex_index = pLwc->tex_atlas[LAE_PUCK_FLOOR_KTX];
     const int arrow_tex_index = pLwc->tex_atlas[LAE_ARROW];
@@ -408,8 +408,8 @@ static void render_floor(const LWCONTEXT *pLwc, const mat4x4 proj, const LWPUCKG
     glBindTexture(GL_TEXTURE_2D, arrow_tex_index);
     glUniform1i(pLwc->shader[shader_index].diffuse_arrow_location, 1);
     set_tex_filter(GL_LINEAR, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 
     //set_tex_filter(GL_NEAREST, GL_NEAREST);
     glUniformMatrix4fv(shader->mvp_location, 1, GL_FALSE, (const GLfloat*)proj_view_model);
@@ -455,7 +455,7 @@ void lwc_render_physics(const LWCONTEXT* pLwc, const mat4x4 view, const mat4x4 p
     int wall_shader_index = LWST_SPHERE_REFLECT;
     int floor_shader_index = LWST_SPHERE_REFLECT_FLOOR;
     
-    int single_play = pLwc->puck_game->battle_id == 0;
+    int single_play = puck_game->battle_id == 0;
     int remote = !single_play && !pLwc->udp->master;
     const float* player_pos = puck_game->go[LPGO_PLAYER].pos;
     const float* target_pos = puck_game->go[LPGO_TARGET].pos;
@@ -472,6 +472,14 @@ void lwc_render_physics(const LWCONTEXT* pLwc, const mat4x4 view, const mat4x4 p
         remote_puck_pos = puck_pos;
         remote_target_pos = target_pos;
     }
+    
+    const float* player_controlled_pos = remote_player_pos;
+    if (puck_game->player_no == 2) {
+        player_controlled_pos = remote_target_pos;
+    }
+    
+    float arrow_scale = 0.5f;
+    float arrowAngle = LWDEG2RAD(70.0f);
     
     LWSPHERERENDERUNIFORM sphere_render_uniform = {
         // float sphere_col_ratio[3];
@@ -500,6 +508,18 @@ void lwc_render_physics(const LWCONTEXT* pLwc, const mat4x4 view, const mat4x4 p
             !remote ? puck_game->go[LPGO_TARGET].move_rad : state->target_move_rad,
             !remote ? puck_game->go[LPGO_PUCK].move_rad : state->puck_move_rad
         },
+        // float arrowRotMat[2][2];
+        {
+            { cosf(-arrowAngle), -sinf(-arrowAngle) },
+            { sinf(-arrowAngle), +cosf(-arrowAngle) },
+        },
+        // float arrow_center[2];
+        {
+            +(player_controlled_pos[0] / puck_game->world_size / arrow_scale),
+            -(player_controlled_pos[1] / puck_game->world_size / arrow_scale),
+        },
+        // float arrow_scale;
+        arrow_scale,
     };
     // Switch sphere reflection color if player number is 2.
     if (puck_game->player_no == 2) {

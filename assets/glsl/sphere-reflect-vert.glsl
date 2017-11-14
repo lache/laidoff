@@ -11,14 +11,18 @@ uniform vec2 vUvOffset;
 uniform vec2 vUvScale;
 uniform vec2 vS9Offset;
 uniform mat4 M;
+uniform vec2 arrow_center;
+uniform float arrow_scale;
+uniform mat2 arrowRotMat2;
 attribute vec3 vPos;
 attribute vec3 vCol;
 attribute vec2 vUv;
 attribute vec2 vS9;
 varying vec3 color;
 varying vec2 uv;
+varying vec2 uvArrow;
 varying vec3 v;
-
+#define M_PI 3.1415926535897932384626433832795
 void main()
 {
     vec3 p = vPos;
@@ -28,4 +32,8 @@ void main()
     gl_Position = pos;
     color = vCol;
     uv = vUvOffset + vUvScale * vUv;
+
+    vec2 uvArrowBase = vUv / arrow_scale - arrow_scale - (0.5 + arrow_center);
+    uvArrow = arrowRotMat2 * uvArrowBase + 0.5;
+    //uvArrow = vUv;
 }

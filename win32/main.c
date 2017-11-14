@@ -269,6 +269,7 @@ void lw_app_quit(LWCONTEXT* pLwc) {
     glfwSetWindowShouldClose(lw_get_window(pLwc), GLFW_TRUE);
 }
 
+#if LW_PLATFORM_WIN32
 INT_PTR CALLBACK TextInputProc(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam) {
     wchar_t lpszTextInput[128];
     WORD cchTextInput;
@@ -372,4 +373,8 @@ void lw_start_text_input_activity(LWCONTEXT* pLwc) {
               hWnd,								// owner window
               TextInputProc);					// dialog box window procedure
 }
-
+#else
+void lw_start_text_input_activity(LWCONTEXT* pLwc) {
+    LOGE("Not implemented yet..");
+}
+#endif

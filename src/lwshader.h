@@ -70,4 +70,6 @@ typedef struct _LWSHADER {
 	GLint sphere_move_rad;
     GLint arrow_center;
     GLint arrow_angle;
+    GLint arrow_scale;
+    GLint arrowRotMat2;
 } LWSHADER;
