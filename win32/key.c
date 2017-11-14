@@ -34,6 +34,10 @@ static void handle_move_key_press_release(LWCONTEXT* pLwc, int key, int action) 
 		lw_press_key_space(pLwc);
 	}
 
+    if (key == GLFW_KEY_A && action == GLFW_PRESS) {
+        lw_press_key_a(pLwc);
+    }
+
 	if (key == GLFW_KEY_Z && action == GLFW_PRESS) {
 		lw_press_key_z(pLwc);
 	}
@@ -65,6 +69,10 @@ static void handle_move_key_press_release(LWCONTEXT* pLwc, int key, int action) 
 	if (key == GLFW_KEY_SPACE && action == GLFW_RELEASE) {
 		lw_release_key_space(pLwc);
 	}
+
+    if (key == GLFW_KEY_A && action == GLFW_RELEASE) {
+        lw_release_key_a(pLwc);
+    }
 
 	if (key == GLFW_KEY_Z && action == GLFW_RELEASE) {
 		lw_release_key_z(pLwc);
@@ -135,10 +143,6 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
 
 	if (key == GLFW_KEY_R && action == GLFW_PRESS) {
 		lw_trigger_reset(pLwc);
-	}
-
-	if (key == GLFW_KEY_A && action == GLFW_PRESS) {
-		
 	}
 
 	if (key == GLFW_KEY_U && (action == GLFW_PRESS || action == GLFW_REPEAT)) {

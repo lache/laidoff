@@ -234,7 +234,7 @@ LWTCPSERVER* new_tcp_server() {
 	}
 	LOGI("TCP Socket created.\n");
 
-    if (setsockopt(server->s, SOL_SOCKET, SO_REUSEADDR, &(int){ 1 }, sizeof(int)) < 0) {
+    if (setsockopt(server->s, SOL_SOCKET, SO_REUSEADDR, (const char*)&(int){ 1 }, sizeof(int)) < 0) {
         LOGE("setsockopt(SO_REUSEADDR) failed");
     }
 

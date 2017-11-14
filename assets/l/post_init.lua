@@ -95,6 +95,7 @@ function on_ui_event(id)
 		return 0
 	elseif id == 'jump_button' then
 		print('[script]button_jump')
+		lo.puck_game_jump(c, c.puck_game)
 		-- temporarily for rematch
 		lo.puck_game_rematch(c, c.puck_game)
 		return 0

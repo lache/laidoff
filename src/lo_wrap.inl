@@ -7288,6 +7288,29 @@ fail:
 }
 
 
+static int _wrap_lw_press_key_a(lua_State* L) {
+  int SWIG_arg = 0;
+  LWCONTEXT *arg1 = (LWCONTEXT *) 0 ;
+  
+  SWIG_check_num_args("lw_press_key_a",1,1)
+  if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("lw_press_key_a",1,"LWCONTEXT *");
+  
+  if (!SWIG_IsOK(SWIG_ConvertPtr(L,1,(void**)&arg1,SWIGTYPE_p__LWCONTEXT,0))){
+    SWIG_fail_ptr("lw_press_key_a",1,SWIGTYPE_p__LWCONTEXT);
+  }
+  
+  lw_press_key_a(arg1);
+  
+  return SWIG_arg;
+  
+  if(0) SWIG_fail;
+  
+fail:
+  lua_error(L);
+  return SWIG_arg;
+}
+
+
 static int _wrap_lw_press_key_z(lua_State* L) {
   int SWIG_arg = 0;
   LWCONTEXT *arg1 = (LWCONTEXT *) 0 ;
@@ -7461,6 +7484,29 @@ static int _wrap_lw_release_key_space(lua_State* L) {
   }
   
   lw_release_key_space(arg1);
+  
+  return SWIG_arg;
+  
+  if(0) SWIG_fail;
+  
+fail:
+  lua_error(L);
+  return SWIG_arg;
+}
+
+
+static int _wrap_lw_release_key_a(lua_State* L) {
+  int SWIG_arg = 0;
+  LWCONTEXT *arg1 = (LWCONTEXT *) 0 ;
+  
+  SWIG_check_num_args("lw_release_key_a",1,1)
+  if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("lw_release_key_a",1,"LWCONTEXT *");
+  
+  if (!SWIG_IsOK(SWIG_ConvertPtr(L,1,(void**)&arg1,SWIGTYPE_p__LWCONTEXT,0))){
+    SWIG_fail_ptr("lw_release_key_a",1,SWIGTYPE_p__LWCONTEXT);
+  }
+  
+  lw_release_key_a(arg1);
   
   return SWIG_arg;
   
@@ -49015,6 +49061,36 @@ fail:
 }
 
 
+static int _wrap_puck_game_jump(lua_State* L) {
+  int SWIG_arg = 0;
+  LWCONTEXT *arg1 = (LWCONTEXT *) 0 ;
+  LWPUCKGAME *arg2 = (LWPUCKGAME *) 0 ;
+  
+  SWIG_check_num_args("puck_game_jump",2,2)
+  if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("puck_game_jump",1,"LWCONTEXT *");
+  if(!SWIG_isptrtype(L,2)) SWIG_fail_arg("puck_game_jump",2,"LWPUCKGAME *");
+  
+  if (!SWIG_IsOK(SWIG_ConvertPtr(L,1,(void**)&arg1,SWIGTYPE_p__LWCONTEXT,0))){
+    SWIG_fail_ptr("puck_game_jump",1,SWIGTYPE_p__LWCONTEXT);
+  }
+  
+  
+  if (!SWIG_IsOK(SWIG_ConvertPtr(L,2,(void**)&arg2,SWIGTYPE_p__LWPUCKGAME,0))){
+    SWIG_fail_ptr("puck_game_jump",2,SWIGTYPE_p__LWPUCKGAME);
+  }
+  
+  puck_game_jump(arg1,arg2);
+  
+  return SWIG_arg;
+  
+  if(0) SWIG_fail;
+  
+fail:
+  lua_error(L);
+  return SWIG_arg;
+}
+
+
 static int _wrap_new_int(lua_State* L) {
   int SWIG_arg = 0;
   int arg1 ;
@@ -49234,7 +49310,7 @@ static swig_lua_const_info swig_SwigModule_constants[]= {
     {SWIG_LUA_CONSTTAB_FLOAT("M_PI", (3.14159265358979323846))},
     {SWIG_LUA_CONSTTAB_FLOAT("LWEPSILON", (1e-3))},
     {SWIG_LUA_CONSTTAB_STRING("__LW_STRING_LINE__", "87")},
-    {SWIG_LUA_CONSTTAB_STRING("LWLOGPOS", "src/lwmacro.h(88): ")},
+    {SWIG_LUA_CONSTTAB_STRING("LWLOGPOS", "src\\lwmacro.h(88): ")},
     {SWIG_LUA_CONSTTAB_INT("MAX_FIELD_SPHERE", (50))},
     {SWIG_LUA_CONSTTAB_INT("MAX_FIELD_REMOTE_SPHERE", (50))},
     {SWIG_LUA_CONSTTAB_INT("MAX_USER_GEOM", (16))},
@@ -49756,6 +49832,7 @@ static swig_lua_method swig_SwigModule_methods[]= {
     { "lw_press_key_up", _wrap_lw_press_key_up},
     { "lw_press_key_down", _wrap_lw_press_key_down},
     { "lw_press_key_space", _wrap_lw_press_key_space},
+    { "lw_press_key_a", _wrap_lw_press_key_a},
     { "lw_press_key_z", _wrap_lw_press_key_z},
     { "lw_press_key_x", _wrap_lw_press_key_x},
     { "lw_press_key_q", _wrap_lw_press_key_q},
@@ -49764,6 +49841,7 @@ static swig_lua_method swig_SwigModule_methods[]= {
     { "lw_release_key_up", _wrap_lw_release_key_up},
     { "lw_release_key_down", _wrap_lw_release_key_down},
     { "lw_release_key_space", _wrap_lw_release_key_space},
+    { "lw_release_key_a", _wrap_lw_release_key_a},
     { "lw_release_key_z", _wrap_lw_release_key_z},
     { "lw_release_key_x", _wrap_lw_release_key_x},
     { "lw_release_key_q", _wrap_lw_release_key_q},
@@ -50062,6 +50140,7 @@ static swig_lua_method swig_SwigModule_methods[]= {
     { "puck_game_pull_puck_toggle", _wrap_puck_game_pull_puck_toggle},
     { "puck_game_rematch", _wrap_puck_game_rematch},
     { "puck_game_reset_view_proj", _wrap_puck_game_reset_view_proj},
+    { "puck_game_jump", _wrap_puck_game_jump},
     { "new_int", _wrap_new_int},
     { "delete_int", _wrap_delete_int},
     { "int_getitem", _wrap_int_getitem},

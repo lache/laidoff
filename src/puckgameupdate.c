@@ -136,6 +136,13 @@ void update_puck_game(LWCONTEXT* pLwc, LWPUCKGAME* puck_game, double delta_time)
     if (puck_game->target.hp_shake_remain_time > 0) {
         puck_game->target.hp_shake_remain_time = LWMAX(0, puck_game->target.hp_shake_remain_time - (float)delta_time);
     }
+    if (puck_game->jump.shake_remain_time > 0) {
+        puck_game->jump.shake_remain_time = LWMAX(0, puck_game->jump.shake_remain_time - (float)delta_time);
+    }
+    if (puck_game->jump.remain_time > 0) {
+        puck_game->jump.remain_time = 0;
+        dBodyAddForce(puck_game->go[LPGO_PLAYER].body, 0, 0, puck_game->jump_force);
+    }
     
     if (puck_game->pull_puck) {
         const dReal* puck_pos = dBodyGetPosition(puck_game->go[LPGO_PUCK].body);
@@ -162,6 +169,39 @@ void update_puck_game(LWCONTEXT* pLwc, LWPUCKGAME* puck_game, double delta_time)
         p.battle_id = pLwc->puck_game->battle_id;
         p.token = pLwc->puck_game->token;
         udp_send(pLwc->udp, (const char*)&p, sizeof(p));
+    }
+}
+
+void puck_game_jump(LWCONTEXT* pLwc, LWPUCKGAME* puck_game) {
+    // Check params
+    if (!pLwc || !puck_game) {
+        return;
+    }
+    // Check already effective jump
+    if (puck_game_jumping(&puck_game->jump)) {
+        return;
+    }
+    // Check effective move input
+    //float dx, dy, dlen;
+    /*if (!lw_get_normalized_dir_pad_input(pLwc, &dx, &dy, &dlen)) {
+    return;
+    }*/
+
+    // Check cooltime
+    if (puck_game_jump_cooltime(puck_game) < puck_game->jump_interval) {
+        puck_game->jump.shake_remain_time = puck_game->jump_shake_time;
+        return;
+    }
+
+    // Start jump!
+    puck_game_commit_jump(puck_game, &puck_game->jump, 1);
+
+    if (!pLwc->udp->master) {
+        LWPJUMP packet_jump;
+        packet_jump.type = LPGP_LWPJUMP;
+        packet_jump.battle_id = pLwc->puck_game->battle_id;
+        packet_jump.token = pLwc->puck_game->token;
+        udp_send(pLwc->udp, (const char*)&packet_jump, sizeof(packet_jump));
     }
 }
 

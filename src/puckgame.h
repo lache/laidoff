@@ -33,6 +33,12 @@ typedef struct _LWPUCKGAMEOBJECT {
 	int red_overlay;
 } LWPUCKGAMEOBJECT;
 
+typedef struct _LWPUCKGAMEJUMP {
+    float last_time;
+    float remain_time;
+    float shake_remain_time;
+} LWPUCKGAMEJUMP;
+
 typedef struct _LWPUCKGAMEDASH {
 	float last_time;
 	float remain_time;
@@ -65,6 +71,9 @@ typedef struct _LWPUCKGAME {
 	float dash_speed_ratio;
 	float dash_shake_time;
 	float hp_shake_time;
+    float jump_force;
+    float jump_interval;
+    float jump_shake_time;
 	float puck_damage_contact_speed_threshold;
     float sphere_mass;
     float sphere_radius;
@@ -83,6 +92,7 @@ typedef struct _LWPUCKGAME {
 	dJointID puck_pull_control_joint;
 	int push;
 	float time;
+    LWPUCKGAMEJUMP jump;
 	LWPUCKGAMEDASH dash;
 	LWPUCKGAMEPLAYER player;
 	LWPUCKGAMEPLAYER target;
@@ -112,8 +122,11 @@ void delete_puck_game(LWPUCKGAME** puck_game);
 void puck_game_push(LWPUCKGAME* puck_game);
 float puck_game_dash_gauge_ratio(LWPUCKGAME* puck_game);
 float puck_game_dash_cooltime(LWPUCKGAME* puck_game);
+float puck_game_jump_cooltime(LWPUCKGAME* puck_game);
 int puck_game_dashing(LWPUCKGAMEDASH* dash);
+int puck_game_jumping(LWPUCKGAMEJUMP* jump);
 void puck_game_near_callback(void *data, dGeomID o1, dGeomID o2);
+void puck_game_commit_jump(LWPUCKGAME* puck_game, LWPUCKGAMEJUMP* jump, int player_no);
 void puck_game_commit_dash(LWPUCKGAME* puck_game, LWPUCKGAMEDASH* dash, float dx, float dy);
 void puck_game_commit_dash_to_puck(LWPUCKGAME* puck_game, LWPUCKGAMEDASH* dash, int player_no);
 void puck_game_player_decrease_hp_test(LWPUCKGAME* puck_game);

@@ -74,6 +74,9 @@ LWPUCKGAME* new_puck_game() {
     puck_game->sphere_mass = 0.1f;
     puck_game->sphere_radius = 0.16f;
 	puck_game->total_time = 80.0f;
+    puck_game->jump_force = 35.0f;
+    puck_game->jump_interval = 0.5f;
+    puck_game->jump_shake_time = 0.5f;
 	// ------
 
 	// Initialize OpenDE
@@ -285,8 +288,22 @@ float puck_game_dash_cooltime(LWPUCKGAME* puck_game) {
 	return puck_game->time - puck_game->dash.last_time;
 }
 
+float puck_game_jump_cooltime(LWPUCKGAME* puck_game) {
+    return puck_game->time - puck_game->jump.last_time;
+}
+
+int puck_game_jumping(LWPUCKGAMEJUMP* jump) {
+    return jump->remain_time > 0;
+}
+
 int puck_game_dashing(LWPUCKGAMEDASH* dash) {
 	return dash->remain_time > 0;
+}
+
+void puck_game_commit_jump(LWPUCKGAME* puck_game, LWPUCKGAMEJUMP* jump, int player_no) {
+    jump->remain_time = puck_game->jump_interval;
+    jump->last_time = puck_game->time;
+
 }
 
 void puck_game_commit_dash(LWPUCKGAME* puck_game, LWPUCKGAMEDASH* dash, float dx, float dy) {
