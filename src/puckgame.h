@@ -110,6 +110,7 @@ typedef struct _LWPUCKGAME {
 	unsigned int c2_token;
 	LWREMOTEPLAYERCONTROL remote_control[2];
 	LWPUCKGAMEDASH remote_dash[2];
+    LWPUCKGAMEJUMP remote_jump[2];
 	int init_ready;
 	int finished;
 	int update_tick;

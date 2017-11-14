@@ -162,6 +162,12 @@ static int update_puck_game(LWSERVER* server, LWPUCKGAME* puck_game, double delt
 			puck_game->remote_dash[i].remain_time = LWMAX(0, puck_game->remote_dash[i].remain_time - (float)delta_time);
 		}
 
+        // Jump
+        if (puck_game->remote_jump[i].remain_time > 0) {
+            puck_game->remote_jump[i].remain_time = 0;
+            dBodyAddForce(puck_game->go[control_enum[i]].body, 0, 0, puck_game->jump_force);
+        }
+
 		if (puck_game->remote_control[i].pull_puck) {
 			const dReal* puck_pos = dBodyGetPosition(puck_game->go[LPGO_PUCK].body);
 			const dReal* player_pos = dBodyGetPosition(puck_game->go[control_enum[i]].body);
@@ -537,6 +543,19 @@ void select_server(LWSERVER* server, LWPUCKGAME* puck_game, LWCONN* conn, int co
 				}
 				break;
 			}
+            case LPGP_LWPJUMP:
+            {
+                LWPJUMP* p = (LWPJUMP*)server->buf;
+                LWPUCKGAME* pg = 0;
+                int player_no = check_token(server, (LWPUDPHEADER*)p, &pg);
+                if (check_player_no(player_no)) {
+                    //LOGI("JUMP");
+                    LWPUCKGAMEJUMP* jump = &pg->remote_jump[control_index_from_player_no(player_no)];
+                    puck_game_commit_jump(pg, jump, player_no);
+                    add_conn_with_token(conn, LW_CONN_CAPACITY, &server->si_other, p->battle_id, p->token, player_no);
+                }
+                break;
+            }
 			case LPGP_LWPPULLSTART:
 			{
 				LWPPULLSTART* p = (LWPPULLSTART*)server->buf;

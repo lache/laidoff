@@ -303,7 +303,6 @@ int puck_game_dashing(LWPUCKGAMEDASH* dash) {
 void puck_game_commit_jump(LWPUCKGAME* puck_game, LWPUCKGAMEJUMP* jump, int player_no) {
     jump->remain_time = puck_game->jump_interval;
     jump->last_time = puck_game->time;
-
 }
 
 void puck_game_commit_dash(LWPUCKGAME* puck_game, LWPUCKGAMEDASH* dash, float dx, float dy) {
