@@ -9,6 +9,8 @@
 /* Begin PBXBuildFile section */
 		2641822E1FB6FD0300BF2D42 /* lwdamagetext.c in Sources */ = {isa = PBXBuildFile; fileRef = 2641822D1FB6FD0300BF2D42 /* lwdamagetext.c */; };
 		264182301FB6FD0900BF2D42 /* lwmath.c in Sources */ = {isa = PBXBuildFile; fileRef = 2641822F1FB6FD0900BF2D42 /* lwmath.c */; };
+		26457DB71FBACE6600FFEE74 /* lwime.c in Sources */ = {isa = PBXBuildFile; fileRef = 26457DB51FBACE6600FFEE74 /* lwime.c */; };
+		26457DBA1FBACEB900FFEE74 /* jsmn.c in Sources */ = {isa = PBXBuildFile; fileRef = 26457DB81FBACEB900FFEE74 /* jsmn.c */; };
 		5633AC321EADDF98003F1549 /* net.c in Sources */ = {isa = PBXBuildFile; fileRef = 5633AC311EADDF98003F1549 /* net.c */; };
 		5663732C1EBA52D3001DA3F4 /* array.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 566372811EBA52D3001DA3F4 /* array.cpp */; };
 		5663732D1EBA52D3001DA3F4 /* box.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 566372831EBA52D3001DA3F4 /* box.cpp */; };
@@ -382,6 +384,10 @@
 		2601AFFC1EE1549700989AA6 /* platform.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = platform.h; path = ../build/include/platform.h; sourceTree = "<group>"; };
 		2641822D1FB6FD0300BF2D42 /* lwdamagetext.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = lwdamagetext.c; sourceTree = "<group>"; };
 		2641822F1FB6FD0900BF2D42 /* lwmath.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = lwmath.c; sourceTree = "<group>"; };
+		26457DB51FBACE6600FFEE74 /* lwime.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = lwime.c; sourceTree = "<group>"; };
+		26457DB61FBACE6600FFEE74 /* lwime.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = lwime.h; sourceTree = "<group>"; };
+		26457DB81FBACEB900FFEE74 /* jsmn.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = jsmn.c; sourceTree = "<group>"; };
+		26457DB91FBACEB900FFEE74 /* jsmn.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = jsmn.h; sourceTree = "<group>"; };
 		5633AC311EADDF98003F1549 /* net.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = net.c; sourceTree = "<group>"; };
 		566372651EBA52D3001DA3F4 /* collision.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = collision.h; sourceTree = "<group>"; };
 		566372661EBA52D3001DA3F4 /* collision_space.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = collision_space.h; sourceTree = "<group>"; };
@@ -1988,8 +1994,6 @@
 		6CA16CF41EA20CA700DB7AF0 /* src */ = {
 			isa = PBXGroup;
 			children = (
-				2641822F1FB6FD0900BF2D42 /* lwmath.c */,
-				2641822D1FB6FD0300BF2D42 /* lwdamagetext.c */,
 				6C7739891FB4B5A5001014DE /* armature.c */,
 				6C7739561FB4B5A1001014DE /* armature.h */,
 				6C7739A21FB4B5A7001014DE /* battle_result.c */,
@@ -2015,6 +2019,8 @@
 				6C7739911FB4B5A6001014DE /* image.h */,
 				6C7739661FB4B5A3001014DE /* input.c */,
 				6C7739B61FB4B5A9001014DE /* input.h */,
+				26457DB81FBACEB900FFEE74 /* jsmn.c */,
+				26457DB91FBACEB900FFEE74 /* jsmn.h */,
 				6C7739A91FB4B5A8001014DE /* key.h */,
 				6C7739B71FB4B5A9001014DE /* ktx.c */,
 				6C7739621FB4B5A2001014DE /* ktx.h */,
@@ -2042,6 +2048,7 @@
 				6C77395A1FB4B5A2001014DE /* lwbuttoncommand.h */,
 				6C77391E1FB4B59D001014DE /* lwcontext.c */,
 				6C7739681FB4B5A3001014DE /* lwcontext.h */,
+				2641822D1FB6FD0300BF2D42 /* lwdamagetext.c */,
 				6C7739B11FB4B5A9001014DE /* lwdamagetext.h */,
 				6C77393A1FB4B59F001014DE /* lwdeltatime.c */,
 				6C7739B21FB4B5A9001014DE /* lwdeltatime.h */,
@@ -2053,9 +2060,12 @@
 				6C77392C1FB4B59E001014DE /* lwfieldrendercommand.h */,
 				6C7739BB1FB4B5AA001014DE /* lwgamescene.h */,
 				6C7739921FB4B5A6001014DE /* lwgl.h */,
+				26457DB51FBACE6600FFEE74 /* lwime.c */,
+				26457DB61FBACE6600FFEE74 /* lwime.h */,
 				6C77397C1FB4B5A4001014DE /* lwkeyframe.h */,
 				6C7739341FB4B59E001014DE /* lwlog.h */,
 				6C7739261FB4B59E001014DE /* lwmacro.h */,
+				2641822F1FB6FD0900BF2D42 /* lwmath.c */,
 				6C7739271FB4B59E001014DE /* lwparabola.c */,
 				6C7739331FB4B59E001014DE /* lwparabola.h */,
 				6C7739851FB4B5A5001014DE /* lwpkm.h */,
@@ -2443,6 +2453,7 @@
 				566373361EBA52D3001DA3F4 /* collision_sapspace.cpp in Sources */,
 				56F189951EC751950019312F /* zbeacon.c in Sources */,
 				56F189BC1EC751950019312F /* zuuid.c in Sources */,
+				26457DB71FBACE6600FFEE74 /* lwime.c in Sources */,
 				566373661EBA52D4001DA3F4 /* memory.cpp in Sources */,
 				56F189831EC751950019312F /* czmq_private_selftest.c in Sources */,
 				6CA16D981EA210BB00DB7AF0 /* lstring.c in Sources */,
@@ -2584,6 +2595,7 @@
 				56ED77BA1EBB9C1C00FABA64 /* DetourNavMeshBuilder.cpp in Sources */,
 				6CA16D821EA210BB00DB7AF0 /* lbaselib.c in Sources */,
 				5663737F1EBA52D4001DA3F4 /* malloc.cpp in Sources */,
+				26457DBA1FBACEB900FFEE74 /* jsmn.c in Sources */,
 				56F188F11EC74DB60019312F /* stream_engine.cpp in Sources */,
 				56F188E21EC74DB60019312F /* raw_encoder.cpp in Sources */,
 				56F189B11EC751950019312F /* zproc.c in Sources */,

@@ -17,6 +17,10 @@
 #include "lwcontext.h"
 #include <czmq.h>
 
+void lw_start_text_input_activity(LWCONTEXT* pLwc) {
+    // Not implemented yet...
+}
+
 char * create_string_from_file(const char * filename) {
     
     NSString *pathname = [[NSBundle mainBundle] pathForResource:[NSString stringWithFormat:@"assets/%s", filename] ofType:@""];
