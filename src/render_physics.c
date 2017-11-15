@@ -9,6 +9,7 @@
 #include "render_text_block.h"
 #include "lwudp.h"
 #include "lwdamagetext.h"
+#include "lwdirpad.h"
 
 typedef struct _LWSPHERERENDERUNIFORM {
     float sphere_col_ratio[3];
@@ -479,7 +480,7 @@ void lwc_render_physics(const LWCONTEXT* pLwc, const mat4x4 view, const mat4x4 p
     }
     
     float arrow_scale = 0.5f;
-    float arrowAngle = LWDEG2RAD(70.0f);
+    float arrowAngle = (float)LWDEG2RAD(70.0f);
     
     LWSPHERERENDERUNIFORM sphere_render_uniform = {
         // float sphere_col_ratio[3];
@@ -560,12 +561,12 @@ void lwc_render_physics(const LWCONTEXT* pLwc, const mat4x4 view, const mat4x4 p
               1.0f, remote_target_pos, state->target_rot, remote, 0);
     // Render damage texts
     render_damage_text(pLwc, view, proj, pLwc->proj);
-    // Current touch position
-    render_dir_pad(pLwc, pLwc->dir_pad_x, pLwc->dir_pad_y);
-    // Touch origin position
-    if (pLwc->dir_pad_dragging) {
-        render_dir_pad(pLwc, pLwc->dir_pad_touch_start_x, pLwc->dir_pad_touch_start_y);
-    }
+    render_dir_pad_with_start(pLwc,
+                              pLwc->left_dir_pad.x,
+                              pLwc->left_dir_pad.y,
+                              pLwc->left_dir_pad.start_x,
+                              pLwc->left_dir_pad.start_y,
+                              pLwc->left_dir_pad.dragging);
     // Dash button
     //render_fist_button(pLwc);
     // Pull button

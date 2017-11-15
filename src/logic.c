@@ -712,14 +712,14 @@ void lwc_update(LWCONTEXT* pLwc, double delta_time) {
 	// Touch start point will follow if the distance
 	// between touch start point and current touch point
 	// aparted by some amount...
-	if (pLwc->dir_pad_dragging) {
-		const float dx = pLwc->dir_pad_x - pLwc->dir_pad_touch_start_x;
-		const float dy = pLwc->dir_pad_y - pLwc->dir_pad_touch_start_y;
+	if (pLwc->left_dir_pad.dragging) {
+		const float dx = pLwc->left_dir_pad.x - pLwc->left_dir_pad.start_x;
+		const float dy = pLwc->left_dir_pad.y - pLwc->left_dir_pad.start_y;
 		const float max_dist = 0.05f;
 		const float cur_dist = sqrtf(dx*dx + dy*dy);
 		if (cur_dist > max_dist) {
-			pLwc->dir_pad_touch_start_x = pLwc->dir_pad_x + (-dx) / cur_dist * max_dist;
-			pLwc->dir_pad_touch_start_y = pLwc->dir_pad_y + (-dy) / cur_dist * max_dist;
+			pLwc->left_dir_pad.start_x = pLwc->left_dir_pad.x + (-dx) / cur_dist * max_dist;
+			pLwc->left_dir_pad.start_y = pLwc->left_dir_pad.y + (-dy) / cur_dist * max_dist;
 		}
 	}
 

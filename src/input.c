@@ -27,8 +27,8 @@ void get_dir_pad_original_center(float aspect_ratio, float *x, float *y) {
 	}
 }
 
-int lw_get_normalized_dir_pad_input(const LWCONTEXT* pLwc, float *dx, float *dy, float *dlen) {
-	if (!pLwc->dir_pad_dragging) {
+int lw_get_normalized_dir_pad_input(const LWCONTEXT* pLwc, const LWDIRPAD* dir_pad, float *dx, float *dy, float *dlen) {
+	if (!dir_pad->dragging) {
 		return 0;
 	}
 
@@ -37,8 +37,8 @@ int lw_get_normalized_dir_pad_input(const LWCONTEXT* pLwc, float *dx, float *dy,
 	float dir_pad_center_y = 0;
 	get_dir_pad_original_center(aspect_ratio, &dir_pad_center_x, &dir_pad_center_y);
 
-	*dx = pLwc->dir_pad_x - pLwc->dir_pad_touch_start_x;
-	*dy = pLwc->dir_pad_y - pLwc->dir_pad_touch_start_y;
+	*dx = dir_pad->x - dir_pad->start_x;
+	*dy = dir_pad->y - dir_pad->start_y;
 
 	*dlen = sqrtf(*dx * *dx + *dy * *dy);
 	
@@ -54,15 +54,15 @@ int lw_get_normalized_dir_pad_input(const LWCONTEXT* pLwc, float *dx, float *dy,
 	return 1;
 }
 
-void reset_dir_pad_position(LWCONTEXT* pLwc) {
+void reset_dir_pad_position(LWCONTEXT* pLwc, LWDIRPAD* dir_pad) {
 	const float aspect_ratio = (float)pLwc->width / pLwc->height;
 
 	float dir_pad_center_x = 0;
 	float dir_pad_center_y = 0;
 	get_dir_pad_original_center(aspect_ratio, &dir_pad_center_x, &dir_pad_center_y);
 
-	pLwc->dir_pad_x = dir_pad_center_x;
-	pLwc->dir_pad_y = dir_pad_center_y;
+    dir_pad->x = dir_pad_center_x;
+    dir_pad->y = dir_pad_center_y;
 }
 
 static void convert_touch_coord_to_ui_coord(LWCONTEXT* pLwc, float *x, float *y) {
@@ -99,13 +99,13 @@ void lw_trigger_mouse_press(LWCONTEXT* pLwc, float x, float y, int pointer_id) {
 
 	if ((pLwc->game_scene == LGS_FIELD || pLwc->game_scene == LGS_PHYSICS)
 		&& fabs(dir_pad_center_x - x) < sr && fabs(dir_pad_center_y - y) < sr
-		&& !pLwc->dir_pad_dragging) {
-		pLwc->dir_pad_touch_start_x = x;
-		pLwc->dir_pad_touch_start_y = y;
-		pLwc->dir_pad_x = x;
-		pLwc->dir_pad_y = y;
-		pLwc->dir_pad_dragging = 1;
-		pLwc->dir_pad_pointer_id = pointer_id;
+		&& !pLwc->left_dir_pad.dragging) {
+		pLwc->left_dir_pad.start_x = x;
+		pLwc->left_dir_pad.start_y = y;
+		pLwc->left_dir_pad.x = x;
+		pLwc->left_dir_pad.y = y;
+		pLwc->left_dir_pad.dragging = 1;
+		pLwc->left_dir_pad.pointer_id = pointer_id;
 	}
 
 	const float fist_button_w = 0.75f;
@@ -122,7 +122,7 @@ void lw_trigger_mouse_press(LWCONTEXT* pLwc, float x, float y, int pointer_id) {
 	if (pLwc->game_scene == LGS_PHYSICS
 		&& fabs(fist_button_x_center - x) < fist_button_w
 		&& fabs(fist_button_y_center - y) < fist_button_h
-		&& (!pLwc->dir_pad_dragging || (pLwc->dir_pad_pointer_id != pointer_id))) {
+		&& (!pLwc->left_dir_pad.dragging || (pLwc->left_dir_pad.pointer_id != pointer_id))) {
         // this event handled by lua script
 		//puck_game_dash(pLwc, pLwc->puck_game);
 	}
@@ -175,7 +175,10 @@ void lw_trigger_mouse_press(LWCONTEXT* pLwc, float x, float y, int pointer_id) {
 	if (pressed_idx >= 0) {
 		const char* id = lwbutton_id(&pLwc->button_list, pressed_idx);
 		logic_emit_ui_event_async(pLwc, id);
+        // Should return here to prevent calling overlapped UI element behind buttons.
+        return;
 	}
+
 }
 
 void lw_trigger_mouse_move(LWCONTEXT* pLwc, float x, float y, int pointer_id) {
@@ -194,7 +197,7 @@ void lw_trigger_mouse_move(LWCONTEXT* pLwc, float x, float y, int pointer_id) {
 	const float aspect_ratio = (float)pLwc->width / pLwc->height;
 
 	if ((pLwc->game_scene == LGS_FIELD || pLwc->game_scene == LGS_PHYSICS)
-		&& pLwc->dir_pad_dragging && pLwc->dir_pad_pointer_id == pointer_id) {
+		&& pLwc->left_dir_pad.dragging && pLwc->left_dir_pad.pointer_id == pointer_id) {
 		float dir_pad_center_x = 0;
 		float dir_pad_center_y = 0;
 		get_dir_pad_original_center(aspect_ratio, &dir_pad_center_x, &dir_pad_center_y);
@@ -217,8 +220,8 @@ void lw_trigger_mouse_move(LWCONTEXT* pLwc, float x, float y, int pointer_id) {
 			y = dir_pad_center_y + sr;
 		}
 
-		pLwc->dir_pad_x = x;
-		pLwc->dir_pad_y = y;
+		pLwc->left_dir_pad.x = x;
+		pLwc->left_dir_pad.y = y;
 	}
 }
 
@@ -272,12 +275,12 @@ void lw_trigger_mouse_release(LWCONTEXT* pLwc, float x, float y, int pointer_id)
 		//puck_game_pull_puck_stop(pLwc, pLwc->puck_game);
 	}
 
-	if (pLwc->dir_pad_pointer_id == pointer_id) {
-		reset_dir_pad_position(pLwc);
-		pLwc->dir_pad_dragging = 0;
+	if (pLwc->left_dir_pad.pointer_id == pointer_id) {
+		reset_dir_pad_position(pLwc, &pLwc->left_dir_pad);
+		pLwc->left_dir_pad.dragging = 0;
 	}
 
-	pLwc->atk_pad_dragging = 0;
+	pLwc->right_dir_pad.dragging = 0;
 	//LOGI("atk_pad_dragging OFF");
 
 	if (pLwc->game_scene == LGS_ADMIN) {
@@ -413,17 +416,17 @@ void lw_trigger_key_enter(LWCONTEXT* pLwc) {
 }
 
 static void simulate_dir_pad_touch_input(LWCONTEXT* pLwc) {
-	pLwc->dir_pad_dragging = pLwc->player_move_left || pLwc->player_move_right || pLwc->player_move_down || pLwc->player_move_up;
+	pLwc->left_dir_pad.dragging = pLwc->player_move_left || pLwc->player_move_right || pLwc->player_move_down || pLwc->player_move_up;
 
 	const float aspect_ratio = (float)pLwc->width / pLwc->height;
 	float dir_pad_center_x = 0;
 	float dir_pad_center_y = 0;
 	get_dir_pad_original_center(aspect_ratio, &dir_pad_center_x, &dir_pad_center_y);
 
-	pLwc->dir_pad_x = dir_pad_center_x + (pLwc->player_move_right - pLwc->player_move_left) / 5.0f;
-	pLwc->dir_pad_y = dir_pad_center_y + (pLwc->player_move_up - pLwc->player_move_down) / 5.0f;
-    pLwc->dir_pad_touch_start_x = dir_pad_center_x;
-    pLwc->dir_pad_touch_start_y = dir_pad_center_y;
+	pLwc->left_dir_pad.x = dir_pad_center_x + (pLwc->player_move_right - pLwc->player_move_left) / 5.0f;
+	pLwc->left_dir_pad.y = dir_pad_center_y + (pLwc->player_move_up - pLwc->player_move_down) / 5.0f;
+    pLwc->left_dir_pad.start_x = dir_pad_center_x;
+    pLwc->left_dir_pad.start_y = dir_pad_center_y;
 }
 
 void lw_press_key_left(LWCONTEXT* pLwc) {

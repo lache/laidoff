@@ -1705,7 +1705,7 @@ void lw_set_size(LWCONTEXT* pLwc, int w, int h) {
     // Render font FBO using render-to-texture
     lwc_render_font_test_fbo(pLwc);
     // Reset dir pad input state
-    reset_dir_pad_position(pLwc);
+    reset_dir_pad_position(pLwc, &pLwc->left_dir_pad);
 
     puck_game_reset_view_proj(pLwc, pLwc->puck_game);
 }

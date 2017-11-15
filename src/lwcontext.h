@@ -29,6 +29,7 @@
 #include "puckgamepacket.h"
 #include "lwuniqueid.h"
 #include "jsmn.h"
+#include "lwdirpad.h"
 #define MAX_RENDER_QUEUE_CAPACITY (512)
 
 typedef enum _LW_SHADER_TYPE {
@@ -190,18 +191,6 @@ typedef struct _LWCONTEXT {
 	const LWANIMACTION* player_action;
 	//float player_aim_theta;
 	LWPLAYERSTATEDATA player_state_data;
-	float dir_pad_touch_start_x;
-	float dir_pad_touch_start_y;
-	// Current Dir pad x coordinate (screen coordinate)
-	float dir_pad_x;
-	// Current Dir pad y coordinate (screen coordinate)
-	float dir_pad_y;
-	// 1 if dir pad (left button) is dragged, 0 if otherwise
-	int dir_pad_dragging;
-	// dir_pad_dragging pointer index
-	int dir_pad_pointer_id;
-	// 1 if attack pad (right button) is dragged, 0 if otherwise
-	int atk_pad_dragging;
 	// Current field event ID
 	int field_event_id;
 	// Next field event ID
@@ -341,6 +330,8 @@ typedef struct _LWCONTEXT {
 	LWHOSTADDR tcp_host_addr;
 	LWHOSTADDR udp_host_addr;
 	int last_text_input_seq;
+    LWDIRPAD left_dir_pad;
+    LWDIRPAD right_dir_pad;
 } LWCONTEXT;
 
 #ifdef __cplusplus

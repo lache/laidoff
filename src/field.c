@@ -173,7 +173,7 @@ void move_player(LWCONTEXT* pLwc) {
 
 		// Using mouse
 		float dx = 0, dy = 0, dlen = 0;
-		if (lw_get_normalized_dir_pad_input(pLwc, &dx, &dy, &dlen) && (dx || dy)) {
+		if (lw_get_normalized_dir_pad_input(pLwc, &pLwc->left_dir_pad, &dx, &dy, &dlen) && (dx || dy)) {
 			pLwc->player_pos_x += dx * move_speed_delta;
 			pLwc->player_pos_y += dy * move_speed_delta;
 			pLwc->player_state_data.rot_z = atan2f(dy, dx);
@@ -907,8 +907,8 @@ void update_field(LWCONTEXT* pLwc, LWFIELD* field) {
 	// Update player state data:
 	// (1) Set inputs
 	pLwc->player_state_data.delta_time = (float)lwcontext_delta_time(pLwc);
-	pLwc->player_state_data.dir = pLwc->dir_pad_dragging;
-	pLwc->player_state_data.atk = pLwc->atk_pad_dragging;
+	pLwc->player_state_data.dir = pLwc->left_dir_pad.dragging;
+	pLwc->player_state_data.atk = pLwc->right_dir_pad.dragging;
 	pLwc->player_state_data.animfin = player_action_animfin;
 	pLwc->player_state_data.aim_last_skin_time = pLwc->action[LWAC_HUMANACTION_STAND_AIM].last_key_f / pLwc->action[LWAC_HUMANACTION_STAND_AIM].fps;
 	pLwc->player_state_data.field = field;

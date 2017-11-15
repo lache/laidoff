@@ -84,7 +84,7 @@ void update_puck_game(LWCONTEXT* pLwc, LWPUCKGAME* puck_game, double delta_time)
     
     //pLwc->player_pos_last_moved_dx
     float dx, dy, dlen;
-    if (lw_get_normalized_dir_pad_input(pLwc, &dx, &dy, &dlen)) {
+    if (lw_get_normalized_dir_pad_input(pLwc, &pLwc->left_dir_pad, &dx, &dy, &dlen)) {
         dJointSetLMotorParam(pcj, dParamVel1, player_speed * dx);
         dJointSetLMotorParam(pcj, dParamVel2, player_speed * dy);
         /*const float last_move_delta_len = sqrtf(pLwc->last_mouse_move_delta_x * pLwc->last_mouse_move_delta_x + pLwc->last_mouse_move_delta_y * pLwc->last_mouse_move_delta_y);
