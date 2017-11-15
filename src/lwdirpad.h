@@ -34,3 +34,4 @@ int dir_pad_release(LWDIRPAD* dir_pad, int pointer_id);
 
 void render_dir_pad(const LWCONTEXT* pLwc, float x, float y);
 void render_dir_pad_with_start(const LWCONTEXT* pLwc, const LWDIRPAD* dir_pad);
+void dir_pad_follow_start_position(LWDIRPAD* dir_pad, float max_dist);

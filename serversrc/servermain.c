@@ -105,6 +105,7 @@ static int lw_get_normalized_dir_pad_input(const LWREMOTEPLAYERCONTROL* control,
 	}
 	*dx = control->dx;
 	*dy = control->dy;
+    *dlen = control->dlen;
 	return 1;
 }
 
@@ -141,12 +142,12 @@ static int update_puck_game(LWSERVER* server, LWPUCKGAME* puck_game, double delt
 		LPGO_TARGET,
 	};
 	for (int i = 0; i < 2; i++) {
-        float player_speed = 0.5f;
+        float player_speed = puck_game_player_speed(); // Should be in this scope
 		float dx, dy, dlen;
 		if (lw_get_normalized_dir_pad_input(&puck_game->remote_control[i], &dx, &dy, &dlen)) {
             dJointEnable(pcj[i]);
-			dJointSetLMotorParam(pcj[i], dParamVel1, player_speed * dx);
-			dJointSetLMotorParam(pcj[i], dParamVel2, player_speed * dy);
+			dJointSetLMotorParam(pcj[i], dParamVel1, player_speed * dx * dlen);
+			dJointSetLMotorParam(pcj[i], dParamVel2, player_speed * dy * dlen);
 		}
 		else {
 			dJointSetLMotorParam(pcj[i], dParamVel1, 0);
@@ -530,6 +531,7 @@ void select_server(LWSERVER* server, LWPUCKGAME* puck_game, LWCONN* conn, int co
 					control->dir_pad_dragging = 1;
 					control->dx = p->dx;
 					control->dy = p->dy;
+                    control->dlen = p->dlen;
 					add_conn_with_token(conn, LW_CONN_CAPACITY, &server->si_other, p->battle_id, p->token, player_no);
 				}
 				break;

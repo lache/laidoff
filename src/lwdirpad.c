@@ -148,3 +148,15 @@ int dir_pad_release(LWDIRPAD* dir_pad, int pointer_id) {
     }
     return have_dragged;
 }
+
+void dir_pad_follow_start_position(LWDIRPAD* dir_pad, float max_dist) {
+    if (dir_pad->dragging) {
+        const float dx = dir_pad->x - dir_pad->start_x;
+        const float dy = dir_pad->y - dir_pad->start_y;
+        const float cur_dist = sqrtf(dx*dx + dy*dy);
+        if (cur_dist > max_dist) {
+            dir_pad->start_x = dir_pad->x + (-dx) / cur_dist * max_dist;
+            dir_pad->start_y = dir_pad->y + (-dy) / cur_dist * max_dist;
+        }
+    }
+}

@@ -337,3 +337,7 @@ void puck_game_commit_fire(LWPUCKGAME* puck_game, LWPUCKGAMEFIRE* fire, int play
     fire->dir_y = puck_fire_dy;
     fire->dir_len = puck_fire_dlen;
 }
+
+float puck_game_player_speed() {
+    return 2.5f;
+}

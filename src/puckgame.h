@@ -68,6 +68,7 @@ typedef struct _LWREMOTEPLAYERCONTROL {
 	int dir_pad_dragging;
 	float dx;
 	float dy;
+    float dlen;
 	int pull_puck;
 } LWREMOTEPLAYERCONTROL;
 
@@ -151,3 +152,4 @@ void puck_game_target_decrease_hp_test(LWPUCKGAME* puck_game);
 float puck_game_remain_time(float total_time, int update_tick);
 void puck_game_go_decrease_hp_test(LWPUCKGAME* puck_game, LWPUCKGAMEPLAYER* go, LWPUCKGAMEDASH* dash);
 void puck_game_commit_fire(LWPUCKGAME* puck_game, LWPUCKGAMEFIRE* fire, int player_no, float puck_fire_dx, float puck_fire_dy, float puck_fire_dlen);
+float puck_game_player_speed();

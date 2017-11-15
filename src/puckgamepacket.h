@@ -78,6 +78,7 @@ typedef struct _LWPMOVE {
 	int token;
 	float dx;
 	float dy;
+    float dlen;
 } LWPMOVE;
 
 // UDP
