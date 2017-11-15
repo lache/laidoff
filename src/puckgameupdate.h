@@ -13,3 +13,4 @@ void puck_game_pull_puck_toggle(LWCONTEXT* pLwc, LWPUCKGAME* puck_game);
 void puck_game_rematch(LWCONTEXT* pLwc, LWPUCKGAME* puck_game);
 void puck_game_reset_view_proj(LWCONTEXT* pLwc, LWPUCKGAME* puck_game);
 void puck_game_jump(LWCONTEXT* pLwc, LWPUCKGAME* puck_game);
+void puck_game_fire(LWCONTEXT* pLwc, LWPUCKGAME* puck_game, float puck_fire_dx, float puck_fire_dy, float puck_fire_dlen);

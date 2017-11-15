@@ -15,6 +15,7 @@ typedef enum _LW_PUCK_GAME_PACKET {
 	LPGP_LWPPULLSTOP,
 	LPGP_LWPSTATE,
     LPGP_LWPJUMP,
+    LPGP_LWPFIRE,
 
 	// tcp
 	LPGP_LWPQUEUE2 = 200,
@@ -92,6 +93,16 @@ typedef struct _LWPDASH {
 	int battle_id;
 	int token;
 } LWPDASH;
+
+// UDP
+typedef struct _LWPFIRE {
+    int type;
+    int battle_id;
+    int token;
+    float dx;
+    float dy;
+    float dlen;
+} LWPFIRE;
 
 // UDP
 typedef struct _LWPJUMP {

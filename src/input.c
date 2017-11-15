@@ -203,8 +203,12 @@ void lw_trigger_mouse_release(LWCONTEXT* pLwc, float x, float y, int pointer_id)
     dir_pad_release(&pLwc->left_dir_pad, pointer_id);
     float puck_fire_dx, puck_fire_dy, puck_fire_dlen;
     lw_get_normalized_dir_pad_input(pLwc, &pLwc->right_dir_pad, &puck_fire_dx, &puck_fire_dy, &puck_fire_dlen);
+    if (pLwc->puck_game->player_no != 2) {
+        puck_fire_dx *= -1;
+        puck_fire_dy *= -1;
+    }
     if (dir_pad_release(&pLwc->right_dir_pad, pointer_id)) {
-        puck_game_fire(pLwc->puck_game, puck_fire_dx, puck_fire_dy, puck_fire_dlen);
+        puck_game_fire(pLwc, pLwc->puck_game, puck_fire_dx, puck_fire_dy, puck_fire_dlen);
     }
 
     if (pLwc->game_scene == LGS_ADMIN) {

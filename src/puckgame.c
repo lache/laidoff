@@ -330,11 +330,7 @@ float puck_game_remain_time(float total_time, int update_tick) {
 	return floorf(LWMAX(0, total_time - update_tick * 1.0f / 125));
 }
 
-void puck_game_fire(LWPUCKGAME* puck_game, float puck_fire_dx, float puck_fire_dy, float puck_fire_dlen) {
-    puck_game_commit_fire(puck_game, &puck_game->fire, puck_fire_dx, puck_fire_dy, puck_fire_dlen);
-}
-
-void puck_game_commit_fire(LWPUCKGAME* puck_game, LWPUCKGAMEFIRE* fire, float puck_fire_dx, float puck_fire_dy, float puck_fire_dlen) {
+void puck_game_commit_fire(LWPUCKGAME* puck_game, LWPUCKGAMEFIRE* fire, int player_no, float puck_fire_dx, float puck_fire_dy, float puck_fire_dlen) {
     fire->remain_time = puck_game->fire_duration;
     fire->last_time = puck_game->time;
     fire->dir_x = puck_fire_dx;

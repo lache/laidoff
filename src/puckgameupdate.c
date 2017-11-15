@@ -137,6 +137,7 @@ void update_puck_game(LWCONTEXT* pLwc, LWPUCKGAME* puck_game, double delta_time)
     if (puck_game->target.hp_shake_remain_time > 0) {
         puck_game->target.hp_shake_remain_time = LWMAX(0, puck_game->target.hp_shake_remain_time - (float)delta_time);
     }
+    // Jump
     if (puck_game->jump.shake_remain_time > 0) {
         puck_game->jump.shake_remain_time = LWMAX(0, puck_game->jump.shake_remain_time - (float)delta_time);
     }
@@ -147,6 +148,7 @@ void update_puck_game(LWCONTEXT* pLwc, LWPUCKGAME* puck_game, double delta_time)
                       0,
                       puck_game->jump_force);
     }
+    // Fire
     if (puck_game->fire.remain_time > 0) {
         // [1] Player Control Joint Version
         /*dJointSetLMotorParam(pcj, dParamVel1, puck_game->fire.dir_x * puck_game->fire_max_force * puck_game->fire.dir_len);
@@ -318,4 +320,19 @@ void puck_game_reset_view_proj(LWCONTEXT* pLwc, LWPUCKGAME* puck_game) {
         up[1] = -1.0f;
     }
     mat4x4_look_at(pLwc->puck_game_view, eye, center, up);
+}
+
+void puck_game_fire(LWCONTEXT* pLwc, LWPUCKGAME* puck_game, float puck_fire_dx, float puck_fire_dy, float puck_fire_dlen) {
+    puck_game_commit_fire(puck_game, &puck_game->fire, 1, puck_fire_dx, puck_fire_dy, puck_fire_dlen);
+
+    if (!pLwc->udp->master) {
+        LWPFIRE packet_fire;
+        packet_fire.type = LPGP_LWPFIRE;
+        packet_fire.battle_id = pLwc->puck_game->battle_id;
+        packet_fire.token = pLwc->puck_game->token;
+        packet_fire.dx = puck_fire_dx;
+        packet_fire.dy = puck_fire_dy;
+        packet_fire.dlen = puck_fire_dlen;
+        udp_send(pLwc->udp, (const char*)&packet_fire, sizeof(packet_fire));
+    }
 }

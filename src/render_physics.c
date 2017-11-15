@@ -485,6 +485,9 @@ void lwc_render_physics(const LWCONTEXT* pLwc, const mat4x4 view, const mat4x4 p
         arrowAngle = atan2f(dy, dx);
         arrow_scale = LWMIN(0.01f + dlen * 0.7f, 1.0f);
     }
+    if (pLwc->puck_game->player_no != 2) {
+        arrow_scale *= -1;
+    }
     
     LWSPHERERENDERUNIFORM sphere_render_uniform = {
         // float sphere_col_ratio[3];
