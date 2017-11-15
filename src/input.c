@@ -37,6 +37,14 @@ void lw_trigger_mouse_press(LWCONTEXT* pLwc, float x, float y, int pointer_id) {
     pLwc->last_mouse_press_x = x;
     pLwc->last_mouse_press_y = y;
 
+    int pressed_idx = lwbutton_press(&pLwc->button_list, x, y);
+    if (pressed_idx >= 0) {
+        const char* id = lwbutton_id(&pLwc->button_list, pressed_idx);
+        logic_emit_ui_event_async(pLwc, id);
+        // Should return here to prevent calling overlapped UI element behind buttons.
+        return;
+    }
+
     if (pLwc->game_scene == LGS_FIELD || pLwc->game_scene == LGS_PHYSICS) {
         const float sr = get_dir_pad_size_radius();
 
@@ -114,14 +122,6 @@ void lw_trigger_mouse_press(LWCONTEXT* pLwc, float x, float y, int pointer_id) {
             //printf("mouse press command slot %d\n", command_slot);
         }
     }
-    int pressed_idx = lwbutton_press(&pLwc->button_list, x, y);
-    if (pressed_idx >= 0) {
-        const char* id = lwbutton_id(&pLwc->button_list, pressed_idx);
-        logic_emit_ui_event_async(pLwc, id);
-        // Should return here to prevent calling overlapped UI element behind buttons.
-        return;
-    }
-
 }
 
 void lw_trigger_mouse_move(LWCONTEXT* pLwc, float x, float y, int pointer_id) {
@@ -200,8 +200,12 @@ void lw_trigger_mouse_release(LWCONTEXT* pLwc, float x, float y, int pointer_id)
         //puck_game_pull_puck_stop(pLwc, pLwc->puck_game);
     }
 
-    dir_pad_release(&pLwc->left_dir_pad, pointer_id, pLwc->aspect_ratio);
-    dir_pad_release(&pLwc->right_dir_pad, pointer_id, pLwc->aspect_ratio);
+    dir_pad_release(&pLwc->left_dir_pad, pointer_id);
+    float puck_fire_dx, puck_fire_dy, puck_fire_dlen;
+    lw_get_normalized_dir_pad_input(pLwc, &pLwc->right_dir_pad, &puck_fire_dx, &puck_fire_dy, &puck_fire_dlen);
+    if (dir_pad_release(&pLwc->right_dir_pad, pointer_id)) {
+        puck_game_fire(pLwc->puck_game, puck_fire_dx, puck_fire_dy, puck_fire_dlen);
+    }
 
     if (pLwc->game_scene == LGS_ADMIN) {
         touch_admin(pLwc, pLwc->last_mouse_press_x, pLwc->last_mouse_press_y, x, y);

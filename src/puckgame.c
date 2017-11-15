@@ -77,6 +77,11 @@ LWPUCKGAME* new_puck_game() {
     puck_game->jump_force = 35.0f;
     puck_game->jump_interval = 0.5f;
     puck_game->jump_shake_time = 0.5f;
+    puck_game->fire_max_force = 35.0f;
+    puck_game->fire_max_vel = 5.0f;
+    puck_game->fire_interval = 1.5f;
+    puck_game->fire_duration = 0.2f;
+    puck_game->fire_shake_time = 0.5f;
 	// ------
 
 	// Initialize OpenDE
@@ -323,4 +328,16 @@ void puck_game_commit_dash_to_puck(LWPUCKGAME* puck_game, LWPUCKGAMEDASH* dash, 
 
 float puck_game_remain_time(float total_time, int update_tick) {
 	return floorf(LWMAX(0, total_time - update_tick * 1.0f / 125));
+}
+
+void puck_game_fire(LWPUCKGAME* puck_game, float puck_fire_dx, float puck_fire_dy, float puck_fire_dlen) {
+    puck_game_commit_fire(puck_game, &puck_game->fire, puck_fire_dx, puck_fire_dy, puck_fire_dlen);
+}
+
+void puck_game_commit_fire(LWPUCKGAME* puck_game, LWPUCKGAMEFIRE* fire, float puck_fire_dx, float puck_fire_dy, float puck_fire_dlen) {
+    fire->remain_time = puck_game->fire_duration;
+    fire->last_time = puck_game->time;
+    fire->dir_x = puck_fire_dx;
+    fire->dir_y = puck_fire_dy;
+    fire->dir_len = puck_fire_dlen;
 }

@@ -418,8 +418,6 @@ static void render_floor(const LWCONTEXT *pLwc, const mat4x4 proj, const LWPUCKG
 
 static void render_lwbutton(const LWCONTEXT* pLwc, const LWBUTTONLIST* button_list) {
     for (int i = 0; i < button_list->button_count; i++) {
-        LW_ATLAS_ENUM lae = LAE_BUTTON_PULL + 2 * i;
-        LW_ATLAS_ENUM lae_alpha = LAE_BUTTON_PULL_ALPHA + 2 * i;
         float or = 1.0f;
         float og = 1.0f;
         float ob = 1.0f;
@@ -427,13 +425,14 @@ static void render_lwbutton(const LWCONTEXT* pLwc, const LWBUTTONLIST* button_li
             or = 0.2f;
             ob = 0.2f;
         }
+        const LWBUTTON* b = &button_list->button[i];
         render_solid_vb_ui_alpha(pLwc,
-                           button_list->button[i].x,
-                           button_list->button[i].y,
-                           button_list->button[i].w,
-                           button_list->button[i].h,
-                           pLwc->tex_atlas[lae],
-                           pLwc->tex_atlas[lae_alpha],
+                           b->x,
+                           b->y,
+                           b->w,
+                           b->h,
+                           pLwc->tex_atlas[b->lae],
+                           pLwc->tex_atlas[b->lae_alpha],
                            LVT_LEFT_TOP_ANCHORED_SQUARE,
                            1.0f,
                            or,
@@ -477,8 +476,15 @@ void lwc_render_physics(const LWCONTEXT* pLwc, const mat4x4 view, const mat4x4 p
         player_controlled_pos = remote_target_pos;
     }
     
-    float arrow_scale = 0.5f;
+    float arrow_scale = 0.4f;
     float arrowAngle = (float)LWDEG2RAD(70.0f);
+    float dx = 0, dy = 0, dlen = 0;
+    int fire = 0;
+    if (lw_get_normalized_dir_pad_input(pLwc, &pLwc->right_dir_pad, &dx, &dy, &dlen) && (dx || dy)) {
+        fire = 1;
+        arrowAngle = atan2f(dy, dx);
+        arrow_scale = LWMIN(0.01f + dlen * 0.7f, 1.0f);
+    }
     
     LWSPHERERENDERUNIFORM sphere_render_uniform = {
         // float sphere_col_ratio[3];
@@ -514,8 +520,8 @@ void lwc_render_physics(const LWCONTEXT* pLwc, const mat4x4 view, const mat4x4 p
         },
         // float arrow_center[2];
         {
-            +(player_controlled_pos[0] / puck_game->world_size / arrow_scale),
-            -(player_controlled_pos[1] / puck_game->world_size / arrow_scale),
+            fire ? +player_controlled_pos[0] / puck_game->world_size : 999.0f,
+            fire ? -player_controlled_pos[1] / puck_game->world_size : 999.0f,
         },
         // float arrow_scale;
         arrow_scale,
@@ -559,12 +565,8 @@ void lwc_render_physics(const LWCONTEXT* pLwc, const mat4x4 view, const mat4x4 p
               1.0f, remote_target_pos, state->target_rot, remote, 0);
     // Render damage texts
     render_damage_text(pLwc, view, proj, pLwc->proj);
-    render_dir_pad_with_start(pLwc,
-                              pLwc->left_dir_pad.x,
-                              pLwc->left_dir_pad.y,
-                              pLwc->left_dir_pad.start_x,
-                              pLwc->left_dir_pad.start_y,
-                              pLwc->left_dir_pad.dragging);
+    render_dir_pad_with_start(pLwc, &pLwc->left_dir_pad);
+    render_dir_pad_with_start(pLwc, &pLwc->right_dir_pad);
     // Dash button
     //render_fist_button(pLwc);
     // Pull button
@@ -587,8 +589,8 @@ void lwc_render_physics(const LWCONTEXT* pLwc, const mat4x4 view, const mat4x4 p
     const float button_x_0 = 0.15f;
     const float button_y_interval = 0.25f;
     const float button_y_0 = -0.50f;
-    lwbutton_append(&(((LWCONTEXT*)pLwc)->button_list), "pull_button", button_x_interval * 1 + button_x_0, button_y_0 + button_y_interval * 0, button_size, button_size);
-    lwbutton_append(&(((LWCONTEXT*)pLwc)->button_list), "dash_button", button_x_interval * 2 + button_x_0, button_y_0 + button_y_interval * 1, button_size, button_size);
-    lwbutton_append(&(((LWCONTEXT*)pLwc)->button_list), "jump_button", button_x_interval * 3 + button_x_0, button_y_0 + button_y_interval * 2, button_size, button_size);
+    lwbutton_lae_append(&(((LWCONTEXT*)pLwc)->button_list), "pull_button", button_x_interval * 1 + button_x_0, button_y_0 + button_y_interval * 0, button_size, button_size, LAE_BUTTON_PULL, LAE_BUTTON_PULL_ALPHA);
+    //lwbutton_lae_append(&(((LWCONTEXT*)pLwc)->button_list), "dash_button", button_x_interval * 2 + button_x_0, button_y_0 + button_y_interval * 1, button_size, button_size, LAE_BUTTON_DASH, LAE_BUTTON_DASH_ALPHA);
+    lwbutton_lae_append(&(((LWCONTEXT*)pLwc)->button_list), "jump_button", button_x_interval * 3 + button_x_0, button_y_0 + button_y_interval * 2, button_size, button_size, LAE_BUTTON_JUMP, LAE_BUTTON_JUMP_ALPHA);
     render_lwbutton(pLwc, &pLwc->button_list);
 }

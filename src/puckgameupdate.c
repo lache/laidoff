@@ -85,6 +85,7 @@ void update_puck_game(LWCONTEXT* pLwc, LWPUCKGAME* puck_game, double delta_time)
     //pLwc->player_pos_last_moved_dx
     float dx, dy, dlen;
     if (lw_get_normalized_dir_pad_input(pLwc, &pLwc->left_dir_pad, &dx, &dy, &dlen)) {
+        dJointEnable(pcj);
         dJointSetLMotorParam(pcj, dParamVel1, player_speed * dx);
         dJointSetLMotorParam(pcj, dParamVel2, player_speed * dy);
         /*const float last_move_delta_len = sqrtf(pLwc->last_mouse_move_delta_x * pLwc->last_mouse_move_delta_x + pLwc->last_mouse_move_delta_y * pLwc->last_mouse_move_delta_y);
@@ -141,7 +142,25 @@ void update_puck_game(LWCONTEXT* pLwc, LWPUCKGAME* puck_game, double delta_time)
     }
     if (puck_game->jump.remain_time > 0) {
         puck_game->jump.remain_time = 0;
-        dBodyAddForce(puck_game->go[LPGO_PLAYER].body, 0, 0, puck_game->jump_force);
+        dBodyAddForce(puck_game->go[LPGO_PLAYER].body,
+                      0,
+                      0,
+                      puck_game->jump_force);
+    }
+    if (puck_game->fire.remain_time > 0) {
+        // [1] Player Control Joint Version
+        /*dJointSetLMotorParam(pcj, dParamVel1, puck_game->fire.dir_x * puck_game->fire_max_force * puck_game->fire.dir_len);
+        dJointSetLMotorParam(pcj, dParamVel2, puck_game->fire.dir_y * puck_game->fire_max_force * puck_game->fire.dir_len);
+        puck_game->fire.remain_time = LWMAX(0, puck_game->fire.remain_time - (float)delta_time);*/
+
+        // [2] Impulse Force Version
+        dJointDisable(pcj);
+        dBodySetLinearVel(puck_game->go[LPGO_PLAYER].body, 0, 0, 0);
+        dBodyAddForce(puck_game->go[LPGO_PLAYER].body,
+                      puck_game->fire.dir_x * puck_game->fire_max_force * puck_game->fire.dir_len,
+                      puck_game->fire.dir_y * puck_game->fire_max_force * puck_game->fire.dir_len,
+                      0);
+        puck_game->fire.remain_time = 0;
     }
     
     if (puck_game->pull_puck) {

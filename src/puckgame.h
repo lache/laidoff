@@ -47,6 +47,15 @@ typedef struct _LWPUCKGAMEDASH {
 	float shake_remain_time;
 } LWPUCKGAMEDASH;
 
+typedef struct _LWPUCKGAMEFIRE {
+    float last_time;
+    float remain_time;
+    float dir_x;
+    float dir_y;
+    float dir_len;
+    float shake_remain_time;
+} LWPUCKGAMEFIRE;
+
 typedef struct _LWPUCKGAMEPLAYER {
 	int total_hp;
 	int current_hp;
@@ -78,6 +87,11 @@ typedef struct _LWPUCKGAME {
     float sphere_mass;
     float sphere_radius;
 	float total_time;
+    float fire_max_force;
+    float fire_max_vel;
+    float fire_interval;
+    float fire_duration;
+    float fire_shake_time;
 	// ----
 	dWorldID world;
 	dSpaceID space;
@@ -94,6 +108,7 @@ typedef struct _LWPUCKGAME {
 	float time;
     LWPUCKGAMEJUMP jump;
 	LWPUCKGAMEDASH dash;
+    LWPUCKGAMEFIRE fire;
 	LWPUCKGAMEPLAYER player;
 	LWPUCKGAMEPLAYER target;
 	float last_remote_dx;
@@ -111,6 +126,7 @@ typedef struct _LWPUCKGAME {
 	LWREMOTEPLAYERCONTROL remote_control[2];
 	LWPUCKGAMEDASH remote_dash[2];
     LWPUCKGAMEJUMP remote_jump[2];
+    LWPUCKGAMEFIRE remote_fire[2];
 	int init_ready;
 	int finished;
 	int update_tick;
@@ -134,3 +150,5 @@ void puck_game_player_decrease_hp_test(LWPUCKGAME* puck_game);
 void puck_game_target_decrease_hp_test(LWPUCKGAME* puck_game);
 float puck_game_remain_time(float total_time, int update_tick);
 void puck_game_go_decrease_hp_test(LWPUCKGAME* puck_game, LWPUCKGAMEPLAYER* go, LWPUCKGAMEDASH* dash);
+void puck_game_fire(LWPUCKGAME* puck_game, float puck_fire_dx, float puck_fire_dy, float puck_fire_dlen);
+void puck_game_commit_fire(LWPUCKGAME* puck_game, LWPUCKGAMEFIRE* fire, float puck_fire_dx, float puck_fire_dy, float puck_fire_dlen);

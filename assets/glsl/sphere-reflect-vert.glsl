@@ -33,7 +33,7 @@ void main()
     color = vCol;
     uv = vUvOffset + vUvScale * vUv;
 
-    vec2 uvArrowBase = vUv / arrow_scale - arrow_scale - (0.5 + arrow_center);
+    vec2 uvArrowBase = (vUv - (0.5 + arrow_center)) / arrow_scale;
     uvArrow = arrowRotMat2 * uvArrowBase + 0.5;
     //uvArrow = vUv;
 }

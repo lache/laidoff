@@ -1511,7 +1511,7 @@ static void load_tex_files(LWCONTEXT* pLwc) {
 
         pLwc->tex_atlas_hash[i] = hash(
             (const unsigned char *)&tex_atlas_filename[i][filename_index]);
-}
+    }
 }
 
 void init_load_textures(LWCONTEXT* pLwc) {
@@ -1701,17 +1701,24 @@ void lw_set_size(LWCONTEXT* pLwc, int w, int h) {
         }
         pLwc->aspect_ratio = 1.0f;
     }
-    
+
+    get_left_dir_pad_original_center(pLwc->aspect_ratio,
+                                     &pLwc->left_dir_pad.origin_x,
+                                     &pLwc->left_dir_pad.origin_y);
+    get_right_dir_pad_original_center(pLwc->aspect_ratio,
+                                      &pLwc->right_dir_pad.origin_x,
+                                      &pLwc->right_dir_pad.origin_y);
+
     // Update default projection matrix (pLwc->proj)
     logic_udate_default_projection(pLwc);
     // Initialize test font FBO
     init_font_fbo(pLwc);
     // Render font FBO using render-to-texture
     lwc_render_font_test_fbo(pLwc);
-    
+
     // Reset dir pad input state
-    reset_dir_pad_position(&pLwc->left_dir_pad, pLwc->aspect_ratio);
-    reset_dir_pad_position(&pLwc->right_dir_pad, pLwc->aspect_ratio);
+    reset_dir_pad_position(&pLwc->left_dir_pad);
+    reset_dir_pad_position(&pLwc->right_dir_pad);
 
     puck_game_reset_view_proj(pLwc, pLwc->puck_game);
 }

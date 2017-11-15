@@ -15,9 +15,13 @@ typedef struct _LWDIRPAD {
     float start_x;
     // Touch start y coordinate (screen coordinate)
     float start_y;
+    // Original center x coordinate (screen coordinate)
+    float origin_x;
+    // Original center y coordinate (screen coordinate)
+    float origin_y;
 } LWDIRPAD;
 
-void reset_dir_pad_position(LWDIRPAD* dir_pad, float aspect_ratio);
+void reset_dir_pad_position(LWDIRPAD* dir_pad);
 int lw_get_normalized_dir_pad_input(const LWCONTEXT* pLwc, const LWDIRPAD* dir_pad, float *dx, float *dy, float *dlen);
 void get_right_dir_pad_original_center(const float aspect_ratio, float *x, float *y);
 void get_left_dir_pad_original_center(const float aspect_ratio, float *x, float *y);
@@ -26,7 +30,7 @@ int dir_pad_press(LWDIRPAD* dir_pad, float x, float y, int pointer_id,
                   float dir_pad_center_x, float dir_pad_center_y, float sr);
 void dir_pad_move(LWDIRPAD* dir_pad, float x, float y, int pointer_id,
                   float dir_pad_center_x, float dir_pad_center_y, float sr);
-void dir_pad_release(LWDIRPAD* dir_pad, int pointer_id, float aspect_ratio);
+int dir_pad_release(LWDIRPAD* dir_pad, int pointer_id);
 
 void render_dir_pad(const LWCONTEXT* pLwc, float x, float y);
-void render_dir_pad_with_start(const LWCONTEXT* pLwc, float x, float y, float start_x, float start_y, int dragging);
+void render_dir_pad_with_start(const LWCONTEXT* pLwc, const LWDIRPAD* dir_pad);
