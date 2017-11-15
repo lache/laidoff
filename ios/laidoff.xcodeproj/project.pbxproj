@@ -11,6 +11,7 @@
 		264182301FB6FD0900BF2D42 /* lwmath.c in Sources */ = {isa = PBXBuildFile; fileRef = 2641822F1FB6FD0900BF2D42 /* lwmath.c */; };
 		26457DB71FBACE6600FFEE74 /* lwime.c in Sources */ = {isa = PBXBuildFile; fileRef = 26457DB51FBACE6600FFEE74 /* lwime.c */; };
 		26457DBA1FBACEB900FFEE74 /* jsmn.c in Sources */ = {isa = PBXBuildFile; fileRef = 26457DB81FBACEB900FFEE74 /* jsmn.c */; };
+		26457DBD1FBC1C5B00FFEE74 /* lwdirpad.c in Sources */ = {isa = PBXBuildFile; fileRef = 26457DBB1FBC1C5B00FFEE74 /* lwdirpad.c */; };
 		5633AC321EADDF98003F1549 /* net.c in Sources */ = {isa = PBXBuildFile; fileRef = 5633AC311EADDF98003F1549 /* net.c */; };
 		5663732C1EBA52D3001DA3F4 /* array.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 566372811EBA52D3001DA3F4 /* array.cpp */; };
 		5663732D1EBA52D3001DA3F4 /* box.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 566372831EBA52D3001DA3F4 /* box.cpp */; };
@@ -388,6 +389,8 @@
 		26457DB61FBACE6600FFEE74 /* lwime.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = lwime.h; sourceTree = "<group>"; };
 		26457DB81FBACEB900FFEE74 /* jsmn.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = jsmn.c; sourceTree = "<group>"; };
 		26457DB91FBACEB900FFEE74 /* jsmn.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = jsmn.h; sourceTree = "<group>"; };
+		26457DBB1FBC1C5B00FFEE74 /* lwdirpad.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = lwdirpad.c; sourceTree = "<group>"; };
+		26457DBC1FBC1C5B00FFEE74 /* lwdirpad.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = lwdirpad.h; sourceTree = "<group>"; };
 		5633AC311EADDF98003F1549 /* net.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = net.c; sourceTree = "<group>"; };
 		566372651EBA52D3001DA3F4 /* collision.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = collision.h; sourceTree = "<group>"; };
 		566372661EBA52D3001DA3F4 /* collision_space.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = collision_space.h; sourceTree = "<group>"; };
@@ -1994,6 +1997,8 @@
 		6CA16CF41EA20CA700DB7AF0 /* src */ = {
 			isa = PBXGroup;
 			children = (
+				26457DBB1FBC1C5B00FFEE74 /* lwdirpad.c */,
+				26457DBC1FBC1C5B00FFEE74 /* lwdirpad.h */,
 				6C7739891FB4B5A5001014DE /* armature.c */,
 				6C7739561FB4B5A1001014DE /* armature.h */,
 				6C7739A21FB4B5A7001014DE /* battle_result.c */,
@@ -2477,6 +2482,7 @@
 				56F188B01EC74DB60019312F /* dish.cpp in Sources */,
 				566373301EBA52D3001DA3F4 /* collision_cylinder_box.cpp in Sources */,
 				566373701EBA52D4001DA3F4 /* plane.cpp in Sources */,
+				26457DBD1FBC1C5B00FFEE74 /* lwdirpad.c in Sources */,
 				6C7739F41FB4B5AA001014DE /* lwuidim.c in Sources */,
 				56F189BB1EC751950019312F /* ztrie.c in Sources */,
 				6C7739D51FB4B5AA001014DE /* logic.c in Sources */,
