@@ -99,6 +99,8 @@ typedef struct _LWCONTEXT {
 	int width;
 	// Screen height
 	int height;
+    // Screen aspect ratio
+    float aspect_ratio;
 	// Shader array
 	LWSHADER shader[MAX_SHADER];
 	// General VBO

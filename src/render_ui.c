@@ -229,10 +229,8 @@ void lwc_create_ui_vbo(LWCONTEXT* pLwc) {
 }
 
 static void s_render_scrap(const LWCONTEXT* pLwc, LWBUTTONLIST* button_list) {
-	const float aspect_ratio = (float)pLwc->width / pLwc->height;
-
 	const float scrap_bg_size_nor = 0.15f;
-	const float scrap_bg_x_nor = aspect_ratio - scrap_bg_width * scrap_bg_size_nor;
+	const float scrap_bg_x_nor = pLwc->aspect_ratio - scrap_bg_width * scrap_bg_size_nor;
 	const float scrap_bg_y_nor = 1.0f;
 
 	render_solid_vb_ui_flip_y_uv_shader(pLwc, scrap_bg_x_nor, scrap_bg_y_nor, 2 * scrap_bg_size_nor, 2 * scrap_bg_size_nor, pLwc->tex_atlas[LAE_3D_APT_TEX_MIP_KTX], LVT_UI_SCRAP_BG,
@@ -260,13 +258,11 @@ static void s_render_scrap(const LWCONTEXT* pLwc, LWBUTTONLIST* button_list) {
 }
 
 static void s_render_tower_button(const LWCONTEXT* pLwc, LWBUTTONLIST* button_list) {
-	const float aspect_ratio = (float)pLwc->width / pLwc->height;
-
 	for (int i = 0; i < 4; i++) {
 		const float btn_bg_size_nor = 0.3f;
 		const float wf = (tower_button_width + tower_button_tag_width) * btn_bg_size_nor;
 		const float hf = tower_button_height * btn_bg_size_nor;
-		const float btn_bg_x_nor = aspect_ratio - wf;
+		const float btn_bg_x_nor = pLwc->aspect_ratio - wf;
 		const float btn_bg_y_nor = 1.0f - (tower_button_height_margin + tower_button_height) * btn_bg_size_nor * (i + 1);
 		const float border_scaled = tower_button_border * btn_bg_size_nor;
 		const float sprite_size_nor = btn_bg_size_nor * (1.0f - 2.0f * tower_button_border);
@@ -305,13 +301,12 @@ static void s_render_tower_button(const LWCONTEXT* pLwc, LWBUTTONLIST* button_li
 }
 
 static void s_render_tower_page_button(const LWCONTEXT* pLwc, LWBUTTONLIST* button_list) {
-	const float aspect_ratio = (float)pLwc->width / pLwc->height;
 	const float left_button_total_width = left_button_width + left_button_left_edge_width + left_button_right_edge_width;
 
 	const float btn_bg_size_nor = 0.1f;
 	const float wf = left_button_total_width * btn_bg_size_nor;
 	const float hf = left_button_height * btn_bg_size_nor;
-	const float btn_bg_x_nor = aspect_ratio - (left_button_width + left_button_right_edge_width + left_button_width_margin + left_button_width + left_button_left_edge_width) * btn_bg_size_nor;
+	const float btn_bg_x_nor = pLwc->aspect_ratio - (left_button_width + left_button_right_edge_width + left_button_width_margin + left_button_width + left_button_left_edge_width) * btn_bg_size_nor;
 	const float btn_bg_y_nor = -1.0f + left_button_height * btn_bg_size_nor;
 
 	// Left arrow button
@@ -329,9 +324,8 @@ static void s_render_tower_page_button(const LWCONTEXT* pLwc, LWBUTTONLIST* butt
 }
 
 static void s_render_full_panel(const LWCONTEXT* pLwc, LWBUTTONLIST* button_list) {
-	const float aspect_ratio = (float)pLwc->width / pLwc->height;
 	const float full_panel_bg_size_nor = 1.0f;
-	const float full_panel_bg_x_nor = -aspect_ratio + full_panel_width/2;
+	const float full_panel_bg_x_nor = -pLwc->aspect_ratio + full_panel_width/2;
 	const float full_panel_bg_y_nor = -0.25f/2;
 
 	int shader_index = LWST_COLOR;
@@ -359,7 +353,7 @@ static void s_render_full_panel(const LWCONTEXT* pLwc, LWBUTTONLIST* button_list
 	text_block.text_bytelen = (int)strlen(text_block.text);
 	text_block.begin_index = 0;
 	text_block.end_index = text_block.text_bytelen;
-	text_block.text_block_x = -aspect_ratio;
+	text_block.text_block_x = -pLwc->aspect_ratio;
 	text_block.text_block_y = 0.75f;
 	text_block.multiline = 0;
 	render_text_block(pLwc, &text_block);
@@ -380,12 +374,12 @@ static void s_render_full_panel(const LWCONTEXT* pLwc, LWBUTTONLIST* button_list
 	const float prop_width = 0.8f;
 	const float button_scale = 0.125f;
 	const float val_width = 0.75f;
-	const float button_x = -aspect_ratio + prop_tab_width + prop_width + val_width;
+	const float button_x = -pLwc->aspect_ratio + prop_tab_width + prop_width + val_width;
 	const float upgrade_text_width_margin = 0.1f;
 	for (int i = 0; i < 9; i++) {
 		const float prop_y = (1.0f + full_panel_bg_y_nor * 2) - 0.05f - 0.175f * (i + 1);
 		const float button_y = prop_y;
-		text_block.text_block_x = -aspect_ratio + prop_tab_width;
+		text_block.text_block_x = -pLwc->aspect_ratio + prop_tab_width;
 		text_block.text_block_y = prop_y;
 		text_block.size = DEFAULT_TEXT_BLOCK_SIZE_D;
 		char prop_msg[128];
@@ -396,7 +390,7 @@ static void s_render_full_panel(const LWCONTEXT* pLwc, LWBUTTONLIST* button_list
 		text_block.end_index = text_block.text_bytelen;
 		render_text_block(pLwc, &text_block);
 
-		text_block.text_block_x = -aspect_ratio + prop_tab_width + prop_width;
+		text_block.text_block_x = -pLwc->aspect_ratio + prop_tab_width + prop_width;
 		text_block.size = DEFAULT_TEXT_BLOCK_SIZE_D;
 		char val_msg[128];
 		sprintf(val_msg, "%d", 100 + i + 1);

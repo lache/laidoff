@@ -39,8 +39,6 @@ int lw_get_render_count(LWCONTEXT* pLwc);
 
 void lw_on_destroy(LWCONTEXT* pLwc);
 
-void get_dir_pad_original_center(float aspect_ratio, float* x, float* y);
-
 void change_to_field(LWCONTEXT* pLwc);
 void change_to_dialog(LWCONTEXT* pLwc);
 void change_to_battle(LWCONTEXT* pLwc);

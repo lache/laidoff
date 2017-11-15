@@ -144,8 +144,7 @@ void render_player_creature_battle_result_ui(const LWCONTEXT* pLwc, const LWBATT
 
 void render_header(const struct _LWCONTEXT* pLwc) {
 
-	const float aspect_ratio = (float)pLwc->width / pLwc->height;
-	render_solid_vb_ui_flip_y_uv(pLwc, 0, header_y_center, 2 * aspect_ratio, header_height,
+	render_solid_vb_ui_flip_y_uv(pLwc, 0, header_y_center, 2 * pLwc->aspect_ratio, header_height,
 		pLwc->tex_programmed[LPT_BOTH_END_GRADIENT_HORIZONTAL], LVT_CENTER_CENTER_ANCHORED_SQUARE,
 		1, 39 / 255.0f, 74 / 255.0f, 110 / 255.0f, 1.0f, 0);
 
@@ -177,8 +176,6 @@ void get_battle_result_next_button_dim(struct _LWUIDIM* d) {
 }
 
 void render_next_button(const struct _LWCONTEXT* pLwc) {
-	
-	const float aspect_ratio = (float)pLwc->width / pLwc->height;
 	LWUIDIM next_button_d;
 	get_battle_result_next_button_dim(&next_button_d);
 	render_solid_vb_ui_flip_y_uv(pLwc,

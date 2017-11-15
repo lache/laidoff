@@ -270,8 +270,7 @@ void render_text_block(const struct _LWCONTEXT *pLwc, const struct _LWTEXTBLOCK*
 
 	// Render text block debug indicator
 	if (pLwc->font_texture_texture_mode) {
-		const float aspect_ratio = (float)pLwc->width / pLwc->height;
-		const float width_pixels = (float)(2 * aspect_ratio) / pLwc->width;
+		const float width_pixels = (float)(2 * pLwc->aspect_ratio) / pLwc->width;
 		const float height_pixels = (float)(2) / pLwc->height;
 
 		//const float w = 2 * width_pixels;
@@ -282,7 +281,7 @@ void render_text_block(const struct _LWCONTEXT *pLwc, const struct _LWTEXTBLOCK*
 			pLwc,
 			text_block->text_block_x,
 			text_block->text_block_y,
-			prop_font_size * size_scaled_xadvance_accum * aspect_ratio / pLwc->width * 2,
+			prop_font_size * size_scaled_xadvance_accum * pLwc->aspect_ratio / pLwc->width * 2,
 			h,
 			pLwc->tex_programmed[LPT_SOLID_RED],
 			lvt,

@@ -700,11 +700,9 @@ static void render_command_banner(const LWCONTEXT* pLwc) {
 	}
 
 	if (skill_name) {
-		const float aspect_ratio = (float)pLwc->width / pLwc->height;
-
 		const float x = 0;
 		const float y = -0.5f;
-		const float w = 1.0f * aspect_ratio;
+		const float w = 1.0f * pLwc->aspect_ratio;
 		const float h = 0.2f;
 
 		const float anim_v = LWCLAMP(5 * lwanim_get_1d(&pLwc->command_banner_anim), 0, 1);

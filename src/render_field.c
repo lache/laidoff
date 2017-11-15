@@ -89,24 +89,22 @@ static void render_ground(const LWCONTEXT* pLwc, const mat4x4 view, const mat4x4
 }
 
 void render_fist_button(const LWCONTEXT* pLwc) {
-    const float aspect_ratio = (float)pLwc->width / pLwc->height;
     const float fist_icon_margin_x = 0.3f;
     const float fist_icon_margin_y = 0.2f;
     const float fist_icon_width = 0.75f;
     const float fist_icon_height = 0.75f;
-    render_solid_vb_ui_alpha(pLwc, aspect_ratio - fist_icon_margin_x, -1 + fist_icon_margin_y,
+    render_solid_vb_ui_alpha(pLwc, pLwc->aspect_ratio - fist_icon_margin_x, -1 + fist_icon_margin_y,
                              fist_icon_width, fist_icon_height,
                              pLwc->tex_atlas[LAE_U_FIST_ICON_KTX], pLwc->tex_atlas[LAE_U_FIST_ICON_ALPHA_KTX],
                              LVT_RIGHT_BOTTOM_ANCHORED_SQUARE, 1, 0, 0, 0, 0);
 }
 
 void render_top_button(const LWCONTEXT* pLwc) {
-    const float aspect_ratio = (float)pLwc->width / pLwc->height;
     const float fist_icon_margin_x = 0.3f;
     const float fist_icon_margin_y = 0.2f;
     const float fist_icon_width = 0.75f;
     const float fist_icon_height = 0.75f;
-    render_solid_vb_ui_alpha(pLwc, aspect_ratio - fist_icon_margin_x, 1 - fist_icon_margin_y, fist_icon_width, fist_icon_height,
+    render_solid_vb_ui_alpha(pLwc, pLwc->aspect_ratio - fist_icon_margin_x, 1 - fist_icon_margin_y, fist_icon_width, fist_icon_height,
                              pLwc->tex_atlas[LAE_U_FIST_ICON_KTX], pLwc->tex_atlas[LAE_U_FIST_ICON_ALPHA_KTX],
                              LVT_RIGHT_TOP_ANCHORED_SQUARE, 1, 0, 0, 0, 0);
 }

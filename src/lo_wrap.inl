@@ -2665,35 +2665,35 @@ SWIG_Lua_dostring(lua_State *L, const char *str) {
 #define SWIGTYPE_p_LWATTRIBVALUE_bits swig_types[5]
 #define SWIGTYPE_p_LWBOX2DCOLLIDER swig_types[6]
 #define SWIGTYPE_p_LWBUTTONLIST swig_types[7]
-#define SWIGTYPE_p_LWFIELDRENDERCOMMAND swig_types[8]
-#define SWIGTYPE_p_LWPKM swig_types[9]
-#define SWIGTYPE_p_LWPSTATE swig_types[10]
-#define SWIGTYPE_p_LWSPRITE swig_types[11]
-#define SWIGTYPE_p_LWTRAIL swig_types[12]
-#define SWIGTYPE_p_LW_ENEMY_TYPE swig_types[13]
-#define SWIGTYPE_p_LW_PROGRAMMED_TEX swig_types[14]
-#define SWIGTYPE_p__LWACTIONMSG swig_types[15]
-#define SWIGTYPE_p__LWANIM swig_types[16]
-#define SWIGTYPE_p__LWANIM1D swig_types[17]
-#define SWIGTYPE_p__LWANIM5D swig_types[18]
-#define SWIGTYPE_p__LWANIMACTION swig_types[19]
-#define SWIGTYPE_p__LWANIMCURVE swig_types[20]
-#define SWIGTYPE_p__LWANIMKEY swig_types[21]
-#define SWIGTYPE_p__LWANIMMARKER swig_types[22]
-#define SWIGTYPE_p__LWARMATURE swig_types[23]
-#define SWIGTYPE_p__LWBATTLECOMMAND swig_types[24]
-#define SWIGTYPE_p__LWBATTLECOMMANDRESULT swig_types[25]
-#define SWIGTYPE_p__LWBATTLECREATURE swig_types[26]
-#define SWIGTYPE_p__LWBITMPCONTEXT swig_types[27]
-#define SWIGTYPE_p__LWBUTTONCOMMAND swig_types[28]
-#define SWIGTYPE_p__LWCONSTRUCT swig_types[29]
-#define SWIGTYPE_p__LWCONSTRUCTPREVIEW swig_types[30]
-#define SWIGTYPE_p__LWCONTEXT swig_types[31]
-#define SWIGTYPE_p__LWCREATURESTAT swig_types[32]
-#define SWIGTYPE_p__LWDAMAGETEXT swig_types[33]
-#define SWIGTYPE_p__LWDELTATIME swig_types[34]
-#define SWIGTYPE_p__LWDESPAWNBULLETMSG swig_types[35]
-#define SWIGTYPE_p__LWDIRPAD swig_types[36]
+#define SWIGTYPE_p_LWDIRPAD swig_types[8]
+#define SWIGTYPE_p_LWFIELDRENDERCOMMAND swig_types[9]
+#define SWIGTYPE_p_LWPKM swig_types[10]
+#define SWIGTYPE_p_LWPSTATE swig_types[11]
+#define SWIGTYPE_p_LWSPRITE swig_types[12]
+#define SWIGTYPE_p_LWTRAIL swig_types[13]
+#define SWIGTYPE_p_LW_ENEMY_TYPE swig_types[14]
+#define SWIGTYPE_p_LW_PROGRAMMED_TEX swig_types[15]
+#define SWIGTYPE_p__LWACTIONMSG swig_types[16]
+#define SWIGTYPE_p__LWANIM swig_types[17]
+#define SWIGTYPE_p__LWANIM1D swig_types[18]
+#define SWIGTYPE_p__LWANIM5D swig_types[19]
+#define SWIGTYPE_p__LWANIMACTION swig_types[20]
+#define SWIGTYPE_p__LWANIMCURVE swig_types[21]
+#define SWIGTYPE_p__LWANIMKEY swig_types[22]
+#define SWIGTYPE_p__LWANIMMARKER swig_types[23]
+#define SWIGTYPE_p__LWARMATURE swig_types[24]
+#define SWIGTYPE_p__LWBATTLECOMMAND swig_types[25]
+#define SWIGTYPE_p__LWBATTLECOMMANDRESULT swig_types[26]
+#define SWIGTYPE_p__LWBATTLECREATURE swig_types[27]
+#define SWIGTYPE_p__LWBITMPCONTEXT swig_types[28]
+#define SWIGTYPE_p__LWBUTTONCOMMAND swig_types[29]
+#define SWIGTYPE_p__LWCONSTRUCT swig_types[30]
+#define SWIGTYPE_p__LWCONSTRUCTPREVIEW swig_types[31]
+#define SWIGTYPE_p__LWCONTEXT swig_types[32]
+#define SWIGTYPE_p__LWCREATURESTAT swig_types[33]
+#define SWIGTYPE_p__LWDAMAGETEXT swig_types[34]
+#define SWIGTYPE_p__LWDELTATIME swig_types[35]
+#define SWIGTYPE_p__LWDESPAWNBULLETMSG swig_types[36]
 #define SWIGTYPE_p__LWEMITTER swig_types[37]
 #define SWIGTYPE_p__LWEMITTER2 swig_types[38]
 #define SWIGTYPE_p__LWEMITTER2OBJECT swig_types[39]
@@ -7106,88 +7106,6 @@ fail:
 }
 
 
-static int _wrap_lw_get_normalized_dir_pad_input(lua_State* L) {
-  int SWIG_arg = 0;
-  LWCONTEXT *arg1 = (LWCONTEXT *) 0 ;
-  LWDIRPAD *arg2 = (LWDIRPAD *) 0 ;
-  float *arg3 = (float *) 0 ;
-  float *arg4 = (float *) 0 ;
-  float *arg5 = (float *) 0 ;
-  int result;
-  
-  SWIG_check_num_args("lw_get_normalized_dir_pad_input",5,5)
-  if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("lw_get_normalized_dir_pad_input",1,"LWCONTEXT const *");
-  if(!SWIG_isptrtype(L,2)) SWIG_fail_arg("lw_get_normalized_dir_pad_input",2,"LWDIRPAD const *");
-  if(!SWIG_isptrtype(L,3)) SWIG_fail_arg("lw_get_normalized_dir_pad_input",3,"float *");
-  if(!SWIG_isptrtype(L,4)) SWIG_fail_arg("lw_get_normalized_dir_pad_input",4,"float *");
-  if(!SWIG_isptrtype(L,5)) SWIG_fail_arg("lw_get_normalized_dir_pad_input",5,"float *");
-  
-  if (!SWIG_IsOK(SWIG_ConvertPtr(L,1,(void**)&arg1,SWIGTYPE_p__LWCONTEXT,0))){
-    SWIG_fail_ptr("lw_get_normalized_dir_pad_input",1,SWIGTYPE_p__LWCONTEXT);
-  }
-  
-  
-  if (!SWIG_IsOK(SWIG_ConvertPtr(L,2,(void**)&arg2,SWIGTYPE_p__LWDIRPAD,0))){
-    SWIG_fail_ptr("lw_get_normalized_dir_pad_input",2,SWIGTYPE_p__LWDIRPAD);
-  }
-  
-  
-  if (!SWIG_IsOK(SWIG_ConvertPtr(L,3,(void**)&arg3,SWIGTYPE_p_float,0))){
-    SWIG_fail_ptr("lw_get_normalized_dir_pad_input",3,SWIGTYPE_p_float);
-  }
-  
-  
-  if (!SWIG_IsOK(SWIG_ConvertPtr(L,4,(void**)&arg4,SWIGTYPE_p_float,0))){
-    SWIG_fail_ptr("lw_get_normalized_dir_pad_input",4,SWIGTYPE_p_float);
-  }
-  
-  
-  if (!SWIG_IsOK(SWIG_ConvertPtr(L,5,(void**)&arg5,SWIGTYPE_p_float,0))){
-    SWIG_fail_ptr("lw_get_normalized_dir_pad_input",5,SWIGTYPE_p_float);
-  }
-  
-  result = (int)lw_get_normalized_dir_pad_input((struct _LWCONTEXT const *)arg1,(struct _LWDIRPAD const *)arg2,arg3,arg4,arg5);
-  lua_pushnumber(L, (lua_Number) result); SWIG_arg++;
-  return SWIG_arg;
-  
-  if(0) SWIG_fail;
-  
-fail:
-  lua_error(L);
-  return SWIG_arg;
-}
-
-
-static int _wrap_reset_dir_pad_position(lua_State* L) {
-  int SWIG_arg = 0;
-  LWCONTEXT *arg1 = (LWCONTEXT *) 0 ;
-  LWDIRPAD *arg2 = (LWDIRPAD *) 0 ;
-  
-  SWIG_check_num_args("reset_dir_pad_position",2,2)
-  if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("reset_dir_pad_position",1,"LWCONTEXT *");
-  if(!SWIG_isptrtype(L,2)) SWIG_fail_arg("reset_dir_pad_position",2,"LWDIRPAD *");
-  
-  if (!SWIG_IsOK(SWIG_ConvertPtr(L,1,(void**)&arg1,SWIGTYPE_p__LWCONTEXT,0))){
-    SWIG_fail_ptr("reset_dir_pad_position",1,SWIGTYPE_p__LWCONTEXT);
-  }
-  
-  
-  if (!SWIG_IsOK(SWIG_ConvertPtr(L,2,(void**)&arg2,SWIGTYPE_p__LWDIRPAD,0))){
-    SWIG_fail_ptr("reset_dir_pad_position",2,SWIGTYPE_p__LWDIRPAD);
-  }
-  
-  reset_dir_pad_position(arg1,arg2);
-  
-  return SWIG_arg;
-  
-  if(0) SWIG_fail;
-  
-fail:
-  lua_error(L);
-  return SWIG_arg;
-}
-
-
 static int _wrap_lw_press_key_left(lua_State* L) {
   int SWIG_arg = 0;
   LWCONTEXT *arg1 = (LWCONTEXT *) 0 ;
@@ -8697,28 +8615,28 @@ fail:
 }
 
 
-static int _wrap_get_dir_pad_original_center(lua_State* L) {
+static int _wrap_get_left_dir_pad_original_center(lua_State* L) {
   int SWIG_arg = 0;
   float arg1 ;
   float *arg2 = (float *) 0 ;
   float *arg3 = (float *) 0 ;
   
-  SWIG_check_num_args("get_dir_pad_original_center",3,3)
-  if(!lua_isnumber(L,1)) SWIG_fail_arg("get_dir_pad_original_center",1,"float");
-  if(!SWIG_isptrtype(L,2)) SWIG_fail_arg("get_dir_pad_original_center",2,"float *");
-  if(!SWIG_isptrtype(L,3)) SWIG_fail_arg("get_dir_pad_original_center",3,"float *");
+  SWIG_check_num_args("get_left_dir_pad_original_center",3,3)
+  if(!lua_isnumber(L,1)) SWIG_fail_arg("get_left_dir_pad_original_center",1,"float");
+  if(!SWIG_isptrtype(L,2)) SWIG_fail_arg("get_left_dir_pad_original_center",2,"float *");
+  if(!SWIG_isptrtype(L,3)) SWIG_fail_arg("get_left_dir_pad_original_center",3,"float *");
   arg1 = (float)lua_tonumber(L, 1);
   
   if (!SWIG_IsOK(SWIG_ConvertPtr(L,2,(void**)&arg2,SWIGTYPE_p_float,0))){
-    SWIG_fail_ptr("get_dir_pad_original_center",2,SWIGTYPE_p_float);
+    SWIG_fail_ptr("get_left_dir_pad_original_center",2,SWIGTYPE_p_float);
   }
   
   
   if (!SWIG_IsOK(SWIG_ConvertPtr(L,3,(void**)&arg3,SWIGTYPE_p_float,0))){
-    SWIG_fail_ptr("get_dir_pad_original_center",3,SWIGTYPE_p_float);
+    SWIG_fail_ptr("get_left_dir_pad_original_center",3,SWIGTYPE_p_float);
   }
   
-  get_dir_pad_original_center(arg1,arg2,arg3);
+  get_left_dir_pad_original_center(arg1,arg2,arg3);
   
   return SWIG_arg;
   
@@ -22997,8 +22915,8 @@ static int _wrap_LWCONTEXT_left_dir_pad_set(lua_State* L) {
   }
   
   
-  if (!SWIG_IsOK(SWIG_ConvertPtr(L,2,(void**)&argp2,SWIGTYPE_p__LWDIRPAD,0))){
-    SWIG_fail_ptr("LWCONTEXT_left_dir_pad_set",2,SWIGTYPE_p__LWDIRPAD);
+  if (!SWIG_IsOK(SWIG_ConvertPtr(L,2,(void**)&argp2,SWIGTYPE_p_LWDIRPAD,0))){
+    SWIG_fail_ptr("LWCONTEXT_left_dir_pad_set",2,SWIGTYPE_p_LWDIRPAD);
   }
   arg2 = *argp2;
   
@@ -23031,7 +22949,7 @@ static int _wrap_LWCONTEXT_left_dir_pad_get(lua_State* L) {
     LWDIRPAD * resultptr;
     resultptr = (LWDIRPAD *) malloc(sizeof(LWDIRPAD));
     memmove(resultptr, &result, sizeof(LWDIRPAD));
-    SWIG_NewPointerObj(L,(void *) resultptr,SWIGTYPE_p__LWDIRPAD,1); SWIG_arg++;
+    SWIG_NewPointerObj(L,(void *) resultptr,SWIGTYPE_p_LWDIRPAD,1); SWIG_arg++;
   }
   return SWIG_arg;
   
@@ -23058,8 +22976,8 @@ static int _wrap_LWCONTEXT_right_dir_pad_set(lua_State* L) {
   }
   
   
-  if (!SWIG_IsOK(SWIG_ConvertPtr(L,2,(void**)&argp2,SWIGTYPE_p__LWDIRPAD,0))){
-    SWIG_fail_ptr("LWCONTEXT_right_dir_pad_set",2,SWIGTYPE_p__LWDIRPAD);
+  if (!SWIG_IsOK(SWIG_ConvertPtr(L,2,(void**)&argp2,SWIGTYPE_p_LWDIRPAD,0))){
+    SWIG_fail_ptr("LWCONTEXT_right_dir_pad_set",2,SWIGTYPE_p_LWDIRPAD);
   }
   arg2 = *argp2;
   
@@ -23092,7 +23010,7 @@ static int _wrap_LWCONTEXT_right_dir_pad_get(lua_State* L) {
     LWDIRPAD * resultptr;
     resultptr = (LWDIRPAD *) malloc(sizeof(LWDIRPAD));
     memmove(resultptr, &result, sizeof(LWDIRPAD));
-    SWIG_NewPointerObj(L,(void *) resultptr,SWIGTYPE_p__LWDIRPAD,1); SWIG_arg++;
+    SWIG_NewPointerObj(L,(void *) resultptr,SWIGTYPE_p_LWDIRPAD,1); SWIG_arg++;
   }
   return SWIG_arg;
   
@@ -49890,8 +49808,6 @@ static swig_lua_method swig_SwigModule_methods[]= {
     { "font_get_base", _wrap_font_get_base},
     { "font_get_line_height", _wrap_font_get_line_height},
     { "release_font", _wrap_release_font},
-    { "lw_get_normalized_dir_pad_input", _wrap_lw_get_normalized_dir_pad_input},
-    { "reset_dir_pad_position", _wrap_reset_dir_pad_position},
     { "lw_press_key_left", _wrap_lw_press_key_left},
     { "lw_press_key_right", _wrap_lw_press_key_right},
     { "lw_press_key_up", _wrap_lw_press_key_up},
@@ -49953,7 +49869,7 @@ static swig_lua_method swig_SwigModule_methods[]= {
     { "lw_get_update_count", _wrap_lw_get_update_count},
     { "lw_get_render_count", _wrap_lw_get_render_count},
     { "lw_on_destroy", _wrap_lw_on_destroy},
-    { "get_dir_pad_original_center", _wrap_get_dir_pad_original_center},
+    { "get_left_dir_pad_original_center", _wrap_get_left_dir_pad_original_center},
     { "change_to_field", _wrap_change_to_field},
     { "change_to_dialog", _wrap_change_to_dialog},
     { "change_to_battle", _wrap_change_to_battle},
@@ -50300,6 +50216,7 @@ static swig_type_info _swigt__p_LWATTRIBVALUE = {"_p_LWATTRIBVALUE", "LWATTRIBVA
 static swig_type_info _swigt__p_LWATTRIBVALUE_bits = {"_p_LWATTRIBVALUE_bits", "LWATTRIBVALUE_bits *", 0, 0, (void*)&_wrap_class_LWATTRIBVALUE_bits, 0};
 static swig_type_info _swigt__p_LWBOX2DCOLLIDER = {"_p_LWBOX2DCOLLIDER", "LWBOX2DCOLLIDER *", 0, 0, (void*)&_wrap_class_LWBOX2DCOLLIDER, 0};
 static swig_type_info _swigt__p_LWBUTTONLIST = {"_p_LWBUTTONLIST", "LWBUTTONLIST *", 0, 0, (void*)0, 0};
+static swig_type_info _swigt__p_LWDIRPAD = {"_p_LWDIRPAD", "LWDIRPAD *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_LWFIELDRENDERCOMMAND = {"_p_LWFIELDRENDERCOMMAND", "LWFIELDRENDERCOMMAND *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_LWPKM = {"_p_LWPKM", "LWPKM *", 0, 0, (void*)&_wrap_class_LWPKM, 0};
 static swig_type_info _swigt__p_LWPSTATE = {"_p_LWPSTATE", "LWPSTATE *", 0, 0, (void*)0, 0};
@@ -50328,7 +50245,6 @@ static swig_type_info _swigt__p__LWCREATURESTAT = {"_p__LWCREATURESTAT", "struct
 static swig_type_info _swigt__p__LWDAMAGETEXT = {"_p__LWDAMAGETEXT", "struct _LWDAMAGETEXT *|LWDAMAGETEXT *|_LWDAMAGETEXT *", 0, 0, (void*)&_wrap_class_LWDAMAGETEXT, 0};
 static swig_type_info _swigt__p__LWDELTATIME = {"_p__LWDELTATIME", "struct _LWDELTATIME *|LWDELTATIME *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p__LWDESPAWNBULLETMSG = {"_p__LWDESPAWNBULLETMSG", "struct _LWDESPAWNBULLETMSG *|_LWDESPAWNBULLETMSG *|LWDESPAWNBULLETMSG *", 0, 0, (void*)&_wrap_class_LWDESPAWNBULLETMSG, 0};
-static swig_type_info _swigt__p__LWDIRPAD = {"_p__LWDIRPAD", "struct _LWDIRPAD *|LWDIRPAD *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p__LWEMITTER = {"_p__LWEMITTER", "struct _LWEMITTER *|_LWEMITTER *|LWEMITTER *", 0, 0, (void*)&_wrap_class_LWEMITTER, 0};
 static swig_type_info _swigt__p__LWEMITTER2 = {"_p__LWEMITTER2", "struct _LWEMITTER2 *|_LWEMITTER2 *|LWEMITTER2 *", 0, 0, (void*)&_wrap_class_LWEMITTER2, 0};
 static swig_type_info _swigt__p__LWEMITTER2OBJECT = {"_p__LWEMITTER2OBJECT", "struct _LWEMITTER2OBJECT *|_LWEMITTER2OBJECT *|LWEMITTER2OBJECT *", 0, 0, (void*)&_wrap_class_LWEMITTER2OBJECT, 0};
@@ -50432,6 +50348,7 @@ static swig_type_info *swig_type_initial[] = {
   &_swigt__p_LWATTRIBVALUE_bits,
   &_swigt__p_LWBOX2DCOLLIDER,
   &_swigt__p_LWBUTTONLIST,
+  &_swigt__p_LWDIRPAD,
   &_swigt__p_LWFIELDRENDERCOMMAND,
   &_swigt__p_LWPKM,
   &_swigt__p_LWPSTATE,
@@ -50460,7 +50377,6 @@ static swig_type_info *swig_type_initial[] = {
   &_swigt__p__LWDAMAGETEXT,
   &_swigt__p__LWDELTATIME,
   &_swigt__p__LWDESPAWNBULLETMSG,
-  &_swigt__p__LWDIRPAD,
   &_swigt__p__LWEMITTER,
   &_swigt__p__LWEMITTER2,
   &_swigt__p__LWEMITTER2OBJECT,
@@ -50564,6 +50480,7 @@ static swig_cast_info _swigc__p_LWATTRIBVALUE[] = {  {&_swigt__p_LWATTRIBVALUE, 
 static swig_cast_info _swigc__p_LWATTRIBVALUE_bits[] = {  {&_swigt__p_LWATTRIBVALUE_bits, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_LWBOX2DCOLLIDER[] = {  {&_swigt__p_LWBOX2DCOLLIDER, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_LWBUTTONLIST[] = {  {&_swigt__p_LWBUTTONLIST, 0, 0, 0},{0, 0, 0, 0}};
+static swig_cast_info _swigc__p_LWDIRPAD[] = {  {&_swigt__p_LWDIRPAD, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_LWFIELDRENDERCOMMAND[] = {  {&_swigt__p_LWFIELDRENDERCOMMAND, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_LWPKM[] = {  {&_swigt__p_LWPKM, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_LWPSTATE[] = {  {&_swigt__p_LWPSTATE, 0, 0, 0},{0, 0, 0, 0}};
@@ -50592,7 +50509,6 @@ static swig_cast_info _swigc__p__LWCREATURESTAT[] = {  {&_swigt__p__LWCREATUREST
 static swig_cast_info _swigc__p__LWDAMAGETEXT[] = {  {&_swigt__p__LWDAMAGETEXT, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p__LWDELTATIME[] = {  {&_swigt__p__LWDELTATIME, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p__LWDESPAWNBULLETMSG[] = {  {&_swigt__p__LWDESPAWNBULLETMSG, 0, 0, 0},{0, 0, 0, 0}};
-static swig_cast_info _swigc__p__LWDIRPAD[] = {  {&_swigt__p__LWDIRPAD, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p__LWEMITTER[] = {  {&_swigt__p__LWEMITTER, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p__LWEMITTER2[] = {  {&_swigt__p__LWEMITTER2, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p__LWEMITTER2OBJECT[] = {  {&_swigt__p__LWEMITTER2OBJECT, 0, 0, 0},{0, 0, 0, 0}};
@@ -50696,6 +50612,7 @@ static swig_cast_info *swig_cast_initial[] = {
   _swigc__p_LWATTRIBVALUE_bits,
   _swigc__p_LWBOX2DCOLLIDER,
   _swigc__p_LWBUTTONLIST,
+  _swigc__p_LWDIRPAD,
   _swigc__p_LWFIELDRENDERCOMMAND,
   _swigc__p_LWPKM,
   _swigc__p_LWPSTATE,
@@ -50724,7 +50641,6 @@ static swig_cast_info *swig_cast_initial[] = {
   _swigc__p__LWDAMAGETEXT,
   _swigc__p__LWDELTATIME,
   _swigc__p__LWDESPAWNBULLETMSG,
-  _swigc__p__LWDIRPAD,
   _swigc__p__LWEMITTER,
   _swigc__p__LWEMITTER2,
   _swigc__p__LWEMITTER2OBJECT,

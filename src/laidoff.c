@@ -958,9 +958,6 @@ int get_tex_index_by_hash_key(const LWCONTEXT* pLwc, const char *hash_key) {
 }
 
 void render_stat(const LWCONTEXT* pLwc) {
-
-    const float aspect_ratio = (float)pLwc->width / pLwc->height;
-
     LWTEXTBLOCK text_block;
     text_block.align = LTBA_LEFT_TOP;
     text_block.text_block_width = DEFAULT_TEXT_BLOCK_WIDTH;
@@ -982,16 +979,13 @@ void render_stat(const LWCONTEXT* pLwc) {
     text_block.text_bytelen = (int)strlen(text_block.text);
     text_block.begin_index = 0;
     text_block.end_index = text_block.text_bytelen;
-    text_block.text_block_x = -aspect_ratio;
+    text_block.text_block_x = -pLwc->aspect_ratio;
     text_block.text_block_y = 1.0f;
     text_block.multiline = 1;
     render_text_block(pLwc, &text_block);
 }
 
 void render_addr(const LWCONTEXT* pLwc) {
-
-    const float aspect_ratio = (float)pLwc->width / pLwc->height;
-
     LWTEXTBLOCK text_block;
     text_block.align = LTBA_LEFT_BOTTOM;
     text_block.text_block_width = DEFAULT_TEXT_BLOCK_WIDTH;
@@ -1010,7 +1004,7 @@ void render_addr(const LWCONTEXT* pLwc) {
     text_block.text_bytelen = (int)strlen(text_block.text);
     text_block.begin_index = 0;
     text_block.end_index = text_block.text_bytelen;
-    text_block.text_block_x = -aspect_ratio;
+    text_block.text_block_x = -pLwc->aspect_ratio;
     text_block.text_block_y = -1.0f;
     text_block.multiline = 1;
     render_text_block(pLwc, &text_block);
@@ -1276,24 +1270,22 @@ void lwc_prerender_mutable_context(LWCONTEXT* pLwc) {
             }
             if (player_damage > 0) {
                 pLwc->puck_game->player.hp_shake_remain_time = pLwc->puck_game->hp_shake_time;
-                const float aspect_ratio = (float)pLwc->width / pLwc->height;
                 mat4x4 proj_view;
                 mat4x4_identity(proj_view);
                 mat4x4_mul(proj_view, pLwc->puck_game_proj, pLwc->puck_game_view);
                 vec2 ui_point;
-                calculate_ui_point_from_world_point(aspect_ratio, proj_view, player_world_point, ui_point);
+                calculate_ui_point_from_world_point(pLwc->aspect_ratio, proj_view, player_world_point, ui_point);
                 spawn_damage_text(pLwc, ui_point[0], ui_point[1], 0, "1", LDTC_UI);
             }
             const int target_damage = pLwc->puck_game_state.target_current_hp - p.target_current_hp;
             if (target_damage > 0) {
                 pLwc->puck_game->target.hp_shake_remain_time = pLwc->puck_game->hp_shake_time;
-                const float aspect_ratio = (float)pLwc->width / pLwc->height;
                 mat4x4 proj_view;
                 mat4x4_identity(proj_view);
                 mat4x4_mul(proj_view, pLwc->puck_game_proj, pLwc->puck_game_view);
 
                 vec2 ui_point;
-                calculate_ui_point_from_world_point(aspect_ratio, proj_view, target_world_point, ui_point);
+                calculate_ui_point_from_world_point(pLwc->aspect_ratio, proj_view, target_world_point, ui_point);
                 spawn_damage_text(pLwc, ui_point[0], ui_point[1], 0, "1", LDTC_UI);
             }
             memcpy(&pLwc->puck_game_state, &p, sizeof(LWPSTATE));
@@ -1698,14 +1690,28 @@ LWCONTEXT *lw_init(void) {
 void lw_set_size(LWCONTEXT* pLwc, int w, int h) {
     pLwc->width = w;
     pLwc->height = h;
+    if (pLwc->width > 0 && pLwc->height > 0) {
+        pLwc->aspect_ratio = (float)pLwc->width / pLwc->height;
+    } else {
+        if (pLwc->width <= 0) {
+            LOGE("Screen width is 0 or below! (%d) Aspect ratio set to 1.0f", pLwc->width);
+        }
+        if (pLwc->height <= 0) {
+            LOGE("Screen heightis 0 or below! (%d) Aspect ratio set to 1.0f", pLwc->height);
+        }
+        pLwc->aspect_ratio = 1.0f;
+    }
+    
     // Update default projection matrix (pLwc->proj)
     logic_udate_default_projection(pLwc);
     // Initialize test font FBO
     init_font_fbo(pLwc);
     // Render font FBO using render-to-texture
     lwc_render_font_test_fbo(pLwc);
+    
     // Reset dir pad input state
-    reset_dir_pad_position(pLwc, &pLwc->left_dir_pad);
+    reset_dir_pad_position(&pLwc->left_dir_pad, pLwc->aspect_ratio);
+    reset_dir_pad_position(&pLwc->right_dir_pad, pLwc->aspect_ratio);
 
     puck_game_reset_view_proj(pLwc, pLwc->puck_game);
 }

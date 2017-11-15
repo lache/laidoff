@@ -153,7 +153,6 @@ static void render_match_state(const LWCONTEXT* pLwc) {
 
 static void render_hp_gauge(const LWCONTEXT* pLwc,
                             float x, float y, int current_hp, int total_hp, float hp_shake_remain_time, int right, const char* str) {
-    const float aspect_ratio = (float)pLwc->width / pLwc->height;
     const float gauge_width = 1.2f;
     const float gauge_height = 0.1f;
     //const float gauge_flush_height = 0.07f;
@@ -162,7 +161,7 @@ static void render_hp_gauge(const LWCONTEXT* pLwc,
     if (hp_shake_remain_time > 0) {
         const float ratio = hp_shake_remain_time / pLwc->puck_game->hp_shake_time;
         const float shake_magnitude = 0.02f;
-        x += ratio * (2 * rand() / (float)RAND_MAX - 1.0f) * shake_magnitude * aspect_ratio;
+        x += ratio * (2 * rand() / (float)RAND_MAX - 1.0f) * shake_magnitude * pLwc->aspect_ratio;
         y += ratio * (2 * rand() / (float)RAND_MAX - 1.0f) * shake_magnitude;
     }
     // Render background (gray)
@@ -221,21 +220,20 @@ static void render_hp_gauge(const LWCONTEXT* pLwc,
 }
 
 static void render_dash_gauge(const LWCONTEXT* pLwc) {
-    const float aspect_ratio = (float)pLwc->width / pLwc->height;
     const float margin_x = 1.5f;
     const float margin_y = 0.3f;
     const float gauge_width = 0.75f;
     const float gauge_height = 0.07f;
     //const float gauge_flush_height = 0.07f;
     const float base_color = 0.3f;
-    float x = -aspect_ratio + margin_x;
+    float x = -pLwc->aspect_ratio + margin_x;
     float y = 1 - margin_y;
     const float boost_gauge_ratio = puck_game_dash_gauge_ratio(pLwc->puck_game);
     // Positioinal offset by shake
     if (pLwc->puck_game->dash.shake_remain_time > 0) {
         const float ratio = pLwc->puck_game->dash.shake_remain_time / pLwc->puck_game->dash_shake_time;
         const float shake_magnitude = 0.02f;
-        x += ratio * (2 * rand() / (float)RAND_MAX - 1.0f) * shake_magnitude * aspect_ratio;
+        x += ratio * (2 * rand() / (float)RAND_MAX - 1.0f) * shake_magnitude * pLwc->aspect_ratio;
         y += ratio * (2 * rand() / (float)RAND_MAX - 1.0f) * shake_magnitude;
     }
     // Render background (red)

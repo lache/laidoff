@@ -1,10 +1,7 @@
 #pragma once
 
 typedef struct _LWCONTEXT LWCONTEXT;
-typedef struct _LWDIRPAD LWDIRPAD;
 
-int lw_get_normalized_dir_pad_input(const LWCONTEXT* pLwc, const LWDIRPAD* dir_pad, float *dx, float *dy, float *dlen);
-void reset_dir_pad_position(LWCONTEXT* pLwc, LWDIRPAD* dir_pad);
 void lw_press_key_left(LWCONTEXT* pLwc);
 void lw_press_key_right(LWCONTEXT* pLwc);
 void lw_press_key_up(LWCONTEXT* pLwc);
