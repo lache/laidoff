@@ -344,6 +344,8 @@ void lw_trigger_key_enter(LWCONTEXT* pLwc) {
 }
 
 static void simulate_dir_pad_touch_input(LWCONTEXT* pLwc) {
+    const int simulate_pointer_id = 10;
+    pLwc->left_dir_pad.pointer_id = simulate_pointer_id;
     pLwc->left_dir_pad.dragging = pLwc->player_move_left || pLwc->player_move_right || pLwc->player_move_down || pLwc->player_move_up;
 
     float dir_pad_center_x = 0;

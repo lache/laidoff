@@ -163,6 +163,8 @@ void update_puck_game(LWCONTEXT* pLwc, LWPUCKGAME* puck_game, double delta_time)
                       puck_game->fire.dir_y * puck_game->fire_max_force * puck_game->fire.dir_len,
                       0);
         puck_game->fire.remain_time = 0;
+        // Force release left dir pad
+        dir_pad_release(&pLwc->left_dir_pad, pLwc->left_dir_pad.pointer_id);
     }
     
     if (puck_game->pull_puck) {
