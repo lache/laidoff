@@ -1,4 +1,4 @@
-﻿#include "logic.h"
+#include "logic.h"
 #include <czmq.h>
 #include "lwcontext.h"
 #include "lwtimepoint.h"
@@ -25,6 +25,7 @@
 #include "lwime.h"
 
 void toggle_font_texture_test_mode(LWCONTEXT* pLwc);
+void requestRemoteNotificationDeviceToken();
 
 static const char* server_addr[] = {
 	"s.popsongremix.com", // AWS Tokyo
@@ -537,6 +538,10 @@ void start_text_input_activity(LWCONTEXT* pLwc) {
 	lw_start_text_input_activity(pLwc);
 }
 
+void start_request_push_token(LWCONTEXT* pLwc) {
+    requestRemoteNotificationDeviceToken();
+}
+
 void reset_runtime_context(LWCONTEXT* pLwc) {
 	// Stop new frame of rendering
 	lwcontext_set_safe_to_start_render(pLwc, 0);
@@ -585,6 +590,7 @@ void reset_runtime_context(LWCONTEXT* pLwc) {
 		{ LWU("레이테스트토글"), toggle_ray_test },
 		{ LWU("네트워크토글"), toggle_network_poll },
 		{ LWU("닉네임 변경"), start_text_input_activity },
+        { LWU("푸시 토큰 등록"), start_request_push_token },
 	};
 	for (int i = 0; i < ARRAY_SIZE(handler_array); i++) {
 		pLwc->admin_button_command[i].name = handler_array[i].name;

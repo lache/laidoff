@@ -28,6 +28,8 @@ typedef enum _LW_PUCK_GAME_PACKET {
 	LPGP_LWPNEWUSERDATA = 207,
 	LPGP_LWPQUERYNICK = 208,
 	LPGP_LWPNICK = 209,
+    LPGP_LWPPUSHTOKEN = 210,
+    LPGP_LWPSYSMSG = 211,
 
 	// internal admin tcp
 	LPGP_LWPCREATEBATTLE = 1000,
@@ -243,5 +245,24 @@ typedef struct _LWPSUDDENDEATH {
 	int Battle_id;
 	unsigned int Token;
 } LWPSUDDENDEATH;
+
+enum {
+    LW_PUSH_TOKEN_LENGTH = 256,
+    LW_SYS_MSG_LENGTH = 256,
+};
+
+typedef struct _LWPPUSHTOKEN {
+    unsigned short Size;
+    unsigned short Type;
+    unsigned int Id[4];
+    int Domain;
+    char Push_token[LW_PUSH_TOKEN_LENGTH];
+} LWPPUSHTOKEN;
+
+typedef struct _LWPSYSMSG {
+    unsigned short size;
+    unsigned short type;
+    char message[LW_SYS_MSG_LENGTH];
+} LWPSYSMSG;
 
 //#pragma pack(pop)

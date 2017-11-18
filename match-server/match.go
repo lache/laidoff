@@ -15,6 +15,8 @@ import (
 	mathrand "math/rand"
 	cryptorand "crypto/rand"
 	"encoding/gob"
+	"../shared-server"
+	"net/rpc"
 )
 
 // #include "../src/puckgamepacket.h"
@@ -36,18 +38,92 @@ type ServerConfig struct {
 	BattlePublicServiceConnType string
 }
 
+type ServiceList struct {
+	arith *Arith
+}
+
 type UserAgent struct {
 	conn net.Conn
 	userDb UserDb
 }
 
+type Arith struct {
+	client *rpc.Client
+}
+
+func (t *Arith) Divide(a, b int) shared_server.Quotient {
+	args := &shared_server.Args{a, b}
+	var reply shared_server.Quotient
+	err := t.client.Call("Arithmetic.Divide", args, &reply)
+	if err != nil {
+		log.Fatal("arith error:", err)
+	}
+	return reply
+}
+
+func (t *Arith) Multiply(a, b int) int {
+	args := &shared_server.Args{a, b}
+	var reply int
+	err := t.client.Call("Arithmetic.Multiply", args, &reply)
+	if err != nil {
+		log.Fatal("arith error:", err)
+	}
+	return reply
+}
+
+func (t *Arith) RegisterPushToken(backoff time.Duration, id []byte, domain int, pushToken string) int {
+	args := &shared_server.PushToken{domain, pushToken, id}
+	var reply int
+	err := t.client.Call("PushService.RegisterPushToken", args, &reply)
+	if err != nil {
+		log.Printf("arith error: %v", err)
+		if backoff > 10 * time.Second {
+			log.Printf("Error - Register Push Token failed: %v", err)
+			return 0
+		} else if backoff > 0 {
+			time.Sleep(backoff)
+		}
+		t.client, err = dialNewRpc()
+		return t.RegisterPushToken(backoff * 2, id, domain, pushToken)
+	}
+	return reply
+}
+
+func dialNewRpc() (*rpc.Client, error) {
+	// Tries to connect to localhost:1234 (The port on which rpc server is listening)
+	conn, err := net.Dial("tcp", "localhost:20171")
+	if err != nil {
+		log.Printf("Connection error: %v", err)
+		return nil, err
+	}
+	return rpc.NewClient(conn), nil
+}
+
+func newServiceList() *ServiceList {
+	client, err := dialNewRpc()
+	if err != nil {
+		log.Printf("dialNewRpc error: %v", err.Error())
+	}
+	// Create a struct, that mimics all methods provided by interface.
+	// It is not compulsory, we are doing it here, just to simulate a traditional method call.
+	arith := &Arith{client: client}
+	return &ServiceList {arith}
+}
+
 func main() {
+	// Set default log format
 	log.SetFlags(log.Lshortfile | log.LstdFlags)
 	log.Println("Greetings from match server")
+	// Create db directory to save user database
 	os.MkdirAll("db", os.ModePerm)
+	// Seed a new random number
 	mathrand.Seed(time.Now().Unix())
+	// Load nick name database
 	nickDb := Nickdb.LoadNickDb()
+	// Service List
+	serviceList := newServiceList()
 	log.Printf("Sample nick: %v", Nickdb.PickRandomNick(&nickDb))
+	// Load conf.json
 	confFile, err := os.Open("conf.json")
 	if err != nil {
 		log.Fatalf("conf.json open error:%v", err.Error())
@@ -58,22 +134,42 @@ func main() {
 	if err != nil {
 		log.Fatalf("conf.json parse error:%v", err.Error())
 	}
+	// Test RPC
+	testRpc()
+	// Create 1 vs. 1 match queue
 	matchQueue := make(chan UserAgent)
+	// Start match worker goroutine
+	go matchWorker(conf, matchQueue)
+	// Open TCP service port and listen for game clients
 	l, err := net.Listen(conf.ConnType, conf.ConnHost+":"+conf.ConnPort)
 	if err != nil {
 		log.Fatalln("Error listening:", err.Error())
 	}
 	defer l.Close()
 	log.Println("Listening on " + conf.ConnHost + ":" + conf.ConnPort)
-	go matchWorker(conf, matchQueue)
 	for {
 		conn, err := l.Accept()
 		if err != nil {
 			log.Println("Error accepting: ", err.Error())
 		} else {
-			go handleRequest(conf, &nickDb, conn, matchQueue)
+			go handleRequest(conf, &nickDb, conn, matchQueue, serviceList)
 		}
 	}
+}
+
+func testRpc() error {
+	// Tries to connect to localhost:1234 (The port on which rpc server is listening)
+	conn, err := net.Dial("tcp", "localhost:20171")
+	if err != nil {
+		log.Fatal("Connection error:", err)
+	}
+	// Create a struct, that mimics all methods provided by interface.
+	// It is not compulsory, we are doing it here, just to simulate a traditional method call.
+	arith := &Arith{client: rpc.NewClient(conn)}
+	log.Println(arith.Multiply(5, 6))
+	log.Println(arith.Divide(500, 10))
+	log.Println(arith.RegisterPushToken(300 * time.Millisecond, []byte{1,2,3,4}, 500, "test-push-token"))
+	return err
 }
 
 func int2ByteArray(v C.int) [4]byte {
@@ -217,7 +313,7 @@ type UserDb struct {
 	Nickname string
 }
 
-func handleRequest(conf ServerConfig, nickDb *Nickdb.NickDb, conn net.Conn, matchQueue chan<- UserAgent) {
+func handleRequest(conf ServerConfig, nickDb *Nickdb.NickDb, conn net.Conn, matchQueue chan<- UserAgent, serviceList *ServiceList) {
 	log.Printf("Accepting from %v", conn.RemoteAddr())
 	for {
 		buf := make([]byte, 1024)
@@ -244,11 +340,54 @@ func handleRequest(conf ServerConfig, nickDb *Nickdb.NickDb, conn net.Conn, matc
 			handleNewUser(nickDb, conn)
 		case C.LPGP_LWPQUERYNICK:
 			handleQueryNick(buf, conn, nickDb)
+		case C.LPGP_LWPPUSHTOKEN:
+			handlePushToken(buf, conn, serviceList)
 		}
 	}
 	conn.Close()
 	log.Printf("Conn closed %v", conn.RemoteAddr())
 }
+
+func byteArrayToCcharArray256(b []byte) [256]C.char {
+	var ret [256]C.char
+	bLen := len(b)
+	if bLen > 255 {
+		bLen = 255
+	}
+	for i := 0; i < bLen; i++ {
+		ret[i] = C.char(b[i])
+	}
+	return ret
+}
+
+func handlePushToken(buf []byte, conn net.Conn, serviceList *ServiceList) {
+	log.Printf("PUSHTOKEN received")
+	// Parse
+	bufReader := bytes.NewReader(buf)
+	recvPacket := C.LWPPUSHTOKEN{}
+	err := binary.Read(bufReader, binary.LittleEndian, &recvPacket)
+	if err != nil {
+		log.Printf("binary.Read fail: %v", err.Error())
+		return
+	}
+	idBytes := IdCuintToByteArray(recvPacket.Id)
+	pushTokenBytes := C.GoBytes(unsafe.Pointer(&recvPacket.Push_token), C.LW_PUSH_TOKEN_LENGTH)
+	pushTokenLength := bytes.IndexByte(pushTokenBytes, 0)
+	pushToken := string(pushTokenBytes[:pushTokenLength])
+	log.Printf("Push token domain %v, token: %v, id: %v", recvPacket.Domain, pushToken, idBytes)
+	pushResult := serviceList.arith.RegisterPushToken(300 * time.Millisecond, idBytes, int(recvPacket.Domain), pushToken)
+	log.Printf("Push result: %v", pushResult)
+	if pushResult == 1 {
+		sysMsg := []byte(fmt.Sprintf("토큰 등록 완료! %v", pushToken))
+		queueOkBuf := packet2Buf(&C.LWPSYSMSG{
+			C.ushort(unsafe.Sizeof(C.LWPSYSMSG{})),
+			C.LPGP_LWPSYSMSG,
+			byteArrayToCcharArray256(sysMsg),
+		})
+		conn.Write(queueOkBuf)
+	}
+}
+
 func handleQueue2(matchQueue chan<- UserAgent, buf []byte, conn net.Conn) {
 	log.Printf("QUEUE2 received")
 

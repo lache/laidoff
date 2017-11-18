@@ -17,6 +17,27 @@
 #include "lwcontext.h"
 #include <czmq.h>
 
+static id app_delegate;
+
+void set_app_delegate(id ad /*app_delegate*/) {
+    app_delegate = ad;
+}
+
+void requestRemoteNotificationDeviceToken()
+{
+//    if (![[NSUserDefaults standardUserDefaults] objectForKey:@"HasSeenPopup"])
+    {
+        UIAlertView *alert = [[UIAlertView alloc]initWithTitle:@"푸시 알림 등록"
+                                                       message:@"푸시 알림을 위한 장치 토큰을 등록할까요?"
+                                                      delegate:app_delegate
+                                             cancelButtonTitle:@"아니오"
+                                             otherButtonTitles:@"예",
+                              nil];
+        [alert show];
+        [[NSUserDefaults standardUserDefaults] setValue:@"YES" forKey:@"HasSeenPopup"];
+    }
+}
+
 void lw_start_text_input_activity(LWCONTEXT* pLwc) {
     // Not implemented yet...
 }

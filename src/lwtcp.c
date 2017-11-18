@@ -7,6 +7,7 @@
 #include "lwudp.h"
 #include "file.h"
 #include "puckgameupdate.h"
+#include <string.h>
 
 //#if LW_AUTO_BUILD || LW_PLATFORM_IOS
 //#define LW_TCP_SERVER "puck-highend.popsongremix.com"
@@ -52,39 +53,29 @@ vartype varname; \
 varname.Size = sizeof(vartype); \
 varname.Type = LPGP_##vartype
 
+int tcp_connect(LWTCP* tcp) {
+    if (tcp->ConnectSocket) {
+        closesocket(tcp->ConnectSocket);
+    }
+    tcp->ConnectSocket = INVALID_SOCKET;
+    tcp->recvbuflen = LW_TCP_BUFLEN;
 
-LWTCP* new_tcp(const LWCONTEXT* pLwc, const char* path_prefix) {
-	LWTCP* tcp = (LWTCP*)malloc(sizeof(LWTCP));
-	memset(tcp, 0, sizeof(LWTCP));
-	tcp->ConnectSocket = INVALID_SOCKET;
-	tcp->recvbuflen = LW_TCP_BUFLEN;
-	tcp->hints.ai_family = AF_UNSPEC;
-	tcp->hints.ai_socktype = SOCK_STREAM;
-	tcp->hints.ai_protocol = IPPROTO_TCP;
-
-	tcp->iResult = getaddrinfo(lw_tcp_addr(pLwc), lw_tcp_port_str(pLwc), &tcp->hints, &tcp->result);
-	if (tcp->iResult != 0) {
-		LOGE("getaddrinfo failed with error: %d", tcp->iResult);
-		free(tcp);
-		return 0;
-	}
-
-	// Attempt to connect to an address until one succeeds
-	for (tcp->ptr = tcp->result; tcp->ptr != NULL; tcp->ptr = tcp->ptr->ai_next) {
-		// Create a socket for connecting to server
-		tcp->ConnectSocket = socket(tcp->ptr->ai_family, tcp->ptr->ai_socktype,
-			tcp->ptr->ai_protocol);
-		if (tcp->ConnectSocket == INVALID_SOCKET) {
-			LOGE("socket failed with error: %ld", WSAGetLastError());
-			free(tcp);
-			return 0;
-		}
-
-		make_socket_nonblocking(tcp->ConnectSocket);
-
+    
+    // Attempt to connect to an address until one succeeds
+    for (tcp->ptr = tcp->result; tcp->ptr != NULL; tcp->ptr = tcp->ptr->ai_next) {
+        // Create a socket for connecting to server
+        tcp->ConnectSocket = socket(tcp->ptr->ai_family, tcp->ptr->ai_socktype,
+                                    tcp->ptr->ai_protocol);
+        if (tcp->ConnectSocket == INVALID_SOCKET) {
+            LOGE("socket failed with error: %ld", (long)WSAGetLastError());
+            return -2;
+        }
+        
+        make_socket_nonblocking(tcp->ConnectSocket);
+        
         fd_set fdset;
         // Connect to server
-		connect(tcp->ConnectSocket, tcp->ptr->ai_addr, (int)tcp->ptr->ai_addrlen);
+        connect(tcp->ConnectSocket, tcp->ptr->ai_addr, (int)tcp->ptr->ai_addrlen);
         FD_ZERO(&fdset);
         FD_SET(tcp->ConnectSocket, &fdset);
         struct timeval connect_timeout;
@@ -96,15 +87,38 @@ LWTCP* new_tcp(const LWCONTEXT* pLwc, const char* path_prefix) {
             tcp->ConnectSocket = INVALID_SOCKET;
             continue;
         }
-		break;
-	}
-	freeaddrinfo(tcp->result);
-	if (tcp->ConnectSocket == INVALID_SOCKET) {
-		LOGE("Unable to connect to server!");
-		//free(tcp);
-		return tcp;
-	}
+        break;
+    }
+    //freeaddrinfo(tcp->result);
+    if (tcp->ConnectSocket == INVALID_SOCKET) {
+        LOGE("Unable to connect to server!");
+        return -3;
+    }
+    return 0;
+}
 
+LWTCP* new_tcp(const LWCONTEXT* pLwc, const char* path_prefix) {
+	LWTCP* tcp = (LWTCP*)malloc(sizeof(LWTCP));
+	memset(tcp, 0, sizeof(LWTCP));
+    tcp->hints.ai_family = AF_UNSPEC;
+    tcp->hints.ai_socktype = SOCK_STREAM;
+    tcp->hints.ai_protocol = IPPROTO_TCP;
+    
+    // Handle SIGPIPE in our side
+    signal(SIGPIPE, SIG_IGN);
+    
+    tcp->iResult = getaddrinfo(lw_tcp_addr(pLwc), lw_tcp_port_str(pLwc), &tcp->hints, &tcp->result);
+    if (tcp->iResult != 0) {
+        LOGE("getaddrinfo failed with error: %d", tcp->iResult);
+        free(tcp);
+        return 0;
+    }
+    
+    if (tcp_connect(tcp) < 0) {
+        free(tcp);
+        return 0;
+    }
+    
 	if (get_cached_user_id(path_prefix, &tcp->user_id) == 0) {
 		LOGI("Cached user id: %08x-%08x-%08x-%08x",
 			tcp->user_id.v[0], tcp->user_id.v[1], tcp->user_id.v[2], tcp->user_id.v[3]);
@@ -120,12 +134,10 @@ LWTCP* new_tcp(const LWCONTEXT* pLwc, const char* path_prefix) {
 
 void destroy_tcp(LWTCP** tcp) {
 	if (*tcp) {
+        freeaddrinfo((*tcp)->result);
 		free(*tcp);
 		*tcp = 0;
 	}
-}
-
-void tcp_send(LWTCP* tcp, const char* data, int size) {
 }
 
 #define CHECK_PACKET(packet_type, packet_size, type) \
@@ -154,10 +166,10 @@ int parse_recv_packets(LWCONTEXT* pLwc, LWTCP* tcp) {
 			memcpy(pLwc->puck_game->target_nickname, p->target_nickname, sizeof(p->target_nickname));
 			pLwc->udp_host_addr.host_resolved = *(unsigned long*)p->ipaddr;
 			sprintf(pLwc->udp_host_addr.host, "%d.%d.%d.%d",
-					(pLwc->udp_host_addr.host_resolved >> 0) & 0xff,
-					(pLwc->udp_host_addr.host_resolved >> 8) & 0xff ,
-					(pLwc->udp_host_addr.host_resolved >> 16) & 0xff,
-					(pLwc->udp_host_addr.host_resolved >> 24) & 0xff);
+					((int)pLwc->udp_host_addr.host_resolved >> 0) & 0xff,
+					((int)pLwc->udp_host_addr.host_resolved >> 8) & 0xff ,
+					((int)pLwc->udp_host_addr.host_resolved >> 16) & 0xff,
+					((int)pLwc->udp_host_addr.host_resolved >> 24) & 0xff);
 			pLwc->udp_host_addr.port = p->port;
 			udp_update_addr(pLwc->udp,
 							pLwc->udp_host_addr.host_resolved,
@@ -195,7 +207,11 @@ int parse_recv_packets(LWCONTEXT* pLwc, LWTCP* tcp) {
 			LOGI("Cached user nick: %s", p->nickname);
 			memcpy(pLwc->puck_game->nickname, p->nickname, sizeof(char) * LW_NICKNAME_MAX_LEN);
 			tcp_send_queue2(tcp, &pLwc->tcp->user_id);
-		} else {
+		} else if (CHECK_PACKET(packet_type, packet_size, LWPSYSMSG)) {
+            LOGI("LWPSYSMSG received");
+            LWPSYSMSG* p = (LWPSYSMSG*)cursor;
+            show_sys_msg(pLwc->def_sys_msg, p->message);
+        } else {
 			LOGE("Unknown TCP packet");
 		}
 		parsed_bytes += packet_size;
@@ -211,7 +227,7 @@ void tcp_update(LWCONTEXT* pLwc, LWTCP* tcp) {
 	if (LW_TCP_BUFLEN - tcp->recvbufnotparsed <= 0) {
 		LOGE("TCP receive buffer overrun!!!");
 	}
-	int n = recv(tcp->ConnectSocket, tcp->recvbuf + tcp->recvbufnotparsed, LW_TCP_BUFLEN - tcp->recvbufnotparsed, 0);
+	int n = (int)recv(tcp->ConnectSocket, tcp->recvbuf + tcp->recvbufnotparsed, LW_TCP_BUFLEN - tcp->recvbufnotparsed, 0);
 	if (n > 0) {
 		LOGI("TCP received: %d bytes", n);
 		tcp->recvbufnotparsed += n;
@@ -228,21 +244,21 @@ void tcp_update(LWCONTEXT* pLwc, LWTCP* tcp) {
 int tcp_send_newuser(LWTCP* tcp) {
 	NEW_TCP_PACKET(LWPNEWUSER, p);
 	memcpy(tcp->sendbuf, &p, sizeof(p));
-	return send(tcp->ConnectSocket, tcp->sendbuf, (int)sizeof(p), 0);
+	return (int)send(tcp->ConnectSocket, tcp->sendbuf, (int)sizeof(p), 0);
 }
 
 int tcp_send_querynick(LWTCP* tcp, const LWUNIQUEID* id) {
 	NEW_TCP_PACKET_CAPITAL(LWPQUERYNICK, p);
 	memcpy(p.Id, id->v, sizeof(LWUNIQUEID));
 	memcpy(tcp->sendbuf, &p, sizeof(p));
-	return send(tcp->ConnectSocket, tcp->sendbuf, (int)sizeof(p), 0);
+	return (int)send(tcp->ConnectSocket, tcp->sendbuf, sizeof(p), 0);
 }
 
 int tcp_send_queue2(LWTCP* tcp, const LWUNIQUEID* id) {
 	NEW_TCP_PACKET_CAPITAL(LWPQUEUE2, p);
 	memcpy(p.Id, id->v, sizeof(LWUNIQUEID));
 	memcpy(tcp->sendbuf, &p, sizeof(p));
-	return send(tcp->ConnectSocket, tcp->sendbuf, (int)sizeof(p), 0);
+	return (int)send(tcp->ConnectSocket, tcp->sendbuf, sizeof(p), 0);
 }
 
 int tcp_send_suddendeath(LWTCP* tcp, int battle_id, unsigned int token) {
@@ -250,7 +266,29 @@ int tcp_send_suddendeath(LWTCP* tcp, int battle_id, unsigned int token) {
 	p.Battle_id = battle_id;
 	p.Token = token;
 	memcpy(tcp->sendbuf, &p, sizeof(p));
-	return send(tcp->ConnectSocket, tcp->sendbuf, (int)sizeof(p), 0);
+	return (int)send(tcp->ConnectSocket, tcp->sendbuf, sizeof(p), 0);
+}
+
+int tcp_send_push_token(LWTCP* tcp, int backoffMs, int domain, const char* push_token) {
+    NEW_TCP_PACKET_CAPITAL(LWPPUSHTOKEN, p);
+    p.Domain = domain;
+    strncpy(p.Push_token, push_token, sizeof(p.Push_token) - 1);
+    memcpy(p.Id, tcp->user_id.v, sizeof(p.Id));
+    p.Push_token[sizeof(p.Push_token) - 1] = '\0';
+    memcpy(tcp->sendbuf, &p, sizeof(p));
+    ssize_t send_result = send(tcp->ConnectSocket, tcp->sendbuf, sizeof(p), 0);
+    if (send_result < 0) {
+        LOGI("Send result error: %ld", send_result);
+        if (backoffMs > 10 * 1000 /* 10 seconds */) {
+            LOGE("tcp_send_push_token: failed");
+            return -1;
+        } else if (backoffMs > 0) {
+            usleep(backoffMs * 1000);
+        }
+        tcp_connect(tcp);
+        return tcp_send_push_token(tcp, backoffMs * 2, domain, push_token);
+    }
+    return (int)send_result;
 }
 
 const char* lw_tcp_addr(const LWCONTEXT* pLwc) {

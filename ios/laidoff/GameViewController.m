@@ -9,9 +9,10 @@
 #import "GameViewController.h"
 #import "lwgl.h"
 #import "laidoff.h"
+#import "AppDelegate.h"
 
 @interface GameViewController () {
-  
+    
 }
 @property (strong, nonatomic) EAGLContext *context;
 @property (nonatomic) LWCONTEXT *pLwc;
@@ -30,7 +31,7 @@ char internal_data_path[1024];
     [super viewDidLoad];
     
     self.context = [[EAGLContext alloc] initWithAPI:kEAGLRenderingAPIOpenGLES2];
-
+    
     if (!self.context) {
         NSLog(@"Failed to create ES context");
     }
@@ -56,6 +57,10 @@ char internal_data_path[1024];
     strcat(internal_data_path, "/Documents");
     NSLog(@"Internal data path: %s", internal_data_path);
     lwc_start_logic_thread(self.pLwc);
+    
+    AppDelegate *appDelegate = (AppDelegate *)[[UIApplication sharedApplication] delegate];
+
+    [appDelegate setContext:self.pLwc];
 }
 
 - (void)dealloc
@@ -70,7 +75,7 @@ char internal_data_path[1024];
 - (void)didReceiveMemoryWarning
 {
     [super didReceiveMemoryWarning];
-
+    
     if ([self isViewLoaded] && ([[self view] window] == nil)) {
         self.view = nil;
         
@@ -81,7 +86,7 @@ char internal_data_path[1024];
         }
         self.context = nil;
     }
-
+    
     // Dispose of any resources that can be recreated.
 }
 

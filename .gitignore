@@ -24,3 +24,6 @@ cmake-build-debug
 workspace.xml
 /android/app/release/app-release
 /android/app/release
+push-server/db
+push-server/cert
+push-server

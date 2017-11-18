@@ -935,6 +935,7 @@
 		56F1897D1EC751950019312F /* ztimerset.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = ztimerset.c; sourceTree = "<group>"; };
 		56F1897E1EC751950019312F /* ztrie.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = ztrie.c; sourceTree = "<group>"; };
 		56F1897F1EC751950019312F /* zuuid.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = zuuid.c; sourceTree = "<group>"; };
+		6C2A5FED1FC03260005B3DF2 /* laidoff.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = laidoff.entitlements; sourceTree = "<group>"; };
 		6C7739171FB4B59D001014DE /* battlelogic.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = battlelogic.h; sourceTree = "<group>"; };
 		6C7739181FB4B59D001014DE /* etc1.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = etc1.h; sourceTree = "<group>"; };
 		6C7739191FB4B59D001014DE /* font.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = font.c; sourceTree = "<group>"; };
@@ -1961,6 +1962,7 @@
 		6CA16CD51EA20B5600DB7AF0 /* laidoff */ = {
 			isa = PBXGroup;
 			children = (
+				6C2A5FED1FC03260005B3DF2 /* laidoff.entitlements */,
 				6CA16CD91EA20B5600DB7AF0 /* AppDelegate.h */,
 				6CA16CDA1EA20B5600DB7AF0 /* AppDelegate.m */,
 				6CA16CE61EA20B5600DB7AF0 /* Assets.xcassets */,
@@ -2277,6 +2279,11 @@
 						CreatedOnToolsVersion = 8.1;
 						DevelopmentTeam = TG9MHV97AH;
 						ProvisioningStyle = Manual;
+						SystemCapabilities = {
+							com.apple.Push = {
+								enabled = 1;
+							};
+						};
 					};
 				};
 			};
@@ -2815,6 +2822,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = laidoff/laidoff.entitlements;
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Manual;
 				DEVELOPMENT_TEAM = TG9MHV97AH;
@@ -2849,6 +2857,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = laidoff/laidoff.entitlements;
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Manual;
 				DEVELOPMENT_TEAM = TG9MHV97AH;

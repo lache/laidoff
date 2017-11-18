@@ -1810,3 +1810,7 @@ void lw_set_kp(LWCONTEXT* pLwc, int kp) {
 double lwcontext_delta_time(const LWCONTEXT* pLwc) {
     return deltatime_delta_time(pLwc->update_dt);
 }
+
+void lw_set_push_token(LWCONTEXT* pLwc, int domain, const char* token) {
+    tcp_send_push_token(pLwc->tcp, 300, domain, token);
+}

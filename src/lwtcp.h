@@ -41,7 +41,6 @@ typedef struct _LWCONTEXT LWCONTEXT;
 
 LWTCP* new_tcp(const LWCONTEXT* pLwc, const char* path_prefix);
 void destroy_tcp(LWTCP** tcp);
-void tcp_send(LWTCP* tcp, const char* data, int size);
 void tcp_update(LWCONTEXT* pLwc, LWTCP* tcp);
 int tcp_send_queue2(LWTCP* tcp, const LWUNIQUEID* id);
 int tcp_send_suddendeath(LWTCP* tcp, int battle_id, unsigned int token);
@@ -50,3 +49,4 @@ int tcp_send_querynick(LWTCP* tcp, const LWUNIQUEID* id);
 const char* lw_tcp_addr(const LWCONTEXT* pLwc);
 const char* lw_tcp_port_str(const LWCONTEXT* pLwc);
 int lw_tcp_port(const LWCONTEXT* pLwc);
+int tcp_send_push_token(LWTCP* tcp, int backoffMs, int domain, const char* push_token);
