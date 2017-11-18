@@ -7,7 +7,7 @@
 //
 
 #import "AppDelegate.h"
-
+#include "lwime.h"
 
 void set_app_delegate(id ad);
 void lw_set_push_token(LWCONTEXT* pLwc, int domain, const char* token);
@@ -90,14 +90,22 @@ didRegisterUserNotificationSettings:(UIUserNotificationSettings *)notificationSe
     // Called when the application is about to terminate. Save data if appropriate. See also applicationDidEnterBackground:.
 }
 
-- (void) alertView:(UIAlertView *)alertView clickedButtonAtIndex:(NSInteger)buttonIndex
-{
-    // 0 = Tapped yes
-    if (buttonIndex == 1)
-    {
-        NSLog(@"Registering for push notifications...");
-        [[UIApplication sharedApplication] registerUserNotificationSettings:[UIUserNotificationSettings settingsForTypes:(UIUserNotificationTypeSound | UIUserNotificationTypeAlert | UIUserNotificationTypeBadge) categories:nil]];
-        [[UIApplication sharedApplication] registerForRemoteNotifications];
+- (void) alertView:(UIAlertView *)alertView clickedButtonAtIndex:(NSInteger)buttonIndex {
+    if (alertView.tag == 100) {
+        // 0 = Tapped yes
+        if (buttonIndex == 1)
+        {
+            NSLog(@"Registering for push notifications...");
+            [[UIApplication sharedApplication] registerUserNotificationSettings:[UIUserNotificationSettings settingsForTypes:(UIUserNotificationTypeSound | UIUserNotificationTypeAlert | UIUserNotificationTypeBadge) categories:nil]];
+            [[UIApplication sharedApplication] registerForRemoteNotifications];
+        }
+    } else if (alertView.tag == 200) {
+        NSString* textInput = [[alertView textFieldAtIndex:0] text];
+        if (textInput) {
+            NSLog(@"Entered: %@", textInput);
+            strcpy(lw_get_text_input_for_writing(), (char*)[textInput UTF8String]);
+            lw_increase_text_input_seq();
+        }
     }
 }
 

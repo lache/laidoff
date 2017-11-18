@@ -16,6 +16,7 @@
 #include "sound.h"
 #include "lwcontext.h"
 #include <czmq.h>
+#include "lwime.h"
 
 static id app_delegate;
 
@@ -33,13 +34,23 @@ void requestRemoteNotificationDeviceToken()
                                              cancelButtonTitle:@"아니오"
                                              otherButtonTitles:@"예",
                               nil];
+        alert.tag = 100;
         [alert show];
         [[NSUserDefaults standardUserDefaults] setValue:@"YES" forKey:@"HasSeenPopup"];
     }
 }
 
 void lw_start_text_input_activity(LWCONTEXT* pLwc) {
-    // Not implemented yet...
+    pLwc->last_text_input_seq = lw_get_text_input_seq();
+    UIAlertView * alert = [[UIAlertView alloc] initWithTitle:@"닉네임"
+                                                     message:@"닉네임을 입력하세요."
+                                                    delegate:app_delegate
+                                           cancelButtonTitle:@"취소"
+                                           otherButtonTitles:@"확인",
+                           nil];
+    alert.tag = 200;
+    alert.alertViewStyle = UIAlertViewStylePlainTextInput;
+    [alert show];
 }
 
 char * create_string_from_file(const char * filename) {
