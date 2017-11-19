@@ -25,7 +25,7 @@
 #include "lwime.h"
 
 void toggle_font_texture_test_mode(LWCONTEXT* pLwc);
-void requestRemoteNotificationDeviceToken();
+void lw_request_remote_notification_device_token(LWCONTEXT* pLwc);
 
 static const char* server_addr[] = {
 	"s.popsongremix.com", // AWS Tokyo
@@ -539,7 +539,7 @@ void start_text_input_activity(LWCONTEXT* pLwc) {
 }
 
 void start_request_push_token(LWCONTEXT* pLwc) {
-    requestRemoteNotificationDeviceToken();
+    lw_request_remote_notification_device_token(pLwc);
 }
 
 void reset_runtime_context(LWCONTEXT* pLwc) {

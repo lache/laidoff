@@ -48,7 +48,7 @@ class DownloadTask extends AsyncTask<DownloadTaskParams, Void, GetFileResult> {
         urlConnection.setDoOutput(false);
         urlConnection.connect();
         String etagServer = urlConnection.getHeaderField("Etag").trim();
-            Log.i(LaidOffNativeActivity.LOG_TAG, String.format("%s - server Etag: %s", remotePath, etagServer));
+            Log.i(LaidoffNativeActivity.LOG_TAG, String.format("%s - server Etag: %s", remotePath, etagServer));
 
         File etagFile = new File(fileAbsolutePath, localFilename + ".Etag");
 
@@ -151,7 +151,7 @@ class DownloadTask extends AsyncTask<DownloadTaskParams, Void, GetFileResult> {
 
     private void writeEtag() {
         if (dtp.sequenceNumber.incrementAndGet() == dtp.totalSequenceNumber) {
-            Log.i(LaidOffNativeActivity.LOG_TAG, "Resource update finished.");
+            Log.i(LaidoffNativeActivity.LOG_TAG, "Resource update finished.");
             dtp.urt.writeListEtag();
             dtp.urt.onResourceLoadFinished();
         }
@@ -159,6 +159,6 @@ class DownloadTask extends AsyncTask<DownloadTaskParams, Void, GetFileResult> {
 
     @SuppressWarnings("UnusedParameters")
     private static void updateProgress(String filename, int downloadedSize, int totalSize) {
-        //Log.i(LaidOffNativeActivity.LOG_TAG, String.format("Downloading %s... (%d/%d bytes)", filename, downloadedSize, totalSize));
+        //Log.i(LaidoffNativeActivity.LOG_TAG, String.format("Downloading %s... (%d/%d bytes)", filename, downloadedSize, totalSize));
     }
 }

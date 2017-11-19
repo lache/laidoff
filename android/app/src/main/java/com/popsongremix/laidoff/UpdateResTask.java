@@ -92,7 +92,7 @@ class UpdateResTask extends AsyncTask<UpdateResTaskParam, Void, File> {
         }
 
         if (packageVersionName.compareTo("0.1.0") == 0) {
-            Log.i(LaidOffNativeActivity.LOG_TAG, "Development version name detected. Version check will be skipped.");
+            Log.i(LaidoffNativeActivity.LOG_TAG, "Development version name detected. Version check will be skipped.");
         } else {
             GetFileResult versionNameFileResult = DownloadTask.getFile(
                     param.fileAbsolutePath,
@@ -168,7 +168,7 @@ class UpdateResTask extends AsyncTask<UpdateResTaskParam, Void, File> {
                 new DownloadTask().execute(dtp);
             }
         } else {
-            Log.i(LaidOffNativeActivity.LOG_TAG, "Resource update not needed. (latest list file)");
+            Log.i(LaidoffNativeActivity.LOG_TAG, "Resource update not needed. (latest list file)");
             onResourceLoadFinished();
         }
     }
@@ -208,13 +208,13 @@ class UpdateResTask extends AsyncTask<UpdateResTaskParam, Void, File> {
                 asyncDialog.setProgress(i + 1);
 
                 if (dtp.sequenceNumber.incrementAndGet() == dtp.totalSequenceNumber) {
-                    Log.i(LaidOffNativeActivity.LOG_TAG, "Resource update finished.");
+                    Log.i(LaidoffNativeActivity.LOG_TAG, "Resource update finished.");
                     dtp.urt.writeListEtag();
                     dtp.urt.onResourceLoadFinished();
                 }
             }
         } else {
-            Log.i(LaidOffNativeActivity.LOG_TAG, "Resource update not needed. (latest list file)");
+            Log.i(LaidoffNativeActivity.LOG_TAG, "Resource update not needed. (latest list file)");
             onResourceLoadFinished();
         }
     }
@@ -228,7 +228,7 @@ class UpdateResTask extends AsyncTask<UpdateResTaskParam, Void, File> {
     }
 
     void onResourceLoadFinished() {
-        String result = LaidOffNativeActivity.signalResourceReady(LaidOffNativeActivity.class);
-        Log.i(LaidOffNativeActivity.LOG_TAG, "onResourceLoadFinished() [JAVA] - calling signalResourceReady() result: " + result);
+        String result = LaidoffNativeActivity.signalResourceReady(LaidoffNativeActivity.class);
+        Log.i(LaidoffNativeActivity.LOG_TAG, "onResourceLoadFinished() [JAVA] - calling signalResourceReady() result: " + result);
     }
 }

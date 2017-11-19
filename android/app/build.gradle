@@ -45,7 +45,7 @@ android {
 
     defaultConfig {
         applicationId "com.popsongremix.laidoff"
-        minSdkVersion   15
+        minSdkVersion 15
         targetSdkVersion 27
 
         versionCode versionProperties['versionCode'] as int
@@ -128,5 +128,8 @@ dependencies {
     //compile 'com.jakewharton.timber:timber:4.5.1'
     //compile 'com.squareup.okhttp3:okhttp:3.6.0'
     //compile 'com.squareup.okhttp3:logging-interceptor:3.6.0'
+    implementation 'com.google.firebase:firebase-messaging:11.6.0'
 }
 
+
+apply plugin: 'com.google.gms.google-services'

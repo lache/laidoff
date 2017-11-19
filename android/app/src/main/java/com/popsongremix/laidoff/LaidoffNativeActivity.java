@@ -12,9 +12,9 @@ import android.media.SoundPool;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.MotionEvent;
 import android.view.WindowManager;
-import android.widget.EditText;
+
+import com.google.firebase.iid.FirebaseInstanceId;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -22,7 +22,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Locale;
 
-public class LaidOffNativeActivity extends NativeActivity
+public class LaidoffNativeActivity extends NativeActivity
 {
     private static boolean mBgmOn;
 
@@ -34,15 +34,16 @@ public class LaidOffNativeActivity extends NativeActivity
 
     private static MediaPlayer mBgmPlayer;
 
-    public static native String signalResourceReady(Class<LaidOffNativeActivity> and9NativeActivityClass);
+    public static native String signalResourceReady(Class<LaidoffNativeActivity> and9NativeActivityClass);
     public static native int pushTextureData(int width, int height, int[] data, int texAtlasIndex);
     public static native void registerAsset(String assetPath, int startOffset, int length);
     private static native void sendApkPath(String apkPath, String filesPath);
+    public static native void setPushTokenAndSend(String text, long pLwcLong);
 
-    public static final String PREFS_NAME = "LaidOffPrefs";
+    public static final String PREFS_NAME = "LaidoffPrefs";
     public static final String PREFS_KEY_HIGHSCORE = "highscore";
 
-    private static LaidOffNativeActivity INSTANCE;
+    private static LaidoffNativeActivity INSTANCE;
     
     public static final String LOG_TAG = "and9";
 
@@ -226,6 +227,10 @@ public class LaidOffNativeActivity extends NativeActivity
 //        String message = editText.getText().toString();
 //        intent.putExtra(EXTRA_MESSAGE, message);
         INSTANCE.startActivity(intent);
+    }
+
+    public static void requestPushToken(long pLwc) {
+        setPushTokenAndSend(FirebaseInstanceId.getInstance().getToken(), pLwc);
     }
 
 }

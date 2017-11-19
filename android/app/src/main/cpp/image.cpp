@@ -49,7 +49,7 @@ extern "C" void release_image(LWBITMAPCONTEXT* pBitmapContext)
     free(pBitmapContext->data);
 }
 
-extern "C" JNIEXPORT int JNICALL Java_com_popsongremix_laidoff_LaidOffNativeActivity_pushTextureData(JNIEnv *env, jobject /* this */, jint w, jint h, jintArray data, jint tex_atlas_index) {
+extern "C" JNIEXPORT int JNICALL Java_com_popsongremix_laidoff_LaidoffNativeActivity_pushTextureData(JNIEnv *env, jobject /* this */, jint w, jint h, jintArray data, jint tex_atlas_index) {
     int len = w*h*4;
     char *body = (char*)env->GetIntArrayElements(data, 0);
 
@@ -74,7 +74,7 @@ extern "C" JNIEXPORT int JNICALL Java_com_popsongremix_laidoff_LaidOffNativeActi
     return len;
 }
 
-extern "C" JNIEXPORT void JNICALL Java_com_popsongremix_laidoff_LaidOffNativeActivity_registerAsset(JNIEnv * env, jclass cls, jstring assetpath, int startoffset, int length) {
+extern "C" JNIEXPORT void JNICALL Java_com_popsongremix_laidoff_LaidoffNativeActivity_registerAsset(JNIEnv * env, jclass cls, jstring assetpath, int startoffset, int length) {
     const char *buffer = env->GetStringUTFChars(assetpath, JNI_FALSE);
 
     register_asset(buffer, startoffset, length);
@@ -91,7 +91,7 @@ extern "C" JNIEXPORT void JNICALL Java_com_popsongremix_laidoff_TextInputActivit
     env->ReleaseStringUTFChars(text, buffer);
 }
 
-extern "C" JNIEXPORT void JNICALL Java_com_popsongremix_laidoff_LaidOffNativeActivity_sendApkPath(JNIEnv * env, jclass cls, jstring apkPath, jstring filesPath) {
+extern "C" JNIEXPORT void JNICALL Java_com_popsongremix_laidoff_LaidoffNativeActivity_sendApkPath(JNIEnv * env, jclass cls, jstring apkPath, jstring filesPath) {
     const char *apkPathBuffer = env->GetStringUTFChars(apkPath, JNI_FALSE);
     set_apk_path(apkPathBuffer);
     env->ReleaseStringUTFChars(apkPath, apkPathBuffer);

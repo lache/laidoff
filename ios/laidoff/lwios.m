@@ -24,7 +24,7 @@ void set_app_delegate(id ad /*app_delegate*/) {
     app_delegate = ad;
 }
 
-void requestRemoteNotificationDeviceToken()
+void lw_request_remote_notification_device_token(LWCONTEXT* pLwc)
 {
 //    if (![[NSUserDefaults standardUserDefaults] objectForKey:@"HasSeenPopup"])
     {

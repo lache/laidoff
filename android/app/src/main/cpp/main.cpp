@@ -64,11 +64,12 @@ static jobject s_obj_from_cpp;
 static ALooper* s_looper_from_cpp;
 static bool s_java_activity_created;
 
-#define JAVA_NATIVE_ACTIVITY_NAME "com.popsongremix.laidoff.LaidOffNativeActivity"
+#define JAVA_NATIVE_ACTIVITY_NAME "com.popsongremix.laidoff.LaidoffNativeActivity"
 #define TEXT_INPUT_ACTIVITY_NAME "com.popsongremix.laidoff.TextInputActivity"
 
 extern "C" int lw_get_text_input_seq();
 extern "C" const char* lw_get_text_input();
+extern "C" void lw_set_push_token(LWCONTEXT* pLwc, int domain, const char* token);
 
 const char* egl_get_error_string(EGLint error)
 {
@@ -119,6 +120,19 @@ void request_void_string_command(const char* command_name, const char* param1)
 
         jmethodID callMeStaticMethod = env->GetStaticMethodID(s_java_native_activity_class, command_name, "(Ljava/lang/String;)V");
         env->CallStaticVoidMethod(s_java_native_activity_class, callMeStaticMethod, soundTypeString);
+    }
+    s_vm_from_cpp->DetachCurrentThread();
+}
+
+void request_void_long_command(const char* command_name, jlong param1)
+{
+    JNIEnv* env;
+    s_vm_from_cpp->AttachCurrentThread(&env, NULL);
+    {
+        jclass s_java_native_activity_class = get_java_native_activity_class(env);
+
+        jmethodID callMeStaticMethod = env->GetStaticMethodID(s_java_native_activity_class, command_name, "(J)V");
+        env->CallStaticVoidMethod(s_java_native_activity_class, callMeStaticMethod, param1);
     }
     s_vm_from_cpp->DetachCurrentThread();
 }
@@ -847,7 +861,7 @@ void android_main(struct android_app* state) {
     }
 }
 
-extern "C" JNIEXPORT jstring JNICALL Java_com_popsongremix_laidoff_LaidOffNativeActivity_signalResourceReady(JNIEnv *env, jobject obj, jclass and9NativeActivityClass)
+extern "C" JNIEXPORT jstring JNICALL Java_com_popsongremix_laidoff_LaidoffNativeActivity_signalResourceReady(JNIEnv *env, jobject obj, jclass and9NativeActivityClass)
 {
     s_env_from_java = env;
     s_obj_from_java = obj;
@@ -871,4 +885,31 @@ extern "C" void lw_app_quit(struct _LWCONTEXT* pLwc)
 extern "C" void lw_start_text_input_activity(LWCONTEXT* pLwc) {
     pLwc->last_text_input_seq = lw_get_text_input_seq();
     request_void_string_command("startTextInputActivity", "dummy");
+}
+
+static char push_token[1024];
+
+extern "C" void lw_request_remote_notification_device_token(LWCONTEXT* pLwc) {
+    request_void_long_command("requestPushToken", (jlong)pLwc);
+
+    //lw_set_push_token(pLwc, 2, push_token);
+}
+
+extern "C" JNIEXPORT void JNICALL Java_com_popsongremix_laidoff_LaidoffFirebaseInstanceIDService_setPushToken(JNIEnv * env, jclass cls, jstring text) {
+    const char *buffer = env->GetStringUTFChars(text, JNI_FALSE);
+
+    size_t buffer_len = strlen(buffer);
+    if (buffer_len > 0) {
+        strcpy(push_token, buffer);
+        push_token[strlen(buffer) - 1] = '\0';
+    } else {
+        push_token[0] = '\0';
+    }
+
+    env->ReleaseStringUTFChars(text, buffer);
+}
+
+extern "C" JNIEXPORT void JNICALL Java_com_popsongremix_laidoff_LaidoffNativeActivity_setPushTokenAndSend(JNIEnv * env, jclass cls, jstring text, jlong pLwcLong) {
+    Java_com_popsongremix_laidoff_LaidoffFirebaseInstanceIDService_setPushToken(env, cls, text);
+    lw_set_push_token((LWCONTEXT*)pLwcLong, 2, push_token);
 }

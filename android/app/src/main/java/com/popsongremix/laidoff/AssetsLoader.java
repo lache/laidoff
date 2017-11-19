@@ -59,7 +59,7 @@ public class AssetsLoader {
 
                 AssetFileDescriptor afd = activity.getAssets().openFd(assetPath);
 
-                LaidOffNativeActivity.registerAsset(assetPath, (int)afd.getStartOffset(), (int)afd.getLength());
+                LaidoffNativeActivity.registerAsset(assetPath, (int)afd.getStartOffset(), (int)afd.getLength());
 
             }
         } catch (IOException e) {
