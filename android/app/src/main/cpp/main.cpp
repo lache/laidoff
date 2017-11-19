@@ -882,8 +882,9 @@ extern "C" void lw_app_quit(struct _LWCONTEXT* pLwc)
     exit(0);
 }
 
-extern "C" void lw_start_text_input_activity(LWCONTEXT* pLwc) {
+extern "C" void lw_start_text_input_activity(LWCONTEXT* pLwc, int tag) {
     pLwc->last_text_input_seq = lw_get_text_input_seq();
+    pLwc->text_input_tag = tag;
     request_void_string_command("startTextInputActivity", "dummy");
 }
 
@@ -901,7 +902,7 @@ extern "C" JNIEXPORT void JNICALL Java_com_popsongremix_laidoff_LaidoffFirebaseI
     size_t buffer_len = strlen(buffer);
     if (buffer_len > 0) {
         strcpy(push_token, buffer);
-        push_token[strlen(buffer) - 1] = '\0';
+        push_token[strlen(buffer)] = '\0';
     } else {
         push_token[0] = '\0';
     }

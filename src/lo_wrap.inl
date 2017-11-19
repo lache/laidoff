@@ -8615,39 +8615,6 @@ fail:
 }
 
 
-static int _wrap_get_left_dir_pad_original_center(lua_State* L) {
-  int SWIG_arg = 0;
-  float arg1 ;
-  float *arg2 = (float *) 0 ;
-  float *arg3 = (float *) 0 ;
-  
-  SWIG_check_num_args("get_left_dir_pad_original_center",3,3)
-  if(!lua_isnumber(L,1)) SWIG_fail_arg("get_left_dir_pad_original_center",1,"float");
-  if(!SWIG_isptrtype(L,2)) SWIG_fail_arg("get_left_dir_pad_original_center",2,"float *");
-  if(!SWIG_isptrtype(L,3)) SWIG_fail_arg("get_left_dir_pad_original_center",3,"float *");
-  arg1 = (float)lua_tonumber(L, 1);
-  
-  if (!SWIG_IsOK(SWIG_ConvertPtr(L,2,(void**)&arg2,SWIGTYPE_p_float,0))){
-    SWIG_fail_ptr("get_left_dir_pad_original_center",2,SWIGTYPE_p_float);
-  }
-  
-  
-  if (!SWIG_IsOK(SWIG_ConvertPtr(L,3,(void**)&arg3,SWIGTYPE_p_float,0))){
-    SWIG_fail_ptr("get_left_dir_pad_original_center",3,SWIGTYPE_p_float);
-  }
-  
-  get_left_dir_pad_original_center(arg1,arg2,arg3);
-  
-  return SWIG_arg;
-  
-  if(0) SWIG_fail;
-  
-fail:
-  lua_error(L);
-  return SWIG_arg;
-}
-
-
 static int _wrap_change_to_field(lua_State* L) {
   int SWIG_arg = 0;
   LWCONTEXT *arg1 = (LWCONTEXT *) 0 ;
@@ -9386,15 +9353,18 @@ fail:
 static int _wrap_lw_start_text_input_activity(lua_State* L) {
   int SWIG_arg = 0;
   LWCONTEXT *arg1 = (LWCONTEXT *) 0 ;
+  int arg2 ;
   
-  SWIG_check_num_args("lw_start_text_input_activity",1,1)
+  SWIG_check_num_args("lw_start_text_input_activity",2,2)
   if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("lw_start_text_input_activity",1,"LWCONTEXT *");
+  if(!lua_isnumber(L,2)) SWIG_fail_arg("lw_start_text_input_activity",2,"int");
   
   if (!SWIG_IsOK(SWIG_ConvertPtr(L,1,(void**)&arg1,SWIGTYPE_p__LWCONTEXT,0))){
     SWIG_fail_ptr("lw_start_text_input_activity",1,SWIGTYPE_p__LWCONTEXT);
   }
   
-  lw_start_text_input_activity(arg1);
+  arg2 = (int)lua_tonumber(L, 2);
+  lw_start_text_input_activity(arg1,arg2);
   
   return SWIG_arg;
   
@@ -16585,6 +16555,56 @@ fail:
 }
 
 
+static int _wrap_LWCONTEXT_aspect_ratio_set(lua_State* L) {
+  int SWIG_arg = 0;
+  struct _LWCONTEXT *arg1 = (struct _LWCONTEXT *) 0 ;
+  float arg2 ;
+  
+  SWIG_check_num_args("_LWCONTEXT::aspect_ratio",2,2)
+  if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("_LWCONTEXT::aspect_ratio",1,"struct _LWCONTEXT *");
+  if(!lua_isnumber(L,2)) SWIG_fail_arg("_LWCONTEXT::aspect_ratio",2,"float");
+  
+  if (!SWIG_IsOK(SWIG_ConvertPtr(L,1,(void**)&arg1,SWIGTYPE_p__LWCONTEXT,0))){
+    SWIG_fail_ptr("LWCONTEXT_aspect_ratio_set",1,SWIGTYPE_p__LWCONTEXT);
+  }
+  
+  arg2 = (float)lua_tonumber(L, 2);
+  if (arg1) (arg1)->aspect_ratio = arg2;
+  
+  return SWIG_arg;
+  
+  if(0) SWIG_fail;
+  
+fail:
+  lua_error(L);
+  return SWIG_arg;
+}
+
+
+static int _wrap_LWCONTEXT_aspect_ratio_get(lua_State* L) {
+  int SWIG_arg = 0;
+  struct _LWCONTEXT *arg1 = (struct _LWCONTEXT *) 0 ;
+  float result;
+  
+  SWIG_check_num_args("_LWCONTEXT::aspect_ratio",1,1)
+  if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("_LWCONTEXT::aspect_ratio",1,"struct _LWCONTEXT *");
+  
+  if (!SWIG_IsOK(SWIG_ConvertPtr(L,1,(void**)&arg1,SWIGTYPE_p__LWCONTEXT,0))){
+    SWIG_fail_ptr("LWCONTEXT_aspect_ratio_get",1,SWIGTYPE_p__LWCONTEXT);
+  }
+  
+  result = (float) ((arg1)->aspect_ratio);
+  lua_pushnumber(L, (lua_Number) result); SWIG_arg++;
+  return SWIG_arg;
+  
+  if(0) SWIG_fail;
+  
+fail:
+  lua_error(L);
+  return SWIG_arg;
+}
+
+
 static int _wrap_LWCONTEXT_shader_set(lua_State* L) {
   int SWIG_arg = 0;
   struct _LWCONTEXT *arg1 = (struct _LWCONTEXT *) 0 ;
@@ -22900,6 +22920,56 @@ fail:
 }
 
 
+static int _wrap_LWCONTEXT_text_input_tag_set(lua_State* L) {
+  int SWIG_arg = 0;
+  struct _LWCONTEXT *arg1 = (struct _LWCONTEXT *) 0 ;
+  int arg2 ;
+  
+  SWIG_check_num_args("_LWCONTEXT::text_input_tag",2,2)
+  if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("_LWCONTEXT::text_input_tag",1,"struct _LWCONTEXT *");
+  if(!lua_isnumber(L,2)) SWIG_fail_arg("_LWCONTEXT::text_input_tag",2,"int");
+  
+  if (!SWIG_IsOK(SWIG_ConvertPtr(L,1,(void**)&arg1,SWIGTYPE_p__LWCONTEXT,0))){
+    SWIG_fail_ptr("LWCONTEXT_text_input_tag_set",1,SWIGTYPE_p__LWCONTEXT);
+  }
+  
+  arg2 = (int)lua_tonumber(L, 2);
+  if (arg1) (arg1)->text_input_tag = arg2;
+  
+  return SWIG_arg;
+  
+  if(0) SWIG_fail;
+  
+fail:
+  lua_error(L);
+  return SWIG_arg;
+}
+
+
+static int _wrap_LWCONTEXT_text_input_tag_get(lua_State* L) {
+  int SWIG_arg = 0;
+  struct _LWCONTEXT *arg1 = (struct _LWCONTEXT *) 0 ;
+  int result;
+  
+  SWIG_check_num_args("_LWCONTEXT::text_input_tag",1,1)
+  if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("_LWCONTEXT::text_input_tag",1,"struct _LWCONTEXT *");
+  
+  if (!SWIG_IsOK(SWIG_ConvertPtr(L,1,(void**)&arg1,SWIGTYPE_p__LWCONTEXT,0))){
+    SWIG_fail_ptr("LWCONTEXT_text_input_tag_get",1,SWIGTYPE_p__LWCONTEXT);
+  }
+  
+  result = (int) ((arg1)->text_input_tag);
+  lua_pushnumber(L, (lua_Number) result); SWIG_arg++;
+  return SWIG_arg;
+  
+  if(0) SWIG_fail;
+  
+fail:
+  lua_error(L);
+  return SWIG_arg;
+}
+
+
 static int _wrap_LWCONTEXT_left_dir_pad_set(lua_State* L) {
   int SWIG_arg = 0;
   struct _LWCONTEXT *arg1 = (struct _LWCONTEXT *) 0 ;
@@ -23055,6 +23125,7 @@ static swig_lua_attribute swig_LWCONTEXT_attributes[] = {
     { "window", _wrap_LWCONTEXT_window_get, _wrap_LWCONTEXT_window_set },
     { "width", _wrap_LWCONTEXT_width_get, _wrap_LWCONTEXT_width_set },
     { "height", _wrap_LWCONTEXT_height_get, _wrap_LWCONTEXT_height_set },
+    { "aspect_ratio", _wrap_LWCONTEXT_aspect_ratio_get, _wrap_LWCONTEXT_aspect_ratio_set },
     { "shader", _wrap_LWCONTEXT_shader_get, _wrap_LWCONTEXT_shader_set },
     { "vertex_buffer", _wrap_LWCONTEXT_vertex_buffer_get, _wrap_LWCONTEXT_vertex_buffer_set },
     { "skin_vertex_buffer", _wrap_LWCONTEXT_skin_vertex_buffer_get, _wrap_LWCONTEXT_skin_vertex_buffer_set },
@@ -23174,6 +23245,7 @@ static swig_lua_attribute swig_LWCONTEXT_attributes[] = {
     { "tcp_host_addr", _wrap_LWCONTEXT_tcp_host_addr_get, _wrap_LWCONTEXT_tcp_host_addr_set },
     { "udp_host_addr", _wrap_LWCONTEXT_udp_host_addr_get, _wrap_LWCONTEXT_udp_host_addr_set },
     { "last_text_input_seq", _wrap_LWCONTEXT_last_text_input_seq_get, _wrap_LWCONTEXT_last_text_input_seq_set },
+    { "text_input_tag", _wrap_LWCONTEXT_text_input_tag_get, _wrap_LWCONTEXT_text_input_tag_set },
     { "left_dir_pad", _wrap_LWCONTEXT_left_dir_pad_get, _wrap_LWCONTEXT_left_dir_pad_set },
     { "right_dir_pad", _wrap_LWCONTEXT_right_dir_pad_get, _wrap_LWCONTEXT_right_dir_pad_set },
     {0,0,0}
@@ -49072,6 +49144,45 @@ fail:
 }
 
 
+static int _wrap_puck_game_fire(lua_State* L) {
+  int SWIG_arg = 0;
+  LWCONTEXT *arg1 = (LWCONTEXT *) 0 ;
+  LWPUCKGAME *arg2 = (LWPUCKGAME *) 0 ;
+  float arg3 ;
+  float arg4 ;
+  float arg5 ;
+  
+  SWIG_check_num_args("puck_game_fire",5,5)
+  if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("puck_game_fire",1,"LWCONTEXT *");
+  if(!SWIG_isptrtype(L,2)) SWIG_fail_arg("puck_game_fire",2,"LWPUCKGAME *");
+  if(!lua_isnumber(L,3)) SWIG_fail_arg("puck_game_fire",3,"float");
+  if(!lua_isnumber(L,4)) SWIG_fail_arg("puck_game_fire",4,"float");
+  if(!lua_isnumber(L,5)) SWIG_fail_arg("puck_game_fire",5,"float");
+  
+  if (!SWIG_IsOK(SWIG_ConvertPtr(L,1,(void**)&arg1,SWIGTYPE_p__LWCONTEXT,0))){
+    SWIG_fail_ptr("puck_game_fire",1,SWIGTYPE_p__LWCONTEXT);
+  }
+  
+  
+  if (!SWIG_IsOK(SWIG_ConvertPtr(L,2,(void**)&arg2,SWIGTYPE_p__LWPUCKGAME,0))){
+    SWIG_fail_ptr("puck_game_fire",2,SWIGTYPE_p__LWPUCKGAME);
+  }
+  
+  arg3 = (float)lua_tonumber(L, 3);
+  arg4 = (float)lua_tonumber(L, 4);
+  arg5 = (float)lua_tonumber(L, 5);
+  puck_game_fire(arg1,arg2,arg3,arg4,arg5);
+  
+  return SWIG_arg;
+  
+  if(0) SWIG_fail;
+  
+fail:
+  lua_error(L);
+  return SWIG_arg;
+}
+
+
 static int _wrap_new_int(lua_State* L) {
   int SWIG_arg = 0;
   int arg1 ;
@@ -49291,7 +49402,7 @@ static swig_lua_const_info swig_SwigModule_constants[]= {
     {SWIG_LUA_CONSTTAB_FLOAT("M_PI", (3.14159265358979323846))},
     {SWIG_LUA_CONSTTAB_FLOAT("LWEPSILON", (1e-3))},
     {SWIG_LUA_CONSTTAB_STRING("__LW_STRING_LINE__", "87")},
-    {SWIG_LUA_CONSTTAB_STRING("LWLOGPOS", "src\\lwmacro.h(88): ")},
+    {SWIG_LUA_CONSTTAB_STRING("LWLOGPOS", "src/lwmacro.h(88): ")},
     {SWIG_LUA_CONSTTAB_INT("MAX_FIELD_SPHERE", (50))},
     {SWIG_LUA_CONSTTAB_INT("MAX_FIELD_REMOTE_SPHERE", (50))},
     {SWIG_LUA_CONSTTAB_INT("MAX_USER_GEOM", (16))},
@@ -49869,7 +49980,6 @@ static swig_lua_method swig_SwigModule_methods[]= {
     { "lw_get_update_count", _wrap_lw_get_update_count},
     { "lw_get_render_count", _wrap_lw_get_render_count},
     { "lw_on_destroy", _wrap_lw_on_destroy},
-    { "get_left_dir_pad_original_center", _wrap_get_left_dir_pad_original_center},
     { "change_to_field", _wrap_change_to_field},
     { "change_to_dialog", _wrap_change_to_dialog},
     { "change_to_battle", _wrap_change_to_battle},
@@ -50121,6 +50231,7 @@ static swig_lua_method swig_SwigModule_methods[]= {
     { "puck_game_rematch", _wrap_puck_game_rematch},
     { "puck_game_reset_view_proj", _wrap_puck_game_reset_view_proj},
     { "puck_game_jump", _wrap_puck_game_jump},
+    { "puck_game_fire", _wrap_puck_game_fire},
     { "new_int", _wrap_new_int},
     { "delete_int", _wrap_delete_int},
     { "int_getitem", _wrap_int_getitem},

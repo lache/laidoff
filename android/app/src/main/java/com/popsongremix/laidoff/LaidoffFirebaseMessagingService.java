@@ -1,14 +1,20 @@
 package com.popsongremix.laidoff;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
+import android.content.Intent;
 import android.util.Log;
+import android.widget.Toast;
 
 import com.google.firebase.messaging.FirebaseMessagingService;
 import com.google.firebase.messaging.RemoteMessage;
 
+import java.util.Map;
+
 public class LaidoffFirebaseMessagingService extends FirebaseMessagingService {
     @Override
     public void onMessageReceived(RemoteMessage remoteMessage) {
-        // ...
+        // This handler only called when the app is in foreground.
 
         // TODO(developer): Handle FCM messages here.
         // Not getting messages here? See why this may be: https://goo.gl/39bRNJ
@@ -25,7 +31,11 @@ public class LaidoffFirebaseMessagingService extends FirebaseMessagingService {
                 // Handle message within 10 seconds
                 //handleNow();
             }
-
+            Map<String, String> remoteData = remoteMessage.getData();
+            if (remoteData.containsKey("msg")) {
+                // The line below throws 'Not an UI thread' exception!
+                //Toast.makeText(this, remoteData.get("msg"), Toast.LENGTH_SHORT).show();
+            }
         }
 
         // Check if message contains a notification payload.

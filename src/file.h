@@ -12,6 +12,7 @@ char* create_binary_from_file(const char* filename, size_t* size);
 void release_binary(char * d);
 int get_cached_user_id(const char* path_prefix, LWUNIQUEID* id);
 int save_cached_user_id(const char* path_prefix, const LWUNIQUEID* id);
+void concat_path(char* path, const char* path1, const char* path2);
 #ifdef __cplusplus
 };
 #endif

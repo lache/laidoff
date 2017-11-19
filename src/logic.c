@@ -534,8 +534,12 @@ void toggle_network_poll(LWCONTEXT* pLwc) {
 	field_set_network(pLwc->field, !field_network(pLwc->field));
 }
 
-void start_text_input_activity(LWCONTEXT* pLwc) {
-	lw_start_text_input_activity(pLwc);
+void start_nickname_text_input_activity(LWCONTEXT* pLwc) {
+	lw_start_text_input_activity(pLwc, 100);
+}
+
+void start_tcp_addr_text_input_activity(LWCONTEXT* pLwc) {
+	lw_start_text_input_activity(pLwc, 200);
 }
 
 void start_request_push_token(LWCONTEXT* pLwc) {
@@ -589,8 +593,9 @@ void reset_runtime_context(LWCONTEXT* pLwc) {
 		{ LWU("Server #1"), connect_to_server_1 },
 		{ LWU("레이테스트토글"), toggle_ray_test },
 		{ LWU("네트워크토글"), toggle_network_poll },
-		{ LWU("닉네임 변경"), start_text_input_activity },
+		{ LWU("닉네임 변경"), start_nickname_text_input_activity },
         { LWU("푸시 토큰 등록"), start_request_push_token },
+		{ LWU("TCP 서버"), start_tcp_addr_text_input_activity },
 	};
 	for (int i = 0; i < ARRAY_SIZE(handler_array); i++) {
 		pLwc->admin_button_command[i].name = handler_array[i].name;
@@ -622,6 +627,30 @@ void logic_udate_default_projection(LWCONTEXT* pLwc) {
 	else {
 		mat4x4_ortho(pLwc->proj, -1.f, 1.f, -1 / ratio, 1 / ratio, 1.f, -1.f);
 	}
+}
+
+int lw_write_tcp_addr(LWCONTEXT* pLwc, const char* tcp_addr) {
+#if LW_PLATFORM_ANDROID
+    FILE* f;
+    char path[1024] = { 0, };
+    concat_path(path, pLwc->internal_data_path, "conf.json");
+    f = fopen(path, "w");
+    if (f == 0) {
+        // no cached user id exists
+        LOGE("Cannot open user id file cache for writing...");
+        return -1;
+    }
+    char conf[1024] = {0,};
+    sprintf(conf, "{\n"
+                    "  \"ClientTcpHost\": \"%s\",\n"
+                    "  \"ConnPort\": \"19856\"\n"
+                    "}", tcp_addr);
+    fputs(conf, f);
+    fclose(f);
+#else
+    LOGE(LWLOGPOS "NOT IMPLEMENTED YET");
+#endif
+    return 0;
 }
 
 void lwc_update(LWCONTEXT* pLwc, double delta_time) {
@@ -722,8 +751,18 @@ void lwc_update(LWCONTEXT* pLwc, double delta_time) {
 	
 	script_emit_logic_frame_finish(pLwc->L, (float)delta_time);
 
+    // Check for a new native user text input
 	if (pLwc->last_text_input_seq != lw_get_text_input_seq()) {
-		show_sys_msg(pLwc->def_sys_msg, lw_get_text_input());
+        switch (pLwc->text_input_tag) {
+            case 100:
+                show_sys_msg(pLwc->def_sys_msg, lw_get_text_input());
+                break;
+            case 200:
+                lw_write_tcp_addr(pLwc, lw_get_text_input());
+                break;
+            default:
+                break;
+        }
 		pLwc->last_text_input_seq = lw_get_text_input_seq();
 	}
 

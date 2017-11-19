@@ -2,7 +2,6 @@ package main
 
 import (
 	"log"
-	"fmt"
 	"net/rpc"
 	"github.com/sideshow/apns2"
 	"github.com/sideshow/apns2/certificate"
@@ -11,6 +10,12 @@ import (
 	"errors"
 	"encoding/gob"
 	"os"
+	"io/ioutil"
+	"github.com/NaySoftware/go-fcm"
+	"net/http"
+	"html/template"
+	"regexp"
+	"fmt"
 )
 
 func registerArith(server *rpc.Server, arith shared_server.Arith, pushService shared_server.PushService) {
@@ -37,35 +42,253 @@ func (t *Arith) Divide(args *shared_server.Args, quo *shared_server.Quotient) er
 	return nil
 }
 
-type PushServiceData struct {
-	PushTokenMap map[string][16]byte // Push Token --> User ID
-	UserIdMap map[[16]byte]string // User ID --> Push Token
+type PushUserData struct {
+	UserId [16]byte
+	Domain int
 }
 
-func (t *PushServiceData) Add(id []byte, pushToken string) {
+type PushServiceData struct {
+	PushTokenMap map[string]PushUserData // Push Token --> Push User Data
+	UserIdMap    map[[16]byte]string // User ID --> Push Token
+}
+
+func (t *PushServiceData) Add(id []byte, pushToken string, domain int) {
 	var idFixed [16]byte
 	copy(idFixed[:], id)
-	t.PushTokenMap[pushToken] = idFixed
+	t.PushTokenMap[pushToken] = PushUserData{idFixed, domain}
 	t.UserIdMap[idFixed] = pushToken
 }
 
+func (t *PushServiceData) DeletePushToken(pushToken string) {
+	pushUserData := t.PushTokenMap[pushToken]
+	delete(t.PushTokenMap, pushToken)
+	delete(t.UserIdMap, pushUserData.UserId)
+}
+
 type PushService struct {
-	data PushServiceData
+	data         PushServiceData
+	fcmServerKey string
 }
 
 func (t *PushService) RegisterPushToken(args *shared_server.PushToken, reply *int) error {
 	log.Printf("Register push token: %v, %v", args.Domain, args.PushToken)
-	t.data.Add(args.UserId, args.PushToken)
+	t.data.Add(args.UserId, args.PushToken, args.Domain)
 	log.Printf("pushTokenMap len: %v", len(t.data.PushTokenMap))
+	writePushServiceData(&t.data)
+	//if args.Domain == 2 { // Android (FCM)
+	//	PostAndroidMessage(t.fcmServerKey, args.PushToken)
+	//} else if args.Domain == 1 {
+	//	PostIosMessage(args.PushToken)
+	//}
+	*reply = 1
+	return nil
+}
+func writePushServiceData(pushServiceData *PushServiceData) {
 	pushKeyDbFile, err := os.Create("db/pushkeydb")
 	if err != nil {
 		log.Fatalf("pushkeydb create failed: %v", err.Error())
 	}
 	encoder := gob.NewEncoder(pushKeyDbFile)
-	encoder.Encode(t.data)
+	encoder.Encode(pushServiceData)
 	pushKeyDbFile.Close()
-	*reply = 1
-	return nil
+}
+
+func PostAndroidMessage(fcmServerKey string, pushToken string, title string, body string) {
+	data := map[string]string{
+		"msg": "Hello world!",
+		"sum": "HW",
+	}
+	c := fcm.NewFcmClient(fcmServerKey)
+	ids := []string{
+		pushToken,
+	}
+	//xds := []string{
+	//	pushToken,
+	//}
+	c.NewFcmRegIdsMsg(ids, data)
+	noti := &fcm.NotificationPayload{
+		Title: title,
+		Body: body,
+		Sound: "default",
+		Icon: "ic_stat_name",
+	}
+	c.SetNotificationPayload(noti)
+	//c.AppendDevices(xds)
+	status, err := c.Send()
+	if err != nil {
+		log.Printf("FCM send error: %v", err.Error())
+	} else {
+		status.PrintResults()
+	}
+}
+
+type Page struct {
+	Title string
+	Body  []byte
+}
+
+var templates = template.Must(template.ParseFiles("edit.html", "view.html", "push.html", "writePush.html"))
+var validPath = regexp.MustCompile("^/(edit|save|view)/([a-zA-Z0-9]+)$")
+var validPushTokenPath = regexp.MustCompile("^/(deletePushToken|sendTestPush|writePush|sendPush)/([a-zA-Z0-9-:]+)$")
+
+func getTitle(w http.ResponseWriter, r *http.Request) (string, error) {
+	m := validPath.FindStringSubmatch(r.URL.Path)
+	if m == nil {
+		http.NotFound(w, r)
+		return "", errors.New("invalid page title")
+	}
+	return  m[2], nil
+}
+
+func (p *Page) save() error {
+	filename := "pages/" + p.Title + ".txt"
+	return ioutil.WriteFile(filename, p.Body, 0600)
+}
+
+func loadPage(title string) (*Page, error) {
+	filename := "pages/" + title + ".txt"
+	body, err := ioutil.ReadFile(filename)
+	if err != nil {
+		return nil, err
+	}
+	return &Page{Title: title, Body: body}, nil
+}
+
+func renderTemplate(w http.ResponseWriter, tmpl string, p *Page) {
+	err := templates.ExecuteTemplate(w, tmpl+".html", p)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+	}
+}
+
+func viewHandler(w http.ResponseWriter, r *http.Request, title string) {
+	title, err := getTitle(w, r)
+	if err != nil {
+		return
+	}
+	p, err := loadPage(title)
+	if err != nil {
+		http.Redirect(w, r, "/edit/" + title, http.StatusFound)
+		return
+	}
+	renderTemplate(w, "view", p)
+}
+
+func editHandler(w http.ResponseWriter, r *http.Request, title string) {
+	title, err := getTitle(w, r)
+	if err != nil {
+		return
+	}
+	p, err := loadPage(title)
+	if err != nil {
+		p = &Page{Title: title}
+	}
+	renderTemplate(w, "edit", p)
+}
+
+func saveHandler(w http.ResponseWriter, r *http.Request, title string) {
+	title, err := getTitle(w, r)
+	if err != nil {
+		return
+	}
+	body := r.FormValue("body")
+	p := &Page{Title: title, Body: []byte(body)}
+	err = p.save()
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	http.Redirect(w, r, "/view/"+title, http.StatusFound)
+}
+
+func makeHandler(fn func (http.ResponseWriter, *http.Request, string)) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		m := validPath.FindStringSubmatch(r.URL.Path)
+		if m == nil {
+			http.NotFound(w, r)
+			return
+		}
+		fn(w, r, m[2])
+	}
+}
+
+func pushHandler(w http.ResponseWriter, _ *http.Request, pushService *PushService) {
+	err := templates.ExecuteTemplate(w, "push.html", pushService.data)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+	}
+}
+
+func deletePushTokenHandler(w http.ResponseWriter, r *http.Request, pushService *PushService, pushToken string) {
+	pushService.data.DeletePushToken(pushToken)
+	writePushServiceData(&pushService.data)
+	http.Redirect(w, r, "/push/", http.StatusFound)
+}
+
+func sendTestPushHandler(w http.ResponseWriter, r *http.Request, pushService *PushService, pushToken string) {
+	domain := pushService.data.PushTokenMap[pushToken].Domain
+	if domain == 2 {
+		PostAndroidMessage(pushService.fcmServerKey, pushToken, "용사는 실직중", "어서와.. 테스트 푸시는 처음이지...?")
+	} else if domain == 1 {
+		PostIosMessage(pushToken, "어서와... 테스트 푸시는 처음이지?")
+	} else {
+		http.NotFound(w, r)
+		return
+	}
+	http.Redirect(w, r, "/push/", http.StatusFound)
+}
+
+func sendPushHandler(w http.ResponseWriter, r *http.Request, pushService *PushService, pushToken string) {
+	body := r.FormValue("body")
+	domain := pushService.data.PushTokenMap[pushToken].Domain
+	if domain == 2 {
+		PostAndroidMessage(pushService.fcmServerKey, pushToken, "용사는 실직중", body)
+	} else if domain == 1 {
+		PostIosMessage(pushToken, body)
+	} else {
+		http.NotFound(w, r)
+		return
+	}
+	http.Redirect(w, r, "/push/", http.StatusFound)
+}
+
+func writePushHandler(w http.ResponseWriter, r *http.Request, pushService *PushService, pushToken string) {
+	type WritePushData struct {
+		PushToken string
+	}
+	err := templates.ExecuteTemplate(w, "writePush.html", WritePushData{pushToken})
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+	}
+}
+
+func makePushHandler(fn func (http.ResponseWriter, *http.Request, *PushService), pushServiceData *PushService) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		fn(w, r, pushServiceData)
+	}
+}
+
+func makePushTokenHandler(fn func (http.ResponseWriter, *http.Request, *PushService, string), pushService *PushService) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		m := validPushTokenPath.FindStringSubmatch(r.URL.Path)
+		if m == nil {
+			http.NotFound(w, r)
+			return
+		}
+		fn(w, r, pushService, m[2])
+	}
+}
+
+func startAdminService(pushService *PushService) {
+	http.HandleFunc("/view/", makeHandler(viewHandler))
+	http.HandleFunc("/edit/", makeHandler(editHandler))
+	http.HandleFunc("/save/", makeHandler(saveHandler))
+	http.HandleFunc("/push/", makePushHandler(pushHandler, pushService))
+	http.HandleFunc("/deletePushToken/", makePushTokenHandler(deletePushTokenHandler, pushService))
+	http.HandleFunc("/sendTestPush/", makePushTokenHandler(sendTestPushHandler, pushService))
+	http.HandleFunc("/writePush/", makePushTokenHandler(writePushHandler, pushService))
+	http.HandleFunc("/sendPush/", makePushTokenHandler(sendPushHandler, pushService))
+	http.ListenAndServe(":18080", nil)
 }
 
 func main() {
@@ -74,13 +297,21 @@ func main() {
 	log.Println("Greetings from push server")
 	// Create db directory to save user database
 	os.MkdirAll("db", os.ModePerm)
+	os.MkdirAll("pages", os.ModePerm)
+	// Load Firebase Cloud Messaging (FCM) server key
+	fcmServerKeyBuf, err := ioutil.ReadFile("cert/dev/fcmserverkey")
+	if err != nil {
+		log.Fatalf("fcm server key load failed: %v", err.Error())
+	}
+	fcmServerKey := string(fcmServerKeyBuf)
 	//Creating an instance of struct which implement Arith interface
 	arith := new(Arith)
 	pushService := &PushService{
 		PushServiceData{
-			make(map[string][16]byte),
+			make(map[string]PushUserData),
 			make(map[[16]byte]string),
 		},
+		fcmServerKey,
 	}
 	pushKeyDbFile, err := os.Open("db/pushkeydb")
 	if err != nil {
@@ -98,6 +329,7 @@ func main() {
 		}
 		log.Printf("pushTokenMap loaded from file. len: %v", len(pushService.data.PushTokenMap))
 	}
+	go startAdminService(pushService)
 
 	//rpc.Register(arith)
 
@@ -119,16 +351,16 @@ func main() {
 	server.Accept(l)
 }
 
-func post_test_push() {
+func PostIosMessage(pushToken string, body string) {
 	cert, err := certificate.FromP12File("cert/dev/cert.p12", "")
 	if err != nil {
 		log.Fatal("Cert Error:", err)
 	}
 
 	notification := &apns2.Notification{}
-	notification.DeviceToken = "fb719d7a7a1629c3c5bda507e5c2940d3cf5bca8a0270508faf97e99624752fd"
+	notification.DeviceToken = pushToken
 	notification.Topic = "com.popsongremix.laidoff"
-	notification.Payload = []byte(`{"aps":{"alert":"어서와, 리모트 푸시는 처음이지?"}}`)
+	notification.Payload = []byte(fmt.Sprintf(`{"aps":{"alert":"%s"}}`, body))
 
 	client := apns2.NewClient(cert).Development()
 	res, err := client.Push(notification)
@@ -137,5 +369,5 @@ func post_test_push() {
 		log.Fatal("Error:", err)
 	}
 
-	fmt.Printf("%v %v %v\n", res.StatusCode, res.ApnsID, res.Reason)
+	log.Printf("Ios push result: %v %v %v", res.StatusCode, res.ApnsID, res.Reason)
 }
