@@ -288,7 +288,7 @@ func startAdminService(pushService *PushService) {
 	http.HandleFunc("/sendTestPush/", makePushTokenHandler(sendTestPushHandler, pushService))
 	http.HandleFunc("/writePush/", makePushTokenHandler(writePushHandler, pushService))
 	http.HandleFunc("/sendPush/", makePushTokenHandler(sendPushHandler, pushService))
-	addr := ":18080"
+	addr := "0.0.0.0:18080"
 	log.Printf("Listening %v for admin service...", addr)
 	http.ListenAndServe(addr, nil)
 }
