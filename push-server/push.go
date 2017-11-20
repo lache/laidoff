@@ -129,7 +129,7 @@ type Page struct {
 
 var templates = template.Must(template.ParseFiles("edit.html", "view.html", "push.html", "writePush.html"))
 var validPath = regexp.MustCompile("^/(edit|save|view)/([a-zA-Z0-9]+)$")
-var validPushTokenPath = regexp.MustCompile("^/(deletePushToken|sendTestPush|writePush|sendPush)/([a-zA-Z0-9-:]+)$")
+var validPushTokenPath = regexp.MustCompile("^/(deletePushToken|sendTestPush|writePush|sendPush)/([a-zA-Z0-9-:_]+)$")
 
 func getTitle(w http.ResponseWriter, r *http.Request) (string, error) {
 	m := validPath.FindStringSubmatch(r.URL.Path)
