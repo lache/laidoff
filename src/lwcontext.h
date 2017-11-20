@@ -335,6 +335,7 @@ typedef struct _LWCONTEXT {
 	int text_input_tag;
     LWDIRPAD left_dir_pad;
     LWDIRPAD right_dir_pad;
+    LWPLEADERBOARD last_leaderboard;
 } LWCONTEXT;
 
 #ifdef __cplusplus

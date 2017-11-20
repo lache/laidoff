@@ -272,6 +272,7 @@
 		56F189BA1EC751950019312F /* ztimerset.c in Sources */ = {isa = PBXBuildFile; fileRef = 56F1897D1EC751950019312F /* ztimerset.c */; };
 		56F189BB1EC751950019312F /* ztrie.c in Sources */ = {isa = PBXBuildFile; fileRef = 56F1897E1EC751950019312F /* ztrie.c */; };
 		56F189BC1EC751950019312F /* zuuid.c in Sources */ = {isa = PBXBuildFile; fileRef = 56F1897F1EC751950019312F /* zuuid.c */; };
+		6C0CB6201FC30FC800DA4E51 /* render_leaderboard.c in Sources */ = {isa = PBXBuildFile; fileRef = 6C0CB61F1FC30FC800DA4E51 /* render_leaderboard.c */; };
 		6C7739BC1FB4B5AA001014DE /* font.c in Sources */ = {isa = PBXBuildFile; fileRef = 6C7739191FB4B59D001014DE /* font.c */; };
 		6C7739BD1FB4B5AA001014DE /* unicode.c in Sources */ = {isa = PBXBuildFile; fileRef = 6C77391D1FB4B59D001014DE /* unicode.c */; };
 		6C7739BE1FB4B5AA001014DE /* lwcontext.c in Sources */ = {isa = PBXBuildFile; fileRef = 6C77391E1FB4B59D001014DE /* lwcontext.c */; };
@@ -935,6 +936,8 @@
 		56F1897D1EC751950019312F /* ztimerset.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = ztimerset.c; sourceTree = "<group>"; };
 		56F1897E1EC751950019312F /* ztrie.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = ztrie.c; sourceTree = "<group>"; };
 		56F1897F1EC751950019312F /* zuuid.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = zuuid.c; sourceTree = "<group>"; };
+		6C0CB61E1FC30FC800DA4E51 /* render_leaderboard.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = render_leaderboard.h; sourceTree = "<group>"; };
+		6C0CB61F1FC30FC800DA4E51 /* render_leaderboard.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = render_leaderboard.c; sourceTree = "<group>"; };
 		6C2A5FED1FC03260005B3DF2 /* laidoff.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = laidoff.entitlements; sourceTree = "<group>"; };
 		6C7739171FB4B59D001014DE /* battlelogic.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = battlelogic.h; sourceTree = "<group>"; };
 		6C7739181FB4B59D001014DE /* etc1.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = etc1.h; sourceTree = "<group>"; };
@@ -2172,6 +2175,8 @@
 				6C7739AA1FB4B5A8001014DE /* unicode.h */,
 				6C77398C1FB4B5A6001014DE /* vertices.h */,
 				6C7739601FB4B5A2001014DE /* zhelpers.h */,
+				6C0CB61E1FC30FC800DA4E51 /* render_leaderboard.h */,
+				6C0CB61F1FC30FC800DA4E51 /* render_leaderboard.c */,
 			);
 			name = src;
 			path = ../../src;
@@ -2649,6 +2654,7 @@
 				56F188D41EC74DB60019312F /* plain_client.cpp in Sources */,
 				56F189081EC74DB60019312F /* vmci_listener.cpp in Sources */,
 				6C7739EE1FB4B5AA001014DE /* render_font_test.c in Sources */,
+				6C0CB6201FC30FC800DA4E51 /* render_leaderboard.c in Sources */,
 				56F188F01EC74DB60019312F /* stream.cpp in Sources */,
 				56F189A61EC751950019312F /* zhash.c in Sources */,
 				6CA16D831EA210BB00DB7AF0 /* lbitlib.c in Sources */,

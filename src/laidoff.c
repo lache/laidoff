@@ -49,6 +49,7 @@
 #include "lwdamagetext.h"
 #include "lwmath.h"
 #include "puckgameupdate.h"
+#include "render_leaderboard.h"
 // SWIG output file
 #include "lo_wrap.inl"
 
@@ -1344,6 +1345,8 @@ void lwc_render(const LWCONTEXT* pLwc) {
         lwc_render_ui(pLwc);
     } else if (pLwc->game_scene == LGS_SPLASH) {
         lwc_render_splash(pLwc);
+    } else if (pLwc->game_scene == LGS_LEADERBOARD) {
+        lwc_render_leaderboard(pLwc);
     }
     // Rendering a system message
     render_sys_msg(pLwc, pLwc->def_sys_msg);

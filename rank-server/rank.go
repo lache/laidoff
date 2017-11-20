@@ -71,10 +71,16 @@ func (t *Rank) Get(id UserId) (int, int, int, error) {
 
 func (t *Rank) PrintAll() {
 	rank := 0
+	tieCount := 1
 	for i, c := 0, len(t.IdArray); i < c; i++ {
 		log.Printf("Rank.%v: %v %v", rank, t.IdArray[i], t.ScoreArray[i])
-		if i < c-1 && t.ScoreArray[i+1] != t.ScoreArray[i] {
-			rank++
+		if i < c-1 {
+			if t.ScoreArray[i+1] == t.ScoreArray[i] {
+				tieCount++
+			} else {
+				rank += tieCount
+				tieCount = 1
+			}
 		}
 	}
 }

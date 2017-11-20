@@ -133,6 +133,8 @@ typedef struct _LWPUCKGAME {
 	int update_tick;
 	char nickname[LW_NICKNAME_MAX_LEN];
 	char target_nickname[LW_NICKNAME_MAX_LEN];
+    unsigned int id1[4];
+    unsigned int id2[4];
 } LWPUCKGAME;
 
 LWPUCKGAME* new_puck_game();

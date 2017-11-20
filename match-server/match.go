@@ -23,9 +23,9 @@ import (
 import "C"
 
 const (
-	MaxNickLen        = 32
-	PUSH_SERVICE_ADDR = "localhost:20171"
-	RANK_SERVICE_ADDR = "localhost:20172"
+	MaxNickLen      = 32
+	PushServiceAddr = ":20171"
+	RankServiceAddr = ":20172"
 )
 
 type UserId [16]byte
@@ -82,7 +82,7 @@ func (t *Arith) Multiply(a, b int) int {
 	return reply
 }
 
-func (t *Arith) RegisterPushToken(backoff time.Duration, id []byte, domain int, pushToken string) int {
+func (t *Arith) RegisterPushToken(backoff time.Duration, id UserId, domain int, pushToken string) int {
 	args := &shared_server.PushToken{domain, pushToken, id}
 	var reply int
 	err := t.client.Call("PushService.RegisterPushToken", args, &reply)
@@ -94,7 +94,7 @@ func (t *Arith) RegisterPushToken(backoff time.Duration, id []byte, domain int, 
 		} else if backoff > 0 {
 			time.Sleep(backoff)
 		}
-		t.client, err = dialNewRpc(PUSH_SERVICE_ADDR)
+		t.client, err = dialNewRpc(PushServiceAddr)
 		return t.RegisterPushToken(backoff*2, id, domain, pushToken)
 	}
 	return reply
@@ -112,7 +112,7 @@ func (t *RankClient) Set(backoff time.Duration, id [16]byte, score int, nickname
 		} else if backoff > 0 {
 			time.Sleep(backoff)
 		}
-		t.client, err = dialNewRpc(RANK_SERVICE_ADDR)
+		t.client, err = dialNewRpc(RankServiceAddr)
 		return t.Set(backoff*2, id, score, nickname)
 	}
 	return reply
@@ -130,7 +130,7 @@ func (t *RankClient) Get(backoff time.Duration, id UserId) *shared_server.ScoreR
 		} else if backoff > 0 {
 			time.Sleep(backoff)
 		}
-		t.client, err = dialNewRpc(RANK_SERVICE_ADDR)
+		t.client, err = dialNewRpc(RankServiceAddr)
 		return t.Get(backoff*2, id)
 	}
 	return &reply
@@ -148,7 +148,7 @@ func (t *RankClient) GetLeaderboard(backoff time.Duration, startIndex int, count
 		} else if backoff > 0 {
 			time.Sleep(backoff)
 		}
-		t.client, err = dialNewRpc(RANK_SERVICE_ADDR)
+		t.client, err = dialNewRpc(RankServiceAddr)
 		return t.GetLeaderboard(backoff*2, startIndex, count)
 	}
 	return &reply
@@ -171,7 +171,7 @@ func newServiceList() *ServiceList {
 	}
 }
 func DialPushService() *Arith {
-	client, err := dialNewRpc(PUSH_SERVICE_ADDR)
+	client, err := dialNewRpc(PushServiceAddr)
 	if err != nil {
 		log.Printf("dialNewRpc error: %v", err.Error())
 	}
@@ -180,7 +180,7 @@ func DialPushService() *Arith {
 }
 
 func DialRankService() *RankClient {
-	client, err := dialNewRpc(RANK_SERVICE_ADDR)
+	client, err := dialNewRpc(RankServiceAddr)
 	if err != nil {
 		log.Printf("dialNewRpc error: %v", err.Error())
 	}
@@ -223,7 +223,7 @@ func main() {
 		log.Fatalln("Error listening:", err.Error())
 	}
 	defer l.Close()
-	log.Printf("Listening %v for match service... ", conf.ConnHost+":"+conf.ConnPort)
+	log.Printf("Listening %v for match service...", conf.ConnHost+":"+conf.ConnPort)
 	for {
 		conn, err := l.Accept()
 		if err != nil {
@@ -237,14 +237,15 @@ func main() {
 func testRpc(serviceList *ServiceList) {
 	log.Println(serviceList.arith.Multiply(5, 6))
 	log.Println(serviceList.arith.Divide(500, 10))
-	log.Println(serviceList.arith.RegisterPushToken(300*time.Millisecond, []byte{1, 2, 3, 4}, 500, "test-push-token"))
+	log.Println(serviceList.arith.RegisterPushToken(300*time.Millisecond, UserId{1, 2, 3, 4}, 500, "test-push-token"))
 	log.Println(serviceList.rank.Set(300*time.Millisecond, UserId{1}, 100, "TestUser1"))
 	log.Println(serviceList.rank.Set(300*time.Millisecond, UserId{2}, 200, "TestUser2"))
 	log.Println(serviceList.rank.Set(300*time.Millisecond, UserId{3}, 300, "TestUser3"))
 	log.Println(serviceList.rank.Set(300*time.Millisecond, UserId{4}, 50, "TestUser4"))
-	log.Println(serviceList.rank.Set(300*time.Millisecond, UserId{5}, 40, "TestUser5"))
-	log.Println(serviceList.rank.Set(300*time.Millisecond, UserId{6}, 30, "TestUser6"))
+	log.Println(serviceList.rank.Set(300*time.Millisecond, UserId{5}, 20, "TestUser5"))
+	log.Println(serviceList.rank.Set(300*time.Millisecond, UserId{6}, 20, "TestUser6"))
 	log.Println(serviceList.rank.Set(300*time.Millisecond, UserId{7}, 20, "TestUser7"))
+	log.Println(serviceList.rank.Set(300*time.Millisecond, UserId{8}, 10, "한글닉넴8"))
 	log.Println(serviceList.rank.GetLeaderboard(300*time.Millisecond, 0, 20))
 	log.Println(serviceList.rank.Get(300*time.Millisecond, UserId{5}))
 }
@@ -269,6 +270,8 @@ func createBattleInstance(conf ServerConfig, c1 UserAgent, c2 UserAgent) {
 	createBattleBuf := packet2Buf(&C.LWPCREATEBATTLE{
 		C.ushort(unsafe.Sizeof(C.LWPCREATEBATTLE{})),
 		C.LPGP_LWPCREATEBATTLE,
+		UserIdToCuint(c1.userDb.Id),
+		UserIdToCuint(c2.userDb.Id),
 	})
 	_, err = conn.Write(createBattleBuf)
 	if err != nil {
@@ -385,7 +388,7 @@ func newUuid() ([]byte, string, error) {
 }
 
 type UserDb struct {
-	Id       []byte
+	Id       UserId
 	Created  time.Time
 	Nickname string
 }
@@ -426,6 +429,13 @@ func handleRequest(conf ServerConfig, nickDb *Nickdb.NickDb, conn net.Conn, matc
 	conn.Close()
 	log.Printf("Conn closed %v", conn.RemoteAddr())
 }
+
+func convertGoStringToCCharArray(strIn *string, strOut *[C.LW_NICKNAME_MAX_LEN]C.char) {
+	for i, b := range []byte(*strIn) {
+		(*strOut)[i] = C.char(b)
+	}
+}
+
 func handleGetLeaderboard(buf []byte, conn net.Conn, serviceList *ServiceList) {
 	log.Printf("GETLEADERBOARD received")
 	// Parse
@@ -439,14 +449,20 @@ func handleGetLeaderboard(buf []byte, conn net.Conn, serviceList *ServiceList) {
 	startIndex := int(recvPacket.Start_index)
 	count := int(recvPacket.Count)
 	leaderboardReply := serviceList.rank.GetLeaderboard(300*time.Millisecond, startIndex, count)
+	var nicknameList [C.LW_LEADERBOARD_ITEMS_IN_PAGE][C.LW_NICKNAME_MAX_LEN]C.char
+	var scoreList [C.LW_LEADERBOARD_ITEMS_IN_PAGE]C.int
+	for i, item := range leaderboardReply.Items {
+		convertGoStringToCCharArray(&item.Nickname, &nicknameList[i])
+		scoreList[i] = C.int(item.Score)
+	}
 	reply := &C.LWPLEADERBOARD{
 		C.ushort(unsafe.Sizeof(C.LWPLEADERBOARD{})),
 		C.LPGP_LWPLEADERBOARD,
 		C.int(len(leaderboardReply.Items)),
 		C.int(leaderboardReply.FirstItemRank),
 		C.int(leaderboardReply.FirstItemTieCount),
-		nil,
-		nil,
+		nicknameList,
+		scoreList,
 	}
 	replyBuf := packet2Buf(reply)
 	conn.Write(replyBuf)
@@ -534,7 +550,7 @@ func handleSuddenDeath(conf ServerConfig, buf []byte) {
 	}
 }
 
-func createNewUser(uuid []byte, nickname string) (*UserDb, *os.File, error) {
+func createNewUser(uuid UserId, nickname string) (*UserDb, *os.File, error) {
 	userDb := &UserDb{
 		uuid,
 		time.Now(),
@@ -568,7 +584,9 @@ func handleNewUser(nickDb *Nickdb.NickDb, conn net.Conn) {
 		cNewNickBytes,
 	})
 	// Write to disk
-	_, _, err = createNewUser(uuid, newNick)
+	var id UserId
+	copy(id[:], uuid)
+	_, _, err = createNewUser(id, newNick)
 	if err != nil {
 		log.Fatalf("createNewUser failed: %v", err.Error())
 	}
@@ -578,8 +596,17 @@ func handleNewUser(nickDb *Nickdb.NickDb, conn net.Conn) {
 	}
 }
 
-func IdCuintToByteArray(id [4]C.uint) []byte {
-	b := make([]byte, 16)
+func UserIdToCuint(id UserId) [4]C.uint {
+	var b [4]C.uint
+	b[0] = C.uint(binary.BigEndian.Uint32(id[0:4]))
+	b[1] = C.uint(binary.BigEndian.Uint32(id[4:8]))
+	b[2] = C.uint(binary.BigEndian.Uint32(id[8:12]))
+	b[3] = C.uint(binary.BigEndian.Uint32(id[12:16]))
+	return b
+}
+
+func IdCuintToByteArray(id [4]C.uint) UserId {
+	var b UserId
 	binary.BigEndian.PutUint32(b[0:], uint32(id[0]))
 	binary.BigEndian.PutUint32(b[4:], uint32(id[1]))
 	binary.BigEndian.PutUint32(b[8:], uint32(id[2]))
@@ -652,6 +679,6 @@ func IdArrayToString(id [4]C.uint) string {
 	return fmt.Sprintf("%08x-%08x-%08x-%08x", id[0], id[1], id[2], id[3])
 }
 
-func IdByteArrayToString(id []byte) string {
+func IdByteArrayToString(id UserId) string {
 	return fmt.Sprintf("%08x-%08x-%08x-%08x", id[0:4], id[4:8], id[8:12], id[12:16])
 }

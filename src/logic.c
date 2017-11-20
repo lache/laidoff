@@ -1,4 +1,4 @@
-﻿#include "logic.h"
+#include "logic.h"
 #include <czmq.h>
 #include "lwcontext.h"
 #include "lwtimepoint.h"
@@ -82,6 +82,10 @@ void change_to_ui(LWCONTEXT* pLwc) {
 
 void change_to_splash(LWCONTEXT* pLwc) {
 	pLwc->next_game_scene = LGS_SPLASH;
+}
+
+void change_to_leaderboard(LWCONTEXT* pLwc) {
+    pLwc->next_game_scene = LGS_LEADERBOARD;
 }
 
 typedef enum _LW_MSG {
@@ -542,6 +546,10 @@ void start_tcp_addr_text_input_activity(LWCONTEXT* pLwc) {
 	lw_start_text_input_activity(pLwc, 200);
 }
 
+void show_leaderboard(LWCONTEXT* pLwc) {
+    tcp_send_get_leaderboard(pLwc->tcp, 300, 0, LW_LEADERBOARD_ITEMS_IN_PAGE);
+}
+
 void start_request_push_token(LWCONTEXT* pLwc) {
     lw_request_remote_notification_device_token(pLwc);
 }
@@ -596,6 +604,7 @@ void reset_runtime_context(LWCONTEXT* pLwc) {
 		{ LWU("닉네임 변경"), start_nickname_text_input_activity },
         { LWU("푸시 토큰 등록"), start_request_push_token },
 		{ LWU("TCP 서버"), start_tcp_addr_text_input_activity },
+        { LWU("리더보드"), show_leaderboard },
 	};
 	for (int i = 0; i < ARRAY_SIZE(handler_array); i++) {
 		pLwc->admin_button_command[i].name = handler_array[i].name;

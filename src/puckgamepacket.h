@@ -32,6 +32,7 @@ typedef enum _LW_PUCK_GAME_PACKET {
     LPGP_LWPSYSMSG = 211,
     LPGP_LWPGETLEADERBOARD = 212,
     LPGP_LWPLEADERBOARD = 213,
+    LPGP_LWPBATTLERESULT = 214,
 
 	// internal admin tcp
 	LPGP_LWPCREATEBATTLE = 1000,
@@ -159,7 +160,7 @@ typedef struct _LWPSTATE {
 } LWPSTATE;
 
 // should be 4-byte aligned...
-// (Cgo compatability issue)
+// (Cgo compatibility issue)
 //#pragma pack(push, 1)
 typedef struct _LWPNEWUSER {
 	unsigned short size;
@@ -229,6 +230,8 @@ typedef struct _LWPBASE {
 typedef struct _LWPCREATEBATTLE {
 	unsigned short size;
 	unsigned short type;
+	unsigned int id1[4];
+	unsigned int id2[4];
 } LWPCREATEBATTLE;
 
 typedef struct _LWPCREATEBATTLEOK {
@@ -263,7 +266,7 @@ typedef struct _LWPLEADERBOARD {
     int First_item_rank;
     int First_item_tie_count;
     char Nickname[LW_LEADERBOARD_ITEMS_IN_PAGE][LW_NICKNAME_MAX_LEN];
-    char Score[LW_LEADERBOARD_ITEMS_IN_PAGE];
+    int Score[LW_LEADERBOARD_ITEMS_IN_PAGE];
 } LWPLEADERBOARD;
 
 enum {
@@ -284,5 +287,13 @@ typedef struct _LWPSYSMSG {
     unsigned short type;
     char message[LW_SYS_MSG_LENGTH];
 } LWPSYSMSG;
+
+typedef struct _LWPBATTLERESULT {
+    unsigned short Size;
+    unsigned short Type;
+    int Winner; // 0:draw, 1:Id1 wins, 2:Id2 wins
+    unsigned int Id1[4];
+    unsigned int Id2[4];
+} LWPBATTLERESULT;
 
 //#pragma pack(pop)

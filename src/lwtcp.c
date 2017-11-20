@@ -8,6 +8,7 @@
 #include "file.h"
 #include "puckgameupdate.h"
 #include <string.h>
+#include "logic.h"
 
 //#if LW_AUTO_BUILD || LW_PLATFORM_IOS
 //#define LW_TCP_SERVER "puck-highend.popsongremix.com"
@@ -213,6 +214,32 @@ int parse_recv_packets(LWCONTEXT* pLwc, LWTCP* tcp) {
             LOGI("LWPSYSMSG received");
             LWPSYSMSG* p = (LWPSYSMSG*)cursor;
             show_sys_msg(pLwc->def_sys_msg, p->message);
+        } else if (CHECK_PACKET(packet_type, packet_size, LWPLEADERBOARD)) {
+            LOGI("LWPLEADERBOARD received");
+            LWPLEADERBOARD* p = (LWPLEADERBOARD*)cursor;
+            // Cache it first
+            memcpy(&pLwc->last_leaderboard, p, sizeof(LWPLEADERBOARD));
+            LOGI("Count: %d", p->Count);
+            LOGI("First Item Rank: %d", p->First_item_rank);
+            LOGI("First Item Tie Count: %d", p->First_item_tie_count);
+            int rank = p->First_item_rank;
+            int tieCount = 1;
+            for (int i = 0; i < p->Count; i++) {
+                LOGI("  rank.%d %s %d", rank, p->Nickname[i], p->Score[i]);
+                if (i < p->Count - 1) {
+                    if (p->Score[i] == p->Score[i+1]) {
+                        tieCount++;
+                    } else {
+                        if (rank == p->First_item_rank) {
+                            rank += p->First_item_tie_count;
+                        } else {
+                            rank += tieCount;
+                        }
+                        tieCount = 1;
+                    }
+                }
+            }
+            change_to_leaderboard(pLwc);
         } else {
 			LOGE("Unknown TCP packet");
 		}
@@ -271,6 +298,34 @@ int tcp_send_suddendeath(LWTCP* tcp, int battle_id, unsigned int token) {
 	return (int)send(tcp->ConnectSocket, tcp->sendbuf, sizeof(p), 0);
 }
 
+int tcp_send_get_leaderboard(LWTCP* tcp, int backoffMs, int start_index, int count) {
+    if (tcp == 0) {
+        LOGE("tcp null");
+        return -1;
+    }
+    NEW_TCP_PACKET_CAPITAL(LWPGETLEADERBOARD, p);
+    p.Start_index = start_index;
+    p.Count = count;
+    memcpy(tcp->sendbuf, &p, sizeof(p));
+    int send_result = (int)send(tcp->ConnectSocket, tcp->sendbuf, sizeof(p), 0);
+    if (send_result < 0) {
+        LOGI("Send result error: %d", send_result);
+        if (backoffMs > 10 * 1000 /* 10 seconds */) {
+            LOGE(LWLOGPOS "failed");
+            return -1;
+        } else if (backoffMs > 0) {
+#if LW_PLATFORM_WIN32
+            Sleep(backoffMs);
+#else
+            usleep(backoffMs * 1000);
+#endif
+        }
+        tcp_connect(tcp);
+        return tcp_send_get_leaderboard(tcp, backoffMs * 2, start_index, count);
+    }
+    return send_result;
+}
+
 int tcp_send_push_token(LWTCP* tcp, int backoffMs, int domain, const char* push_token) {
 	if (tcp == 0) {
 		LOGE("tcp null");
@@ -282,9 +337,9 @@ int tcp_send_push_token(LWTCP* tcp, int backoffMs, int domain, const char* push_
     memcpy(p.Id, tcp->user_id.v, sizeof(p.Id));
     p.Push_token[sizeof(p.Push_token) - 1] = '\0';
     memcpy(tcp->sendbuf, &p, sizeof(p));
-    int send_result = send(tcp->ConnectSocket, tcp->sendbuf, sizeof(p), 0);
+    int send_result = (int)send(tcp->ConnectSocket, tcp->sendbuf, sizeof(p), 0);
     if (send_result < 0) {
-        LOGI("Send result error: %ld", send_result);
+        LOGI("Send result error: %d", send_result);
         if (backoffMs > 10 * 1000 /* 10 seconds */) {
             LOGE("tcp_send_push_token: failed");
             return -1;
@@ -298,7 +353,7 @@ int tcp_send_push_token(LWTCP* tcp, int backoffMs, int domain, const char* push_
         tcp_connect(tcp);
         return tcp_send_push_token(tcp, backoffMs * 2, domain, push_token);
     }
-    return (int)send_result;
+    return send_result;
 }
 
 const char* lw_tcp_addr(const LWCONTEXT* pLwc) {

@@ -18,6 +18,8 @@ import (
 	"fmt"
 )
 
+type UserId [16]byte
+
 func registerArith(server *rpc.Server, arith shared_server.Arith, pushService shared_server.PushService) {
 	// registers Arith interface by name of `Arithmetic`.
 	// If you want this name to be same as the type name, you
@@ -51,12 +53,12 @@ type PushUserData struct {
 
 type PushServiceData struct {
 	PushTokenMap map[string]PushUserData // Push Token --> Push User Data
-	UserIdMap    map[[16]byte]string // User ID --> Push Token
+	UserIdMap    map[UserId]string // User ID --> Push Token
 }
 
-func (t *PushServiceData) Add(id []byte, pushToken string, domain int) {
+func (t *PushServiceData) Add(id UserId, pushToken string, domain int) {
 	var idFixed [16]byte
-	copy(idFixed[:], id)
+	copy(idFixed[:], id[:])
 	t.PushTokenMap[pushToken] = PushUserData{idFixed, domain, "", pushToken}
 	t.UserIdMap[idFixed] = pushToken
 }
@@ -337,7 +339,7 @@ func main() {
 	pushService := &PushService{
 		PushServiceData{
 			make(map[string]PushUserData),
-			make(map[[16]byte]string),
+			make(map[UserId]string),
 		},
 		fcmServerKey,
 	}

@@ -641,7 +641,10 @@ int tcp_server_entry(void* context) {
 		if (base->type == LPGP_LWPCREATEBATTLE && base->size == sizeof(LWPCREATEBATTLE)) {
 			LWPCREATEBATTLEOK reply_p;
 			LOGI("LWPCREATEBATTLE: Create a new puck game instance");
+            LWPCREATEBATTLE* p = (LWPCREATEBATTLE*)base;
 			LWPUCKGAME* puck_game = new_puck_game();
+            memcpy(puck_game->id1, p->id1, sizeof(puck_game->id1));
+            memcpy(puck_game->id2, p->id2, sizeof(puck_game->id2));
 			const int battle_id = server->battle_counter + 1; // battle id is 1-based index
 			puck_game->server = server;
 			puck_game->battle_id = battle_id;
@@ -655,6 +658,7 @@ int tcp_server_entry(void* context) {
 			reply_p.Battle_id = battle_id;
 			reply_p.C1_token = puck_game->c1_token;
 			reply_p.C2_token = puck_game->c2_token;
+            // IpAddr, Port field is ignored for now...
 			reply_p.IpAddr[0] = 192;
 			reply_p.IpAddr[1] = 168;
 			reply_p.IpAddr[2] = 0;
@@ -769,8 +773,10 @@ int main(int argc, char* argv[]) {
 	{
 	}
 	LWSERVER* server = new_server();
+    // TCP listen & reply thread (listen requests from match server)
 	thrd_t thr;
 	thrd_create(&thr, tcp_server_entry, server);
+    // Create a test puck game instance (not used for battle)
 	LWPUCKGAME* puck_game = new_puck_game();
 	puck_game->server = server;
 	puck_game->on_player_damaged = on_player_damaged;

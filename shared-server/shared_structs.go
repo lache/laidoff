@@ -11,7 +11,7 @@ type Quotient struct {
 type PushToken struct {
 	Domain    int
 	PushToken string
-	UserId    []byte
+	UserId    [16]byte
 }
 
 type ScoreItem struct {

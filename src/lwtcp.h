@@ -19,7 +19,7 @@
 #include "lwringbuffer.h"
 #include "lwuniqueid.h"
 
-#define LW_TCP_BUFLEN 512
+#define LW_TCP_BUFLEN 1024
 
 typedef struct _LWTCP {
 #if LW_PLATFORM_WIN32
@@ -50,3 +50,4 @@ const char* lw_tcp_addr(const LWCONTEXT* pLwc);
 const char* lw_tcp_port_str(const LWCONTEXT* pLwc);
 int lw_tcp_port(const LWCONTEXT* pLwc);
 int tcp_send_push_token(LWTCP* tcp, int backoffMs, int domain, const char* push_token);
+int tcp_send_get_leaderboard(LWTCP* tcp, int backoffMs, int start_index, int count);
