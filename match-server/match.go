@@ -22,7 +22,13 @@ import (
 // #include "../src/puckgamepacket.h"
 import "C"
 
-const MaxNickLen = 32
+const (
+	MaxNickLen        = 32
+	PUSH_SERVICE_ADDR = "localhost:20171"
+	RANK_SERVICE_ADDR = "localhost:20172"
+)
+
+type UserId [16]byte
 
 type ServerConfig struct {
 	ConnHost string
@@ -40,6 +46,7 @@ type ServerConfig struct {
 
 type ServiceList struct {
 	arith *Arith
+	rank  *RankClient
 }
 
 type UserAgent struct {
@@ -48,6 +55,10 @@ type UserAgent struct {
 }
 
 type Arith struct {
+	client *rpc.Client
+}
+
+type RankClient struct {
 	client *rpc.Client
 }
 
@@ -83,16 +94,68 @@ func (t *Arith) RegisterPushToken(backoff time.Duration, id []byte, domain int, 
 		} else if backoff > 0 {
 			time.Sleep(backoff)
 		}
-		t.client, err = dialNewRpc()
+		t.client, err = dialNewRpc(PUSH_SERVICE_ADDR)
 		return t.RegisterPushToken(backoff*2, id, domain, pushToken)
 	}
 	return reply
 }
 
-func dialNewRpc() (*rpc.Client, error) {
-	address := "localhost:20171"
+func (t *RankClient) Set(backoff time.Duration, id [16]byte, score int, nickname string) int {
+	args := &shared_server.ScoreItem{Id: id, Score: score, Nickname: nickname}
+	var reply int
+	err := t.client.Call("RankService.Set", args, &reply)
+	if err != nil {
+		log.Printf("error: %v", err)
+		if backoff > 10*time.Second {
+			log.Printf("Error: %v - (retry finally failed)", err)
+			return 0
+		} else if backoff > 0 {
+			time.Sleep(backoff)
+		}
+		t.client, err = dialNewRpc(RANK_SERVICE_ADDR)
+		return t.Set(backoff*2, id, score, nickname)
+	}
+	return reply
+}
+
+func (t *RankClient) Get(backoff time.Duration, id UserId) *shared_server.ScoreRankItem {
+	args := id
+	var reply shared_server.ScoreRankItem
+	err := t.client.Call("RankService.Get", args, &reply)
+	if err != nil {
+		log.Printf("error: %v", err)
+		if backoff > 10*time.Second {
+			log.Printf("Error: %v - (retry finally failed)", err)
+			return nil
+		} else if backoff > 0 {
+			time.Sleep(backoff)
+		}
+		t.client, err = dialNewRpc(RANK_SERVICE_ADDR)
+		return t.Get(backoff*2, id)
+	}
+	return &reply
+}
+
+func (t *RankClient) GetLeaderboard(backoff time.Duration, startIndex int, count int) *shared_server.LeaderboardReply {
+	args := &shared_server.LeaderboardRequest{startIndex, count}
+	var reply shared_server.LeaderboardReply
+	err := t.client.Call("RankService.GetLeaderboard", args, &reply)
+	if err != nil {
+		log.Printf("error: %v", err)
+		if backoff > 10*time.Second {
+			log.Printf("Error: %v - (retry finally failed)", err)
+			return nil
+		} else if backoff > 0 {
+			time.Sleep(backoff)
+		}
+		t.client, err = dialNewRpc(RANK_SERVICE_ADDR)
+		return t.GetLeaderboard(backoff*2, startIndex, count)
+	}
+	return &reply
+}
+
+func dialNewRpc(address string) (*rpc.Client, error) {
 	log.Printf("Dial to RPC server %v...", address)
-	// Tries to connect to localhost:1234 (The port on which rpc server is listening)
 	conn, err := net.Dial("tcp", address)
 	if err != nil {
 		log.Printf("Connection error: %v", err)
@@ -102,14 +165,26 @@ func dialNewRpc() (*rpc.Client, error) {
 }
 
 func newServiceList() *ServiceList {
-	client, err := dialNewRpc()
+	return &ServiceList{
+		DialPushService(),
+		DialRankService(),
+	}
+}
+func DialPushService() *Arith {
+	client, err := dialNewRpc(PUSH_SERVICE_ADDR)
 	if err != nil {
 		log.Printf("dialNewRpc error: %v", err.Error())
 	}
-	// Create a struct, that mimics all methods provided by interface.
-	// It is not compulsory, we are doing it here, just to simulate a traditional method call.
 	arith := &Arith{client: client}
-	return &ServiceList{arith}
+	return arith
+}
+
+func DialRankService() *RankClient {
+	client, err := dialNewRpc(RANK_SERVICE_ADDR)
+	if err != nil {
+		log.Printf("dialNewRpc error: %v", err.Error())
+	}
+	return &RankClient{client: client}
 }
 
 func main() {
@@ -137,7 +212,7 @@ func main() {
 		log.Fatalf("conf.json parse error:%v", err.Error())
 	}
 	// Test RPC
-	testRpc()
+	testRpc(serviceList)
 	// Create 1 vs. 1 match queue
 	matchQueue := make(chan UserAgent)
 	// Start match worker goroutine
@@ -148,7 +223,7 @@ func main() {
 		log.Fatalln("Error listening:", err.Error())
 	}
 	defer l.Close()
-	log.Printf("Listening %v for match service... ", conf.ConnHost + ":" + conf.ConnPort)
+	log.Printf("Listening %v for match service... ", conf.ConnHost+":"+conf.ConnPort)
 	for {
 		conn, err := l.Accept()
 		if err != nil {
@@ -159,19 +234,19 @@ func main() {
 	}
 }
 
-func testRpc() error {
-	// Tries to connect to localhost:1234 (The port on which rpc server is listening)
-	conn, err := net.Dial("tcp", "localhost:20171")
-	if err != nil {
-		log.Fatal("Connection error:", err)
-	}
-	// Create a struct, that mimics all methods provided by interface.
-	// It is not compulsory, we are doing it here, just to simulate a traditional method call.
-	arith := &Arith{client: rpc.NewClient(conn)}
-	log.Println(arith.Multiply(5, 6))
-	log.Println(arith.Divide(500, 10))
-	log.Println(arith.RegisterPushToken(300*time.Millisecond, []byte{1, 2, 3, 4}, 500, "test-push-token"))
-	return err
+func testRpc(serviceList *ServiceList) {
+	log.Println(serviceList.arith.Multiply(5, 6))
+	log.Println(serviceList.arith.Divide(500, 10))
+	log.Println(serviceList.arith.RegisterPushToken(300*time.Millisecond, []byte{1, 2, 3, 4}, 500, "test-push-token"))
+	log.Println(serviceList.rank.Set(300*time.Millisecond, UserId{1}, 100, "TestUser1"))
+	log.Println(serviceList.rank.Set(300*time.Millisecond, UserId{2}, 200, "TestUser2"))
+	log.Println(serviceList.rank.Set(300*time.Millisecond, UserId{3}, 300, "TestUser3"))
+	log.Println(serviceList.rank.Set(300*time.Millisecond, UserId{4}, 50, "TestUser4"))
+	log.Println(serviceList.rank.Set(300*time.Millisecond, UserId{5}, 40, "TestUser5"))
+	log.Println(serviceList.rank.Set(300*time.Millisecond, UserId{6}, 30, "TestUser6"))
+	log.Println(serviceList.rank.Set(300*time.Millisecond, UserId{7}, 20, "TestUser7"))
+	log.Println(serviceList.rank.GetLeaderboard(300*time.Millisecond, 0, 20))
+	log.Println(serviceList.rank.Get(300*time.Millisecond, UserId{5}))
 }
 
 func int2ByteArray(v C.int) [4]byte {
@@ -344,10 +419,37 @@ func handleRequest(conf ServerConfig, nickDb *Nickdb.NickDb, conn net.Conn, matc
 			handleQueryNick(buf, conn, nickDb)
 		case C.LPGP_LWPPUSHTOKEN:
 			handlePushToken(buf, conn, serviceList)
+		case C.LPGP_LWPGETLEADERBOARD:
+			handleGetLeaderboard(buf, conn, serviceList)
 		}
 	}
 	conn.Close()
 	log.Printf("Conn closed %v", conn.RemoteAddr())
+}
+func handleGetLeaderboard(buf []byte, conn net.Conn, serviceList *ServiceList) {
+	log.Printf("GETLEADERBOARD received")
+	// Parse
+	bufReader := bytes.NewReader(buf)
+	recvPacket := C.LWPGETLEADERBOARD{}
+	err := binary.Read(bufReader, binary.LittleEndian, &recvPacket)
+	if err != nil {
+		log.Printf("binary.Read fail: %v", err.Error())
+		return
+	}
+	startIndex := int(recvPacket.Start_index)
+	count := int(recvPacket.Count)
+	leaderboardReply := serviceList.rank.GetLeaderboard(300*time.Millisecond, startIndex, count)
+	reply := &C.LWPLEADERBOARD{
+		C.ushort(unsafe.Sizeof(C.LWPLEADERBOARD{})),
+		C.LPGP_LWPLEADERBOARD,
+		C.int(len(leaderboardReply.Items)),
+		C.int(leaderboardReply.FirstItemRank),
+		C.int(leaderboardReply.FirstItemTieCount),
+		nil,
+		nil,
+	}
+	replyBuf := packet2Buf(reply)
+	conn.Write(replyBuf)
 }
 
 func byteArrayToCcharArray256(b []byte) [256]C.char {

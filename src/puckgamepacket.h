@@ -30,6 +30,8 @@ typedef enum _LW_PUCK_GAME_PACKET {
 	LPGP_LWPNICK = 209,
     LPGP_LWPPUSHTOKEN = 210,
     LPGP_LWPSYSMSG = 211,
+    LPGP_LWPGETLEADERBOARD = 212,
+    LPGP_LWPLEADERBOARD = 213,
 
 	// internal admin tcp
 	LPGP_LWPCREATEBATTLE = 1000,
@@ -171,6 +173,7 @@ typedef struct _LWPQUERYNICK {
 } LWPQUERYNICK;
 
 #define LW_NICKNAME_MAX_LEN (32)
+#define LW_LEADERBOARD_ITEMS_IN_PAGE (20)
 
 typedef struct _LWPNICK {
 	unsigned short size;
@@ -245,6 +248,23 @@ typedef struct _LWPSUDDENDEATH {
 	int Battle_id;
 	unsigned int Token;
 } LWPSUDDENDEATH;
+
+typedef struct _LWPGETLEADERBOARD {
+    unsigned short Size;
+    unsigned short Type;
+    int Start_index;
+    int Count;
+} LWPGETLEADERBOARD;
+
+typedef struct _LWPLEADERBOARD {
+    unsigned short Size;
+    unsigned short Type;
+    int Count;
+    int First_item_rank;
+    int First_item_tie_count;
+    char Nickname[LW_LEADERBOARD_ITEMS_IN_PAGE][LW_NICKNAME_MAX_LEN];
+    char Score[LW_LEADERBOARD_ITEMS_IN_PAGE];
+} LWPLEADERBOARD;
 
 enum {
     LW_PUSH_TOKEN_LENGTH = 256,

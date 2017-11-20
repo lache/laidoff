@@ -9,7 +9,35 @@ type Quotient struct {
 }
 
 type PushToken struct {
-	Domain int
+	Domain    int
 	PushToken string
-	UserId []byte
+	UserId    []byte
+}
+
+type ScoreItem struct {
+	Id       [16]byte
+	Score    int
+	Nickname string
+}
+
+type ScoreRankItem struct {
+	Id    [16]byte
+	Score int
+	Rank  int
+}
+
+type LeaderboardRequest struct {
+	StartIndex int
+	Count      int
+}
+
+type LeaderboardItem struct {
+	Nickname string
+	Score    int
+}
+
+type LeaderboardReply struct {
+	FirstItemRank     int
+	FirstItemTieCount int
+	Items             []LeaderboardItem
 }
