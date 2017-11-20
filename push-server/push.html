@@ -17,10 +17,12 @@
 <body>
 <ul>
 {{range $key, $value := .PushTokenMap}}
-    <li><pre class="wrap">{{$key}}</pre>
+    <li>메모:[{{$value.Memo}}]
+        <pre class="wrap">{{$key}}</pre>
         [<a href="/writePush/{{$key}}">Write push</a>]
         [<a href="/sendTestPush/{{$key}}">Send test push</a>]
         [<a href="/deletePushToken/{{$key}}">Delete push token</a>]
+        [<a href="/editPushToken/{{$key}}">Edit push token</a>]
     </li>
 {{end}}
 </ul>

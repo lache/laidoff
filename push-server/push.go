@@ -45,6 +45,8 @@ func (t *Arith) Divide(args *shared_server.Args, quo *shared_server.Quotient) er
 type PushUserData struct {
 	UserId [16]byte
 	Domain int
+	Memo string
+	PushToken string
 }
 
 type PushServiceData struct {
@@ -55,7 +57,7 @@ type PushServiceData struct {
 func (t *PushServiceData) Add(id []byte, pushToken string, domain int) {
 	var idFixed [16]byte
 	copy(idFixed[:], id)
-	t.PushTokenMap[pushToken] = PushUserData{idFixed, domain}
+	t.PushTokenMap[pushToken] = PushUserData{idFixed, domain, "", pushToken}
 	t.UserIdMap[idFixed] = pushToken
 }
 
@@ -127,9 +129,9 @@ type Page struct {
 	Body  []byte
 }
 
-var templates = template.Must(template.ParseFiles("edit.html", "view.html", "push.html", "writePush.html"))
+var templates = template.Must(template.ParseFiles("editPushToken.html", "edit.html", "view.html", "push.html", "writePush.html"))
 var validPath = regexp.MustCompile("^/(edit|save|view)/([a-zA-Z0-9]+)$")
-var validPushTokenPath = regexp.MustCompile("^/(deletePushToken|sendTestPush|writePush|sendPush)/([a-zA-Z0-9-:_]+)$")
+var validPushTokenPath = regexp.MustCompile("^/(savePushToken|editPushToken|deletePushToken|sendTestPush|writePush|sendPush)/([a-zA-Z0-9-:_]+)$")
 
 func getTitle(w http.ResponseWriter, r *http.Request) (string, error) {
 	m := validPath.FindStringSubmatch(r.URL.Path)
@@ -238,6 +240,15 @@ func sendTestPushHandler(w http.ResponseWriter, r *http.Request, pushService *Pu
 	http.Redirect(w, r, "/push/", http.StatusFound)
 }
 
+func savePushTokenHandler(w http.ResponseWriter, r *http.Request, pushService *PushService, pushToken string) {
+	pushUserData := pushService.data.PushTokenMap[pushToken]
+	memo := r.FormValue("memo")
+	pushUserData.Memo = memo
+	pushService.data.PushTokenMap[pushToken] = pushUserData
+	writePushServiceData(&pushService.data)
+	http.Redirect(w, r, "/push/", http.StatusFound)
+}
+
 func sendPushHandler(w http.ResponseWriter, r *http.Request, pushService *PushService, pushToken string) {
 	body := r.FormValue("body")
 	domain := pushService.data.PushTokenMap[pushToken].Domain
@@ -250,6 +261,14 @@ func sendPushHandler(w http.ResponseWriter, r *http.Request, pushService *PushSe
 		return
 	}
 	http.Redirect(w, r, "/push/", http.StatusFound)
+}
+
+func editPushTokenHandler(w http.ResponseWriter, r *http.Request, pushService *PushService, pushToken string) {
+	pushUserData := pushService.data.PushTokenMap[pushToken]
+	err := templates.ExecuteTemplate(w, "editPushToken.html", pushUserData)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+	}
 }
 
 func writePushHandler(w http.ResponseWriter, r *http.Request, pushService *PushService, pushToken string) {
@@ -288,6 +307,8 @@ func startAdminService(pushService *PushService) {
 	http.HandleFunc("/sendTestPush/", makePushTokenHandler(sendTestPushHandler, pushService))
 	http.HandleFunc("/writePush/", makePushTokenHandler(writePushHandler, pushService))
 	http.HandleFunc("/sendPush/", makePushTokenHandler(sendPushHandler, pushService))
+	http.HandleFunc("/editPushToken/", makePushTokenHandler(editPushTokenHandler, pushService))
+	http.HandleFunc("/savePushToken/", makePushTokenHandler(savePushTokenHandler, pushService))
 	addr := "0.0.0.0:18080"
 	log.Printf("Listening %v for admin service...", addr)
 	http.ListenAndServe(addr, nil)
