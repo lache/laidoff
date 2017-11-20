@@ -1,4 +1,4 @@
-#include "logic.h"
+﻿#include "logic.h"
 #include <czmq.h>
 #include "lwcontext.h"
 #include "lwtimepoint.h"

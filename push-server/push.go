@@ -288,8 +288,15 @@ func startAdminService(pushService *PushService) {
 	http.HandleFunc("/sendTestPush/", makePushTokenHandler(sendTestPushHandler, pushService))
 	http.HandleFunc("/writePush/", makePushTokenHandler(writePushHandler, pushService))
 	http.HandleFunc("/sendPush/", makePushTokenHandler(sendPushHandler, pushService))
-	http.ListenAndServe(":18080", nil)
+	addr := ":18080"
+	log.Printf("Listening %v for admin service...", addr)
+	http.ListenAndServe(addr, nil)
 }
+
+const (
+	ANDROID_KEY_PATH = "cert/dev/fcmserverkey"
+	APPLE_KEY_PATH = "cert/dev/cert.p12"
+)
 
 func main() {
 	// Set default log format
@@ -299,7 +306,7 @@ func main() {
 	os.MkdirAll("db", os.ModePerm)
 	os.MkdirAll("pages", os.ModePerm)
 	// Load Firebase Cloud Messaging (FCM) server key
-	fcmServerKeyBuf, err := ioutil.ReadFile("cert/dev/fcmserverkey")
+	fcmServerKeyBuf, err := ioutil.ReadFile(ANDROID_KEY_PATH)
 	if err != nil {
 		log.Fatalf("fcm server key load failed: %v", err.Error())
 	}
@@ -340,8 +347,10 @@ func main() {
 	server := rpc.NewServer()
 	registerArith(server, arith, pushService)
 
+	addr := ":20171"
+	log.Printf("Listening %v for push service...", addr)
 	// Listen for incoming tcp packets on specified port.
-	l, e := net.Listen("tcp", ":20171")
+	l, e := net.Listen("tcp", addr)
 	if e != nil {
 		log.Fatal("listen error:", e)
 	}
@@ -352,7 +361,7 @@ func main() {
 }
 
 func PostIosMessage(pushToken string, body string) {
-	cert, err := certificate.FromP12File("cert/dev/cert.p12", "")
+	cert, err := certificate.FromP12File(APPLE_KEY_PATH, "")
 	if err != nil {
 		log.Fatal("Cert Error:", err)
 	}

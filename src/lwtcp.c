@@ -104,9 +104,11 @@ LWTCP* new_tcp(const LWCONTEXT* pLwc, const char* path_prefix) {
     tcp->hints.ai_socktype = SOCK_STREAM;
     tcp->hints.ai_protocol = IPPROTO_TCP;
     
+#if !LW_PLATFORM_WIN32
     // Handle SIGPIPE in our side
     signal(SIGPIPE, SIG_IGN);
-    
+#endif
+
     tcp->iResult = getaddrinfo(lw_tcp_addr(pLwc), lw_tcp_port_str(pLwc), &tcp->hints, &tcp->result);
     if (tcp->iResult != 0) {
         LOGE("getaddrinfo failed with error: %d", tcp->iResult);
@@ -270,20 +272,28 @@ int tcp_send_suddendeath(LWTCP* tcp, int battle_id, unsigned int token) {
 }
 
 int tcp_send_push_token(LWTCP* tcp, int backoffMs, int domain, const char* push_token) {
+	if (tcp == 0) {
+		LOGE("tcp null");
+		return -1;
+	}
     NEW_TCP_PACKET_CAPITAL(LWPPUSHTOKEN, p);
     p.Domain = domain;
     strncpy(p.Push_token, push_token, sizeof(p.Push_token) - 1);
     memcpy(p.Id, tcp->user_id.v, sizeof(p.Id));
     p.Push_token[sizeof(p.Push_token) - 1] = '\0';
     memcpy(tcp->sendbuf, &p, sizeof(p));
-    ssize_t send_result = send(tcp->ConnectSocket, tcp->sendbuf, sizeof(p), 0);
+    int send_result = send(tcp->ConnectSocket, tcp->sendbuf, sizeof(p), 0);
     if (send_result < 0) {
         LOGI("Send result error: %ld", send_result);
         if (backoffMs > 10 * 1000 /* 10 seconds */) {
             LOGE("tcp_send_push_token: failed");
             return -1;
         } else if (backoffMs > 0) {
+#if LW_PLATFORM_WIN32
+            Sleep(backoffMs);
+#else
             usleep(backoffMs * 1000);
+#endif
         }
         tcp_connect(tcp);
         return tcp_send_push_token(tcp, backoffMs * 2, domain, push_token);

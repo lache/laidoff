@@ -365,7 +365,7 @@ INT_PTR CALLBACK TextInputProc(HWND hDlg, UINT message, WPARAM wParam, LPARAM lP
     return FALSE;
 }
 
-void lw_start_text_input_activity(LWCONTEXT* pLwc) {
+void lw_start_text_input_activity(LWCONTEXT* pLwc, int tag) {
     HWND hWnd = glfwGetWin32Window(pLwc->window);
     HINSTANCE hInst = GetModuleHandle(NULL);
     DialogBox(hInst,							// application instance
@@ -378,3 +378,7 @@ void lw_start_text_input_activity(LWCONTEXT* pLwc) {
     LOGE("Not implemented yet..");
 }
 #endif
+
+void lw_request_remote_notification_device_token(LWCONTEXT* pLwc) {
+    LOGE("Not supported in win32");
+}

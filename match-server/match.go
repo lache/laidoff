@@ -43,7 +43,7 @@ type ServiceList struct {
 }
 
 type UserAgent struct {
-	conn net.Conn
+	conn   net.Conn
 	userDb UserDb
 }
 
@@ -77,21 +77,23 @@ func (t *Arith) RegisterPushToken(backoff time.Duration, id []byte, domain int, 
 	err := t.client.Call("PushService.RegisterPushToken", args, &reply)
 	if err != nil {
 		log.Printf("arith error: %v", err)
-		if backoff > 10 * time.Second {
+		if backoff > 10*time.Second {
 			log.Printf("Error - Register Push Token failed: %v", err)
 			return 0
 		} else if backoff > 0 {
 			time.Sleep(backoff)
 		}
 		t.client, err = dialNewRpc()
-		return t.RegisterPushToken(backoff * 2, id, domain, pushToken)
+		return t.RegisterPushToken(backoff*2, id, domain, pushToken)
 	}
 	return reply
 }
 
 func dialNewRpc() (*rpc.Client, error) {
+	address := "localhost:20171"
+	log.Printf("Dial to RPC server %v...", address)
 	// Tries to connect to localhost:1234 (The port on which rpc server is listening)
-	conn, err := net.Dial("tcp", "localhost:20171")
+	conn, err := net.Dial("tcp", address)
 	if err != nil {
 		log.Printf("Connection error: %v", err)
 		return nil, err
@@ -107,7 +109,7 @@ func newServiceList() *ServiceList {
 	// Create a struct, that mimics all methods provided by interface.
 	// It is not compulsory, we are doing it here, just to simulate a traditional method call.
 	arith := &Arith{client: client}
-	return &ServiceList {arith}
+	return &ServiceList{arith}
 }
 
 func main() {
@@ -146,7 +148,7 @@ func main() {
 		log.Fatalln("Error listening:", err.Error())
 	}
 	defer l.Close()
-	log.Println("Listening on " + conf.ConnHost + ":" + conf.ConnPort)
+	log.Printf("Listening %v for match service... ", conf.ConnHost + ":" + conf.ConnPort)
 	for {
 		conn, err := l.Accept()
 		if err != nil {
@@ -168,7 +170,7 @@ func testRpc() error {
 	arith := &Arith{client: rpc.NewClient(conn)}
 	log.Println(arith.Multiply(5, 6))
 	log.Println(arith.Divide(500, 10))
-	log.Println(arith.RegisterPushToken(300 * time.Millisecond, []byte{1,2,3,4}, 500, "test-push-token"))
+	log.Println(arith.RegisterPushToken(300*time.Millisecond, []byte{1, 2, 3, 4}, 500, "test-push-token"))
 	return err
 }
 
@@ -375,7 +377,7 @@ func handlePushToken(buf []byte, conn net.Conn, serviceList *ServiceList) {
 	pushTokenLength := bytes.IndexByte(pushTokenBytes, 0)
 	pushToken := string(pushTokenBytes[:pushTokenLength])
 	log.Printf("Push token domain %v, token: %v, id: %v", recvPacket.Domain, pushToken, idBytes)
-	pushResult := serviceList.arith.RegisterPushToken(300 * time.Millisecond, idBytes, int(recvPacket.Domain), pushToken)
+	pushResult := serviceList.arith.RegisterPushToken(300*time.Millisecond, idBytes, int(recvPacket.Domain), pushToken)
 	log.Printf("Push result: %v", pushResult)
 	if pushResult == 1 {
 		sysMsg := []byte(fmt.Sprintf("토큰 등록 완료! %v", pushToken))
@@ -404,7 +406,7 @@ func handleQueue2(matchQueue chan<- UserAgent, buf []byte, conn net.Conn) {
 		log.Printf("user db load failed: %v", err.Error())
 	} else {
 		// Queue connection
-		matchQueue <- UserAgent { conn, *userDb }
+		matchQueue <- UserAgent{conn, *userDb}
 
 		queueOkBuf := packet2Buf(&C.LWPQUEUEOK{
 			C.ushort(unsafe.Sizeof(C.LWPQUEUEOK{})),
