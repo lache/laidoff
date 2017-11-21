@@ -64,6 +64,8 @@ int tcp_connect(LWTCP* tcp) {
         LOGE("Unable to connect to server!");
         return -3;
     }
+    int set = 1;
+    setsockopt (tcp->ConnectSocket, SOL_SOCKET, SO_NOSIGPIPE, &set, sizeof (int));
     return 0;
 }
 
@@ -83,9 +85,9 @@ LWTCP* new_tcp(LWCONTEXT* pLwc,
     tcp->pLwc = pLwc;
 #if !LW_PLATFORM_WIN32
     // Handle SIGPIPE in our side
-    signal(SIGPIPE, SIG_IGN);
+    //signal(SIGPIPE, SIG_IGN);
 #endif
-
+    
     tcp->iResult = getaddrinfo(host_addr->host, host_addr->port_str, &tcp->hints, &tcp->result);
     if (tcp->iResult != 0) {
         LOGE("getaddrinfo failed with error: %d", tcp->iResult);

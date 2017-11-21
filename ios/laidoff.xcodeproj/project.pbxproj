@@ -272,6 +272,7 @@
 		56F189BA1EC751950019312F /* ztimerset.c in Sources */ = {isa = PBXBuildFile; fileRef = 56F1897D1EC751950019312F /* ztimerset.c */; };
 		56F189BB1EC751950019312F /* ztrie.c in Sources */ = {isa = PBXBuildFile; fileRef = 56F1897E1EC751950019312F /* ztrie.c */; };
 		56F189BC1EC751950019312F /* zuuid.c in Sources */ = {isa = PBXBuildFile; fileRef = 56F1897F1EC751950019312F /* zuuid.c */; };
+		6C0CB2461FC45AB6006BEDCD /* lwtcpclient.c in Sources */ = {isa = PBXBuildFile; fileRef = 6C0CB2441FC45AB6006BEDCD /* lwtcpclient.c */; };
 		6C0CB6201FC30FC800DA4E51 /* render_leaderboard.c in Sources */ = {isa = PBXBuildFile; fileRef = 6C0CB61F1FC30FC800DA4E51 /* render_leaderboard.c */; };
 		6C7739BC1FB4B5AA001014DE /* font.c in Sources */ = {isa = PBXBuildFile; fileRef = 6C7739191FB4B59D001014DE /* font.c */; };
 		6C7739BD1FB4B5AA001014DE /* unicode.c in Sources */ = {isa = PBXBuildFile; fileRef = 6C77391D1FB4B59D001014DE /* unicode.c */; };
@@ -936,6 +937,8 @@
 		56F1897D1EC751950019312F /* ztimerset.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = ztimerset.c; sourceTree = "<group>"; };
 		56F1897E1EC751950019312F /* ztrie.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = ztrie.c; sourceTree = "<group>"; };
 		56F1897F1EC751950019312F /* zuuid.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = zuuid.c; sourceTree = "<group>"; };
+		6C0CB2441FC45AB6006BEDCD /* lwtcpclient.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = lwtcpclient.c; sourceTree = "<group>"; };
+		6C0CB2451FC45AB6006BEDCD /* lwtcpclient.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = lwtcpclient.h; sourceTree = "<group>"; };
 		6C0CB61E1FC30FC800DA4E51 /* render_leaderboard.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = render_leaderboard.h; sourceTree = "<group>"; };
 		6C0CB61F1FC30FC800DA4E51 /* render_leaderboard.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = render_leaderboard.c; sourceTree = "<group>"; };
 		6C2A5FED1FC03260005B3DF2 /* laidoff.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = laidoff.entitlements; sourceTree = "<group>"; };
@@ -2002,6 +2005,8 @@
 		6CA16CF41EA20CA700DB7AF0 /* src */ = {
 			isa = PBXGroup;
 			children = (
+				6C0CB2441FC45AB6006BEDCD /* lwtcpclient.c */,
+				6C0CB2451FC45AB6006BEDCD /* lwtcpclient.h */,
 				26457DBB1FBC1C5B00FFEE74 /* lwdirpad.c */,
 				26457DBC1FBC1C5B00FFEE74 /* lwdirpad.h */,
 				6C7739891FB4B5A5001014DE /* armature.c */,
@@ -2433,6 +2438,7 @@
 				56F188EA1EC74DB60019312F /* session_base.cpp in Sources */,
 				566373331EBA52D3001DA3F4 /* collision_cylinder_trimesh.cpp in Sources */,
 				566373741EBA52D4001DA3F4 /* sphere.cpp in Sources */,
+				6C0CB2461FC45AB6006BEDCD /* lwtcpclient.c in Sources */,
 				5663733B1EBA52D3001DA3F4 /* collision_trimesh_disabled.cpp in Sources */,
 				5663734A1EBA52D4001DA3F4 /* fastldlt.cpp in Sources */,
 				566373311EBA52D3001DA3F4 /* collision_cylinder_plane.cpp in Sources */,

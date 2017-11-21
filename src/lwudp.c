@@ -43,6 +43,8 @@ LWUDP* new_udp() {
 #endif
 		exit(EXIT_FAILURE);
 	}
+    int set = 1;
+    setsockopt (udp->s, SOL_SOCKET, SO_NOSIGPIPE, &set, sizeof (int));
 
 	//setup address structure
 	memset((char *)&udp->si_other, 0, sizeof(udp->si_other));
@@ -109,6 +111,10 @@ void udp_update(LWCONTEXT* pLwc, LWUDP* udp) {
 				exit(EXIT_FAILURE);
 			}
 #else
+            // Socket recovery needed
+            LOGE(LWLOGPOS "UDP socket error! Socket recovery needed...");
+            udp->ready = 0;
+            return;
 #endif
 		}
 		const int packet_type = *(int*)udp->buf;
@@ -226,7 +232,7 @@ void udp_update(LWCONTEXT* pLwc, LWUDP* udp) {
 		}
 		default:
 		{
-			LOGE("Unknown UDP datagram received.");
+			LOGE("Unknown datagram (UDP packet) received.");
 			break;
 		}
 		}
