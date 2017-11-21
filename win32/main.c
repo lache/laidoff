@@ -83,7 +83,7 @@ static GLFWwindow* create_glfw_window() {
 }
 
 #if LW_PLATFORM_WIN32
-static void make_multiple_instances_nonoverlapping(GLFWwindow* window, const RECT* work_area, int window_rect_to_client_rect_dx, int window_rect_to_client_rect_dy, int width, int height) {
+static int make_multiple_instances_nonoverlapping(GLFWwindow* window, const RECT* work_area, int window_rect_to_client_rect_dx, int window_rect_to_client_rect_dy, int width, int height) {
     HANDLE first_mutex = CreateMutex(NULL, TRUE, "laidoff-win32-client-mutex-1");
     int first_window_exists = GetLastError() == ERROR_ALREADY_EXISTS;
     if (first_window_exists) {
@@ -98,15 +98,19 @@ static void make_multiple_instances_nonoverlapping(GLFWwindow* window, const REC
                 CloseHandle(third_mutex);
                 // fourth position
                 glfwSetWindowPos(window, work_area->left + window_rect_to_client_rect_dx + width + window_rect_to_client_rect_dx, work_area->top + window_rect_to_client_rect_dy + height + window_rect_to_client_rect_dy);
+                return 3;
             } else {
                 // third position
                 glfwSetWindowPos(window, work_area->left + window_rect_to_client_rect_dx, work_area->top + window_rect_to_client_rect_dy + height + window_rect_to_client_rect_dy);
+                return 2;
             }
         } else {
             // second position
             glfwSetWindowPos(window, work_area->left + window_rect_to_client_rect_dx + width + window_rect_to_client_rect_dx, work_area->top + window_rect_to_client_rect_dy);
+            return 1;
         }
     }
+    return 0;
 }
 #endif
 
@@ -213,9 +217,24 @@ int main(int argc, char* argv[]) {
     int height = 0;
     glfwGetFramebufferSize(window, &width, &height);
 #if LW_PLATFORM_WIN32
-    make_multiple_instances_nonoverlapping(window, &work_area, window_rect_to_client_rect_dx, window_rect_to_client_rect_dy, width, height);
+    int client_instance_id = make_multiple_instances_nonoverlapping(window, &work_area, window_rect_to_client_rect_dx, window_rect_to_client_rect_dy, width, height);
 #endif
     LWCONTEXT* pLwc = lw_init_initial_size(width, height);
+#if LW_PLATFORM_WIN32
+    switch (client_instance_id) {
+    case 0:
+        break;
+    case 1:
+        pLwc->user_data_path = "user1";
+        break;
+    case 2:
+        pLwc->user_data_path = "user2";
+        break;
+    case 3:
+        pLwc->user_data_path = "user3";
+        break;
+    }
+#endif
 
     lw_set_window(pLwc, window);
 

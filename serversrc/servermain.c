@@ -24,6 +24,7 @@
 #include <tinycthread.h>
 #include "pcg_basic.h"
 #include "lwtcp.h"
+#include "puckgamepacket.h"
 #if LW_PLATFORM_WIN32
 #define LwChangeDirectory(x) SetCurrentDirectory(x)
 #else
@@ -767,15 +768,91 @@ void broadcast_state_packet(LWSERVER* server, const LWCONN* conn, int conn_capac
 	}
 }
 
+static int puck_game_winner(const LWPUCKGAME* puck_game) {
+    if (puck_game->player.current_hp > 0
+        && puck_game->target.current_hp > 0
+        && puck_game->time < puck_game->total_time) {
+        // not yet finished
+        return -1;
+    }
+    const int hp_diff = puck_game->player.current_hp - puck_game->target.current_hp;
+    if (hp_diff == 0) {
+        return 0;
+    } else if (hp_diff > 0) {
+        return 1;
+    } else {
+        return 2;
+    }
+}
+
+int tcp_send_battle_result(LWTCP* tcp,
+                           int backoffMs,
+                           const unsigned int* id1,
+                           const unsigned int* id2,
+                           int winner) {
+    if (tcp == 0) {
+        LOGE("tcp null");
+        return -1;
+    }
+    NEW_TCP_PACKET_CAPITAL(LWPBATTLERESULT, p);
+    memcpy(p.Id1, id1, sizeof(p.Id1));
+    memcpy(p.Id2, id2, sizeof(p.Id2));
+    p.Winner = winner;
+    memcpy(tcp->sendbuf, &p, sizeof(p));
+    int send_result = (int)send(tcp->ConnectSocket, tcp->sendbuf, sizeof(p), 0);
+    if (send_result < 0) {
+        LOGI("Send result error: %d", send_result);
+        if (backoffMs > 10 * 1000 /* 10 seconds */) {
+            LOGE("tcp_send_push_token: failed");
+            return -1;
+        } else if (backoffMs > 0) {
+            struct timespec ts;
+            ts.tv_sec = 0;
+            ts.tv_nsec = backoffMs * 1000 * 1000;
+            thrd_sleep(&ts, 0);
+        }
+        tcp_connect(tcp);
+        return tcp_send_battle_result(tcp, backoffMs * 2, id1, id2, winner);
+    }
+    return send_result;
+}
+
+void process_battle_reward(LWPUCKGAME* puck_game, LWTCP* reward_service) {
+    tcp_send_battle_result(reward_service,
+                           300,
+                           puck_game->id1,
+                           puck_game->id2,
+                           puck_game_winner(puck_game));
+}
+
+void reward_service_on_connect(LWTCP* tcp, const char* path_prefix) {
+    LOGI("Reward service connected.");
+}
+
+int reward_service_on_recv_packets(LWTCP* tcp) {
+    LOGI("Packet received (%d bytes) from reward service.", tcp->recvbufnotparsed);
+    return tcp->recvbufnotparsed;
+}
+
 int main(int argc, char* argv[]) {
 	LOGI("LAIDOFF-SERVER: Greetings.");
 	while (!directory_exists("assets") && LwChangeDirectory(".."))
 	{
 	}
+    // Create main server instance
 	LWSERVER* server = new_server();
     // TCP listen & reply thread (listen requests from match server)
 	thrd_t thr;
 	thrd_create(&thr, tcp_server_entry, server);
+    // Create reward server connection
+    LWHOSTADDR reward_host_addr;
+    strcpy(reward_host_addr.host, "127.0.0.1");
+    strcpy(reward_host_addr.port_str, "10290");
+    LWTCP* reward_service = new_tcp(0,
+                                    0,
+                                    &reward_host_addr,
+                                    reward_service_on_connect,
+                                    reward_service_on_recv_packets);
     // Create a test puck game instance (not used for battle)
 	LWPUCKGAME* puck_game = new_puck_game();
 	puck_game->server = server;
@@ -807,6 +884,7 @@ int main(int argc, char* argv[]) {
 						if (server->puck_game_pool[j]->finished == 0
 							&& update_puck_game(server, server->puck_game_pool[j], logic_timestep) < 0) {
 							server->puck_game_pool[j]->finished = 1;
+                            process_battle_reward(server->puck_game_pool[j], reward_service);
 						}
 					}
 				}
@@ -835,5 +913,6 @@ int main(int argc, char* argv[]) {
 		//LOGI("Loop time: %.3f ms", loop_time * 1000);
 	}
 	delete_puck_game(&puck_game);
+    destroy_tcp(&reward_service);
 	return 0;
 }

@@ -80,6 +80,7 @@ LWTCP* new_tcp(const LWCONTEXT* pLwc,
     tcp->on_connect = on_connect;
     tcp->on_recv_packets = on_recv_packets;
     memcpy(&tcp->host_addr, host_addr, sizeof(LWHOSTADDR));
+    tcp->pLwc = pLwc;
 #if !LW_PLATFORM_WIN32
     // Handle SIGPIPE in our side
     signal(SIGPIPE, SIG_IGN);

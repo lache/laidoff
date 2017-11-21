@@ -11,6 +11,7 @@
 #include "puckgamepacket.h"
 #include "lwtcp.h"
 #include "puckgameupdate.h"
+#include "lwtcpclient.h"
 
 void update_puck_game(LWCONTEXT* pLwc, LWPUCKGAME* puck_game, double delta_time) {
     if (!puck_game->world) {

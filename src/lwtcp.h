@@ -28,6 +28,19 @@ typedef struct _LWTCP LWTCP;
 typedef void(*LWTCP_ON_CONNECT)(LWTCP*, const char*);
 typedef int(*LWTCP_ON_RECV_PACKETS)(LWTCP* tcp);
 
+#define NEW_TCP_PACKET(vartype, varname) \
+vartype varname; \
+varname.size = sizeof(vartype); \
+varname.type = LPGP_##vartype
+
+#define NEW_TCP_PACKET_CAPITAL(vartype, varname) \
+vartype varname; \
+varname.Size = sizeof(vartype); \
+varname.Type = LPGP_##vartype
+
+#define CHECK_PACKET(packet_type, packet_size, type) \
+packet_type == LPGP_##type && packet_size == sizeof(type)
+
 typedef struct _LWTCP {
 #if LW_PLATFORM_WIN32
 	WSADATA wsaData;

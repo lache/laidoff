@@ -12,19 +12,6 @@
 #include "puckgameupdate.h"
 #include "logic.h"
 
-#define NEW_TCP_PACKET(vartype, varname) \
-vartype varname; \
-varname.size = sizeof(vartype); \
-varname.type = LPGP_##vartype
-
-#define NEW_TCP_PACKET_CAPITAL(vartype, varname) \
-vartype varname; \
-varname.Size = sizeof(vartype); \
-varname.Type = LPGP_##vartype
-
-#define CHECK_PACKET(packet_type, packet_size, type) \
-packet_type == LPGP_##type && packet_size == sizeof(type)
-
 void tcp_on_connect(LWTCP* tcp, const char* path_prefix) {
     if (get_cached_user_id(path_prefix, &tcp->user_id) == 0) {
         LOGI("Cached user id: %08x-%08x-%08x-%08x",
@@ -171,8 +158,8 @@ int parse_recv_packets(LWTCP* tcp) {
         } else if (CHECK_PACKET(packet_type, packet_size, LWPNEWUSERDATA)) {
             LOGI("LWPNEWUSERDATA received");
             LWPNEWUSERDATA* p = (LWPNEWUSERDATA*)cursor;
-            save_cached_user_id(pLwc->internal_data_path, (LWUNIQUEID*)p->id);
-            get_cached_user_id(pLwc->internal_data_path, &pLwc->tcp->user_id);
+            save_cached_user_id(pLwc->user_data_path, (LWUNIQUEID*)p->id);
+            get_cached_user_id(pLwc->user_data_path, &pLwc->tcp->user_id);
             LOGI("[NEW] Cached user nick: %s, id: %08x-%08x-%08x-%08x",
                  p->nickname,
                  pLwc->tcp->user_id.v[0],
