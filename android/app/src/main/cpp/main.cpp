@@ -733,6 +733,7 @@ void android_main(struct android_app* state) {
             }
             engine.pLwc = lw_init_initial_size(engine.width, engine.height);
 			engine.pLwc->internal_data_path = state->activity->internalDataPath;
+			engine.pLwc->user_data_path = state->activity->internalDataPath;
             lw_set_size(engine.pLwc, engine.width, engine.height);
             engine.inited = true;
             lwc_start_logic_thread(engine.pLwc);
