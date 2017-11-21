@@ -1113,6 +1113,9 @@ void delete_all_rmsgs(LWCONTEXT* pLwc) {
     }
 }
 static void read_all_rmsgs(LWCONTEXT* pLwc) {
+    if (pLwc->mq == 0) {
+        return;
+    }
     zmq_msg_t rmsg;
     while (1) {
         zmq_msg_init(&rmsg);
@@ -1674,7 +1677,7 @@ LWCONTEXT* lw_init_initial_size(int width, int height) {
 
     init_net(pLwc);
 
-    pLwc->mq = init_mq(logic_server_addr(pLwc->server_index), pLwc->def_sys_msg);
+    pLwc->mq = 0;// init_mq(logic_server_addr(pLwc->server_index), pLwc->def_sys_msg);
 
     init_armature(pLwc);
 

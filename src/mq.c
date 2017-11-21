@@ -551,6 +551,9 @@ void mq_poll(void* _pLwc, void* sm, void* _mq, void* field) {
 
 void deinit_mq(void* _mq) {
 	LWMESSAGEQUEUE* mq = (LWMESSAGEQUEUE*)_mq;
+    if (mq == 0) {
+        return;
+    }
 	zhash_destroy(&mq->kvmap);
 	zhash_destroy(&mq->posmap);
 	zsock_destroy(&mq->publisher);
@@ -638,11 +641,17 @@ void mq_send_despawn_bullet(void* _mq, int bullet_id) {
 }
 
 void* mq_rmsg_reader(void* _mq) {
+    if (_mq == 0) {
+        return 0;
+    }
 	LWMESSAGEQUEUE* mq = (LWMESSAGEQUEUE*)_mq;
 	return zsock_resolve(mq->rmsg_reader);
 }
 
 void* mq_rmsg_writer(void* _mq) {
+    if (_mq == 0) {
+        return 0;
+    }
 	LWMESSAGEQUEUE* mq = (LWMESSAGEQUEUE*)_mq;
 	return zsock_resolve(mq->rmsg_writer);
 }

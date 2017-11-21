@@ -67,7 +67,7 @@ int tcp_connect(LWTCP* tcp) {
     return 0;
 }
 
-LWTCP* new_tcp(const LWCONTEXT* pLwc,
+LWTCP* new_tcp(LWCONTEXT* pLwc,
                const char* path_prefix,
                const LWHOSTADDR* host_addr,
                LWTCP_ON_CONNECT on_connect,
