@@ -1,11 +1,3 @@
-//
-//  render_leaderboard.c
-//  laidoff
-//
-//  Created by 김거엽 on 2017. 11. 20..
-//  Copyright © 2017년 KIMGEO YEOB. All rights reserved.
-//
-
 #include "render_leaderboard.h"
 #include "lwcontext.h"
 #include "lwlog.h"
@@ -19,7 +11,7 @@ static void render_item(const LWCONTEXT* pLwc, int index, const char* rank, cons
     text_block.text_block_line_height = DEFAULT_TEXT_BLOCK_LINE_HEIGHT_F;
     text_block.size = DEFAULT_TEXT_BLOCK_SIZE_E;
     text_block.multiline = 1;
-    SET_COLOR_RGBA_FLOAT(text_block.color_normal_glyph, 1, 1, 1 - header, 1);
+    SET_COLOR_RGBA_FLOAT(text_block.color_normal_glyph, 1, 1, (float)(1 - header), 1);
     SET_COLOR_RGBA_FLOAT(text_block.color_normal_outline, 0, 0, 0, 1);
     SET_COLOR_RGBA_FLOAT(text_block.color_emp_glyph, 1, 1, 0, 1);
     SET_COLOR_RGBA_FLOAT(text_block.color_emp_outline, 0, 0, 0, 1);
