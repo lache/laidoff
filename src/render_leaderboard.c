@@ -28,14 +28,14 @@ static void render_item(const LWCONTEXT* pLwc, int index, const char* rank, cons
     text_block.text_bytelen = (int)strlen(text_block.text);
     text_block.begin_index = 0;
     text_block.end_index = text_block.text_bytelen;
-    text_block.text_block_x = 0.2f;
+    text_block.text_block_x = 0.3f;
     render_text_block(pLwc, &text_block);
 
     text_block.text = score;
     text_block.text_bytelen = (int)strlen(text_block.text);
     text_block.begin_index = 0;
     text_block.end_index = text_block.text_bytelen;
-    text_block.text_block_x = 0.9f;
+    text_block.text_block_x = 1.2f;
     render_text_block(pLwc, &text_block);
 }
 

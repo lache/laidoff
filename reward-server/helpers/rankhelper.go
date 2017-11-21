@@ -6,6 +6,7 @@ import (
 	"net/rpc"
 	"net"
 	"../../shared-server"
+	"strings"
 )
 
 type RankClient struct {
@@ -54,15 +55,19 @@ func (t *RankClient) Get(backoff time.Duration, id [16]byte) *shared_server.Scor
 	var reply shared_server.ScoreRankItem
 	err := t.client.Call("RankService.Get", args, &reply)
 	if err != nil {
-		log.Printf("error: %v", err)
-		if backoff > 10*time.Second {
-			log.Printf("Error: %v - (retry finally failed)", err)
+		if strings.Compare(err.Error(), "id not exist") == 0 {
 			return nil
-		} else if backoff > 0 {
-			time.Sleep(backoff)
+		} else {
+			log.Printf("error: %v", err)
+			if backoff > 10*time.Second {
+				log.Printf("Error: %v - (retry finally failed)", err)
+				return nil
+			} else if backoff > 0 {
+				time.Sleep(backoff)
+			}
+			t.client, err = dialNewRpc(t.addr)
+			return t.Get(backoff*2, id)
 		}
-		t.client, err = dialNewRpc(t.addr)
-		return t.Get(backoff*2, id)
 	}
 	return &reply
 }

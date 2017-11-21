@@ -7,6 +7,7 @@ import (
 	"./helpers"
 	"encoding/binary"
 	"bytes"
+	"time"
 )
 
 // #include "../src/puckgamepacket.h"
@@ -40,7 +41,7 @@ func main() {
 		}
 	}
 }
-func handleRequest(conn net.Conn, client *helpers.RankClient) {
+func handleRequest(conn net.Conn, rank *helpers.RankClient) {
 	log.Printf("Accepting from %v", conn.RemoteAddr())
 	for {
 		buf := make([]byte, 1024)
@@ -60,14 +61,22 @@ func handleRequest(conn net.Conn, client *helpers.RankClient) {
 		log.Printf("  Type %v", packetType)
 		switch packetType {
 		case C.LPGP_LWPBATTLERESULT:
-			handleBattleResult(buf, conn)
+			handleBattleResult(buf, conn, rank)
 		}
 	}
 	conn.Close()
 	log.Printf("Conn closed %v", conn.RemoteAddr())
 }
 
-func handleBattleResult(buf []byte, conn net.Conn) {
+func convertCCharArrayToGoString(strIn *[C.LW_NICKNAME_MAX_LEN]C.char, strOut *string) {
+	bytes := make([]byte, len(strIn))
+	for i, b := range strIn {
+		bytes[i] = byte(b)
+	}
+	*strOut = string(bytes)
+}
+
+func handleBattleResult(buf []byte, conn net.Conn, rank *helpers.RankClient) {
 	log.Printf("BATTLERESULT received")
 	// Parse
 	bufReader := bytes.NewReader(buf)
@@ -79,8 +88,35 @@ func handleBattleResult(buf []byte, conn net.Conn) {
 	}
 	id1 := IdCuintToByteArray(recvPacket.Id1)
 	id2 := IdCuintToByteArray(recvPacket.Id2)
+	var nickname1 string
+	var nickname2 string
+	convertCCharArrayToGoString(&recvPacket.Nickname1, &nickname1)
+	convertCCharArrayToGoString(&recvPacket.Nickname2, &nickname2)
 	winner := int(recvPacket.Winner)
 	log.Printf("Battle result received; id1=%v, id2=%v, winner=%v", id1, id2, winner)
+	backoff := 300 * time.Millisecond
+	newScore1 := 0
+	newScore2 := 0
+	oldScore1 := rank.Get(backoff, id1)
+	oldScore2 := rank.Get(backoff, id2)
+	if oldScore1 != nil {
+		newScore1 = oldScore1.Score + 1
+		if winner == 1 {
+			newScore1++
+		}
+	} else {
+		newScore1 = 1
+	}
+	if oldScore2 != nil {
+		newScore2 = oldScore2.Score + 1
+		if winner == 2 {
+			newScore2++
+		}
+	} else {
+		newScore2 = 1
+	}
+	rank.Set(backoff, id1, newScore1, nickname1)
+	rank.Set(backoff, id2, newScore2, nickname2)
 }
 
 type UserId [16]byte

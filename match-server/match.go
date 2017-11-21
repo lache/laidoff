@@ -267,11 +267,19 @@ func createBattleInstance(conf ServerConfig, c1 UserAgent, c2 UserAgent) {
 		log.Fatalf("DialTCP error! - %v", err.Error())
 	}
 	// Send create battle request
+
+	var c1Nickname [C.LW_NICKNAME_MAX_LEN]C.char
+	var c2Nickname [C.LW_NICKNAME_MAX_LEN]C.char
+	convertGoStringToCCharArray(&c1.userDb.Nickname, &c1Nickname)
+	convertGoStringToCCharArray(&c2.userDb.Nickname, &c2Nickname)
+
 	createBattleBuf := packet2Buf(&C.LWPCREATEBATTLE{
 		C.ushort(unsafe.Sizeof(C.LWPCREATEBATTLE{})),
 		C.LPGP_LWPCREATEBATTLE,
 		UserIdToCuint(c1.userDb.Id),
 		UserIdToCuint(c2.userDb.Id),
+		c1Nickname,
+		c2Nickname,
 	})
 	_, err = conn.Write(createBattleBuf)
 	if err != nil {

@@ -232,6 +232,8 @@ typedef struct _LWPCREATEBATTLE {
 	unsigned short type;
 	unsigned int id1[4];
 	unsigned int id2[4];
+    char nickname1[LW_NICKNAME_MAX_LEN];
+    char nickname2[LW_NICKNAME_MAX_LEN];
 } LWPCREATEBATTLE;
 
 typedef struct _LWPCREATEBATTLEOK {
@@ -294,6 +296,8 @@ typedef struct _LWPBATTLERESULT {
     int Winner; // 0:draw, 1:Id1 wins, 2:Id2 wins
     unsigned int Id1[4];
     unsigned int Id2[4];
+    char Nickname1[LW_NICKNAME_MAX_LEN];
+    char Nickname2[LW_NICKNAME_MAX_LEN];
 } LWPBATTLERESULT;
 
 //#pragma pack(pop)

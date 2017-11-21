@@ -646,6 +646,8 @@ int tcp_server_entry(void* context) {
 			LWPUCKGAME* puck_game = new_puck_game();
             memcpy(puck_game->id1, p->id1, sizeof(puck_game->id1));
             memcpy(puck_game->id2, p->id2, sizeof(puck_game->id2));
+            memcpy(puck_game->nickname, p->nickname1, sizeof(puck_game->nickname));
+            memcpy(puck_game->target_nickname, p->nickname2, sizeof(puck_game->target_nickname));
 			const int battle_id = server->battle_counter + 1; // battle id is 1-based index
 			puck_game->server = server;
 			puck_game->battle_id = battle_id;
@@ -789,6 +791,8 @@ int tcp_send_battle_result(LWTCP* tcp,
                            int backoffMs,
                            const unsigned int* id1,
                            const unsigned int* id2,
+                           const char* nickname1,
+                           const char* nickname2,
                            int winner) {
     if (tcp == 0) {
         LOGE("tcp null");
@@ -798,6 +802,8 @@ int tcp_send_battle_result(LWTCP* tcp,
     memcpy(p.Id1, id1, sizeof(p.Id1));
     memcpy(p.Id2, id2, sizeof(p.Id2));
     p.Winner = winner;
+    memcpy(p.Nickname1, nickname1, sizeof(p.Nickname1));
+    memcpy(p.Nickname2, nickname2, sizeof(p.Nickname2));
     memcpy(tcp->sendbuf, &p, sizeof(p));
     int send_result = (int)send(tcp->ConnectSocket, tcp->sendbuf, sizeof(p), 0);
     if (send_result < 0) {
@@ -812,7 +818,13 @@ int tcp_send_battle_result(LWTCP* tcp,
             thrd_sleep(&ts, 0);
         }
         tcp_connect(tcp);
-        return tcp_send_battle_result(tcp, backoffMs * 2, id1, id2, winner);
+        return tcp_send_battle_result(tcp,
+                                      backoffMs * 2,
+                                      id1,
+                                      id2,
+                                      nickname1,
+                                      nickname2,
+                                      winner);
     }
     return send_result;
 }
@@ -822,6 +834,8 @@ void process_battle_reward(LWPUCKGAME* puck_game, LWTCP* reward_service) {
                            300,
                            puck_game->id1,
                            puck_game->id2,
+                           puck_game->nickname,
+                           puck_game->target_nickname,
                            puck_game_winner(puck_game));
 }
 
