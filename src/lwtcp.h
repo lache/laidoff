@@ -7,14 +7,16 @@
 #pragma comment (lib, "Mswsock.lib")
 #pragma comment (lib, "AdvApi32.lib")
 #else
+#include <czmq_prelude.h>
 #include <fcntl.h>
 #include <sys/socket.h>
 #if !LW_PLATFORM_OSX && !LW_PLATFORM_IOS
+//#include <czmq_prelude.h>
 #include <linux/in.h>
 #include <endian.h>
 #endif
 #include <stdlib.h>
-#include <czmq_prelude.h>
+//#include <czmq_prelude.h>
 #endif
 #include "lwringbuffer.h"
 #include "lwuniqueid.h"

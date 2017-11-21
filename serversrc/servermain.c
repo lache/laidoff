@@ -1,4 +1,5 @@
 #include "platform_detection.h"
+#include "lwtcp.h"
 #if LW_PLATFORM_WIN32
 #include <winsock2.h>
 #else
@@ -23,7 +24,7 @@
 #include "lwtimepoint.h"
 #include <tinycthread.h>
 #include "pcg_basic.h"
-#include "lwtcp.h"
+//#include "lwtcp.h"
 #include "puckgamepacket.h"
 #if LW_PLATFORM_WIN32
 #define LwChangeDirectory(x) SetCurrentDirectory(x)
