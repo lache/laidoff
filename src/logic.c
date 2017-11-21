@@ -22,6 +22,7 @@
 #include "puckgameupdate.h"
 #include "lwudp.h"
 #include "lwtcp.h"
+#include "lwtcpclient.h"
 #include "lwime.h"
 
 void toggle_font_texture_test_mode(LWCONTEXT* pLwc);
@@ -706,7 +707,7 @@ void lwc_update(LWCONTEXT* pLwc, double delta_time) {
 	}
 
 	if (pLwc->tcp) {
-		tcp_update(pLwc, pLwc->tcp);
+		tcp_update(pLwc->tcp);
 	}
 
 	//****//
@@ -878,8 +879,12 @@ static void s_logic_worker(zsock_t *pipe, void *args) {
 	// WSAStartup should be called within
 	// a thread which opens sockets.
 	pLwc->udp = new_udp();
-
-	pLwc->tcp = new_tcp(pLwc, pLwc->internal_data_path);
+	pLwc->tcp = new_tcp(pLwc,
+                        pLwc->internal_data_path,
+                        &pLwc->tcp_host_addr,
+                        tcp_on_connect,
+                        parse_recv_packets);
+    pLwc->tcp->pLwc = pLwc;
 
 	zloop_t* loop = zloop_new();
 	pLwc->logic_loop = loop;

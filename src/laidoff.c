@@ -46,6 +46,7 @@
 #include "puckgame.h"
 #include "lwudp.h"
 #include "lwtcp.h"
+#include "lwtcpclient.h"
 #include "lwdamagetext.h"
 #include "lwmath.h"
 #include "puckgameupdate.h"

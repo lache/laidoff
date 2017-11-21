@@ -30,6 +30,7 @@
 #include "lwuniqueid.h"
 #include "jsmn.h"
 #include "lwdirpad.h"
+#include "lwhostaddr.h"
 #define MAX_RENDER_QUEUE_CAPACITY (512)
 
 typedef enum _LW_SHADER_TYPE {
@@ -84,13 +85,6 @@ extern const char* tex_font_atlas_filename[2];
 typedef struct _LWPUCKGAME LWPUCKGAME;
 typedef struct _LWUDP LWUDP;
 typedef struct _LWTCP LWTCP;
-
-typedef struct _LWHOSTADDR {
-	char host[128];
-	char port_str[16];
-	unsigned long host_resolved;
-	int port;
-} LWHOSTADDR;
 
 typedef struct _LWCONTEXT {
 	// Window instance

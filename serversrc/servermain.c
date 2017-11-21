@@ -20,15 +20,15 @@
 #include <inttypes.h>
 #include <fcntl.h>
 #include "puckgamepacket.h"
+#include "lwtimepoint.h"
+#include <tinycthread.h>
+#include "pcg_basic.h"
+#include "lwtcp.h"
 #if LW_PLATFORM_WIN32
 #define LwChangeDirectory(x) SetCurrentDirectory(x)
 #else
 #define LwChangeDirectory(x) chdir(x)
 #endif
-
-#include "lwtimepoint.h"
-#include <tinycthread.h>
-#include "pcg_basic.h"
 
 _Thread_local int thread_local_var;
 

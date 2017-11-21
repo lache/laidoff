@@ -248,6 +248,8 @@ add_executable(laidoff-server
 	src/puckgame.h
 	src/pcg_basic.c
 	src/pcg_basic.h
+	src/lwtcp.c
+	src/lwtcp.h
 	${LAIDOFF_SERVER_LIB}
 	${SERVER_WIN32_DEPS}
 	${ODE_LIB}

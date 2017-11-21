@@ -12,6 +12,7 @@
 #include "puckgameupdate.h"
 #include "puckgame.h"
 #include "lwdirpad.h"
+#include "lwtcpclient.h"
 
 static void convert_touch_coord_to_ui_coord(LWCONTEXT* pLwc, float *x, float *y) {
     if (pLwc->height < pLwc->width) {
