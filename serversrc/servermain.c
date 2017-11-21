@@ -206,13 +206,6 @@ static int update_puck_game(LWSERVER* server, LWPUCKGAME* puck_game, double delt
 	return 0;
 }
 
-#if LW_PLATFORM_WIN32
-#else
-int WSAGetLastError() {
-	return -1;
-}
-#endif
-
 LWSERVER* new_server() {
 	LWSERVER* server = malloc(sizeof(LWSERVER));
 	memset(server, 0, sizeof(LWSERVER));
