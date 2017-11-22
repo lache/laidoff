@@ -1677,7 +1677,7 @@ LWCONTEXT* lw_init_initial_size(int width, int height) {
 
     init_net(pLwc);
 
-    pLwc->mq = 0;// init_mq(logic_server_addr(pLwc->server_index), pLwc->def_sys_msg);
+    pLwc->mq = init_mq(logic_server_addr(pLwc->server_index), pLwc->def_sys_msg);
 
     init_armature(pLwc);
 

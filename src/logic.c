@@ -358,7 +358,7 @@ static void reinit_mq(LWCONTEXT* pLwc) {
 
 	deinit_mq(pLwc->mq);
 
-    pLwc->mq = 0;// init_mq(server_addr[pLwc->server_index], pLwc->def_sys_msg);
+    pLwc->mq = init_mq(server_addr[pLwc->server_index], pLwc->def_sys_msg);
 }
 
 void connect_to_server_0(LWCONTEXT* pLwc) {
