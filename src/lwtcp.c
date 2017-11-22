@@ -84,8 +84,8 @@ LWTCP* new_tcp(LWCONTEXT* pLwc,
     memcpy(&tcp->host_addr, host_addr, sizeof(LWHOSTADDR));
     tcp->pLwc = pLwc;
 #if !LW_PLATFORM_WIN32
-    // Handle SIGPIPE in our side
-    //signal(SIGPIPE, SIG_IGN);
+    // Handle SIGPIPE in our side (prevent crashing iOS app)
+    signal(SIGPIPE, SIG_IGN);
 #endif
     
     tcp->iResult = getaddrinfo(host_addr->host, host_addr->port_str, &tcp->hints, &tcp->result);

@@ -1,4 +1,4 @@
-﻿#include "logic.h"
+#include "logic.h"
 #include <czmq.h>
 #include "lwcontext.h"
 #include "lwtimepoint.h"
@@ -640,7 +640,7 @@ void logic_udate_default_projection(LWCONTEXT* pLwc) {
 }
 
 int lw_write_tcp_addr(LWCONTEXT* pLwc, const char* tcp_addr) {
-#if LW_PLATFORM_ANDROID
+#if LW_PLATFORM_ANDROID || LW_PLATFORM_IOS
     FILE* f;
     char path[1024] = { 0, };
     concat_path(path, pLwc->internal_data_path, "conf.json");

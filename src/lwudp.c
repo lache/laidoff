@@ -43,6 +43,7 @@ LWUDP* new_udp() {
 #endif
 		exit(EXIT_FAILURE);
 	}
+    
     int set = 1;
     setsockopt (udp->s, SOL_SOCKET, SO_NOSIGPIPE, &set, sizeof (int));
 

@@ -91,7 +91,7 @@ didRegisterUserNotificationSettings:(UIUserNotificationSettings *)notificationSe
 }
 
 - (void) alertView:(UIAlertView *)alertView clickedButtonAtIndex:(NSInteger)buttonIndex {
-    if (alertView.tag == 100) {
+    if (alertView.tag == 10000) {
         // 0 = Tapped yes
         if (buttonIndex == 1)
         {
@@ -99,7 +99,7 @@ didRegisterUserNotificationSettings:(UIUserNotificationSettings *)notificationSe
             [[UIApplication sharedApplication] registerUserNotificationSettings:[UIUserNotificationSettings settingsForTypes:(UIUserNotificationTypeSound | UIUserNotificationTypeAlert | UIUserNotificationTypeBadge) categories:nil]];
             [[UIApplication sharedApplication] registerForRemoteNotifications];
         }
-    } else if (alertView.tag == 200) {
+    } else {
         NSString* textInput = [[alertView textFieldAtIndex:0] text];
         if (textInput) {
             NSLog(@"Entered: %@", textInput);

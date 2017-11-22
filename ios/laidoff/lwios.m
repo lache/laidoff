@@ -34,21 +34,23 @@ void lw_request_remote_notification_device_token(LWCONTEXT* pLwc)
                                              cancelButtonTitle:@"아니오"
                                              otherButtonTitles:@"예",
                               nil];
-        alert.tag = 100;
+        alert.tag = 10000;
         [alert show];
         [[NSUserDefaults standardUserDefaults] setValue:@"YES" forKey:@"HasSeenPopup"];
     }
 }
 
-void lw_start_text_input_activity(LWCONTEXT* pLwc) {
+void lw_start_text_input_activity(LWCONTEXT* pLwc, int tag) {
     pLwc->last_text_input_seq = lw_get_text_input_seq();
-    UIAlertView * alert = [[UIAlertView alloc] initWithTitle:@"닉네임"
-                                                     message:@"닉네임을 입력하세요."
+    pLwc->text_input_tag = tag;
+    
+    UIAlertView * alert = [[UIAlertView alloc] initWithTitle:@"입력!! 입력을 해라!!!"
+                                                     message:[NSString stringWithFormat:@"입력!! (태그:%d)", tag]
                                                     delegate:app_delegate
                                            cancelButtonTitle:@"취소"
                                            otherButtonTitles:@"확인",
                            nil];
-    alert.tag = 200;
+    alert.tag = tag;
     alert.alertViewStyle = UIAlertViewStylePlainTextInput;
     [alert show];
 }
