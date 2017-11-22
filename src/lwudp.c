@@ -43,10 +43,10 @@ LWUDP* new_udp() {
 #endif
 		exit(EXIT_FAILURE);
 	}
-    
+#if LW_PLATFORM_IOS
     int set = 1;
     setsockopt (udp->s, SOL_SOCKET, SO_NOSIGPIPE, &set, sizeof (int));
-
+#endif
 	//setup address structure
 	memset((char *)&udp->si_other, 0, sizeof(udp->si_other));
 	udp->si_other.sin_family = AF_INET;

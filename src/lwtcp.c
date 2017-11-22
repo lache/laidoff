@@ -64,8 +64,10 @@ int tcp_connect(LWTCP* tcp) {
         LOGE("Unable to connect to server!");
         return -3;
     }
+#if LW_PLATFORM_IOS
     int set = 1;
     setsockopt (tcp->ConnectSocket, SOL_SOCKET, SO_NOSIGPIPE, &set, sizeof (int));
+#endif
     return 0;
 }
 
