@@ -655,7 +655,25 @@ static void init_vbo(LWCONTEXT* pLwc) {
     // LVT_PUCK
     load_vbo(pLwc, ASSETS_BASE_PATH "vbo" PATH_SEPARATOR "puck.vbo",
              &pLwc->vertex_buffer[LVT_PUCK]);
-
+    // LVT_TOWER_BASE
+    load_vbo(pLwc, ASSETS_BASE_PATH "vbo" PATH_SEPARATOR "tower-base.vbo",
+             &pLwc->vertex_buffer[LVT_TOWER_BASE]);
+    // LVT_TOWER_1
+    load_vbo(pLwc, ASSETS_BASE_PATH "vbo" PATH_SEPARATOR "tower-1.vbo",
+             &pLwc->vertex_buffer[LVT_TOWER_1]);
+    // LVT_TOWER_2
+    load_vbo(pLwc, ASSETS_BASE_PATH "vbo" PATH_SEPARATOR "tower-2.vbo",
+             &pLwc->vertex_buffer[LVT_TOWER_2]);
+    // LVT_TOWER_3
+    load_vbo(pLwc, ASSETS_BASE_PATH "vbo" PATH_SEPARATOR "tower-3.vbo",
+             &pLwc->vertex_buffer[LVT_TOWER_3]);
+    // LVT_TOWER_4
+    load_vbo(pLwc, ASSETS_BASE_PATH "vbo" PATH_SEPARATOR "tower-4.vbo",
+             &pLwc->vertex_buffer[LVT_TOWER_4]);
+    // LVT_TOWER_5
+    load_vbo(pLwc, ASSETS_BASE_PATH "vbo" PATH_SEPARATOR "tower-5.vbo",
+             &pLwc->vertex_buffer[LVT_TOWER_5]);
+    
     // LVT_LEFT_TOP_ANCHORED_SQUARE ~ LVT_RIGHT_BOTTOM_ANCHORED_SQUARE
     // 9 anchored squares...
     const float anchored_square_offset[][2] = {

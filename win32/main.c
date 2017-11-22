@@ -393,7 +393,7 @@ void lw_start_text_input_activity(LWCONTEXT* pLwc, int tag) {
               TextInputProc);					// dialog box window procedure
 }
 #else
-void lw_start_text_input_activity(LWCONTEXT* pLwc) {
+void lw_start_text_input_activity(LWCONTEXT* pLwc, int tag) {
     LOGE("Not implemented yet..");
 }
 #endif

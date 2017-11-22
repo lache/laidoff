@@ -82,6 +82,16 @@ LWPUCKGAME* new_puck_game() {
     puck_game->fire_interval = 1.5f;
     puck_game->fire_duration = 0.2f;
     puck_game->fire_shake_time = 0.5f;
+    puck_game->tower_pos = 1.8f;
+    puck_game->tower_radius = 0.825f / 2; // Check tower.blend file
+    puck_game->tower_pos_multiplier[0][0] = -1;
+    puck_game->tower_pos_multiplier[0][1] = +1;
+    puck_game->tower_pos_multiplier[1][0] = +1;
+    puck_game->tower_pos_multiplier[1][1] = +1;
+    puck_game->tower_pos_multiplier[2][0] = -1;
+    puck_game->tower_pos_multiplier[2][1] = -1;
+    puck_game->tower_pos_multiplier[3][0] = +1;
+    puck_game->tower_pos_multiplier[3][1] = -1;
 	// ------
 
 	// Initialize OpenDE
@@ -95,6 +105,15 @@ LWPUCKGAME* new_puck_game() {
 	puck_game->boundary[LPGB_N] = dCreatePlane(puck_game->space, 0, 1, 0, -puck_game->world_size_half);
 	dWorldSetGravity(puck_game->world, 0, 0, -9.81f);
 	dWorldSetCFM(puck_game->world, 1e-5f);
+    
+    for (int i = 0; i < 4; i++) {
+        puck_game->tower[i] = dCreateCapsule(puck_game->space, puck_game->tower_radius, 10.0f);
+        dGeomSetPosition(puck_game->tower[i],
+                         puck_game->tower_pos * puck_game->tower_pos_multiplier[i][0],
+                         puck_game->tower_pos * puck_game->tower_pos_multiplier[i][1],
+                         0.0f);
+    }
+    
 	
 	create_go(puck_game, LPGO_PUCK, puck_game->sphere_mass, puck_game->sphere_radius, 0.0f, 0.0f);
 	create_go(puck_game, LPGO_PLAYER, puck_game->sphere_mass, puck_game->sphere_radius, -1.0f, 0.0f);

@@ -93,10 +93,14 @@ typedef struct _LWPUCKGAME {
     float fire_interval;
     float fire_duration;
     float fire_shake_time;
+    float tower_pos;
+    float tower_radius;
 	// ----
 	dWorldID world;
 	dSpaceID space;
 	dGeomID boundary[LPGB_COUNT];
+    dGeomID tower[4];
+    float tower_pos_multiplier[4][2];
 	LWPUCKGAMEOBJECT go[LPGO_COUNT];
 	dJointGroupID contact_joint_group;
 	dJointGroupID  player_control_joint_group;
