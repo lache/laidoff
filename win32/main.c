@@ -149,7 +149,8 @@ int main(int argc, char* argv[]) {
 
     glfwWindowHint(GLFW_DEPTH_BITS, 16);
 
-    //glfwWindowHint(GLFW_SAMPLES, 8); // supersampling
+    // enable supersampling (fullscreen antialiasing)
+    glfwWindowHint(GLFW_SAMPLES, 8);
 
 #if LW_PLATFORM_RPI
     glfwWindowHint(GLFW_CLIENT_API, GLFW_OPENGL_ES_API);

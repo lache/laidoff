@@ -195,6 +195,12 @@ void update_puck_game(LWCONTEXT* pLwc, LWPUCKGAME* puck_game, double delta_time)
         p.token = pLwc->puck_game->token;
         udp_send(pLwc->udp, (const char*)&p, sizeof(p));
     }
+    // Tower shake
+    for (int i = 0; i < LW_PUCK_GAME_TOWER_COUNT; i++) {
+        if (puck_game->tower[i].shake_remain_time > 0) {
+            puck_game->tower[i].shake_remain_time = LWMAX(0, puck_game->tower[i].shake_remain_time - (float)delta_time);
+        }
+    }
 }
 
 void puck_game_jump(LWCONTEXT* pLwc, LWPUCKGAME* puck_game) {

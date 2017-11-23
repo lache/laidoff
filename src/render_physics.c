@@ -29,7 +29,7 @@ typedef struct _LWTOWERRENDERDATA {
     float b;
 } LWTOWERRENDERDATA;
 
-static void render_tower(const LWCONTEXT* pLwc, const mat4x4 view, const mat4x4 proj, const float* pos, int hp) {
+static void render_tower(const LWCONTEXT* pLwc, const mat4x4 view, const mat4x4 proj, const float* pos, const LWPUCKGAMETOWER* tower) {
     int shader_index = LWST_DEFAULT;
     const LWSHADER* shader = &pLwc->shader[shader_index];
     glUseProgram(shader->program);
@@ -47,28 +47,9 @@ static void render_tower(const LWCONTEXT* pLwc, const mat4x4 view, const mat4x4 
     float sx = 1.0f;
     float sy = 1.0f;
     float sz = 1.0f;
-    float x = pos[0];
-    float y = pos[1];
-    float z = pos[2];
-    
-    mat4x4 model;
-    mat4x4_identity(model);
-    mat4x4_mul(model, model, rot);
-    mat4x4_scale_aniso(model, model, sx, sy, sz);
-    //mat4x4_scale_aniso(model, model, 5, 5, 5);
-    
-    mat4x4 model_translate;
-    mat4x4_translate(model_translate, x, y, z);
-    
-    mat4x4_mul(model, model_translate, model);
-    
-    mat4x4 view_model;
-    mat4x4_mul(view_model, view, model);
-    
-    mat4x4 proj_view_model;
-    mat4x4_identity(proj_view_model);
-    mat4x4_mul(proj_view_model, proj, view_model);
-    
+
+    int hp = tower->hp;
+
     glUniform1f(shader->overlay_color_ratio_location, 1);
 
     LWTOWERRENDERDATA tower_render_data[] = {
@@ -80,6 +61,35 @@ static void render_tower(const LWCONTEXT* pLwc, const mat4x4 view, const mat4x4 
         { LVT_TOWER_5, 0.2f, 0.9f, 0.2f },
     };
     for (int i = 0; i < ARRAY_SIZE(tower_render_data); i++) {
+        float x = pos[0];
+        float y = pos[1];
+        float z = pos[2];
+        // Positioinal offset by shake
+        if (tower->shake_remain_time > 0) {
+            const float ratio = tower->shake_remain_time / pLwc->puck_game->tower_shake_time;
+            const float shake_magnitude = 0.03f;
+            x += ratio * (2 * rand() / (float)RAND_MAX - 1.0f) * shake_magnitude * pLwc->aspect_ratio;
+            y += ratio * (2 * rand() / (float)RAND_MAX - 1.0f) * shake_magnitude;
+        }
+
+        mat4x4 model;
+        mat4x4_identity(model);
+        mat4x4_mul(model, model, rot);
+        mat4x4_scale_aniso(model, model, sx, sy, sz);
+        //mat4x4_scale_aniso(model, model, 5, 5, 5);
+
+        mat4x4 model_translate;
+        mat4x4_translate(model_translate, x, y, z);
+
+        mat4x4_mul(model, model_translate, model);
+
+        mat4x4 view_model;
+        mat4x4_mul(view_model, view, model);
+
+        mat4x4 proj_view_model;
+        mat4x4_identity(proj_view_model);
+        mat4x4_mul(proj_view_model, proj, view_model);
+
         const LWTOWERRENDERDATA* d = tower_render_data + i;
         float r = d->r;
         float g = d->g;
@@ -647,13 +657,13 @@ void lwc_render_physics(const LWCONTEXT* pLwc, const mat4x4 view, const mat4x4 p
     render_go(pLwc, view, proj, &puck_game->go[LPGO_TARGET], pLwc->tex_atlas[player_no == 2 ? LAE_PUCK_PLAYER_KTX : LAE_PUCK_ENEMY_KTX],
               1.0f, remote_target_pos, state->target_rot, remote, 0);
     // Towers
-    for (int i = 0; i < 4; i++) {
+    for (int i = 0; i < LW_PUCK_GAME_TOWER_COUNT; i++) {
         float tower_pos[] = {
             puck_game->tower_pos * puck_game->tower_pos_multiplier[i][0],
             puck_game->tower_pos * puck_game->tower_pos_multiplier[i][1],
             0
         };
-        render_tower(pLwc, view, proj, tower_pos, 5 - i);
+        render_tower(pLwc, view, proj, tower_pos, &puck_game->tower[i]);
     }
     // Render damage texts
     render_damage_text(pLwc, view, proj, pLwc->proj);

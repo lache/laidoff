@@ -72,6 +72,16 @@ typedef struct _LWREMOTEPLAYERCONTROL {
 	int pull_puck;
 } LWREMOTEPLAYERCONTROL;
 
+typedef struct _LWPUCKGAMETOWER {
+    dGeomID geom;
+    int hp;
+    int owner_player_no;
+    double last_damaged_at;
+    float shake_remain_time;
+} LWPUCKGAMETOWER;
+
+#define LW_PUCK_GAME_TOWER_COUNT (4)
+
 typedef struct _LWPUCKGAME {
 	// Static game data
 	float world_size;
@@ -95,12 +105,14 @@ typedef struct _LWPUCKGAME {
     float fire_shake_time;
     float tower_pos;
     float tower_radius;
+    float tower_pos_multiplier[LW_PUCK_GAME_TOWER_COUNT][2];
+    int tower_total_hp;
+    float tower_shake_time;
 	// ----
 	dWorldID world;
 	dSpaceID space;
 	dGeomID boundary[LPGB_COUNT];
-    dGeomID tower[4];
-    float tower_pos_multiplier[4][2];
+    LWPUCKGAMETOWER tower[LW_PUCK_GAME_TOWER_COUNT];
 	LWPUCKGAMEOBJECT go[LPGO_COUNT];
 	dJointGroupID contact_joint_group;
 	dJointGroupID  player_control_joint_group;
