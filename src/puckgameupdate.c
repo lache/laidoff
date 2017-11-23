@@ -201,6 +201,10 @@ void update_puck_game(LWCONTEXT* pLwc, LWPUCKGAME* puck_game, double delta_time)
             puck_game->tower[i].shake_remain_time = LWMAX(0, puck_game->tower[i].shake_remain_time - (float)delta_time);
         }
     }
+    update_puck_ownership(puck_game);
+    if (puck_game->puck_reflect_size > 1.0f) {
+        puck_game->puck_reflect_size = LWMAX(1.0f, puck_game->puck_reflect_size - (float)delta_time * 2);
+    }
 }
 
 void puck_game_jump(LWCONTEXT* pLwc, LWPUCKGAME* puck_game) {

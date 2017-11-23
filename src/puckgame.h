@@ -80,7 +80,7 @@ typedef struct _LWPUCKGAMETOWER {
     float shake_remain_time;
 } LWPUCKGAMETOWER;
 
-#define LW_PUCK_GAME_TOWER_COUNT (4)
+#define LW_PUCK_GAME_TOWER_COUNT (2)
 
 typedef struct _LWPUCKGAME {
 	// Static game data
@@ -151,6 +151,8 @@ typedef struct _LWPUCKGAME {
 	char target_nickname[LW_NICKNAME_MAX_LEN];
     unsigned int id1[4];
     unsigned int id2[4];
+    int puck_owner_player_no;
+    float puck_reflect_size;
 } LWPUCKGAME;
 
 LWPUCKGAME* new_puck_game();
@@ -171,3 +173,4 @@ float puck_game_remain_time(float total_time, int update_tick);
 void puck_game_go_decrease_hp_test(LWPUCKGAME* puck_game, LWPUCKGAMEPLAYER* go, LWPUCKGAMEDASH* dash);
 void puck_game_commit_fire(LWPUCKGAME* puck_game, LWPUCKGAMEFIRE* fire, int player_no, float puck_fire_dx, float puck_fire_dy, float puck_fire_dlen);
 float puck_game_player_speed();
+void update_puck_ownership(LWPUCKGAME* puck_game);

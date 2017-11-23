@@ -54,10 +54,12 @@ void lw_trigger_mouse_press(LWCONTEXT* pLwc, float x, float y, int pointer_id) {
         get_left_dir_pad_original_center(pLwc->aspect_ratio, &left_dir_pad_center_x, &left_dir_pad_center_y);
         dir_pad_press(&pLwc->left_dir_pad, x, y, pointer_id, left_dir_pad_center_x, left_dir_pad_center_y, sr);
 
-        float right_dir_pad_center_x = 0;
-        float right_dir_pad_center_y = 0;
-        get_right_dir_pad_original_center(pLwc->aspect_ratio, &right_dir_pad_center_x, &right_dir_pad_center_y);
-        dir_pad_press(&pLwc->right_dir_pad, x, y, pointer_id, right_dir_pad_center_x, right_dir_pad_center_y, sr);
+        if (pLwc->control_flags & LCF_PUCK_GAME_RIGHT_DIR_PAD) {
+            float right_dir_pad_center_x = 0;
+            float right_dir_pad_center_y = 0;
+            get_right_dir_pad_original_center(pLwc->aspect_ratio, &right_dir_pad_center_x, &right_dir_pad_center_y);
+            dir_pad_press(&pLwc->right_dir_pad, x, y, pointer_id, right_dir_pad_center_x, right_dir_pad_center_y, sr);
+        }
     }
 
     const float fist_button_w = 0.75f;
@@ -146,10 +148,12 @@ void lw_trigger_mouse_move(LWCONTEXT* pLwc, float x, float y, int pointer_id) {
         get_left_dir_pad_original_center(pLwc->aspect_ratio, &left_dir_pad_center_x, &left_dir_pad_center_y);
         dir_pad_move(&pLwc->left_dir_pad, x, y, pointer_id, left_dir_pad_center_x, left_dir_pad_center_y, sr);
 
-        float right_dir_pad_center_x = 0;
-        float right_dir_pad_center_y = 0;
-        get_right_dir_pad_original_center(pLwc->aspect_ratio, &right_dir_pad_center_x, &right_dir_pad_center_y);
-        dir_pad_move(&pLwc->right_dir_pad, x, y, pointer_id, right_dir_pad_center_x, right_dir_pad_center_y, sr);
+        if (pLwc->control_flags & LCF_PUCK_GAME_RIGHT_DIR_PAD) {
+            float right_dir_pad_center_x = 0;
+            float right_dir_pad_center_y = 0;
+            get_right_dir_pad_original_center(pLwc->aspect_ratio, &right_dir_pad_center_x, &right_dir_pad_center_y);
+            dir_pad_move(&pLwc->right_dir_pad, x, y, pointer_id, right_dir_pad_center_x, right_dir_pad_center_y, sr);
+        }
     }
 }
 

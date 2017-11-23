@@ -14,6 +14,7 @@ uniform sampler2D diffuse;
 uniform float alpha_multiplier;
 uniform vec3 overlay_color;
 uniform float overlay_color_ratio;
+uniform vec3 multiply_color;
 varying vec3 color;
 varying vec2 uv;
 // Outputs
@@ -23,5 +24,6 @@ void main()
 {
     vec4 t = TEX(diffuse, uv); // + vec4(color, 0.0);
     fragColor = (1.0 - overlay_color_ratio) * t + overlay_color_ratio * vec4(overlay_color, t.a);
+	fragColor.rgb *= multiply_color;
     fragColor.a *= alpha_multiplier;
 }

@@ -288,6 +288,7 @@ create_shader(const char *shader_name, LWSHADER *pShader, const GLchar *vst, con
     pShader->alpha_multiplier_location = glGetUniformLocation(pShader->program, "alpha_multiplier");
     pShader->overlay_color_location = glGetUniformLocation(pShader->program, "overlay_color");
     pShader->overlay_color_ratio_location = glGetUniformLocation(pShader->program, "overlay_color_ratio");
+    pShader->multiply_color_location = glGetUniformLocation(pShader->program, "multiply_color");
     pShader->diffuse_location = glGetUniformLocation(pShader->program, "diffuse");
     pShader->diffuse_arrow_location = glGetUniformLocation(pShader->program, "diffuse_arrow");
     pShader->alpha_only_location = glGetUniformLocation(pShader->program, "alpha_only");
@@ -322,10 +323,15 @@ create_shader(const char *shader_name, LWSHADER *pShader, const GLchar *vst, con
     pShader->sphere_col_ratio = glGetUniformLocation(pShader->program, "sphere_col_ratio");
     pShader->sphere_speed = glGetUniformLocation(pShader->program, "sphere_speed");
     pShader->sphere_move_rad = glGetUniformLocation(pShader->program, "sphere_move_rad");
+    pShader->reflect_size = glGetUniformLocation(pShader->program, "reflect_size");
     pShader->arrow_center = glGetUniformLocation(pShader->program, "arrow_center");
     pShader->arrow_angle = glGetUniformLocation(pShader->program, "arrow_angle");
     pShader->arrow_scale = glGetUniformLocation(pShader->program, "arrow_scale");
     pShader->arrowRotMat2 = glGetUniformLocation(pShader->program, "arrowRotMat2");
+
+    // Set initial value...
+    glUseProgram(pShader->program);
+    glUniform3f(pShader->multiply_color_location, 1.0f, 1.0f, 1.0f);
 
     // Attribs
     pShader->vpos_location = glGetAttribLocation(pShader->program, "vPos");
@@ -1669,6 +1675,8 @@ LWCONTEXT* lw_init_initial_size(int width, int height) {
     //test_image();
 
     LWCONTEXT* pLwc = (LWCONTEXT *)calloc(1, sizeof(LWCONTEXT));
+    
+    pLwc->control_flags = LCF_PUCK_GAME_DASH | LCF_PUCK_GAME_JUMP | LCF_PUCK_GAME_PULL;
 
     parse_conf(pLwc);
 

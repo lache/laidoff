@@ -34,6 +34,7 @@ typedef struct _LWSHADER {
 	GLint alpha_multiplier_location;
 	GLint overlay_color_location;
 	GLint overlay_color_ratio_location;
+    GLint multiply_color_location;
 	GLint diffuse_location;
     GLint diffuse_arrow_location;
 	GLint alpha_only_location;
@@ -68,6 +69,7 @@ typedef struct _LWSHADER {
 	GLint sphere_col_ratio;
 	GLint sphere_speed;
 	GLint sphere_move_rad;
+    GLint reflect_size;
     GLint arrow_center;
     GLint arrow_angle;
     GLint arrow_scale;

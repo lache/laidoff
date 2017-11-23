@@ -64,7 +64,7 @@ LWPUCKGAME* new_puck_game() {
     puck_game->world_size_half = puck_game->world_size / 2.0f;
     puck_game->dash_interval = 1.5f;
     puck_game->dash_duration = 0.1f;
-    puck_game->dash_speed_ratio = 8.0f;
+    puck_game->dash_speed_ratio = 2.0f;
     puck_game->dash_shake_time = 0.3f;
     puck_game->hp_shake_time = 0.3f;
     puck_game->puck_damage_contact_speed_threshold = 1.1f;
@@ -83,16 +83,26 @@ LWPUCKGAME* new_puck_game() {
     puck_game->fire_interval = 1.5f;
     puck_game->fire_duration = 0.2f;
     puck_game->fire_shake_time = 0.5f;
-    puck_game->tower_pos = 1.8f;
+    puck_game->tower_pos = 1.1f;
     puck_game->tower_radius = 0.825f / 2; // Check tower.blend file
-    puck_game->tower_pos_multiplier[0][0] = -1;
-    puck_game->tower_pos_multiplier[0][1] = +1;
-    puck_game->tower_pos_multiplier[1][0] = +1;
-    puck_game->tower_pos_multiplier[1][1] = +1;
-    puck_game->tower_pos_multiplier[2][0] = -1;
-    puck_game->tower_pos_multiplier[2][1] = -1;
-    puck_game->tower_pos_multiplier[3][0] = +1;
-    puck_game->tower_pos_multiplier[3][1] = -1;
+    puck_game->puck_reflect_size = 1.0f;
+    int tower_pos_multiplier_index = 0;
+    puck_game->tower_pos_multiplier[tower_pos_multiplier_index][0] = -1;
+    puck_game->tower_pos_multiplier[tower_pos_multiplier_index][1] = -1;
+    tower_pos_multiplier_index++;
+    /*puck_game->tower_pos_multiplier[tower_pos_multiplier_index][0] = -1;
+    puck_game->tower_pos_multiplier[tower_pos_multiplier_index][1] = +1;
+    tower_pos_multiplier_index++;*/
+    puck_game->tower_pos_multiplier[tower_pos_multiplier_index][0] = +1;
+    puck_game->tower_pos_multiplier[tower_pos_multiplier_index][1] = +1;
+    tower_pos_multiplier_index++;
+    /*puck_game->tower_pos_multiplier[tower_pos_multiplier_index][0] = +1;
+    puck_game->tower_pos_multiplier[tower_pos_multiplier_index][1] = -1;
+    tower_pos_multiplier_index++;*/
+    if (tower_pos_multiplier_index != LW_PUCK_GAME_TOWER_COUNT) {
+        LOGE("Runtime assertion error");
+        exit(-1);
+    }
     puck_game->tower_total_hp = 5;
     puck_game->tower_shake_time = 0.2f;
     // ------
@@ -119,12 +129,13 @@ LWPUCKGAME* new_puck_game() {
         puck_game->tower[i].hp = puck_game->tower_total_hp;
         // Tower #0(NW), #1(NE) --> player 1
         // Tower #2(SW), #3(SE) --> player 2
-        puck_game->tower[i].owner_player_no = i < 2 ? 1 : 2;
+        puck_game->tower[i].owner_player_no = i < LW_PUCK_GAME_TOWER_COUNT / 2 ? 1 : 2;
     }
 
+    float start_pos = 0.6f;
     create_go(puck_game, LPGO_PUCK, puck_game->sphere_mass, puck_game->sphere_radius, 0.0f, 0.0f);
-    create_go(puck_game, LPGO_PLAYER, puck_game->sphere_mass, puck_game->sphere_radius, -1.0f, 0.0f);
-    create_go(puck_game, LPGO_TARGET, puck_game->sphere_mass, puck_game->sphere_radius, 1.0f, 0.0f);
+    create_go(puck_game, LPGO_PLAYER, puck_game->sphere_mass, puck_game->sphere_radius, -start_pos, -start_pos);
+    create_go(puck_game, LPGO_TARGET, puck_game->sphere_mass, puck_game->sphere_radius, +start_pos, +start_pos);
 
     puck_game->contact_joint_group = dJointGroupCreate(0);
     puck_game->player_control_joint_group = dJointGroupCreate(0);
@@ -193,38 +204,40 @@ void puck_game_target_decrease_hp_test(LWPUCKGAME* puck_game) {
     puck_game_go_decrease_hp_test(puck_game, &puck_game->target, &puck_game->remote_dash[1]);
 }
 
-static void near_puck_player(LWPUCKGAME* puck_game) {
-    LWPUCKGAMEOBJECT* puck = &puck_game->go[LPGO_PUCK];
-    LWPUCKGAMEOBJECT* player = &puck_game->go[LPGO_PLAYER];
-    if (dBodyIsKinematic(puck->body)) {
-        dBodySetDynamic(puck->body);
+static void near_puck_go(LWPUCKGAME* puck_game, int player_no, dContact* contact) {
+    //LWPUCKGAMEOBJECT* puck = &puck_game->go[LPGO_PUCK];
+    //LWPUCKGAMEOBJECT* go = &puck_game->go[player_no == 1 ? LPGO_PLAYER : LPGO_TARGET];
+    contact->surface.mode = dContactSoftCFM | dContactBounce;
+    contact->surface.mu = 1.9f;
 
-        const float dx = puck->pos[0] - player->pos[0];
-        const float dy = puck->pos[1] - player->pos[1];
-        const float fscale = 50.0f;
-        dBodyAddForce(puck->body, dx*fscale, dy*fscale, 0);
+    if (puck_game->puck_owner_player_no == 0) {
+        puck_game->puck_owner_player_no = player_no;
+        puck_game->puck_reflect_size = 2.0f;
+    } else if (puck_game->puck_owner_player_no != player_no) {
+        if (player_no == 1) {
+            puck_game->player.puck_contacted = 1;
+            if (puck_game->on_player_damaged) {
+                puck_game->on_player_damaged(puck_game);
+                puck_game->puck_owner_player_no = 1;
+                puck_game->puck_reflect_size = 2.0f;
+            }
+        } else {
+            puck_game->target.puck_contacted = 1;
+            if (puck_game->on_target_damaged) {
+                puck_game->on_target_damaged(puck_game);
+                puck_game->puck_owner_player_no = 2;
+                puck_game->puck_reflect_size = 2.0f;
+            }
+        }
     }
-
-    puck_game->player.puck_contacted = 1;
-
-    if (puck_game->on_player_damaged) {
-        puck_game->on_player_damaged(puck_game);
-    }
-
-    const float puck_speed = (float)dLENGTH(dBodyGetLinearVel(puck->body));
-    //LOGI("Contact puck velocity: %.2f", puck_speed);
 }
 
-static void near_puck_target(LWPUCKGAME* puck_game) {
-    LWPUCKGAMEOBJECT* puck = &puck_game->go[LPGO_PUCK];
-    LWPUCKGAMEOBJECT* target = &puck_game->go[LPGO_TARGET];
-    puck_game->target.puck_contacted = 1;
-    if (puck_game->on_target_damaged) {
-        puck_game->on_target_damaged(puck_game);
-    }
+static void near_puck_player(LWPUCKGAME* puck_game, dContact* contact) {
+    near_puck_go(puck_game, 1, contact);
+}
 
-    const float puck_speed = (float)dLENGTH(dBodyGetLinearVel(puck->body));
-    //LOGI("Contact puck velocity: %.2f", puck_speed);
+static void near_puck_target(LWPUCKGAME* puck_game, dContact* contact) {
+    near_puck_go(puck_game, 2, contact);
 }
 
 LWPUCKGAMETOWER* get_tower_from_geom(LWPUCKGAME* puck_game, dGeomID maybe_tower_geom) {
@@ -242,6 +255,10 @@ void near_puck_tower(LWPUCKGAME* puck_game, dGeomID puck_geom, LWPUCKGAMETOWER* 
     contact->surface.mode = dContactSoftCFM | dContactBounce;
     contact->surface.mu = 1.9f;
     contact->surface.bounce_vel = 0;
+    // Check puck ownership
+    if (puck_game->puck_owner_player_no == tower->owner_player_no) {
+        return;
+    }
     // Check minimum contact damage speed threshold
     dBodyID puck_body = dGeomGetBody(puck_geom);
     dReal puck_speed = dLENGTH(dBodyGetLinearVel(puck_body));
@@ -302,10 +319,11 @@ void puck_game_near_callback(void* data, dGeomID geom1, dGeomID geom2) {
             } else if (geom1 == puck_game->go[LPGO_PUCK].geom && geom2 == puck_game->go[LPGO_PLAYER].geom
                        || geom1 == puck_game->go[LPGO_PLAYER].geom && geom2 == puck_game->go[LPGO_PUCK].geom) {
                 // Player - puck contacts
-                contact[i].surface.mode = dContactSoftCFM | dContactBounce;
-                contact[i].surface.mu = 1.9f;
-
-                near_puck_player(puck_game);
+                near_puck_player(puck_game, &contact[i]);
+            } else if (geom1 == puck_game->go[LPGO_PUCK].geom && geom2 == puck_game->go[LPGO_TARGET].geom
+                       || geom1 == puck_game->go[LPGO_TARGET].geom && geom2 == puck_game->go[LPGO_PUCK].geom) {
+                // Target - puck contacts
+                near_puck_target(puck_game, &contact[i]);
             } else if (geom1 == puck_game->go[LPGO_PUCK].geom && (tower = get_tower_from_geom(puck_game, geom2))) {
                 // Puck - tower contacts
                 near_puck_tower(puck_game, geom1, tower, &contact[i], now);
@@ -316,11 +334,6 @@ void puck_game_near_callback(void* data, dGeomID geom1, dGeomID geom2) {
                 // Other contacts
                 contact[i].surface.mode = dContactSoftCFM | dContactBounce;
                 contact[i].surface.mu = 1.9f;
-            }
-
-            if ((geom1 == puck_game->go[LPGO_PUCK].geom && geom2 == puck_game->go[LPGO_TARGET].geom)
-                || (geom1 == puck_game->go[LPGO_PUCK].geom && geom2 == puck_game->go[LPGO_TARGET].geom)) {
-                near_puck_target(puck_game);
             }
 
             dJointID c = dJointCreateContact(puck_game->world, puck_game->contact_joint_group, &contact[i]);
@@ -392,4 +405,13 @@ void puck_game_commit_fire(LWPUCKGAME* puck_game, LWPUCKGAMEFIRE* fire, int play
 
 float puck_game_player_speed() {
     return 2.5f;
+}
+
+void update_puck_ownership(LWPUCKGAME* puck_game) {
+    const float speed = puck_game->go[LPGO_PUCK].speed;
+    const float red_overlay_ratio = LWMIN(1.0f, speed / puck_game->puck_damage_contact_speed_threshold);
+    if (puck_game->puck_owner_player_no != 0 && red_overlay_ratio < 0.5f) {
+        puck_game->puck_owner_player_no = 0;
+        //puck_game->puck_reflect_size = 2.0f;
+    }
 }

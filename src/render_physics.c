@@ -17,6 +17,7 @@ typedef struct _LWSPHERERENDERUNIFORM {
     float sphere_col[3][3];
     float sphere_speed[3];
     float sphere_move_rad[3];
+    float reflect_size[3];
     float arrowRotMat2[2][2];
     float arrow_center[2];
     float arrow_scale;
@@ -151,9 +152,22 @@ static void render_go(const LWCONTEXT* pLwc, const mat4x4 view, const mat4x4 pro
     mat4x4_identity(proj_view_model);
     mat4x4_mul(proj_view_model, proj, view_model);
     
+    const float e = 2.718f;
     const float red_overlay_ratio = go->red_overlay ? LWMIN(1.0f, speed / go->puck_game->puck_damage_contact_speed_threshold) : 0;
-    const float red_overlay_logistic_ratio = 1 / (1 + powf(2.718f, -(20.0f * (red_overlay_ratio - 0.8f))));
-    glUniform3f(shader->overlay_color_location, 1, 0, 0);
+    const float red_overlay_logistic_ratio = LWMIN(0.3f, 1 / (1 + powf(e, -(20.0f * (red_overlay_ratio - 0.8f)))));
+    if (go->red_overlay) {
+        if (pLwc->puck_game->puck_owner_player_no == 1) {
+            glUniform3f(shader->overlay_color_location, 0, 0, 1);
+            glUniform3f(shader->multiply_color_location, 0, 0, 1);
+        } else if (pLwc->puck_game->puck_owner_player_no == 2) {
+            glUniform3f(shader->overlay_color_location, 1, 0, 0);
+            glUniform3f(shader->multiply_color_location, 1, 0, 0);
+        } else {
+            glUniform3f(shader->multiply_color_location, 1, 1, 1);
+        }
+    } else {
+        glUniform3f(shader->multiply_color_location, 1, 1, 1);
+    }
     glUniform1f(shader->overlay_color_ratio_location, red_overlay_logistic_ratio);
     
     const LW_VBO_TYPE lvt = LVT_PUCK;
@@ -165,6 +179,7 @@ static void render_go(const LWCONTEXT* pLwc, const mat4x4 view, const mat4x4 pro
     //set_tex_filter(GL_NEAREST, GL_NEAREST);
     glUniformMatrix4fv(shader->mvp_location, 1, GL_FALSE, (const GLfloat*)proj_view_model);
     glDrawArrays(GL_TRIANGLES, 0, pLwc->vertex_buffer[lvt].vertex_count);
+    glUniform3f(shader->multiply_color_location, 1, 1, 1);
 }
 
 static void render_timer(const LWCONTEXT* pLwc, float remain_sec) {
@@ -388,6 +403,7 @@ static void render_wall(const LWCONTEXT *pLwc, const mat4x4 proj, const LWPUCKGA
     glUniform3fv(shader->sphere_col, 3, (const float*)sphere_render_uniform->sphere_col);
     glUniform1fv(shader->sphere_speed, 3, (const float*)sphere_render_uniform->sphere_speed);
     glUniform1fv(shader->sphere_move_rad, 3, (const float*)sphere_render_uniform->sphere_move_rad);
+    glUniform3fv(shader->reflect_size, 1, (const float*)sphere_render_uniform->reflect_size);
     
     const int tex_index = 0;
     mat4x4 rot_x;
@@ -452,6 +468,7 @@ static void render_floor(const LWCONTEXT *pLwc, const mat4x4 proj, const LWPUCKG
     glUniformMatrix2fv(shader->arrowRotMat2, 1, 0, (const float*)sphere_render_uniform->arrowRotMat2);
     glUniform2fv(shader->arrow_center, 1, sphere_render_uniform->arrow_center);
     glUniform1f(shader->arrow_scale, sphere_render_uniform->arrow_scale);
+    glUniform3fv(shader->reflect_size, 1, (const float*)sphere_render_uniform->reflect_size);
     
     const int tex_index = pLwc->tex_atlas[LAE_PUCK_FLOOR_KTX];
     const int arrow_tex_index = pLwc->tex_atlas[LAE_ARROW];
@@ -578,6 +595,21 @@ void lwc_render_physics(const LWCONTEXT* pLwc, const mat4x4 view, const mat4x4 p
     if (pLwc->puck_game->player_no != 2) {
         arrow_scale *= -1;
     }
+
+    float puck_sphere_col[3];
+    if (puck_game->puck_owner_player_no == 0) {
+        puck_sphere_col[0] = 0.3f;
+        puck_sphere_col[1] = 0.3f;
+        puck_sphere_col[2] = 0.3f;
+    } else if (puck_game->puck_owner_player_no == 1) {
+        puck_sphere_col[0] = 0.2f;
+        puck_sphere_col[1] = 0.1f;
+        puck_sphere_col[2] = 1.0f;
+    } else {
+        puck_sphere_col[0] = 1.0f;
+        puck_sphere_col[1] = 0.1f;
+        puck_sphere_col[2] = 0.2f;
+    }
     
     LWSPHERERENDERUNIFORM sphere_render_uniform = {
         // float sphere_col_ratio[3];
@@ -592,7 +624,7 @@ void lwc_render_physics(const LWCONTEXT* pLwc, const mat4x4 view, const mat4x4 p
         {
             { 0.0f, 1.0f, 0.8f },
             { 1.0f, 0.0f, 0.0f },
-            { 0.2f, 0.3f, 1.0f }
+            { puck_sphere_col[0], puck_sphere_col[1], puck_sphere_col[2] }
         },
         // float sphere_speed[3];
         {
@@ -605,6 +637,12 @@ void lwc_render_physics(const LWCONTEXT* pLwc, const mat4x4 view, const mat4x4 p
             !remote ? puck_game->go[LPGO_PLAYER].move_rad : state->player_move_rad,
             !remote ? puck_game->go[LPGO_TARGET].move_rad : state->target_move_rad,
             !remote ? puck_game->go[LPGO_PUCK].move_rad : state->puck_move_rad
+        },
+        // float reflect_size[3];
+        {
+            1.0f,
+            1.0f,
+            puck_game->puck_reflect_size,
         },
         // float arrowRotMat[2][2];
         {
@@ -648,7 +686,7 @@ void lwc_render_physics(const LWCONTEXT* pLwc, const mat4x4 view, const mat4x4 p
                 LVT_RIGHT_CENTER_ANCHORED_SQUARE, wall_height, 2.0f, 2.0f, &sphere_render_uniform);
     const int player_no = pLwc->puck_game->player_no;
     // Game object: Puck
-    render_go(pLwc, view, proj, &puck_game->go[LPGO_PUCK], pLwc->tex_atlas[LAE_PUCK_KTX],
+    render_go(pLwc, view, proj, &puck_game->go[LPGO_PUCK], pLwc->tex_atlas[LAE_PUCK_GRAY_KTX],
               1.0f, remote_puck_pos, state->puck_rot, remote, !remote ? puck_game->go[LPGO_PUCK].speed : state->puck_speed);
     // Game object: Player
     render_go(pLwc, view, proj, &puck_game->go[LPGO_PLAYER], pLwc->tex_atlas[player_no == 2 ? LAE_PUCK_ENEMY_KTX : LAE_PUCK_PLAYER_KTX],
@@ -668,7 +706,9 @@ void lwc_render_physics(const LWCONTEXT* pLwc, const mat4x4 view, const mat4x4 p
     // Render damage texts
     render_damage_text(pLwc, view, proj, pLwc->proj);
     render_dir_pad_with_start(pLwc, &pLwc->left_dir_pad);
-    render_dir_pad_with_start(pLwc, &pLwc->right_dir_pad);
+    if (pLwc->control_flags & LCF_PUCK_GAME_RIGHT_DIR_PAD) {
+        render_dir_pad_with_start(pLwc, &pLwc->right_dir_pad);
+    }
     // Dash button
     //render_fist_button(pLwc);
     // Pull button
@@ -691,8 +731,14 @@ void lwc_render_physics(const LWCONTEXT* pLwc, const mat4x4 view, const mat4x4 p
     const float button_x_0 = 0.15f;
     const float button_y_interval = 0.25f;
     const float button_y_0 = -0.50f;
-    lwbutton_lae_append(&(((LWCONTEXT*)pLwc)->button_list), "pull_button", button_x_interval * 1 + button_x_0, button_y_0 + button_y_interval * 0, button_size, button_size, LAE_BUTTON_PULL, LAE_BUTTON_PULL_ALPHA);
-    //lwbutton_lae_append(&(((LWCONTEXT*)pLwc)->button_list), "dash_button", button_x_interval * 2 + button_x_0, button_y_0 + button_y_interval * 1, button_size, button_size, LAE_BUTTON_DASH, LAE_BUTTON_DASH_ALPHA);
-    lwbutton_lae_append(&(((LWCONTEXT*)pLwc)->button_list), "jump_button", button_x_interval * 3 + button_x_0, button_y_0 + button_y_interval * 2, button_size, button_size, LAE_BUTTON_JUMP, LAE_BUTTON_JUMP_ALPHA);
+    if (pLwc->control_flags & LCF_PUCK_GAME_PULL) {
+        lwbutton_lae_append(&(((LWCONTEXT*)pLwc)->button_list), "pull_button", button_x_interval * 1 + button_x_0, button_y_0 + button_y_interval * 0, button_size, button_size, LAE_BUTTON_PULL, LAE_BUTTON_PULL_ALPHA);
+    }
+    if (pLwc->control_flags & LCF_PUCK_GAME_DASH) {
+        lwbutton_lae_append(&(((LWCONTEXT*)pLwc)->button_list), "dash_button", button_x_interval * 2 + button_x_0, button_y_0 + button_y_interval * 1, button_size, button_size, LAE_BUTTON_DASH, LAE_BUTTON_DASH_ALPHA);
+    }
+    if (pLwc->control_flags & LCF_PUCK_GAME_JUMP) {
+        lwbutton_lae_append(&(((LWCONTEXT*)pLwc)->button_list), "jump_button", button_x_interval * 3 + button_x_0, button_y_0 + button_y_interval * 2, button_size, button_size, LAE_BUTTON_JUMP, LAE_BUTTON_JUMP_ALPHA);
+    }
     render_lwbutton(pLwc, &pLwc->button_list);
 }
