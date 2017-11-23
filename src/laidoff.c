@@ -1297,8 +1297,11 @@ void lwc_prerender_mutable_context(LWCONTEXT* pLwc) {
                 player_world_point = world_point_2;
                 target_world_point = world_point_1;
             }
+            // 'player' is currently playing player
+            // 'target' is currently opponent player
             if (player_damage > 0) {
                 pLwc->puck_game->player.hp_shake_remain_time = pLwc->puck_game->hp_shake_time;
+                pLwc->puck_game->tower[pLwc->puck_game->player_no == 2 ? 1 : 0/*player*/].shake_remain_time = pLwc->puck_game->tower_shake_time;
                 mat4x4 proj_view;
                 mat4x4_identity(proj_view);
                 mat4x4_mul(proj_view, pLwc->puck_game_proj, pLwc->puck_game_view);
@@ -1309,6 +1312,7 @@ void lwc_prerender_mutable_context(LWCONTEXT* pLwc) {
             const int target_damage = pLwc->puck_game_state.target_current_hp - p.target_current_hp;
             if (target_damage > 0) {
                 pLwc->puck_game->target.hp_shake_remain_time = pLwc->puck_game->hp_shake_time;
+                pLwc->puck_game->tower[pLwc->puck_game->player_no == 2 ? 0 : 1/*target*/].shake_remain_time = pLwc->puck_game->tower_shake_time;
                 mat4x4 proj_view;
                 mat4x4_identity(proj_view);
                 mat4x4_mul(proj_view, pLwc->puck_game_proj, pLwc->puck_game_view);

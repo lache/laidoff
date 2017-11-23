@@ -3,8 +3,7 @@
 #include "lwlog.h"
 
 
-#if LW_PLATFORM_WIN32
-#else
+#if !LW_PLATFORM_WIN32
 int WSAGetLastError() {
 	return -1;
 }

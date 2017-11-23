@@ -155,7 +155,10 @@ typedef struct _LWPSTATE {
 	int player_total_hp;
 	int target_current_hp;
 	int target_total_hp;
-	// state
+    // puck
+    int puck_owner_player_no;
+    float puck_reflect_size;
+	// battle state
 	int finished;
 } LWPSTATE;
 

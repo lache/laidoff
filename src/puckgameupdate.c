@@ -26,10 +26,12 @@ void update_puck_game(LWCONTEXT* pLwc, LWPUCKGAME* puck_game, double delta_time)
     puck_game->on_target_damaged = puck_game->remote ? 0 : puck_game_target_decrease_hp_test;
     puck_game->time += (float)delta_time;
     puck_game->player.puck_contacted = 0;
-    dSpaceCollide(puck_game->space, puck_game, puck_game_near_callback);
-    //dWorldStep(puck_game->world, 0.005f);
-    dWorldQuickStep(puck_game->world, 1.0f / 60);
-    dJointGroupEmpty(puck_game->contact_joint_group);
+    if (!puck_game->remote) {
+        dSpaceCollide(puck_game->space, puck_game, puck_game_near_callback);
+        //dWorldStep(puck_game->world, 0.005f);
+        dWorldQuickStep(puck_game->world, 1.0f / 60);
+        dJointGroupEmpty(puck_game->contact_joint_group);
+    }
     if (puck_game->player.puck_contacted == 0) {
         puck_game->player.last_contact_puck_body = 0;
     }
@@ -202,9 +204,7 @@ void update_puck_game(LWCONTEXT* pLwc, LWPUCKGAME* puck_game, double delta_time)
         }
     }
     update_puck_ownership(puck_game);
-    if (puck_game->puck_reflect_size > 1.0f) {
-        puck_game->puck_reflect_size = LWMAX(1.0f, puck_game->puck_reflect_size - (float)delta_time * 2);
-    }
+    update_puck_reflect_size(puck_game, (float)delta_time);
 }
 
 void puck_game_jump(LWCONTEXT* pLwc, LWPUCKGAME* puck_game) {

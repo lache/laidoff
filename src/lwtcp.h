@@ -71,3 +71,6 @@ LWTCP* new_tcp(LWCONTEXT* pLwc,
 void destroy_tcp(LWTCP** tcp);
 void tcp_update(LWTCP* tcp);
 int tcp_connect(LWTCP* tcp);
+#if !LW_PLATFORM_WIN32
+int WSAGetLastError();
+#endif

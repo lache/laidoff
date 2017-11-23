@@ -214,20 +214,12 @@ static void near_puck_go(LWPUCKGAME* puck_game, int player_no, dContact* contact
         puck_game->puck_owner_player_no = player_no;
         puck_game->puck_reflect_size = 2.0f;
     } else if (puck_game->puck_owner_player_no != player_no) {
+        puck_game->puck_reflect_size = 2.0f;
+        puck_game->puck_owner_player_no = player_no;
         if (player_no == 1) {
             puck_game->player.puck_contacted = 1;
-            if (puck_game->on_player_damaged) {
-                puck_game->on_player_damaged(puck_game);
-                puck_game->puck_owner_player_no = 1;
-                puck_game->puck_reflect_size = 2.0f;
-            }
         } else {
             puck_game->target.puck_contacted = 1;
-            if (puck_game->on_target_damaged) {
-                puck_game->on_target_damaged(puck_game);
-                puck_game->puck_owner_player_no = 2;
-                puck_game->puck_reflect_size = 2.0f;
-            }
         }
     }
 }
@@ -267,10 +259,26 @@ void near_puck_tower(LWPUCKGAME* puck_game, dGeomID puck_geom, LWPUCKGAMETOWER* 
     }
     // Check last damaged cooltime
     if (now - tower->last_damaged_at > 1.0f) {
-        if (tower->hp > 0) {
-            tower->hp--;
+        int* player_hp = tower->owner_player_no == 1 ? &puck_game->player.current_hp : &puck_game->target.current_hp;
+        if (tower->hp > 0 || *player_hp > 0) {
+            if (tower->hp > 0) {
+                tower->hp--;
+            }
+            if (*player_hp > 0) {
+                (*player_hp)--;
+            }
             tower->shake_remain_time = puck_game->tower_shake_time;
             tower->last_damaged_at = now;
+
+            if (tower->owner_player_no == 1) {
+                if (puck_game->on_player_damaged) {
+                    puck_game->on_player_damaged(puck_game);
+                }
+            } else {
+                if (puck_game->on_target_damaged) {
+                    puck_game->on_target_damaged(puck_game);
+                }
+            }
         }
     }
 }
@@ -405,6 +413,12 @@ void puck_game_commit_fire(LWPUCKGAME* puck_game, LWPUCKGAMEFIRE* fire, int play
 
 float puck_game_player_speed() {
     return 2.5f;
+}
+
+void update_puck_reflect_size(LWPUCKGAME* puck_game, float delta_time) {
+    if (puck_game->puck_reflect_size > 1.0f) {
+        puck_game->puck_reflect_size = LWMAX(1.0f, puck_game->puck_reflect_size - (float)delta_time * 2);
+    }
 }
 
 void update_puck_ownership(LWPUCKGAME* puck_game) {

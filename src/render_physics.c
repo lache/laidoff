@@ -48,8 +48,36 @@ static void render_tower(const LWCONTEXT* pLwc, const mat4x4 view, const mat4x4 
     float sx = 1.0f;
     float sy = 1.0f;
     float sz = 1.0f;
-
-    int hp = tower->hp;
+    
+    float hp_ratio = 0;
+    const int remote = pLwc->puck_game->remote;
+    if (remote) {
+        float hp_ratio1 = 0;
+        float hp_ratio2 = 0;
+        if (pLwc->puck_game_state.player_total_hp) {
+            hp_ratio1 = (float)pLwc->puck_game_state.player_current_hp / pLwc->puck_game_state.player_total_hp;
+        }
+        if (pLwc->puck_game_state.target_total_hp) {
+            hp_ratio2 = (float)pLwc->puck_game_state.target_current_hp / pLwc->puck_game_state.target_total_hp;
+        }
+        
+        if (tower->owner_player_no == 1) {
+            if (pLwc->puck_game->player_no == 2) {
+                hp_ratio = hp_ratio2;
+            } else {
+                hp_ratio = hp_ratio1;
+            }
+        } else {
+            if (pLwc->puck_game->player_no == 2) {
+                hp_ratio = hp_ratio1;
+            } else {
+                hp_ratio = hp_ratio2;
+            }
+        }
+    } else {
+        hp_ratio = (float)tower->hp / pLwc->puck_game->tower_total_hp;
+    }
+    int hp = (int)ceilf(pLwc->puck_game->tower_total_hp * hp_ratio);
 
     glUniform1f(shader->overlay_color_ratio_location, 1);
 
@@ -152,16 +180,28 @@ static void render_go(const LWCONTEXT* pLwc, const mat4x4 view, const mat4x4 pro
     mat4x4_identity(proj_view_model);
     mat4x4_mul(proj_view_model, proj, view_model);
     
+    int puck_owner_player_no = pLwc->puck_game->remote ? pLwc->puck_game_state.puck_owner_player_no : pLwc->puck_game->puck_owner_player_no;
+    
     const float e = 2.718f;
     const float red_overlay_ratio = go->red_overlay ? LWMIN(1.0f, speed / go->puck_game->puck_damage_contact_speed_threshold) : 0;
     const float red_overlay_logistic_ratio = LWMIN(0.3f, 1 / (1 + powf(e, -(20.0f * (red_overlay_ratio - 0.8f)))));
     if (go->red_overlay) {
-        if (pLwc->puck_game->puck_owner_player_no == 1) {
-            glUniform3f(shader->overlay_color_location, 0, 0, 1);
-            glUniform3f(shader->multiply_color_location, 0, 0, 1);
-        } else if (pLwc->puck_game->puck_owner_player_no == 2) {
-            glUniform3f(shader->overlay_color_location, 1, 0, 0);
-            glUniform3f(shader->multiply_color_location, 1, 0, 0);
+        if (puck_owner_player_no == 1) {
+            if (pLwc->puck_game->player_no == 2) {
+                glUniform3f(shader->overlay_color_location, 1, 0, 0);
+                glUniform3f(shader->multiply_color_location, 1, 0, 0);
+            } else {
+                glUniform3f(shader->overlay_color_location, 0, 0, 1);
+                glUniform3f(shader->multiply_color_location, 0, 0, 1);
+            }
+        } else if (puck_owner_player_no == 2) {
+            if (pLwc->puck_game->player_no == 2) {
+                glUniform3f(shader->overlay_color_location, 0, 0, 1);
+                glUniform3f(shader->multiply_color_location, 0, 0, 1);
+            } else {
+                glUniform3f(shader->overlay_color_location, 1, 0, 0);
+                glUniform3f(shader->multiply_color_location, 1, 0, 0);
+            }
         } else {
             glUniform3f(shader->multiply_color_location, 1, 1, 1);
         }
@@ -597,20 +637,32 @@ void lwc_render_physics(const LWCONTEXT* pLwc, const mat4x4 view, const mat4x4 p
     }
 
     float puck_sphere_col[3];
-    if (puck_game->puck_owner_player_no == 0) {
+    int puck_owner_player_no = puck_game->remote ? state->puck_owner_player_no : puck_game->puck_owner_player_no;
+    if (puck_owner_player_no == 0) {
         puck_sphere_col[0] = 0.3f;
         puck_sphere_col[1] = 0.3f;
         puck_sphere_col[2] = 0.3f;
-    } else if (puck_game->puck_owner_player_no == 1) {
-        puck_sphere_col[0] = 0.2f;
-        puck_sphere_col[1] = 0.1f;
-        puck_sphere_col[2] = 1.0f;
+    } else if (puck_owner_player_no == 1) {
+        if (puck_game->player_no == 2) {
+            puck_sphere_col[0] = 1.0f;
+            puck_sphere_col[1] = 0.1f;
+            puck_sphere_col[2] = 0.2f;
+        } else {
+            puck_sphere_col[0] = 0.2f;
+            puck_sphere_col[1] = 0.1f;
+            puck_sphere_col[2] = 1.0f;
+        }
     } else {
-        puck_sphere_col[0] = 1.0f;
-        puck_sphere_col[1] = 0.1f;
-        puck_sphere_col[2] = 0.2f;
+        if (puck_game->player_no == 2) {
+            puck_sphere_col[0] = 0.2f;
+            puck_sphere_col[1] = 0.1f;
+            puck_sphere_col[2] = 1.0f;
+        } else {
+            puck_sphere_col[0] = 1.0f;
+            puck_sphere_col[1] = 0.1f;
+            puck_sphere_col[2] = 0.2f;
+        }
     }
-    
     LWSPHERERENDERUNIFORM sphere_render_uniform = {
         // float sphere_col_ratio[3];
         { 1.0f, 1.0f, 1.0f },
@@ -642,7 +694,7 @@ void lwc_render_physics(const LWCONTEXT* pLwc, const mat4x4 view, const mat4x4 p
         {
             1.0f,
             1.0f,
-            puck_game->puck_reflect_size,
+            remote ? state->puck_reflect_size : puck_game->puck_reflect_size,
         },
         // float arrowRotMat[2][2];
         {

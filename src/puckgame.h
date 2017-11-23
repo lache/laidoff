@@ -174,3 +174,4 @@ void puck_game_go_decrease_hp_test(LWPUCKGAME* puck_game, LWPUCKGAMEPLAYER* go, 
 void puck_game_commit_fire(LWPUCKGAME* puck_game, LWPUCKGAMEFIRE* fire, int player_no, float puck_fire_dx, float puck_fire_dy, float puck_fire_dlen);
 float puck_game_player_speed();
 void update_puck_ownership(LWPUCKGAME* puck_game);
+void update_puck_reflect_size(LWPUCKGAME* puck_game, float delta_time);

@@ -2,6 +2,7 @@
   <dictionary name="kimgeoyeob">
     <words>
       <w>leaderboard</w>
+      <w>recvfrom</w>
     </words>
   </dictionary>
 </component>
