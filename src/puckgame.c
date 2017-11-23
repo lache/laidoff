@@ -251,6 +251,9 @@ void near_puck_tower(LWPUCKGAME* puck_game, dGeomID puck_geom, LWPUCKGAMETOWER* 
     if (puck_game->puck_owner_player_no == tower->owner_player_no) {
         return;
     }
+    if (puck_game->puck_owner_player_no == 0) {
+        return;
+    }
     // Check minimum contact damage speed threshold
     dBodyID puck_body = dGeomGetBody(puck_geom);
     dReal puck_speed = dLENGTH(dBodyGetLinearVel(puck_body));

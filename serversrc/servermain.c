@@ -637,8 +637,8 @@ int tcp_server_entry(void *context) {
             const int battle_id = server->battle_counter + 1; // battle id is 1-based index
             puck_game->server = server;
             puck_game->battle_id = battle_id;
-            puck_game->on_player_damaged = on_player_damaged;
-            puck_game->on_target_damaged = on_target_damaged;
+            //puck_game->on_player_damaged = on_player_damaged;
+            //puck_game->on_target_damaged = on_target_damaged;
             puck_game->c1_token = pcg32_random();
             puck_game->c2_token = pcg32_random();
             // Build reply packet

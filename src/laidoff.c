@@ -1291,11 +1291,27 @@ void lwc_prerender_mutable_context(LWCONTEXT* pLwc) {
             vec4 world_point_2 = {
                 p.target[0], p.target[1], p.target[2], 1.0f,
             };
+            vec4 tower1_world_point = {
+                pLwc->puck_game->tower_pos * pLwc->puck_game->tower_pos_multiplier[0][0],
+                pLwc->puck_game->tower_pos * pLwc->puck_game->tower_pos_multiplier[0][1],
+                0.0f,
+                1.0f,
+            };
+            vec4 tower2_world_point = {
+                pLwc->puck_game->tower_pos * pLwc->puck_game->tower_pos_multiplier[1][0],
+                pLwc->puck_game->tower_pos * pLwc->puck_game->tower_pos_multiplier[1][1],
+                0.0f,
+                1.0f,
+            };
             float* player_world_point = world_point_1;
             float* target_world_point = world_point_2;
+            float* player_tower_world_point = tower1_world_point;
+            float* target_tower_world_point = tower2_world_point;
             if (pLwc->puck_game->player_no == 2) {
                 player_world_point = world_point_2;
                 target_world_point = world_point_1;
+                player_tower_world_point = tower2_world_point;
+                target_tower_world_point = tower1_world_point;
             }
             // 'player' is currently playing player
             // 'target' is currently opponent player
@@ -1306,7 +1322,7 @@ void lwc_prerender_mutable_context(LWCONTEXT* pLwc) {
                 mat4x4_identity(proj_view);
                 mat4x4_mul(proj_view, pLwc->puck_game_proj, pLwc->puck_game_view);
                 vec2 ui_point;
-                calculate_ui_point_from_world_point(pLwc->aspect_ratio, proj_view, player_world_point, ui_point);
+                calculate_ui_point_from_world_point(pLwc->aspect_ratio, proj_view, player_tower_world_point, ui_point);
                 spawn_damage_text(pLwc, ui_point[0], ui_point[1], 0, "1", LDTC_UI);
             }
             const int target_damage = pLwc->puck_game_state.target_current_hp - p.target_current_hp;
@@ -1318,7 +1334,7 @@ void lwc_prerender_mutable_context(LWCONTEXT* pLwc) {
                 mat4x4_mul(proj_view, pLwc->puck_game_proj, pLwc->puck_game_view);
 
                 vec2 ui_point;
-                calculate_ui_point_from_world_point(pLwc->aspect_ratio, proj_view, target_world_point, ui_point);
+                calculate_ui_point_from_world_point(pLwc->aspect_ratio, proj_view, target_tower_world_point, ui_point);
                 spawn_damage_text(pLwc, ui_point[0], ui_point[1], 0, "1", LDTC_UI);
             }
             memcpy(&pLwc->puck_game_state, &p, sizeof(LWPSTATE));
