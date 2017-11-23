@@ -327,12 +327,12 @@ void puck_game_near_callback(void* data, dGeomID geom1, dGeomID geom2) {
                 //contact[i].fdir1[1] = 0.0f;
                 //contact[i].fdir1[2] = 0.0f;
                 contact[i].surface.mu = 100.9f;
-            } else if (geom1 == puck_game->go[LPGO_PUCK].geom && geom2 == puck_game->go[LPGO_PLAYER].geom
-                       || geom1 == puck_game->go[LPGO_PLAYER].geom && geom2 == puck_game->go[LPGO_PUCK].geom) {
+            } else if ((geom1 == puck_game->go[LPGO_PUCK].geom && geom2 == puck_game->go[LPGO_PLAYER].geom)
+                       || (geom1 == puck_game->go[LPGO_PLAYER].geom && geom2 == puck_game->go[LPGO_PUCK].geom)) {
                 // Player - puck contacts
                 near_puck_player(puck_game, &contact[i]);
-            } else if (geom1 == puck_game->go[LPGO_PUCK].geom && geom2 == puck_game->go[LPGO_TARGET].geom
-                       || geom1 == puck_game->go[LPGO_TARGET].geom && geom2 == puck_game->go[LPGO_PUCK].geom) {
+            } else if ((geom1 == puck_game->go[LPGO_PUCK].geom && geom2 == puck_game->go[LPGO_TARGET].geom)
+                       || (geom1 == puck_game->go[LPGO_TARGET].geom && geom2 == puck_game->go[LPGO_PUCK].geom)) {
                 // Target - puck contacts
                 near_puck_target(puck_game, &contact[i]);
             } else if (geom1 == puck_game->go[LPGO_PUCK].geom && (tower = get_tower_from_geom(puck_game, geom2))) {
@@ -344,7 +344,7 @@ void puck_game_near_callback(void* data, dGeomID geom1, dGeomID geom2) {
             } else {
                 // Other contacts
                 contact[i].surface.mode = dContactSoftCFM | dContactBounce;
-                contact[i].surface.mu = 1.9f;
+                contact[i].surface.mu = 0;//1.9f;
             }
 
             dJointID c = dJointCreateContact(puck_game->world, puck_game->contact_joint_group, &contact[i]);
