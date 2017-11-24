@@ -35,18 +35,16 @@ static void testgo_move_callback(dBodyID b) {
     }
 }
 
-static void create_go(LWPUCKGAME* puck_game, LW_PUCK_GAME_OBJECT lpgo, float mass, float radius, float x, float y) {
+static void create_go(LWPUCKGAME* puck_game, LW_PUCK_GAME_OBJECT lpgo, float mass, float radius) {
     LWPUCKGAMEOBJECT* go = &puck_game->go[lpgo];
     go->puck_game = puck_game;
     go->radius = radius;
     const float testgo_radius = go->radius;
-    const float initial_height = testgo_radius * 1;
     go->geom = dCreateSphere(puck_game->space, testgo_radius);
     go->body = dBodyCreate(puck_game->world);
     dMass m;
     dMassSetSphereTotal(&m, mass, testgo_radius);
     dBodySetMass(go->body, &m);
-    dBodySetPosition(go->body, x, y, initial_height);
     dBodySetData(go->body, go);
     dBodySetMovedCallback(go->body, testgo_move_callback);
     //dBodySetLinearVel(go->body, -2.0f, 3.0f, 0);
@@ -105,6 +103,7 @@ LWPUCKGAME* new_puck_game() {
     }
     puck_game->tower_total_hp = 5;
     puck_game->tower_shake_time = 0.2f;
+    puck_game->go_start_pos = 0.6f;
     // ------
 
     // Initialize OpenDE
@@ -126,16 +125,14 @@ LWPUCKGAME* new_puck_game() {
                          puck_game->tower_pos * puck_game->tower_pos_multiplier[i][1],
                          0.0f);
         dGeomSetData(puck_game->tower[i].geom, &puck_game->tower[i]);
-        puck_game->tower[i].hp = puck_game->tower_total_hp;
         // Tower #0(NW), #1(NE) --> player 1
         // Tower #2(SW), #3(SE) --> player 2
         puck_game->tower[i].owner_player_no = i < LW_PUCK_GAME_TOWER_COUNT / 2 ? 1 : 2;
     }
-
-    float start_pos = 0.6f;
-    create_go(puck_game, LPGO_PUCK, puck_game->sphere_mass, puck_game->sphere_radius, 0.0f, 0.0f);
-    create_go(puck_game, LPGO_PLAYER, puck_game->sphere_mass, puck_game->sphere_radius, -start_pos, -start_pos);
-    create_go(puck_game, LPGO_TARGET, puck_game->sphere_mass, puck_game->sphere_radius, +start_pos, +start_pos);
+    
+    create_go(puck_game, LPGO_PUCK, puck_game->sphere_mass, puck_game->sphere_radius);
+    create_go(puck_game, LPGO_PLAYER, puck_game->sphere_mass, puck_game->sphere_radius);
+    create_go(puck_game, LPGO_TARGET, puck_game->sphere_mass, puck_game->sphere_radius);
 
     puck_game->contact_joint_group = dJointGroupCreate(0);
     puck_game->player_control_joint_group = dJointGroupCreate(0);
@@ -162,6 +159,9 @@ LWPUCKGAME* new_puck_game() {
 
     puck_game->go[LPGO_PUCK].red_overlay = 1;
 
+    // Puck game runtime reset
+    puck_game_reset(puck_game);
+
     puck_game->init_ready = 1;
     return puck_game;
 }
@@ -179,7 +179,7 @@ void delete_puck_game(LWPUCKGAME** puck_game) {
     *puck_game = 0;
 }
 
-void puck_game_go_decrease_hp_test(LWPUCKGAME* puck_game, LWPUCKGAMEPLAYER* go, LWPUCKGAMEDASH* dash) {
+void puck_game_go_decrease_hp_test(LWPUCKGAME* puck_game, LWPUCKGAMEPLAYER* go, LWPUCKGAMEDASH* dash, LWPUCKGAMETOWER* tower) {
     LWPUCKGAMEOBJECT* puck = &puck_game->go[LPGO_PUCK];
     const float puck_speed = (float)dLENGTH(dBodyGetLinearVel(puck->body));
 
@@ -194,14 +194,20 @@ void puck_game_go_decrease_hp_test(LWPUCKGAME* puck_game, LWPUCKGAMEPLAYER* go, 
         }
         go->hp_shake_remain_time = puck_game->hp_shake_time;
     }
+
+    if (tower->hp > 0) {
+        tower->hp--;
+    } else if (tower->hp <= 0) {
+        tower->hp = puck_game->tower_total_hp;
+    }
 }
 
 void puck_game_player_decrease_hp_test(LWPUCKGAME* puck_game) {
-    puck_game_go_decrease_hp_test(puck_game, &puck_game->player, &puck_game->remote_dash[0]);
+    puck_game_go_decrease_hp_test(puck_game, &puck_game->player, &puck_game->remote_dash[0], &puck_game->tower[0]);
 }
 
 void puck_game_target_decrease_hp_test(LWPUCKGAME* puck_game) {
-    puck_game_go_decrease_hp_test(puck_game, &puck_game->target, &puck_game->remote_dash[1]);
+    puck_game_go_decrease_hp_test(puck_game, &puck_game->target, &puck_game->remote_dash[1], &puck_game->tower[1]);
 }
 
 static void near_puck_go(LWPUCKGAME* puck_game, int player_no, dContact* contact) {
@@ -430,5 +436,20 @@ void update_puck_ownership(LWPUCKGAME* puck_game) {
     if (puck_game->puck_owner_player_no != 0 && red_overlay_ratio < 0.5f) {
         puck_game->puck_owner_player_no = 0;
         //puck_game->puck_reflect_size = 2.0f;
+    }
+}
+
+void puck_game_reset(LWPUCKGAME* puck_game) {
+    for (int i = 0; i < LW_PUCK_GAME_TOWER_COUNT; i++) {
+        puck_game->tower[i].hp = puck_game->tower_total_hp;
+    }
+    dBodySetPosition(puck_game->go[LPGO_PUCK].body, 0.0f, 0.0f, puck_game->go[LPGO_PUCK].radius);
+    dBodySetPosition(puck_game->go[LPGO_PLAYER].body, -puck_game->go_start_pos, -puck_game->go_start_pos, puck_game->go[LPGO_PUCK].radius);
+    dBodySetPosition(puck_game->go[LPGO_TARGET].body, +puck_game->go_start_pos, +puck_game->go_start_pos, puck_game->go[LPGO_PUCK].radius);
+    for (int i = 0; i < LPGO_COUNT; i++) {
+        dBodySetLinearVel(puck_game->go[i].body, 0, 0, 0);
+        dBodySetAngularVel(puck_game->go[i].body, 0, 0, 0);
+        dBodySetForce(puck_game->go[i].body, 0, 0, 0);
+        dBodySetTorque(puck_game->go[i].body, 0, 0, 0);
     }
 }

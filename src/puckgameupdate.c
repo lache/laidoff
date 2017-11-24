@@ -22,11 +22,11 @@ void update_puck_game(LWCONTEXT* pLwc, LWPUCKGAME* puck_game, double delta_time)
     }
     
     puck_game->remote = !pLwc->udp->master;
-    puck_game->on_player_damaged = puck_game->remote ? 0 : puck_game_player_decrease_hp_test;
-    puck_game->on_target_damaged = puck_game->remote ? 0 : puck_game_target_decrease_hp_test;
+    //puck_game->on_player_damaged = puck_game->remote ? 0 : puck_game_player_decrease_hp_test;
+    //puck_game->on_target_damaged = puck_game->remote ? 0 : puck_game_target_decrease_hp_test;
     puck_game->time += (float)delta_time;
     puck_game->player.puck_contacted = 0;
-    if (!puck_game->remote) {
+    if (puck_game->battle_id == 0) {
         dSpaceCollide(puck_game->space, puck_game, puck_game_near_callback);
         //dWorldStep(puck_game->world, 0.005f);
         dWorldQuickStep(puck_game->world, 1.0f / 60);
@@ -317,8 +317,10 @@ void puck_game_rematch(LWCONTEXT* pLwc, LWPUCKGAME* puck_game) {
         && pLwc->puck_game_state.finished) {
         puck_game->battle_id = 0;
         puck_game->token = 0;
+        puck_game->remote = 0;
         puck_game->player_no = 1;
         puck_game_reset_view_proj(pLwc, puck_game);
+        puck_game_reset(puck_game);
         tcp_send_queue2(pLwc->tcp, &pLwc->tcp->user_id);
     }
 }

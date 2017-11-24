@@ -30,7 +30,7 @@ typedef struct _LWTOWERRENDERDATA {
     float b;
 } LWTOWERRENDERDATA;
 
-static void render_tower(const LWCONTEXT* pLwc, const mat4x4 view, const mat4x4 proj, const float* pos, const LWPUCKGAMETOWER* tower) {
+static void render_tower(const LWCONTEXT* pLwc, const mat4x4 view, const mat4x4 proj, const float* pos, const LWPUCKGAMETOWER* tower, int remote) {
     int shader_index = LWST_DEFAULT;
     const LWSHADER* shader = &pLwc->shader[shader_index];
     glUseProgram(shader->program);
@@ -50,7 +50,6 @@ static void render_tower(const LWCONTEXT* pLwc, const mat4x4 view, const mat4x4 
     float sz = 1.0f;
     
     float hp_ratio = 0;
-    const int remote = pLwc->puck_game->remote;
     if (remote) {
         float hp_ratio1 = 0;
         float hp_ratio2 = 0;
@@ -180,7 +179,7 @@ static void render_go(const LWCONTEXT* pLwc, const mat4x4 view, const mat4x4 pro
     mat4x4_identity(proj_view_model);
     mat4x4_mul(proj_view_model, proj, view_model);
     
-    int puck_owner_player_no = pLwc->puck_game->remote ? pLwc->puck_game_state.puck_owner_player_no : pLwc->puck_game->puck_owner_player_no;
+    int puck_owner_player_no = remote ? pLwc->puck_game_state.puck_owner_player_no : pLwc->puck_game->puck_owner_player_no;
     
     const float e = 2.718f;
     const float red_overlay_ratio = go->red_overlay ? LWMIN(1.0f, speed / go->puck_game->puck_damage_contact_speed_threshold) : 0;
@@ -274,9 +273,9 @@ static void render_match_state(const LWCONTEXT* pLwc) {
             }
         } else {
             if (pLwc->puck_game->battle_id == 0) {
-                sprintf(str, "YOU LOSE (BID:%d) (Searching...) [PRACTICE MODE]", pLwc->puck_game->battle_id);
+                sprintf(str, "YOU LOST (BID:%d) (Searching...) [PRACTICE MODE]", pLwc->puck_game->battle_id);
             } else {
-                sprintf(str, "YOU LOSE (BID:%d) (TOUCH 'JUMP' TO REMATCH)", pLwc->puck_game->battle_id);
+                sprintf(str, "YOU LOST (BID:%d) (TOUCH 'JUMP' TO REMATCH)", pLwc->puck_game->battle_id);
             }
         }
     } else {
@@ -637,7 +636,7 @@ void lwc_render_physics(const LWCONTEXT* pLwc, const mat4x4 view, const mat4x4 p
     }
 
     float puck_sphere_col[3];
-    int puck_owner_player_no = puck_game->remote ? state->puck_owner_player_no : puck_game->puck_owner_player_no;
+    int puck_owner_player_no = remote ? state->puck_owner_player_no : puck_game->puck_owner_player_no;
     if (puck_owner_player_no == 0) {
         puck_sphere_col[0] = 0.3f;
         puck_sphere_col[1] = 0.3f;
@@ -753,7 +752,7 @@ void lwc_render_physics(const LWCONTEXT* pLwc, const mat4x4 view, const mat4x4 p
             puck_game->tower_pos * puck_game->tower_pos_multiplier[i][1],
             0
         };
-        render_tower(pLwc, view, proj, tower_pos, &puck_game->tower[i]);
+        render_tower(pLwc, view, proj, tower_pos, &puck_game->tower[i], remote);
     }
     // Render damage texts
     render_damage_text(pLwc, view, proj, pLwc->proj);

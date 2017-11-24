@@ -389,11 +389,11 @@ void broadcast_packet(LWSERVER *server, const LWCONN *conn, int conn_capacity, c
 }
 
 void on_player_damaged(LWPUCKGAME *puck_game) {
-    puck_game_go_decrease_hp_test(puck_game, &puck_game->player, &puck_game->remote_dash[0]);
+    puck_game_go_decrease_hp_test(puck_game, &puck_game->player, &puck_game->remote_dash[0], &puck_game->tower[0]);
 }
 
 void on_target_damaged(LWPUCKGAME *puck_game) {
-    puck_game_go_decrease_hp_test(puck_game, &puck_game->target, &puck_game->remote_dash[1]);
+    puck_game_go_decrease_hp_test(puck_game, &puck_game->target, &puck_game->remote_dash[1], &puck_game->tower[1]);
 }
 
 void select_tcp_server(LWTCPSERVER *server) {
