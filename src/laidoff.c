@@ -328,6 +328,9 @@ create_shader(const char *shader_name, LWSHADER *pShader, const GLchar *vst, con
     pShader->arrow_angle = glGetUniformLocation(pShader->program, "arrow_angle");
     pShader->arrow_scale = glGetUniformLocation(pShader->program, "arrow_scale");
     pShader->arrowRotMat2 = glGetUniformLocation(pShader->program, "arrowRotMat2");
+    pShader->gauge_ratio = glGetUniformLocation(pShader->program, "gauge_ratio");
+    pShader->full_color = glGetUniformLocation(pShader->program, "full_color");
+    pShader->empty_color = glGetUniformLocation(pShader->program, "empty_color");
 
     // Set initial value...
     glUseProgram(pShader->program);
@@ -411,6 +414,9 @@ void init_gl_shaders(LWCONTEXT* pLwc) {
     char *sphere_reflect_floor_frag_glsl = create_string_from_file(ASSETS_BASE_PATH
                                                                    GLSL_DIR_NAME PATH_SEPARATOR
                                                                    "sphere-reflect-floor-frag.glsl");
+    char *ringgauge_frag_glsl = create_string_from_file(ASSETS_BASE_PATH
+                                                        GLSL_DIR_NAME PATH_SEPARATOR
+                                                        "ringgauge-frag.glsl");
 
     if (!default_vert_glsl) {
         LOGE("init_gl_shaders: default-vert.glsl not loaded. Abort...");
@@ -487,6 +493,11 @@ void init_gl_shaders(LWCONTEXT* pLwc) {
         return;
     }
 
+    if (!ringgauge_frag_glsl) {
+        LOGE("init_gl_shaders: ringgauge-frag.glsl not loaded. Abort...");
+        return;
+    }
+
     create_shader("Default Shader", &pLwc->shader[LWST_DEFAULT], default_vert_glsl, default_frag_glsl);
     create_shader("Font Shader", &pLwc->shader[LWST_FONT], default_vert_glsl, font_frag_glsl);
     create_shader("ETC1 with Alpha Shader", &pLwc->shader[LWST_ETC1], default_vert_glsl, etc1_frag_glsl);
@@ -498,6 +509,7 @@ void init_gl_shaders(LWCONTEXT* pLwc) {
     create_shader("Panel Shader", &pLwc->shader[LWST_PANEL], default_vert_glsl, panel_frag_glsl);
     create_shader("Sphere Reflect Shader", &pLwc->shader[LWST_SPHERE_REFLECT], sphere_reflect_vert_glsl, sphere_reflect_frag_glsl);
     create_shader("Sphere Reflect Floor Shader", &pLwc->shader[LWST_SPHERE_REFLECT_FLOOR], sphere_reflect_vert_glsl, sphere_reflect_floor_frag_glsl);
+    create_shader("Ringgauge Shader", &pLwc->shader[LWST_RINGGAUGE], default_vert_glsl, ringgauge_frag_glsl);
 
     release_string(default_vert_glsl);
     release_string(skin_vert_glsl);
@@ -515,6 +527,7 @@ void init_gl_shaders(LWCONTEXT* pLwc) {
     release_string(emitter2_frag_glsl);
     release_string(sphere_reflect_frag_glsl);
     release_string(sphere_reflect_floor_frag_glsl);
+    release_string(ringgauge_frag_glsl);
 }
 
 static void load_vbo(LWCONTEXT* pLwc, const char *filename, LWVBO *pVbo) {
@@ -679,7 +692,10 @@ static void init_vbo(LWCONTEXT* pLwc) {
     // LVT_TOWER_5
     load_vbo(pLwc, ASSETS_BASE_PATH "vbo" PATH_SEPARATOR "tower-5.vbo",
              &pLwc->vertex_buffer[LVT_TOWER_5]);
-    
+    // LVT_RINGGAUGE
+    load_vbo(pLwc, ASSETS_BASE_PATH "vbo" PATH_SEPARATOR "ringgauge.vbo",
+             &pLwc->vertex_buffer[LVT_RINGGAUGE]);
+
     // LVT_LEFT_TOP_ANCHORED_SQUARE ~ LVT_RIGHT_BOTTOM_ANCHORED_SQUARE
     // 9 anchored squares...
     const float anchored_square_offset[][2] = {
@@ -1695,7 +1711,7 @@ LWCONTEXT* lw_init_initial_size(int width, int height) {
     //test_image();
 
     LWCONTEXT* pLwc = (LWCONTEXT *)calloc(1, sizeof(LWCONTEXT));
-    
+
     pLwc->control_flags = LCF_PUCK_GAME_DASH | LCF_PUCK_GAME_JUMP | LCF_PUCK_GAME_PULL;
 
     parse_conf(pLwc);

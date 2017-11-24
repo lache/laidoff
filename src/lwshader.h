@@ -74,4 +74,7 @@ typedef struct _LWSHADER {
     GLint arrow_angle;
     GLint arrow_scale;
     GLint arrowRotMat2;
+    GLint gauge_ratio;
+    GLint full_color;
+    GLint empty_color;
 } LWSHADER;

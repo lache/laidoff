@@ -10,6 +10,7 @@
 #include "lwudp.h"
 #include "lwdamagetext.h"
 #include "lwdirpad.h"
+#include "lwmath.h"
 
 typedef struct _LWSPHERERENDERUNIFORM {
     float sphere_col_ratio[3];
@@ -246,6 +247,41 @@ static void render_timer(const LWCONTEXT* pLwc, float remain_sec) {
     text_block.text_block_x = 0.0f;
     text_block.text_block_y = 1.0f - 0.05f;
     render_text_block(pLwc, &text_block);
+}
+
+static void render_dash_ring_gauge(const LWCONTEXT* pLwc, vec4 player_pos) {
+    float gauge_ratio = puck_game_dash_gauge_ratio(pLwc->puck_game);
+    if (gauge_ratio >= 1.0f) {
+        return;
+    }
+    mat4x4 proj_view;
+    mat4x4_identity(proj_view);
+    mat4x4_mul(proj_view, pLwc->puck_game_proj, pLwc->puck_game_view);
+    vec2 ui_point;
+    calculate_ui_point_from_world_point(pLwc->aspect_ratio, proj_view, player_pos, ui_point);
+
+    glUseProgram(pLwc->shader[LWST_RINGGAUGE].program);
+    glUniform3f(pLwc->shader[LWST_RINGGAUGE].full_color, 0, 1, 0);
+    glUniform3f(pLwc->shader[LWST_RINGGAUGE].empty_color, 1, 0, 0);
+    glUniform1f(pLwc->shader[LWST_RINGGAUGE].gauge_ratio, gauge_ratio);
+    // text origin point debug indicator
+    render_solid_vb_ui_flip_y_uv_shader_rot(
+        pLwc,
+        ui_point[0],
+        ui_point[1],
+        0.03f,
+        0.03f,
+        0,//pLwc->tex_atlas[LVT_RINGGAUGE],
+        LVT_RINGGAUGE,
+        0.75f,
+        0,
+        1,
+        0,
+        1,
+        0,
+        LWST_RINGGAUGE,
+        (float)M_PI
+    );
 }
 
 static void render_match_state(const LWCONTEXT* pLwc) {
@@ -774,6 +810,14 @@ void lwc_render_physics(const LWCONTEXT* pLwc, const mat4x4 view, const mat4x4 p
     render_timer(pLwc, puck_game_remain_time(pLwc->puck_game->total_time, state->update_tick));
     // Match state text (bottom of the screen)
     render_match_state(pLwc);
+    // Dash ring gauge
+    vec4 player_controlled_pos_vec4 = {
+        player_controlled_pos[0],
+        player_controlled_pos[1],
+        player_controlled_pos[2],
+        1.0f,
+    };
+    render_dash_ring_gauge(pLwc, player_controlled_pos_vec4);
     
     // Register as a button
     const float button_size = 0.35f;
