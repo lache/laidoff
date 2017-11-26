@@ -93,7 +93,7 @@ static void render_tower(const LWCONTEXT* pLwc, const mat4x4 view, const mat4x4 
         float x = pos[0];
         float y = pos[1];
         float z = pos[2];
-        // Positioinal offset by shake
+        // Positional offset by shake
         if (tower->shake_remain_time > 0) {
             const float ratio = tower->shake_remain_time / pLwc->puck_game->tower_shake_time;
             const float shake_magnitude = 0.03f;
