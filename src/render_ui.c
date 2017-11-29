@@ -360,15 +360,15 @@ static void s_render_full_panel(const LWCONTEXT* pLwc, LWBUTTONLIST* button_list
 	// Properties & Values
 	text_block.align = LTBA_LEFT_CENTER;
 	const char* prop_str[] = {
-		u8"투사 방식",
-		u8"타겟 감지 속도",
-		u8"발포 전 예열 속도",
-		u8"발포 후 냉각 속도",
-		u8"포탑 회전 속도",
-		u8"내구도",
-		u8"건설 효율",
-		u8"최대 사거리",
-		u8"최소 사거리",
+		"Projectile Type",// u8"투사 방식",
+		"Detection Lag", //u8"타겟 감지 속도",
+		"Pre Warm up", //u8"발포 전 예열 속도",
+		"Post Cool down", //u8"발포 후 냉각 속도",
+		"Rotation Speed", //u8"포탑 회전 속도",
+		"Durability", //u8"내구도",
+		"Construction", //u8"건설 효율",
+		"Max Range", //u8"최대 사거리",
+		"Min Range", //u8"최소 사거리",
 	};
 	const float prop_tab_width = 0.3f;
 	const float prop_width = 0.8f;

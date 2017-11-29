@@ -83,6 +83,7 @@ extern const char* tex_font_atlas_filename[2];
 #define PS_VERTEX_BUFFER_COUNT LPVT_COUNT
 #define MAX_DELTA_TIME_HISTORY (60)
 #define LW_MAX_CONF_TOKEN (128)
+
 typedef struct _LWPUCKGAME LWPUCKGAME;
 typedef struct _LWUDP LWUDP;
 typedef struct _LWTCP LWTCP;

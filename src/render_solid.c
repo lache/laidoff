@@ -89,7 +89,7 @@ void render_solid_vb_ui_alpha(const LWCONTEXT* pLwc,
 	float alpha_multiplier, float or, float og, float ob, float oratio) {
 	int shader_index = LWST_ETC1;
 
-    LWSHADER* shader = &pLwc->shader[shader_index];
+    const LWSHADER* shader = &pLwc->shader[shader_index];
 
 	glUseProgram(shader->program);
 	glUniform2fv(shader->vuvoffset_location, 1, default_uv_offset);

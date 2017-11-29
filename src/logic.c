@@ -460,7 +460,7 @@ void reset_battle_context(LWCONTEXT* pLwc) {
 
 	set_creature_data(
 		&pLwc->player[2],
-		u8"손톱깎이",
+		u8"Nail Clipper",
 		3,
 		46,
 		46,
@@ -476,7 +476,7 @@ void reset_battle_context(LWCONTEXT* pLwc) {
 
 	set_creature_data(
 		&pLwc->player[3],
-		u8"대문호",
+		u8"Great Writer",
 		8,
 		105,
 		105,
@@ -540,11 +540,11 @@ void toggle_network_poll(LWCONTEXT* pLwc) {
 }
 
 void start_nickname_text_input_activity(LWCONTEXT* pLwc) {
-	lw_start_text_input_activity(pLwc, 100);
+	lw_start_text_input_activity(pLwc, LITI_NICKNAME);
 }
 
 void start_tcp_addr_text_input_activity(LWCONTEXT* pLwc) {
-	lw_start_text_input_activity(pLwc, 200);
+	lw_start_text_input_activity(pLwc, LITI_SERVER_ADDR);
 }
 
 void show_leaderboard(LWCONTEXT* pLwc) {
@@ -764,12 +764,19 @@ void lwc_update(LWCONTEXT* pLwc, double delta_time) {
     // Check for a new native user text input
 	if (pLwc->last_text_input_seq != lw_get_text_input_seq()) {
         switch (pLwc->text_input_tag) {
-            case 100:
-                show_sys_msg(pLwc->def_sys_msg, lw_get_text_input());
+            case LITI_NICKNAME:
+            {
+                char nicknameMsg[256];
+                sprintf(nicknameMsg, "Changing nickname to %s...", lw_get_text_input());
+                show_sys_msg(pLwc->def_sys_msg, nicknameMsg);
+                tcp_send_setnickname(pLwc->tcp, &pLwc->tcp->user_id, lw_get_text_input());
                 break;
-            case 200:
+            }   
+            case LITI_SERVER_ADDR:
+            {
                 lw_write_tcp_addr(pLwc, lw_get_text_input());
                 break;
+            }   
             default:
                 break;
         }

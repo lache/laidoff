@@ -388,6 +388,7 @@ INT_PTR CALLBACK TextInputProc(HWND hDlg, UINT message, WPARAM wParam, LPARAM lP
 void lw_start_text_input_activity(LWCONTEXT* pLwc, int tag) {
     HWND hWnd = glfwGetWin32Window(pLwc->window);
     HINSTANCE hInst = GetModuleHandle(NULL);
+    pLwc->text_input_tag = tag;
     DialogBox(hInst,							// application instance
               MAKEINTRESOURCE(IDD_DIALOG2),		// dialog box resource
               hWnd,								// owner window

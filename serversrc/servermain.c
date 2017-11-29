@@ -630,10 +630,10 @@ int tcp_server_entry(void *context) {
             LOGI("LWPCREATEBATTLE: Create a new puck game instance");
             LWPCREATEBATTLE *p = (LWPCREATEBATTLE *) base;
             LWPUCKGAME *puck_game = new_puck_game();
-            memcpy(puck_game->id1, p->id1, sizeof(puck_game->id1));
-            memcpy(puck_game->id2, p->id2, sizeof(puck_game->id2));
-            memcpy(puck_game->nickname, p->nickname1, sizeof(puck_game->nickname));
-            memcpy(puck_game->target_nickname, p->nickname2, sizeof(puck_game->target_nickname));
+            memcpy(puck_game->id1, p->Id1, sizeof(puck_game->id1));
+            memcpy(puck_game->id2, p->Id2, sizeof(puck_game->id2));
+            memcpy(puck_game->nickname, p->Nickname1, sizeof(puck_game->nickname));
+            memcpy(puck_game->target_nickname, p->Nickname2, sizeof(puck_game->target_nickname));
             const int battle_id = server->battle_counter + 1; // battle id is 1-based index
             puck_game->server = server;
             puck_game->battle_id = battle_id;

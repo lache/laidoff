@@ -801,7 +801,7 @@ void lwc_render_physics(const LWCONTEXT* pLwc, const mat4x4 view, const mat4x4 p
     // Pull button
     //render_top_button(pLwc);
     // Dash cooltime gauge
-    render_dash_gauge(pLwc);
+    //render_dash_gauge(pLwc);
     // HP gauges (player & target)
     const char* target_nickname = puck_game->battle_id ? puck_game->target_nickname : "== Searching opponent ==";
     render_hp_gauge(pLwc, -0.8f, 1.0f - 0.1f, state->player_current_hp, state->player_total_hp, player->hp_shake_remain_time, 1, puck_game->nickname);

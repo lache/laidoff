@@ -109,6 +109,14 @@ int tcp_send_push_token(LWTCP* tcp, int backoffMs, int domain, const char* push_
     return send_result;
 }
 
+int tcp_send_setnickname(LWTCP* tcp, const LWUNIQUEID* id, const char* nickname) {
+    NEW_TCP_PACKET_CAPITAL(LWPSETNICKNAME, p);
+    memcpy(p.Id, id->v, sizeof(p.Id));
+    memcpy(p.Nickname, nickname, sizeof(p.Nickname));
+    memcpy(tcp->sendbuf, &p, sizeof(p));
+    return (int)send(tcp->ConnectSocket, tcp->sendbuf, sizeof(p), 0);
+}
+
 int parse_recv_packets(LWTCP* tcp) {
     LWCONTEXT* pLwc = tcp->pLwc;
     // too small for parsing

@@ -22,7 +22,7 @@
 #define UINT_PTR unsigned int *
 #endif
 
-UINT_PTR sock;                        /* Socket descriptor */
+SOCKET sock;                        /* Socket descriptor */
 struct sockaddr_in echoServAddr; /* Echo server address */
 struct sockaddr_in fromAddr;     /* Source address of echo */
 unsigned short echoServPort;     /* Echo server port */

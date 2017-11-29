@@ -11,6 +11,7 @@ int tcp_send_newuser(LWTCP* tcp);
 int tcp_send_querynick(LWTCP* tcp, const LWUNIQUEID* id);
 int tcp_send_push_token(LWTCP* tcp, int backoffMs, int domain, const char* push_token);
 int tcp_send_get_leaderboard(LWTCP* tcp, int backoffMs, int start_index, int count);
+int tcp_send_setnickname(LWTCP* tcp, const LWUNIQUEID* id, const char* nickname);
 int parse_recv_packets(LWTCP* tcp);
 const char* lw_tcp_addr(const LWCONTEXT* pLwc);
 const char* lw_tcp_port_str(const LWCONTEXT* pLwc);

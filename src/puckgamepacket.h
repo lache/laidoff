@@ -33,6 +33,8 @@ typedef enum _LW_PUCK_GAME_PACKET {
     LPGP_LWPGETLEADERBOARD = 212,
     LPGP_LWPLEADERBOARD = 213,
     LPGP_LWPBATTLERESULT = 214,
+    LPGP_LWPSETNICKNAME = 215,
+    LPGP_LWPSETNICKNAMERESULT = 216,
 
 	// internal admin tcp
 	LPGP_LWPCREATEBATTLE = 1000,
@@ -231,12 +233,12 @@ typedef struct _LWPBASE {
 } LWPBASE;
 
 typedef struct _LWPCREATEBATTLE {
-	unsigned short size;
-	unsigned short type;
-	unsigned int id1[4];
-	unsigned int id2[4];
-    char nickname1[LW_NICKNAME_MAX_LEN];
-    char nickname2[LW_NICKNAME_MAX_LEN];
+	unsigned short Size;
+	unsigned short Type;
+	unsigned int Id1[4];
+	unsigned int Id2[4];
+    char Nickname1[LW_NICKNAME_MAX_LEN];
+    char Nickname2[LW_NICKNAME_MAX_LEN];
 } LWPCREATEBATTLE;
 
 typedef struct _LWPCREATEBATTLEOK {
@@ -302,5 +304,19 @@ typedef struct _LWPBATTLERESULT {
     char Nickname1[LW_NICKNAME_MAX_LEN];
     char Nickname2[LW_NICKNAME_MAX_LEN];
 } LWPBATTLERESULT;
+
+typedef struct _LWPSETNICKNAME {
+    unsigned short Size;
+    unsigned short Type;
+    unsigned int Id[4];
+    char Nickname[LW_NICKNAME_MAX_LEN];
+} LWPSETNICKNAME;
+
+typedef struct _LWPSETNICKNAMERESULT {
+    unsigned short Size;
+    unsigned short Type;
+    unsigned int Id[4];
+    char Nickname[LW_NICKNAME_MAX_LEN];
+} LWPSETNICKNAMERESULT;
 
 //#pragma pack(pop)
