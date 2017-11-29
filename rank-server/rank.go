@@ -45,7 +45,10 @@ func (t *Rank) SetWithNickname(id UserId, newScore int, nickname string) (int, i
 			t.IdScoreMap[id] = newScore
 			newRank, newTieCount := updateScoreDesc(&t.ScoreArray, oldScore, newScore)
 			moveUserIdWithinSlice(&t.IdArray, oldIdArrayIndex, newRank)
+			t.NicknameArray[oldIdArrayIndex] = nickname
 			moveStringWithinSlice(&t.NicknameArray, oldIdArrayIndex, newRank)
+			// Update nickname (if changed)
+			//t.NicknameArray[newRank] = nickname
 			return newRank, newTieCount
 		}
 		return -1, -1
@@ -241,7 +244,7 @@ func (t *RankService) GetLeaderboard(args *shared_server.LeaderboardRequest, rep
 
 func main() {
 	log.SetFlags(log.Lshortfile | log.LstdFlags)
-	selfTest()
+	//selfTest()
 	server := rpc.NewServer()
 	rankService := &RankService{
 		newRank(),

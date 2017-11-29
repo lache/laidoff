@@ -46,7 +46,7 @@ func main() {
 		log.Fatalf("conf.json parse error:%v", err.Error())
 	}
 	// Test RPC
-	testRpc(serviceList)
+	//testRpc(serviceList)
 	// Create 1 vs. 1 match queue
 	matchQueue := make(chan user.UserAgent)
 	// Start match worker goroutine
