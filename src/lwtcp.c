@@ -41,20 +41,57 @@ int tcp_connect(LWTCP* tcp) {
         }
         
         make_socket_nonblocking(tcp->ConnectSocket);
-        
-        fd_set fdset;
+
         // Connect to server
-        connect(tcp->ConnectSocket, tcp->ptr->ai_addr, (int)tcp->ptr->ai_addrlen);
-        FD_ZERO(&fdset);
-        FD_SET(tcp->ConnectSocket, &fdset);
-        struct timeval connect_timeout;
-        connect_timeout.tv_sec = 3;
-        connect_timeout.tv_usec = 0;
-        if (select(tcp->ConnectSocket+1, NULL, &fdset, NULL, &connect_timeout) != 1) {
-            LOGE("TCP connect timeout");
-            closesocket(tcp->ConnectSocket);
-            tcp->ConnectSocket = INVALID_SOCKET;
-            continue;
+        int connect_ret = connect(tcp->ConnectSocket, tcp->ptr->ai_addr, (int)tcp->ptr->ai_addrlen);
+        if (connect_ret == -1) {
+            if (errno != EINPROGRESS) {
+                LOGE("TCP connect failed! (refused?)");
+                closesocket(tcp->ConnectSocket);
+                tcp->ConnectSocket = INVALID_SOCKET;
+                continue;
+            }
+            fd_set fdset;
+            FD_ZERO(&fdset);
+            FD_SET(tcp->ConnectSocket, &fdset);
+            struct timeval connect_timeout;
+            connect_timeout.tv_sec = 3;
+            connect_timeout.tv_usec = 0;
+            int select_ret = select(tcp->ConnectSocket+1, NULL, &fdset, NULL, &connect_timeout);
+            if (select_ret == 0) {
+                LOGE("TCP connect timeout");
+                closesocket(tcp->ConnectSocket);
+                tcp->ConnectSocket = INVALID_SOCKET;
+                continue;
+            }
+            if (select_ret != 1) {
+                LOGE("TCP connect select failed");
+                closesocket(tcp->ConnectSocket);
+                tcp->ConnectSocket = INVALID_SOCKET;
+                continue;
+            }
+            if (!FD_ISSET(tcp->ConnectSocket, &fdset)) {
+                LOGE("TCP connect failed!");
+                closesocket(tcp->ConnectSocket);
+                tcp->ConnectSocket = INVALID_SOCKET;
+                continue;
+            }
+            int optval;
+            socklen_t optlen;
+            optval = -1;
+            optlen = sizeof(optval);
+            if (getsockopt(tcp->ConnectSocket, SOL_SOCKET, SO_ERROR, &optval, &optlen) == -1) {
+                LOGE("getsockopt error");
+                continue;
+            }
+            if (optval == 0) {
+                // Connection ok.
+            } else {
+                LOGE("Connection error, optval=%d (%s)", optval, strerror(optval));
+                closesocket(tcp->ConnectSocket);
+                tcp->ConnectSocket = INVALID_SOCKET;
+                continue;
+            }
         }
         break;
     }
