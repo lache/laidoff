@@ -49,7 +49,7 @@ int tcp_connect(LWTCP* tcp) {
             if (tcp_connect_errno == 0) {
                 LOGI("[INFO] TCP connect() returned value indicates it finished synchronously (connecting to localhost?)");
             } else {
-                if (tcp_connect_errno != EINPROGRESS && tcp_connect_errno != 0) {
+                if (tcp_connect_errno != EAGAIN && tcp_connect_errno != EINPROGRESS && tcp_connect_errno != 0) {
                     LOGE("TCP connect failed! (refused?)");
                     closesocket(tcp->ConnectSocket);
                     tcp->ConnectSocket = INVALID_SOCKET;

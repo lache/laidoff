@@ -287,13 +287,13 @@ static void render_radial_wave(const LWCONTEXT* pLwc,
     glDepthMask(GL_TRUE);
 }
 
-static void render_timer(const LWCONTEXT* pLwc, float remain_sec) {
+static void render_timer(const LWCONTEXT* pLwc, float remain_sec, float total_sec) {
     // Render text
     LWTEXTBLOCK text_block;
-    text_block.align = LTBA_CENTER_TOP;
+    text_block.align = LTBA_CENTER_CENTER;
     text_block.text_block_width = DEFAULT_TEXT_BLOCK_WIDTH;
     text_block.text_block_line_height = DEFAULT_TEXT_BLOCK_LINE_HEIGHT_E;
-    text_block.size = DEFAULT_TEXT_BLOCK_SIZE_A;
+    text_block.size = DEFAULT_TEXT_BLOCK_SIZE_D;
     text_block.multiline = 1;
     SET_COLOR_RGBA_FLOAT(text_block.color_normal_glyph, 1, 1, 1, 1);
     SET_COLOR_RGBA_FLOAT(text_block.color_normal_outline, 0, 0, 0, 1);
@@ -305,13 +305,45 @@ static void render_timer(const LWCONTEXT* pLwc, float remain_sec) {
     } else {
         sprintf(str, u8"%.0f", remain_sec);
     }
+    float remain_ratio = 1.0f;
+    if (total_sec != 0) {
+        remain_ratio = remain_sec / total_sec;
+    }
+    float x = 0.0f;
+    float y = 0.9f;
     text_block.text = str;
     text_block.text_bytelen = (int)strlen(text_block.text);
     text_block.begin_index = 0;
     text_block.end_index = text_block.text_bytelen;
-    text_block.text_block_x = 0.0f;
-    text_block.text_block_y = 1.0f - 0.05f;
+    text_block.text_block_x = x;
+    text_block.text_block_y = y;
     render_text_block(pLwc, &text_block);
+
+    const LWSHADER* shader = &pLwc->shader[LWST_RINGGAUGE];
+
+    glUseProgram(shader->program);
+    glUniform3f(shader->full_color, 0, 1, 0);
+    glUniform3f(shader->empty_color, 1, 0, 0);
+    glUniform1f(shader->gauge_ratio, remain_ratio);
+
+    // text origin point debug indicator
+    render_solid_vb_ui_flip_y_uv_shader_rot(
+        pLwc,
+        x,
+        y,
+        0.0425f,
+        0.0425f,
+        0,//pLwc->tex_atlas[LVT_RINGGAUGE],
+        LVT_RINGGAUGETHICK,
+        1.0f,
+        0,
+        1,
+        0,
+        1,
+        0,
+        LWST_RINGGAUGE,
+        (float)M_PI
+    );
 }
 
 static void render_dash_ring_gauge(const LWCONTEXT* pLwc, vec4 player_pos) {
@@ -397,9 +429,10 @@ static void render_match_state(const LWCONTEXT* pLwc) {
 }
 
 static void render_hp_gauge(const LWCONTEXT* pLwc,
-                            float x, float y, int current_hp, int total_hp, float hp_shake_remain_time, int right, const char* str) {
-    const float gauge_width = 1.2f;
-    const float gauge_height = 0.1f;
+                            float w, float h,
+                            float x, float y, int current_hp, int total_hp, float hp_shake_remain_time, int left, const char* str) {
+    const float gauge_width = w;
+    const float gauge_height = h;
     //const float gauge_flush_height = 0.07f;
     const float base_color = 0.1f;
     // Positioinal offset by shake
@@ -410,11 +443,14 @@ static void render_hp_gauge(const LWCONTEXT* pLwc,
         y += ratio * (2 * rand() / (float)RAND_MAX - 1.0f) * shake_magnitude;
     }
     // Render background (gray)
-    render_solid_vb_ui(pLwc,
-                       x, y, gauge_width, gauge_height,
+    /*render_solid_vb_ui(pLwc,
+                       x,
+                       y,
+                       gauge_width,
+                       gauge_height,
                        0,
-                       LVT_CENTER_TOP_ANCHORED_SQUARE,
-                       1, base_color, base_color, base_color, 1);
+                       LVT_CENTER_BOTTOM_ANCHORED_SQUARE,
+                       1, base_color, base_color, base_color, 1);*/
     const float cell_border = 0.015f;
     if (total_hp > 0) {
         const float cell_width = (gauge_width - cell_border * (total_hp + 1)) / total_hp;
@@ -422,7 +458,7 @@ static void render_hp_gauge(const LWCONTEXT* pLwc,
         const float cell_x_stride = cell_width + cell_border;
         for (int i = 0; i < total_hp; i++) {
             float r = base_color, g = base_color, b = base_color;
-            if (right) {
+            if (left) {
                 if (total_hp - current_hp > i) {
                     r = 1;
                 } else {
@@ -436,9 +472,12 @@ static void render_hp_gauge(const LWCONTEXT* pLwc,
                 }
             }
             
-            // Render background (green)
+            // Render foreground (green or red)
             render_solid_vb_ui(pLwc,
-                               cell_x_0 + cell_x_stride * i, y - gauge_height / 2, cell_width, gauge_height - cell_border * 2,
+                               cell_x_0 + cell_x_stride * i,
+                               y + gauge_height / 2,
+                               cell_width,
+                               gauge_height - cell_border * 2,
                                0,
                                LVT_LEFT_CENTER_ANCHORED_SQUARE,
                                1, r, g, b, 1);
@@ -446,7 +485,7 @@ static void render_hp_gauge(const LWCONTEXT* pLwc,
     }
     // Render text
     LWTEXTBLOCK text_block;
-    text_block.align = LTBA_CENTER_BOTTOM;
+    text_block.align = left ? LTBA_LEFT_TOP : LTBA_RIGHT_TOP;
     text_block.text_block_width = DEFAULT_TEXT_BLOCK_WIDTH;
     text_block.text_block_line_height = DEFAULT_TEXT_BLOCK_LINE_HEIGHT_E;
     text_block.size = DEFAULT_TEXT_BLOCK_SIZE_E;
@@ -459,7 +498,7 @@ static void render_hp_gauge(const LWCONTEXT* pLwc,
     text_block.text_bytelen = (int)strlen(text_block.text);
     text_block.begin_index = 0;
     text_block.end_index = text_block.text_bytelen;
-    text_block.text_block_x = x;
+    text_block.text_block_x = left ? -pLwc->aspect_ratio : +pLwc->aspect_ratio;
     text_block.text_block_y = y;
     render_text_block(pLwc, &text_block);
 }
@@ -874,10 +913,18 @@ void lwc_render_physics(const LWCONTEXT* pLwc, const mat4x4 view, const mat4x4 p
     //render_dash_gauge(pLwc);
     // HP gauges (player & target)
     const char* target_nickname = puck_game->battle_id ? puck_game->target_nickname : "== Searching opponent ==";
-    render_hp_gauge(pLwc, -0.8f, 1.0f - 0.1f, state->player_current_hp, state->player_total_hp, player->hp_shake_remain_time, 1, puck_game->nickname);
-    render_hp_gauge(pLwc, +0.8f, 1.0f - 0.1f, state->target_current_hp, state->target_total_hp, target->hp_shake_remain_time, 0, target_nickname);
+    const float gauge_width = pLwc->aspect_ratio * 0.9f;
+    const float gauge_height = 0.075f;
+    const float gauge1_x = -pLwc->aspect_ratio + gauge_width / 2;
+    const float gauge1_y = 1.0f - gauge_height;
+    const float gauge2_x = pLwc->aspect_ratio - gauge_width / 2;
+    const float gauge2_y = 1.0f - gauge_height;
+    render_hp_gauge(pLwc, gauge_width, gauge_height, gauge1_x, gauge1_y, state->player_current_hp, state->player_total_hp, player->hp_shake_remain_time, 1, puck_game->nickname);
+    render_hp_gauge(pLwc, gauge_width, gauge_height, gauge2_x, gauge2_y, state->target_current_hp, state->target_total_hp, target->hp_shake_remain_time, 0, target_nickname);
     // Battle timer (center top of the screen)
-    render_timer(pLwc, puck_game_remain_time(pLwc->puck_game->total_time, state->update_tick));
+    render_timer(pLwc,
+                 puck_game_remain_time(pLwc->puck_game->total_time, state->update_tick),
+                 pLwc->puck_game->total_time);
     // Match state text (bottom of the screen)
     render_match_state(pLwc);
     // Dash ring gauge

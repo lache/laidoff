@@ -706,6 +706,9 @@ static void init_vbo(LWCONTEXT* pLwc) {
     // LVT_RINGGAUGE
     load_vbo(pLwc, ASSETS_BASE_PATH "vbo" PATH_SEPARATOR "ringgauge.vbo",
              &pLwc->vertex_buffer[LVT_RINGGAUGE]);
+    // LVT_RINGGAUGETHICK
+    load_vbo(pLwc, ASSETS_BASE_PATH "vbo" PATH_SEPARATOR "ringgaugethick.vbo",
+             &pLwc->vertex_buffer[LVT_RINGGAUGETHICK]);
     // LVT_RADIALWAVE
     load_vbo(pLwc, ASSETS_BASE_PATH "vbo" PATH_SEPARATOR "radialwave.vbo",
              &pLwc->vertex_buffer[LVT_RADIALWAVE]);
@@ -1015,8 +1018,8 @@ int get_tex_index_by_hash_key(const LWCONTEXT* pLwc, const char *hash_key) {
 
 void render_stat(const LWCONTEXT* pLwc) {
     LWTEXTBLOCK text_block;
-    text_block.align = LTBA_LEFT_TOP;
-    text_block.text_block_width = DEFAULT_TEXT_BLOCK_WIDTH;
+    text_block.align = LTBA_RIGHT_BOTTOM;
+    text_block.text_block_width = DEFAULT_TEXT_BLOCK_WIDTH / 2;
     text_block.text_block_line_height = DEFAULT_TEXT_BLOCK_LINE_HEIGHT_F;
     text_block.size = DEFAULT_TEXT_BLOCK_SIZE_F;
     SET_COLOR_RGBA_FLOAT(text_block.color_normal_glyph, 1, 1, 1, 1);
@@ -1024,7 +1027,7 @@ void render_stat(const LWCONTEXT* pLwc) {
     SET_COLOR_RGBA_FLOAT(text_block.color_emp_glyph, 1, 1, 0, 1);
     SET_COLOR_RGBA_FLOAT(text_block.color_emp_outline, 0, 0, 0, 1);
     char msg[128];
-    sprintf(msg, "L:%.1f\nR:%.1f\nRMSG:%d(%d-%d)",
+    sprintf(msg, "L:%.1f R:%.1f RMSG:%d(%d-%d)",
         (float)(1.0 / deltatime_history_avg(pLwc->update_dt)),
             (float)(1.0 / deltatime_history_avg(pLwc->render_dt)),
             pLwc->rmsg_send_count - pLwc->rmsg_recv_count,
@@ -1035,8 +1038,8 @@ void render_stat(const LWCONTEXT* pLwc) {
     text_block.text_bytelen = (int)strlen(text_block.text);
     text_block.begin_index = 0;
     text_block.end_index = text_block.text_bytelen;
-    text_block.text_block_x = -pLwc->aspect_ratio;
-    text_block.text_block_y = 1.0f;
+    text_block.text_block_x = pLwc->aspect_ratio;
+    text_block.text_block_y = -1.0f;
     text_block.multiline = 1;
     render_text_block(pLwc, &text_block);
 }
