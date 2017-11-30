@@ -8,7 +8,7 @@
 #define TEX texture
 #endif
 
-precision mediump float;
+precision highp float;
 
 uniform sampler2D diffuse;
 uniform float alpha_multiplier;
@@ -26,5 +26,5 @@ void main()
     vec4 t = TEX(diffuse, uv); // + vec4(color, 0.0);
     fragColor = (1.0 - overlay_color_ratio) * t + overlay_color_ratio * vec4(overlay_color, t.a);
 	fragColor.rgb *= multiply_color;
-    fragColor.a *= (1 - talpha) * alpha_multiplier;
+    fragColor.a *= (1.0 - talpha) * alpha_multiplier;
 }
