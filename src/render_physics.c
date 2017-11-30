@@ -154,32 +154,12 @@ static void render_go(const LWCONTEXT* pLwc, const mat4x4 view, const mat4x4 pro
     glUniform3f(shader->overlay_color_location, 1, 1, 1);
     glUniform1f(shader->overlay_color_ratio_location, 0);
     
-    mat4x4 rot;
-    mat4x4_identity(rot);
+    
     float sx = render_scale * go->radius, sy = render_scale * go->radius, sz = render_scale * go->radius;
     float x = render_scale * (remote_pos ? remote_pos[0] : go->pos[0]);
     float y = render_scale * (remote_pos ? remote_pos[1] : go->pos[1]);
     float z = render_scale * (remote_pos ? remote_pos[2] : go->pos[2]);
-    
-    mat4x4 model;
-    mat4x4_identity(model);
-    mat4x4_mul(model, model, rot);
-    mat4x4_scale_aniso(model, model, sx, sy, sz);
-    //mat4x4_scale_aniso(model, model, 5, 5, 5);
-    
-    mat4x4 model_translate;
-    mat4x4_translate(model_translate, x, y, z);
-    
-    mat4x4_mul(model, remote ? remote_rot : go->rot, model);
-    mat4x4_mul(model, model_translate, model);
-    
-    mat4x4 view_model;
-    mat4x4_mul(view_model, view, model);
-    
-    mat4x4 proj_view_model;
-    mat4x4_identity(proj_view_model);
-    mat4x4_mul(proj_view_model, proj, view_model);
-    
+
     int puck_owner_player_no = remote ? pLwc->puck_game_state.puck_owner_player_no : pLwc->puck_game->puck_owner_player_no;
     
     const float e = 2.718f;
@@ -210,6 +190,28 @@ static void render_go(const LWCONTEXT* pLwc, const mat4x4 view, const mat4x4 pro
     }
     glUniform1f(shader->overlay_color_ratio_location, red_overlay_logistic_ratio);
     
+    mat4x4 rot;
+    mat4x4_identity(rot);
+
+    mat4x4 model;
+    mat4x4_identity(model);
+    mat4x4_mul(model, model, rot);
+    mat4x4_scale_aniso(model, model, sx, sy, sz);
+    //mat4x4_scale_aniso(model, model, 5, 5, 5);
+
+    mat4x4 model_translate;
+    mat4x4_translate(model_translate, x, y, z);
+
+    mat4x4_mul(model, remote ? remote_rot : go->rot, model);
+    mat4x4_mul(model, model_translate, model);
+
+    mat4x4 view_model;
+    mat4x4_mul(view_model, view, model);
+
+    mat4x4 proj_view_model;
+    mat4x4_identity(proj_view_model);
+    mat4x4_mul(proj_view_model, proj, view_model);
+
     const LW_VBO_TYPE lvt = LVT_PUCK;
     glBindBuffer(GL_ARRAY_BUFFER, pLwc->vertex_buffer[lvt].vertex_buffer);
     bind_all_vertex_attrib(pLwc, lvt);
@@ -220,6 +222,69 @@ static void render_go(const LWCONTEXT* pLwc, const mat4x4 view, const mat4x4 pro
     glUniformMatrix4fv(shader->mvp_location, 1, GL_FALSE, (const GLfloat*)proj_view_model);
     glDrawArrays(GL_TRIANGLES, 0, pLwc->vertex_buffer[lvt].vertex_count);
     glUniform3f(shader->multiply_color_location, 1, 1, 1);
+}
+
+static void render_radial_wave(const LWCONTEXT* pLwc,
+                               const mat4x4 view,
+                               const mat4x4 proj,
+                               const LWPUCKGAMEOBJECT* go,
+                               int tex_index,
+                               float render_scale,
+                               const float* remote_pos,
+                               const mat4x4 remote_rot,
+                               int remote,
+                               float speed) {
+    const float uv_offset[2] = { -(float)pLwc->app_time / 2, 0.0f };
+    const float uv_scale[2] = { 0.75f, 1.0f };
+    const float scale = 0.75f;
+    const float alpha = 0.20f;
+
+    int shader_index = LWST_RADIALWAVE;
+    const LWSHADER* shader = &pLwc->shader[shader_index];
+    glUseProgram(shader->program);
+    glUniform2fv(shader->vuvoffset_location, 1, uv_offset);
+    glUniform2fv(shader->vuvscale_location, 1, uv_scale);
+    glUniform2fv(shader->vs9offset_location, 1, default_uv_offset);
+    glUniform1f(shader->alpha_multiplier_location, alpha);
+    glUniform1i(shader->diffuse_location, 0); // 0 means GL_TEXTURE0
+    glUniform1i(shader->alpha_only_location, 1); // 1 means GL_TEXTURE1
+    glUniform3f(shader->overlay_color_location, 1, 1, 1);
+    glUniform1f(shader->overlay_color_ratio_location, 0);
+    glUniform1f(shader->wrap_offset, 0);
+
+    float x = render_scale * (remote_pos ? remote_pos[0] : go->pos[0]);
+    float y = render_scale * (remote_pos ? remote_pos[1] : go->pos[1]);
+    float z = render_scale * (remote_pos ? remote_pos[2] : go->pos[2]);
+
+    mat4x4 rot, model, model_translate, view_model, proj_view_model;
+
+    mat4x4_identity(rot);
+    mat4x4_identity(model);
+    mat4x4_mul(model, model, rot);
+    mat4x4_scale_aniso(model, model, scale, scale, scale);
+    mat4x4_translate(model_translate, x, y, z);
+    mat4x4_mul(model, model_translate, model);
+    mat4x4_mul(view_model, view, model);
+    mat4x4_identity(proj_view_model);
+    mat4x4_mul(proj_view_model, proj, view_model);
+
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE);
+    glDepthMask(GL_FALSE);
+
+    const LW_VBO_TYPE lvt = LVT_RADIALWAVE;
+    glBindBuffer(GL_ARRAY_BUFFER, pLwc->vertex_buffer[lvt].vertex_buffer);
+    bind_all_vertex_attrib(pLwc, lvt);
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D, pLwc->tex_atlas[LAE_LINEARWAVE]);
+    set_tex_filter(GL_LINEAR, GL_LINEAR);
+    //set_tex_filter(GL_NEAREST, GL_NEAREST);
+    glUniformMatrix4fv(shader->mvp_location, 1, GL_FALSE, (const GLfloat*)proj_view_model);
+    glDrawArrays(GL_TRIANGLES, 0, pLwc->vertex_buffer[lvt].vertex_count);
+    glUniform3f(shader->multiply_color_location, 1, 1, 1);
+
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    glDepthMask(GL_TRUE);
 }
 
 static void render_timer(const LWCONTEXT* pLwc, float remain_sec) {
@@ -603,6 +668,7 @@ static void render_lwbutton(const LWCONTEXT* pLwc, const LWBUTTONLIST* button_li
         float or = 1.0f;
         float og = 1.0f;
         float ob = 1.0f;
+        // Pull button hardcoding
         if (i == 0 && pLwc->puck_game->pull_puck) {
             or = 0.2f;
             ob = 0.2f;
@@ -778,6 +844,10 @@ void lwc_render_physics(const LWCONTEXT* pLwc, const mat4x4 view, const mat4x4 p
     // Game object: Player
     render_go(pLwc, view, proj, &puck_game->go[LPGO_PLAYER], pLwc->tex_atlas[player_no == 2 ? LAE_PUCK_ENEMY_KTX : LAE_PUCK_PLAYER_KTX],
               1.0f, remote_player_pos, state->player_rot, remote, 0);
+    if (pLwc->puck_game->pull_puck) {
+        render_radial_wave(pLwc, view, proj, &puck_game->go[LPGO_PLAYER], pLwc->tex_atlas[player_no == 2 ? LAE_PUCK_ENEMY_KTX : LAE_PUCK_PLAYER_KTX],
+                           1.0f, remote_player_pos, state->player_rot, remote, 0);
+    }
     // Game object: Enemy
     render_go(pLwc, view, proj, &puck_game->go[LPGO_TARGET], pLwc->tex_atlas[player_no == 2 ? LAE_PUCK_PLAYER_KTX : LAE_PUCK_ENEMY_KTX],
               1.0f, remote_target_pos, state->target_rot, remote, 0);

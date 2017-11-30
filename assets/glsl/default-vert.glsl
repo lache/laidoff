@@ -16,6 +16,7 @@ attribute vec2 vUv;
 attribute vec2 vS9;
 varying vec3 color;
 varying vec2 uv;
+varying float talpha;
 
 void main()
 {
@@ -24,4 +25,6 @@ void main()
     gl_Position = MVP * vec4(p, 1.0);
     color = vCol;
     uv = vUvOffset + vUvScale * vUv;
+	talpha = vPos.x * vPos.x + vPos.y * vPos.y;
+	talpha = talpha * talpha;
 }

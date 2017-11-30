@@ -77,4 +77,5 @@ typedef struct _LWSHADER {
     GLint gauge_ratio;
     GLint full_color;
     GLint empty_color;
+    GLint wrap_offset;
 } LWSHADER;
