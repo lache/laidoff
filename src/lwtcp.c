@@ -45,42 +45,47 @@ int tcp_connect(LWTCP* tcp) {
         // Connect to server
         int connect_ret = connect(tcp->ConnectSocket, tcp->ptr->ai_addr, (int)tcp->ptr->ai_addrlen);
         if (connect_ret == -1) {
-            if (errno != EINPROGRESS) {
-                LOGE("TCP connect failed! (refused?)");
-                closesocket(tcp->ConnectSocket);
-                tcp->ConnectSocket = INVALID_SOCKET;
-                continue;
-            }
-            fd_set fdset;
-            FD_ZERO(&fdset);
-            FD_SET(tcp->ConnectSocket, &fdset);
-            struct timeval connect_timeout;
-            connect_timeout.tv_sec = 3;
-            connect_timeout.tv_usec = 0;
-            int select_ret = select(tcp->ConnectSocket+1, NULL, &fdset, NULL, &connect_timeout);
-            if (select_ret == 0) {
-                LOGE("TCP connect timeout");
-                closesocket(tcp->ConnectSocket);
-                tcp->ConnectSocket = INVALID_SOCKET;
-                continue;
-            }
-            if (select_ret != 1) {
-                LOGE("TCP connect select failed");
-                closesocket(tcp->ConnectSocket);
-                tcp->ConnectSocket = INVALID_SOCKET;
-                continue;
-            }
-            if (!FD_ISSET(tcp->ConnectSocket, &fdset)) {
-                LOGE("TCP connect failed!");
-                closesocket(tcp->ConnectSocket);
-                tcp->ConnectSocket = INVALID_SOCKET;
-                continue;
+            int tcp_connect_errno = errno;
+            if (tcp_connect_errno == 0) {
+                LOGI("[INFO] TCP connect() returned value indicates it finished synchronously (connecting to localhost?)");
+            } else {
+                if (tcp_connect_errno != EINPROGRESS && tcp_connect_errno != 0) {
+                    LOGE("TCP connect failed! (refused?)");
+                    closesocket(tcp->ConnectSocket);
+                    tcp->ConnectSocket = INVALID_SOCKET;
+                    continue;
+                }
+                fd_set fdset;
+                FD_ZERO(&fdset);
+                FD_SET(tcp->ConnectSocket, &fdset);
+                struct timeval connect_timeout;
+                connect_timeout.tv_sec = 3;
+                connect_timeout.tv_usec = 0;
+                int select_ret = select(tcp->ConnectSocket + 1, NULL, &fdset, NULL, &connect_timeout);
+                if (select_ret == 0) {
+                    LOGE("TCP connect timeout");
+                    closesocket(tcp->ConnectSocket);
+                    tcp->ConnectSocket = INVALID_SOCKET;
+                    continue;
+                }
+                if (select_ret != 1) {
+                    LOGE("TCP connect select failed");
+                    closesocket(tcp->ConnectSocket);
+                    tcp->ConnectSocket = INVALID_SOCKET;
+                    continue;
+                }
+                if (!FD_ISSET(tcp->ConnectSocket, &fdset)) {
+                    LOGE("TCP connect failed!");
+                    closesocket(tcp->ConnectSocket);
+                    tcp->ConnectSocket = INVALID_SOCKET;
+                    continue;
+                }
             }
             int optval;
             socklen_t optlen;
             optval = -1;
             optlen = sizeof(optval);
-            if (getsockopt(tcp->ConnectSocket, SOL_SOCKET, SO_ERROR, &optval, &optlen) == -1) {
+            if (getsockopt(tcp->ConnectSocket, SOL_SOCKET, SO_ERROR, (char*)&optval, &optlen) == -1) {
                 LOGE("getsockopt error");
                 continue;
             }
