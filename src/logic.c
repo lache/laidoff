@@ -757,7 +757,7 @@ void lwc_update(LWCONTEXT* pLwc, double delta_time) {
 	// Touch start point will follow if the distance
 	// between touch start point and current touch point
 	// aparted by some amount...
-    dir_pad_follow_start_position(&pLwc->left_dir_pad, 0.4f);
+    dir_pad_follow_start_position(&pLwc->left_dir_pad, 0.2f);
 	
 	script_emit_logic_frame_finish(pLwc->L, (float)delta_time);
 

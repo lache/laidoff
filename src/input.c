@@ -361,6 +361,8 @@ static void simulate_dir_pad_touch_input(LWCONTEXT* pLwc) {
     pLwc->left_dir_pad.y = dir_pad_center_y + (pLwc->player_move_up - pLwc->player_move_down) / 5.0f;
     pLwc->left_dir_pad.start_x = dir_pad_center_x;
     pLwc->left_dir_pad.start_y = dir_pad_center_y;
+    pLwc->left_dir_pad.touch_began_x = dir_pad_center_x;
+    pLwc->left_dir_pad.touch_began_y = dir_pad_center_y;
 }
 
 void lw_press_key_left(LWCONTEXT* pLwc) {

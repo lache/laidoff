@@ -34,6 +34,64 @@ void render_dir_pad(const LWCONTEXT* pLwc, float x, float y) {
     glDrawArrays(GL_TRIANGLES, 0, pLwc->vertex_buffer[vbo_index].vertex_count);
 }
 
+void render_dir_pad_joystick_type(const LWCONTEXT* pLwc, float x, float y, LW_ATLAS_ENUM lae) {
+    int shader_index = LWST_DEFAULT;
+    const int vbo_index = LVT_CENTER_CENTER_ANCHORED_SQUARE;
+    const float size = 0.25f;
+    mat4x4 model;
+    mat4x4_identity(model);
+    mat4x4_rotate_X(model, model, 0);
+    mat4x4_scale_aniso(model, model, size, size, size);
+    mat4x4 model_translate;
+    mat4x4_translate(model_translate, x, y, 0);
+    mat4x4_mul(model, model_translate, model);
+
+    mat4x4 view_model;
+    mat4x4 view; mat4x4_identity(view);
+    mat4x4_mul(view_model, view, model);
+
+    mat4x4 proj_view_model;
+    mat4x4_identity(proj_view_model);
+    mat4x4_mul(proj_view_model, pLwc->proj, view_model);
+
+    const LWSHADER* shader = &pLwc->shader[shader_index];
+
+    glUseProgram(shader->program);
+    glUniform2fv(shader->vuvoffset_location, 1, default_uv_offset);
+    glUniform2fv(shader->vuvscale_location, 1, default_uv_scale);
+    glUniform2fv(shader->vs9offset_location, 1, default_uv_offset);
+    glUniform1f(shader->alpha_multiplier_location, 1.0f);
+    glUniform1i(shader->diffuse_location, 0); // 0 means GL_TEXTURE0
+    glUniform3f(shader->overlay_color_location, 1, 1, 1);
+    glUniform1f(shader->overlay_color_ratio_location, 0);
+
+    glBindBuffer(GL_ARRAY_BUFFER, pLwc->vertex_buffer[vbo_index].vertex_buffer);
+    bind_all_vertex_attrib(pLwc, vbo_index);
+    glUniformMatrix4fv(shader->mvp_location, 1, GL_FALSE, (const GLfloat*)proj_view_model);
+    glActiveTexture(GL_TEXTURE0);
+    glUniform1i(shader->diffuse_location, 0); // 0 means GL_TEXTURE0
+    glBindTexture(GL_TEXTURE_2D, pLwc->tex_atlas[lae]);
+    set_tex_filter(GL_LINEAR, GL_LINEAR);
+
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE);
+    glDepthMask(GL_FALSE);
+
+    glDrawArrays(GL_TRIANGLES, 0, pLwc->vertex_buffer[vbo_index].vertex_count);
+
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    glDepthMask(GL_TRUE);
+}
+
+void render_dir_pad_joystick_area(const LWCONTEXT* pLwc, float x, float y) {
+    render_dir_pad_joystick_type(pLwc, x, y, LAE_JOYSTICKAREA);
+}
+
+void render_dir_pad_joystick(const LWCONTEXT* pLwc, float x, float y) {
+    render_dir_pad_joystick_type(pLwc, x, y, LAE_JOYSTICK);
+}
+
+
 void render_dir_pad_with_start(const LWCONTEXT* pLwc, const LWDIRPAD* dir_pad) {
     // Current touch position
     render_dir_pad(pLwc, dir_pad->x, dir_pad->y);
@@ -43,8 +101,19 @@ void render_dir_pad_with_start(const LWCONTEXT* pLwc, const LWDIRPAD* dir_pad) {
     }
 }
 
+void render_dir_pad_with_start_joystick(const LWCONTEXT* pLwc, const LWDIRPAD* dir_pad) {
+    if (dir_pad->dragging) {
+        render_dir_pad_joystick_area(pLwc, dir_pad->start_x, dir_pad->start_y);
+    } else {
+        render_dir_pad_joystick_area(pLwc, dir_pad->origin_x, dir_pad->origin_y);
+    }
+    
+    // Current touch position
+    render_dir_pad_joystick(pLwc, dir_pad->x, dir_pad->y);
+}
+
 float get_dir_pad_size_radius() {
-    return 0.75f;
+    return 0.55f;
 }
 
 void get_right_dir_pad_original_center(const float aspect_ratio, float *x, float *y) {
@@ -106,6 +175,8 @@ int dir_pad_press(LWDIRPAD* dir_pad, float x, float y, int pointer_id,
         && !dir_pad->dragging) {
         dir_pad->start_x = x;
         dir_pad->start_y = y;
+        dir_pad->touch_began_x = x;
+        dir_pad->touch_began_y = y;
         dir_pad->x = x;
         dir_pad->y = y;
         dir_pad->dragging = 1;
@@ -154,9 +225,22 @@ void dir_pad_follow_start_position(LWDIRPAD* dir_pad, float max_dist) {
         const float dx = dir_pad->x - dir_pad->start_x;
         const float dy = dir_pad->y - dir_pad->start_y;
         const float cur_dist = sqrtf(dx*dx + dy*dy);
+
         if (cur_dist > max_dist) {
-            dir_pad->start_x = dir_pad->x + (-dx) / cur_dist * max_dist;
-            dir_pad->start_y = dir_pad->y + (-dy) / cur_dist * max_dist;
+            float new_start_x = dir_pad->x + (-dx) / cur_dist * max_dist;
+            float new_start_y = dir_pad->y + (-dy) / cur_dist * max_dist;
+
+            const float dx2 = new_start_x - dir_pad->touch_began_x;
+            const float dy2 = new_start_y - dir_pad->touch_began_y;
+            const float org_dist = sqrtf(dx2*dx2 + dy2*dy2);
+            const float max_org_dist = 0.2f;
+            if (org_dist < max_org_dist) {
+                dir_pad->start_x = new_start_x;
+                dir_pad->start_y = new_start_y;
+            } else {
+                dir_pad->start_x = dir_pad->touch_began_x + dx2 / org_dist * max_org_dist;
+                dir_pad->start_y = dir_pad->touch_began_y + dy2 / org_dist * max_org_dist;
+            }
         }
     }
 }

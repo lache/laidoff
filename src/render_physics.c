@@ -901,7 +901,7 @@ void lwc_render_physics(const LWCONTEXT* pLwc, const mat4x4 view, const mat4x4 p
     }
     // Render damage texts
     render_damage_text(pLwc, view, proj, pLwc->proj);
-    render_dir_pad_with_start(pLwc, &pLwc->left_dir_pad);
+    render_dir_pad_with_start_joystick(pLwc, &pLwc->left_dir_pad);
     if (pLwc->control_flags & LCF_PUCK_GAME_RIGHT_DIR_PAD) {
         render_dir_pad_with_start(pLwc, &pLwc->right_dir_pad);
     }

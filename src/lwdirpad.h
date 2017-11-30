@@ -11,13 +11,17 @@ typedef struct _LWDIRPAD {
     float x;
     // Current dir pad y coordinate (screen coordinate)
     float y;
-    // Touch start x coordinate (screen coordinate)
+    // Touch start x coordinate (screen coordinate) -- could be FOLLOWED while dragging
     float start_x;
-    // Touch start y coordinate (screen coordinate)
+    // Touch start y coordinate (screen coordinate) -- could be FOLLOWED while dragging
     float start_y;
-    // Original center x coordinate (screen coordinate)
+    // Touch start x coordinate (screen coordinate) -- DETERMINED at touch began, CONSTANT while dragging
+    float touch_began_x;
+    // Touch start y coordinate (screen coordinate) -- DETERMINED at touch began, CONSTANT while dragging
+    float touch_began_y;
+    // Original center x coordinate (screen coordinate) -- CONSTANT during runtime
     float origin_x;
-    // Original center y coordinate (screen coordinate)
+    // Original center y coordinate (screen coordinate) -- CONSTANT during runtime
     float origin_y;
 } LWDIRPAD;
 
@@ -35,3 +39,6 @@ int dir_pad_release(LWDIRPAD* dir_pad, int pointer_id);
 void render_dir_pad(const LWCONTEXT* pLwc, float x, float y);
 void render_dir_pad_with_start(const LWCONTEXT* pLwc, const LWDIRPAD* dir_pad);
 void dir_pad_follow_start_position(LWDIRPAD* dir_pad, float max_dist);
+void render_dir_pad_joystick_area(const LWCONTEXT* pLwc, float x, float y);
+void render_dir_pad_joystick(const LWCONTEXT* pLwc, float x, float y);
+void render_dir_pad_with_start_joystick(const LWCONTEXT* pLwc, const LWDIRPAD* dir_pad);

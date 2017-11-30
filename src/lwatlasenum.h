@@ -99,6 +99,8 @@ typedef enum _LW_ATLAS_ENUM
     LAE_ARROW,
     LAE_RADIALWAVE,
     LAE_LINEARWAVE,
+    LAE_JOYSTICKAREA,
+    LAE_JOYSTICK,
     
     LAE_COUNT,
 } LW_ATLAS_ENUM;
@@ -199,6 +201,8 @@ static const char *tex_atlas_filename[] = {
     ASSETS_BASE_PATH "ktx" PATH_SEPARATOR "arrow.ktx",
     ASSETS_BASE_PATH "ktx" PATH_SEPARATOR "radialwave.ktx",
     ASSETS_BASE_PATH "ktx" PATH_SEPARATOR "linearwave.ktx",
+    ASSETS_BASE_PATH "ktx" PATH_SEPARATOR "joystickarea.ktx",
+    ASSETS_BASE_PATH "ktx" PATH_SEPARATOR "joystick.ktx",
 };
 
 #define MAX_TEX_ATLAS LAE_COUNT
