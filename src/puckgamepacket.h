@@ -133,6 +133,17 @@ typedef struct _LWPPULLSTOP {
 	int token;
 } LWPPULLSTOP;
 
+typedef struct _LWPSTATEBITFIELD {
+    unsigned int player_current_hp : 4;
+    unsigned int player_total_hp : 4;
+    unsigned int target_current_hp : 4;
+    unsigned int target_total_hp : 4;
+    unsigned int puck_owner_player_no : 2;
+    unsigned int finished : 1;
+    unsigned int player_pull: 1;
+    unsigned int target_pull : 1;
+} LWPSTATEBITFIELD;
+
 // UDP
 typedef struct _LWPSTATE {
 	int type;
@@ -152,16 +163,10 @@ typedef struct _LWPSTATE {
 	float target_rot[4][4];
 	float target_speed;
 	float target_move_rad;
-	// HP
-	int player_current_hp;
-	int player_total_hp;
-	int target_current_hp;
-	int target_total_hp;
-    // puck
-    int puck_owner_player_no;
+    // reflect size
     float puck_reflect_size;
-	// battle state
-	int finished;
+    // bitfield
+    LWPSTATEBITFIELD bf;
 } LWPSTATE;
 
 // should be 4-byte aligned...

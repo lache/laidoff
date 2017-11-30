@@ -1317,7 +1317,7 @@ void lwc_prerender_mutable_context(LWCONTEXT* pLwc) {
             LWPSTATE sampled_state;
             linear_interpolate_state(&sampled_state, pLwc->udp->state_buffer, LW_STATE_RING_BUFFER_CAPACITY, sample_update_tick);
             //memcpy(&pLwc->puck_game_state, &sampled_state, sizeof(LWPSTATE));
-            const int player_damage = pLwc->puck_game_state.player_current_hp - p.player_current_hp;
+            const int player_damage = pLwc->puck_game_state.bf.player_current_hp - p.bf.player_current_hp;
             vec4 world_point_1 = {
                 p.player[0], p.player[1], p.player[2], 1.0f,
             };
@@ -1358,7 +1358,7 @@ void lwc_prerender_mutable_context(LWCONTEXT* pLwc) {
                 calculate_ui_point_from_world_point(pLwc->aspect_ratio, proj_view, player_tower_world_point, ui_point);
                 spawn_damage_text(pLwc, ui_point[0], ui_point[1], 0, "1", LDTC_UI);
             }
-            const int target_damage = pLwc->puck_game_state.target_current_hp - p.target_current_hp;
+            const int target_damage = pLwc->puck_game_state.bf.target_current_hp - p.bf.target_current_hp;
             if (target_damage > 0) {
                 pLwc->puck_game->target.hp_shake_remain_time = pLwc->puck_game->hp_shake_time;
                 pLwc->puck_game->tower[pLwc->puck_game->player_no == 2 ? 0 : 1/*target*/].shake_remain_time = pLwc->puck_game->tower_shake_time;

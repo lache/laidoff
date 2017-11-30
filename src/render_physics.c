@@ -54,11 +54,11 @@ static void render_tower(const LWCONTEXT* pLwc, const mat4x4 view, const mat4x4 
     if (remote) {
         float hp_ratio1 = 0;
         float hp_ratio2 = 0;
-        if (pLwc->puck_game_state.player_total_hp) {
-            hp_ratio1 = (float)pLwc->puck_game_state.player_current_hp / pLwc->puck_game_state.player_total_hp;
+        if (pLwc->puck_game_state.bf.player_total_hp) {
+            hp_ratio1 = (float)pLwc->puck_game_state.bf.player_current_hp / pLwc->puck_game_state.bf.player_total_hp;
         }
-        if (pLwc->puck_game_state.target_total_hp) {
-            hp_ratio2 = (float)pLwc->puck_game_state.target_current_hp / pLwc->puck_game_state.target_total_hp;
+        if (pLwc->puck_game_state.bf.target_total_hp) {
+            hp_ratio2 = (float)pLwc->puck_game_state.bf.target_current_hp / pLwc->puck_game_state.bf.target_total_hp;
         }
         
         if (tower->owner_player_no == 1) {
@@ -160,7 +160,7 @@ static void render_go(const LWCONTEXT* pLwc, const mat4x4 view, const mat4x4 pro
     float y = render_scale * (remote_pos ? remote_pos[1] : go->pos[1]);
     float z = render_scale * (remote_pos ? remote_pos[2] : go->pos[2]);
 
-    int puck_owner_player_no = remote ? pLwc->puck_game_state.puck_owner_player_no : pLwc->puck_game->puck_owner_player_no;
+    int puck_owner_player_no = remote ? pLwc->puck_game_state.bf.puck_owner_player_no : pLwc->puck_game->puck_owner_player_no;
     
     const float e = 2.718f;
     const float red_overlay_ratio = go->red_overlay ? LWMIN(1.0f, speed / go->puck_game->puck_damage_contact_speed_threshold) : 0;
@@ -394,8 +394,8 @@ static void render_match_state(const LWCONTEXT* pLwc) {
     SET_COLOR_RGBA_FLOAT(text_block.color_emp_glyph, 1, 1, 0, 1);
     SET_COLOR_RGBA_FLOAT(text_block.color_emp_outline, 0, 0, 0, 1);
     char str[128];
-    if (pLwc->puck_game_state.finished) {
-        int hp_diff = pLwc->puck_game_state.player_current_hp - pLwc->puck_game_state.target_current_hp;
+    if (pLwc->puck_game_state.bf.finished) {
+        int hp_diff = pLwc->puck_game_state.bf.player_current_hp - pLwc->puck_game_state.bf.target_current_hp;
         if (hp_diff == 0) {
             sprintf(str, u8"DRAW (BID:%d) (TOUCH 'JUMP' TO REMATCH)", pLwc->puck_game->battle_id);
         } else if (hp_diff > 0) {
@@ -777,7 +777,7 @@ void lwc_render_physics(const LWCONTEXT* pLwc, const mat4x4 view, const mat4x4 p
     }
 
     float puck_sphere_col[3];
-    int puck_owner_player_no = remote ? state->puck_owner_player_no : puck_game->puck_owner_player_no;
+    int puck_owner_player_no = remote ? state->bf.puck_owner_player_no : puck_game->puck_owner_player_no;
     if (puck_owner_player_no == 0) {
         puck_sphere_col[0] = 0.3f;
         puck_sphere_col[1] = 0.3f;
@@ -883,13 +883,17 @@ void lwc_render_physics(const LWCONTEXT* pLwc, const mat4x4 view, const mat4x4 p
     // Game object: Player
     render_go(pLwc, view, proj, &puck_game->go[LPGO_PLAYER], pLwc->tex_atlas[player_no == 2 ? LAE_PUCK_ENEMY_KTX : LAE_PUCK_PLAYER_KTX],
               1.0f, remote_player_pos, state->player_rot, remote, 0);
-    if (pLwc->puck_game->pull_puck) {
+    if (remote ? state->bf.player_pull : pLwc->puck_game->pull_puck) {
         render_radial_wave(pLwc, view, proj, &puck_game->go[LPGO_PLAYER], pLwc->tex_atlas[player_no == 2 ? LAE_PUCK_ENEMY_KTX : LAE_PUCK_PLAYER_KTX],
                            1.0f, remote_player_pos, state->player_rot, remote, 0);
     }
     // Game object: Enemy
     render_go(pLwc, view, proj, &puck_game->go[LPGO_TARGET], pLwc->tex_atlas[player_no == 2 ? LAE_PUCK_PLAYER_KTX : LAE_PUCK_ENEMY_KTX],
               1.0f, remote_target_pos, state->target_rot, remote, 0);
+    if (state->bf.target_pull) {
+        render_radial_wave(pLwc, view, proj, &puck_game->go[LPGO_TARGET], pLwc->tex_atlas[player_no == 2 ? LAE_PUCK_PLAYER_KTX : LAE_PUCK_ENEMY_KTX],
+                  1.0f, remote_target_pos, state->target_rot, remote, 0);
+    }
     // Towers
     for (int i = 0; i < LW_PUCK_GAME_TOWER_COUNT; i++) {
         float tower_pos[] = {
@@ -919,8 +923,8 @@ void lwc_render_physics(const LWCONTEXT* pLwc, const mat4x4 view, const mat4x4 p
     const float gauge1_y = 1.0f - gauge_height;
     const float gauge2_x = pLwc->aspect_ratio - gauge_width / 2;
     const float gauge2_y = 1.0f - gauge_height;
-    render_hp_gauge(pLwc, gauge_width, gauge_height, gauge1_x, gauge1_y, state->player_current_hp, state->player_total_hp, player->hp_shake_remain_time, 1, puck_game->nickname);
-    render_hp_gauge(pLwc, gauge_width, gauge_height, gauge2_x, gauge2_y, state->target_current_hp, state->target_total_hp, target->hp_shake_remain_time, 0, target_nickname);
+    render_hp_gauge(pLwc, gauge_width, gauge_height, gauge1_x, gauge1_y, state->bf.player_current_hp, state->bf.player_total_hp, player->hp_shake_remain_time, 1, puck_game->nickname);
+    render_hp_gauge(pLwc, gauge_width, gauge_height, gauge2_x, gauge2_y, state->bf.target_current_hp, state->bf.target_total_hp, target->hp_shake_remain_time, 0, target_nickname);
     // Battle timer (center top of the screen)
     render_timer(pLwc,
                  puck_game_remain_time(pLwc->puck_game->total_time, state->update_tick),
