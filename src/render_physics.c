@@ -859,23 +859,75 @@ void lwc_render_physics(const LWCONTEXT* pLwc, const mat4x4 view, const mat4x4 p
         sphere_render_uniform.sphere_col[1][1] = 1.0f;
         sphere_render_uniform.sphere_col[1][2] = 0.8f;
     }
-    const float wall_height = 0.8f;
+    const float wall_height = 1.6f;
     const LWPUCKGAMEPLAYER* player = &puck_game->player;
     const LWPUCKGAMEPLAYER* target = &puck_game->target;
     // Floor
     render_floor(pLwc, proj, puck_game, floor_shader_index, view, &sphere_render_uniform);
     // North wall
-    render_wall(pLwc, proj, puck_game, wall_shader_index, view, 0, 2, 0, (float)LWDEG2RAD(90), 0,
-                LVT_CENTER_BOTTOM_ANCHORED_SQUARE, 2.0f, wall_height, 2.0f, &sphere_render_uniform);
+    render_wall(pLwc,
+                proj,
+                puck_game,
+                wall_shader_index,
+                view,
+                0,
+                puck_game->world_size / 2,
+                0,
+                (float)LWDEG2RAD(90),
+                0,
+                LVT_CENTER_BOTTOM_ANCHORED_SQUARE,
+                puck_game->world_size / 2,
+                wall_height / 2,
+                puck_game->world_size / 2,
+                &sphere_render_uniform);
     // South wall
-    render_wall(pLwc, proj, puck_game, wall_shader_index, view, 0, -2, 0, (float)LWDEG2RAD(-90), 0,
-                LVT_CENTER_TOP_ANCHORED_SQUARE, 2.0f, wall_height, 2.0f, &sphere_render_uniform);
+    render_wall(pLwc,
+                proj,
+                puck_game,
+                wall_shader_index,
+                view,
+                0,
+                -puck_game->world_size / 2,
+                0,
+                (float)LWDEG2RAD(-90),
+                0,
+                LVT_CENTER_TOP_ANCHORED_SQUARE,
+                puck_game->world_size / 2,
+                wall_height / 2,
+                puck_game->world_size / 2,
+                &sphere_render_uniform);
     // East wall
-    render_wall(pLwc, proj, puck_game, wall_shader_index, view, 2, 0, 0, 0, (float)LWDEG2RAD(90),
-                LVT_LEFT_CENTER_ANCHORED_SQUARE, wall_height, 2.0f, 2.0f, &sphere_render_uniform);
+    render_wall(pLwc,
+                proj,
+                puck_game,
+                wall_shader_index,
+                view,
+                puck_game->world_size / 2,
+                0,
+                0,
+                0,
+                (float)LWDEG2RAD(90),
+                LVT_LEFT_CENTER_ANCHORED_SQUARE,
+                wall_height / 2,
+                puck_game->world_size / 2,
+                puck_game->world_size / 2,
+                &sphere_render_uniform);
     // West wall
-    render_wall(pLwc, proj, puck_game, wall_shader_index, view, -2, 0, 0, 0, (float)LWDEG2RAD(-90),
-                LVT_RIGHT_CENTER_ANCHORED_SQUARE, wall_height, 2.0f, 2.0f, &sphere_render_uniform);
+    render_wall(pLwc,
+                proj,
+                puck_game,
+                wall_shader_index,
+                view,
+                -puck_game->world_size / 2,
+                0,
+                0,
+                0,
+                (float)LWDEG2RAD(-90),
+                LVT_RIGHT_CENTER_ANCHORED_SQUARE,
+                wall_height / 2,
+                puck_game->world_size / 2,
+                puck_game->world_size / 2,
+                &sphere_render_uniform);
     const int player_no = pLwc->puck_game->player_no;
     // Game object: Puck
     render_go(pLwc, view, proj, &puck_game->go[LPGO_PUCK], pLwc->tex_atlas[LAE_PUCK_GRAY_KTX],
