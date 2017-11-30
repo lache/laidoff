@@ -113,7 +113,7 @@ void render_dir_pad_with_start_joystick(const LWCONTEXT* pLwc, const LWDIRPAD* d
 }
 
 float get_dir_pad_size_radius() {
-    return 0.55f;
+    return 0.6f;
 }
 
 void get_right_dir_pad_original_center(const float aspect_ratio, float *x, float *y) {
@@ -142,10 +142,6 @@ int lw_get_normalized_dir_pad_input(const LWCONTEXT* pLwc, const LWDIRPAD* dir_p
     if (!dir_pad->dragging) {
         return 0;
     }
-
-    float dir_pad_center_x = 0;
-    float dir_pad_center_y = 0;
-    get_left_dir_pad_original_center(pLwc->aspect_ratio, &dir_pad_center_x, &dir_pad_center_y);
 
     *dx = dir_pad->x - dir_pad->start_x;
     *dy = dir_pad->y - dir_pad->start_y;
@@ -220,20 +216,20 @@ int dir_pad_release(LWDIRPAD* dir_pad, int pointer_id) {
     return have_dragged;
 }
 
-void dir_pad_follow_start_position(LWDIRPAD* dir_pad, float max_dist) {
+void dir_pad_follow_start_position(LWDIRPAD* dir_pad) {
     if (dir_pad->dragging) {
         const float dx = dir_pad->x - dir_pad->start_x;
         const float dy = dir_pad->y - dir_pad->start_y;
         const float cur_dist = sqrtf(dx*dx + dy*dy);
 
-        if (cur_dist > max_dist) {
-            float new_start_x = dir_pad->x + (-dx) / cur_dist * max_dist;
-            float new_start_y = dir_pad->y + (-dy) / cur_dist * max_dist;
+        if (cur_dist > dir_pad->max_follow_distance) {
+            float new_start_x = dir_pad->x + (-dx) / cur_dist * dir_pad->max_follow_distance;
+            float new_start_y = dir_pad->y + (-dy) / cur_dist * dir_pad->max_follow_distance;
 
             const float dx2 = new_start_x - dir_pad->touch_began_x;
             const float dy2 = new_start_y - dir_pad->touch_began_y;
             const float org_dist = sqrtf(dx2*dx2 + dy2*dy2);
-            const float max_org_dist = 0.2f;
+            const float max_org_dist = dir_pad->max_began_distance;
             if (org_dist < max_org_dist) {
                 dir_pad->start_x = new_start_x;
                 dir_pad->start_y = new_start_y;
@@ -243,4 +239,22 @@ void dir_pad_follow_start_position(LWDIRPAD* dir_pad, float max_dist) {
             }
         }
     }
+}
+
+void dir_pad_init(LWDIRPAD* dir_pad,
+                  float origin_x,
+                  float origin_y,
+                  float max_follow_distance,
+                  float max_began_distance) {
+    memset(dir_pad, 0, sizeof(LWDIRPAD));
+    dir_pad->x = origin_x;
+    dir_pad->y = origin_y;
+    dir_pad->start_x = origin_x;
+    dir_pad->start_y = origin_y;
+    dir_pad->touch_began_x = origin_x;
+    dir_pad->touch_began_y = origin_y;
+    dir_pad->origin_x = origin_x;
+    dir_pad->origin_y = origin_y;
+    dir_pad->max_follow_distance = max_follow_distance;
+    dir_pad->max_began_distance = max_began_distance;
 }

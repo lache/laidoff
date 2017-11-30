@@ -23,8 +23,17 @@ typedef struct _LWDIRPAD {
     float origin_x;
     // Original center y coordinate (screen coordinate) -- CONSTANT during runtime
     float origin_y;
+    // Max distance between '(x,y)' and '(start_x, start_y)' -- CONSTANT during runtime
+    float max_follow_distance;
+    // Max distance between '(start_x, start_y)' and '(touch_began_x, touch_began_y)' -- CONSTANT during runtime
+    float max_began_distance;
 } LWDIRPAD;
 
+void dir_pad_init(LWDIRPAD* dir_pad,
+                  float origin_x,
+                  float origin_y,
+                  float max_follow_distance,
+                  float max_began_distance);
 void reset_dir_pad_position(LWDIRPAD* dir_pad);
 int lw_get_normalized_dir_pad_input(const LWCONTEXT* pLwc, const LWDIRPAD* dir_pad, float *dx, float *dy, float *dlen);
 void get_right_dir_pad_original_center(const float aspect_ratio, float *x, float *y);
@@ -38,7 +47,7 @@ int dir_pad_release(LWDIRPAD* dir_pad, int pointer_id);
 
 void render_dir_pad(const LWCONTEXT* pLwc, float x, float y);
 void render_dir_pad_with_start(const LWCONTEXT* pLwc, const LWDIRPAD* dir_pad);
-void dir_pad_follow_start_position(LWDIRPAD* dir_pad, float max_dist);
+void dir_pad_follow_start_position(LWDIRPAD* dir_pad);
 void render_dir_pad_joystick_area(const LWCONTEXT* pLwc, float x, float y);
 void render_dir_pad_joystick(const LWCONTEXT* pLwc, float x, float y);
 void render_dir_pad_with_start_joystick(const LWCONTEXT* pLwc, const LWDIRPAD* dir_pad);

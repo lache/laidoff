@@ -40,9 +40,9 @@ void update_puck_game(LWCONTEXT* pLwc, LWPUCKGAME* puck_game, double delta_time)
     //LOGI("pos %.2f %.2f %.2f", p[0], p[1], p[2]);
     
     dJointID pcj = puck_game->player_control_joint;
-    float player_speed = puck_game_player_speed();
-    //dJointSetLMotorParam(pcj, dParamVel1, player_speed * (pLwc->player_move_right - pLwc->player_move_left));
-    //dJointSetLMotorParam(pcj, dParamVel2, player_speed * (pLwc->player_move_up - pLwc->player_move_down));
+    float player_max_speed = puck_game_player_max_speed();
+    //dJointSetLMotorParam(pcj, dParamVel1, player_max_speed * (pLwc->player_move_right - pLwc->player_move_left));
+    //dJointSetLMotorParam(pcj, dParamVel2, player_max_speed * (pLwc->player_move_up - pLwc->player_move_down));
     
     switch (pLwc->udp->state) {
         case LUS_INIT:
@@ -88,12 +88,20 @@ void update_puck_game(LWCONTEXT* pLwc, LWPUCKGAME* puck_game, double delta_time)
     //pLwc->player_pos_last_moved_dx
     float dx, dy, dlen;
     if (lw_get_normalized_dir_pad_input(pLwc, &pLwc->left_dir_pad, &dx, &dy, &dlen)) {
+        const float dlen_max = pLwc->left_dir_pad.max_follow_distance;
+        if (dlen > dlen_max) {
+            dlen = dlen_max;
+        }
+        float dlen_ratio = dlen / dlen_max;
+        dlen_ratio *= dlen_ratio;
+        dlen_ratio *= dlen_ratio;
+        //LOGI("dx=%.2f, dy=%.2f, dlen=%.2f, dlen_max=%.2f", dx, dy, dlen, dlen_max);
         dJointEnable(pcj);
-        dJointSetLMotorParam(pcj, dParamVel1, player_speed * dx * dlen);
-        dJointSetLMotorParam(pcj, dParamVel2, player_speed * dy * dlen);
+        dJointSetLMotorParam(pcj, dParamVel1, player_max_speed * dx * dlen_ratio);
+        dJointSetLMotorParam(pcj, dParamVel2, player_max_speed * dy * dlen_ratio);
         /*const float last_move_delta_len = sqrtf(pLwc->last_mouse_move_delta_x * pLwc->last_mouse_move_delta_x + pLwc->last_mouse_move_delta_y * pLwc->last_mouse_move_delta_y);
-         dJointSetLMotorParam(pcj, dParamVel1, player_speed * pLwc->last_mouse_move_delta_x / last_move_delta_len);
-         dJointSetLMotorParam(pcj, dParamVel2, player_speed * pLwc->last_mouse_move_delta_y / last_move_delta_len);*/
+         dJointSetLMotorParam(pcj, dParamVel1, player_max_speed * pLwc->last_mouse_move_delta_x / last_move_delta_len);
+         dJointSetLMotorParam(pcj, dParamVel2, player_max_speed * pLwc->last_mouse_move_delta_y / last_move_delta_len);*/
         
         if (!pLwc->udp->master && pLwc->udp->state == LUS_MATCHED) {
             LWPMOVE packet_move;
@@ -102,7 +110,7 @@ void update_puck_game(LWCONTEXT* pLwc, LWPUCKGAME* puck_game, double delta_time)
             packet_move.token = pLwc->puck_game->token;
             packet_move.dx = pLwc->puck_game->player_no == 2 ? -dx : dx;
             packet_move.dy = pLwc->puck_game->player_no == 2 ? -dy : dy;
-            packet_move.dlen = dlen;
+            packet_move.dlen = dlen_ratio;
             udp_send(pLwc->udp, (const char*)&packet_move, sizeof(packet_move));
         }
     }
@@ -122,11 +130,10 @@ void update_puck_game(LWCONTEXT* pLwc, LWPUCKGAME* puck_game, double delta_time)
     
     // Move direction fixed while dashing
     if (puck_game->dash.remain_time > 0) {
-        player_speed *= puck_game->dash_speed_ratio;
         dx = puck_game->dash.dir_x;
         dy = puck_game->dash.dir_y;
-        dJointSetLMotorParam(pcj, dParamVel1, player_speed * dx);
-        dJointSetLMotorParam(pcj, dParamVel2, player_speed * dy);
+        dJointSetLMotorParam(pcj, dParamVel1, puck_game_player_dash_speed() * dx);
+        dJointSetLMotorParam(pcj, dParamVel2, puck_game_player_dash_speed() * dy);
         puck_game->dash.remain_time = LWMAX(0, puck_game->dash.remain_time - (float)delta_time);
     }
     // Decrease shake remain time

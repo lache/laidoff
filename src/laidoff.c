@@ -1766,6 +1766,19 @@ LWCONTEXT* lw_init_initial_size(int width, int height) {
 
     pLwc->puck_game = new_puck_game();
 
+    float dir_pad_origin_x, dir_pad_origin_y;
+    get_left_dir_pad_original_center(pLwc->aspect_ratio, &dir_pad_origin_x, &dir_pad_origin_y);
+    dir_pad_init(&pLwc->left_dir_pad,
+                 dir_pad_origin_x,
+                 dir_pad_origin_y,
+                 0.1f,
+                 0.2f);
+    get_right_dir_pad_original_center(pLwc->aspect_ratio, &dir_pad_origin_x, &dir_pad_origin_y);
+    dir_pad_init(&pLwc->right_dir_pad,
+                 dir_pad_origin_x,
+                 dir_pad_origin_y,
+                 0.1f,
+                 0.2f);
     return pLwc;
 }
 

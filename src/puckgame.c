@@ -60,9 +60,8 @@ LWPUCKGAME* new_puck_game() {
     const int hp = 10;
     puck_game->world_size = 4.0f;
     puck_game->world_size_half = puck_game->world_size / 2.0f;
-    puck_game->dash_interval = 1.5f;
+    puck_game->dash_interval = 1.2f;
     puck_game->dash_duration = 0.1f;
-    puck_game->dash_speed_ratio = 2.0f;
     puck_game->dash_shake_time = 0.3f;
     puck_game->hp_shake_time = 0.3f;
     puck_game->puck_damage_contact_speed_threshold = 1.1f;
@@ -420,8 +419,12 @@ void puck_game_commit_fire(LWPUCKGAME* puck_game, LWPUCKGAMEFIRE* fire, int play
     fire->dir_len = puck_fire_dlen;
 }
 
-float puck_game_player_speed() {
-    return 2.5f;
+float puck_game_player_max_speed() {
+    return 1.0f;
+}
+
+float puck_game_player_dash_speed() {
+    return 6.0f;
 }
 
 void update_puck_reflect_size(LWPUCKGAME* puck_game, float delta_time) {
