@@ -3,6 +3,7 @@
 #include "lwcontext.h"
 #include "linmath.h"
 #include "laidoff.h"
+#include <string.h>
 
 void render_dir_pad(const LWCONTEXT* pLwc, float x, float y) {
     int shader_index = LWST_DEFAULT;
