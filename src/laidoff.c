@@ -1320,59 +1320,26 @@ void lwc_prerender_mutable_context(LWCONTEXT* pLwc) {
             LWPSTATE sampled_state;
             linear_interpolate_state(&sampled_state, pLwc->udp->state_buffer, LW_STATE_RING_BUFFER_CAPACITY, sample_update_tick);
             //memcpy(&pLwc->puck_game_state, &sampled_state, sizeof(LWPSTATE));
-            const int player_damage = pLwc->puck_game_state.bf.player_current_hp - p.bf.player_current_hp;
-            vec4 world_point_1 = {
-                p.player[0], p.player[1], p.player[2], 1.0f,
-            };
-            vec4 world_point_2 = {
-                p.target[0], p.target[1], p.target[2], 1.0f,
-            };
-            vec4 tower1_world_point = {
-                pLwc->puck_game->tower_pos * pLwc->puck_game->tower_pos_multiplier[0][0],
-                pLwc->puck_game->tower_pos * pLwc->puck_game->tower_pos_multiplier[0][1],
-                0.0f,
-                1.0f,
-            };
-            vec4 tower2_world_point = {
-                pLwc->puck_game->tower_pos * pLwc->puck_game->tower_pos_multiplier[1][0],
-                pLwc->puck_game->tower_pos * pLwc->puck_game->tower_pos_multiplier[1][1],
-                0.0f,
-                1.0f,
-            };
-            float* player_world_point = world_point_1;
-            float* target_world_point = world_point_2;
-            float* player_tower_world_point = tower1_world_point;
-            float* target_tower_world_point = tower2_world_point;
-            if (pLwc->puck_game->player_no == 2) {
-                player_world_point = world_point_2;
-                target_world_point = world_point_1;
-                player_tower_world_point = tower2_world_point;
-                target_tower_world_point = tower1_world_point;
-            }
+            
             // 'player' is currently playing player
             // 'target' is currently opponent player
+            const int player_damage = pLwc->puck_game_state.bf.player_current_hp - p.bf.player_current_hp;
             if (player_damage > 0) {
-                pLwc->puck_game->player.hp_shake_remain_time = pLwc->puck_game->hp_shake_time;
-                pLwc->puck_game->tower[pLwc->puck_game->player_no == 2 ? 1 : 0/*player*/].shake_remain_time = pLwc->puck_game->tower_shake_time;
-                mat4x4 proj_view;
-                mat4x4_identity(proj_view);
-                mat4x4_mul(proj_view, pLwc->puck_game_proj, pLwc->puck_game_view);
-                vec2 ui_point;
-                calculate_ui_point_from_world_point(pLwc->aspect_ratio, proj_view, player_tower_world_point, ui_point);
-                spawn_damage_text(pLwc, ui_point[0], ui_point[1], 0, "1", LDTC_UI);
+                puck_game_shake_player(pLwc->puck_game, &pLwc->puck_game->player);
+                puck_game_spawn_tower_damage_text(pLwc,
+                                                  pLwc->puck_game,
+                                                  &pLwc->puck_game->tower[pLwc->puck_game->player_no == 2 ? 1 : 0/*player*/],
+                                                  player_damage);
             }
             const int target_damage = pLwc->puck_game_state.bf.target_current_hp - p.bf.target_current_hp;
             if (target_damage > 0) {
-                pLwc->puck_game->target.hp_shake_remain_time = pLwc->puck_game->hp_shake_time;
-                pLwc->puck_game->tower[pLwc->puck_game->player_no == 2 ? 0 : 1/*target*/].shake_remain_time = pLwc->puck_game->tower_shake_time;
-                mat4x4 proj_view;
-                mat4x4_identity(proj_view);
-                mat4x4_mul(proj_view, pLwc->puck_game_proj, pLwc->puck_game_view);
-
-                vec2 ui_point;
-                calculate_ui_point_from_world_point(pLwc->aspect_ratio, proj_view, target_tower_world_point, ui_point);
-                spawn_damage_text(pLwc, ui_point[0], ui_point[1], 0, "1", LDTC_UI);
+                puck_game_shake_player(pLwc->puck_game, &pLwc->puck_game->target);
+                puck_game_spawn_tower_damage_text(pLwc,
+                                                  pLwc->puck_game,
+                                                  &pLwc->puck_game->tower[pLwc->puck_game->player_no == 2 ? 0 : 1/*target*/],
+                                                   target_damage);
             }
+            // Overwrite old game state with a new one
             memcpy(&pLwc->puck_game_state, &p, sizeof(LWPSTATE));
         } else {
             LOGE("State buffer dequeue failed.");
@@ -1768,6 +1735,7 @@ LWCONTEXT* lw_init_initial_size(int width, int height) {
     lwparabola_test();
 
     pLwc->puck_game = new_puck_game();
+    pLwc->puck_game->pLwc = pLwc;
 
     float dir_pad_origin_x, dir_pad_origin_y;
     get_left_dir_pad_original_center(pLwc->aspect_ratio, &dir_pad_origin_x, &dir_pad_origin_y);

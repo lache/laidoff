@@ -131,7 +131,6 @@ typedef struct _LWPUCKGAME {
 	float last_remote_dx;
 	float last_remote_dy;
 	int pull_puck;
-	int remote;
 	void(*on_player_damaged)(LWPUCKGAME*);
 	void(*on_target_damaged)(LWPUCKGAME*);
 	void* server;
@@ -159,6 +158,7 @@ typedef struct _LWPUCKGAME {
     float world_roll_target;
     float world_roll_target_follow_ratio;
     int world_roll_dirty;
+    void* pLwc; // opaque pointer to LWCONTEXT
 } LWPUCKGAME;
 
 LWPUCKGAME* new_puck_game();
@@ -183,3 +183,5 @@ float puck_game_player_dash_speed();
 void update_puck_ownership(LWPUCKGAME* puck_game);
 void update_puck_reflect_size(LWPUCKGAME* puck_game, float delta_time);
 void puck_game_reset(LWPUCKGAME* puck_game);
+void puck_game_remote_state_reset(LWPUCKGAME* puck_game, LWPSTATE* state);
+void puck_game_tower_pos(vec4 p_out, const LWPUCKGAME* puck_game, int owner_player_no);

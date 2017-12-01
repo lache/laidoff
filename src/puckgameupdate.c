@@ -12,6 +12,7 @@
 #include "lwtcp.h"
 #include "puckgameupdate.h"
 #include "lwtcpclient.h"
+#include "lwmath.h"
 
 void update_puck_game(LWCONTEXT* pLwc, LWPUCKGAME* puck_game, double delta_time) {
     if (!puck_game->world) {
@@ -20,10 +21,9 @@ void update_puck_game(LWCONTEXT* pLwc, LWPUCKGAME* puck_game, double delta_time)
     if (!pLwc->udp) {
         return;
     }
-    
-    puck_game->remote = !pLwc->udp->master;
-    //puck_game->on_player_damaged = puck_game->remote ? 0 : puck_game_player_decrease_hp_test;
-    //puck_game->on_target_damaged = puck_game->remote ? 0 : puck_game_target_decrease_hp_test;
+    const int remote = puck_game_remote(pLwc, puck_game);
+    puck_game->on_player_damaged = remote ? 0 : puck_game_player_tower_decrease_hp_test;
+    puck_game->on_target_damaged = remote ? 0 : puck_game_target_tower_decrease_hp_test;
     puck_game->time += (float)delta_time;
     puck_game->player.puck_contacted = 0;
     if (puck_game->battle_id == 0) {
@@ -335,11 +335,11 @@ void puck_game_rematch(LWCONTEXT* pLwc, LWPUCKGAME* puck_game) {
         && pLwc->puck_game_state.bf.finished) {
         puck_game->battle_id = 0;
         puck_game->token = 0;
-        puck_game->remote = 0;
         puck_game->player_no = 1;
         memset(&pLwc->puck_game_state, 0, sizeof(pLwc->puck_game_state));
         puck_game_reset_view_proj(pLwc, puck_game);
         puck_game_reset(puck_game);
+        puck_game_remote_state_reset(puck_game, &pLwc->puck_game_state);
         tcp_send_queue2(pLwc->tcp, &pLwc->tcp->user_id);
     }
 }
@@ -370,4 +370,41 @@ void puck_game_fire(LWCONTEXT* pLwc, LWPUCKGAME* puck_game, float puck_fire_dx, 
         packet_fire.dlen = puck_fire_dlen;
         udp_send(pLwc->udp, (const char*)&packet_fire, sizeof(packet_fire));
     }
+}
+
+void puck_game_shake_player(LWPUCKGAME* puck_game, LWPUCKGAMEPLAYER* player) {
+    player->hp_shake_remain_time = puck_game->hp_shake_time;
+}
+
+void puck_game_spawn_tower_damage_text(LWCONTEXT* pLwc, LWPUCKGAME* puck_game, LWPUCKGAMETOWER* tower, int damage) {
+    tower->shake_remain_time = puck_game->tower_shake_time;
+    mat4x4 proj_view;
+    mat4x4_identity(proj_view);
+    mat4x4_mul(proj_view, pLwc->puck_game_proj, pLwc->puck_game_view);
+    vec2 ui_point;
+    vec4 tower_world_point;
+    puck_game_tower_pos(tower_world_point, puck_game, tower->owner_player_no);
+    calculate_ui_point_from_world_point(pLwc->aspect_ratio, proj_view, tower_world_point, ui_point);
+    char damage_str[16];
+    sprintf(damage_str, "%d", damage);
+    spawn_damage_text(pLwc, ui_point[0], ui_point[1], 0, damage_str, LDTC_UI);
+}
+
+void puck_game_tower_damage_test(LWCONTEXT* pLwc, LWPUCKGAME* puck_game, LWPUCKGAMEPLAYER* player, LWPUCKGAMETOWER* tower, int damage) {
+    puck_game_shake_player(pLwc->puck_game, player);
+    puck_game_spawn_tower_damage_text(pLwc, pLwc->puck_game, tower, damage);
+}
+
+void puck_game_player_tower_decrease_hp_test(LWPUCKGAME* puck_game) {
+    puck_game_tower_damage_test(puck_game->pLwc, puck_game, &puck_game->player, &puck_game->tower[0], 1);
+}
+
+void puck_game_target_tower_decrease_hp_test(LWPUCKGAME* puck_game) {
+    puck_game_tower_damage_test(puck_game->pLwc, puck_game, &puck_game->target, &puck_game->tower[1], 1);
+}
+
+int puck_game_remote(const LWCONTEXT* pLwc, const LWPUCKGAME* puck_game) {
+    int single_play = puck_game->battle_id == 0;
+    int remote = !single_play && !pLwc->udp->master;
+    return remote;
 }

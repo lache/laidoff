@@ -24,6 +24,7 @@
 #include "lwtcp.h"
 #include "lwtcpclient.h"
 #include "lwime.h"
+#include "puckgame.h"
 
 void toggle_font_texture_test_mode(LWCONTEXT* pLwc);
 void lw_request_remote_notification_device_token(LWCONTEXT* pLwc);
@@ -611,6 +612,8 @@ void reset_runtime_context(LWCONTEXT* pLwc) {
 		pLwc->admin_button_command[i].name = handler_array[i].name;
 		pLwc->admin_button_command[i].command_handler = handler_array[i].command_handler;
 	}
+    puck_game_reset(pLwc->puck_game);
+    puck_game_remote_state_reset(pLwc->puck_game, &pLwc->puck_game_state);
 	// Run script for testing script error logging function (no effects on system)
 	script_run_file(pLwc, ASSETS_BASE_PATH "l" PATH_SEPARATOR "error_test.lua");
 	// Run post init script

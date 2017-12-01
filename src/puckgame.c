@@ -128,7 +128,7 @@ LWPUCKGAME* new_puck_game() {
         // Tower #2(SW), #3(SE) --> player 2
         puck_game->tower[i].owner_player_no = i < LW_PUCK_GAME_TOWER_COUNT / 2 ? 1 : 2;
     }
-    
+
     create_go(puck_game, LPGO_PUCK, puck_game->sphere_mass, puck_game->sphere_radius);
     create_go(puck_game, LPGO_PLAYER, puck_game->sphere_mass, puck_game->sphere_radius);
     create_go(puck_game, LPGO_TARGET, puck_game->sphere_mass, puck_game->sphere_radius);
@@ -449,6 +449,14 @@ void puck_game_reset(LWPUCKGAME* puck_game) {
     dBodySetPosition(puck_game->go[LPGO_PUCK].body, 0.0f, 0.0f, puck_game->go[LPGO_PUCK].radius);
     dBodySetPosition(puck_game->go[LPGO_PLAYER].body, -puck_game->go_start_pos, -puck_game->go_start_pos, puck_game->go[LPGO_PUCK].radius);
     dBodySetPosition(puck_game->go[LPGO_TARGET].body, +puck_game->go_start_pos, +puck_game->go_start_pos, puck_game->go[LPGO_PUCK].radius);
+    dMatrix3 rot_identity = {
+        1, 0, 0, 0,
+        0, 1, 0, 0,
+        0, 0, 1, 0,
+    };
+    dBodySetRotation(puck_game->go[LPGO_PUCK].body, rot_identity);
+    dBodySetRotation(puck_game->go[LPGO_PLAYER].body, rot_identity);
+    dBodySetRotation(puck_game->go[LPGO_TARGET].body, rot_identity);
     for (int i = 0; i < LPGO_COUNT; i++) {
         dBodySetLinearVel(puck_game->go[i].body, 0, 0, 0);
         dBodySetAngularVel(puck_game->go[i].body, 0, 0, 0);
@@ -459,4 +467,27 @@ void puck_game_reset(LWPUCKGAME* puck_game) {
     puck_game->world_roll_axis = 0;
     puck_game->world_roll_target = 0;
     puck_game->world_roll_target_follow_ratio = 0.05f;
+    puck_game->player.total_hp = 10;
+    puck_game->player.current_hp = 10;
+    puck_game->target.total_hp = 10;
+    puck_game->target.current_hp = 10;
+}
+
+void puck_game_remote_state_reset(LWPUCKGAME* puck_game, LWPSTATE* state) {
+    state->bf.puck_owner_player_no = 0;
+    state->bf.player_current_hp = 10;
+    state->bf.player_total_hp = 10;
+    state->bf.target_current_hp = 10;
+    state->bf.target_total_hp = 10;
+}
+
+void puck_game_tower_pos(vec4 p_out, const LWPUCKGAME* puck_game, int owner_player_no) {
+    if (owner_player_no != 1 && owner_player_no != 2) {
+        LOGE(LWLOGPOS "invalid owner_player_no: %d", owner_player_no);
+        return;
+    }
+    p_out[0] = puck_game->tower_pos * puck_game->tower_pos_multiplier[owner_player_no - 1][0];
+    p_out[1] = puck_game->tower_pos * puck_game->tower_pos_multiplier[owner_player_no - 1][1];
+    p_out[2] = 0.0f;
+    p_out[3] = 1.0f;
 }

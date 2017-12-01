@@ -89,7 +89,11 @@ static void render_tower(const LWCONTEXT* pLwc, const mat4x4 view, const mat4x4 
             }
         }
     } else {
-        hp_ratio = (float)tower->hp / pLwc->puck_game->tower_total_hp;
+        if (tower->owner_player_no == 1) {
+            hp_ratio = (float)puck_game->player.current_hp / puck_game->player.total_hp;
+        } else {
+            hp_ratio = (float)puck_game->target.current_hp / puck_game->target.total_hp;
+        }
     }
     int hp = (int)ceilf(pLwc->puck_game->tower_total_hp * hp_ratio);
 
@@ -1063,8 +1067,12 @@ void lwc_render_physics(const LWCONTEXT* pLwc, const mat4x4 view, const mat4x4 p
     const float gauge1_y = 1.0f - gauge_height;
     const float gauge2_x = pLwc->aspect_ratio - gauge_width / 2;
     const float gauge2_y = 1.0f - gauge_height;
-    render_hp_gauge(pLwc, gauge_width, gauge_height, gauge1_x, gauge1_y, state->bf.player_current_hp, state->bf.player_total_hp, player->hp_shake_remain_time, 1, puck_game->nickname);
-    render_hp_gauge(pLwc, gauge_width, gauge_height, gauge2_x, gauge2_y, state->bf.target_current_hp, state->bf.target_total_hp, target->hp_shake_remain_time, 0, target_nickname);
+    const int player_current_hp = remote ? state->bf.player_current_hp : puck_game->player.current_hp;
+    const int target_current_hp = remote ? state->bf.target_current_hp : puck_game->target.current_hp;
+    const int player_total_hp = remote ? state->bf.player_total_hp : puck_game->player.total_hp;
+    const int target_total_hp = remote ? state->bf.target_total_hp : puck_game->target.total_hp;
+    render_hp_gauge(pLwc, gauge_width, gauge_height, gauge1_x, gauge1_y, player_current_hp, player_total_hp, player->hp_shake_remain_time, 1, puck_game->nickname);
+    render_hp_gauge(pLwc, gauge_width, gauge_height, gauge2_x, gauge2_y, target_current_hp, target_total_hp, target->hp_shake_remain_time, 0, target_nickname);
     // Battle timer (center top of the screen)
     render_timer(pLwc,
                  puck_game_remain_time(pLwc->puck_game->total_time, state->update_tick),
