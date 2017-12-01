@@ -102,6 +102,8 @@ typedef enum _LW_ATLAS_ENUM
     LAE_JOYSTICKAREA,
     LAE_JOYSTICK,
     LAE_PHYSICS_MENU,
+    LAE_UI_CAUTION_POPUP,
+    LAE_UI_CAUTION_POPUP_ALPHA,
     
     LAE_COUNT,
 } LW_ATLAS_ENUM;
@@ -205,6 +207,8 @@ static const char *tex_atlas_filename[] = {
     ASSETS_BASE_PATH "ktx" PATH_SEPARATOR "joystickarea.ktx",
     ASSETS_BASE_PATH "ktx" PATH_SEPARATOR "joystick.ktx",
     ASSETS_BASE_PATH "ktx" PATH_SEPARATOR "physics-menu.ktx",
+    ASSETS_BASE_PATH "ktx" PATH_SEPARATOR "ui-caution-popup-a.ktx",
+    ASSETS_BASE_PATH "ktx" PATH_SEPARATOR "ui-caution-popup-a_alpha.ktx",
 };
 
 #define MAX_TEX_ATLAS LAE_COUNT

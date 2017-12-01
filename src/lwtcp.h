@@ -74,6 +74,7 @@ typedef struct _LWTCP {
     LWHOSTADDR host_addr;
     // State
     LW_UDP_STATE state;
+    int send_fail;
 } LWTCP;
 
 LWTCP* new_tcp(LWCONTEXT* pLwc,

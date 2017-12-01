@@ -12,6 +12,7 @@
 #include "lwdirpad.h"
 #include "lwmath.h"
 #include "puckgameupdate.h"
+#include "lwtcp.h"
 
 typedef struct _LWSPHERERENDERUNIFORM {
     float sphere_col_ratio[3];
@@ -812,11 +813,49 @@ static void render_lwbutton(const LWCONTEXT* pLwc, const LWBUTTONLIST* button_li
                                  pLwc->tex_atlas[b->lae_alpha],
                                  LVT_LEFT_TOP_ANCHORED_SQUARE,
                                  1.0f,
-                                 or ,
+                                 or,
                                  og,
                                  ob,
                                  1.0f);
     }
+}
+
+void render_caution_popup(const LWCONTEXT* pLwc) {
+    render_solid_vb_ui_alpha(pLwc,
+                             0,
+                             0,
+                             1.5f,
+                             1.5f,
+                             pLwc->tex_atlas[LAE_UI_CAUTION_POPUP],
+                             pLwc->tex_atlas[LAE_UI_CAUTION_POPUP_ALPHA],
+                             LVT_CENTER_CENTER_ANCHORED_SQUARE,
+                             1.0f,
+                             0.0f,
+                             0.0f,
+                             0.0f,
+                             0.0f);
+    // Render text
+    LWTEXTBLOCK text_block;
+    text_block.align = LTBA_LEFT_TOP;
+    text_block.text_block_width = 1.0f;
+    text_block.text_block_line_height = DEFAULT_TEXT_BLOCK_LINE_HEIGHT_E;
+    text_block.size = DEFAULT_TEXT_BLOCK_SIZE_E;
+    text_block.multiline = 1;
+    SET_COLOR_RGBA_FLOAT(text_block.color_normal_glyph, 1, 1, 0, 1);
+    SET_COLOR_RGBA_FLOAT(text_block.color_normal_outline, 0, 0, 0, 0);
+    SET_COLOR_RGBA_FLOAT(text_block.color_emp_glyph, 1, 1, 0, 1);
+    SET_COLOR_RGBA_FLOAT(text_block.color_emp_outline, 0, 0, 0, 1);
+    char str[256];
+    sprintf(str, "Server disconnected.\nPlease check your internet\nconnection.");
+    float x = -0.5f;
+    float y = 0.15f;
+    text_block.text = str;
+    text_block.text_bytelen = (int)strlen(text_block.text);
+    text_block.begin_index = 0;
+    text_block.end_index = text_block.text_bytelen;
+    text_block.text_block_x = x;
+    text_block.text_block_y = y;
+    render_text_block(pLwc, &text_block);
 }
 
 void lwc_render_physics(const LWCONTEXT* pLwc, const mat4x4 view, const mat4x4 proj) {
@@ -1110,4 +1149,8 @@ void lwc_render_physics(const LWCONTEXT* pLwc, const mat4x4 view, const mat4x4 p
         lwbutton_lae_append(&(((LWCONTEXT*)pLwc)->button_list), "jump_button", button_x_interval * 3 + button_x_0, button_y_0 + button_y_interval * 2, button_size, button_size, LAE_BUTTON_JUMP, LAE_BUTTON_JUMP_ALPHA);
     }
     render_lwbutton(pLwc, &pLwc->button_list);
+    
+    if (pLwc->tcp->send_fail || (pLwc->udp && pLwc->udp->ready == 0)) {
+        render_caution_popup(pLwc);
+    }
 }
