@@ -712,6 +712,9 @@ static void init_vbo(LWCONTEXT* pLwc) {
     // LVT_RADIALWAVE
     load_vbo(pLwc, ASSETS_BASE_PATH "vbo" PATH_SEPARATOR "radialwave.vbo",
              &pLwc->vertex_buffer[LVT_RADIALWAVE]);
+    // LVT_PHYSICS_MENU
+    load_vbo(pLwc, ASSETS_BASE_PATH "vbo" PATH_SEPARATOR "physics-menu.vbo",
+             &pLwc->vertex_buffer[LVT_PHYSICS_MENU]);
 
     // LVT_LEFT_TOP_ANCHORED_SQUARE ~ LVT_RIGHT_BOTTOM_ANCHORED_SQUARE
     // 9 anchored squares...

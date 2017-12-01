@@ -153,6 +153,12 @@ typedef struct _LWPUCKGAME {
     unsigned int id2[4];
     int puck_owner_player_no;
     float puck_reflect_size;
+    int world_roll_axis; // 0: x-axis, 1: y-axis, 2: z-axis
+    int world_roll_dir; // 0: positive, 1: negative
+    float world_roll;
+    float world_roll_target;
+    float world_roll_target_follow_ratio;
+    int world_roll_dirty;
 } LWPUCKGAME;
 
 LWPUCKGAME* new_puck_game();

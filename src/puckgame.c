@@ -59,7 +59,7 @@ LWPUCKGAME* new_puck_game() {
     memset(puck_game, 0, sizeof(LWPUCKGAME));
     const int hp = 10;
     puck_game->world_size = 4.0f;
-    puck_game->world_size_half = puck_game->world_size / 2.0f;
+    puck_game->world_size_half = puck_game->world_size / 2;
     puck_game->dash_interval = 1.2f;
     puck_game->dash_duration = 0.1f;
     puck_game->dash_shake_time = 0.3f;
@@ -455,4 +455,8 @@ void puck_game_reset(LWPUCKGAME* puck_game) {
         dBodySetForce(puck_game->go[i].body, 0, 0, 0);
         dBodySetTorque(puck_game->go[i].body, 0, 0, 0);
     }
+    puck_game->world_roll = 0;
+    puck_game->world_roll_axis = 0;
+    puck_game->world_roll_target = 0;
+    puck_game->world_roll_target_follow_ratio = 0.05f;
 }

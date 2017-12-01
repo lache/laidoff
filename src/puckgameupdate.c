@@ -212,6 +212,17 @@ void update_puck_game(LWCONTEXT* pLwc, LWPUCKGAME* puck_game, double delta_time)
     }
     update_puck_ownership(puck_game);
     update_puck_reflect_size(puck_game, (float)delta_time);
+
+    if (puck_game->world_roll_dirty) {
+        const float world_roll_diff = puck_game->world_roll_target - puck_game->world_roll;
+        if (fabsf(world_roll_diff) < LWEPSILON) {
+            puck_game->world_roll = puck_game->world_roll_target;
+            puck_game->world_roll_dirty = 0;
+            LOGI("World roll transition finished");
+        } else {
+            puck_game->world_roll += world_roll_diff * puck_game->world_roll_target_follow_ratio;
+        }
+    }
 }
 
 void puck_game_jump(LWCONTEXT* pLwc, LWPUCKGAME* puck_game) {

@@ -231,6 +231,40 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
 		play_sound(LWS_WING);
 		lw_set_kp(pLwc, 5);
 	}
+
+    // West
+    if (key == GLFW_KEY_KP_4 && action == GLFW_PRESS) {
+        pLwc->puck_game->world_roll_dir = 1;
+        pLwc->puck_game->world_roll_axis = 1;
+        pLwc->puck_game->world_roll_target = (float)LWDEG2RAD(180);
+        pLwc->puck_game->world_roll_dirty = 1;
+    }
+    // East
+    if (key == GLFW_KEY_KP_6 && action == GLFW_PRESS) {
+        pLwc->puck_game->world_roll_dir = 0;
+        pLwc->puck_game->world_roll_axis = 1;
+        pLwc->puck_game->world_roll_target = (float)LWDEG2RAD(180);
+        pLwc->puck_game->world_roll_dirty = 1;
+    }
+    // Center (puck battle scene)
+    if (key == GLFW_KEY_KP_5 && action == GLFW_PRESS) {
+        pLwc->puck_game->world_roll_target = 0;
+        pLwc->puck_game->world_roll_dirty = 1;
+    }
+    // North
+    if (key == GLFW_KEY_KP_8 && action == GLFW_PRESS) {
+        pLwc->puck_game->world_roll_dir = 0;
+        pLwc->puck_game->world_roll_axis = 0;
+        pLwc->puck_game->world_roll_target = (float)LWDEG2RAD(180);
+        pLwc->puck_game->world_roll_dirty = 1;
+    }
+    // South
+    if (key == GLFW_KEY_KP_2 && action == GLFW_PRESS) {
+        pLwc->puck_game->world_roll_dir = 1;
+        pLwc->puck_game->world_roll_axis = 0;
+        pLwc->puck_game->world_roll_target = (float)LWDEG2RAD(180);
+        pLwc->puck_game->world_roll_dirty = 1;
+    }
 }
 
 void char_callback(GLFWwindow* window, unsigned int c) {
