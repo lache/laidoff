@@ -138,13 +138,14 @@ int parse_recv_packets(LWTCP* tcp) {
             pLwc->puck_game->battle_id = p->battle_id;
             pLwc->puck_game->token = p->token;
             pLwc->puck_game->player_no = p->player_no;
-            pLwc->udp->master = 0;
-            pLwc->udp->token = 1; // should be other than zero
-            pLwc->udp->state = LUS_MATCHED;
+            pLwc->tcp->state = LUS_MATCHED;
+            // create UDP socket for battle sync
+            pLwc->udp = new_udp();
+            // make a copy of target nickname
             memcpy(pLwc->puck_game->target_nickname, p->target_nickname, sizeof(p->target_nickname));
             pLwc->udp_host_addr.host_resolved = *(unsigned long*)p->ipaddr;
             sprintf(pLwc->udp_host_addr.host, "%d.%d.%d.%d",
-                ((int)pLwc->udp_host_addr.host_resolved >> 0) & 0xff,
+                    ((int)pLwc->udp_host_addr.host_resolved >> 0) & 0xff,
                     ((int)pLwc->udp_host_addr.host_resolved >> 8) & 0xff,
                     ((int)pLwc->udp_host_addr.host_resolved >> 16) & 0xff,
                     ((int)pLwc->udp_host_addr.host_resolved >> 24) & 0xff);
@@ -235,3 +236,4 @@ const char* lw_tcp_port_str(const LWCONTEXT* pLwc) {
 int lw_tcp_port(const LWCONTEXT* pLwc) {
     return pLwc->tcp_host_addr.port;
 }
+

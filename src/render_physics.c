@@ -11,6 +11,7 @@
 #include "lwdamagetext.h"
 #include "lwdirpad.h"
 #include "lwmath.h"
+#include "puckgameupdate.h"
 
 typedef struct _LWSPHERERENDERUNIFORM {
     float sphere_col_ratio[3];
@@ -829,8 +830,7 @@ void lwc_render_physics(const LWCONTEXT* pLwc, const mat4x4 view, const mat4x4 p
     int wall_shader_index = LWST_SPHERE_REFLECT;
     int floor_shader_index = LWST_SPHERE_REFLECT_FLOOR;
 
-    int single_play = puck_game->battle_id == 0;
-    int remote = !single_play && !pLwc->udp->master;
+    const int remote = puck_game_remote(pLwc, pLwc->puck_game);
     const float* player_pos = puck_game->go[LPGO_PLAYER].pos;
     const float* target_pos = puck_game->go[LPGO_TARGET].pos;
     const float* puck_pos = puck_game->go[LPGO_PUCK].pos;

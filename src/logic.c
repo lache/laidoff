@@ -359,7 +359,7 @@ static void reinit_mq(LWCONTEXT* pLwc) {
 
 	deinit_mq(pLwc->mq);
 
-    pLwc->mq = init_mq(server_addr[pLwc->server_index], pLwc->def_sys_msg);
+    pLwc->mq = 0;//init_mq(server_addr[pLwc->server_index], pLwc->def_sys_msg);
 }
 
 void connect_to_server_0(LWCONTEXT* pLwc) {
@@ -888,7 +888,7 @@ static void s_logic_worker(zsock_t *pipe, void *args) {
 	// Create a new udp instance here since
 	// WSAStartup should be called within
 	// a thread which opens sockets.
-	pLwc->udp = new_udp();
+    pLwc->udp = 0;//new_udp();
 	pLwc->tcp = new_tcp(pLwc,
                         pLwc->user_data_path,
                         &pLwc->tcp_host_addr,

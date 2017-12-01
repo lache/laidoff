@@ -15,19 +15,7 @@
 #include "puckgamepacket.h"
 #include "lwringbuffer.h"
 
-#define LW_UDP_BUFLEN 512
-
-typedef enum _LW_UDP_STATE {
-	// Init
-	LUS_INIT,
-	// Before token received
-	LUS_GETTOKEN,
-	// Wait match
-	LUS_QUEUE,
-	// Battle started
-	LUS_MATCHED,
-} LW_UDP_STATE;
-
+#define LW_UDP_BUFLEN (512)
 #define LW_STATE_RING_BUFFER_CAPACITY (16)
 
 typedef struct _LWUDP {
@@ -42,12 +30,6 @@ typedef struct _LWUDP {
 	struct timeval tv;
 	int recv_len;
 	int ready;
-	// State
-	LW_UDP_STATE state;
-	// Network session token
-	int token;
-	// 1 if master, 0 if slave
-	int master;
 	// State ring buffer
 	LWPSTATE state_buffer[LW_STATE_RING_BUFFER_CAPACITY];
 	LWRINGBUFFER state_ring_buffer;

@@ -178,7 +178,9 @@ LW_PLAYER_STATE run_state(LW_PLAYER_STATE cur_state, LWPLAYERSTATEDATA* data) {
 	if (transition) {
 		transition(data);
 		// TODO Should we call 'mq_publish_now()' here?
-		mq_send_action(data->mq, get_anim_by_state(new_state, 0));
+        if (data->mq) {
+            mq_send_action(data->mq, get_anim_by_state(new_state, 0));
+        }
 	}
 	return new_state;
 }

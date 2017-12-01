@@ -18,9 +18,6 @@ void update_puck_game(LWCONTEXT* pLwc, LWPUCKGAME* puck_game, double delta_time)
     if (!puck_game->world) {
         return;
     }
-    if (!pLwc->udp) {
-        return;
-    }
     const int remote = puck_game_remote(pLwc, puck_game);
     puck_game->on_player_damaged = remote ? 0 : puck_game_player_tower_decrease_hp_test;
     puck_game->on_target_damaged = remote ? 0 : puck_game_target_tower_decrease_hp_test;
@@ -35,8 +32,7 @@ void update_puck_game(LWCONTEXT* pLwc, LWPUCKGAME* puck_game, double delta_time)
     if (puck_game->player.puck_contacted == 0) {
         puck_game->player.last_contact_puck_body = 0;
     }
-    const dReal* p = dBodyGetPosition(puck_game->go[LPGO_PUCK].body);
-    
+    //const dReal* p = dBodyGetPosition(puck_game->go[LPGO_PUCK].body);
     //LOGI("pos %.2f %.2f %.2f", p[0], p[1], p[2]);
     
     dJointID pcj = puck_game->player_control_joint;
@@ -62,8 +58,7 @@ void update_puck_game(LWCONTEXT* pLwc, LWPUCKGAME* puck_game, double delta_time)
          dJointSetLMotorParam(pcj, dParamVel1, player_max_speed * pLwc->last_mouse_move_delta_x / last_move_delta_len);
          dJointSetLMotorParam(pcj, dParamVel2, player_max_speed * pLwc->last_mouse_move_delta_y / last_move_delta_len);*/
         
-        if (!pLwc->udp->master
-            && pLwc->udp->state == LUS_MATCHED
+        if (pLwc->tcp->state == LUS_MATCHED
             && pLwc->puck_game_state.bf.finished == 0
             && remote) {
             LWPMOVE packet_move;
@@ -80,8 +75,7 @@ void update_puck_game(LWCONTEXT* pLwc, LWPUCKGAME* puck_game, double delta_time)
         dJointSetLMotorParam(pcj, dParamVel1, 0);
         dJointSetLMotorParam(pcj, dParamVel2, 0);
         
-        if (!pLwc->udp->master
-            && pLwc->udp->state == LUS_MATCHED
+        if (pLwc->tcp->state == LUS_MATCHED
             && pLwc->puck_game_state.bf.finished == 0
             && remote) {
             LWPSTOP packet_stop;
@@ -222,8 +216,7 @@ void puck_game_jump(LWCONTEXT* pLwc, LWPUCKGAME* puck_game) {
     
     const int remote = puck_game_remote(pLwc, puck_game);
 
-    if (!pLwc->udp->master
-        && pLwc->puck_game_state.bf.finished == 0
+    if (pLwc->puck_game_state.bf.finished == 0
         && remote) {
         LWPJUMP packet_jump;
         packet_jump.type = LPGP_LWPJUMP;
@@ -260,8 +253,7 @@ void puck_game_dash(LWCONTEXT* pLwc, LWPUCKGAME* puck_game) {
     
     const int remote = puck_game_remote(pLwc, puck_game);
     
-    if (!pLwc->udp->master
-        && pLwc->puck_game_state.bf.finished == 0
+    if (pLwc->puck_game_state.bf.finished == 0
         && remote) {
         LWPDASH packet_dash;
         packet_dash.type = LPGP_LWPDASH;
@@ -319,7 +311,10 @@ void puck_game_rematch(LWCONTEXT* pLwc, LWPUCKGAME* puck_game) {
         puck_game_reset_view_proj(pLwc, puck_game);
         puck_game_reset(puck_game);
         puck_game_remote_state_reset(puck_game, &pLwc->puck_game_state);
-        tcp_send_queue2(pLwc->tcp, &pLwc->tcp->user_id);
+        int send_result = tcp_send_queue2(pLwc->tcp, &pLwc->tcp->user_id);
+        if (send_result < 0) {
+            LOGE(LWLOGPOS "Send result failed: %d", send_result);
+        }
     }
 }
 
@@ -338,17 +333,14 @@ void puck_game_reset_view_proj(LWCONTEXT* pLwc, LWPUCKGAME* puck_game) {
 
 void puck_game_fire(LWCONTEXT* pLwc, LWPUCKGAME* puck_game, float puck_fire_dx, float puck_fire_dy, float puck_fire_dlen) {
     puck_game_commit_fire(puck_game, &puck_game->fire, 1, puck_fire_dx, puck_fire_dy, puck_fire_dlen);
-
-    if (!pLwc->udp->master) {
-        LWPFIRE packet_fire;
-        packet_fire.type = LPGP_LWPFIRE;
-        packet_fire.battle_id = pLwc->puck_game->battle_id;
-        packet_fire.token = pLwc->puck_game->token;
-        packet_fire.dx = puck_fire_dx;
-        packet_fire.dy = puck_fire_dy;
-        packet_fire.dlen = puck_fire_dlen;
-        udp_send(pLwc->udp, (const char*)&packet_fire, sizeof(packet_fire));
-    }
+    LWPFIRE packet_fire;
+    packet_fire.type = LPGP_LWPFIRE;
+    packet_fire.battle_id = pLwc->puck_game->battle_id;
+    packet_fire.token = pLwc->puck_game->token;
+    packet_fire.dx = puck_fire_dx;
+    packet_fire.dy = puck_fire_dy;
+    packet_fire.dlen = puck_fire_dlen;
+    udp_send(pLwc->udp, (const char*)&packet_fire, sizeof(packet_fire));
 }
 
 void puck_game_shake_player(LWPUCKGAME* puck_game, LWPUCKGAMEPLAYER* player) {
@@ -383,7 +375,5 @@ void puck_game_target_tower_decrease_hp_test(LWPUCKGAME* puck_game) {
 }
 
 int puck_game_remote(const LWCONTEXT* pLwc, const LWPUCKGAME* puck_game) {
-    int single_play = puck_game->battle_id == 0;
-    int remote = !single_play && !pLwc->udp->master;
-    return remote;
+    return puck_game->battle_id != 0;
 }

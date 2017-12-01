@@ -506,6 +506,9 @@ const LWMQMSG* mq_sync_next(void* _mq) {
 }
 
 LWPOSSYNCMSG* mq_possync_first(void* _mq) {
+    if (_mq == 0) {
+        return 0;
+    }
 	LWMESSAGEQUEUE* mq = (LWMESSAGEQUEUE*)_mq;
 	return (LWPOSSYNCMSG*)zhash_first(mq->posmap);
 }
@@ -598,11 +601,17 @@ void mq_interrupt() {
 }
 
 void mq_lock_mutex(void* _mq) {
+    if (_mq == 0) {
+        return;
+    }
 	LWMESSAGEQUEUE* mq = (LWMESSAGEQUEUE*)_mq;
 	ZMUTEX_LOCK(mq->mutex);
 }
 
 void mq_unlock_mutex(void* _mq) {
+    if (_mq == 0) {
+        return;
+    }
 	LWMESSAGEQUEUE* mq = (LWMESSAGEQUEUE*)_mq;
 	ZMUTEX_UNLOCK(mq->mutex);
 }

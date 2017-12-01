@@ -43,6 +43,17 @@ varname.Type = LPGP_##vartype
 #define CHECK_PACKET(packet_type, packet_size, type) \
 packet_type == LPGP_##type && packet_size == sizeof(type)
 
+typedef enum _LW_UDP_STATE {
+    // Init
+    LUS_INIT,
+    // Before token received
+    LUS_GETTOKEN,
+    // Wait match
+    LUS_QUEUE,
+    // Battle started
+    LUS_MATCHED,
+} LW_UDP_STATE;
+
 typedef struct _LWTCP {
 #if LW_PLATFORM_WIN32
 	WSADATA wsaData;
@@ -61,6 +72,8 @@ typedef struct _LWTCP {
     LWTCP_ON_CONNECT on_connect;
     LWTCP_ON_RECV_PACKETS on_recv_packets;
     LWHOSTADDR host_addr;
+    // State
+    LW_UDP_STATE state;
 } LWTCP;
 
 LWTCP* new_tcp(LWCONTEXT* pLwc,
