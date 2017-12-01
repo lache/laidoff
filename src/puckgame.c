@@ -57,7 +57,7 @@ LWPUCKGAME* new_puck_game() {
     // Static game data
     LWPUCKGAME* puck_game = malloc(sizeof(LWPUCKGAME));
     memset(puck_game, 0, sizeof(LWPUCKGAME));
-    const int hp = 10;
+    // datasheet begin
     puck_game->world_size = 4.0f;
     puck_game->world_size_half = puck_game->world_size / 2;
     puck_game->dash_interval = 1.2f;
@@ -65,10 +65,6 @@ LWPUCKGAME* new_puck_game() {
     puck_game->dash_shake_time = 0.3f;
     puck_game->hp_shake_time = 0.3f;
     puck_game->puck_damage_contact_speed_threshold = 1.1f;
-    puck_game->player.total_hp = hp;
-    puck_game->player.current_hp = hp;
-    puck_game->target.total_hp = hp;
-    puck_game->target.current_hp = hp;
     puck_game->sphere_mass = 0.1f;
     puck_game->sphere_radius = 0.16f;
     puck_game->total_time = 80.0f;
@@ -83,6 +79,13 @@ LWPUCKGAME* new_puck_game() {
     puck_game->tower_pos = 1.1f;
     puck_game->tower_radius = 0.825f / 2; // Check tower.blend file
     puck_game->puck_reflect_size = 1.0f;
+    puck_game->hp = 10;
+    // datasheet end
+    puck_game->player.total_hp = puck_game->hp;
+    puck_game->player.current_hp = puck_game->hp;
+    puck_game->target.total_hp = puck_game->hp;
+    puck_game->target.current_hp = puck_game->hp;
+
     int tower_pos_multiplier_index = 0;
     puck_game->tower_pos_multiplier[tower_pos_multiplier_index][0] = -1;
     puck_game->tower_pos_multiplier[tower_pos_multiplier_index][1] = -1;
@@ -475,10 +478,12 @@ void puck_game_reset(LWPUCKGAME* puck_game) {
 
 void puck_game_remote_state_reset(LWPUCKGAME* puck_game, LWPSTATE* state) {
     state->bf.puck_owner_player_no = 0;
-    state->bf.player_current_hp = 10;
-    state->bf.player_total_hp = 10;
-    state->bf.target_current_hp = 10;
-    state->bf.target_total_hp = 10;
+    state->bf.player_current_hp = puck_game->hp;
+    state->bf.player_total_hp = puck_game->hp;
+    state->bf.target_current_hp = puck_game->hp;
+    state->bf.target_total_hp = puck_game->hp;
+    state->bf.player_pull = 0;
+    state->bf.target_pull = 0;
 }
 
 void puck_game_tower_pos(vec4 p_out, const LWPUCKGAME* puck_game, int owner_player_no) {
