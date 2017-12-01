@@ -138,6 +138,9 @@ int parse_recv_packets(LWTCP* tcp) {
             pLwc->puck_game->battle_id = p->battle_id;
             pLwc->puck_game->token = p->token;
             pLwc->puck_game->player_no = p->player_no;
+            pLwc->udp->master = 0;
+            pLwc->udp->token = 1; // should be other than zero
+            pLwc->udp->state = LUS_MATCHED;
             memcpy(pLwc->puck_game->target_nickname, p->target_nickname, sizeof(p->target_nickname));
             pLwc->udp_host_addr.host_resolved = *(unsigned long*)p->ipaddr;
             sprintf(pLwc->udp_host_addr.host, "%d.%d.%d.%d",

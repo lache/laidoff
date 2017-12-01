@@ -44,47 +44,6 @@ void update_puck_game(LWCONTEXT* pLwc, LWPUCKGAME* puck_game, double delta_time)
     //dJointSetLMotorParam(pcj, dParamVel1, player_max_speed * (pLwc->player_move_right - pLwc->player_move_left));
     //dJointSetLMotorParam(pcj, dParamVel2, player_max_speed * (pLwc->player_move_up - pLwc->player_move_down));
     
-    switch (pLwc->udp->state) {
-        case LUS_INIT:
-        case LUS_GETTOKEN:
-        {
-            LWPGETTOKEN p;
-            p.type = LPGP_LWPGETTOKEN;
-            udp_send(pLwc->udp, (const char*)&p, sizeof(p));
-            break;
-        }
-        case LUS_QUEUE:
-        {
-            LWPQUEUE p;
-            p.type = LPGP_LWPQUEUE;
-            p.token = pLwc->udp->token;
-            udp_send(pLwc->udp, (const char*)&p, sizeof(p));
-            break;
-        }
-        case LUS_MATCHED:
-        {
-            if (pLwc->udp->master) {
-                LWPSTATE p;
-                p.type = LPGP_LWPSTATE;
-                p.puck[0] = puck_game->go[LPGO_PUCK].pos[0];
-                p.puck[1] = puck_game->go[LPGO_PUCK].pos[1];
-                p.puck[2] = puck_game->go[LPGO_PUCK].pos[2];
-                p.player[0] = puck_game->go[LPGO_PLAYER].pos[0];
-                p.player[1] = puck_game->go[LPGO_PLAYER].pos[1];
-                p.player[2] = puck_game->go[LPGO_PLAYER].pos[2];
-                p.target[0] = puck_game->go[LPGO_TARGET].pos[0];
-                p.target[1] = puck_game->go[LPGO_TARGET].pos[1];
-                p.target[2] = puck_game->go[LPGO_TARGET].pos[2];
-                memcpy(p.puck_rot, puck_game->go[LPGO_PUCK].rot, sizeof(mat4x4));
-                memcpy(p.player_rot, puck_game->go[LPGO_PLAYER].rot, sizeof(mat4x4));
-                memcpy(p.target_rot, puck_game->go[LPGO_TARGET].rot, sizeof(mat4x4));
-                udp_send(pLwc->udp, (const char*)&p, sizeof(p));
-            }
-            break;
-        }
-            break;
-    }
-    
     //pLwc->player_pos_last_moved_dx
     float dx, dy, dlen;
     if (lw_get_normalized_dir_pad_input(pLwc, &pLwc->left_dir_pad, &dx, &dy, &dlen)) {
@@ -103,7 +62,10 @@ void update_puck_game(LWCONTEXT* pLwc, LWPUCKGAME* puck_game, double delta_time)
          dJointSetLMotorParam(pcj, dParamVel1, player_max_speed * pLwc->last_mouse_move_delta_x / last_move_delta_len);
          dJointSetLMotorParam(pcj, dParamVel2, player_max_speed * pLwc->last_mouse_move_delta_y / last_move_delta_len);*/
         
-        if (!pLwc->udp->master && pLwc->udp->state == LUS_MATCHED) {
+        if (!pLwc->udp->master
+            && pLwc->udp->state == LUS_MATCHED
+            && pLwc->puck_game_state.bf.finished == 0
+            && remote) {
             LWPMOVE packet_move;
             packet_move.type = LPGP_LWPMOVE;
             packet_move.battle_id = pLwc->puck_game->battle_id;
@@ -118,7 +80,10 @@ void update_puck_game(LWCONTEXT* pLwc, LWPUCKGAME* puck_game, double delta_time)
         dJointSetLMotorParam(pcj, dParamVel1, 0);
         dJointSetLMotorParam(pcj, dParamVel2, 0);
         
-        if (!pLwc->udp->master && pLwc->udp->state == LUS_MATCHED) {
+        if (!pLwc->udp->master
+            && pLwc->udp->state == LUS_MATCHED
+            && pLwc->puck_game_state.bf.finished == 0
+            && remote) {
             LWPSTOP packet_stop;
             packet_stop.type = LPGP_LWPSTOP;
             packet_stop.battle_id = pLwc->puck_game->battle_id;
@@ -191,18 +156,24 @@ void update_puck_game(LWCONTEXT* pLwc, LWPUCKGAME* puck_game, double delta_time)
         const dReal scale = power / flen;
         dBodyAddForce(puck_game->go[LPGO_PUCK].body, f[0] * scale, f[1] * scale, f[2] * scale);
         
-        LWPPULLSTART p;
-        p.type = LPGP_LWPPULLSTART;
-        p.battle_id = pLwc->puck_game->battle_id;
-        p.token = pLwc->puck_game->token;
-        udp_send(pLwc->udp, (const char*)&p, sizeof(p));
+        if (pLwc->puck_game_state.bf.finished == 0
+            && remote) {
+            LWPPULLSTART p;
+            p.type = LPGP_LWPPULLSTART;
+            p.battle_id = pLwc->puck_game->battle_id;
+            p.token = pLwc->puck_game->token;
+            udp_send(pLwc->udp, (const char*)&p, sizeof(p));
+        }
     }
     else {
-        LWPPULLSTOP p;
-        p.type = LPGP_LWPPULLSTOP;
-        p.battle_id = pLwc->puck_game->battle_id;
-        p.token = pLwc->puck_game->token;
-        udp_send(pLwc->udp, (const char*)&p, sizeof(p));
+        if (pLwc->puck_game_state.bf.finished == 0
+            && remote) {
+            LWPPULLSTOP p;
+            p.type = LPGP_LWPPULLSTOP;
+            p.battle_id = pLwc->puck_game->battle_id;
+            p.token = pLwc->puck_game->token;
+            udp_send(pLwc->udp, (const char*)&p, sizeof(p));
+        }
     }
     // Tower shake
     for (int i = 0; i < LW_PUCK_GAME_TOWER_COUNT; i++) {
@@ -248,8 +219,12 @@ void puck_game_jump(LWCONTEXT* pLwc, LWPUCKGAME* puck_game) {
 
     // Start jump!
     puck_game_commit_jump(puck_game, &puck_game->jump, 1);
+    
+    const int remote = puck_game_remote(pLwc, puck_game);
 
-    if (!pLwc->udp->master) {
+    if (!pLwc->udp->master
+        && pLwc->puck_game_state.bf.finished == 0
+        && remote) {
         LWPJUMP packet_jump;
         packet_jump.type = LPGP_LWPJUMP;
         packet_jump.battle_id = pLwc->puck_game->battle_id;
@@ -283,7 +258,11 @@ void puck_game_dash(LWCONTEXT* pLwc, LWPUCKGAME* puck_game) {
     puck_game_commit_dash_to_puck(puck_game, &puck_game->dash, 1);
     //puck_game_commit_dash(puck_game, &puck_game->dash, dx, dy);
     
-    if (!pLwc->udp->master) {
+    const int remote = puck_game_remote(pLwc, puck_game);
+    
+    if (!pLwc->udp->master
+        && pLwc->puck_game_state.bf.finished == 0
+        && remote) {
         LWPDASH packet_dash;
         packet_dash.type = LPGP_LWPDASH;
         packet_dash.battle_id = pLwc->puck_game->battle_id;
