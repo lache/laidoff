@@ -1,7 +1,13 @@
 <component name="ProjectDictionaryState">
   <dictionary name="kimgeoyeob">
     <words>
+      <w>decomp</w>
       <w>leaderboard</w>
+      <w>logi</w>
+      <w>lwnumcompfloatpreset</w>
+      <w>lwnumcompquaternionpreset</w>
+      <w>lwnumcompvec</w>
+      <w>numcomp</w>
       <w>printf</w>
       <w>recvfrom</w>
     </words>
