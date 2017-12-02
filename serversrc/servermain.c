@@ -65,7 +65,8 @@ _Thread_local int thread_local_var;
 typedef struct _LWSERVER {
     SOCKET s;
     struct sockaddr_in server, si_other;
-    int slen, recv_len;
+    socklen_t slen;
+    int recv_len;
     char buf[BUFLEN];
 #if LW_PLATFORM_WIN32
     WSADATA wsa;
@@ -481,8 +482,13 @@ void select_server(LWSERVER *server, LWPUCKGAME *puck_game, LWCONN *conn, int co
     //printf("rv");
     //try to receive some data, this is a blocking call
     if (rv == 1) {
-        if ((server->recv_len = recvfrom(server->s, server->buf, BUFLEN, 0, (struct sockaddr *) &server->si_other,
-                                         &server->slen)) == SOCKET_ERROR) {
+        server->recv_len = (int)recvfrom(server->s,
+                                         server->buf,
+                                         BUFLEN,
+                                         0,
+                                         (struct sockaddr *)&server->si_other,
+                                         &server->slen);
+        if (server->recv_len == SOCKET_ERROR) {
             //printf("recvfrom() failed with error code : %d", WSAGetLastError());
             //exit(EXIT_FAILURE);
         } else {

@@ -820,7 +820,7 @@ static void render_lwbutton(const LWCONTEXT* pLwc, const LWBUTTONLIST* button_li
     }
 }
 
-void render_caution_popup(const LWCONTEXT* pLwc) {
+void render_caution_popup(const LWCONTEXT* pLwc, const char* str) {
     render_solid_vb_ui_alpha(pLwc,
                              0,
                              0,
@@ -845,8 +845,6 @@ void render_caution_popup(const LWCONTEXT* pLwc) {
     SET_COLOR_RGBA_FLOAT(text_block.color_normal_outline, 0, 0, 0, 0);
     SET_COLOR_RGBA_FLOAT(text_block.color_emp_glyph, 1, 1, 0, 1);
     SET_COLOR_RGBA_FLOAT(text_block.color_emp_outline, 0, 0, 0, 1);
-    char str[256];
-    sprintf(str, "Server disconnected.\nPlease check your internet\nconnection.");
     float x = -0.5f;
     float y = 0.15f;
     text_block.text = str;
@@ -1150,7 +1148,13 @@ void lwc_render_physics(const LWCONTEXT* pLwc, const mat4x4 view, const mat4x4 p
     }
     render_lwbutton(pLwc, &pLwc->button_list);
     
-    if (pLwc->tcp->send_fail || (pLwc->udp && pLwc->udp->ready == 0)) {
-        render_caution_popup(pLwc);
+    if (pLwc->tcp == 0) {
+        char str[256];
+        sprintf(str, "Could not conect to server.\n(is server ready?)");
+        render_caution_popup(pLwc, str);
+    } else if (pLwc->tcp->send_fail || (pLwc->udp && pLwc->udp->ready == 0)) {
+        char str[256];
+        sprintf(str, "Server disconnected.\nPlease check your internet\nconnection.");
+        render_caution_popup(pLwc, str);
     }
 }

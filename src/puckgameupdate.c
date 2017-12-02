@@ -58,7 +58,8 @@ void update_puck_game(LWCONTEXT* pLwc, LWPUCKGAME* puck_game, double delta_time)
          dJointSetLMotorParam(pcj, dParamVel1, player_max_speed * pLwc->last_mouse_move_delta_x / last_move_delta_len);
          dJointSetLMotorParam(pcj, dParamVel2, player_max_speed * pLwc->last_mouse_move_delta_y / last_move_delta_len);*/
         
-        if (pLwc->tcp->state == LUS_MATCHED
+        if (pLwc->tcp
+            && pLwc->tcp->state == LUS_MATCHED
             && pLwc->puck_game_state.bf.finished == 0
             && remote) {
             LWPMOVE packet_move;
@@ -75,7 +76,8 @@ void update_puck_game(LWCONTEXT* pLwc, LWPUCKGAME* puck_game, double delta_time)
         dJointSetLMotorParam(pcj, dParamVel1, 0);
         dJointSetLMotorParam(pcj, dParamVel2, 0);
         
-        if (pLwc->tcp->state == LUS_MATCHED
+        if (pLwc->tcp
+            && pLwc->tcp->state == LUS_MATCHED
             && pLwc->puck_game_state.bf.finished == 0
             && remote) {
             LWPSTOP packet_stop;
