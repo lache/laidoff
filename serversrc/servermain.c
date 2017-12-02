@@ -29,6 +29,7 @@
 #include "puckgamepacket.h"
 #include "lwtimepoint.h"
 #include <tinycthread.h>
+#include <numcomp.h>
 #include "pcg_basic.h"
 #include "puckgamepacket.h"
 
@@ -738,17 +739,18 @@ void broadcast_state_packet(LWSERVER *server, const LWCONN *conn, int conn_capac
                 packet_state.player_move_rad = puck_game->go[player_go_enum].move_rad;
                 packet_state.target_move_rad = puck_game->go[target_go_enum].move_rad;
                 packet_state.puck_reflect_size = puck_game->puck_reflect_size;
-                packet_state.bf.player_current_hp = player->current_hp;
-                packet_state.bf.player_total_hp = player->total_hp;
-                packet_state.bf.target_current_hp = target->current_hp;
-                packet_state.bf.target_total_hp = target->total_hp;
-                packet_state.bf.puck_owner_player_no = puck_game->puck_owner_player_no;
-                packet_state.bf.finished = puck_game->finished;
-                packet_state.bf.player_pull = puck_game->remote_control[0].pull_puck;
-                packet_state.bf.target_pull = puck_game->remote_control[1].pull_puck;
+                packet_state.bf.player_current_hp = (unsigned int)player->current_hp;
+                packet_state.bf.player_total_hp = (unsigned int)player->total_hp;
+                packet_state.bf.target_current_hp = (unsigned int)target->current_hp;
+                packet_state.bf.target_total_hp = (unsigned int)target->total_hp;
+                packet_state.bf.puck_owner_player_no = (unsigned int)puck_game->puck_owner_player_no;
+                packet_state.bf.finished = (unsigned int)puck_game->finished;
+                packet_state.bf.player_pull = (unsigned int)puck_game->remote_control[0].pull_puck;
+                packet_state.bf.target_pull = (unsigned int)puck_game->remote_control[1].pull_puck;
                 double tp = lwtimepoint_now_seconds();
                 sendto(server->s, (const char *) &packet_state, sizeof(packet_state), 0,
                        (struct sockaddr *) &conn[i].si, server->slen);
+                // log elapsed time
                 double elapsed = lwtimepoint_now_seconds() - tp;
                 //LOGI("Broadcast sendto elapsed: %.3f ms", elapsed * 1000);
                 sent = 1;
@@ -846,6 +848,9 @@ int reward_service_on_recv_packets(LWTCP *tcp) {
 
 int main(int argc, char *argv[]) {
     LOGI("LAIDOFF-SERVER: Greetings.");
+    LOGI("sizeof(LWPSTATE) == %zu bytes", sizeof(LWPSTATE));
+    LOGI("sizeof(LWPSTATE2) == %zu bytes", sizeof(LWPSTATE2));
+    numcomp_test_all();
     while (!directory_exists("assets") && LwChangeDirectory("..")) {
     }
     // Create main server instance

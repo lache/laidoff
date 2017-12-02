@@ -169,6 +169,22 @@ typedef struct _LWPSTATE {
     LWPSTATEBITFIELD bf;
 } LWPSTATE;
 
+typedef struct _LWPSTATE2GAMEOBJECT {
+    unsigned int pos; // fixed-point compressed vec3 (x:12-bit, y:12-bit, z:8-bit)
+    unsigned int rot; // compressed quaternion
+    unsigned short speed; // fixed-point compressed float
+    unsigned short move_rad; // fixed-point compressed float
+} LWPSTATE2GAMEOBJECT;
+
+// UDP
+typedef struct _LWPSTATE2 {
+    unsigned char type;
+    unsigned char puck_reflect_size; // fixed-point compressed float
+    unsigned short update_tick;
+    LWPSTATE2GAMEOBJECT go[3]; // [3] --> [0]:player, [1]:puck, [2]:target
+    LWPSTATEBITFIELD bf; // bitfield
+} LWPSTATE2;
+
 // should be 4-byte aligned...
 // (Cgo compatibility issue)
 //#pragma pack(push, 1)

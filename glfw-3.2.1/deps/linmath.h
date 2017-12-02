@@ -500,34 +500,38 @@ v' = v + q.w * t + cross(q.xyz, t)
 	vec3_add(r, v, t);
 	vec3_add(r, r, u);
 }
+// quat order: [w, x, y, z]
 static inline void mat4x4_from_quat(mat4x4 M, const quat q)
 {
-	float a = q[3];
-	float b = q[0];
-	float c = q[1];
-	float d = q[2];
-	float a2 = a*a;
-	float b2 = b*b;
-	float c2 = c*c;
-	float d2 = d*d;
+    float* te = (float*)M;
+    float x = q[1], y = q[2], z = q[3], w = q[0];
+    float x2 = x + x, y2 = y + y, z2 = z + z;
+    float xx = x * x2, xy = x * y2, xz = x * z2;
+    float yy = y * y2, yz = y * z2, zz = z * z2;
+    float wx = w * x2, wy = w * y2, wz = w * z2;
 
-	M[0][0] = a2 + b2 - c2 - d2;
-	M[0][1] = 2.f*(b*c + a*d);
-	M[0][2] = 2.f*(b*d - a*c);
-	M[0][3] = 0.f;
+    te[ 0 ] = 1.0f - ( yy + zz );
+    te[ 4 ] = xy - wz;
+    te[ 8 ] = xz + wy;
 
-	M[1][0] = 2*(b*c - a*d);
-	M[1][1] = a2 - b2 + c2 - d2;
-	M[1][2] = 2.f*(c*d + a*b);
-	M[1][3] = 0.f;
+    te[ 1 ] = xy + wz;
+    te[ 5 ] = 1.0f - ( xx + zz );
+    te[ 9 ] = yz - wx;
 
-	M[2][0] = 2.f*(b*d + a*c);
-	M[2][1] = 2.f*(c*d - a*b);
-	M[2][2] = a2 - b2 - c2 + d2;
-	M[2][3] = 0.f;
+    te[ 2 ] = xz - wy;
+    te[ 6 ] = yz + wx;
+    te[ 10 ] = 1.0f - ( xx + yy );
 
-	M[3][0] = M[3][1] = M[3][2] = 0.f;
-	M[3][3] = 1.f;
+    // last column
+    te[ 3 ] = 0;
+    te[ 7 ] = 0;
+    te[ 11 ] = 0;
+
+    // bottom row
+    te[ 12 ] = 0;
+    te[ 13 ] = 0;
+    te[ 14 ] = 0;
+    te[ 15 ] = 1.0f;
 }
 
 static inline void mat4x4o_mul_quat(mat4x4 R, mat4x4 M, quat q)
@@ -541,34 +545,48 @@ static inline void mat4x4o_mul_quat(mat4x4 R, mat4x4 M, quat q)
 	R[3][0] = R[3][1] = R[3][2] = 0.f;
 	R[3][3] = 1.f;
 }
-static inline void quat_from_mat4x4(quat q, mat4x4 M)
+static inline void quat_from_mat4x4(quat q, mat4x4 m)
 {
-	float r=0.f;
-	int i;
+    float m11 = m[0][0], m12 = m[1][0], m13 = m[2][0];
+    float m21 = m[0][1], m22 = m[1][1], m23 = m[2][1];
+    float m31 = m[0][2], m32 = m[1][2], m33 = m[2][2];
+    float trace = m11 + m22 + m33;
+    float s;
+    if ( trace > 0 ) {
+        s = 0.5f / sqrtf( trace + 1.0f );
 
-	int perm[] = { 0, 1, 2, 0, 1 };
-	int *p = perm;
+        q[0] = 0.25f / s;
+        q[1] = ( m32 - m23 ) * s;
+        q[2] = ( m13 - m31 ) * s;
+        q[3] = ( m21 - m12 ) * s;
 
-	for(i = 0; i<3; i++) {
-		float m = M[i][i];
-		if( m < r )
-			continue;
-		m = r;
-		p = &perm[i];
-	}
+    } else if ( m11 > m22 && m11 > m33 ) {
 
-	r = (float) sqrt(1.f + M[p[0]][p[0]] - M[p[1]][p[1]] - M[p[2]][p[2]] );
+        s = 2.0f * sqrtf( 1.0f + m11 - m22 - m33 );
 
-	if(r < 1e-6) {
-		q[0] = 1.f;
-		q[1] = q[2] = q[3] = 0.f;
-		return;
-	}
+        q[0] = ( m32 - m23 ) / s;
+        q[1] = 0.25f * s;
+        q[2] = ( m12 + m21 ) / s;
+        q[3] = ( m13 + m31 ) / s;
 
-	q[0] = r/2.f;
-	q[1] = (M[p[0]][p[1]] - M[p[1]][p[0]])/(2.f*r);
-	q[2] = (M[p[2]][p[0]] - M[p[0]][p[2]])/(2.f*r);
-	q[3] = (M[p[2]][p[1]] - M[p[1]][p[2]])/(2.f*r);
+    } else if ( m22 > m33 ) {
+
+        s = 2.0f * sqrtf( 1.0f + m22 - m11 - m33 );
+
+        q[0] = ( m13 - m31 ) / s;
+        q[1] = ( m12 + m21 ) / s;
+        q[2] = 0.25f * s;
+        q[3] = ( m23 + m32 ) / s;
+
+    } else {
+
+        s = 2.0f * sqrtf( 1.0f + m33 - m11 - m22 );
+
+        q[0] = ( m21 - m12 ) / s;
+        q[1] = ( m13 + m31 ) / s;
+        q[2] = ( m23 + m32 ) / s;
+        q[3] = 0.25f * s;
+
+    }
 }
-
 #endif
