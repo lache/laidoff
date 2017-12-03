@@ -713,7 +713,7 @@ void fill_state2_gameobject(LWPSTATE2GAMEOBJECT* packet_field,
                                                 &server->numcomp.q[LNQT_ROT]);
     packet_field->speed = (unsigned short)numcomp_compress_float(go->speed,
                                                                  &server->numcomp.f[LNFT_PUCK_SPEED]);
-    packet_field->move_rad = (unsigned short)numcomp_compress_float(go->move_rad,
+    packet_field->move_rad = (unsigned short)numcomp_compress_float(numcomp_wrap_radian(go->move_rad),
                                                                     &server->numcomp.f[LNFT_PUCK_MOVE_RAD]);
 }
 
@@ -733,6 +733,7 @@ void send_puck_game_state2(LWSERVER* server,
     packet_state.type = LPGP_LWPSTATE2;
     packet_state.puck_reflect_size = (unsigned char)numcomp_compress_float(puck_game->puck_reflect_size,
                                                                            &server->numcomp.f[LNFT_PUCK_REFLECT_SIZE]);
+    LOGI("puck_reflect_size = %f", puck_game->puck_reflect_size);
     packet_state.update_tick = (unsigned short)puck_game->update_tick;
     fill_state2_gameobject(&packet_state.go[0], server, &puck_game->go[LPGO_PUCK]);
     fill_state2_gameobject(&packet_state.go[1], server, &puck_game->go[player_go_enum]);

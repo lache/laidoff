@@ -3,7 +3,7 @@
 void numcomp_puck_game_init(LWNUMCOMPPUCKGAME* numcomp) {
     numcomp_init_float_preset(&numcomp->f[LNFT_PUCK_REFLECT_SIZE],
                               sizeof(unsigned char) * 8,
-                              0.0f,
+                              1.0f,
                               2.0f);
     numcomp_init_float_preset(&numcomp->f[LNFT_PUCK_SPEED],
                               sizeof(unsigned short) * 8,

@@ -1346,6 +1346,7 @@ static void convert_state2_to_state(LWPSTATE* state, const LWPSTATE2* state2, co
     state->update_tick = state2->update_tick;
     numcomp_decompress_vec3(state->puck, state2->go[0].pos, &numcomp->v[LNVT_POS]);
     numcomp_decompress_vec3(state->player, state2->go[1].pos, &numcomp->v[LNVT_POS]);
+    LOGIx("player z = %f", state->player[2]);
     numcomp_decompress_vec3(state->target, state2->go[2].pos, &numcomp->v[LNVT_POS]);
     numcomp_decompress_mat4x4(state->puck_rot, state2->go[0].rot, &numcomp->q[LNQT_ROT]);
     numcomp_decompress_mat4x4(state->player_rot, state2->go[1].rot, &numcomp->q[LNQT_ROT]);

@@ -2,12 +2,15 @@
 
 #include "linmath.h"
 
+// compress 32-bit floating point value into
+// c-bit fixed-point compressed value between [m, M].
 typedef struct _LWNUMCOMPFLOATPRESET {
     int c; // compressed bit
-    float m; // minimum value
-    float M; // maximum value
+    float m; // minimum original value (inclusive)
+    float M; // maximum original value (inclusive)
     float l; // range
     float s; // step
+    unsigned int M_comp; //maximum compressed value
 } LWNUMCOMPFLOATPRESET;
 
 typedef struct _LWNUMCOMPVEC3PRESET {
@@ -40,9 +43,9 @@ void numcomp_decompress_mat4x4(mat4x4 m, unsigned int v_comp, const LWNUMCOMPQUA
 // misc
 void numcomp_convert_euler_xyz_to_quaternion(float* q, float ex, float ey, float ez);
 void numcomp_convert_quaternion_to_euler_xyz(const float* q, float* ex, float* ey, float* ez);
-float wrap_max(float x, float max);
-float wrap_min_max(float x, float min, float max);
-float wrap_radian(float r);
+float numcomp_wrap_max(float x, float max);
+float numcomp_wrap_min_max(float x, float min, float max);
+float numcomp_wrap_radian(float r);
 
 void numcomp_test_all();
 void numcomp_batch_test_float();

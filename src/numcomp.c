@@ -10,18 +10,19 @@ void numcomp_init_float_preset(LWNUMCOMPFLOATPRESET* preset, int c, float m, flo
     preset->m = m;
     preset->M = M;
     preset->l = M - m;
-    preset->s = preset->l / powf(2.0f, c);
+    preset->s = preset->l / (powf(2.0f, c) - 1.0f);
+    preset->M_comp = (unsigned int)((1 << preset->c) - 1);
 }
 
 unsigned int numcomp_compress_float(float v, const LWNUMCOMPFLOATPRESET* preset) {
-    if (v < preset->m) {
-        v = preset->m;
+    if (v <= preset->m) {
+        return 0;
     }
-    if (v > preset->M) {
-        v = preset->M;
+    if (v >= preset->M) {
+        return preset->M_comp;
     }
     float base = v - preset->m;
-    return (unsigned int)((base + preset->s * 0.5f) / preset->s);
+    return (unsigned int)((base / preset->s) + 0.5f);
 }
 
 float numcomp_decompress_float(unsigned int v_comp, const LWNUMCOMPFLOATPRESET* preset) {
@@ -78,7 +79,7 @@ float numcomp_test_vec3(const float* v, const LWNUMCOMPVEC3PRESET* preset) {
 
 void numcomp_test_vec3_print(const float* v, const LWNUMCOMPVEC3PRESET* preset) {
     float err = numcomp_test_vec3(v, preset);
-    LOGI("vec3:(%.4f,.%4f,.%4f) (err:%.6f)", v[0], v[1], v[2], err);
+    LOGI("vec3:(%.4f,%.4f,%.4f) (err:%.6f)", v[0], v[1], v[2], err);
 }
 
 float float_random_01() {
@@ -110,11 +111,15 @@ void numcomp_batch_test_vec3() {
                              11, -2.0f, +2.0f,
                              10, +0.0f, +5.0f);
     const int random_mask = 0x00ffffff;
+    float v_high_z[3] = { 0, 0, 10.0f };
+    numcomp_test_vec3_print(v_high_z, &p2);
+    float v_low_z[3] = { 0, 0, -10.0f };
+    numcomp_test_vec3_print(v_low_z, &p2);
     for (int i = 0; i < 500; i++) {
         float v[3] = {
                 float_random_range(-2.0f, +2.0f),
                 float_random_range(-2.0f, +2.0f),
-                float_random_range(+0.0f, +5.0f),
+                float_random_range(+0.0f, +5.1f),
         };
         numcomp_test_vec3_print(v, &p2);
     }
@@ -124,8 +129,18 @@ void numcomp_batch_test_float() {
     LWNUMCOMPFLOATPRESET p1;
     numcomp_init_float_preset(&p1, 11, -2.0f, 2.0f);
     numcomp_test_float_print(-100.0f, &p1);
+    float slightly_smaller_than_M = p1.M - p1.s * 0.1f;
+    numcomp_test_float_print(slightly_smaller_than_M, &p1);
     for (int i = 0; i < 500; i++) {
         numcomp_test_float_print(p1.m + 0.0123f * i, &p1);
+    }
+    // small test
+    {
+        LWNUMCOMPFLOATPRESET p2;
+        numcomp_init_float_preset(&p2, 2, -2.0f, 2.0f);
+        numcomp_test_float_print(1.99f, &p2);
+        numcomp_test_float_print(-1.4f, &p2);
+        numcomp_test_float_print(-1.2f, &p2);
     }
 }
 
@@ -241,29 +256,29 @@ void numcomp_convert_quaternion_to_euler_xyz(const float q[4],
 /* change to `float/fmodf` or `long float/fmodl` or `int/%` as appropriate */
 
 /* wrap x -> [0,max) */
-float wrap_max(float x, float max) {
+float numcomp_wrap_max(float x, float max) {
     /* integer math: `(max + x % max) % max` */
     return fmodf(max + fmodf(x, max), max);
 }
 
 /* wrap x -> [min,max) */
-float wrap_min_max(float x, float min, float max) {
-    return min + wrap_max(x - min, max - min);
+float numcomp_wrap_min_max(float x, float min, float max) {
+    return min + numcomp_wrap_max(x - min, max - min);
 }
 
-float wrap_radian(float r) {
-    return wrap_min_max(r, (float)-M_PI, (float)M_PI);
+float numcomp_wrap_radian(float r) {
+    return numcomp_wrap_min_max(r, (float) -M_PI, (float) M_PI);
 }
 
 void numcomp_test_quaternion(float ex, float ey, float ez, const LWNUMCOMPQUATERNIONPRESET* preset) {
     if (ex) {
-        ex = wrap_radian(ex);
+        ex = numcomp_wrap_radian(ex);
     }
     if (ey) {
-        ey = wrap_radian(ey);
+        ey = numcomp_wrap_radian(ey);
     }
     if (ez) {
-        ez = wrap_radian(ez);
+        ez = numcomp_wrap_radian(ez);
     }
     float q[4];
     numcomp_convert_euler_xyz_to_quaternion(q, ex, ey, ez);
@@ -358,13 +373,13 @@ void numcomp_batch_test_quaternion() {
 
 void numcomp_test_mat4x4(float ex, float ey, float ez, const LWNUMCOMPQUATERNIONPRESET* preset) {
     if (ex) {
-        ex = wrap_radian(ex);
+        ex = numcomp_wrap_radian(ex);
     }
     if (ey) {
-        ey = wrap_radian(ey);
+        ey = numcomp_wrap_radian(ey);
     }
     if (ez) {
-        ez = wrap_radian(ez);
+        ez = numcomp_wrap_radian(ez);
     }
     float q[4];
     numcomp_convert_euler_xyz_to_quaternion(q, ex, ey, ez);
