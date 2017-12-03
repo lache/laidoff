@@ -381,6 +381,7 @@
 		6CA16DA11EA210BB00DB7AF0 /* lvm.c in Sources */ = {isa = PBXBuildFile; fileRef = 6CA16D7C1EA210BB00DB7AF0 /* lvm.c */; };
 		6CA16DA21EA210BB00DB7AF0 /* lzio.c in Sources */ = {isa = PBXBuildFile; fileRef = 6CA16D7E1EA210BB00DB7AF0 /* lzio.c */; };
 		6CA16DA41EA2110E00DB7AF0 /* lwios.m in Sources */ = {isa = PBXBuildFile; fileRef = 6CA16DA31EA2110E00DB7AF0 /* lwios.m */; };
+		6CEB73DF1FD3CF5500D92EED /* numcomp_puck_game.c in Sources */ = {isa = PBXBuildFile; fileRef = 6CEB73DE1FD3CF5500D92EED /* numcomp_puck_game.c */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -1181,6 +1182,8 @@
 		6CA16D7E1EA210BB00DB7AF0 /* lzio.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = lzio.c; sourceTree = "<group>"; };
 		6CA16D7F1EA210BB00DB7AF0 /* lzio.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = lzio.h; sourceTree = "<group>"; };
 		6CA16DA31EA2110E00DB7AF0 /* lwios.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = lwios.m; sourceTree = "<group>"; };
+		6CEB73DD1FD3CF5500D92EED /* numcomp_puck_game.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = numcomp_puck_game.h; sourceTree = "<group>"; };
+		6CEB73DE1FD3CF5500D92EED /* numcomp_puck_game.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = numcomp_puck_game.c; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -2005,6 +2008,8 @@
 		6CA16CF41EA20CA700DB7AF0 /* src */ = {
 			isa = PBXGroup;
 			children = (
+				6CEB73DE1FD3CF5500D92EED /* numcomp_puck_game.c */,
+				6CEB73DD1FD3CF5500D92EED /* numcomp_puck_game.h */,
 				6C0CB2441FC45AB6006BEDCD /* lwtcpclient.c */,
 				6C0CB2451FC45AB6006BEDCD /* lwtcpclient.h */,
 				26457DBB1FBC1C5B00FFEE74 /* lwdirpad.c */,
@@ -2412,6 +2417,7 @@
 				56F188D71EC74DB60019312F /* poll.cpp in Sources */,
 				566373721EBA52D4001DA3F4 /* ray.cpp in Sources */,
 				56F188DF1EC74DB60019312F /* radio.cpp in Sources */,
+				6CEB73DF1FD3CF5500D92EED /* numcomp_puck_game.c in Sources */,
 				6C7739DC1FB4B5AA001014DE /* puckgame.c in Sources */,
 				5663736C1EBA52D4001DA3F4 /* odeinit.cpp in Sources */,
 				56F188CD1EC74DB60019312F /* options.cpp in Sources */,

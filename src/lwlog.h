@@ -2,6 +2,10 @@
 
 #include "platform_detection.h"
 
+static inline void lw_null_printf(const char* x, ...) {}
+// Use this instead of LOGI if you want to suppress logging temporarily
+#define LOGIx(...) (void)lw_null_printf(__VA_ARGS__);
+
 #if LW_PLATFORM_WIN32
 #include <stdio.h>
 #include <windows.h>

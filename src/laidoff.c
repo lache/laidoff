@@ -51,6 +51,7 @@
 #include "lwmath.h"
 #include "puckgameupdate.h"
 #include "render_leaderboard.h"
+#include "numcomp_puck_game.h"
 // SWIG output file
 #include "lo_wrap.inl"
 
@@ -1301,68 +1302,110 @@ void linear_interpolate_state(LWPSTATE* p, LWPSTATE* state_buffer, int state_buf
     }
 }
 
-void lwc_prerender_mutable_context(LWCONTEXT* pLwc) {
-    if (pLwc->udp == 0 || pLwc->udp->ready == 0) {
-        return;
+static void dequeue_puck_game_state_and_apply(LWCONTEXT* pLwc) {
+    LWPSTATE new_state;
+    if (ringbuffer_dequeue(&pLwc->udp->state_ring_buffer, &new_state) == 0) {
+        //double client_elapsed = lwtimepoint_now_seconds() - pLwc->udp->puck_state_sync_client_timepoint;
+        //double sample_update_tick = (pLwc->udp->puck_state_sync_server_timepoint + client_elapsed) * state_sync_hz;
+        //LWPSTATE sampled_state;
+        //linear_interpolate_state(&sampled_state, pLwc->udp->state_buffer, LW_STATE_RING_BUFFER_CAPACITY, sample_update_tick);
+        //memcpy(&pLwc->puck_game_state, &sampled_state, sizeof(LWPSTATE));
+        
+        // 'player' is currently playing player
+        // 'target' is currently opponent player
+        const int player_damage = pLwc->puck_game_state.bf.player_current_hp - new_state.bf.player_current_hp;
+        if (player_damage > 0) {
+            puck_game_shake_player(pLwc->puck_game, &pLwc->puck_game->player);
+            puck_game_spawn_tower_damage_text(pLwc,
+                                              pLwc->puck_game,
+                                              &pLwc->puck_game->tower[pLwc->puck_game->player_no == 2 ? 1 : 0/*player*/],
+                                              player_damage);
+        }
+        const int target_damage = pLwc->puck_game_state.bf.target_current_hp - new_state.bf.target_current_hp;
+        if (target_damage > 0) {
+            puck_game_shake_player(pLwc->puck_game, &pLwc->puck_game->target);
+            puck_game_spawn_tower_damage_text(pLwc,
+                                              pLwc->puck_game,
+                                              &pLwc->puck_game->tower[pLwc->puck_game->player_no == 2 ? 0 : 1/*target*/],
+                                              target_damage);
+        }
+        // If the battle is finished
+        if (pLwc->puck_game_state.bf.finished < new_state.bf.finished) {
+            LOGI(LWLOGPOS "Battle finished. Destroying UDP context...");
+            destroy_udp(&pLwc->udp);
+        }
+        // Overwrite old game state with a new one
+        memcpy(&pLwc->puck_game_state, &new_state, sizeof(LWPSTATE));
+    } else {
+        LOGE("State buffer dequeue failed.");
     }
+}
+
+static void convert_state2_to_state(LWPSTATE* state, const LWPSTATE2* state2, const LWNUMCOMPPUCKGAME* numcomp) {
+    state->type = LPGP_LWPSTATE;
+    state->update_tick = state2->update_tick;
+    numcomp_decompress_vec3(state->puck, state2->go[0].pos, &numcomp->v[LNVT_POS]);
+    numcomp_decompress_vec3(state->player, state2->go[1].pos, &numcomp->v[LNVT_POS]);
+    numcomp_decompress_vec3(state->target, state2->go[2].pos, &numcomp->v[LNVT_POS]);
+    numcomp_decompress_mat4x4(state->puck_rot, state2->go[0].rot, &numcomp->q[LNQT_ROT]);
+    numcomp_decompress_mat4x4(state->player_rot, state2->go[1].rot, &numcomp->q[LNQT_ROT]);
+    numcomp_decompress_mat4x4(state->target_rot, state2->go[2].rot, &numcomp->q[LNQT_ROT]);
+    state->puck_speed = numcomp_decompress_float(state2->go[0].speed, &numcomp->f[LNFT_PUCK_SPEED]);
+    state->player_speed = numcomp_decompress_float(state2->go[1].speed, &numcomp->f[LNFT_PUCK_SPEED]);
+    state->target_speed = numcomp_decompress_float(state2->go[2].speed, &numcomp->f[LNFT_PUCK_SPEED]);
+    state->puck_move_rad = numcomp_decompress_float(state2->go[0].move_rad, &numcomp->f[LNFT_PUCK_MOVE_RAD]);
+    state->player_move_rad = numcomp_decompress_float(state2->go[1].move_rad, &numcomp->f[LNFT_PUCK_MOVE_RAD]);
+    state->target_move_rad = numcomp_decompress_float(state2->go[2].move_rad, &numcomp->f[LNFT_PUCK_MOVE_RAD]);
+    state->puck_reflect_size = numcomp_decompress_float(state2->puck_reflect_size, &numcomp->f[LNFT_PUCK_REFLECT_SIZE]);
+    state->bf = state2->bf;
+}
+
+static void dequeue_puck_game_state2_and_push_to_state_queue(LWCONTEXT* pLwc) {
+    LWPSTATE2 new_state2;
+    if (ringbuffer_dequeue(&pLwc->udp->state2_ring_buffer, &new_state2) == 0) {
+        LWPSTATE new_state;
+        convert_state2_to_state(&new_state, &new_state2, &pLwc->udp->numcomp);
+        ringbuffer_queue(&pLwc->udp->state_ring_buffer, &new_state);
+    } else {
+        LOGE("State2 buffer dequeue failed.");
+    }
+}
+
+static void dequeue_from_state_queue(LWCONTEXT* pLwc) {
     int size = ringbuffer_size(&pLwc->udp->state_ring_buffer);
-    //const int state_sync_hz = 60;
     if (size >= 1) {
         while (ringbuffer_size(&pLwc->udp->state_ring_buffer) >= 6) {
             LWPSTATE pout_unused;
             ringbuffer_dequeue(&pLwc->udp->state_ring_buffer, &pout_unused);
         }
+        dequeue_puck_game_state_and_apply(pLwc);
+    } else {
+        LOGIx("Puck game state buffer underrun");
+    }
+}
 
-        LWPSTATE new_state;
-        if (ringbuffer_dequeue(&pLwc->udp->state_ring_buffer, &new_state) == 0) {
-            //double client_elapsed = lwtimepoint_now_seconds() - pLwc->udp->puck_state_sync_client_timepoint;
-            //double sample_update_tick = (pLwc->udp->puck_state_sync_server_timepoint + client_elapsed) * state_sync_hz;
-            //LWPSTATE sampled_state;
-            //linear_interpolate_state(&sampled_state, pLwc->udp->state_buffer, LW_STATE_RING_BUFFER_CAPACITY, sample_update_tick);
-            //memcpy(&pLwc->puck_game_state, &sampled_state, sizeof(LWPSTATE));
-            
-            // 'player' is currently playing player
-            // 'target' is currently opponent player
-            const int player_damage = pLwc->puck_game_state.bf.player_current_hp - new_state.bf.player_current_hp;
-            if (player_damage > 0) {
-                puck_game_shake_player(pLwc->puck_game, &pLwc->puck_game->player);
-                puck_game_spawn_tower_damage_text(pLwc,
-                                                  pLwc->puck_game,
-                                                  &pLwc->puck_game->tower[pLwc->puck_game->player_no == 2 ? 1 : 0/*player*/],
-                                                  player_damage);
-            }
-            const int target_damage = pLwc->puck_game_state.bf.target_current_hp - new_state.bf.target_current_hp;
-            if (target_damage > 0) {
-                puck_game_shake_player(pLwc->puck_game, &pLwc->puck_game->target);
-                puck_game_spawn_tower_damage_text(pLwc,
-                                                  pLwc->puck_game,
-                                                  &pLwc->puck_game->tower[pLwc->puck_game->player_no == 2 ? 0 : 1/*target*/],
-                                                   target_damage);
-            }
-            // If the battle is finished
-            if (pLwc->puck_game_state.bf.finished < new_state.bf.finished) {
-                LOGI(LWLOGPOS "Battle finished. Destroying UDP context...");
-                destroy_udp(&pLwc->udp);
-            }
-            // Overwrite old game state with a new one
-            memcpy(&pLwc->puck_game_state, &new_state, sizeof(LWPSTATE));
-        } else {
-            LOGE("State buffer dequeue failed.");
+static void dequeue_from_state2_queue(LWCONTEXT* pLwc) {
+    int size = ringbuffer_size(&pLwc->udp->state2_ring_buffer);
+    if (size >= 1) {
+        while (ringbuffer_size(&pLwc->udp->state2_ring_buffer) >= 6) {
+            LWPSTATE2 pout_unused;
+            ringbuffer_dequeue(&pLwc->udp->state2_ring_buffer, &pout_unused);
         }
+        dequeue_puck_game_state2_and_push_to_state_queue(pLwc);
+        dequeue_puck_game_state_and_apply(pLwc);
+    } else {
+        LOGIx("Puck game state2 buffer underrun");
     }
-    /*else if (size == 3)
-    {
-        const LWPSTATE* p = ringbuffer_peek(&pLwc->udp->state_ring_buffer);
-        if (p) {
-            pLwc->udp->puck_state_sync_server_timepoint = p->update_tick * 1.0 / state_sync_hz;
-            pLwc->udp->puck_state_sync_client_timepoint = lwtimepoint_now_seconds() + (1.0 / state_sync_hz) * 8;
-        }
-    }*/
-    else {
-#if !LW_PLATFORM_WIN32
-        //LOGE("Puck game state buffer underrun");
-#endif
+}
+
+void lwc_prerender_mutable_context(LWCONTEXT* pLwc) {
+    if (pLwc->udp == 0 || pLwc->udp->ready == 0) {
+        return;
     }
+    // using LWPSTATE
+    //dequeue_from_state_queue(pLwc);
+    // using LWPSTATE2
+    dequeue_from_state2_queue(pLwc);
 }
 
 void lwc_render(const LWCONTEXT* pLwc) {

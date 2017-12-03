@@ -1,6 +1,6 @@
 #include "platform_detection.h"
 #include "lwtcp.h"
-
+#include "numcomp_puck_game.h"
 #if LW_PLATFORM_WIN32
 #include <winsock2.h>
 #else
@@ -78,6 +78,7 @@ typedef struct _LWSERVER {
     int token_counter;
     int battle_counter;
     LWPUCKGAME *puck_game_pool[LW_PUCK_GAME_POOL_CAPACITY];
+    LWNUMCOMPPUCKGAME numcomp;
 } LWSERVER;
 
 typedef struct _LWTCPSERVER {
@@ -247,6 +248,8 @@ LWSERVER *new_server() {
         exit(EXIT_FAILURE);
     }
     LOGI("Bind done");
+    // numcomp presets setup
+    numcomp_puck_game_init(&server->numcomp);
     return server;
 }
 
@@ -411,8 +414,13 @@ void select_tcp_server(LWTCPSERVER *server) {
     int rv = select(server->s + 1, &readfds, NULL, NULL, &tv);
     //try to receive some data, this is a blocking call
     if (rv == 1) {
-        if ((server->recv_len = recvfrom(server->s, server->buf, BUFLEN, 0, (struct sockaddr *) &server->si_other,
-                                         &server->slen)) == SOCKET_ERROR) {
+        if ((server->recv_len = (int)recvfrom(server->s,
+                                              server->buf,
+                                              BUFLEN,
+                                              0,
+                                              (struct sockaddr*)&server->si_other,
+
+                                              (socklen_t*)&server->slen)) == SOCKET_ERROR) {
             //LOGE("recvfrom() failed with error code : %d", WSAGetLastError());
             //exit(EXIT_FAILURE);
         } else {
@@ -436,7 +444,7 @@ void select_tcp_server(LWTCPSERVER *server) {
 }
 
 int check_token(LWSERVER *server, LWPUDPHEADER *p, LWPUCKGAME **puck_game) {
-    if (p->battle_id<1 || p->battle_id>LW_PUCK_GAME_POOL_CAPACITY) {
+    if ((p->battle_id<1) || p->battle_id>LW_PUCK_GAME_POOL_CAPACITY) {
         if (p->battle_id != 0) {
             LOGE("Invalid battle id range: %d", p->battle_id);
         } else {
@@ -627,6 +635,8 @@ void select_server(LWSERVER *server, LWPUCKGAME *puck_game, LWCONN *conn, int co
 int tcp_server_entry(void *context) {
     LWTCPSERVER *tcp_server = new_tcp_server();
     LWSERVER *server = context;
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wmissing-noreturn"
     while (1) {
         int c = sizeof(struct sockaddr_in);
         SOCKET client_sock = accept(tcp_server->s, (struct sockaddr *) &tcp_server->server, &c);
@@ -676,7 +686,7 @@ int tcp_server_entry(void *context) {
         } else if (base->type == LPGP_LWPSUDDENDEATH && base->size == sizeof(LWPSUDDENDEATH)) {
             LOGI("LWPSUDDENDEATH!");
             LWPSUDDENDEATH *p = (LWPSUDDENDEATH *) base;
-            if (p->Battle_id<1 || p->Battle_id>LW_PUCK_GAME_POOL_CAPACITY) {
+            if ((p->Battle_id < 1) || p->Battle_id>LW_PUCK_GAME_POOL_CAPACITY) {
 
             } else {
                 LWPUCKGAME *pg = server->puck_game_pool[p->Battle_id - 1];
@@ -690,7 +700,119 @@ int tcp_server_entry(void *context) {
             LOGE("Admin TCP unexpected packet");
         }
     }
+#pragma clang diagnostic pop
     return 0;
+}
+
+void fill_state2_gameobject(LWPSTATE2GAMEOBJECT* packet_field,
+                            const LWSERVER* server,
+                            const LWPUCKGAMEOBJECT* go) {
+    packet_field->pos = numcomp_compress_vec3(go->pos,
+                                              &server->numcomp.v[LNVT_POS]);
+    packet_field->rot = numcomp_compress_mat4x4(go->rot,
+                                                &server->numcomp.q[LNQT_ROT]);
+    packet_field->speed = (unsigned short)numcomp_compress_float(go->speed,
+                                                                 &server->numcomp.f[LNFT_PUCK_SPEED]);
+    packet_field->move_rad = (unsigned short)numcomp_compress_float(go->move_rad,
+                                                                    &server->numcomp.f[LNFT_PUCK_MOVE_RAD]);
+}
+
+void send_puck_game_state2(LWSERVER* server,
+                           const LWPUCKGAME* puck_game,
+                           int player_no,
+                           struct sockaddr* sa) {
+    LW_PUCK_GAME_OBJECT player_go_enum = LPGO_PLAYER;
+    LW_PUCK_GAME_OBJECT target_go_enum = LPGO_TARGET;
+    const LWPUCKGAMEPLAYER *player = &puck_game->player;
+    const LWPUCKGAMEPLAYER *target = &puck_game->target;
+    if (player_no == 2) {
+        player = &puck_game->target;
+        target = &puck_game->player;
+    }
+    LWPSTATE2 packet_state;
+    packet_state.type = LPGP_LWPSTATE2;
+    packet_state.puck_reflect_size = (unsigned char)numcomp_compress_float(puck_game->puck_reflect_size,
+                                                                           &server->numcomp.f[LNFT_PUCK_REFLECT_SIZE]);
+    packet_state.update_tick = (unsigned short)puck_game->update_tick;
+    fill_state2_gameobject(&packet_state.go[0], server, &puck_game->go[LPGO_PUCK]);
+    fill_state2_gameobject(&packet_state.go[1], server, &puck_game->go[player_go_enum]);
+    fill_state2_gameobject(&packet_state.go[2], server, &puck_game->go[target_go_enum]);
+    packet_state.bf.player_current_hp = (unsigned int)player->current_hp;
+    packet_state.bf.player_total_hp = (unsigned int)player->total_hp;
+    packet_state.bf.target_current_hp = (unsigned int)target->current_hp;
+    packet_state.bf.target_total_hp = (unsigned int)target->total_hp;
+    packet_state.bf.puck_owner_player_no = (unsigned int)puck_game->puck_owner_player_no;
+    packet_state.bf.finished = (unsigned int)puck_game->finished;
+    packet_state.bf.player_pull = (unsigned int)puck_game->remote_control[0].pull_puck;
+    packet_state.bf.target_pull = (unsigned int)puck_game->remote_control[1].pull_puck;
+    // send!
+    double tp = lwtimepoint_now_seconds();
+    sendto(server->s,
+           (const char*)&packet_state,
+           sizeof(packet_state),
+           0,
+           sa,
+           server->slen);
+    // log elapsed time
+    double elapsed = lwtimepoint_now_seconds() - tp;
+    //LOGI("Broadcast sendto elapsed: %.3f ms", elapsed * 1000);
+}
+
+void send_puck_game_state(LWSERVER* server,
+                          const LWPUCKGAME* puck_game,
+                          int player_no,
+                          struct sockaddr* sa) {
+    float x_scale = 1.0f;
+    float y_scale = 1.0f;
+    LW_PUCK_GAME_OBJECT player_go_enum = LPGO_PLAYER;
+    LW_PUCK_GAME_OBJECT target_go_enum = LPGO_TARGET;
+    const LWPUCKGAMEPLAYER *player = &puck_game->player;
+    const LWPUCKGAMEPLAYER *target = &puck_game->target;
+    if (player_no == 2) {
+        player = &puck_game->target;
+        target = &puck_game->player;
+    }
+    LWPSTATE packet_state;
+    packet_state.type = LPGP_LWPSTATE;
+    packet_state.update_tick = puck_game->update_tick;
+    packet_state.puck[0] = x_scale * puck_game->go[LPGO_PUCK].pos[0];
+    packet_state.puck[1] = y_scale * puck_game->go[LPGO_PUCK].pos[1];
+    packet_state.puck[2] = puck_game->go[LPGO_PUCK].pos[2];
+    packet_state.player[0] = x_scale * puck_game->go[player_go_enum].pos[0];
+    packet_state.player[1] = y_scale * puck_game->go[player_go_enum].pos[1];
+    packet_state.player[2] = puck_game->go[player_go_enum].pos[2];
+    packet_state.target[0] = x_scale * puck_game->go[target_go_enum].pos[0];
+    packet_state.target[1] = y_scale * puck_game->go[target_go_enum].pos[1];
+    packet_state.target[2] = puck_game->go[target_go_enum].pos[2];
+    memcpy(packet_state.puck_rot, puck_game->go[LPGO_PUCK].rot, sizeof(mat4x4));
+    memcpy(packet_state.player_rot, puck_game->go[player_go_enum].rot, sizeof(mat4x4));
+    memcpy(packet_state.target_rot, puck_game->go[target_go_enum].rot, sizeof(mat4x4));
+    packet_state.puck_speed = puck_game->go[LPGO_PUCK].speed;
+    packet_state.player_speed = puck_game->go[player_go_enum].speed;
+    packet_state.target_speed = puck_game->go[target_go_enum].speed;
+    packet_state.puck_move_rad = puck_game->go[LPGO_PUCK].move_rad;
+    packet_state.player_move_rad = puck_game->go[player_go_enum].move_rad;
+    packet_state.target_move_rad = puck_game->go[target_go_enum].move_rad;
+    packet_state.puck_reflect_size = puck_game->puck_reflect_size;
+    packet_state.bf.player_current_hp = (unsigned int)player->current_hp;
+    packet_state.bf.player_total_hp = (unsigned int)player->total_hp;
+    packet_state.bf.target_current_hp = (unsigned int)target->current_hp;
+    packet_state.bf.target_total_hp = (unsigned int)target->total_hp;
+    packet_state.bf.puck_owner_player_no = (unsigned int)puck_game->puck_owner_player_no;
+    packet_state.bf.finished = (unsigned int)puck_game->finished;
+    packet_state.bf.player_pull = (unsigned int)puck_game->remote_control[0].pull_puck;
+    packet_state.bf.target_pull = (unsigned int)puck_game->remote_control[1].pull_puck;
+    // send!
+    double tp = lwtimepoint_now_seconds();
+    sendto(server->s,
+           (const char*)&packet_state,
+           sizeof(packet_state),
+           0,
+           sa,
+           server->slen);
+    // log elapsed time
+    double elapsed = lwtimepoint_now_seconds() - tp;
+    //LOGI("Broadcast sendto elapsed: %.3f ms", elapsed * 1000);
 }
 
 void broadcast_state_packet(LWSERVER *server, const LWCONN *conn, int conn_capacity) {
@@ -702,57 +824,14 @@ void broadcast_state_packet(LWSERVER *server, const LWCONN *conn, int conn_capac
             && conn[i].battle_id <= LW_PUCK_GAME_POOL_CAPACITY) {
             const LWPUCKGAME *puck_game = server->puck_game_pool[conn[i].battle_id - 1];
             if (puck_game) {
-                float xscale = 1.0f;
-                float yscale = 1.0f;
-                LW_PUCK_GAME_OBJECT player_go_enum = LPGO_PLAYER;
-                LW_PUCK_GAME_OBJECT target_go_enum = LPGO_TARGET;
-                const LWPUCKGAMEPLAYER *player = &puck_game->player;
-                const LWPUCKGAMEPLAYER *target = &puck_game->target;
-                if (conn[i].player_no == 2) {
-                    /*player_go_enum = LPGO_TARGET;
-                    target_go_enum = LPGO_PLAYER;
-                    xscale = -1.0f;
-                    yscale = -1.0f;*/
-                    player = &puck_game->target;
-                    target = &puck_game->player;
-                }
-
-                LWPSTATE packet_state;
-                packet_state.type = LPGP_LWPSTATE;
-                packet_state.update_tick = puck_game->update_tick;
-                packet_state.puck[0] = xscale * puck_game->go[LPGO_PUCK].pos[0];
-                packet_state.puck[1] = yscale * puck_game->go[LPGO_PUCK].pos[1];
-                packet_state.puck[2] = puck_game->go[LPGO_PUCK].pos[2];
-                packet_state.player[0] = xscale * puck_game->go[player_go_enum].pos[0];
-                packet_state.player[1] = yscale * puck_game->go[player_go_enum].pos[1];
-                packet_state.player[2] = puck_game->go[player_go_enum].pos[2];
-                packet_state.target[0] = xscale * puck_game->go[target_go_enum].pos[0];
-                packet_state.target[1] = yscale * puck_game->go[target_go_enum].pos[1];
-                packet_state.target[2] = puck_game->go[target_go_enum].pos[2];
-                memcpy(packet_state.puck_rot, puck_game->go[LPGO_PUCK].rot, sizeof(mat4x4));
-                memcpy(packet_state.player_rot, puck_game->go[player_go_enum].rot, sizeof(mat4x4));
-                memcpy(packet_state.target_rot, puck_game->go[target_go_enum].rot, sizeof(mat4x4));
-                packet_state.puck_speed = puck_game->go[LPGO_PUCK].speed;
-                packet_state.player_speed = puck_game->go[player_go_enum].speed;
-                packet_state.target_speed = puck_game->go[target_go_enum].speed;
-                packet_state.puck_move_rad = puck_game->go[LPGO_PUCK].move_rad;
-                packet_state.player_move_rad = puck_game->go[player_go_enum].move_rad;
-                packet_state.target_move_rad = puck_game->go[target_go_enum].move_rad;
-                packet_state.puck_reflect_size = puck_game->puck_reflect_size;
-                packet_state.bf.player_current_hp = (unsigned int)player->current_hp;
-                packet_state.bf.player_total_hp = (unsigned int)player->total_hp;
-                packet_state.bf.target_current_hp = (unsigned int)target->current_hp;
-                packet_state.bf.target_total_hp = (unsigned int)target->total_hp;
-                packet_state.bf.puck_owner_player_no = (unsigned int)puck_game->puck_owner_player_no;
-                packet_state.bf.finished = (unsigned int)puck_game->finished;
-                packet_state.bf.player_pull = (unsigned int)puck_game->remote_control[0].pull_puck;
-                packet_state.bf.target_pull = (unsigned int)puck_game->remote_control[1].pull_puck;
-                double tp = lwtimepoint_now_seconds();
-                sendto(server->s, (const char *) &packet_state, sizeof(packet_state), 0,
-                       (struct sockaddr *) &conn[i].si, server->slen);
-                // log elapsed time
-                double elapsed = lwtimepoint_now_seconds() - tp;
-                //LOGI("Broadcast sendto elapsed: %.3f ms", elapsed * 1000);
+//                send_puck_game_state(server,
+//                                     puck_game,
+//                                     conn[i].player_no,
+//                                     (struct sockaddr*)&conn[i].si);
+                send_puck_game_state2(server,
+                                      puck_game,
+                                      conn[i].player_no,
+                                      (struct sockaddr*)&conn[i].si);
                 sent = 1;
             }
         }

@@ -14,6 +14,7 @@
 #endif
 #include "puckgamepacket.h"
 #include "lwringbuffer.h"
+#include "numcomp_puck_game.h"
 
 #define LW_UDP_BUFLEN (512)
 #define LW_STATE_RING_BUFFER_CAPACITY (16)
@@ -37,6 +38,14 @@ typedef struct _LWUDP {
 	double puck_state_sync_client_timepoint;
 	int state_count;
 	double state_start_timepoint;
+    // State2 ring buffer
+    LWPSTATE state2_buffer[LW_STATE_RING_BUFFER_CAPACITY];
+    LWRINGBUFFER state2_ring_buffer;
+    double puck_state2_sync_server_timepoint;
+    double puck_state2_sync_client_timepoint;
+    int state2_count;
+    double state2_start_timepoint;
+    LWNUMCOMPPUCKGAME numcomp;
 } LWUDP;
 
 typedef struct _LWCONTEXT LWCONTEXT;

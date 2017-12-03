@@ -58,6 +58,8 @@ LWUDP* new_udp() {
     make_socket_nonblocking(udp->s);
     udp->ready = 1;
     ringbuffer_init(&udp->state_ring_buffer, udp->state_buffer, sizeof(LWPSTATE), LW_STATE_RING_BUFFER_CAPACITY);
+    ringbuffer_init(&udp->state2_ring_buffer, udp->state2_buffer, sizeof(LWPSTATE2), LW_STATE_RING_BUFFER_CAPACITY);
+    numcomp_puck_game_init(&udp->numcomp);
     return udp;
 }
 
@@ -89,6 +91,10 @@ void queue_state(LWUDP* udp, const LWPSTATE* p) {
     ringbuffer_queue(&udp->state_ring_buffer, p);
 }
 
+void queue_state2(LWUDP* udp, const LWPSTATE2* p) {
+    ringbuffer_queue(&udp->state2_ring_buffer, p);
+}
+
 void udp_update(LWCONTEXT* pLwc, LWUDP* udp) {
     if (udp->ready == 0) {
         return;
@@ -98,7 +104,7 @@ void udp_update(LWCONTEXT* pLwc, LWUDP* udp) {
     int rv = 0;
     while ((rv = select(udp->s + 1, &udp->readfds, NULL, NULL, &udp->tv)) == 1)
     {
-        if ((udp->recv_len = recvfrom(udp->s, udp->buf, LW_UDP_BUFLEN, 0, (struct sockaddr *) &udp->si_other, &udp->slen)) == SOCKET_ERROR) {
+        if ((udp->recv_len = recvfrom(udp->s, udp->buf, LW_UDP_BUFLEN, 0, (struct sockaddr*)&udp->si_other, (socklen_t*)&udp->slen)) == SOCKET_ERROR) {
 #if LW_PLATFORM_WIN32
             int wsa_error_code = WSAGetLastError();
             if (wsa_error_code == WSAECONNRESET) {
@@ -124,7 +130,7 @@ void udp_update(LWCONTEXT* pLwc, LWUDP* udp) {
             {
                 LWPSTATE* p = (LWPSTATE*)udp->buf;
                 if (udp->recv_len != sizeof(LWPSTATE)) {
-                    LOGE("LWPSTATE: Size error %d (%d expected)", udp->recv_len, sizeof(LWPSTATE));
+                    LOGE("LWPSTATE: Size error %d (%zu expected)", udp->recv_len, sizeof(LWPSTATE));
                 }
                 //int tick_diff = p->update_tick - pLwc->puck_game_state.update_tick;
                 /*if (tick_diff > 0)*/ {
@@ -136,22 +142,48 @@ void udp_update(LWCONTEXT* pLwc, LWUDP* udp) {
                     double state_packet_interval = last_received - pLwc->puck_game_state_last_received;
                     pLwc->puck_game_state_last_received = last_received;
                     pLwc->puck_game_state_last_received_interval = state_packet_interval * 1000;
-                    
-                    queue_state(pLwc->udp, p);
+                    // IGNORE LWPSTATE packet
+                    //queue_state(pLwc->udp, p);
                     int rb_size = ringbuffer_size(&pLwc->udp->state_ring_buffer);
                     if (pLwc->udp->state_count == 0) {
                         pLwc->udp->state_start_timepoint = lwtimepoint_now_seconds();
                     }
                     pLwc->udp->state_count++;
                     double elapsed_from_start = lwtimepoint_now_seconds() - pLwc->udp->state_start_timepoint;
-                    //LOGI("State packet interval: %.3f ms (rb size=%d) (%.2f pps)", pLwc->puck_game_state_last_received_interval, rb_size, (float)pLwc->udp->state_count / elapsed_from_start);
-                    
+                    LOGIx("State packet interval: %.3f ms (rb size=%d) (%.2f pps)",
+                          pLwc->puck_game_state_last_received_interval,
+                          rb_size,
+                          (float)pLwc->udp->state_count / elapsed_from_start);
                 }
                 break;
             }
             default:
             {
-                LOGE("Unknown datagram (UDP packet) received.");
+                const unsigned char packet_type_short = *(unsigned char*)udp->buf;
+                switch (packet_type_short) {
+                    case LPGP_LWPSTATE2:
+                    {
+                        LWPSTATE2* p = (LWPSTATE2*)udp->buf;
+                        if (udp->recv_len != sizeof(LWPSTATE2)) {
+                            LOGE("LWPSTATE2: Size error %d (%zu expected)", udp->recv_len, sizeof(LWPSTATE));
+                        }
+                        double last_received = lwtimepoint_now_seconds();
+                        double state_packet_interval = last_received - pLwc->puck_game_state2_last_received;
+                        pLwc->puck_game_state2_last_received = last_received;
+                        pLwc->puck_game_state2_last_received_interval = state_packet_interval * 1000;
+                        queue_state2(pLwc->udp, p);
+                        if (pLwc->udp->state2_count == 0) {
+                            pLwc->udp->state2_start_timepoint = lwtimepoint_now_seconds();
+                        }
+                        pLwc->udp->state2_count++;
+                        break;
+                    }
+                    default:
+                    {
+                        LOGE("Unknown datagram (UDP packet) received.");
+                        break;
+                    }
+                }
                 break;
             }
         }

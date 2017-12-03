@@ -2,9 +2,11 @@
   <dictionary name="kimgeoyeob">
     <words>
       <w>decomp</w>
+      <w>gameobject</w>
       <w>leaderboard</w>
       <w>logi</w>
       <w>lwnumcompfloatpreset</w>
+      <w>lwnumcomppuckgame</w>
       <w>lwnumcompquaternionpreset</w>
       <w>lwnumcompvec</w>
       <w>numcomp</w>

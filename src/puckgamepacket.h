@@ -16,6 +16,7 @@ typedef enum _LW_PUCK_GAME_PACKET {
 	LPGP_LWPSTATE,
     LPGP_LWPJUMP,
     LPGP_LWPFIRE,
+    LPGP_LWPSTATE2,
 
 	// tcp
 	LPGP_LWPQUEUE2 = 200,
@@ -181,7 +182,7 @@ typedef struct _LWPSTATE2 {
     unsigned char type;
     unsigned char puck_reflect_size; // fixed-point compressed float
     unsigned short update_tick;
-    LWPSTATE2GAMEOBJECT go[3]; // [3] --> [0]:player, [1]:puck, [2]:target
+    LWPSTATE2GAMEOBJECT go[3]; // [3] --> [0]:puck, [1]:player, [2]:target
     LWPSTATEBITFIELD bf; // bitfield
 } LWPSTATE2;
 

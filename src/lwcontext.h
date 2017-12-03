@@ -330,6 +330,12 @@ typedef struct _LWCONTEXT {
 	double puck_game_state_last_received;
 	// Last state packet reception interval (msec)
 	double puck_game_state_last_received_interval;
+    // Puck game remote(server) state
+    //LWPSTATE puck_game_state2;
+    // Puck game remote state last received time (sec)
+    double puck_game_state2_last_received;
+    // Last state packet reception interval (msec)
+    double puck_game_state2_last_received_interval;
 	const char* internal_data_path;
     const char* user_data_path;
 	mat4x4 puck_game_view;

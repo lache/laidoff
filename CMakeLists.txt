@@ -252,6 +252,8 @@ add_executable(laidoff-server
         src/lwtcp.h
         src/numcomp.c
         src/numcomp.h
+        src/numcomp_puck_game.c
+        src/numcomp_puck_game.h
         ${LAIDOFF_SERVER_LIB}
         ${SERVER_WIN32_DEPS}
         ${ODE_LIB}

@@ -157,7 +157,7 @@ unsigned int numcomp_compress_quaternion(const float q0[4], const LWNUMCOMPQUATE
             abs_max_negative = q[i] < 0;
         }
     }
-    LOGI("abs_max_idx = %d (negative = %d)", abs_max_idx, abs_max_negative);
+    LOGIx("abs_max_idx = %d (negative = %d)", abs_max_idx, abs_max_negative);
     if (abs_max_negative) {
         for (int i = 0; i < 4; i++) {
             q[i] *= -1;
