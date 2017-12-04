@@ -1,4 +1,4 @@
-﻿#include "render_ui.h"
+#include "render_ui.h"
 #include "lwgl.h"
 #include "lwcontext.h"
 #include "laidoff.h"
@@ -328,15 +328,15 @@ static void s_render_full_panel(const LWCONTEXT* pLwc, LWBUTTONLIST* button_list
 	const float full_panel_bg_x_nor = -pLwc->aspect_ratio + full_panel_width/2;
 	const float full_panel_bg_y_nor = -0.25f/2;
 
-	int shader_index = LWST_COLOR;
+    int panel_shader_index = LWST_COLOR; //LWST_PANEL;
 
-	glUseProgram(pLwc->shader[shader_index].program);
-	glUniform1f(pLwc->shader[shader_index].time, (float)pLwc->app_time);
-	glUniform2f(pLwc->shader[shader_index].resolution, (float)pLwc->width, (float)pLwc->height);
+	glUseProgram(pLwc->shader[panel_shader_index].program);
+	glUniform1f(pLwc->shader[panel_shader_index].time, (float)pLwc->app_time);
+	glUniform2f(pLwc->shader[panel_shader_index].resolution, (float)pLwc->width, (float)pLwc->height);
 	// Panel background
 	render_solid_vb_ui_flip_y_uv_shader_rot(pLwc, full_panel_bg_x_nor, full_panel_bg_y_nor, 2 * full_panel_bg_size_nor, 2 * full_panel_bg_size_nor,
 		0, LVT_UI_FULL_PANEL_BG,
-		1, 0, 0, 0, 0, 0, shader_index, 0);
+		1, 0, 0, 0, 0, 0, panel_shader_index, 0);
 	// Panel title
 	LWTEXTBLOCK text_block;
 	text_block.align = LTBA_LEFT_TOP;
@@ -401,6 +401,7 @@ static void s_render_full_panel(const LWCONTEXT* pLwc, LWBUTTONLIST* button_list
 		render_text_block(pLwc, &text_block);
 
 		// Upgrade button
+        int shader_index = LWST_COLOR;
 		const float wf = button_width * button_scale;
 		const float hf = button_height * button_scale;
 		render_solid_vb_ui_flip_y_uv_shader_rot(pLwc, button_x, button_y, 2.0f * button_scale, 2.0f * button_scale,
