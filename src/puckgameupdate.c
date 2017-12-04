@@ -344,9 +344,9 @@ void puck_game_rematch(LWCONTEXT* pLwc, LWPUCKGAME* puck_game) {
 
 void puck_game_reset_view_proj(LWCONTEXT* pLwc, LWPUCKGAME* puck_game) {
     // Setup puck game view, proj matrices
-    const float screen_aspect_ratio = (float)pLwc->width / pLwc->height;
-    mat4x4_perspective(pLwc->puck_game_proj, (float)(LWDEG2RAD(49.1343) / screen_aspect_ratio), screen_aspect_ratio, 1.0f, 500.0f);
-    vec3 eye = { 0.0f, 0.0f, 12.0f };
+    
+    mat4x4_perspective(pLwc->puck_game_proj, (float)(LWDEG2RAD(49.1343) / pLwc->aspect_ratio), pLwc->aspect_ratio, 1.0f, 500.0f);
+    vec3 eye = { 0.0f, 0.0f, 10.0f /*12.0f*/ };
     vec3 center = { 0, 0, 0 };
     vec3 up = { 0, 1, 0 };
     if (puck_game->player_no == 2) {

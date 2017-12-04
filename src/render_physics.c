@@ -62,9 +62,9 @@ static void render_tower(const LWCONTEXT* pLwc, const mat4x4 view, const mat4x4 
 
     mat4x4 rot;
     mat4x4_identity(rot);
-    float sx = 1.0f;
-    float sy = 1.0f;
-    float sz = 1.0f;
+    float sx = puck_game->tower_radius / puck_game->tower_mesh_radius;
+    float sy = sx;
+    float sz = sx;
 
     float hp_ratio = 0;
     if (remote) {

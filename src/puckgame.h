@@ -83,9 +83,8 @@ typedef struct _LWPUCKGAMETOWER {
 #define LW_PUCK_GAME_TOWER_COUNT (2)
 
 typedef struct _LWPUCKGAME {
-	// Static game data
+	// ---- Static game data begin
 	float world_size;
-	float world_size_half;
 	float dash_interval;
 	float dash_duration;
 	float dash_shake_time;
@@ -104,11 +103,14 @@ typedef struct _LWPUCKGAME {
     float fire_shake_time;
     float tower_pos;
     float tower_radius;
-    float tower_pos_multiplier[LW_PUCK_GAME_TOWER_COUNT][2];
+    float tower_mesh_radius;
     int tower_total_hp;
     float tower_shake_time;
     float go_start_pos;
-	// ----
+    int hp;
+    // ---- Static game data end
+    float world_size_half;
+    float tower_pos_multiplier[LW_PUCK_GAME_TOWER_COUNT][2];
 	dWorldID world;
 	dSpaceID space;
 	dGeomID boundary[LPGB_COUNT];
@@ -152,7 +154,6 @@ typedef struct _LWPUCKGAME {
     unsigned int id2[4];
     int puck_owner_player_no;
     float puck_reflect_size;
-    int hp;
     int world_roll_axis; // 0: x-axis, 1: y-axis, 2: z-axis
     int world_roll_dir; // 0: positive, 1: negative
     float world_roll;

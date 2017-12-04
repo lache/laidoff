@@ -35,6 +35,7 @@ typedef enum _LW_PUCK_GAME_PACKET {
     LPGP_LWPBATTLERESULT = 214,
     LPGP_LWPSETNICKNAME = 215,
     LPGP_LWPSETNICKNAMERESULT = 216,
+    LPGP_LWPSETBATTLEPRESET = 217,
     // should be less than 256 (packet type field: unsigned char type)
     LPGP_SENTIAL_UNSIGNED_CHAR = 255,
 	// internal admin tcp
@@ -354,5 +355,37 @@ typedef struct _LWPSETNICKNAMERESULT {
     unsigned int Id[4];
     char Nickname[LW_NICKNAME_MAX_LEN];
 } LWPSETNICKNAMERESULT;
+
+typedef struct _LWPSETBATTLEPRESET {
+    unsigned short size;
+    unsigned short type;
+    // LWPUCKGAME datasheet
+    float world_size;
+    float dash_interval;
+    float dash_duration;
+    float dash_shake_time;
+    float hp_shake_time;
+    float jump_force;
+    float jump_interval;
+    float jump_shake_time;
+    float puck_damage_contact_speed_threshold;
+    float sphere_mass;
+    float sphere_radius;
+    float total_time;
+    float fire_max_force;
+    float fire_max_vel;
+    float fire_interval;
+    float fire_duration;
+    float fire_shake_time;
+    float tower_pos;
+    float tower_radius;
+    float tower_mesh_radius;
+    int tower_total_hp;
+    float tower_shake_time;
+    float go_start_pos;
+    int hp;
+    // Camera
+    float camera_height;
+} LWPSETBATTLEPRESET;
 
 //#pragma pack(pop)

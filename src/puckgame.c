@@ -59,33 +59,36 @@ LWPUCKGAME* new_puck_game() {
     memset(puck_game, 0, sizeof(LWPUCKGAME));
     // datasheet begin
     puck_game->world_size = 4.0f;
-    puck_game->world_size_half = puck_game->world_size / 2;
     puck_game->dash_interval = 1.2f;
     puck_game->dash_duration = 0.1f;
     puck_game->dash_shake_time = 0.3f;
     puck_game->hp_shake_time = 0.3f;
-    puck_game->puck_damage_contact_speed_threshold = 1.1f;
-    puck_game->sphere_mass = 0.1f;
-    puck_game->sphere_radius = 0.16f;
-    puck_game->total_time = 80.0f;
     puck_game->jump_force = 35.0f;
     puck_game->jump_interval = 0.5f;
     puck_game->jump_shake_time = 0.5f;
+    puck_game->puck_damage_contact_speed_threshold = 1.1f;
+    puck_game->sphere_mass = 0.1f;
+    puck_game->sphere_radius = 0.12f; //0.16f;
+    puck_game->total_time = 80.0f;
     puck_game->fire_max_force = 35.0f;
     puck_game->fire_max_vel = 5.0f;
     puck_game->fire_interval = 1.5f;
     puck_game->fire_duration = 0.2f;
     puck_game->fire_shake_time = 0.5f;
     puck_game->tower_pos = 1.1f;
-    puck_game->tower_radius = 0.825f / 2; // Check tower.blend file
-    puck_game->puck_reflect_size = 1.0f;
+    puck_game->tower_radius = 0.3f; //0.825f / 2;
+    puck_game->tower_mesh_radius = 0.825f / 2; // Check tower.blend file
+    puck_game->tower_total_hp = 5;
+    puck_game->tower_shake_time = 0.2f;
+    puck_game->go_start_pos = 0.6f;
     puck_game->hp = 10;
     // datasheet end
+    puck_game->world_size_half = puck_game->world_size / 2;
     puck_game->player.total_hp = puck_game->hp;
     puck_game->player.current_hp = puck_game->hp;
     puck_game->target.total_hp = puck_game->hp;
     puck_game->target.current_hp = puck_game->hp;
-
+    puck_game->puck_reflect_size = 1.0f;
     int tower_pos_multiplier_index = 0;
     puck_game->tower_pos_multiplier[tower_pos_multiplier_index][0] = -1;
     puck_game->tower_pos_multiplier[tower_pos_multiplier_index][1] = -1;
@@ -103,9 +106,7 @@ LWPUCKGAME* new_puck_game() {
         LOGE("Runtime assertion error");
         exit(-1);
     }
-    puck_game->tower_total_hp = 5;
-    puck_game->tower_shake_time = 0.2f;
-    puck_game->go_start_pos = 0.6f;
+
     // ------
 
     // Initialize OpenDE

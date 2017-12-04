@@ -1,4 +1,4 @@
-﻿#include <string.h>
+#include <string.h>
 
 #include "lwcontext.h"
 #include "render_dialog.h"
@@ -43,9 +43,9 @@ static void render_dialog_balloon(const LWCONTEXT* pLwc)
 	glUniform1i(pLwc->shader[shader_index].alpha_only_location, 1); // 1 means GL_TEXTURE1
 	glUniformMatrix4fv(pLwc->shader[shader_index].mvp_location, 1, GL_FALSE, (const GLfloat*)pLwc->proj);
 
-	const float screen_aspect_ratio = (float)pLwc->width / pLwc->height;
+	
 
-	float ui_scale_x = screen_aspect_ratio;
+	float ui_scale_x = pLwc->aspect_ratio;
 	float ui_scale_y = 0.275f;
 
 	mat4x4 model_translate;
@@ -87,9 +87,9 @@ static void render_bg(const LWCONTEXT* pLwc)
 {
 	int shader_index = LWST_DEFAULT;
 
-	const float screen_aspect_ratio = (float)pLwc->width / pLwc->height;
+	
 
-	float ui_scale_x = screen_aspect_ratio;
+	float ui_scale_x = pLwc->aspect_ratio;
 	float ui_scale_y = 1;
 
 	mat4x4 model_translate;

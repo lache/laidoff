@@ -601,10 +601,10 @@ void lwc_render_field(const LWCONTEXT* pLwc) {
     glUniform1f(pLwc->shader[shader_index].overlay_color_ratio_location, 0);
     glUniformMatrix4fv(pLwc->shader[shader_index].mvp_location, 1, GL_FALSE, (const GLfloat*)pLwc->proj);
     
-    const float screen_aspect_ratio = (float)pLwc->width / pLwc->height;
+    
     
     mat4x4 perspective;
-    mat4x4_perspective(perspective, (float)(LWDEG2RAD(49.134) / screen_aspect_ratio), screen_aspect_ratio, 1.0f, 500.0f);
+    mat4x4_perspective(perspective, (float)(LWDEG2RAD(49.134) / pLwc->aspect_ratio), pLwc->aspect_ratio, 1.0f, 500.0f);
     
     float player_x = 0, player_y = 0, player_z = 0;
     get_field_player_position(pLwc->field, &player_x, &player_y, &player_z);

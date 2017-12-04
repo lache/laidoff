@@ -1,4 +1,4 @@
-﻿#include <stdio.h>
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -468,7 +468,7 @@ void render_player_creature_ui(const LWCONTEXT* pLwc, const LWBATTLECREATURE* c,
 	SET_COLOR_RGBA_FLOAT(text_block.color_emp_outline, 0, 0, 0, 1);
 
 
-	const float screen_aspect_ratio = (float)pLwc->width / pLwc->height;
+	
 
 	float left_top_x = 0;
 	float left_top_y = 0;
@@ -476,9 +476,9 @@ void render_player_creature_ui(const LWCONTEXT* pLwc, const LWBATTLECREATURE* c,
 	float area_width = 0;
 	float area_height = 0;
 
-	get_player_creature_ui_box(pos, screen_aspect_ratio, &left_top_x, &left_top_y, &area_width, &area_height);
+	get_player_creature_ui_box(pos, pLwc->aspect_ratio, &left_top_x, &left_top_y, &area_width, &area_height);
 
-	const float block_x_margin = 0.075f * screen_aspect_ratio;
+	const float block_x_margin = 0.075f * pLwc->aspect_ratio;
 	const float block_y_margin = 0.025f;
 
 	const float bar_width = area_width - block_x_margin * 2;
@@ -748,9 +748,9 @@ static void render_command_palette(const LWCONTEXT* pLwc) {
 		return;
 	}
 
-	const float screen_aspect_ratio = (float)pLwc->width / pLwc->height;
+	
 
-	const float screen_width = 2 * screen_aspect_ratio;
+	const float screen_width = 2 * pLwc->aspect_ratio;
 	const float screen_height = 2;
 	const int command_slot_margin_count = 2;
 	const int command_slot_count = 6;
@@ -900,7 +900,7 @@ void lwc_render_battle(const LWCONTEXT* pLwc) {
 
 	glUniformMatrix4fv(pLwc->shader[shader_index].mvp_location, 1, GL_FALSE, (const GLfloat*)pLwc->proj);
 
-	const float screen_aspect_ratio = (float)pLwc->width / pLwc->height;
+	
 
 	int only_render_ui = 0;
 
@@ -910,7 +910,7 @@ void lwc_render_battle(const LWCONTEXT* pLwc) {
 			pLwc,
 			0,
 			0,
-			2 * screen_aspect_ratio,
+			2 * pLwc->aspect_ratio,
 			2,
 			pLwc->tex_programmed[LPT_SOLID_TRANSPARENT],
 			LVT_CENTER_CENTER_ANCHORED_SQUARE,

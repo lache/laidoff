@@ -1,4 +1,4 @@
-﻿#include <stdio.h>
+#include <stdio.h>
 #include <string.h>
 #include "render_battle_result.h"
 #include "lwcontext.h"
@@ -34,7 +34,7 @@ void render_player_creature_battle_result_ui(const LWCONTEXT* pLwc, const LWBATT
 	SET_COLOR_RGBA_FLOAT(text_block.color_emp_outline, 0, 0, 0, 1);
 
 
-	const float screen_aspect_ratio = (float)pLwc->width / pLwc->height;
+	
 
 	float left_top_x = 0;
 	float left_top_y = 0;
@@ -42,9 +42,9 @@ void render_player_creature_battle_result_ui(const LWCONTEXT* pLwc, const LWBATT
 	float area_width = 0;
 	float area_height = 0;
 
-	get_player_creature_result_ui_box(pos, screen_aspect_ratio, &left_top_x, &left_top_y, &area_width, &area_height);
+	get_player_creature_result_ui_box(pos, pLwc->aspect_ratio, &left_top_x, &left_top_y, &area_width, &area_height);
 
-	const float block_x_margin = 0.075f * screen_aspect_ratio;
+	const float block_x_margin = 0.075f * pLwc->aspect_ratio;
 	const float block_y_margin = 0.025f;
 
 	const float bar_width = area_width - block_x_margin * 2;
