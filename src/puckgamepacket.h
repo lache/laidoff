@@ -40,6 +40,8 @@ typedef enum _LW_PUCK_GAME_PACKET {
 	// internal admin tcp
 	LPGP_LWPCREATEBATTLE = 1000,
 	LPGP_LWPCREATEBATTLEOK = 1001,
+    LPGP_LWPCHECKBATTLEVALID = 1002,
+    LPGP_LWPBATTLEVALID = 1003,
 } LW_PUCK_GAME_PACKET;
 
 // Client -> Server
@@ -273,6 +275,18 @@ typedef struct _LWPCREATEBATTLEOK {
 	unsigned short Port;
 	unsigned short Padding_unused;
 } LWPCREATEBATTLEOK;
+
+typedef struct _LWPCHECKBATTLEVALID {
+    unsigned short Size;
+    unsigned short Type;
+    int Battle_id;
+} LWPCHECKBATTLEVALID;
+
+typedef struct _LWPBATTLEVALID {
+    unsigned short Size;
+    unsigned short Type;
+    int Valid;
+} LWPBATTLEVALID;
 
 typedef struct _LWPSUDDENDEATH {
 	unsigned short Size;

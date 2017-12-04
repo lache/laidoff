@@ -96,6 +96,14 @@ func NewCreateBattle(id1, id2 user.UserId, nickname1, nickname2 string) *C.LWPCR
 	}
 }
 
+func NewCheckBattleValid(battleId int) *C.LWPCHECKBATTLEVALID {
+	return &C.LWPCHECKBATTLEVALID{
+		C.ushort(unsafe.Sizeof(C.LWPCHECKBATTLEVALID{})),
+		C.LPGP_LWPCHECKBATTLEVALID,
+		C.int(battleId),
+	}
+}
+
 func Packet2Buf(packet interface{}) []byte {
 	buf := &bytes.Buffer{}
 	binary.Write(buf, binary.LittleEndian, packet)

@@ -2,26 +2,34 @@ package battle
 
 import (
 	"log"
-	"unsafe"
 	"bytes"
 	"encoding/binary"
 	"../user"
 	"../config"
 	"../convert"
 	"net"
+	"reflect"
+	"errors"
+	"unsafe"
 )
 // #include "../../src/puckgamepacket.h"
 import "C"
 
 type Ok struct {
+	RemoveCache    bool
+	BattleId       int
 	createBattleOk C.LWPCREATEBATTLEOK
-	c1 user.UserAgent
-	c2 user.UserAgent
+	c1             user.UserAgent
+	c2             user.UserAgent
+	RemoveUserId   user.UserId
 }
 
-func CreateBattleInstance(conf config.ServerConfig, c1 user.UserAgent, c2 user.UserAgent, battleOkQueue chan<- Ok) {
-	// Connect to battle service
-	tcpAddr, err := net.ResolveTCPAddr(conf.BattleServiceConnType, conf.BattleServiceHost+":"+conf.BattleServicePort)
+type Service struct {
+	Conf config.ServerConfig
+}
+
+func (sc *Service) Connection() (net.Conn, error) {
+	tcpAddr, err := net.ResolveTCPAddr(sc.Conf.BattleServiceConnType, sc.Conf.BattleServiceHost+":"+sc.Conf.BattleServicePort)
 	if err != nil {
 		log.Fatalf("ResolveTCPAddr error! - %v", err.Error())
 	}
@@ -29,58 +37,82 @@ func CreateBattleInstance(conf config.ServerConfig, c1 user.UserAgent, c2 user.U
 	if err != nil {
 		log.Fatalf("DialTCP error! - %v", err.Error())
 	}
-	// Send create battle request
+	return conn, err
+}
 
+func WaitForReply(connToBattle net.Conn, replyPacketRef interface{}, expectedReplySize uintptr, expectedReplyType int) error {
+	replyBuf := make([]byte, expectedReplySize)
+	replyBufLen, err := connToBattle.Read(replyBuf)
+	if err != nil {
+		log.Printf("Recv %v reply failed - %v", reflect.TypeOf(replyPacketRef).String(), err.Error())
+		return err
+	}
+	if replyBufLen != int(expectedReplySize) {
+		log.Printf("Recv %v reply size error - %v expected, got %v", reflect.TypeOf(replyPacketRef).String(), expectedReplySize, replyBufLen)
+		return errors.New("read size not match")
+	}
+	replyBufReader := bytes.NewReader(replyBuf)
+	err = binary.Read(replyBufReader, binary.LittleEndian, replyPacketRef)
+	if err != nil {
+		log.Printf("binary.Read fail - %v", err)
+		return err
+	}
+	packetSize := int(binary.LittleEndian.Uint16(replyBuf[0:2]))
+	packetType := int(binary.LittleEndian.Uint16(replyBuf[2:4]))
+	if packetSize == int(expectedReplySize) && packetType == expectedReplyType {
+		return nil
+	}
+	return errors.New("parsed size or type error")
+}
+
+func CreateBattleInstance(battleService Service, c1 user.UserAgent, c2 user.UserAgent, battleOkQueue chan<- Ok) {
+	connToBattle, err := battleService.Connection()
+	if err != nil {
+		log.Fatalf("battleService error! %v", err.Error())
+	}
+	// Send create battle request
 	createBattleBuf := convert.Packet2Buf(convert.NewCreateBattle(
 		c1.Db.Id,
 		c2.Db.Id,
 		c1.Db.Nickname,
 		c2.Db.Nickname,
 	))
-	_, err = conn.Write(createBattleBuf)
+	_, err = connToBattle.Write(createBattleBuf)
 	if err != nil {
 		log.Fatalf("Send LSBPT_LWSPHEREBATTLEPACKETCREATEBATTLE failed")
 	}
 	// Wait for a reply
-	createBattleOk := C.LWPCREATEBATTLEOK{}
-	createBattleOkBuf := make([]byte, unsafe.Sizeof(C.LWPCREATEBATTLEOK{}))
-	createBattleOkBufLen, err := conn.Read(createBattleOkBuf)
+	createBattleOk := &C.LWPCREATEBATTLEOK{}
+	err = WaitForReply(connToBattle, createBattleOk, unsafe.Sizeof(*createBattleOk), int(C.LPGP_LWPCREATEBATTLEOK))
 	if err != nil {
-		log.Printf("Recv LSBPT_LWSPHEREBATTLEPACKETCREATEBATTLE reply failed")
-		return
-	}
-	if createBattleOkBufLen != int(unsafe.Sizeof(C.LWPCREATEBATTLEOK{})) {
-		log.Printf("Recv LSBPT_LWSPHEREBATTLEPACKETCREATEBATTLE reply size error")
-		return
-	}
-	createBattleOkBufReader := bytes.NewReader(createBattleOkBuf)
-	err = binary.Read(createBattleOkBufReader, binary.LittleEndian, &createBattleOk)
-	if err != nil {
-		log.Printf("binary.Read fail")
-		return
-	}
-	if createBattleOk.Size == C.ushort(unsafe.Sizeof(C.LWPCREATEBATTLEOK{})) && createBattleOk.Type == C.LPGP_LWPCREATEBATTLEOK {
+		log.Printf("WaitForReply failed - %v", err.Error())
+	} else {
 		// No error! so far ... proceed battle
 		log.Printf("MATCH %v and %v matched successfully!", c1.Conn.RemoteAddr(), c2.Conn.RemoteAddr())
-		battleOkQueue <- Ok{
-			createBattleOk,
+		battleOkQueue <- Ok {
+			false,
+			int(createBattleOk.Battle_id),
+			*createBattleOk,
 			c1,
 			c2,
+			user.UserId{},
 		}
-	} else {
-		log.Printf("Recv LSBPT_LWSPHEREBATTLEPACKETCREATEBATTLE reply corrupted")
 	}
 }
 
 func OkWorker(conf config.ServerConfig, battleOkQueue <-chan Ok, ongoingBattleMap map[user.UserId]Ok) {
 	for {
 		battleOk := <-battleOkQueue
-		ongoingBattleMap[battleOk.c1.Db.Id] = battleOk
-		ongoingBattleMap[battleOk.c2.Db.Id] = battleOk
-		WriteMatched2(conf, battleOk.c1.Conn, battleOk, battleOk.c1.Db.Id)
-		WriteMatched2(conf, battleOk.c2.Conn, battleOk, battleOk.c2.Db.Id)
-		//battleOk.c1.Conn.Write(createMatched2Buf(conf, battleOk.createBattleOk, battleOk.createBattleOk.C1_token, 1, battleOk.c2.Db.Nickname))
-		//battleOk.c2.Conn.Write(createMatched2Buf(conf, battleOk.createBattleOk, battleOk.createBattleOk.C2_token, 2, battleOk.c1.Db.Nickname))
+		if battleOk.RemoveCache == false {
+			log.Printf("OkWorker: received battle ok. Sending MATCHED2 to both clients")
+			ongoingBattleMap[battleOk.c1.Db.Id] = battleOk
+			ongoingBattleMap[battleOk.c2.Db.Id] = battleOk
+			WriteMatched2(conf, battleOk.c1.Conn, battleOk, battleOk.c1.Db.Id)
+			WriteMatched2(conf, battleOk.c2.Conn, battleOk, battleOk.c2.Db.Id)
+		} else {
+			log.Printf("OkWorker: received battle ok [remove]. Removing cache entry for user %v", battleOk.RemoveUserId)
+			delete(ongoingBattleMap, battleOk.RemoveUserId)
+		}
 	}
 }
 

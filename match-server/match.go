@@ -53,8 +53,9 @@ func main() {
 	battleOkQueue := make(chan battle.Ok)
 	// Ongoing battle map
 	ongoingBattleMap := make(map[user.UserId]battle.Ok)
+	battleService := battle.Service{ conf }
 	// Start match worker goroutine
-	go matchWorker(conf, matchQueue, battleOkQueue)
+	go matchWorker(battleService, matchQueue, battleOkQueue)
 	// Start battle ok worker goroutine
 	go battle.OkWorker(conf, battleOkQueue, ongoingBattleMap)
 	// Open TCP service port and listen for game clients
@@ -69,7 +70,7 @@ func main() {
 		if err != nil {
 			log.Println("Error accepting: ", err.Error())
 		} else {
-			go handleRequest(conf, &nickDb, conn, matchQueue, serviceList, ongoingBattleMap)
+			go handleRequest(conf, &nickDb, conn, matchQueue, serviceList, ongoingBattleMap, battleService, battleOkQueue)
 		}
 	}
 }
@@ -90,7 +91,7 @@ func testRpc(serviceList *service.ServiceList) {
 	log.Println(serviceList.Rank.Get(300*time.Millisecond, user.UserId{5}))
 }
 
-func matchWorker(conf config.ServerConfig, matchQueue <-chan user.UserAgent, battleOkQueue chan<- battle.Ok) {
+func matchWorker(battleService battle.Service, matchQueue <-chan user.UserAgent, battleOkQueue chan<- battle.Ok) {
 	for {
 		c1 := <-matchQueue
 		c2 := <-matchQueue
@@ -109,7 +110,7 @@ func matchWorker(conf config.ServerConfig, matchQueue <-chan user.UserAgent, bat
 			n1, err1 := c1.Conn.Write(maybeMatchedBuf)
 			n2, err2 := c2.Conn.Write(maybeMatchedBuf)
 			if n1 == 4 && n2 == 4 && err1 == nil && err2 == nil {
-				go battle.CreateBattleInstance(conf, c1, c2, battleOkQueue)
+				go battle.CreateBattleInstance(battleService, c1, c2, battleOkQueue)
 			} else {
 				// Match cannot be proceeded
 				checkMatchError(err1, c1.Conn)
@@ -139,7 +140,7 @@ func sendRetryQueue(conn net.Conn) {
 	}
 }
 
-func handleRequest(conf config.ServerConfig, nickDb *Nickdb.NickDb, conn net.Conn, matchQueue chan<- user.UserAgent, serviceList *service.ServiceList, ongoingBattleMap map[user.UserId]battle.Ok) {
+func handleRequest(conf config.ServerConfig, nickDb *Nickdb.NickDb, conn net.Conn, matchQueue chan<- user.UserAgent, serviceList *service.ServiceList, ongoingBattleMap map[user.UserId]battle.Ok, battleService battle.Service, battleOkQueue chan<- battle.Ok) {
 	log.Printf("Accepting from %v", conn.RemoteAddr())
 	for {
 		buf := make([]byte, 1024)
@@ -159,7 +160,7 @@ func handleRequest(conf config.ServerConfig, nickDb *Nickdb.NickDb, conn net.Con
 		log.Printf("  Type %v", packetType)
 		switch packetType {
 		case C.LPGP_LWPQUEUE2:
-			handler.HandleQueue2(conf, matchQueue, buf, conn, ongoingBattleMap)
+			handler.HandleQueue2(conf, matchQueue, buf, conn, ongoingBattleMap, battleService, battleOkQueue)
 		case C.LPGP_LWPSUDDENDEATH:
 			handler.HandleSuddenDeath(conf, buf) // relay 'buf' to battle service
 		case C.LPGP_LWPNEWUSER:

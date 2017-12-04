@@ -647,8 +647,9 @@ int tcp_server_entry(void *context) {
         LOGI("Admin TCP recv len: %d", recv_len);
         LWPBASE *base = (LWPBASE *) recv_buf;
         if (base->type == LPGP_LWPCREATEBATTLE && base->size == sizeof(LWPCREATEBATTLE)) {
+            LOGI("LWPCREATEBATTLE received");
             LWPCREATEBATTLEOK reply_p;
-            LWPCREATEBATTLE *p = (LWPCREATEBATTLE *) base;
+            LWPCREATEBATTLE* p = (LWPCREATEBATTLE*)base;
             LWPUCKGAME *puck_game = new_puck_game();
             memcpy(puck_game->id1, p->Id1, sizeof(puck_game->id1));
             memcpy(puck_game->id2, p->Id2, sizeof(puck_game->id2));
@@ -676,7 +677,7 @@ int tcp_server_entry(void *context) {
             reply_p.Port = 10288;
             server->puck_game_pool[server->battle_counter] = puck_game;
             // send reply to client
-            send(client_sock, (const char *) &reply_p, sizeof(LWPCREATEBATTLEOK), 0);
+            send(client_sock, (const char*)&reply_p, sizeof(LWPCREATEBATTLEOK), 0);
             // Increment and wrap battle counter (XXX)
             server->battle_counter++;
             if (server->battle_counter >= LW_PUCK_GAME_POOL_CAPACITY) {
@@ -686,10 +687,10 @@ int tcp_server_entry(void *context) {
                 }
             }
         } else if (base->type == LPGP_LWPSUDDENDEATH && base->size == sizeof(LWPSUDDENDEATH)) {
-            LOGI("LWPSUDDENDEATH!");
-            LWPSUDDENDEATH *p = (LWPSUDDENDEATH *) base;
+            LOGI("LWPSUDDENDEATH received");
+            LWPSUDDENDEATH* p = (LWPSUDDENDEATH*) base;
             if ((p->Battle_id < 1) || p->Battle_id>LW_PUCK_GAME_POOL_CAPACITY) {
-
+                // index out of range
             } else {
                 LWPUCKGAME *pg = server->puck_game_pool[p->Battle_id - 1];
                 if (pg->c1_token == p->Token || pg->c2_token == p->Token) {
@@ -697,7 +698,20 @@ int tcp_server_entry(void *context) {
                     pg->target.current_hp = 1;
                 }
             }
-
+        } else if (base->type == LPGP_LWPCHECKBATTLEVALID && base->size == sizeof(LWPCHECKBATTLEVALID)) {
+            LOGI("LWPCHECKBATTLEVALID received");
+            LWPBATTLEVALID reply_p;
+            reply_p.Type = LPGP_LWPBATTLEVALID;
+            reply_p.Size = sizeof(LWPBATTLEVALID);
+            reply_p.Valid = 0;
+            LWPCHECKBATTLEVALID* p = (LWPCHECKBATTLEVALID*)base;
+            if ((p->Battle_id < 1) || p->Battle_id>LW_PUCK_GAME_POOL_CAPACITY) {
+                // index out of range
+            } else {
+                LWPUCKGAME *pg = server->puck_game_pool[p->Battle_id - 1];
+                reply_p.Valid = (pg && pg->finished == 0);
+            }
+            send(client_sock, (const char*)&reply_p, sizeof(LWPBATTLEVALID), 0);
         } else {
             LOGE("Admin TCP unexpected packet");
         }
