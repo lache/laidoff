@@ -32,12 +32,14 @@ int tcp_send_sendbuf(LWTCP* tcp, int s) {
 }
 
 int tcp_send_newuser(LWTCP* tcp) {
+    LOGI("Sending LWPNEWUSER");
     NEW_TCP_PACKET(LWPNEWUSER, p);
     memcpy(tcp->sendbuf, &p, sizeof(p));
     return tcp_send_sendbuf(tcp, sizeof(p));
 }
 
 int tcp_send_querynick(LWTCP* tcp, const LWUNIQUEID* id) {
+    LOGI("Sending LWPQUERYNICK");
     NEW_TCP_PACKET_CAPITAL(LWPQUERYNICK, p);
     memcpy(p.Id, id->v, sizeof(LWUNIQUEID));
     memcpy(tcp->sendbuf, &p, sizeof(p));
@@ -45,6 +47,7 @@ int tcp_send_querynick(LWTCP* tcp, const LWUNIQUEID* id) {
 }
 
 int tcp_send_queue2(LWTCP* tcp, const LWUNIQUEID* id) {
+    LOGI("Sending LWPQUEUE2");
     NEW_TCP_PACKET_CAPITAL(LWPQUEUE2, p);
     memcpy(p.Id, id->v, sizeof(LWUNIQUEID));
     memcpy(tcp->sendbuf, &p, sizeof(p));
@@ -52,6 +55,7 @@ int tcp_send_queue2(LWTCP* tcp, const LWUNIQUEID* id) {
 }
 
 int tcp_send_suddendeath(LWTCP* tcp, int battle_id, unsigned int token) {
+    LOGI("Sending LWPSUDDENDEATH");
     NEW_TCP_PACKET_CAPITAL(LWPSUDDENDEATH, p);
     p.Battle_id = battle_id;
     p.Token = token;
@@ -60,6 +64,7 @@ int tcp_send_suddendeath(LWTCP* tcp, int battle_id, unsigned int token) {
 }
 
 int tcp_send_get_leaderboard(LWTCP* tcp, int backoffMs, int start_index, int count) {
+    LOGI("Sending LWPGETLEADERBOARD");
     if (tcp == 0) {
         LOGE("tcp null");
         return -1;
@@ -88,6 +93,7 @@ int tcp_send_get_leaderboard(LWTCP* tcp, int backoffMs, int start_index, int cou
 }
 
 int tcp_send_push_token(LWTCP* tcp, int backoffMs, int domain, const char* push_token) {
+    LOGI("Sending LWPPUSHTOKEN");
     if (tcp == 0) {
         LOGE("tcp null");
         return -1;
@@ -118,6 +124,7 @@ int tcp_send_push_token(LWTCP* tcp, int backoffMs, int domain, const char* push_
 }
 
 int tcp_send_setnickname(LWTCP* tcp, const LWUNIQUEID* id, const char* nickname) {
+    LOGI("Sending LWPSETNICKNAME");
     NEW_TCP_PACKET_CAPITAL(LWPSETNICKNAME, p);
     memcpy(p.Id, id->v, sizeof(p.Id));
     memcpy(p.Nickname, nickname, sizeof(p.Nickname));

@@ -4,19 +4,19 @@ import (
 	"log"
 	"net"
 	"encoding/binary"
-	"bytes"
 	"unsafe"
 	"os"
 	"encoding/json"
+	"time"
+	mathrand "math/rand"
 	"./nickdb"
 	"./convert"
 	"./user"
 	"./service"
 	"./handler"
 	"./config"
-	"time"
-	mathrand "math/rand"
-)
+	"./battle"
+	)
 
 // #include "../src/puckgamepacket.h"
 import "C"
@@ -47,10 +47,16 @@ func main() {
 	}
 	// Test RPC
 	//testRpc(serviceList)
-	// Create 1 vs. 1 match queue
+	// Create 1 vs. 1 match waiting queue
 	matchQueue := make(chan user.UserAgent)
+	// Create battle ok queue
+	battleOkQueue := make(chan battle.Ok)
+	// Ongoing battle map
+	ongoingBattleMap := make(map[user.UserId]battle.Ok)
 	// Start match worker goroutine
-	go matchWorker(conf, matchQueue)
+	go matchWorker(conf, matchQueue, battleOkQueue)
+	// Start battle ok worker goroutine
+	go battle.OkWorker(conf, battleOkQueue, ongoingBattleMap)
 	// Open TCP service port and listen for game clients
 	l, err := net.Listen(conf.ConnType, conf.ConnHost+":"+conf.ConnPort)
 	if err != nil {
@@ -63,7 +69,7 @@ func main() {
 		if err != nil {
 			log.Println("Error accepting: ", err.Error())
 		} else {
-			go handleRequest(conf, &nickDb, conn, matchQueue, serviceList)
+			go handleRequest(conf, &nickDb, conn, matchQueue, serviceList, ongoingBattleMap)
 		}
 	}
 }
@@ -84,78 +90,15 @@ func testRpc(serviceList *service.ServiceList) {
 	log.Println(serviceList.Rank.Get(300*time.Millisecond, user.UserId{5}))
 }
 
-func createBattleInstance(conf config.ServerConfig, c1 user.UserAgent, c2 user.UserAgent) {
-	// Connect to battle service
-	tcpAddr, err := net.ResolveTCPAddr(conf.BattleServiceConnType, conf.BattleServiceHost+":"+conf.BattleServicePort)
-	if err != nil {
-		log.Fatalf("ResolveTCPAddr error! - %v", err.Error())
-	}
-	conn, err := net.DialTCP("tcp", nil, tcpAddr)
-	if err != nil {
-		log.Fatalf("DialTCP error! - %v", err.Error())
-	}
-	// Send create battle request
-
-	createBattleBuf := convert.Packet2Buf(convert.NewCreateBattle(
-		c1.Db.Id,
-		c2.Db.Id,
-		c1.Db.Nickname,
-		c2.Db.Nickname,
-		))
-	_, err = conn.Write(createBattleBuf)
-	if err != nil {
-		log.Fatalf("Send LSBPT_LWSPHEREBATTLEPACKETCREATEBATTLE failed")
-	}
-	// Wait for a reply
-	createBattleOk := C.LWPCREATEBATTLEOK{}
-	createBattleOkBuf := make([]byte, unsafe.Sizeof(C.LWPCREATEBATTLEOK{}))
-	createBattleOkBufLen, err := conn.Read(createBattleOkBuf)
-	if err != nil {
-		log.Printf("Recv LSBPT_LWSPHEREBATTLEPACKETCREATEBATTLE reply failed")
-		return
-	}
-	if createBattleOkBufLen != int(unsafe.Sizeof(C.LWPCREATEBATTLEOK{})) {
-		log.Printf("Recv LSBPT_LWSPHEREBATTLEPACKETCREATEBATTLE reply size error")
-		return
-	}
-	createBattleOkBufReader := bytes.NewReader(createBattleOkBuf)
-	err = binary.Read(createBattleOkBufReader, binary.LittleEndian, &createBattleOk)
-	if err != nil {
-		log.Printf("binary.Read fail")
-		return
-	}
-	if createBattleOk.Size == C.ushort(unsafe.Sizeof(C.LWPCREATEBATTLEOK{})) && createBattleOk.Type == C.LPGP_LWPCREATEBATTLEOK {
-		// No error! so far ... proceed battle
-		log.Printf("MATCH %v and %v matched successfully!", c1.Conn.RemoteAddr(), c2.Conn.RemoteAddr())
-		c1.Conn.Write(createMatched2Buf(conf, createBattleOk, createBattleOk.C1_token, 1, c2.Db.Nickname))
-		c2.Conn.Write(createMatched2Buf(conf, createBattleOk, createBattleOk.C2_token, 2, c1.Db.Nickname))
-	} else {
-		log.Printf("Recv LSBPT_LWSPHEREBATTLEPACKETCREATEBATTLE reply corrupted")
-	}
-}
-
-func createMatched2Buf(conf config.ServerConfig, createBattleOk C.LWPCREATEBATTLEOK, token C.uint, playerNo C.int, targetNickname string) []byte {
-	publicAddr, err := net.ResolveTCPAddr(conf.BattlePublicServiceConnType, conf.BattlePublicServiceHost+":"+conf.BattlePublicServicePort)
-	if err != nil {
-		log.Panicf("BattlePublicService conf parse error: %v", err.Error())
-	}
-	publicAddrIpv4 := publicAddr.IP.To4()
-
-	return convert.Packet2Buf(convert.NewMatched2(
-		publicAddr.Port,
-		publicAddrIpv4,
-		int(createBattleOk.Battle_id),
-		uint(token),
-		int(playerNo),
-		targetNickname,
-	))
-}
-
-func matchWorker(conf config.ServerConfig, matchQueue <-chan user.UserAgent) {
+func matchWorker(conf config.ServerConfig, matchQueue <-chan user.UserAgent, battleOkQueue chan<- battle.Ok) {
 	for {
 		c1 := <-matchQueue
 		c2 := <-matchQueue
 		if c1.Conn == c2.Conn {
+			log.Printf("The same connection sending QUEUE2 twice. Replying with RETRYQUEUE...")
+			sendRetryQueue(c1.Conn)
+		} else if c1.Db.Id == c2.Db.Id {
+			log.Printf("The same user ID sending QUEUE2 twice. Replying with RETRYQUEUE...")
 			sendRetryQueue(c1.Conn)
 		} else {
 			log.Printf("%v and %v matched! (maybe)", c1.Conn.RemoteAddr(), c2.Conn.RemoteAddr())
@@ -166,7 +109,7 @@ func matchWorker(conf config.ServerConfig, matchQueue <-chan user.UserAgent) {
 			n1, err1 := c1.Conn.Write(maybeMatchedBuf)
 			n2, err2 := c2.Conn.Write(maybeMatchedBuf)
 			if n1 == 4 && n2 == 4 && err1 == nil && err2 == nil {
-				go createBattleInstance(conf, c1, c2)
+				go battle.CreateBattleInstance(conf, c1, c2, battleOkQueue)
 			} else {
 				// Match cannot be proceeded
 				checkMatchError(err1, c1.Conn)
@@ -196,7 +139,7 @@ func sendRetryQueue(conn net.Conn) {
 	}
 }
 
-func handleRequest(conf config.ServerConfig, nickDb *Nickdb.NickDb, conn net.Conn, matchQueue chan<- user.UserAgent, serviceList *service.ServiceList) {
+func handleRequest(conf config.ServerConfig, nickDb *Nickdb.NickDb, conn net.Conn, matchQueue chan<- user.UserAgent, serviceList *service.ServiceList, ongoingBattleMap map[user.UserId]battle.Ok) {
 	log.Printf("Accepting from %v", conn.RemoteAddr())
 	for {
 		buf := make([]byte, 1024)
@@ -216,7 +159,7 @@ func handleRequest(conf config.ServerConfig, nickDb *Nickdb.NickDb, conn net.Con
 		log.Printf("  Type %v", packetType)
 		switch packetType {
 		case C.LPGP_LWPQUEUE2:
-			handler.HandleQueue2(matchQueue, buf, conn)
+			handler.HandleQueue2(conf, matchQueue, buf, conn, ongoingBattleMap)
 		case C.LPGP_LWPSUDDENDEATH:
 			handler.HandleSuddenDeath(conf, buf) // relay 'buf' to battle service
 		case C.LPGP_LWPNEWUSER:

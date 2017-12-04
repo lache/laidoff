@@ -227,7 +227,6 @@ void render_text_block(const struct _LWCONTEXT *pLwc, const struct _LWTEXTBLOCK*
     }
     
     int shader_index = LWST_FONT;
-    const float screen_aspect_ratio = (float)pLwc->width / pLwc->height;
     
     glUseProgram(pLwc->shader[shader_index].program);
     

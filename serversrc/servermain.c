@@ -641,12 +641,11 @@ int tcp_server_entry(void *context) {
         int c = sizeof(struct sockaddr_in);
         SOCKET client_sock = accept(tcp_server->s, (struct sockaddr *) &tcp_server->server, &c);
         char recv_buf[512];
-        int recv_len = recv(client_sock, recv_buf, 512, 0);
+        int recv_len = (int)recv(client_sock, recv_buf, 512, 0);
         LOGI("Admin TCP recv len: %d", recv_len);
         LWPBASE *base = (LWPBASE *) recv_buf;
         if (base->type == LPGP_LWPCREATEBATTLE && base->size == sizeof(LWPCREATEBATTLE)) {
             LWPCREATEBATTLEOK reply_p;
-            LOGI("LWPCREATEBATTLE: Create a new puck game instance");
             LWPCREATEBATTLE *p = (LWPCREATEBATTLE *) base;
             LWPUCKGAME *puck_game = new_puck_game();
             memcpy(puck_game->id1, p->Id1, sizeof(puck_game->id1));
@@ -654,6 +653,7 @@ int tcp_server_entry(void *context) {
             memcpy(puck_game->nickname, p->Nickname1, sizeof(puck_game->nickname));
             memcpy(puck_game->target_nickname, p->Nickname2, sizeof(puck_game->target_nickname));
             const int battle_id = server->battle_counter + 1; // battle id is 1-based index
+            LOGI("LWPCREATEBATTLE: Create a new puck game instance (battle id = %d)", battle_id);
             puck_game->server = server;
             puck_game->battle_id = battle_id;
             //puck_game->on_player_damaged = on_player_damaged;
@@ -699,6 +699,7 @@ int tcp_server_entry(void *context) {
         } else {
             LOGE("Admin TCP unexpected packet");
         }
+        closesocket(client_sock);
     }
 #pragma clang diagnostic pop
     return 0;
@@ -733,7 +734,7 @@ void send_puck_game_state2(LWSERVER* server,
     packet_state.type = LPGP_LWPSTATE2;
     packet_state.puck_reflect_size = (unsigned char)numcomp_compress_float(puck_game->puck_reflect_size,
                                                                            &server->numcomp.f[LNFT_PUCK_REFLECT_SIZE]);
-    LOGI("puck_reflect_size = %f", puck_game->puck_reflect_size);
+    LOGIx("puck_reflect_size = %f", puck_game->puck_reflect_size);
     packet_state.update_tick = (unsigned short)puck_game->update_tick;
     fill_state2_gameobject(&packet_state.go[0], server, &puck_game->go[LPGO_PUCK]);
     fill_state2_gameobject(&packet_state.go[1], server, &puck_game->go[player_go_enum]);
@@ -978,6 +979,7 @@ int main(int argc, char *argv[]) {
                         if (server->puck_game_pool[j]->finished == 0
                             && update_puck_game(server, server->puck_game_pool[j], logic_timestep) < 0) {
                             server->puck_game_pool[j]->finished = 1;
+                            LOGI("Battle finished. (battle id = %d)", server->puck_game_pool[j]->battle_id);
                             process_battle_reward(server->puck_game_pool[j], reward_service);
                         }
                     }
