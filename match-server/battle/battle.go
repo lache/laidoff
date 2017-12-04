@@ -31,11 +31,11 @@ type Service struct {
 func (sc *Service) Connection() (net.Conn, error) {
 	tcpAddr, err := net.ResolveTCPAddr(sc.Conf.BattleServiceConnType, sc.Conf.BattleServiceHost+":"+sc.Conf.BattleServicePort)
 	if err != nil {
-		log.Fatalf("ResolveTCPAddr error! - %v", err.Error())
+		log.Fatalf("Battle service ResolveTCPAddr error! - %v", err.Error())
 	}
 	conn, err := net.DialTCP("tcp", nil, tcpAddr)
 	if err != nil {
-		log.Fatalf("DialTCP error! - %v", err.Error())
+		log.Fatalf("Battle service DialTCP error! - %v", err.Error())
 	}
 	return conn, err
 }

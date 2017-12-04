@@ -160,6 +160,9 @@ typedef struct _LWPUCKGAME {
     float world_roll_target_follow_ratio;
     int world_roll_dirty;
     void* pLwc; // opaque pointer to LWCONTEXT
+    float target_dx;
+    float target_dy;
+    float target_dlen_ratio;
 } LWPUCKGAME;
 
 LWPUCKGAME* new_puck_game();

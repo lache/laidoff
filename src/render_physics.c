@@ -1097,7 +1097,7 @@ void lwc_render_physics(const LWCONTEXT* pLwc, const mat4x4 view, const mat4x4 p
     // Dash cooltime gauge
     //render_dash_gauge(pLwc);
     // HP gauges (player & target)
-    const char* target_nickname = puck_game->battle_id ? puck_game->target_nickname : "== Searching opponent ==";
+    const char* target_nickname = puck_game->battle_id ? puck_game->target_nickname : "BOGUS (Searching opponent...)";
     const float gauge_width = pLwc->aspect_ratio * 0.9f;
     const float gauge_height = 0.075f;
     const float gauge1_x = -pLwc->aspect_ratio + gauge_width / 2;
