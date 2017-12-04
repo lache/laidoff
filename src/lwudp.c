@@ -110,7 +110,7 @@ void udp_update(LWCONTEXT* pLwc, LWUDP* udp) {
             if (wsa_error_code == WSAECONNRESET) {
                 // UDP server not ready?
                 // Go back to single play mode
-                udp->master = 1;
+                //udp->master = 1;
                 return;
             }
             else {

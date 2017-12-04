@@ -88,3 +88,7 @@
 #define LWLOGPOS __FILE__ "(" __LW_STRING_LINE__ "): "
 
 #define LWOFFSETOF(s,m) ((size_t)&(((s*)0)->m))
+
+#if LW_PLATFORM_WIN32
+typedef int socklen_t;
+#endif

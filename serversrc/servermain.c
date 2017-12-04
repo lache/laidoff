@@ -635,8 +635,10 @@ void select_server(LWSERVER *server, LWPUCKGAME *puck_game, LWCONN *conn, int co
 int tcp_server_entry(void *context) {
     LWTCPSERVER *tcp_server = new_tcp_server();
     LWSERVER *server = context;
+#if !LW_PLATFORM_WIN32
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wmissing-noreturn"
+#endif
     while (1) {
         int c = sizeof(struct sockaddr_in);
         SOCKET client_sock = accept(tcp_server->s, (struct sockaddr *) &tcp_server->server, &c);
@@ -701,7 +703,9 @@ int tcp_server_entry(void *context) {
         }
         closesocket(client_sock);
     }
+#if !LW_PLATFORM_WIN32
 #pragma clang diagnostic pop
+#endif
     return 0;
 }
 

@@ -545,7 +545,7 @@ static inline void mat4x4o_mul_quat(mat4x4 R, mat4x4 M, quat q)
 	R[3][0] = R[3][1] = R[3][2] = 0.f;
 	R[3][3] = 1.f;
 }
-static inline void quat_from_mat4x4(quat q, mat4x4 m)
+static inline void quat_from_mat4x4(quat q, const mat4x4 m)
 {
     float m11 = m[0][0], m12 = m[1][0], m13 = m[2][0];
     float m21 = m[0][1], m22 = m[1][1], m23 = m[2][1];

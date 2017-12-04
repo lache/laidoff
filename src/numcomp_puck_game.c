@@ -1,4 +1,5 @@
 #include "numcomp_puck_game.h"
+#include "lwmacro.h"
 
 void numcomp_puck_game_init(LWNUMCOMPPUCKGAME* numcomp) {
     numcomp_init_float_preset(&numcomp->f[LNFT_PUCK_REFLECT_SIZE],

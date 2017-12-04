@@ -10,7 +10,7 @@ void numcomp_init_float_preset(LWNUMCOMPFLOATPRESET* preset, int c, float m, flo
     preset->m = m;
     preset->M = M;
     preset->l = M - m;
-    preset->s = preset->l / (powf(2.0f, c) - 1.0f);
+    preset->s = preset->l / (powf(2.0f, (float)c) - 1.0f);
     preset->M_comp = (unsigned int)((1 << preset->c) - 1);
 }
 
@@ -195,7 +195,7 @@ void numcomp_decompress_quaternion(float q[4], unsigned int c, const LWNUMCOMPQU
     int abs_max_idx = c >> preset->c_sum;
     unsigned int v_comp = c & ((1 << preset->c_sum) - 1);
     float smallest_threes[3];
-    numcomp_decompress_vec3(smallest_threes, v_comp, preset);
+    numcomp_decompress_vec3(smallest_threes, v_comp, &preset->smallest_threes);
     float q_sqr_sum = 0;
     int st_index = 0;
     for (int i = 0; i < 4; i++) {

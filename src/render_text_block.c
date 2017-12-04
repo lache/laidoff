@@ -101,7 +101,7 @@ void render_font_glyph(const LWCONTEXT* pLwc,
     
     mat4x4_identity(identity_view);
     
-    for (size_t i = 0; i < unicode_strlen; i++) {
+    for (int i = 0; i < unicode_strlen; i++) {
         if (unicode_str[i] == '\n') {
             if (text_block->multiline) {
                 *size_scaled_xadvance_accum = 0;
@@ -170,7 +170,7 @@ void render_font_glyph(const LWCONTEXT* pLwc,
             }
             else {
                 glBindTexture(GL_TEXTURE_2D, pLwc->tex_font_atlas[bci->page]);
-                // TODO: 폰트 텍스처 해상도 1024x1024 하드코딩
+                // TODO: font texture resolution hardcoded to 1024x1024
                 set_texture_parameter_values(pLwc, bci->x, bci->y, bci->width, bci->height, 1024, 1024, 1);
             }
             
