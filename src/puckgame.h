@@ -188,3 +188,4 @@ void puck_game_reset(LWPUCKGAME* puck_game);
 void puck_game_remote_state_reset(LWPUCKGAME* puck_game, LWPSTATE* state);
 void puck_game_tower_pos(vec4 p_out, const LWPUCKGAME* puck_game, int owner_player_no);
 void puck_game_control_bogus(LWPUCKGAME* puck_game);
+void puck_game_update_remote_player(LWPUCKGAME* puck_game, float delta_time, int i);

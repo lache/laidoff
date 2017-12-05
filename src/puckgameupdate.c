@@ -14,6 +14,44 @@
 #include "lwtcpclient.h"
 #include "lwmath.h"
 
+void update_world_roll(LWPUCKGAME* puck_game) {
+    if (puck_game->world_roll_dirty) {
+        const float world_roll_diff = puck_game->world_roll_target - puck_game->world_roll;
+        if (fabsf(world_roll_diff) < LWEPSILON) {
+            puck_game->world_roll = puck_game->world_roll_target;
+            puck_game->world_roll_dirty = 0;
+            LOGI("World roll transition finished");
+        } else {
+            puck_game->world_roll += world_roll_diff * puck_game->world_roll_target_follow_ratio;
+        }
+    }
+}
+
+void update_shake(LWPUCKGAME* puck_game, float delta_time) {
+    // Decrease shake remain time
+    if (puck_game->remote_dash[0].shake_remain_time > 0) {
+        puck_game->remote_dash[0].shake_remain_time = LWMAX(0, puck_game->remote_dash[0].shake_remain_time - (float)delta_time);
+    }
+    // Decrease HP remain time (player)
+    if (puck_game->player.hp_shake_remain_time > 0) {
+        puck_game->player.hp_shake_remain_time = LWMAX(0, puck_game->player.hp_shake_remain_time - (float)delta_time);
+    }
+    // Decrease HP remain time (target)
+    if (puck_game->target.hp_shake_remain_time > 0) {
+        puck_game->target.hp_shake_remain_time = LWMAX(0, puck_game->target.hp_shake_remain_time - (float)delta_time);
+    }
+    // Jump
+    if (puck_game->remote_jump[0].shake_remain_time > 0) {
+        puck_game->remote_jump[0].shake_remain_time = LWMAX(0, puck_game->remote_jump[0].shake_remain_time - (float)delta_time);
+    }
+    // Tower shake
+    for (int i = 0; i < LW_PUCK_GAME_TOWER_COUNT; i++) {
+        if (puck_game->tower[i].shake_remain_time > 0) {
+            puck_game->tower[i].shake_remain_time = LWMAX(0, puck_game->tower[i].shake_remain_time - (float)delta_time);
+        }
+    }
+}
+
 void update_puck_game(LWCONTEXT* pLwc, LWPUCKGAME* puck_game, double delta_time) {
     if (!puck_game->world) {
         return;
@@ -83,9 +121,6 @@ void update_puck_game(LWCONTEXT* pLwc, LWPUCKGAME* puck_game, double delta_time)
             udp_send(pLwc->udp, (const char*)&packet_stop, sizeof(packet_stop));
         }
     }
-
-    // control bogus (AI player)
-    puck_game_control_bogus(puck_game);
 
     // Move direction fixed while dashing
     // Dash
@@ -157,41 +192,13 @@ void update_puck_game(LWCONTEXT* pLwc, LWPUCKGAME* puck_game, double delta_time)
 
     // -------- Client only --------
 
-    // Decrease shake remain time
-    if (puck_game->remote_dash[0].shake_remain_time > 0) {
-        puck_game->remote_dash[0].shake_remain_time = LWMAX(0, puck_game->remote_dash[0].shake_remain_time - (float)delta_time);
-    }
-    // Decrease HP remain time (player)
-    if (puck_game->player.hp_shake_remain_time > 0) {
-        puck_game->player.hp_shake_remain_time = LWMAX(0, puck_game->player.hp_shake_remain_time - (float)delta_time);
-    }
-    // Decrease HP remain time (target)
-    if (puck_game->target.hp_shake_remain_time > 0) {
-        puck_game->target.hp_shake_remain_time = LWMAX(0, puck_game->target.hp_shake_remain_time - (float)delta_time);
-    }
-    // Jump
-    if (puck_game->remote_jump[0].shake_remain_time > 0) {
-        puck_game->remote_jump[0].shake_remain_time = LWMAX(0, puck_game->remote_jump[0].shake_remain_time - (float)delta_time);
-    }
-    // Tower shake
-    for (int i = 0; i < LW_PUCK_GAME_TOWER_COUNT; i++) {
-        if (puck_game->tower[i].shake_remain_time > 0) {
-            puck_game->tower[i].shake_remain_time = LWMAX(0, puck_game->tower[i].shake_remain_time - (float)delta_time);
-        }
-    }
+    // control bogus (AI player)
+    puck_game_control_bogus(puck_game);
+
+    update_shake(puck_game, (float)delta_time);
     update_puck_ownership(puck_game);
     update_puck_reflect_size(puck_game, (float)delta_time);
-
-    if (puck_game->world_roll_dirty) {
-        const float world_roll_diff = puck_game->world_roll_target - puck_game->world_roll;
-        if (fabsf(world_roll_diff) < LWEPSILON) {
-            puck_game->world_roll = puck_game->world_roll_target;
-            puck_game->world_roll_dirty = 0;
-            LOGI("World roll transition finished");
-        } else {
-            puck_game->world_roll += world_roll_diff * puck_game->world_roll_target_follow_ratio;
-        }
-    }
+    update_world_roll(puck_game);
 }
 
 void puck_game_jump(LWCONTEXT* pLwc, LWPUCKGAME* puck_game) {
