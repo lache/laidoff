@@ -157,7 +157,7 @@ void render_header(const struct _LWCONTEXT* pLwc) {
 	SET_COLOR_RGBA_FLOAT(text_block.color_normal_outline, 0, 0, 0, 1);
 	SET_COLOR_RGBA_FLOAT(text_block.color_emp_glyph, 1, 1, 0, 1);
 	SET_COLOR_RGBA_FLOAT(text_block.color_emp_outline, 0, 0, 0, 1);
-	text_block.text = LWU("전투결과");
+	text_block.text = LWU("BATTLE RESULT");
 	text_block.text_bytelen = (int)strlen(text_block.text);
 	text_block.begin_index = 0;
 	text_block.end_index = text_block.text_bytelen;
@@ -193,7 +193,7 @@ void render_next_button(const struct _LWCONTEXT* pLwc) {
 	SET_COLOR_RGBA_FLOAT(text_block.color_normal_outline, 0, 0, 0, 1);
 	SET_COLOR_RGBA_FLOAT(text_block.color_emp_glyph, 1, 1, 0, 1);
 	SET_COLOR_RGBA_FLOAT(text_block.color_emp_outline, 0, 0, 0, 1);
-	text_block.text = LWU("확인");
+	text_block.text = LWU("OK");
 	text_block.text_bytelen = (int)strlen(text_block.text);
 	text_block.begin_index = 0;
 	text_block.end_index = text_block.text_bytelen;

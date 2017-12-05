@@ -348,7 +348,7 @@ static void s_render_full_panel(const LWCONTEXT* pLwc, LWBUTTONLIST* button_list
 	SET_COLOR_RGBA_FLOAT(text_block.color_emp_glyph, 1, 1, 0, 1);
 	SET_COLOR_RGBA_FLOAT(text_block.color_emp_outline, 0, 0, 0, 0);
 	char msg[128];
-	sprintf(msg, u8"[$] 연구");
+	sprintf(msg, u8"[$] Research");
 	text_block.text = msg;
 	text_block.text_bytelen = (int)strlen(text_block.text);
 	text_block.begin_index = 0;
@@ -360,15 +360,15 @@ static void s_render_full_panel(const LWCONTEXT* pLwc, LWBUTTONLIST* button_list
 	// Properties & Values
 	text_block.align = LTBA_LEFT_CENTER;
 	const char* prop_str[] = {
-		"Projectile Type",// u8"투사 방식",
-		"Detection Lag", //u8"타겟 감지 속도",
-		"Pre Warm up", //u8"발포 전 예열 속도",
-		"Post Cool down", //u8"발포 후 냉각 속도",
-		"Rotation Speed", //u8"포탑 회전 속도",
-		"Durability", //u8"내구도",
-		"Construction", //u8"건설 효율",
-		"Max Range", //u8"최대 사거리",
-		"Min Range", //u8"최소 사거리",
+		"Projectile Type",
+		"Detection Lag",
+		"Pre Warm up",
+		"Post Cool down",
+		"Rotation Speed",
+		"Durability",
+		"Construction",
+		"Max Range",
+		"Min Range",
 	};
 	const float prop_tab_width = 0.3f;
 	const float prop_width = 0.8f;

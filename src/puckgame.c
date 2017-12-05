@@ -375,11 +375,11 @@ float puck_game_dash_gauge_ratio(LWPUCKGAME* puck_game) {
 }
 
 float puck_game_dash_cooltime(LWPUCKGAME* puck_game) {
-    return puck_game->time - puck_game->dash.last_time;
+    return puck_game->time - puck_game->remote_dash[0].last_time;
 }
 
 float puck_game_jump_cooltime(LWPUCKGAME* puck_game) {
-    return puck_game->time - puck_game->jump.last_time;
+    return puck_game->time - puck_game->remote_jump[0].last_time;
 }
 
 int puck_game_jumping(LWPUCKGAMEJUMP* jump) {
@@ -496,4 +496,30 @@ void puck_game_tower_pos(vec4 p_out, const LWPUCKGAME* puck_game, int owner_play
     p_out[1] = puck_game->tower_pos * puck_game->tower_pos_multiplier[owner_player_no - 1][1];
     p_out[2] = 0.0f;
     p_out[3] = 1.0f;
+}
+
+void puck_game_control_bogus(LWPUCKGAME* puck_game, float player_max_speed) {
+    // update target movement actuator (LMotor) according to dir pad input
+    float target_follow_agility = 0.01f; // 0 ~ 1
+    dJointID tcj = puck_game->target_control_joint;
+    float ideal_target_dx = puck_game->go[LPGO_PUCK].pos[0] - puck_game->go[LPGO_TARGET].pos[0];
+    float ideal_target_dy = puck_game->go[LPGO_PUCK].pos[1] - puck_game->go[LPGO_TARGET].pos[1];
+    puck_game->target_dx = (1.0f - target_follow_agility) * puck_game->target_dx + target_follow_agility * ideal_target_dx;
+    puck_game->target_dy = (1.0f - target_follow_agility) * puck_game->target_dy + target_follow_agility * ideal_target_dy;
+    float target_dx2 = puck_game->target_dx * puck_game->target_dx;
+    float target_dy2 = puck_game->target_dy * puck_game->target_dy;
+    float target_dlen = sqrtf(target_dx2 + target_dy2);
+    float ideal_target_dx2 = ideal_target_dx * ideal_target_dx;
+    float ideal_target_dy2 = ideal_target_dy * ideal_target_dy;
+    float ideal_target_dlen = sqrtf(ideal_target_dx2 + ideal_target_dy2);
+
+    float ideal_target_dlen_ratio = 1.0f;
+    if (ideal_target_dlen < 0.5f) {
+        ideal_target_dlen_ratio = 0.5f;
+    }
+    puck_game->target_dlen_ratio = (1.0f - target_follow_agility) * puck_game->target_dlen_ratio + target_follow_agility * ideal_target_dlen_ratio;
+
+    dJointEnable(tcj);
+    dJointSetLMotorParam(tcj, dParamVel1, player_max_speed * puck_game->target_dx / target_dlen * puck_game->target_dlen_ratio);
+    dJointSetLMotorParam(tcj, dParamVel2, player_max_speed * puck_game->target_dy / target_dlen * puck_game->target_dlen_ratio);
 }

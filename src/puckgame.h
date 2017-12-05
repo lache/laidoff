@@ -125,9 +125,6 @@ typedef struct _LWPUCKGAME {
 	dJointID puck_pull_control_joint;
 	int push;
 	float time;
-    LWPUCKGAMEJUMP jump;
-	LWPUCKGAMEDASH dash;
-    LWPUCKGAMEFIRE fire;
 	LWPUCKGAMEPLAYER player;
 	LWPUCKGAMEPLAYER target;
 	float last_remote_dx;
@@ -190,3 +187,4 @@ void update_puck_reflect_size(LWPUCKGAME* puck_game, float delta_time);
 void puck_game_reset(LWPUCKGAME* puck_game);
 void puck_game_remote_state_reset(LWPUCKGAME* puck_game, LWPSTATE* state);
 void puck_game_tower_pos(vec4 p_out, const LWPUCKGAME* puck_game, int owner_player_no);
+void puck_game_control_bogus(LWPUCKGAME* puck_game, float player_max_speed);

@@ -540,8 +540,8 @@ static void render_dash_gauge(const LWCONTEXT* pLwc) {
     float y = 1 - margin_y;
     const float boost_gauge_ratio = puck_game_dash_gauge_ratio(pLwc->puck_game);
     // Positioinal offset by shake
-    if (pLwc->puck_game->dash.shake_remain_time > 0) {
-        const float ratio = pLwc->puck_game->dash.shake_remain_time / pLwc->puck_game->dash_shake_time;
+    if (pLwc->puck_game->remote_dash[0].shake_remain_time > 0) {
+        const float ratio = pLwc->puck_game->remote_dash[0].shake_remain_time / pLwc->puck_game->dash_shake_time;
         const float shake_magnitude = 0.02f;
         x += ratio * (2 * rand() / (float)RAND_MAX - 1.0f) * shake_magnitude * pLwc->aspect_ratio;
         y += ratio * (2 * rand() / (float)RAND_MAX - 1.0f) * shake_magnitude;
