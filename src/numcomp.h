@@ -42,7 +42,7 @@ unsigned int numcomp_compress_mat4x4(const mat4x4 m, const LWNUMCOMPQUATERNIONPR
 void numcomp_decompress_mat4x4(mat4x4 m, unsigned int v_comp, const LWNUMCOMPQUATERNIONPRESET* preset);
 // misc
 void numcomp_convert_euler_xyz_to_quaternion(float* q, float ex, float ey, float ez);
-void numcomp_convert_quaternion_to_euler_xyz(const float* q, float* ex, float* ey, float* ez);
+void numcomp_convert_quaternion_to_euler_xyz(const float q[4], float* ex, float* ey, float* ez);
 float numcomp_wrap_max(float x, float max);
 float numcomp_wrap_min_max(float x, float min, float max);
 float numcomp_wrap_radian(float r);
@@ -53,3 +53,5 @@ void numcomp_batch_test_vec3();
 void numcomp_batch_test_quaternion();
 void numcomp_batch_test_mat4x4();
 void numcomp_batch_test_conversion();
+float numcomp_float_random_01();
+float numcomp_float_random_range(float m, float M);

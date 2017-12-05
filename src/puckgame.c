@@ -2,6 +2,7 @@
 #include "lwmacro.h"
 #include "lwlog.h"
 #include "lwtimepoint.h"
+#include "numcomp.h"
 //#include "lwcontext.h"
 //#include "input.h"
 
@@ -539,7 +540,8 @@ void puck_game_control_bogus(LWPUCKGAME* puck_game) {
 
     int bogus_player_no = puck_game->player_no == 2 ? 1 : 2;
     LWPUCKGAMEDASH* dash = &puck_game->remote_dash[bogus_player_no - 1];
-    if (puck_game_dash_can_cast(puck_game, dash)) {
+    const float dash_cooltime_aware_lag = numcomp_float_random_range(0.4f, 0.7f);
+    if (puck_game_dash_elapsed_since_last(puck_game, dash) >= puck_game->dash_interval + dash_cooltime_aware_lag) {
         puck_game_dash(puck_game, dash, bogus_player_no);
     }
 }

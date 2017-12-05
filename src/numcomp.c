@@ -82,13 +82,13 @@ void numcomp_test_vec3_print(const float* v, const LWNUMCOMPVEC3PRESET* preset) 
     LOGI("vec3:(%.4f,%.4f,%.4f) (err:%.6f)", v[0], v[1], v[2], err);
 }
 
-float float_random_01() {
+float numcomp_float_random_01() {
     const int random_mask = 0x00ffffff;
     return (float)(pcg32_random() & random_mask) / random_mask;
 }
 
-float float_random_range(float m, float M) {
-    return m + float_random_01() * (M - m);
+float numcomp_float_random_range(float m, float M) {
+    return m + numcomp_float_random_01() * (M - m);
 }
 
 void numcomp_test_all() {
@@ -117,9 +117,9 @@ void numcomp_batch_test_vec3() {
     numcomp_test_vec3_print(v_low_z, &p2);
     for (int i = 0; i < 500; i++) {
         float v[3] = {
-                float_random_range(-2.0f, +2.0f),
-                float_random_range(-2.0f, +2.0f),
-                float_random_range(+0.0f, +5.1f),
+                numcomp_float_random_range(-2.0f, +2.0f),
+                numcomp_float_random_range(-2.0f, +2.0f),
+                numcomp_float_random_range(+0.0f, +5.1f),
         };
         numcomp_test_vec3_print(v, &p2);
     }
