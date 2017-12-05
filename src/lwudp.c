@@ -75,6 +75,9 @@ void destroy_udp(LWUDP** udp) {
 }
 
 void udp_send(LWUDP* udp, const char* data, int size) {
+    if (!udp) {
+        return;
+    }
     //send the message
     if (sendto(udp->s, data, size, 0, (struct sockaddr *) &udp->si_other, udp->slen) == SOCKET_ERROR)
     {
