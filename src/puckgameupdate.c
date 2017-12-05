@@ -36,7 +36,6 @@ void update_puck_game(LWCONTEXT* pLwc, LWPUCKGAME* puck_game, double delta_time)
     //LOGI("pos %.2f %.2f %.2f", p[0], p[1], p[2]);
 
     dJointID pcj = puck_game->player_control_joint;
-    float player_max_speed = puck_game_player_max_speed();
 
     // update player movement actuator (LMotor) according to dir pad input
     float dx, dy, dlen;
@@ -50,8 +49,8 @@ void update_puck_game(LWCONTEXT* pLwc, LWPUCKGAME* puck_game, double delta_time)
         dlen_ratio *= dlen_ratio;
         LOGIx("dx=%.2f, dy=%.2f, dlen=%.2f, dlen_max=%.2f", dx, dy, dlen, dlen_max);
         dJointEnable(pcj);
-        dJointSetLMotorParam(pcj, dParamVel1, player_max_speed * dx * dlen_ratio);
-        dJointSetLMotorParam(pcj, dParamVel2, player_max_speed * dy * dlen_ratio);
+        dJointSetLMotorParam(pcj, dParamVel1, puck_game->player_max_move_speed * dx * dlen_ratio);
+        dJointSetLMotorParam(pcj, dParamVel2, puck_game->player_max_move_speed * dy * dlen_ratio);
         /*const float last_move_delta_len = sqrtf(pLwc->last_mouse_move_delta_x * pLwc->last_mouse_move_delta_x + pLwc->last_mouse_move_delta_y * pLwc->last_mouse_move_delta_y);
         dJointSetLMotorParam(pcj, dParamVel1, player_max_speed * pLwc->last_mouse_move_delta_x / last_move_delta_len);
         dJointSetLMotorParam(pcj, dParamVel2, player_max_speed * pLwc->last_mouse_move_delta_y / last_move_delta_len);*/
@@ -86,15 +85,15 @@ void update_puck_game(LWCONTEXT* pLwc, LWPUCKGAME* puck_game, double delta_time)
     }
 
     // control bogus (AI player)
-    puck_game_control_bogus(puck_game, player_max_speed);
+    puck_game_control_bogus(puck_game);
 
     // Move direction fixed while dashing
     // Dash
     if (puck_game->remote_dash[0].remain_time > 0) {
         dx = puck_game->remote_dash[0].dir_x;
         dy = puck_game->remote_dash[0].dir_y;
-        dJointSetLMotorParam(pcj, dParamVel1, puck_game_player_dash_speed() * dx);
-        dJointSetLMotorParam(pcj, dParamVel2, puck_game_player_dash_speed() * dy);
+        dJointSetLMotorParam(pcj, dParamVel1, puck_game->player_dash_speed * dx);
+        dJointSetLMotorParam(pcj, dParamVel2, puck_game->player_dash_speed * dy);
         puck_game->remote_dash[0].remain_time = LWMAX(0, puck_game->remote_dash[0].remain_time - (float)delta_time);
     }
     // Jump

@@ -108,6 +108,8 @@ typedef struct _LWPUCKGAME {
     float tower_shake_time;
     float go_start_pos;
     int hp;
+    float player_max_move_speed;
+    float player_dash_speed;
     // ---- Static game data end
     float world_size_half;
     float tower_pos_multiplier[LW_PUCK_GAME_TOWER_COUNT][2];
@@ -180,11 +182,9 @@ void puck_game_target_decrease_hp_test(LWPUCKGAME* puck_game);
 float puck_game_remain_time(float total_time, int update_tick);
 void puck_game_go_decrease_hp_test(LWPUCKGAME* puck_game, LWPUCKGAMEPLAYER* go, LWPUCKGAMEDASH* dash, LWPUCKGAMETOWER* tower);
 void puck_game_commit_fire(LWPUCKGAME* puck_game, LWPUCKGAMEFIRE* fire, int player_no, float puck_fire_dx, float puck_fire_dy, float puck_fire_dlen);
-float puck_game_player_max_speed();
-float puck_game_player_dash_speed();
 void update_puck_ownership(LWPUCKGAME* puck_game);
 void update_puck_reflect_size(LWPUCKGAME* puck_game, float delta_time);
 void puck_game_reset(LWPUCKGAME* puck_game);
 void puck_game_remote_state_reset(LWPUCKGAME* puck_game, LWPSTATE* state);
 void puck_game_tower_pos(vec4 p_out, const LWPUCKGAME* puck_game, int owner_player_no);
-void puck_game_control_bogus(LWPUCKGAME* puck_game, float player_max_speed);
+void puck_game_control_bogus(LWPUCKGAME* puck_game);

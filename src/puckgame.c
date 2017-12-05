@@ -82,6 +82,8 @@ LWPUCKGAME* new_puck_game() {
     puck_game->tower_shake_time = 0.2f;
     puck_game->go_start_pos = 0.6f;
     puck_game->hp = 10;
+    puck_game->player_max_move_speed = 1.0f;
+    puck_game->player_dash_speed = 6.0f;
     // datasheet end
     puck_game->world_size_half = puck_game->world_size / 2;
     puck_game->player.total_hp = puck_game->hp;
@@ -423,14 +425,6 @@ void puck_game_commit_fire(LWPUCKGAME* puck_game, LWPUCKGAMEFIRE* fire, int play
     fire->dir_len = puck_fire_dlen;
 }
 
-float puck_game_player_max_speed() {
-    return 1.0f;
-}
-
-float puck_game_player_dash_speed() {
-    return 6.0f;
-}
-
 void update_puck_reflect_size(LWPUCKGAME* puck_game, float delta_time) {
     if (puck_game->puck_reflect_size > 1.0f) {
         puck_game->puck_reflect_size = LWMAX(1.0f, puck_game->puck_reflect_size - (float)delta_time * 2);
@@ -498,7 +492,7 @@ void puck_game_tower_pos(vec4 p_out, const LWPUCKGAME* puck_game, int owner_play
     p_out[3] = 1.0f;
 }
 
-void puck_game_control_bogus(LWPUCKGAME* puck_game, float player_max_speed) {
+void puck_game_control_bogus(LWPUCKGAME* puck_game) {
     // update target movement actuator (LMotor) according to dir pad input
     float target_follow_agility = 0.01f; // 0 ~ 1
     dJointID tcj = puck_game->target_control_joint;
@@ -520,6 +514,6 @@ void puck_game_control_bogus(LWPUCKGAME* puck_game, float player_max_speed) {
     puck_game->target_dlen_ratio = (1.0f - target_follow_agility) * puck_game->target_dlen_ratio + target_follow_agility * ideal_target_dlen_ratio;
 
     dJointEnable(tcj);
-    dJointSetLMotorParam(tcj, dParamVel1, player_max_speed * puck_game->target_dx / target_dlen * puck_game->target_dlen_ratio);
-    dJointSetLMotorParam(tcj, dParamVel2, player_max_speed * puck_game->target_dy / target_dlen * puck_game->target_dlen_ratio);
+    dJointSetLMotorParam(tcj, dParamVel1, puck_game->player_max_move_speed * puck_game->target_dx / target_dlen * puck_game->target_dlen_ratio);
+    dJointSetLMotorParam(tcj, dParamVel2, puck_game->player_max_move_speed * puck_game->target_dy / target_dlen * puck_game->target_dlen_ratio);
 }

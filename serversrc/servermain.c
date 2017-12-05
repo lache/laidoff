@@ -125,15 +125,14 @@ static void update_puck_game_remote_player(LWPUCKGAME* puck_game, float delta_ti
         LPGO_PLAYER,
         LPGO_TARGET,
     };
-    float player_speed = puck_game_player_max_speed(); // Should be in this scope
     float dx, dy, dlen;
     if (lw_get_normalized_dir_pad_input(&puck_game->remote_control[i], &dx, &dy, &dlen)) {
         if (dlen > 1.0f) {
             dlen = 1.0f;
         }
         dJointEnable(pcj[i]);
-        dJointSetLMotorParam(pcj[i], dParamVel1, player_speed * dx * dlen);
-        dJointSetLMotorParam(pcj[i], dParamVel2, player_speed * dy * dlen);
+        dJointSetLMotorParam(pcj[i], dParamVel1, puck_game->player_max_move_speed * dx * dlen);
+        dJointSetLMotorParam(pcj[i], dParamVel2, puck_game->player_max_move_speed * dy * dlen);
     } else {
         dJointSetLMotorParam(pcj[i], dParamVel1, 0);
         dJointSetLMotorParam(pcj[i], dParamVel2, 0);
@@ -143,8 +142,8 @@ static void update_puck_game_remote_player(LWPUCKGAME* puck_game, float delta_ti
     if (puck_game->remote_dash[i].remain_time > 0) {
         dx = puck_game->remote_dash[i].dir_x;
         dy = puck_game->remote_dash[i].dir_y;
-        dJointSetLMotorParam(pcj[i], dParamVel1, puck_game_player_dash_speed() * dx);
-        dJointSetLMotorParam(pcj[i], dParamVel2, puck_game_player_dash_speed() * dy);
+        dJointSetLMotorParam(pcj[i], dParamVel1, puck_game->player_dash_speed * dx);
+        dJointSetLMotorParam(pcj[i], dParamVel2, puck_game->player_dash_speed * dy);
         puck_game->remote_dash[i].remain_time = LWMAX(0,
                                                       puck_game->remote_dash[i].remain_time - delta_time);
     }
