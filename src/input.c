@@ -394,7 +394,7 @@ void lw_press_key_a(LWCONTEXT* pLwc) {
 }
 
 void lw_press_key_z(LWCONTEXT* pLwc) {
-    puck_game_dash(pLwc, pLwc->puck_game);
+    puck_game_dash_and_send(pLwc, pLwc->puck_game);
 }
 
 void lw_press_key_x(LWCONTEXT* pLwc) {

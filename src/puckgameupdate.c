@@ -180,15 +180,14 @@ void puck_game_jump(LWCONTEXT* pLwc, LWPUCKGAME* puck_game) {
     }
 }
 
-void puck_game_dash(LWCONTEXT* pLwc, LWPUCKGAME* puck_game) {
+int puck_game_dash(LWCONTEXT* pLwc, LWPUCKGAME* puck_game, LWPUCKGAMEDASH* dash) {
     // Check params
     if (!pLwc || !puck_game) {
-        return;
+        return -1;
     }
-    LWPUCKGAMEDASH* dash = &puck_game->remote_dash[puck_game->player_no == 2 ? 1 : 0];
     // Check already effective dash
     if (puck_game_dashing(dash)) {
-        return;
+        return -2;
     }
     // Check effective move input
     //float dx, dy, dlen;
@@ -199,22 +198,28 @@ void puck_game_dash(LWCONTEXT* pLwc, LWPUCKGAME* puck_game) {
     // Check cooltime
     if (puck_game_dash_cooltime(puck_game) < puck_game->dash_interval) {
         dash->shake_remain_time = puck_game->dash_shake_time;
-        return;
+        return -3;
     }
 
     // Start dash!
     puck_game_commit_dash_to_puck(puck_game, dash, puck_game->player_no == 2 ? 2 : 1);
     //puck_game_commit_dash(puck_game, &puck_game->dash, dx, dy);
+    return 0;
+}
 
-    const int remote = puck_game_remote(pLwc, puck_game);
+void puck_game_dash_and_send(LWCONTEXT* pLwc, LWPUCKGAME* puck_game) {
+    LWPUCKGAMEDASH* dash = &puck_game->remote_dash[puck_game->player_no == 2 ? 1 : 0];
+    if (puck_game_dash(pLwc, puck_game, dash) == 0) {
+        const int remote = puck_game_remote(pLwc, puck_game);
 
-    if (pLwc->puck_game_state.bf.finished == 0
-        && remote) {
-        LWPDASH packet_dash;
-        packet_dash.type = LPGP_LWPDASH;
-        packet_dash.battle_id = pLwc->puck_game->battle_id;
-        packet_dash.token = pLwc->puck_game->token;
-        udp_send(pLwc->udp, (const char*)&packet_dash, sizeof(packet_dash));
+        if (pLwc->puck_game_state.bf.finished == 0
+            && remote) {
+            LWPDASH packet_dash;
+            packet_dash.type = LPGP_LWPDASH;
+            packet_dash.battle_id = pLwc->puck_game->battle_id;
+            packet_dash.token = pLwc->puck_game->token;
+            udp_send(pLwc->udp, (const char*)&packet_dash, sizeof(packet_dash));
+        }
     }
 }
 

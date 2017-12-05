@@ -91,7 +91,7 @@ function on_ui_event(id)
 		return 0
 	elseif id == 'dash_button' then
 		print('[script]button_dash')
-		lo.puck_game_dash(c, c.puck_game)
+		lo.puck_game_dash_and_send(c, c.puck_game)
 		return 0
 	elseif id == 'jump_button' then
 		print('[script]button_jump')
