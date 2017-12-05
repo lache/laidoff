@@ -131,7 +131,6 @@ typedef struct _LWPUCKGAME {
 	LWPUCKGAMEPLAYER target;
 	float last_remote_dx;
 	float last_remote_dy;
-	int pull_puck;
 	void(*on_player_damaged)(LWPUCKGAME*);
 	void(*on_target_damaged)(LWPUCKGAME*);
 	void* server;
@@ -189,3 +188,5 @@ void puck_game_remote_state_reset(LWPUCKGAME* puck_game, LWPSTATE* state);
 void puck_game_tower_pos(vec4 p_out, const LWPUCKGAME* puck_game, int owner_player_no);
 void puck_game_control_bogus(LWPUCKGAME* puck_game);
 void puck_game_update_remote_player(LWPUCKGAME* puck_game, float delta_time, int i);
+LWPUCKGAMEDASH* puck_game_single_play_dash_object(LWPUCKGAME* puck_game);
+LWPUCKGAMEJUMP* puck_game_single_play_jump_object(LWPUCKGAME* puck_game);

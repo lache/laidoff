@@ -28,9 +28,15 @@ void update_world_roll(LWPUCKGAME* puck_game) {
 }
 
 void update_shake(LWPUCKGAME* puck_game, float delta_time) {
-    // Decrease shake remain time
-    if (puck_game->remote_dash[0].shake_remain_time > 0) {
-        puck_game->remote_dash[0].shake_remain_time = LWMAX(0, puck_game->remote_dash[0].shake_remain_time - (float)delta_time);
+    for (int i = 0; i < 2; i++) {
+        // Decrease shake remain time
+        if (puck_game->remote_dash[i].shake_remain_time > 0) {
+            puck_game->remote_dash[i].shake_remain_time = LWMAX(0, puck_game->remote_dash[i].shake_remain_time - (float)delta_time);
+        }
+        // Jump
+        if (puck_game->remote_jump[i].shake_remain_time > 0) {
+            puck_game->remote_jump[i].shake_remain_time = LWMAX(0, puck_game->remote_jump[i].shake_remain_time - (float)delta_time);
+        }
     }
     // Decrease HP remain time (player)
     if (puck_game->player.hp_shake_remain_time > 0) {
@@ -39,10 +45,6 @@ void update_shake(LWPUCKGAME* puck_game, float delta_time) {
     // Decrease HP remain time (target)
     if (puck_game->target.hp_shake_remain_time > 0) {
         puck_game->target.hp_shake_remain_time = LWMAX(0, puck_game->target.hp_shake_remain_time - (float)delta_time);
-    }
-    // Jump
-    if (puck_game->remote_jump[0].shake_remain_time > 0) {
-        puck_game->remote_jump[0].shake_remain_time = LWMAX(0, puck_game->remote_jump[0].shake_remain_time - (float)delta_time);
     }
     // Tower shake
     for (int i = 0; i < LW_PUCK_GAME_TOWER_COUNT; i++) {
@@ -70,33 +72,27 @@ void update_puck_game(LWCONTEXT* pLwc, LWPUCKGAME* puck_game, double delta_time)
     if (puck_game->player.puck_contacted == 0) {
         puck_game->player.last_contact_puck_body = 0;
     }
-    //const dReal* p = dBodyGetPosition(puck_game->go[LPGO_PUCK].body);
-    //LOGI("pos %.2f %.2f %.2f", p[0], p[1], p[2]);
 
-    dJointID pcj = puck_game->player_control_joint;
-
-    // update player movement actuator (LMotor) according to dir pad input
     float dx, dy, dlen;
-    if (lw_get_normalized_dir_pad_input(pLwc, &pLwc->left_dir_pad, &dx, &dy, &dlen)) {
-        const float dlen_max = pLwc->left_dir_pad.max_follow_distance;
-        if (dlen > dlen_max) {
-            dlen = dlen_max;
-        }
-        float dlen_ratio = dlen / dlen_max;
-        dlen_ratio *= dlen_ratio;
-        dlen_ratio *= dlen_ratio;
-        LOGIx("dx=%.2f, dy=%.2f, dlen=%.2f, dlen_max=%.2f", dx, dy, dlen, dlen_max);
-        dJointEnable(pcj);
-        dJointSetLMotorParam(pcj, dParamVel1, puck_game->player_max_move_speed * dx * dlen_ratio);
-        dJointSetLMotorParam(pcj, dParamVel2, puck_game->player_max_move_speed * dy * dlen_ratio);
-        /*const float last_move_delta_len = sqrtf(pLwc->last_mouse_move_delta_x * pLwc->last_mouse_move_delta_x + pLwc->last_mouse_move_delta_y * pLwc->last_mouse_move_delta_y);
-        dJointSetLMotorParam(pcj, dParamVel1, player_max_speed * pLwc->last_mouse_move_delta_x / last_move_delta_len);
-        dJointSetLMotorParam(pcj, dParamVel2, player_max_speed * pLwc->last_mouse_move_delta_y / last_move_delta_len);*/
+    int dir_pad_dragging = lw_get_normalized_dir_pad_input(pLwc, &pLwc->left_dir_pad, &dx, &dy, &dlen);
+    const float dlen_max = pLwc->left_dir_pad.max_follow_distance;
+    if (dlen > dlen_max) {
+        dlen = dlen_max;
+    }
+    float dlen_ratio = dlen / dlen_max;
+    // make dlen_ratio ^ 4
+    dlen_ratio *= dlen_ratio;
+    dlen_ratio *= dlen_ratio;
+    puck_game->remote_control[0].dir_pad_dragging = pLwc->left_dir_pad.dragging;
+    puck_game->remote_control[0].dx = dx;
+    puck_game->remote_control[0].dy = dy;
+    puck_game->remote_control[0].dlen = dlen_ratio;
 
-        if (pLwc->tcp
-            && pLwc->tcp->state == LUS_MATCHED
-            && pLwc->puck_game_state.bf.finished == 0
-            && remote) {
+    const int send_udp = remote && pLwc->puck_game_state.bf.finished == 0;
+    
+    if (dir_pad_dragging) {
+        LOGIx("dx=%.2f, dy=%.2f, dlen=%.2f, dlen_max=%.2f", dx, dy, dlen, dlen_max);
+        if (send_udp) {
             LWPMOVE packet_move;
             packet_move.type = LPGP_LWPMOVE;
             packet_move.battle_id = pLwc->puck_game->battle_id;
@@ -107,13 +103,7 @@ void update_puck_game(LWCONTEXT* pLwc, LWPUCKGAME* puck_game, double delta_time)
             udp_send(pLwc->udp, (const char*)&packet_move, sizeof(packet_move));
         }
     } else {
-        dJointSetLMotorParam(pcj, dParamVel1, 0);
-        dJointSetLMotorParam(pcj, dParamVel2, 0);
-
-        if (pLwc->tcp
-            && pLwc->tcp->state == LUS_MATCHED
-            && pLwc->puck_game_state.bf.finished == 0
-            && remote) {
+        if (send_udp) {
             LWPSTOP packet_stop;
             packet_stop.type = LPGP_LWPSTOP;
             packet_stop.battle_id = pLwc->puck_game->battle_id;
@@ -122,57 +112,9 @@ void update_puck_game(LWCONTEXT* pLwc, LWPUCKGAME* puck_game, double delta_time)
         }
     }
 
-    // Move direction fixed while dashing
-    // Dash
-    if (puck_game->remote_dash[0].remain_time > 0) {
-        dx = puck_game->remote_dash[0].dir_x;
-        dy = puck_game->remote_dash[0].dir_y;
-        dJointSetLMotorParam(pcj, dParamVel1, puck_game->player_dash_speed * dx);
-        dJointSetLMotorParam(pcj, dParamVel2, puck_game->player_dash_speed * dy);
-        puck_game->remote_dash[0].remain_time = LWMAX(0, puck_game->remote_dash[0].remain_time - (float)delta_time);
-    }
-    // Jump
-    if (puck_game->remote_jump[0].remain_time > 0) {
-        puck_game->remote_jump[0].remain_time = 0;
-        dBodyAddForce(puck_game->go[LPGO_PLAYER].body,
-                      0,
-                      0,
-                      puck_game->jump_force);
-    }
-    // Fire
-    if (puck_game->remote_fire[0].remain_time > 0) {
-        // [1] Player Control Joint Version
-        /*dJointSetLMotorParam(pcj, dParamVel1, puck_game->remote_fire[0].dir_x * puck_game->fire_max_force * puck_game->remote_fire[0].dir_len);
-        dJointSetLMotorParam(pcj, dParamVel2, puck_game->remote_fire[0].dir_y * puck_game->fire_max_force * puck_game->remote_fire[0].dir_len);
-        puck_game->remote_fire[0].remain_time = LWMAX(0, puck_game->remote_fire[0].remain_time - (float)delta_time);*/
-
-        // [2] Impulse Force Version
-        dJointDisable(pcj);
-        dBodySetLinearVel(puck_game->go[LPGO_PLAYER].body, 0, 0, 0);
-        dBodyAddForce(puck_game->go[LPGO_PLAYER].body,
-                      puck_game->remote_fire[0].dir_x * puck_game->fire_max_force * puck_game->remote_fire[0].dir_len,
-                      puck_game->remote_fire[0].dir_y * puck_game->fire_max_force * puck_game->remote_fire[0].dir_len,
-                      0);
-        puck_game->remote_fire[0].remain_time = 0;
-        // Force release left dir pad
-        dir_pad_release(&pLwc->left_dir_pad, pLwc->left_dir_pad.pointer_id);
-    }
     // Pull
-    if (puck_game->pull_puck) {
-        const dReal* puck_pos = dBodyGetPosition(puck_game->go[LPGO_PUCK].body);
-        const dReal* player_pos = dBodyGetPosition(puck_game->go[LPGO_PLAYER].body);
-        const dVector3 f = {
-            player_pos[0] - puck_pos[0],
-            player_pos[1] - puck_pos[1],
-            player_pos[2] - puck_pos[2]
-        };
-        const dReal flen = dLENGTH(f);
-        const dReal power = 0.1f;
-        const dReal scale = power / flen;
-        dBodyAddForce(puck_game->go[LPGO_PUCK].body, f[0] * scale, f[1] * scale, f[2] * scale);
-
-        if (pLwc->puck_game_state.bf.finished == 0
-            && remote) {
+    if (puck_game->remote_control[0].pull_puck) {
+        if (send_udp) {
             LWPPULLSTART p;
             p.type = LPGP_LWPPULLSTART;
             p.battle_id = pLwc->puck_game->battle_id;
@@ -180,8 +122,7 @@ void update_puck_game(LWCONTEXT* pLwc, LWPUCKGAME* puck_game, double delta_time)
             udp_send(pLwc->udp, (const char*)&p, sizeof(p));
         }
     } else {
-        if (pLwc->puck_game_state.bf.finished == 0
-            && remote) {
+        if (send_udp) {
             LWPPULLSTOP p;
             p.type = LPGP_LWPPULLSTOP;
             p.battle_id = pLwc->puck_game->battle_id;
@@ -189,6 +130,8 @@ void update_puck_game(LWCONTEXT* pLwc, LWPUCKGAME* puck_game, double delta_time)
             udp_send(pLwc->udp, (const char*)&p, sizeof(p));
         }
     }
+
+    puck_game_update_remote_player(puck_game, (float)delta_time, puck_game->player_no == 2 ? 1 : 0);
 
     // -------- Client only --------
 
@@ -242,8 +185,9 @@ void puck_game_dash(LWCONTEXT* pLwc, LWPUCKGAME* puck_game) {
     if (!pLwc || !puck_game) {
         return;
     }
+    LWPUCKGAMEDASH* dash = &puck_game->remote_dash[puck_game->player_no == 2 ? 1 : 0];
     // Check already effective dash
-    if (puck_game_dashing(&puck_game->remote_dash[0])) {
+    if (puck_game_dashing(dash)) {
         return;
     }
     // Check effective move input
@@ -254,12 +198,12 @@ void puck_game_dash(LWCONTEXT* pLwc, LWPUCKGAME* puck_game) {
 
     // Check cooltime
     if (puck_game_dash_cooltime(puck_game) < puck_game->dash_interval) {
-        puck_game->remote_dash[0].shake_remain_time = puck_game->dash_shake_time;
+        dash->shake_remain_time = puck_game->dash_shake_time;
         return;
     }
 
     // Start dash!
-    puck_game_commit_dash_to_puck(puck_game, &puck_game->remote_dash[0], 1);
+    puck_game_commit_dash_to_puck(puck_game, dash, puck_game->player_no == 2 ? 2 : 1);
     //puck_game_commit_dash(puck_game, &puck_game->dash, dx, dy);
 
     const int remote = puck_game_remote(pLwc, puck_game);
@@ -295,15 +239,15 @@ void puck_game_target_dash(LWPUCKGAME* puck_game, int player_no) {
 }
 
 void puck_game_pull_puck_start(LWCONTEXT* pLwc, LWPUCKGAME* puck_game) {
-    puck_game->pull_puck = 1;
+    puck_game->remote_control[0].pull_puck = 1;
 }
 
 void puck_game_pull_puck_stop(LWCONTEXT* pLwc, LWPUCKGAME* puck_game) {
-    puck_game->pull_puck = 0;
+    puck_game->remote_control[0].pull_puck = 0;
 }
 
 void puck_game_pull_puck_toggle(LWCONTEXT* pLwc, LWPUCKGAME* puck_game) {
-    if (puck_game->pull_puck) {
+    if (puck_game->remote_control[0].pull_puck) {
         puck_game_pull_puck_stop(pLwc, puck_game);
     } else {
         puck_game_pull_puck_start(pLwc, puck_game);

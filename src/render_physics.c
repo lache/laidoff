@@ -539,9 +539,10 @@ static void render_dash_gauge(const LWCONTEXT* pLwc) {
     float x = -pLwc->aspect_ratio + margin_x;
     float y = 1 - margin_y;
     const float boost_gauge_ratio = puck_game_dash_gauge_ratio(pLwc->puck_game);
+    const LWPUCKGAMEDASH* dash = puck_game_single_play_dash_object(pLwc->puck_game);
     // Positioinal offset by shake
-    if (pLwc->puck_game->remote_dash[0].shake_remain_time > 0) {
-        const float ratio = pLwc->puck_game->remote_dash[0].shake_remain_time / pLwc->puck_game->dash_shake_time;
+    if (dash->shake_remain_time > 0) {
+        const float ratio = dash->shake_remain_time / pLwc->puck_game->dash_shake_time;
         const float shake_magnitude = 0.02f;
         x += ratio * (2 * rand() / (float)RAND_MAX - 1.0f) * shake_magnitude * pLwc->aspect_ratio;
         y += ratio * (2 * rand() / (float)RAND_MAX - 1.0f) * shake_magnitude;
@@ -793,13 +794,13 @@ static void render_floor(const LWCONTEXT *pLwc, const mat4x4 proj, const LWPUCKG
     glDrawArrays(GL_TRIANGLES, 0, pLwc->vertex_buffer[lvt].vertex_count);
 }
 
-static void render_lwbutton(const LWCONTEXT* pLwc, const LWBUTTONLIST* button_list) {
+static void render_lwbutton(const LWCONTEXT* pLwc, const LWBUTTONLIST* button_list, int pull_puck) {
     for (int i = 0; i < button_list->button_count; i++) {
         float or = 1.0f;
         float og = 1.0f;
         float ob = 1.0f;
         // Pull button hardcoding
-        if (i == 0 && pLwc->puck_game->pull_puck) {
+        if (i == 0 && pull_puck) {
             or = 0.2f;
             ob = 0.2f;
         }
@@ -1064,7 +1065,7 @@ void lwc_render_physics(const LWCONTEXT* pLwc, const mat4x4 view, const mat4x4 p
     // Game object: Player
     render_go(pLwc, view, proj, puck_game, &puck_game->go[LPGO_PLAYER], pLwc->tex_atlas[player_no == 2 ? LAE_PUCK_ENEMY_KTX : LAE_PUCK_PLAYER_KTX],
               1.0f, remote_player_pos, state->player_rot, remote, 0);
-    if (remote ? state->bf.player_pull : pLwc->puck_game->pull_puck) {
+    if (remote ? state->bf.player_pull : puck_game->remote_control[0].pull_puck) {
         render_radial_wave(pLwc, view, proj, puck_game, &puck_game->go[LPGO_PLAYER], pLwc->tex_atlas[player_no == 2 ? LAE_PUCK_ENEMY_KTX : LAE_PUCK_PLAYER_KTX],
                            1.0f, remote_player_pos, state->player_rot, remote, 0);
     }
@@ -1146,7 +1147,7 @@ void lwc_render_physics(const LWCONTEXT* pLwc, const mat4x4 view, const mat4x4 p
     if (pLwc->control_flags & LCF_PUCK_GAME_JUMP) {
         lwbutton_lae_append(&(((LWCONTEXT*)pLwc)->button_list), "jump_button", button_x_interval * 3 + button_x_0, button_y_0 + button_y_interval * 2, button_size, button_size, LAE_BUTTON_JUMP, LAE_BUTTON_JUMP_ALPHA);
     }
-    render_lwbutton(pLwc, &pLwc->button_list);
+    render_lwbutton(pLwc, &pLwc->button_list, puck_game->remote_control[0].pull_puck);
     
     if (pLwc->tcp == 0) {
         char str[256];

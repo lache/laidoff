@@ -207,7 +207,16 @@ void puck_game_go_decrease_hp_test(LWPUCKGAME* puck_game, LWPUCKGAMEPLAYER* go, 
     }
 }
 
+LWPUCKGAMEDASH* puck_game_single_play_dash_object(LWPUCKGAME* puck_game) {
+    return &puck_game->remote_dash[puck_game->player_no == 2 ? 1 : 0];
+}
+
+LWPUCKGAMEJUMP* puck_game_single_play_jump_object(LWPUCKGAME* puck_game) {
+    return &puck_game->remote_jump[puck_game->player_no == 2 ? 1 : 0];
+}
+
 void puck_game_player_decrease_hp_test(LWPUCKGAME* puck_game) {
+    LWPUCKGAMEDASH* dash = puck_game_single_play_dash_object(puck_game);
     puck_game_go_decrease_hp_test(puck_game, &puck_game->player, &puck_game->remote_dash[0], &puck_game->tower[0]);
 }
 
@@ -377,11 +386,13 @@ float puck_game_dash_gauge_ratio(LWPUCKGAME* puck_game) {
 }
 
 float puck_game_dash_cooltime(LWPUCKGAME* puck_game) {
-    return puck_game->time - puck_game->remote_dash[0].last_time;
+    LWPUCKGAMEDASH* dash = puck_game_single_play_dash_object(puck_game);
+    return puck_game->time - dash->last_time;
 }
 
 float puck_game_jump_cooltime(LWPUCKGAME* puck_game) {
-    return puck_game->time - puck_game->remote_jump[0].last_time;
+    LWPUCKGAMEJUMP* jump = puck_game_single_play_jump_object(puck_game);
+    return puck_game->time - jump->last_time;
 }
 
 int puck_game_jumping(LWPUCKGAMEJUMP* jump) {

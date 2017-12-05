@@ -96,11 +96,11 @@ func matchWorker(battleService battle.Service, matchQueue <-chan user.UserAgent,
 		c1 := <-matchQueue
 		c2 := <-matchQueue
 		if c1.Conn == c2.Conn {
-			log.Printf("The same connection sending QUEUE2 twice. Replying with RETRYQUEUE...")
-			sendRetryQueue(c1.Conn)
+			log.Printf("The same connection sending QUEUE2 twice. Flushing match requests and replying with RETRYQUEUE to the later connection...")
+			sendRetryQueue(c2.Conn)
 		} else if c1.Db.Id == c2.Db.Id {
-			log.Printf("The same user ID sending QUEUE2 twice. Replying with RETRYQUEUE...")
-			sendRetryQueue(c1.Conn)
+			log.Printf("The same user ID sending QUEUE2 twice. Flushing match requests and replying with RETRYQUEUE to the later connection...")
+			sendRetryQueue(c2.Conn)
 		} else {
 			log.Printf("%v and %v matched! (maybe)", c1.Conn.RemoteAddr(), c2.Conn.RemoteAddr())
 			maybeMatchedBuf := convert.Packet2Buf(&C.LWPMAYBEMATCHED{

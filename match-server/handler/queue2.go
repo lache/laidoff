@@ -29,33 +29,41 @@ func HandleQueue2(conf config.ServerConfig, matchQueue chan<- user.UserAgent, bu
 			log.Printf("Nickname '%v' has the ongoing battle session. Check this battle still valid...", userDb.Nickname)
 			connToBattle, err := battleService.Connection()
 			if err != nil {
-				log.Fatalf("Connection to battle service failed - %v", err.Error())
-			}
-			checkBattleValidBuf := convert.Packet2Buf(convert.NewCheckBattleValid(battleOk.BattleId))
-			connToBattle.Write(checkBattleValidBuf)
-			battleValid := &C.LWPBATTLEVALID{}
-			err = battle.WaitForReply(connToBattle, battleValid, unsafe.Sizeof(*battleValid), int(C.LPGP_LWPBATTLEVALID))
-			if err != nil {
-				log.Printf("WaitForReply failed - %v", err.Error())
+				log.Printf("Connection to battle service failed - %v", err.Error())
+				log.Printf("Assume ongoing battle session is invalid")
+				// Battle is not valid. Remove from cache
+				battleOkQueue <- battle.Ok{
+					RemoveCache:    true,
+					RemoveUserId:   userDb.Id,
+				}
+				// And then fallback to queuing this user
 			} else {
-				if battleValid.Valid == 1 {
-					// [1] QUEUEOK
-					queueOkBuf := convert.Packet2Buf(convert.NewLwpQueueOk())
-					conn.Write(queueOkBuf)
-					// [2] MAYBEMATCHED
-					maybeMatchedBuf := convert.Packet2Buf(convert.NewLwpMaybeMatched())
-					conn.Write(maybeMatchedBuf)
-					// [3] MATCHED2
-					battle.WriteMatched2(conf, conn, battleOk, userDb.Id)
-					// Should exit this function here
-					return
+				checkBattleValidBuf := convert.Packet2Buf(convert.NewCheckBattleValid(battleOk.BattleId))
+				connToBattle.Write(checkBattleValidBuf)
+				battleValid := &C.LWPBATTLEVALID{}
+				err = battle.WaitForReply(connToBattle, battleValid, unsafe.Sizeof(*battleValid), int(C.LPGP_LWPBATTLEVALID))
+				if err != nil {
+					log.Printf("WaitForReply failed - %v", err.Error())
 				} else {
-					// Battle is not valid. Remove from cache
-					battleOkQueue <- battle.Ok{
-						RemoveCache:    true,
-						RemoveUserId:   userDb.Id,
+					if battleValid.Valid == 1 {
+						// [1] QUEUEOK
+						queueOkBuf := convert.Packet2Buf(convert.NewLwpQueueOk())
+						conn.Write(queueOkBuf)
+						// [2] MAYBEMATCHED
+						maybeMatchedBuf := convert.Packet2Buf(convert.NewLwpMaybeMatched())
+						conn.Write(maybeMatchedBuf)
+						// [3] MATCHED2
+						battle.WriteMatched2(conf, conn, battleOk, userDb.Id)
+						// Should exit this function here
+						return
+					} else {
+						// Battle is not valid. Remove from cache
+						battleOkQueue <- battle.Ok{
+							RemoveCache:    true,
+							RemoveUserId:   userDb.Id,
+						}
+						// And then fallback to queuing this user
 					}
-					// Fallback to queuing this user
 				}
 			}
 		}
