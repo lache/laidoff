@@ -167,8 +167,8 @@ typedef struct _LWPUCKGAME {
 LWPUCKGAME* new_puck_game();
 void delete_puck_game(LWPUCKGAME** puck_game);
 void puck_game_push(LWPUCKGAME* puck_game);
-float puck_game_dash_gauge_ratio(LWPUCKGAME* puck_game);
-float puck_game_dash_cooltime(LWPUCKGAME* puck_game);
+float puck_game_dash_gauge_ratio(LWPUCKGAME* puck_game, const LWPUCKGAMEDASH* dash);
+float puck_game_dash_elapsed_since_last(const LWPUCKGAME* puck_game, const LWPUCKGAMEDASH* dash);
 float puck_game_jump_cooltime(LWPUCKGAME* puck_game);
 int puck_game_dashing(LWPUCKGAMEDASH* dash);
 int puck_game_jumping(LWPUCKGAMEJUMP* jump);
@@ -190,3 +190,5 @@ void puck_game_control_bogus(LWPUCKGAME* puck_game);
 void puck_game_update_remote_player(LWPUCKGAME* puck_game, float delta_time, int i);
 LWPUCKGAMEDASH* puck_game_single_play_dash_object(LWPUCKGAME* puck_game);
 LWPUCKGAMEJUMP* puck_game_single_play_jump_object(LWPUCKGAME* puck_game);
+int puck_game_dash(LWPUCKGAME* puck_game, LWPUCKGAMEDASH* dash, int player_no);
+int puck_game_dash_can_cast(const LWPUCKGAME* puck_game, const LWPUCKGAMEDASH* dash);

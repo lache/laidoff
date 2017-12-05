@@ -373,7 +373,8 @@ static void render_timer(const LWCONTEXT* pLwc, float remain_sec, float total_se
 }
 
 static void render_dash_ring_gauge(const LWCONTEXT* pLwc, vec4 player_pos) {
-    float gauge_ratio = puck_game_dash_gauge_ratio(pLwc->puck_game);
+    const LWPUCKGAMEDASH* dash = puck_game_single_play_dash_object(pLwc->puck_game);
+    float gauge_ratio = puck_game_dash_gauge_ratio(pLwc->puck_game, dash);
     if (gauge_ratio >= 1.0f) {
         return;
     }
@@ -538,8 +539,8 @@ static void render_dash_gauge(const LWCONTEXT* pLwc) {
     const float base_color = 0.3f;
     float x = -pLwc->aspect_ratio + margin_x;
     float y = 1 - margin_y;
-    const float boost_gauge_ratio = puck_game_dash_gauge_ratio(pLwc->puck_game);
     const LWPUCKGAMEDASH* dash = puck_game_single_play_dash_object(pLwc->puck_game);
+    const float boost_gauge_ratio = puck_game_dash_gauge_ratio(pLwc->puck_game, dash);
     // Positioinal offset by shake
     if (dash->shake_remain_time > 0) {
         const float ratio = dash->shake_remain_time / pLwc->puck_game->dash_shake_time;

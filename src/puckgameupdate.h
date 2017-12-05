@@ -6,7 +6,6 @@ typedef struct _LWPUCKGAMETOWER LWPUCKGAMETOWER;
 typedef struct _LWPUCKGAMEPLAYER LWPUCKGAMEPLAYER;
 
 void update_puck_game(LWCONTEXT* pLwc, LWPUCKGAME* puck_game, double delta_time);
-int puck_game_dash(LWCONTEXT* pLwc, LWPUCKGAME* puck_game, LWPUCKGAMEDASH* dash);
 void puck_game_target_move(LWPUCKGAME* puck_game, float dx, float dy);
 void puck_game_target_stop(LWPUCKGAME* puck_game);
 void puck_game_target_dash(LWPUCKGAME* puck_game, int player_no);

@@ -49304,44 +49304,6 @@ fail:
 }
 
 
-static int _wrap_puck_game_dash(lua_State* L) {
-  int SWIG_arg = 0;
-  LWCONTEXT *arg1 = (LWCONTEXT *) 0 ;
-  LWPUCKGAME *arg2 = (LWPUCKGAME *) 0 ;
-  LWPUCKGAMEDASH *arg3 = (LWPUCKGAMEDASH *) 0 ;
-  int result;
-  
-  SWIG_check_num_args("puck_game_dash",3,3)
-  if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("puck_game_dash",1,"LWCONTEXT *");
-  if(!SWIG_isptrtype(L,2)) SWIG_fail_arg("puck_game_dash",2,"LWPUCKGAME *");
-  if(!SWIG_isptrtype(L,3)) SWIG_fail_arg("puck_game_dash",3,"LWPUCKGAMEDASH *");
-  
-  if (!SWIG_IsOK(SWIG_ConvertPtr(L,1,(void**)&arg1,SWIGTYPE_p__LWCONTEXT,0))){
-    SWIG_fail_ptr("puck_game_dash",1,SWIGTYPE_p__LWCONTEXT);
-  }
-  
-  
-  if (!SWIG_IsOK(SWIG_ConvertPtr(L,2,(void**)&arg2,SWIGTYPE_p__LWPUCKGAME,0))){
-    SWIG_fail_ptr("puck_game_dash",2,SWIGTYPE_p__LWPUCKGAME);
-  }
-  
-  
-  if (!SWIG_IsOK(SWIG_ConvertPtr(L,3,(void**)&arg3,SWIGTYPE_p__LWPUCKGAMEDASH,0))){
-    SWIG_fail_ptr("puck_game_dash",3,SWIGTYPE_p__LWPUCKGAMEDASH);
-  }
-  
-  result = (int)puck_game_dash(arg1,arg2,arg3);
-  lua_pushnumber(L, (lua_Number) result); SWIG_arg++;
-  return SWIG_arg;
-  
-  if(0) SWIG_fail;
-  
-fail:
-  lua_error(L);
-  return SWIG_arg;
-}
-
-
 static int _wrap_puck_game_target_move(lua_State* L) {
   int SWIG_arg = 0;
   LWPUCKGAME *arg1 = (LWPUCKGAME *) 0 ;
@@ -50882,7 +50844,6 @@ static swig_lua_method swig_SwigModule_methods[]= {
     { "construct_set_preview_enable", _wrap_construct_set_preview_enable},
     { "construct_set_preview", _wrap_construct_set_preview},
     { "update_puck_game", _wrap_update_puck_game},
-    { "puck_game_dash", _wrap_puck_game_dash},
     { "puck_game_target_move", _wrap_puck_game_target_move},
     { "puck_game_target_stop", _wrap_puck_game_target_stop},
     { "puck_game_target_dash", _wrap_puck_game_target_dash},

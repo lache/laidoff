@@ -131,12 +131,14 @@ void update_puck_game(LWCONTEXT* pLwc, LWPUCKGAME* puck_game, double delta_time)
         }
     }
 
-    puck_game_update_remote_player(puck_game, (float)delta_time, puck_game->player_no == 2 ? 1 : 0);
-
-    // -------- Client only --------
-
     // control bogus (AI player)
     puck_game_control_bogus(puck_game);
+
+    for (int i = 0; i < 2; i++) {
+        puck_game_update_remote_player(puck_game, (float)delta_time, i);
+    }
+
+    // -------- Client only --------
 
     update_shake(puck_game, (float)delta_time);
     update_puck_ownership(puck_game);
@@ -180,40 +182,12 @@ void puck_game_jump(LWCONTEXT* pLwc, LWPUCKGAME* puck_game) {
     }
 }
 
-int puck_game_dash(LWCONTEXT* pLwc, LWPUCKGAME* puck_game, LWPUCKGAMEDASH* dash) {
-    // Check params
-    if (!pLwc || !puck_game) {
-        return -1;
-    }
-    // Check already effective dash
-    if (puck_game_dashing(dash)) {
-        return -2;
-    }
-    // Check effective move input
-    //float dx, dy, dlen;
-    /*if (!lw_get_normalized_dir_pad_input(pLwc, &dx, &dy, &dlen)) {
-    return;
-    }*/
-
-    // Check cooltime
-    if (puck_game_dash_cooltime(puck_game) < puck_game->dash_interval) {
-        dash->shake_remain_time = puck_game->dash_shake_time;
-        return -3;
-    }
-
-    // Start dash!
-    puck_game_commit_dash_to_puck(puck_game, dash, puck_game->player_no == 2 ? 2 : 1);
-    //puck_game_commit_dash(puck_game, &puck_game->dash, dx, dy);
-    return 0;
-}
-
 void puck_game_dash_and_send(LWCONTEXT* pLwc, LWPUCKGAME* puck_game) {
     LWPUCKGAMEDASH* dash = &puck_game->remote_dash[puck_game->player_no == 2 ? 1 : 0];
-    if (puck_game_dash(pLwc, puck_game, dash) == 0) {
+    if (puck_game_dash(puck_game, dash, puck_game->player_no == 2 ? 2 : 1) == 0) {
         const int remote = puck_game_remote(pLwc, puck_game);
-
-        if (pLwc->puck_game_state.bf.finished == 0
-            && remote) {
+        const int send_udp = remote && pLwc->puck_game_state.bf.finished == 0;
+        if (send_udp) {
             LWPDASH packet_dash;
             packet_dash.type = LPGP_LWPDASH;
             packet_dash.battle_id = pLwc->puck_game->battle_id;
