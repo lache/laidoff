@@ -55,6 +55,7 @@
 // SWIG output file
 #include "lo_wrap.inl"
 
+#define GLSL_DIR_NAME "glsl"
 #define LW_SUPPORT_ETC1_HARDWARE_DECODING LW_PLATFORM_ANDROID
 #define LW_SUPPORT_VAO (LW_PLATFORM_WIN32 || LW_PLATFORM_OSX || LW_PLATFORM_LINUX)
 
@@ -358,70 +359,68 @@ create_shader(const char *shader_name, LWSHADER *pShader, const GLchar *vst, con
 }
 
 void init_gl_shaders(LWCONTEXT* pLwc) {
-
-    //#if LW_PLATFORM_WIN32 || LW_PLATFORM_OSX
-#define GLSL_DIR_NAME "glsl"
-//#else
-//#define GLSL_DIR_NAME "glsles"
-//#endif
-
     // Vertex Shader
-    char *default_vert_glsl = create_string_from_file(ASSETS_BASE_PATH
+    char* default_vert_glsl = create_string_from_file(ASSETS_BASE_PATH
                                                       GLSL_DIR_NAME PATH_SEPARATOR
                                                       "default-vert.glsl");
-    char *skin_vert_glsl = create_string_from_file(ASSETS_BASE_PATH
+    char* skin_vert_glsl = create_string_from_file(ASSETS_BASE_PATH
                                                    GLSL_DIR_NAME PATH_SEPARATOR
                                                    "skin-vert.glsl");
-    char *fan_vert_glsl = create_string_from_file(ASSETS_BASE_PATH
+    char* fan_vert_glsl = create_string_from_file(ASSETS_BASE_PATH
                                                   GLSL_DIR_NAME PATH_SEPARATOR
                                                   "fan-vert.glsl");
-    char *emitter_vert_glsl = create_string_from_file(ASSETS_BASE_PATH
+    char* emitter_vert_glsl = create_string_from_file(ASSETS_BASE_PATH
                                                       GLSL_DIR_NAME PATH_SEPARATOR
                                                       "emitter-vert.glsl");
-    char *emitter2_vert_glsl = create_string_from_file(ASSETS_BASE_PATH
+    char* emitter2_vert_glsl = create_string_from_file(ASSETS_BASE_PATH
                                                        GLSL_DIR_NAME PATH_SEPARATOR
                                                        "emitter2-vert.glsl");
-    char *sphere_reflect_vert_glsl = create_string_from_file(ASSETS_BASE_PATH
+    char* sphere_reflect_vert_glsl = create_string_from_file(ASSETS_BASE_PATH
                                                              GLSL_DIR_NAME PATH_SEPARATOR
                                                              "sphere-reflect-vert.glsl");
-
+    char* default_normal_vert_glsl = create_string_from_file(ASSETS_BASE_PATH
+                                                             GLSL_DIR_NAME PATH_SEPARATOR
+                                                             "default-normal-vert.glsl");
     // Fragment Shader
-    char *default_frag_glsl = create_string_from_file(ASSETS_BASE_PATH
+    char* default_frag_glsl = create_string_from_file(ASSETS_BASE_PATH
                                                       GLSL_DIR_NAME PATH_SEPARATOR
                                                       "default-frag.glsl");
-    char *color_frag_glsl = create_string_from_file(ASSETS_BASE_PATH
+    char* color_frag_glsl = create_string_from_file(ASSETS_BASE_PATH
                                                     GLSL_DIR_NAME PATH_SEPARATOR
                                                     "color-frag.glsl");
-    char *panel_frag_glsl = create_string_from_file(ASSETS_BASE_PATH
+    char* panel_frag_glsl = create_string_from_file(ASSETS_BASE_PATH
                                                     GLSL_DIR_NAME PATH_SEPARATOR
                                                     "panel-frag.glsl");
-    char *font_frag_glsl = create_string_from_file(ASSETS_BASE_PATH
+    char* font_frag_glsl = create_string_from_file(ASSETS_BASE_PATH
                                                    GLSL_DIR_NAME PATH_SEPARATOR
                                                    "font-frag.glsl");
-    char *etc1_frag_glsl = create_string_from_file(ASSETS_BASE_PATH
+    char* etc1_frag_glsl = create_string_from_file(ASSETS_BASE_PATH
                                                    GLSL_DIR_NAME PATH_SEPARATOR
                                                    "etc1-frag.glsl");
-    char *fan_frag_glsl = create_string_from_file(ASSETS_BASE_PATH
+    char* fan_frag_glsl = create_string_from_file(ASSETS_BASE_PATH
                                                   GLSL_DIR_NAME PATH_SEPARATOR
                                                   "fan-frag.glsl");
-    char *emitter_frag_glsl = create_string_from_file(ASSETS_BASE_PATH
+    char* emitter_frag_glsl = create_string_from_file(ASSETS_BASE_PATH
                                                       GLSL_DIR_NAME PATH_SEPARATOR
                                                       "emitter-frag.glsl");
-    char *emitter2_frag_glsl = create_string_from_file(ASSETS_BASE_PATH
+    char* emitter2_frag_glsl = create_string_from_file(ASSETS_BASE_PATH
                                                        GLSL_DIR_NAME PATH_SEPARATOR
                                                        "emitter2-frag.glsl");
-    char *sphere_reflect_frag_glsl = create_string_from_file(ASSETS_BASE_PATH
+    char* sphere_reflect_frag_glsl = create_string_from_file(ASSETS_BASE_PATH
                                                              GLSL_DIR_NAME PATH_SEPARATOR
                                                              "sphere-reflect-frag.glsl");
-    char *sphere_reflect_floor_frag_glsl = create_string_from_file(ASSETS_BASE_PATH
+    char* sphere_reflect_floor_frag_glsl = create_string_from_file(ASSETS_BASE_PATH
                                                                    GLSL_DIR_NAME PATH_SEPARATOR
                                                                    "sphere-reflect-floor-frag.glsl");
-    char *ringgauge_frag_glsl = create_string_from_file(ASSETS_BASE_PATH
+    char* ringgauge_frag_glsl = create_string_from_file(ASSETS_BASE_PATH
                                                         GLSL_DIR_NAME PATH_SEPARATOR
                                                         "ringgauge-frag.glsl");
-    char *radialwave_frag_glsl = create_string_from_file(ASSETS_BASE_PATH
+    char* radialwave_frag_glsl = create_string_from_file(ASSETS_BASE_PATH
                                                          GLSL_DIR_NAME PATH_SEPARATOR
                                                          "radialwave-frag.glsl");
+    char* default_normal_frag_glsl = create_string_from_file(ASSETS_BASE_PATH
+                                                             GLSL_DIR_NAME PATH_SEPARATOR
+                                                             "default-normal-frag.glsl");
 
     if (!default_vert_glsl) {
         LOGE("init_gl_shaders: default-vert.glsl not loaded. Abort...");
@@ -445,6 +444,11 @@ void init_gl_shaders(LWCONTEXT* pLwc) {
 
     if (!sphere_reflect_vert_glsl) {
         LOGE("init_gl_shaders: sphere-reflect-vert.glsl not loaded. Abort...");
+        return;
+    }
+
+    if (!default_normal_vert_glsl) {
+        LOGE("init_gl_shaders: default-normal-vert.glsl not loaded. Abort...");
         return;
     }
 
@@ -508,6 +512,11 @@ void init_gl_shaders(LWCONTEXT* pLwc) {
         return;
     }
 
+    if (!default_normal_frag_glsl) {
+        LOGE("init_gl_shaders: default-normal-frag.glsl not loaded. Abort...");
+        return;
+    }
+
     create_shader("Default Shader", &pLwc->shader[LWST_DEFAULT], default_vert_glsl, default_frag_glsl);
     create_shader("Font Shader", &pLwc->shader[LWST_FONT], default_vert_glsl, font_frag_glsl);
     create_shader("ETC1 with Alpha Shader", &pLwc->shader[LWST_ETC1], default_vert_glsl, etc1_frag_glsl);
@@ -521,6 +530,7 @@ void init_gl_shaders(LWCONTEXT* pLwc) {
     create_shader("Sphere Reflect Floor Shader", &pLwc->shader[LWST_SPHERE_REFLECT_FLOOR], sphere_reflect_vert_glsl, sphere_reflect_floor_frag_glsl);
     create_shader("Ringgauge Shader", &pLwc->shader[LWST_RINGGAUGE], default_vert_glsl, ringgauge_frag_glsl);
     create_shader("Radial wave Shader", &pLwc->shader[LWST_RADIALWAVE], default_vert_glsl, radialwave_frag_glsl);
+    create_shader("Default Normal Shader", &pLwc->shader[LWST_DEFAULT_NORMAL], default_normal_vert_glsl, default_normal_frag_glsl);
 
     release_string(default_vert_glsl);
     release_string(skin_vert_glsl);
@@ -528,6 +538,7 @@ void init_gl_shaders(LWCONTEXT* pLwc) {
     release_string(emitter_vert_glsl);
     release_string(emitter2_vert_glsl);
     release_string(sphere_reflect_vert_glsl);
+    release_string(default_normal_vert_glsl);
     release_string(default_frag_glsl);
     release_string(color_frag_glsl);
     release_string(panel_frag_glsl);
@@ -540,6 +551,7 @@ void init_gl_shaders(LWCONTEXT* pLwc) {
     release_string(sphere_reflect_floor_frag_glsl);
     release_string(ringgauge_frag_glsl);
     release_string(radialwave_frag_glsl);
+    release_string(default_normal_frag_glsl);
 }
 
 static void load_vbo(LWCONTEXT* pLwc, const char *filename, LWVBO *pVbo) {
@@ -786,39 +798,49 @@ static void init_vbo(LWCONTEXT* pLwc) {
 }
 
 void set_vertex_attrib_pointer(const LWCONTEXT* pLwc, int shader_index) {
+    // vertex coordinates
     glEnableVertexAttribArray(pLwc->shader[shader_index].vpos_location);
     glVertexAttribPointer(pLwc->shader[shader_index].vpos_location, 3, GL_FLOAT, GL_FALSE,
                           stride_in_bytes, (void *)0);
+    // vertex color / normal
     glEnableVertexAttribArray(pLwc->shader[shader_index].vcol_location);
     glVertexAttribPointer(pLwc->shader[shader_index].vcol_location, 3, GL_FLOAT, GL_FALSE,
                           stride_in_bytes, (void *)(sizeof(float) * 3));
+    // uv coordinates
     glEnableVertexAttribArray(pLwc->shader[shader_index].vuv_location);
     glVertexAttribPointer(pLwc->shader[shader_index].vuv_location, 2, GL_FLOAT, GL_FALSE,
                           stride_in_bytes, (void *)(sizeof(float) * (3 + 3)));
+    // scale-9 coordinates
     glEnableVertexAttribArray(pLwc->shader[shader_index].vs9_location);
     glVertexAttribPointer(pLwc->shader[shader_index].vs9_location, 2, GL_FLOAT, GL_FALSE,
                           stride_in_bytes, (void *)(sizeof(float) * (3 + 3 + 2)));
 }
 
 void set_skin_vertex_attrib_pointer(const LWCONTEXT* pLwc, int shader_index) {
+    // vertex coordinates
     glEnableVertexAttribArray(pLwc->shader[shader_index].vpos_location);
     glVertexAttribPointer(pLwc->shader[shader_index].vpos_location, 3, GL_FLOAT, GL_FALSE,
                           skin_stride_in_bytes, (void *)0);
+    // vertex color / normal
     glEnableVertexAttribArray(pLwc->shader[shader_index].vcol_location);
     glVertexAttribPointer(pLwc->shader[shader_index].vcol_location, 3, GL_FLOAT, GL_FALSE,
                           skin_stride_in_bytes, (void *)(sizeof(float) * 3));
+    // uv coordinates
     glEnableVertexAttribArray(pLwc->shader[shader_index].vuv_location);
     glVertexAttribPointer(pLwc->shader[shader_index].vuv_location, 2, GL_FLOAT, GL_FALSE,
                           skin_stride_in_bytes, (void *)(sizeof(float) * (3 + 3)));
+    // bone weights
     glEnableVertexAttribArray(pLwc->shader[shader_index].vbweight_location);
     glVertexAttribPointer(pLwc->shader[shader_index].vbweight_location, 4, GL_FLOAT, GL_FALSE,
                           skin_stride_in_bytes, (void *)(sizeof(float) * (3 + 3 + 2)));
+    // bone transformations
     glEnableVertexAttribArray(pLwc->shader[shader_index].vbmat_location);
     glVertexAttribPointer(pLwc->shader[shader_index].vbmat_location, 4, GL_FLOAT, GL_FALSE,
                           skin_stride_in_bytes, (void *)(sizeof(float) * (3 + 3 + 2 + 4)));
 }
 
 void set_fan_vertex_attrib_pointer(const LWCONTEXT* pLwc, int shader_index) {
+    // vertex coordinates
     glEnableVertexAttribArray(pLwc->shader[shader_index].vpos_location);
     glVertexAttribPointer(pLwc->shader[shader_index].vpos_location, 3, GL_FLOAT, GL_FALSE,
                           fan_stride_in_bytes, (void *)0);
@@ -1310,7 +1332,7 @@ static void dequeue_puck_game_state_and_apply(LWCONTEXT* pLwc) {
         //LWPSTATE sampled_state;
         //linear_interpolate_state(&sampled_state, pLwc->udp->state_buffer, LW_STATE_RING_BUFFER_CAPACITY, sample_update_tick);
         //memcpy(&pLwc->puck_game_state, &sampled_state, sizeof(LWPSTATE));
-        
+
         // 'player' is currently playing player
         // 'target' is currently opponent player
         const int player_damage = pLwc->puck_game_state.bf.player_current_hp - new_state.bf.player_current_hp;
@@ -1599,23 +1621,23 @@ static void load_tex_files(LWCONTEXT* pLwc) {
             if (load_ktx_hw_or_sw(tex_atlas_filename[i]) < 0) {
                 LOGE("load_tex_files: load_ktx_hw_or_sw failure - %s", tex_atlas_filename[i]);
             }
-        } else if (strcmp(tex_atlas_filename[i] + tex_atlas_filename_len - 4, ".png") == 0) {
-            // Software decoding of PNG
-            load_png_pkm_sw_decoding(pLwc, i);
-        } else if (strcmp(tex_atlas_filename[i] + tex_atlas_filename_len - 4, ".pkm") == 0) {
+            } else if (strcmp(tex_atlas_filename[i] + tex_atlas_filename_len - 4, ".png") == 0) {
+                // Software decoding of PNG
+                load_png_pkm_sw_decoding(pLwc, i);
+            } else if (strcmp(tex_atlas_filename[i] + tex_atlas_filename_len - 4, ".pkm") == 0) {
 #if LW_SUPPORT_ETC1_HARDWARE_DECODING
-            load_pkm_hw_decoding(tex_atlas_filename[i]);
+                load_pkm_hw_decoding(tex_atlas_filename[i]);
 #else
-            load_png_pkm_sw_decoding(pLwc, i);
+                load_png_pkm_sw_decoding(pLwc, i);
 #endif
-        } else {
-            LOGE("load_tex_files: unknown tex file extension - %s", tex_atlas_filename[i]);
-        }
+            } else {
+                LOGE("load_tex_files: unknown tex file extension - %s", tex_atlas_filename[i]);
+            }
 
-        pLwc->tex_atlas_hash[i] = hash(
-            (const unsigned char *)&tex_atlas_filename[i][filename_index]);
+            pLwc->tex_atlas_hash[i] = hash(
+                (const unsigned char *)&tex_atlas_filename[i][filename_index]);
+        }
     }
-}
 
 void init_load_textures(LWCONTEXT* pLwc) {
     // Sprites
