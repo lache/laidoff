@@ -116,11 +116,14 @@ LWPUCKGAME* new_puck_game() {
     dInitODE2(0);
     puck_game->world = dWorldCreate();
     puck_game->space = dHashSpaceCreate(0);
+    // dCreatePlane(..., a, b, c, d); ==> plane equation: a*x + b*y + c*z = d
     puck_game->boundary[LPGB_GROUND] = dCreatePlane(puck_game->space, 0, 0, 1, 0);
     puck_game->boundary[LPGB_E] = dCreatePlane(puck_game->space, -1, 0, 0, -puck_game->world_size_half);
     puck_game->boundary[LPGB_W] = dCreatePlane(puck_game->space, 1, 0, 0, -puck_game->world_size_half);
     puck_game->boundary[LPGB_S] = dCreatePlane(puck_game->space, 0, -1, 0, -puck_game->world_size_half);
     puck_game->boundary[LPGB_N] = dCreatePlane(puck_game->space, 0, 1, 0, -puck_game->world_size_half);
+    puck_game->boundary[LPGB_DIAGONAL_1] = dCreatePlane(puck_game->space, -1, -1, 0, 0);
+    puck_game->boundary[LPGB_DIAGONAL_2] = dCreatePlane(puck_game->space, +1, +1, 0, 0);
     dWorldSetGravity(puck_game->world, 0, 0, -9.81f);
     dWorldSetCFM(puck_game->world, 1e-5f);
 
@@ -309,8 +312,28 @@ void near_puck_tower(LWPUCKGAME* puck_game, dGeomID puck_geom, LWPUCKGAMETOWER* 
 
 void puck_game_near_callback(void* data, dGeomID geom1, dGeomID geom2) {
     LWPUCKGAME* puck_game = (LWPUCKGAME*)data;
-    const double now = lwtimepoint_now_seconds();
+    // Early pruning
+    // LPGB_DIAGONAL_1 should collided only with LPGO_PLAYER
+    // LPGB_DIAGONAL_2 should collided only with LPGO_TARGET
+    if (puck_game->boundary[LPGB_DIAGONAL_1]) {
+        if (geom1 == puck_game->boundary[LPGB_DIAGONAL_1] || geom2 == puck_game->boundary[LPGB_DIAGONAL_1]) {
+            if (geom1 == puck_game->go[LPGO_PLAYER].geom || geom2 == puck_game->go[LPGO_PLAYER].geom) {
 
+            } else {
+                return;
+            }
+        }
+    }
+    if (puck_game->boundary[LPGB_DIAGONAL_2]) {
+        if (geom1 == puck_game->boundary[LPGB_DIAGONAL_2] || geom2 == puck_game->boundary[LPGB_DIAGONAL_2]) {
+            if (geom1 == puck_game->go[LPGO_TARGET].geom || geom2 == puck_game->go[LPGO_TARGET].geom) {
+
+            } else {
+                return;
+            }
+        }
+    }
+    const double now = lwtimepoint_now_seconds();
     if (dGeomIsSpace(geom1) || dGeomIsSpace(geom2)) {
 
         // colliding a space with something :
@@ -323,6 +346,15 @@ void puck_game_near_callback(void* data, dGeomID geom1, dGeomID geom2) {
             dSpaceCollide((dSpaceID)geom2, data, &puck_game_near_callback);
 
     } else {
+        
+        //if (geom1 == puck_game->boundary[LPGB_DIAGONAL_2] || geom2 == puck_game->boundary[LPGB_DIAGONAL_2]) {
+        //    if (geom1 == puck_game->go[LPGO_TARGET].geom || puck_game->go[LPGO_TARGET].geom) {
+
+        //    } else {
+        //        return;
+        //    }
+        //}
+
         const int max_contacts = 5;
         dContact contact[5];
         // colliding two non-space geoms, so generate contact
