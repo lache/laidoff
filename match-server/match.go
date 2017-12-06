@@ -106,11 +106,11 @@ func matchWorker(battleService battle.Service, matchQueue <-chan user.UserAgent,
 				log.Printf("Nickname '%v' queue cancelled", c2.Db.Nickname)
 			} else {
 				log.Printf("The same connection sending QUEUE2 twice. Flushing match requests and replying with RETRYQUEUE to the later connection...")
-				sendRetryQueue(c2.Conn)
+				battle.SendRetryQueue(c2.Conn)
 			}
 		} else if c1.Db.Id == c2.Db.Id {
 			log.Printf("The same user ID sending QUEUE2 twice. Flushing match requests and replying with RETRYQUEUE to the later connection...")
-			sendRetryQueue(c2.Conn)
+			battle.SendRetryQueue(c2.Conn)
 		} else {
 			log.Printf("%v and %v matched! (maybe)", c1.Conn.RemoteAddr(), c2.Conn.RemoteAddr())
 			maybeMatchedBuf := convert.Packet2Buf(&C.LWPMAYBEMATCHED{
@@ -134,19 +134,7 @@ func checkMatchError(err error, conn net.Conn) {
 	if err != nil {
 		log.Printf("%v: %v error!", conn.RemoteAddr(), err.Error())
 	} else {
-		sendRetryQueue(conn)
-	}
-}
-func sendRetryQueue(conn net.Conn) {
-	retryQueueBuf := convert.Packet2Buf(&C.LWPRETRYQUEUE{
-		C.ushort(unsafe.Sizeof(C.LWPRETRYQUEUE{})),
-		C.LPGP_LWPRETRYQUEUE,
-	})
-	_, retrySendErr := conn.Write(retryQueueBuf)
-	if retrySendErr != nil {
-		log.Printf("%v: %v error!", conn.RemoteAddr(), retrySendErr.Error())
-	} else {
-		log.Printf("%v: Send retry match packet to client", conn.RemoteAddr())
+		battle.SendRetryQueue(conn)
 	}
 }
 

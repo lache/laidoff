@@ -35,7 +35,7 @@ func (sc *Service) Connection() (net.Conn, error) {
 	}
 	conn, err := net.DialTCP("tcp", nil, tcpAddr)
 	if err != nil {
-		log.Fatalf("Battle service DialTCP error! - %v", err.Error())
+		log.Printf("Battle service DialTCP error! - %v", err.Error())
 	}
 	return conn, err
 }
@@ -68,34 +68,37 @@ func WaitForReply(connToBattle net.Conn, replyPacketRef interface{}, expectedRep
 func CreateBattleInstance(battleService Service, c1 user.UserAgent, c2 user.UserAgent, battleOkQueue chan<- Ok) {
 	connToBattle, err := battleService.Connection()
 	if err != nil {
-		log.Fatalf("battleService error! %v", err.Error())
-	}
-	// Send create battle request
-	createBattleBuf := convert.Packet2Buf(convert.NewCreateBattle(
-		c1.Db.Id,
-		c2.Db.Id,
-		c1.Db.Nickname,
-		c2.Db.Nickname,
-	))
-	_, err = connToBattle.Write(createBattleBuf)
-	if err != nil {
-		log.Fatalf("Send LSBPT_LWSPHEREBATTLEPACKETCREATEBATTLE failed")
-	}
-	// Wait for a reply
-	createBattleOk := &C.LWPCREATEBATTLEOK{}
-	err = WaitForReply(connToBattle, createBattleOk, unsafe.Sizeof(*createBattleOk), int(C.LPGP_LWPCREATEBATTLEOK))
-	if err != nil {
-		log.Printf("WaitForReply failed - %v", err.Error())
+		log.Printf("battleService error! %v", err.Error())
+		SendRetryQueueLater(c1.Conn)
+		SendRetryQueueLater(c2.Conn)
 	} else {
-		// No error! so far ... proceed battle
-		log.Printf("MATCH %v and %v matched successfully!", c1.Conn.RemoteAddr(), c2.Conn.RemoteAddr())
-		battleOkQueue <- Ok {
-			false,
-			int(createBattleOk.Battle_id),
-			*createBattleOk,
-			c1,
-			c2,
-			user.UserId{},
+		// Send create battle request
+		createBattleBuf := convert.Packet2Buf(convert.NewCreateBattle(
+			c1.Db.Id,
+			c2.Db.Id,
+			c1.Db.Nickname,
+			c2.Db.Nickname,
+		))
+		_, err = connToBattle.Write(createBattleBuf)
+		if err != nil {
+			log.Fatalf("Send LSBPT_LWSPHEREBATTLEPACKETCREATEBATTLE failed")
+		}
+		// Wait for a reply
+		createBattleOk := &C.LWPCREATEBATTLEOK{}
+		err = WaitForReply(connToBattle, createBattleOk, unsafe.Sizeof(*createBattleOk), int(C.LPGP_LWPCREATEBATTLEOK))
+		if err != nil {
+			log.Printf("WaitForReply failed - %v", err.Error())
+		} else {
+			// No error! so far ... proceed battle
+			log.Printf("MATCH %v and %v matched successfully!", c1.Conn.RemoteAddr(), c2.Conn.RemoteAddr())
+			battleOkQueue <- Ok {
+				false,
+				int(createBattleOk.Battle_id),
+				*createBattleOk,
+				c1,
+				c2,
+				user.UserId{},
+			}
 		}
 	}
 }
@@ -139,4 +142,30 @@ func createMatched2Buf(conf config.ServerConfig, createBattleOk C.LWPCREATEBATTL
 		int(playerNo),
 		targetNickname,
 	))
+}
+
+func SendRetryQueue(conn net.Conn) {
+	retryQueueBuf := convert.Packet2Buf(&C.LWPRETRYQUEUE{
+		C.ushort(unsafe.Sizeof(C.LWPRETRYQUEUE{})),
+		C.LPGP_LWPRETRYQUEUE,
+	})
+	_, retrySendErr := conn.Write(retryQueueBuf)
+	if retrySendErr != nil {
+		log.Printf("%v: %v error!", conn.RemoteAddr(), retrySendErr.Error())
+	} else {
+		log.Printf("%v: Send retry match packet to client", conn.RemoteAddr())
+	}
+}
+
+func SendRetryQueueLater(conn net.Conn) {
+	retryQueueLaterBuf := convert.Packet2Buf(&C.LWPRETRYQUEUELATER{
+		C.ushort(unsafe.Sizeof(C.LWPRETRYQUEUELATER{})),
+		C.LPGP_LWPRETRYQUEUELATER,
+	})
+	_, retrySendErr := conn.Write(retryQueueLaterBuf)
+	if retrySendErr != nil {
+		log.Printf("%v: %v error!", conn.RemoteAddr(), retrySendErr.Error())
+	} else {
+		log.Printf("%v: Send retry later match packet to client", conn.RemoteAddr())
+	}
 }

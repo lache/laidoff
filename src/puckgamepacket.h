@@ -38,6 +38,7 @@ typedef enum _LW_PUCK_GAME_PACKET {
     LPGP_LWPSETBATTLEPRESET = 217,
     LPGP_LWPCANCELQUEUE = 218,
     LPGP_LWPCANCELQUEUEOK = 219,
+    LPGP_LWPRETRYQUEUELATER = 220,
     // should be less than 256 (packet type field: unsigned char type)
     LPGP_SENTIAL_UNSIGNED_CHAR = 255,
 	// internal admin tcp
@@ -247,6 +248,11 @@ typedef struct _LWPRETRYQUEUE {
 	unsigned short size;
 	unsigned short type;
 } LWPRETRYQUEUE;
+
+typedef struct _LWPRETRYQUEUELATER {
+    unsigned short size;
+    unsigned short type;
+} LWPRETRYQUEUELATER;
 
 typedef struct _LWPMAYBEMATCHED {
 	unsigned short size;
