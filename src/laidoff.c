@@ -869,16 +869,25 @@ static void init_vao(LWCONTEXT* pLwc, int shader_index) {
     for (int i = 0; i < VERTEX_BUFFER_COUNT; i++) {
         glBindVertexArray(pLwc->vao[i]);
         glBindBuffer(GL_ARRAY_BUFFER, pLwc->vertex_buffer[i].vertex_buffer);
-        if (i == LVT_UI_SCRAP_BG || i == LVT_UI_TOWER_BUTTON_BG || i == LVT_UI_LEFT_BUTTON_BG || i == LVT_UI_BUTTON_BG) {
+        if (i == LVT_UI_SCRAP_BG
+            || i == LVT_UI_TOWER_BUTTON_BG
+            || i == LVT_UI_LEFT_BUTTON_BG
+            || i == LVT_UI_BUTTON_BG) {
             set_vertex_attrib_pointer(pLwc, LWST_COLOR);
         } else if (i == LVT_UI_FULL_PANEL_BG) {
             //set_vertex_attrib_pointer(pLwc, LWST_PANEL);
             set_vertex_attrib_pointer(pLwc, LWST_COLOR);
+        } else if (i == LVT_TOWER_BASE
+                   || i == LVT_TOWER_1
+                   || i == LVT_TOWER_2
+                   || i == LVT_TOWER_3
+                   || i == LVT_TOWER_4
+                   || i == LVT_TOWER_5) {
+            set_vertex_attrib_pointer(pLwc, LWST_DEFAULT_NORMAL);
         } else {
             set_vertex_attrib_pointer(pLwc, shader_index);
         }
     }
-
     glBindBuffer(GL_ARRAY_BUFFER, 0);
     glBindVertexArray(0);
 #endif

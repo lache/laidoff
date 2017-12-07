@@ -23,8 +23,8 @@ FRAG_COLOR_OUTPUT_DECL
 void main()
 {
     vec4 t = TEX(diffuse, uv);
-	vec3 l_dir = normalize(vec3(1.0,1.0,1.0));
-	vec3 light_col = vec3(1.0,1.0,1.0);
+	vec3 l_dir = normalize(vec3(1.0,-1.0,1.0));
+	vec3 light_col = vec3(0.3,0.3,0.3);
 	float intensity = max(dot(normal, l_dir), 0.0);
     fragColor = (1.0 - overlay_color_ratio) * t + overlay_color_ratio * vec4(overlay_color, t.a);
 	fragColor.rgb *= multiply_color;
