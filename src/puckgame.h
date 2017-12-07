@@ -110,12 +110,16 @@ typedef struct _LWPUCKGAME {
     int hp;
     float player_max_move_speed;
     float player_dash_speed;
+    float boundary_impact_falloff_speed;
+    float boundary_impact_start;
     // ---- Static game data end
     float world_size_half;
     float tower_pos_multiplier[LW_PUCK_GAME_TOWER_COUNT][2];
 	dWorldID world;
 	dSpaceID space;
 	dGeomID boundary[LPGB_COUNT];
+    float boundary_impact[LPGB_COUNT];
+    int boundary_impact_player_no[LPGB_COUNT];
     LWPUCKGAMETOWER tower[LW_PUCK_GAME_TOWER_COUNT];
 	LWPUCKGAMEOBJECT go[LPGO_COUNT];
 	dJointGroupID contact_joint_group;

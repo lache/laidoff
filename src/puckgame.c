@@ -85,6 +85,8 @@ LWPUCKGAME* new_puck_game() {
     puck_game->hp = 10;
     puck_game->player_max_move_speed = 1.0f;
     puck_game->player_dash_speed = 6.0f;
+    puck_game->boundary_impact_falloff_speed = 10.0f;
+    puck_game->boundary_impact_start = 3.0f;
     // datasheet end
     puck_game->world_size_half = puck_game->world_size / 2;
     puck_game->player.total_hp = puck_game->hp;
@@ -120,10 +122,15 @@ LWPUCKGAME* new_puck_game() {
     puck_game->boundary[LPGB_GROUND] = dCreatePlane(puck_game->space, 0, 0, 1, 0);
     puck_game->boundary[LPGB_E] = dCreatePlane(puck_game->space, -1, 0, 0, -puck_game->world_size_half);
     puck_game->boundary[LPGB_W] = dCreatePlane(puck_game->space, 1, 0, 0, -puck_game->world_size_half);
-    puck_game->boundary[LPGB_S] = dCreatePlane(puck_game->space, 0, -1, 0, -puck_game->world_size_half);
-    puck_game->boundary[LPGB_N] = dCreatePlane(puck_game->space, 0, 1, 0, -puck_game->world_size_half);
+    puck_game->boundary[LPGB_N] = dCreatePlane(puck_game->space, 0, -1, 0, -puck_game->world_size_half);
+    puck_game->boundary[LPGB_S] = dCreatePlane(puck_game->space, 0, 1, 0, -puck_game->world_size_half);
     puck_game->boundary[LPGB_DIAGONAL_1] = dCreatePlane(puck_game->space, -1, -1, 0, 0);
     puck_game->boundary[LPGB_DIAGONAL_2] = dCreatePlane(puck_game->space, +1, +1, 0, 0);
+    for (int i = 0; i < LPGB_COUNT; i++) {
+        if (puck_game->boundary[i]) {
+            dGeomSetData(puck_game->boundary[i], (void*)i);
+        }
+    }
     dWorldSetGravity(puck_game->world, 0, 0, -9.81f);
     dWorldSetCFM(puck_game->world, 1e-5f);
 
@@ -256,6 +263,13 @@ static void near_puck_target(LWPUCKGAME* puck_game, dContact* contact) {
     near_puck_go(puck_game, 2, contact);
 }
 
+int is_wall_geom(LWPUCKGAME* puck_game, dGeomID maybe_wall_geom) {
+    return puck_game->boundary[LPGB_E] == maybe_wall_geom
+        || puck_game->boundary[LPGB_W] == maybe_wall_geom
+        || puck_game->boundary[LPGB_S] == maybe_wall_geom
+        || puck_game->boundary[LPGB_N] == maybe_wall_geom;
+}
+
 LWPUCKGAMETOWER* get_tower_from_geom(LWPUCKGAME* puck_game, dGeomID maybe_tower_geom) {
     for (int i = 0; i < LW_PUCK_GAME_TOWER_COUNT; i++) {
         if (maybe_tower_geom == puck_game->tower[i].geom) {
@@ -263,6 +277,16 @@ LWPUCKGAMETOWER* get_tower_from_geom(LWPUCKGAME* puck_game, dGeomID maybe_tower_
         }
     }
     return 0;
+}
+
+void near_puck_wall(LWPUCKGAME* puck_game, dGeomID puck_geom, dGeomID wall_geom) {
+    LW_PUCK_GAME_BOUNDARY boundary = (LW_PUCK_GAME_BOUNDARY)dGeomGetData(wall_geom);
+    if (boundary < LPGB_E || boundary > LPGB_N) {
+        LOGE("boundary geom data corrupted");
+        return;
+    }
+    puck_game->boundary_impact[boundary] = puck_game->boundary_impact_start;
+    puck_game->boundary_impact_player_no[boundary] = puck_game->puck_owner_player_no;
 }
 
 void near_puck_tower(LWPUCKGAME* puck_game, dGeomID puck_geom, LWPUCKGAMETOWER* tower, dContact* contact, double now) {
@@ -394,6 +418,18 @@ void puck_game_near_callback(void* data, dGeomID geom1, dGeomID geom2) {
             } else if (geom2 == puck_game->go[LPGO_PUCK].geom && (tower = get_tower_from_geom(puck_game, geom1))) {
                 // Puck - tower contacts
                 near_puck_tower(puck_game, geom2, tower, &contact[i], now);
+            } else if (geom1 == puck_game->go[LPGO_PUCK].geom && is_wall_geom(puck_game, geom2)) {
+                // Puck - wall contacts
+                contact[i].surface.mode = dContactSoftCFM | dContactBounce;
+                contact[i].surface.mu = 0;//1.9f;
+
+                near_puck_wall(puck_game, geom1, geom2);
+            } else if (geom2 == puck_game->go[LPGO_PUCK].geom && is_wall_geom(puck_game, geom1)) {
+                // Puck - wall contacts
+                contact[i].surface.mode = dContactSoftCFM | dContactBounce;
+                contact[i].surface.mu = 0;//1.9f;
+
+                near_puck_wall(puck_game, geom2, geom1);
             } else {
                 // Other contacts
                 contact[i].surface.mode = dContactSoftCFM | dContactBounce;

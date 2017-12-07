@@ -592,9 +592,10 @@ static void render_dash_gauge(const LWCONTEXT* pLwc) {
     render_text_block(pLwc, &text_block);
 }
 
-static void render_wall(const LWCONTEXT *pLwc, const mat4x4 proj, const LWPUCKGAME *puck_game,
+static void render_wall(const LWCONTEXT* pLwc, const mat4x4 proj, const LWPUCKGAME* puck_game,
                         int shader_index, const mat4x4 view, float x, float y, float z,
-                        float x_rot, float y_rot, LW_VBO_TYPE lvt, float sx, float sy, float sz, const LWSPHERERENDERUNIFORM* sphere_render_uniform) {
+                        float x_rot, float y_rot, LW_VBO_TYPE lvt, float sx, float sy, float sz,
+                        const LWSPHERERENDERUNIFORM* sphere_render_uniform, LW_PUCK_GAME_BOUNDARY boundary) {
     const LWSHADER* shader = &pLwc->shader[shader_index];
     glUseProgram(shader->program);
     glUniform2fv(shader->vuvoffset_location, 1, default_uv_offset);
@@ -639,7 +640,25 @@ static void render_wall(const LWCONTEXT *pLwc, const mat4x4 proj, const LWPUCKGA
     mat4x4_identity(proj_view_model);
     mat4x4_mul(proj_view_model, proj, view_model);
 
-    glUniform3f(shader->overlay_color_location, 0.2f, 0.2f, 0.2f);
+    int boundary_player_no = puck_game->boundary_impact_player_no[boundary];
+    float boundary_impact = puck_game->boundary_impact[boundary];
+    float boundary_impact_ratio = boundary_impact / puck_game->boundary_impact_start;
+    if (boundary_player_no == 1) {
+        glUniform3f(shader->overlay_color_location,
+                    0.1f + 0.0f * boundary_impact_ratio,
+                    0.1f + 0.0f * boundary_impact_ratio,
+                    0.1f + 0.9f * boundary_impact_ratio);
+    } else if (boundary_player_no == 2) {
+        glUniform3f(shader->overlay_color_location,
+                    0.1f + 0.9f * boundary_impact_ratio,
+                    0.1f + 0.0f * boundary_impact_ratio,
+                    0.1f + 0.0f * boundary_impact_ratio);
+    } else {
+        glUniform3f(shader->overlay_color_location,
+                    0.1f,
+                    0.1f,
+                    0.1f);
+    }
     glUniform1f(shader->overlay_color_ratio_location, 1.0f);
 
     //glUniformMatrix4fv(shader->mvp_location, 1, GL_FALSE, (const GLfloat*)proj_view_model);
@@ -1010,7 +1029,8 @@ void lwc_render_physics(const LWCONTEXT* pLwc, const mat4x4 view, const mat4x4 p
                 puck_game->world_size_half,
                 wall_height / 2,
                 puck_game->world_size_half,
-                &sphere_render_uniform);
+                &sphere_render_uniform,
+                LPGB_N);
     // South wall
     render_wall(pLwc,
                 proj,
@@ -1026,7 +1046,8 @@ void lwc_render_physics(const LWCONTEXT* pLwc, const mat4x4 view, const mat4x4 p
                 puck_game->world_size_half,
                 wall_height / 2,
                 puck_game->world_size_half,
-                &sphere_render_uniform);
+                &sphere_render_uniform,
+                LPGB_S);
     // East wall
     render_wall(pLwc,
                 proj,
@@ -1042,7 +1063,8 @@ void lwc_render_physics(const LWCONTEXT* pLwc, const mat4x4 view, const mat4x4 p
                 wall_height / 2,
                 puck_game->world_size_half,
                 puck_game->world_size_half,
-                &sphere_render_uniform);
+                &sphere_render_uniform,
+                LPGB_E);
     // West wall
     render_wall(pLwc,
                 proj,
@@ -1058,7 +1080,8 @@ void lwc_render_physics(const LWCONTEXT* pLwc, const mat4x4 view, const mat4x4 p
                 wall_height / 2,
                 puck_game->world_size_half,
                 puck_game->world_size_half,
-                &sphere_render_uniform);
+                &sphere_render_uniform,
+                LPGB_W);
     const int player_no = pLwc->puck_game->player_no;
     // Game object: Puck
     render_go(pLwc, view, proj, puck_game, &puck_game->go[LPGO_PUCK], pLwc->tex_atlas[LAE_PUCK_GRAY_KTX],
@@ -1142,7 +1165,7 @@ void lwc_render_physics(const LWCONTEXT* pLwc, const mat4x4 view, const mat4x4 p
     if (pLwc->control_flags & LCF_PUCK_GAME_PULL) {
         lwbutton_lae_append(&(((LWCONTEXT*)pLwc)->button_list),
                             "pull_button",
-                            +1.000f + button_size * 1.75f - button_size,
+                            +1.000f + button_size * 1.75f / 2 - button_size / 2,
                             +0.175f,
                             button_size,
                             button_size,

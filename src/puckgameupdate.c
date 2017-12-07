@@ -27,6 +27,16 @@ void update_world_roll(LWPUCKGAME* puck_game) {
     }
 }
 
+void update_boundary_impact(LWPUCKGAME* puck_game, float delta_time) {
+    for (int i = 0; i < LPGB_COUNT; i++) {
+        puck_game->boundary_impact[i] -= puck_game->boundary_impact_falloff_speed * delta_time;
+        if (puck_game->boundary_impact[i] < 0) {
+            puck_game->boundary_impact[i] = 0;
+            puck_game->boundary_impact_player_no[i] = 0;
+        }
+    }
+}
+
 void update_shake(LWPUCKGAME* puck_game, float delta_time) {
     for (int i = 0; i < 2; i++) {
         // Decrease shake remain time
@@ -144,6 +154,7 @@ void update_puck_game(LWCONTEXT* pLwc, LWPUCKGAME* puck_game, double delta_time)
     update_puck_ownership(puck_game);
     update_puck_reflect_size(puck_game, (float)delta_time);
     update_world_roll(puck_game);
+    update_boundary_impact(puck_game, (float)delta_time);
 }
 
 void puck_game_jump(LWCONTEXT* pLwc, LWPUCKGAME* puck_game) {
