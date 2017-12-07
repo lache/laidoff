@@ -102,6 +102,8 @@ function on_ui_event(id)
 	elseif id == 'practice_button' then
 		print('[script]practice_button')
 		lo.puck_game_reset_battle_state(c.puck_game)
+		lo.puck_game_clear_match_data(c, c.puck_game)
+		lo.puck_game_reset_view_proj(c, c.puck_game)
 		lo.puck_game_roll_to_practice(c.puck_game)
 	elseif id == 'back_button' then
 		if c.puck_game.game_state == lo.LPGS_SEARCHING then
