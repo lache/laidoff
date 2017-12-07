@@ -864,9 +864,13 @@ static int loop_pipe_reader(zloop_t* loop, zsock_t* pipe, void* args) {
 		} else if (d && s == sizeof(LWMSGRELOADSCRIPT) && *(int*)d == LM_LWMSGSTOPLOGICLOOP) {
 			logic_stop_logic_update_job(pLwc);
 		} else if (d && s == sizeof(LWMSGUIEVENT) && *(int*)d == LM_LWMSGUIEVENT) {
-			LWMSGUIEVENT* m = (LWMSGUIEVENT*)d;
-			LOGI("UI Event: %s", m->id);
-			script_emit_ui_event(pLwc->L, m->id);
+            LWMSGUIEVENT* m = (LWMSGUIEVENT*)d;
+            if (pLwc->puck_game->world_roll_dirty == 0) {
+                LOGI("UI Event: %s", m->id);
+                script_emit_ui_event(pLwc->L, m->id);
+            } else {
+                LOGI("UI Event '%s' suppressed since state is dirty", m->id);
+            }
 		} else {
 			abort();
 		}

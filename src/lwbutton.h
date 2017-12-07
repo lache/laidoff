@@ -8,6 +8,7 @@
 typedef struct _LWBUTTON {
     char id[LW_UI_IDENTIFIER_LENGTH];
     float x, y, w, h;
+    int enable_lae;
     LW_ATLAS_ENUM lae;
     LW_ATLAS_ENUM lae_alpha;
     float ui_alpha;

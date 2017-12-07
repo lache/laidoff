@@ -548,7 +548,7 @@ void puck_game_reset(LWPUCKGAME* puck_game) {
     puck_game->world_roll = 0;
     puck_game->world_roll_axis = 0;
     puck_game->world_roll_target = 0;
-    puck_game->world_roll_target_follow_ratio = 0.05f;
+    puck_game->world_roll_target_follow_ratio = 0.075f;
     puck_game->player.total_hp = 10;
     puck_game->player.current_hp = 10;
     puck_game->target.total_hp = 10;
@@ -716,4 +716,22 @@ int puck_game_dash(LWPUCKGAME* puck_game, LWPUCKGAMEDASH* dash, int player_no) {
     puck_game_commit_dash_to_puck(puck_game, dash, player_no);
     //puck_game_commit_dash(puck_game, &puck_game->dash, dx, dy);
     return 0;
+}
+
+void puck_game_roll_world(LWPUCKGAME* puck_game, int dir, int axis, float target) {
+    if (puck_game->world_roll_dirty == 0) {
+        LOGI("World roll began...");
+        puck_game->world_roll_dir = dir;
+        puck_game->world_roll_axis = axis;
+        puck_game->world_roll_target = target;
+        puck_game->world_roll_dirty = 1;
+    }
+}
+
+void puck_game_roll_to_battle(LWPUCKGAME* puck_game) {
+    if (puck_game->world_roll_dirty == 0) {
+        LOGI("World roll to battle began...");
+        puck_game->world_roll_target = 0;
+        puck_game->world_roll_dirty = 1;
+    }
 }

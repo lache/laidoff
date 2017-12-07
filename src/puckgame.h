@@ -167,6 +167,7 @@ typedef struct _LWPUCKGAME {
     float target_dy;
     float target_dlen_ratio;
     float battle_ui_alpha;
+    float main_menu_ui_alpha;
 } LWPUCKGAME;
 
 LWPUCKGAME* new_puck_game();
@@ -197,3 +198,5 @@ LWPUCKGAMEDASH* puck_game_single_play_dash_object(LWPUCKGAME* puck_game);
 LWPUCKGAMEJUMP* puck_game_single_play_jump_object(LWPUCKGAME* puck_game);
 int puck_game_dash(LWPUCKGAME* puck_game, LWPUCKGAMEDASH* dash, int player_no);
 int puck_game_dash_can_cast(const LWPUCKGAME* puck_game, const LWPUCKGAMEDASH* dash);
+void puck_game_roll_world(LWPUCKGAME* puck_game, int dir, int axis, float target);
+void puck_game_roll_to_battle(LWPUCKGAME* puck_game);

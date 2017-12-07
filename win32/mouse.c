@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include "laidoff.h"
+#include "lwlog.h"
 #if LW_PLATFORM_WIN32
 #include "lwimgui.h"
 #endif
@@ -26,7 +27,8 @@ void mouse_button_callback(GLFWwindow* window, int button, int action, int mods)
 
 		if (action == GLFW_PRESS)
 		{
-			//printf("glfw mouse press pos x=%f, y=%f (normalized x=%f, y=%f)\n", xpos, ypos, normalized_xpos, normalized_ypos);
+			LOGIx("glfw mouse press pos x=%f, y=%f (normalized x=%f, y=%f)",
+                 xpos, ypos, normalized_xpos, normalized_ypos);
 
 			lw_trigger_touch(pLwc, (float)normalized_xpos, (float)normalized_ypos, 0);
 

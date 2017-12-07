@@ -22,10 +22,18 @@ void update_world_roll(LWPUCKGAME* puck_game) {
             puck_game->world_roll_dirty = 0;
             LOGI("World roll transition finished");
         } else {
-            puck_game->world_roll += world_roll_diff * puck_game->world_roll_target_follow_ratio;
+            const float world_roll_diff_delta = world_roll_diff * puck_game->world_roll_target_follow_ratio;
+            if (fabsf(world_roll_diff_delta) < LWEPSILON/5) {
+                puck_game->world_roll = puck_game->world_roll_target;
+                puck_game->world_roll_dirty = 0;
+                LOGI("World roll transition finished");
+            } else {
+                puck_game->world_roll += world_roll_diff_delta;
+            }
         }
     }
     puck_game->battle_ui_alpha = LWMAX(0.0f, 1.0f - puck_game->world_roll);
+    puck_game->main_menu_ui_alpha = LWMAX(0.0f, 1.0f - fabsf((float)LWDEG2RAD(180) - puck_game->world_roll));
 }
 
 void update_boundary_impact(LWPUCKGAME* puck_game, float delta_time) {

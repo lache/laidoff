@@ -827,19 +827,21 @@ static void render_lwbutton(const LWCONTEXT* pLwc, const LWBUTTONLIST* button_li
             ob = 0.2f;
         }
         const LWBUTTON* b = &button_list->button[i];
-        render_solid_vb_ui_alpha(pLwc,
-                                 b->x,
-                                 b->y,
-                                 b->w,
-                                 b->h,
-                                 pLwc->tex_atlas[b->lae],
-                                 pLwc->tex_atlas[b->lae_alpha],
-                                 LVT_LEFT_TOP_ANCHORED_SQUARE,
-                                 b->ui_alpha,
-                                 or,
-                                 og,
-                                 ob,
-                                 1.0f);
+        if (b->ui_alpha) {
+            render_solid_vb_ui_alpha(pLwc,
+                                     b->x,
+                                     b->y,
+                                     b->w,
+                                     b->h,
+                                     pLwc->tex_atlas[b->lae],
+                                     pLwc->tex_atlas[b->lae_alpha],
+                                     LVT_LEFT_TOP_ANCHORED_SQUARE,
+                                     b->ui_alpha,
+                                     or ,
+                                     og,
+                                     ob,
+                                     1.0f);
+        }
     }
 }
 
@@ -889,6 +891,103 @@ static void render_popup_ui_layer(const LWCONTEXT* pLwc) {
         sprintf(str, "Server disconnected.\nPlease check your internet\nconnection.");
         render_caution_popup(pLwc, str);
     }
+}
+
+static void render_main_menu(const LWCONTEXT* pLwc, const LWPUCKGAME* puck_game,
+                             const mat4x4 view, const mat4x4 proj, float ui_alpha) {
+    int shader_index = LWST_DEFAULT;
+    const int vbo_index = LVT_CENTER_CENTER_ANCHORED_SQUARE;
+    const float size = 0.8f;
+    mat4x4 model;
+    mat4x4_identity(model);
+    //mat4x4_rotate_Y(model, model, (float)LWDEG2RAD(180));
+    mat4x4_scale_aniso(model, model, size, size, size);
+    mat4x4 model_translate;
+    mat4x4_translate(model_translate, 0, 0, 0);
+    mat4x4_mul(model, model, model_translate);
+
+    //mult_world_roll(model, puck_game->world_roll_axis, puck_game->world_roll_dir, puck_game->world_roll);
+
+    mat4x4 view_model;
+    mat4x4 view_identity;
+    mat4x4_identity(view_identity);
+    mat4x4_mul(view_model, view_identity, model);
+
+    mat4x4 proj_view_model;
+    mat4x4_identity(proj_view_model);
+    mat4x4_mul(proj_view_model, pLwc->proj, view_model);
+
+    const LWSHADER* shader = &pLwc->shader[shader_index];
+
+    glUseProgram(shader->program);
+    glUniform2fv(shader->vuvoffset_location, 1, default_uv_offset);
+    glUniform2fv(shader->vuvscale_location, 1, default_uv_scale);
+    glUniform2fv(shader->vs9offset_location, 1, default_uv_offset);
+    glUniform1f(shader->alpha_multiplier_location, ui_alpha);
+    glUniform1i(shader->diffuse_location, 0); // 0 means GL_TEXTURE0
+    glUniform3f(shader->overlay_color_location, 1, 1, 1);
+    glUniform1f(shader->overlay_color_ratio_location, 0);
+
+    glBindBuffer(GL_ARRAY_BUFFER, pLwc->vertex_buffer[vbo_index].vertex_buffer);
+    bind_all_vertex_attrib(pLwc, vbo_index);
+    glUniformMatrix4fv(shader->mvp_location, 1, GL_FALSE, (const GLfloat*)proj_view_model);
+    glActiveTexture(GL_TEXTURE0);
+    glUniform1i(shader->diffuse_location, 0); // 0 means GL_TEXTURE0
+    glBindTexture(GL_TEXTURE_2D, pLwc->tex_atlas[LAE_UI_MAIN_MENU]);
+    set_tex_filter(GL_LINEAR, GL_LINEAR);
+
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE);
+    glDepthMask(GL_FALSE);
+
+    glDrawArrays(GL_TRIANGLES, 0, pLwc->vertex_buffer[vbo_index].vertex_count);
+
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    glDepthMask(GL_TRUE);
+}
+
+static void render_main_menu_ui_layer(const LWCONTEXT* pLwc, const LWPUCKGAME* puck_game,
+                                   const mat4x4 view, const mat4x4 proj, const mat4x4 ui_proj,
+                                   int remote, const float* player_controlled_pos) {
+    render_main_menu(pLwc, puck_game, view, proj, puck_game->main_menu_ui_alpha);
+
+    float button_alpha = 0.0f; // alpha zeroed intentially (nonzero only when debugging)
+    lwbutton_lae_append(&(((LWCONTEXT*)pLwc)->button_list),
+                        "practice_button",
+                        -0.75f,
+                        +0.70f,
+                        +0.70f,
+                        +0.40f,
+                        0,
+                        0,
+                        puck_game->main_menu_ui_alpha * button_alpha);
+    lwbutton_lae_append(&(((LWCONTEXT*)pLwc)->button_list),
+                        "tutorial_button",
+                        +0.75f - 0.70f,
+                        +0.70f,
+                        +0.70f,
+                        +0.40f,
+                        0,
+                        0,
+                        puck_game->main_menu_ui_alpha * button_alpha);
+    lwbutton_lae_append(&(((LWCONTEXT*)pLwc)->button_list),
+                        "online_button",
+                        -0.75f,
+                        +0.25f,
+                        +0.75f * 2,
+                        +0.50f,
+                        0,
+                        0,
+                        puck_game->main_menu_ui_alpha * button_alpha);
+    lwbutton_lae_append(&(((LWCONTEXT*)pLwc)->button_list),
+                        "leaderboard_button",
+                        -0.75f,
+                        +0.25f - 0.50f - 0.05f,
+                        +0.75f * 2,
+                        +0.40f,
+                        0,
+                        0,
+                        puck_game->main_menu_ui_alpha * button_alpha);
 }
 
 static void render_battle_ui_layer(const LWCONTEXT* pLwc, const LWPUCKGAME* puck_game,
@@ -986,7 +1085,6 @@ static void render_battle_ui_layer(const LWCONTEXT* pLwc, const LWPUCKGAME* puck
                             LAE_BUTTON_JUMP_ALPHA,
                             ui_alpha);
     }
-    render_lwbutton(pLwc, &pLwc->button_list, puck_game->remote_control[0].pull_puck);
 }
 
 void lwc_render_physics(const LWCONTEXT* pLwc, const mat4x4 view, const mat4x4 proj) {
@@ -1225,6 +1323,12 @@ void lwc_render_physics(const LWCONTEXT* pLwc, const mat4x4 view, const mat4x4 p
     if (puck_game->battle_ui_alpha) {
         render_battle_ui_layer(pLwc, puck_game, view, proj, pLwc->proj, remote, player_controlled_pos);
     }
+    // main menu UI layer
+    if (puck_game->main_menu_ui_alpha) {
+        render_main_menu_ui_layer(pLwc, puck_game, view, proj, pLwc->proj, remote, player_controlled_pos);
+    }
+    // render buttons (shared)
+    render_lwbutton(pLwc, &pLwc->button_list, puck_game->remote_control[0].pull_puck);
     // popup UI layer
     render_popup_ui_layer(pLwc);
 }
