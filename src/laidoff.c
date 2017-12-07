@@ -1779,7 +1779,7 @@ LWCONTEXT* lw_init_initial_size(int width, int height) {
 
     LWCONTEXT* pLwc = (LWCONTEXT *)calloc(1, sizeof(LWCONTEXT));
 
-    pLwc->control_flags = LCF_PUCK_GAME_DASH | LCF_PUCK_GAME_JUMP | LCF_PUCK_GAME_PULL;
+    pLwc->control_flags = LCF_PUCK_GAME_DASH | /*LCF_PUCK_GAME_JUMP | */LCF_PUCK_GAME_PULL;
 
     parse_conf(pLwc);
 

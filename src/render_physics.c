@@ -318,7 +318,7 @@ static void render_timer(const LWCONTEXT* pLwc, float remain_sec, float total_se
     LWTEXTBLOCK text_block;
     text_block.align = LTBA_CENTER_CENTER;
     text_block.text_block_width = DEFAULT_TEXT_BLOCK_WIDTH;
-    text_block.text_block_line_height = DEFAULT_TEXT_BLOCK_LINE_HEIGHT_E;
+    text_block.text_block_line_height = DEFAULT_TEXT_BLOCK_LINE_HEIGHT_F;
     text_block.size = DEFAULT_TEXT_BLOCK_SIZE_D;
     text_block.multiline = 1;
     SET_COLOR_RGBA_FLOAT(text_block.color_normal_glyph, 1, 1, 1, 1);
@@ -336,7 +336,7 @@ static void render_timer(const LWCONTEXT* pLwc, float remain_sec, float total_se
         remain_ratio = remain_sec / total_sec;
     }
     float x = 0.0f;
-    float y = 0.9f;
+    float y = 0.925f;
     text_block.text = str;
     text_block.text_bytelen = (int)strlen(text_block.text);
     text_block.begin_index = 0;
@@ -357,8 +357,8 @@ static void render_timer(const LWCONTEXT* pLwc, float remain_sec, float total_se
         pLwc,
         x,
         y,
-        0.0425f,
-        0.0425f,
+        0.0325f,
+        0.0325f,
         0,//pLwc->tex_atlas[LVT_RINGGAUGE],
         LVT_RINGGAUGETHICK,
         1.0f,
@@ -722,7 +722,7 @@ static void render_floor(const LWCONTEXT *pLwc, const mat4x4 proj, const LWPUCKG
     const LWSHADER* shader = &pLwc->shader[shader_index];
     glUseProgram(shader->program);
     glUniform2fv(shader->vuvoffset_location, 1, default_uv_offset);
-    const float uv_scale[2] = { 5, 5 };
+    const float uv_scale[2] = { 3, 3 };
     glUniform2fv(shader->vuvscale_location, 1, uv_scale);
     glUniform2fv(shader->vs9offset_location, 1, default_uv_offset);
     glUniform1f(shader->alpha_multiplier_location, 1.0f);
@@ -1136,17 +1136,38 @@ void lwc_render_physics(const LWCONTEXT* pLwc, const mat4x4 view, const mat4x4 p
     const float button_size = 0.35f;
     const float button_margin_x = 0.025f;
     const float button_x_interval = button_size + button_margin_x;
-    const float button_x_0 = 0.15f;
+    const float button_x_0 = 0.25f;
     const float button_y_interval = 0.25f;
     const float button_y_0 = -0.50f;
     if (pLwc->control_flags & LCF_PUCK_GAME_PULL) {
-        lwbutton_lae_append(&(((LWCONTEXT*)pLwc)->button_list), "pull_button", button_x_interval * 1 + button_x_0, button_y_0 + button_y_interval * 0, button_size, button_size, LAE_BUTTON_PULL, LAE_BUTTON_PULL_ALPHA);
+        lwbutton_lae_append(&(((LWCONTEXT*)pLwc)->button_list),
+                            "pull_button",
+                            +1.000f + button_size * 1.75f - button_size,
+                            +0.175f,
+                            button_size,
+                            button_size,
+                            LAE_BUTTON_PULL,
+                            LAE_BUTTON_PULL_ALPHA);
     }
     if (pLwc->control_flags & LCF_PUCK_GAME_DASH) {
-        lwbutton_lae_append(&(((LWCONTEXT*)pLwc)->button_list), "dash_button", button_x_interval * 2 + button_x_0, button_y_0 + button_y_interval * 1, button_size, button_size, LAE_BUTTON_DASH, LAE_BUTTON_DASH_ALPHA);
+        lwbutton_lae_append(&(((LWCONTEXT*)pLwc)->button_list),
+                            "dash_button",
+                            +1.00f,
+                            -0.225f,
+                            button_size * 1.75f,
+                            button_size * 1.75f,
+                            LAE_BUTTON_DASH,
+                            LAE_BUTTON_DASH_ALPHA);
     }
     if (pLwc->control_flags & LCF_PUCK_GAME_JUMP) {
-        lwbutton_lae_append(&(((LWCONTEXT*)pLwc)->button_list), "jump_button", button_x_interval * 3 + button_x_0, button_y_0 + button_y_interval * 2, button_size, button_size, LAE_BUTTON_JUMP, LAE_BUTTON_JUMP_ALPHA);
+        lwbutton_lae_append(&(((LWCONTEXT*)pLwc)->button_list),
+                            "jump_button",
+                            button_x_0 + button_x_interval * 3,
+                            button_y_0 + button_y_interval * 2,
+                            button_size,
+                            button_size,
+                            LAE_BUTTON_JUMP,
+                            LAE_BUTTON_JUMP_ALPHA);
     }
     render_lwbutton(pLwc, &pLwc->button_list, puck_game->remote_control[0].pull_puck);
     

@@ -114,7 +114,7 @@ void render_dir_pad_with_start_joystick(const LWCONTEXT* pLwc, const LWDIRPAD* d
 }
 
 float get_dir_pad_size_radius() {
-    return 0.6f;
+    return 0.5f;
 }
 
 void get_right_dir_pad_original_center(const float aspect_ratio, float *x, float *y) {
