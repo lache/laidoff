@@ -10,6 +10,7 @@
 #include <android/input.h>
 #include <stdlib.h>
 #include <lwtimepoint.h>
+#include <input.h>
 #include "laidoff.h"
 #include "lwlog.h"
 #include "czmq.h"
@@ -543,7 +544,8 @@ static int32_t engine_handle_input(struct android_app* app, AInputEvent* event) 
         case AINPUT_EVENT_TYPE_KEY:
 			if (AKeyEvent_getKeyCode(event) == AKEYCODE_BACK) {
 				// actions on back key
-				//return 1; // <-- uncomment this line to prevent default back button handler called
+				lw_go_back(engine->pLwc);
+				return 1; // <-- uncomment this line to prevent default back button handler called
 			};
             // handle key input...
             break;

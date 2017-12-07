@@ -94,7 +94,6 @@ LWPUCKGAME* new_puck_game() {
     puck_game->target.total_hp = puck_game->hp;
     puck_game->target.current_hp = puck_game->hp;
     puck_game->puck_reflect_size = 1.0f;
-    puck_game->battle_ui_alpha = 1.0f;
     int tower_pos_multiplier_index = 0;
     puck_game->tower_pos_multiplier[tower_pos_multiplier_index][0] = -1;
     puck_game->tower_pos_multiplier[tower_pos_multiplier_index][1] = -1;
@@ -524,7 +523,7 @@ void update_puck_ownership(LWPUCKGAME* puck_game) {
     }
 }
 
-void puck_game_reset(LWPUCKGAME* puck_game) {
+void puck_game_reset_battle_state(LWPUCKGAME* puck_game) {
     for (int i = 0; i < LW_PUCK_GAME_TOWER_COUNT; i++) {
         puck_game->tower[i].hp = puck_game->tower_total_hp;
     }
@@ -545,9 +544,14 @@ void puck_game_reset(LWPUCKGAME* puck_game) {
         dBodySetForce(puck_game->go[i].body, 0, 0, 0);
         dBodySetTorque(puck_game->go[i].body, 0, 0, 0);
     }
-    puck_game->world_roll = 0;
-    puck_game->world_roll_axis = 0;
-    puck_game->world_roll_target = 0;
+}
+
+void puck_game_reset(LWPUCKGAME* puck_game) {
+    puck_game_reset_battle_state(puck_game);
+    puck_game->game_state = LPGS_MAIN_MENU;
+    puck_game->world_roll = (float)LWDEG2RAD(180);
+    puck_game->world_roll_axis = 1;
+    puck_game->world_roll_target = puck_game->world_roll;
     puck_game->world_roll_target_follow_ratio = 0.075f;
     puck_game->player.total_hp = 10;
     puck_game->player.current_hp = 10;
@@ -730,8 +734,25 @@ void puck_game_roll_world(LWPUCKGAME* puck_game, int dir, int axis, float target
 
 void puck_game_roll_to_battle(LWPUCKGAME* puck_game) {
     if (puck_game->world_roll_dirty == 0) {
+        puck_game->game_state = LPGS_BATTLE;
         LOGI("World roll to battle began...");
         puck_game->world_roll_target = 0;
         puck_game->world_roll_dirty = 1;
+    }
+}
+
+void puck_game_roll_to_practice(LWPUCKGAME* puck_game) {
+    if (puck_game->world_roll_dirty == 0) {
+        puck_game->game_state = LPGS_PRACTICE;
+        LOGI("World roll to practice began...");
+        puck_game->world_roll_target = 0;
+        puck_game->world_roll_dirty = 1;
+    }
+}
+
+void puck_game_roll_to_main_menu(LWPUCKGAME* puck_game) {
+    if (puck_game->world_roll_dirty == 0) {
+        puck_game->game_state = LPGS_MAIN_MENU;
+        puck_game_roll_world(puck_game, 0, 1, (float)LWDEG2RAD(180));
     }
 }

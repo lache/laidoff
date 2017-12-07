@@ -20,6 +20,15 @@ typedef enum _LW_PUCK_GAME_OBJECT {
 	LPGO_COUNT,
 } LW_PUCK_GAME_OBJECT;
 
+typedef enum _LW_PUCK_GAME_STATE {
+    LPGS_MAIN_MENU,
+    LPGS_PRACTICE,
+    LPGS_TUTORIAL,
+    LPGS_SEARCHING,
+    LPGS_BATTLE,
+    LPGS_LEADERBOARD,
+} LW_PUCK_GAME_STATE;
+
 typedef struct _LWPUCKGAMEOBJECT {
 	dGeomID geom;
 	dBodyID body;
@@ -168,6 +177,7 @@ typedef struct _LWPUCKGAME {
     float target_dlen_ratio;
     float battle_ui_alpha;
     float main_menu_ui_alpha;
+    LW_PUCK_GAME_STATE game_state;
 } LWPUCKGAME;
 
 LWPUCKGAME* new_puck_game();
@@ -200,3 +210,6 @@ int puck_game_dash(LWPUCKGAME* puck_game, LWPUCKGAMEDASH* dash, int player_no);
 int puck_game_dash_can_cast(const LWPUCKGAME* puck_game, const LWPUCKGAMEDASH* dash);
 void puck_game_roll_world(LWPUCKGAME* puck_game, int dir, int axis, float target);
 void puck_game_roll_to_battle(LWPUCKGAME* puck_game);
+void puck_game_roll_to_practice(LWPUCKGAME* puck_game);
+void puck_game_roll_to_main_menu(LWPUCKGAME* puck_game);
+void puck_game_reset_battle_state(LWPUCKGAME* puck_game);

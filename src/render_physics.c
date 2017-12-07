@@ -897,7 +897,7 @@ static void render_main_menu(const LWCONTEXT* pLwc, const LWPUCKGAME* puck_game,
                              const mat4x4 view, const mat4x4 proj, float ui_alpha) {
     int shader_index = LWST_DEFAULT;
     const int vbo_index = LVT_CENTER_CENTER_ANCHORED_SQUARE;
-    const float size = 0.8f;
+    const float size = 0.75f;
     mat4x4 model;
     mat4x4_identity(model);
     //mat4x4_rotate_Y(model, model, (float)LWDEG2RAD(180));
@@ -1012,7 +1012,7 @@ static void render_battle_ui_layer(const LWCONTEXT* pLwc, const LWPUCKGAME* puck
     // Dash cooltime gauge
     //render_dash_gauge(pLwc);
     // HP gauges (player & target)
-    const char* target_nickname = puck_game->battle_id ? puck_game->target_nickname : "BOGUS (Searching opponent...)";
+    const char* target_nickname = puck_game->battle_id ? puck_game->target_nickname : "Bogus Opponent";
     const float gauge_width = pLwc->aspect_ratio * 0.9f;
     const float gauge_height = 0.075f;
     const float gauge1_x = -pLwc->aspect_ratio + gauge_width / 2;

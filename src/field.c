@@ -255,6 +255,10 @@ void resolve_player_event_collision(LWCONTEXT* pLwc) {
 }
 
 int field_create_sphere_script_collider(LWFIELD* field, int obj_key, LW_SPACE_GROUP space_group, float radius, float x, float y, float z) {
+    if (field == 0) {
+        LOGE(LWLOGPOS "field null");
+        return -2;
+    }
 	for (int i = 0; i < MAX_SCRIPT_GEOM; i++) {
 		if (field->script_geom[i] == 0) {
 			field->script_geom[i] = dCreateSphere(field->space_group[space_group], radius);
@@ -1382,7 +1386,9 @@ void field_destroy_all_script_colliders(LWFIELD* field) {
 }
 
 void field_get_player_position(const LWFIELD* field, vec3 p) {
-	p[0] = (float)field->player_pos[0];
-	p[1] = (float)field->player_pos[1];
-	p[2] = (float)(field->player_pos[2] - field->player_length / 2 - field->player_radius);
+    if (field) {
+        p[0] = (float)field->player_pos[0];
+        p[1] = (float)field->player_pos[1];
+        p[2] = (float)(field->player_pos[2] - field->player_length / 2 - field->player_radius);
+    }
 }

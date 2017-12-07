@@ -93,6 +93,7 @@
 #include "lwparabola.h"
 #include "construct.h"
 #include "puckgameupdate.h"
+#include "puckgame.h"
 #ifdef WIN32
 #pragma warning(pop)
 #endif
@@ -188,6 +189,7 @@
 %include "lwparabola.h"
 %include "construct.h"
 %include "puckgameupdate.h"
+%include "puckgame.h"
 
 // using the C-array
 %include <carrays.i>

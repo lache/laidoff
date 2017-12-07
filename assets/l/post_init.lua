@@ -99,6 +99,10 @@ function on_ui_event(id)
 		-- temporarily for rematch
 		lo.puck_game_rematch(c, c.puck_game)
 		return 0
+	elseif id == 'practice_button' then
+		print('[script]practice_button')
+		lo.puck_game_reset_battle_state(c.puck_game)
+		lo.puck_game_roll_to_practice(c.puck_game)
 	else 
 		lo.construct_set_preview_enable(c.construct, 0)
 		return 0

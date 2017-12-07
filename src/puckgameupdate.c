@@ -151,7 +151,7 @@ void update_puck_game(LWCONTEXT* pLwc, LWPUCKGAME* puck_game, double delta_time)
     }
 
     // control bogus (AI player)
-    puck_game_control_bogus(puck_game);
+    //puck_game_control_bogus(puck_game);
 
     for (int i = 0; i < 2; i++) {
         puck_game_update_remote_player(puck_game, (float)delta_time, i);
