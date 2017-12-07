@@ -178,6 +178,7 @@ typedef struct _LWPUCKGAME {
     float battle_ui_alpha;
     float main_menu_ui_alpha;
     LW_PUCK_GAME_STATE game_state;
+    char searching_str[256];
 } LWPUCKGAME;
 
 LWPUCKGAME* new_puck_game();
@@ -213,3 +214,4 @@ void puck_game_roll_to_battle(LWPUCKGAME* puck_game);
 void puck_game_roll_to_practice(LWPUCKGAME* puck_game);
 void puck_game_roll_to_main_menu(LWPUCKGAME* puck_game);
 void puck_game_reset_battle_state(LWPUCKGAME* puck_game);
+void puck_game_set_searching_str(LWPUCKGAME* puck_game, const char* str);

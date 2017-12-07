@@ -1364,6 +1364,7 @@ static void dequeue_puck_game_state_and_apply(LWCONTEXT* pLwc) {
         if (pLwc->puck_game_state.bf.finished < new_state.bf.finished) {
             LOGI(LWLOGPOS "Battle finished. Destroying UDP context...");
             destroy_udp(&pLwc->udp);
+            puck_game_roll_to_main_menu(pLwc->puck_game);
         }
         // Overwrite old game state with a new one
         memcpy(&pLwc->puck_game_state, &new_state, sizeof(LWPSTATE));

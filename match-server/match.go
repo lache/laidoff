@@ -93,11 +93,21 @@ func testRpc(serviceList *service.ServiceList) {
 
 func matchWorker(battleService battle.Service, matchQueue <-chan user.UserAgent, battleOkQueue chan<- battle.Ok) {
 	for {
+		log.Printf("Match queue empty")
 		c1 := <-matchQueue
+		log.Printf("Match queue size 1")
 		c2 := <-matchQueue
+		log.Printf("Match queue size 2")
 		if c1.Conn == c2.Conn {
-			log.Printf("The same connection sending QUEUE2 twice. Flushing match requests and replying with RETRYQUEUE to the later connection...")
-			sendRetryQueue(c2.Conn)
+			if c2.CancelQueue {
+				// Send queue cancel success reply
+				cancelQueueOkBuf := convert.Packet2Buf(convert.NewLwpCancelQueueOk())
+				c2.Conn.Write(cancelQueueOkBuf)
+				log.Printf("Nickname '%v' queue cancelled", c2.Db.Nickname)
+			} else {
+				log.Printf("The same connection sending QUEUE2 twice. Flushing match requests and replying with RETRYQUEUE to the later connection...")
+				sendRetryQueue(c2.Conn)
+			}
 		} else if c1.Db.Id == c2.Db.Id {
 			log.Printf("The same user ID sending QUEUE2 twice. Flushing match requests and replying with RETRYQUEUE to the later connection...")
 			sendRetryQueue(c2.Conn)
@@ -161,6 +171,8 @@ func handleRequest(conf config.ServerConfig, nickDb *Nickdb.NickDb, conn net.Con
 		switch packetType {
 		case C.LPGP_LWPQUEUE2:
 			handler.HandleQueue2(conf, matchQueue, buf, conn, ongoingBattleMap, battleService, battleOkQueue)
+		case C.LPGP_LWPCANCELQUEUE:
+			handler.HandleCancelQueue(conf, matchQueue, buf, conn, ongoingBattleMap, battleService, battleOkQueue)
 		case C.LPGP_LWPSUDDENDEATH:
 			handler.HandleSuddenDeath(conf, buf) // relay 'buf' to battle service
 		case C.LPGP_LWPNEWUSER:

@@ -54,6 +54,14 @@ int tcp_send_queue2(LWTCP* tcp, const LWUNIQUEID* id) {
     return tcp_send_sendbuf(tcp, sizeof(p));
 }
 
+int tcp_send_cancelqueue(LWTCP* tcp, const LWUNIQUEID* id) {
+    LOGI("Sending LWPCANCELQUEUE");
+    NEW_TCP_PACKET_CAPITAL(LWPCANCELQUEUE, p);
+    memcpy(p.Id, id->v, sizeof(LWUNIQUEID));
+    memcpy(tcp->sendbuf, &p, sizeof(p));
+    return tcp_send_sendbuf(tcp, sizeof(p));
+}
+
 int tcp_send_suddendeath(LWTCP* tcp, int battle_id, unsigned int token) {
     LOGI("Sending LWPSUDDENDEATH");
     NEW_TCP_PACKET_CAPITAL(LWPSUDDENDEATH, p);
@@ -150,6 +158,8 @@ int parse_recv_packets(LWTCP* tcp) {
         if (CHECK_PACKET(packet_type, packet_size, LWPMATCHED2)) {
             LWPMATCHED2* p = (LWPMATCHED2*)cursor;
             LOGI("LWPMATCHED2 - bid:%d", p->battle_id);
+            pLwc->puck_game->world_roll_dir *= -1;
+            puck_game_roll_to_battle(pLwc->puck_game);
             pLwc->puck_game->battle_id = p->battle_id;
             pLwc->puck_game->token = p->token;
             pLwc->puck_game->player_no = p->player_no;
@@ -174,6 +184,9 @@ int parse_recv_packets(LWTCP* tcp) {
         } else if (CHECK_PACKET(packet_type, packet_size, LWPQUEUEOK)) {
             LOGI("LWPQUEUEOK received");
             //show_sys_msg(pLwc->def_sys_msg, "LWPQUEUEOK received");
+        } else if (CHECK_PACKET(packet_type, packet_size, LWPCANCELQUEUEOK)) {
+            LOGI("LWPCANCELQUEUE received");
+            show_sys_msg(pLwc->def_sys_msg, "Searching aborted");
         } else if (CHECK_PACKET(packet_type, packet_size, LWPRETRYQUEUE)) {
             LOGI("LWPRETRYQUEUE received");
             //show_sys_msg(pLwc->def_sys_msg, "LWPRETRYQUEUE received");
@@ -194,13 +207,13 @@ int parse_recv_packets(LWTCP* tcp) {
                  pLwc->tcp->user_id.v[2],
                  pLwc->tcp->user_id.v[3]);
             memcpy(pLwc->puck_game->nickname, p->nickname, sizeof(char) * LW_NICKNAME_MAX_LEN);
-            tcp_send_queue2(tcp, &pLwc->tcp->user_id);
+            //tcp_send_queue2(tcp, &pLwc->tcp->user_id);
         } else if (CHECK_PACKET(packet_type, packet_size, LWPNICK)) {
             LOGI("LWPNICK received");
             LWPNICK* p = (LWPNICK*)cursor;
             LOGI("Cached user nick: %s", p->nickname);
             memcpy(pLwc->puck_game->nickname, p->nickname, sizeof(char) * LW_NICKNAME_MAX_LEN);
-            tcp_send_queue2(tcp, &pLwc->tcp->user_id);
+            //tcp_send_queue2(tcp, &pLwc->tcp->user_id);
         } else if (CHECK_PACKET(packet_type, packet_size, LWPSYSMSG)) {
             LOGI("LWPSYSMSG received");
             LWPSYSMSG* p = (LWPSYSMSG*)cursor;

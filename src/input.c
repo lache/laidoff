@@ -448,14 +448,14 @@ void lw_release_key_x(LWCONTEXT* pLwc) {
 void lw_release_key_q(LWCONTEXT* pLwc) {
 }
 
-void lw_go_back(LWCONTEXT* pLwc) {
+void lw_go_back(LWCONTEXT* pLwc, void* native_context) {
     if (pLwc->puck_game) {
         if (pLwc->puck_game->game_state == LPGS_PRACTICE) {
             puck_game_roll_to_main_menu(pLwc->puck_game);
         } else if (pLwc->puck_game->game_state == LPGS_MAIN_MENU) {
-            lw_app_quit(pLwc);
+            lw_app_quit(pLwc, native_context);
         }
     } else {
-        lw_app_quit(pLwc);
+        lw_app_quit(pLwc, native_context);
     }
 }

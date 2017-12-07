@@ -79,7 +79,7 @@ void set_texture_parameter_values(const LWCONTEXT* pLwc, float x, float y, float
 int get_tex_index_by_hash_key(const LWCONTEXT* pLwc, const char* hash_key);
 void set_texture_parameter(const LWCONTEXT* pLwc, LWENUM _LW_ATLAS_ENUM lae, LWENUM _LW_ATLAS_SPRITE las);
 
-void lw_app_quit(LWCONTEXT* pLwc);
+void lw_app_quit(LWCONTEXT* pLwc, void* native_context);
 unsigned long hash(const unsigned char *str);
 void reset_battle_context(LWCONTEXT* pLwc);
 void lwc_start_logic_thread(LWCONTEXT* pLwc);

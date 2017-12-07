@@ -41,6 +41,17 @@ func ParseQueue2(buf []byte) (*C.LWPQUEUE2, error) {
 	return recvPacket, nil
 }
 
+func ParseCancelQueue(buf []byte) (*C.LWPCANCELQUEUE, error) {
+	bufReader := bytes.NewReader(buf)
+	recvPacket := &C.LWPCANCELQUEUE{}
+	err := binary.Read(bufReader, binary.LittleEndian, recvPacket)
+	if err != nil {
+		log.Printf("binary.Read fail: %v", err.Error())
+		return nil, err
+	}
+	return recvPacket, nil
+}
+
 func ParseSetNickname(buf []byte) (*C.LWPSETNICKNAME, error) {
 	bufReader := bytes.NewReader(buf)
 	recvPacket := &C.LWPSETNICKNAME{}

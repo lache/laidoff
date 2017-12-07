@@ -124,8 +124,8 @@ LWPUCKGAME* new_puck_game() {
     puck_game->boundary[LPGB_W] = dCreatePlane(puck_game->space, 1, 0, 0, -puck_game->world_size_half);
     puck_game->boundary[LPGB_N] = dCreatePlane(puck_game->space, 0, -1, 0, -puck_game->world_size_half);
     puck_game->boundary[LPGB_S] = dCreatePlane(puck_game->space, 0, 1, 0, -puck_game->world_size_half);
-    puck_game->boundary[LPGB_DIAGONAL_1] = dCreatePlane(puck_game->space, -1, -1, 0, 0);
-    puck_game->boundary[LPGB_DIAGONAL_2] = dCreatePlane(puck_game->space, +1, +1, 0, 0);
+    //puck_game->boundary[LPGB_DIAGONAL_1] = dCreatePlane(puck_game->space, -1, -1, 0, 0);
+    //puck_game->boundary[LPGB_DIAGONAL_2] = dCreatePlane(puck_game->space, +1, +1, 0, 0);
     for (int i = 0; i < LPGB_COUNT; i++) {
         if (puck_game->boundary[i]) {
             dGeomSetData(puck_game->boundary[i], (void*)i);
@@ -184,7 +184,9 @@ LWPUCKGAME* new_puck_game() {
 
 void delete_puck_game(LWPUCKGAME** puck_game) {
     for (int i = 0; i < LPGB_COUNT; i++) {
-        dGeomDestroy((*puck_game)->boundary[i]);
+        if ((*puck_game)->boundary[i]) {
+            dGeomDestroy((*puck_game)->boundary[i]);
+        }
     }
     dJointGroupDestroy((*puck_game)->player_control_joint_group);
     dJointGroupDestroy((*puck_game)->contact_joint_group);
@@ -544,19 +546,20 @@ void puck_game_reset_battle_state(LWPUCKGAME* puck_game) {
         dBodySetForce(puck_game->go[i].body, 0, 0, 0);
         dBodySetTorque(puck_game->go[i].body, 0, 0, 0);
     }
+    puck_game->player.total_hp = 10;
+    puck_game->player.current_hp = 10;
+    puck_game->target.total_hp = 10;
+    puck_game->target.current_hp = 10;
 }
 
 void puck_game_reset(LWPUCKGAME* puck_game) {
     puck_game_reset_battle_state(puck_game);
     puck_game->game_state = LPGS_MAIN_MENU;
     puck_game->world_roll = (float)LWDEG2RAD(180);
+    puck_game->world_roll_dir = 1;
     puck_game->world_roll_axis = 1;
     puck_game->world_roll_target = puck_game->world_roll;
     puck_game->world_roll_target_follow_ratio = 0.075f;
-    puck_game->player.total_hp = 10;
-    puck_game->player.current_hp = 10;
-    puck_game->target.total_hp = 10;
-    puck_game->target.current_hp = 10;
 }
 
 void puck_game_remote_state_reset(LWPUCKGAME* puck_game, LWPSTATE* state) {
@@ -753,6 +756,10 @@ void puck_game_roll_to_practice(LWPUCKGAME* puck_game) {
 void puck_game_roll_to_main_menu(LWPUCKGAME* puck_game) {
     if (puck_game->world_roll_dirty == 0) {
         puck_game->game_state = LPGS_MAIN_MENU;
-        puck_game_roll_world(puck_game, 0, 1, (float)LWDEG2RAD(180));
+        puck_game_roll_world(puck_game, 1, 1, (float)LWDEG2RAD(180));
     }
+}
+
+void puck_game_set_searching_str(LWPUCKGAME* puck_game, const char* str) {
+    strcpy(puck_game->searching_str, str);
 }

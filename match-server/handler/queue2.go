@@ -68,7 +68,7 @@ func HandleQueue2(conf config.ServerConfig, matchQueue chan<- user.UserAgent, bu
 			}
 		}
 		// Queue connection
-		matchQueue <- user.UserAgent{conn, *userDb}
+		matchQueue <- user.UserAgent{conn, *userDb, false }
 		// Send reply
 		queueOkBuf := convert.Packet2Buf(convert.NewLwpQueueOk())
 		conn.Write(queueOkBuf)

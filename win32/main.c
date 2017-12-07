@@ -264,7 +264,7 @@ int main(int argc, char* argv[]) {
     // (i.e., by clicking 'X' button on the window)
     // call lw_app_quit to cleanup the logic thread.
     if (!pLwc->quit_request) {
-        lw_app_quit(pLwc);
+        lw_app_quit(pLwc, 0);
     }
 #if LW_PLATFORM_WIN32
     lwimgui_shutdown();
@@ -283,7 +283,7 @@ int main(int argc, char* argv[]) {
     exit(EXIT_SUCCESS);
 }
 
-void lw_app_quit(LWCONTEXT* pLwc) {
+void lw_app_quit(LWCONTEXT* pLwc, void* native_context) {
     pLwc->quit_request = 1;
     zsock_wait(pLwc->logic_actor);
     glfwSetWindowShouldClose(lw_get_window(pLwc), GLFW_TRUE);

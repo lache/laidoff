@@ -408,6 +408,31 @@ static void render_dash_ring_gauge(const LWCONTEXT* pLwc, vec4 player_pos, float
     );
 }
 
+static void render_searching_state(const LWCONTEXT* pLwc, const LWPUCKGAME* puck_game) {
+    if (puck_game->searching_str == 0) {
+        return;
+    }
+    // Render text
+    float ui_alpha = 0.3f + 0.7f * fabsf(sinf((float)(pLwc->app_time * 3.0f)));
+    LWTEXTBLOCK text_block;
+    text_block.align = LTBA_CENTER_CENTER;
+    text_block.text_block_width = DEFAULT_TEXT_BLOCK_WIDTH;
+    text_block.text_block_line_height = DEFAULT_TEXT_BLOCK_LINE_HEIGHT_E;
+    text_block.size = DEFAULT_TEXT_BLOCK_SIZE_C;
+    text_block.multiline = 1;
+    SET_COLOR_RGBA_FLOAT(text_block.color_normal_glyph, 1, 1, 1, ui_alpha);
+    SET_COLOR_RGBA_FLOAT(text_block.color_normal_outline, 0, 0, 0, ui_alpha);
+    SET_COLOR_RGBA_FLOAT(text_block.color_emp_glyph, 1, 1, 0, ui_alpha);
+    SET_COLOR_RGBA_FLOAT(text_block.color_emp_outline, 0, 0, 0, ui_alpha);
+    text_block.text = puck_game->searching_str;
+    text_block.text_bytelen = (int)strlen(text_block.text);
+    text_block.begin_index = 0;
+    text_block.end_index = text_block.text_bytelen;
+    text_block.text_block_x = 0;
+    text_block.text_block_y = 0;
+    render_text_block(pLwc, &text_block);
+}
+
 static void render_match_state(const LWCONTEXT* pLwc, float ui_alpha) {
     // Render text
     LWTEXTBLOCK text_block;
@@ -1030,7 +1055,7 @@ static void render_battle_ui_layer(const LWCONTEXT* pLwc, const LWPUCKGAME* puck
                  puck_game_remain_time(pLwc->puck_game->total_time, state->update_tick),
                  pLwc->puck_game->total_time, ui_alpha);
     // Match state text (bottom of the screen)
-    render_match_state(pLwc, ui_alpha);
+    //render_match_state(pLwc, ui_alpha);
     // Dash ring gauge
     vec4 player_controlled_pos_vec4 = {
         player_controlled_pos[0],
@@ -1083,6 +1108,17 @@ static void render_battle_ui_layer(const LWCONTEXT* pLwc, const LWPUCKGAME* puck
                             button_size,
                             LAE_BUTTON_JUMP,
                             LAE_BUTTON_JUMP_ALPHA,
+                            ui_alpha);
+    }
+    if (remote == 0) {
+        lwbutton_lae_append(&(((LWCONTEXT*)pLwc)->button_list),
+                            "back_button",
+                            -pLwc->aspect_ratio,
+                            0.8f,
+                            button_size * 1.5f,
+                            button_size * 1.5f,
+                            LAE_UI_BACK_BUTTON,
+                            LAE_UI_BACK_BUTTON,
                             ui_alpha);
     }
 }
@@ -1319,13 +1355,27 @@ void lwc_render_physics(const LWCONTEXT* pLwc, const mat4x4 view, const mat4x4 p
         };
         render_tower(pLwc, view, proj, puck_game, tower_pos, &puck_game->tower[i], remote);
     }
-    // battle UI layer
-    if (puck_game->battle_ui_alpha) {
-        render_battle_ui_layer(pLwc, puck_game, view, proj, pLwc->proj, remote, player_controlled_pos);
-    }
-    // main menu UI layer
-    if (puck_game->main_menu_ui_alpha) {
-        render_main_menu_ui_layer(pLwc, puck_game, view, proj, pLwc->proj, remote, player_controlled_pos);
+    if (puck_game->game_state != LPGS_SEARCHING) {
+        // battle UI layer
+        if (puck_game->battle_ui_alpha) {
+            render_battle_ui_layer(pLwc, puck_game, view, proj, pLwc->proj, remote, player_controlled_pos);
+        }
+        // main menu UI layer
+        if (puck_game->main_menu_ui_alpha) {
+            render_main_menu_ui_layer(pLwc, puck_game, view, proj, pLwc->proj, remote, player_controlled_pos);
+        }
+    } else {
+        render_searching_state(pLwc, puck_game);
+        const float button_size = 0.35f;
+        lwbutton_lae_append(&(((LWCONTEXT*)pLwc)->button_list),
+                            "back_button",
+                            +0.0f - button_size * 1.5f / 2,
+                            -0.5f + button_size * 1.5f / 2,
+                            button_size * 1.5f,
+                            button_size * 1.5f,
+                            LAE_UI_BACK_BUTTON,
+                            LAE_UI_BACK_BUTTON,
+                            1.0f);
     }
     // render buttons (shared)
     render_lwbutton(pLwc, &pLwc->button_list, puck_game->remote_control[0].pull_puck);

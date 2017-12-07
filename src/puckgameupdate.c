@@ -253,15 +253,19 @@ void puck_game_pull_puck_toggle(LWCONTEXT* pLwc, LWPUCKGAME* puck_game) {
     }
 }
 
+void puck_game_clear_match_data(LWCONTEXT* pLwc, LWPUCKGAME* puck_game) {
+    puck_game->battle_id = 0;
+    puck_game->token = 0;
+    puck_game->player_no = 1;
+    memset(&pLwc->puck_game_state, 0, sizeof(pLwc->puck_game_state));
+}
+
 void puck_game_rematch(LWCONTEXT* pLwc, LWPUCKGAME* puck_game) {
     // queue again after game ended
     if (puck_game->battle_id
         && puck_game->token
         && pLwc->puck_game_state.bf.finished) {
-        puck_game->battle_id = 0;
-        puck_game->token = 0;
-        puck_game->player_no = 1;
-        memset(&pLwc->puck_game_state, 0, sizeof(pLwc->puck_game_state));
+        puck_game_clear_match_data(pLwc, puck_game);
         puck_game_reset_view_proj(pLwc, puck_game);
         puck_game_reset(puck_game);
         puck_game_remote_state_reset(puck_game, &pLwc->puck_game_state);

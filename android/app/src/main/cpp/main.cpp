@@ -543,8 +543,10 @@ static int32_t engine_handle_input(struct android_app* app, AInputEvent* event) 
 			return 1;
         case AINPUT_EVENT_TYPE_KEY:
 			if (AKeyEvent_getKeyCode(event) == AKEYCODE_BACK) {
-				// actions on back key
-				lw_go_back(engine->pLwc);
+				if(AKeyEvent_getAction(event) == AKEY_EVENT_ACTION_DOWN) {
+					// actions on back key
+					lw_go_back(engine->pLwc, engine->app->activity);
+				}
 				return 1; // <-- uncomment this line to prevent default back button handler called
 			};
             // handle key input...
@@ -880,9 +882,9 @@ extern "C" JNIEXPORT jstring JNICALL Java_com_popsongremix_laidoff_LaidoffNative
     return env->NewStringUTF(hello.c_str());
 }
 
-extern "C" void lw_app_quit(struct _LWCONTEXT* pLwc)
+extern "C" void lw_app_quit(struct _LWCONTEXT* pLwc, void* native_context)
 {
-    exit(0);
+	ANativeActivity_finish(reinterpret_cast<ANativeActivity*>(native_context));
 }
 
 extern "C" void lw_start_text_input_activity(LWCONTEXT* pLwc, int tag) {

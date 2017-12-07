@@ -20,8 +20,9 @@ type UserDb struct {
 }
 
 type UserAgent struct {
-	Conn net.Conn
-	Db   UserDb
+	Conn        net.Conn
+	Db          UserDb
+	CancelQueue bool
 }
 
 func NewUuid() ([]byte, string, error) {

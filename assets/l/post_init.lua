@@ -103,6 +103,20 @@ function on_ui_event(id)
 		print('[script]practice_button')
 		lo.puck_game_reset_battle_state(c.puck_game)
 		lo.puck_game_roll_to_practice(c.puck_game)
+	elseif id == 'back_button' then
+		if c.puck_game.game_state == lo.LPGS_SEARCHING then
+			lo.tcp_send_cancelqueue(c.tcp, c.tcp.user_id)
+			c.puck_game.game_state = lo.LPGS_MAIN_MENU
+		else
+			lo.lw_go_back(c, nil)
+		end
+	elseif id == 'tutorial_button' then
+		lo.show_sys_msg(c.def_sys_msg, 'TUTORIAL: under construction')
+	elseif id == 'online_button' then
+		c.puck_game.game_state = lo.LPGS_SEARCHING
+		lo.puck_game_set_searching_str(c.puck_game, 'SEARCHING OPPONENT...')
+		lo.puck_game_clear_match_data(c, c.puck_game)
+		lo.tcp_send_queue2(c.tcp, c.tcp.user_id)
 	else 
 		lo.construct_set_preview_enable(c.construct, 0)
 		return 0

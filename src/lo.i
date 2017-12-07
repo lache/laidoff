@@ -94,6 +94,8 @@
 #include "construct.h"
 #include "puckgameupdate.h"
 #include "puckgame.h"
+#include "lwtcp.h"
+#include "lwtcpclient.h"
 #ifdef WIN32
 #pragma warning(pop)
 #endif
@@ -190,6 +192,8 @@
 %include "construct.h"
 %include "puckgameupdate.h"
 %include "puckgame.h"
+%include "lwtcp.h"
+%include "lwtcpclient.h"
 
 // using the C-array
 %include <carrays.i>
