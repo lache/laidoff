@@ -87,22 +87,23 @@ void update_damage_text(LWCONTEXT* pLwc) {
 	}
 }
 
-void render_damage_text_3d(
+static void render_damage_text_3d(
 	const LWCONTEXT* pLwc,
 	const LWDAMAGETEXT* damage_text,
 	const mat4x4 view,
-	const mat4x4 proj) {
-	render_text_block(pLwc, &damage_text->text_block);
+	const mat4x4 proj,
+    float ui_alpha) {
+    render_text_block_alpha(pLwc, &damage_text->text_block, ui_alpha);
 }
 
-void render_damage_text(const LWCONTEXT* pLwc, const mat4x4 view, const mat4x4 proj, const mat4x4 ui_proj) {
+void render_damage_text(const LWCONTEXT* pLwc, const mat4x4 view, const mat4x4 proj, const mat4x4 ui_proj, float ui_alpha) {
 	ARRAY_ITERATE_VALID(const LWDAMAGETEXT, pLwc->damage_text) {
 		if (e->coord == LDTC_3D) {
-			render_damage_text_3d(pLwc, &pLwc->damage_text[i], view, proj);
+			render_damage_text_3d(pLwc, &pLwc->damage_text[i], view, proj, ui_alpha);
 		} else if (e->coord == LDTC_UI) {
 			mat4x4 identity;
 			mat4x4_identity(identity);
-			render_damage_text_3d(pLwc, &pLwc->damage_text[i], identity, ui_proj);
+			render_damage_text_3d(pLwc, &pLwc->damage_text[i], identity, ui_proj, ui_alpha);
 		} else {
 			LOGE("Unknown LWDAMAGETEXT coord value: %d", e->coord);
 		}

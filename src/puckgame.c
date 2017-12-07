@@ -94,6 +94,7 @@ LWPUCKGAME* new_puck_game() {
     puck_game->target.total_hp = puck_game->hp;
     puck_game->target.current_hp = puck_game->hp;
     puck_game->puck_reflect_size = 1.0f;
+    puck_game->battle_ui_alpha = 1.0f;
     int tower_pos_multiplier_index = 0;
     puck_game->tower_pos_multiplier[tower_pos_multiplier_index][0] = -1;
     puck_game->tower_pos_multiplier[tower_pos_multiplier_index][1] = -1;

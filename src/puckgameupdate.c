@@ -25,6 +25,7 @@ void update_world_roll(LWPUCKGAME* puck_game) {
             puck_game->world_roll += world_roll_diff * puck_game->world_roll_target_follow_ratio;
         }
     }
+    puck_game->battle_ui_alpha = LWMAX(0.0f, 1.0f - puck_game->world_roll);
 }
 
 void update_boundary_impact(LWPUCKGAME* puck_game, float delta_time) {

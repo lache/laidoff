@@ -953,7 +953,7 @@ void lwc_render_battle(const LWCONTEXT* pLwc) {
 	} ARRAY_ITERATE_VALID_END();
 
 	// Attack damage_text
-	render_damage_text(pLwc, pLwc->battle_view, pLwc->battle_proj, pLwc->proj);
+	render_damage_text(pLwc, pLwc->battle_view, pLwc->battle_proj, pLwc->proj, 1.0f);
 
 	// Command palette
 	if (pLwc->battle_state != LBS_COMMAND_IN_PROGRESS) {

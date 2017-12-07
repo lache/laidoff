@@ -24,4 +24,4 @@ typedef struct _LWDAMAGETEXT
 int spawn_damage_text(LWCONTEXT* pLwc, float x, float y, float z, const char *text, LW_DAMAGE_TEXT_COORD coord);
 int spawn_exp_text(LWCONTEXT* pLwc, float x, float y, float z, const char *text, LW_DAMAGE_TEXT_COORD coord);
 void update_damage_text(LWCONTEXT* pLwc);
-void render_damage_text(const LWCONTEXT* pLwc, const mat4x4 view, const mat4x4 proj, const mat4x4 ui_proj);
+void render_damage_text(const LWCONTEXT* pLwc, const mat4x4 view, const mat4x4 proj, const mat4x4 ui_proj, float ui_alpha);

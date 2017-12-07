@@ -35,7 +35,7 @@ void render_dir_pad(const LWCONTEXT* pLwc, float x, float y) {
     glDrawArrays(GL_TRIANGLES, 0, pLwc->vertex_buffer[vbo_index].vertex_count);
 }
 
-void render_dir_pad_joystick_type(const LWCONTEXT* pLwc, float x, float y, LW_ATLAS_ENUM lae) {
+void render_dir_pad_joystick_type(const LWCONTEXT* pLwc, float x, float y, LW_ATLAS_ENUM lae, float ui_alpha) {
     int shader_index = LWST_DEFAULT;
     const int vbo_index = LVT_CENTER_CENTER_ANCHORED_SQUARE;
     const float size = 0.25f;
@@ -61,7 +61,7 @@ void render_dir_pad_joystick_type(const LWCONTEXT* pLwc, float x, float y, LW_AT
     glUniform2fv(shader->vuvoffset_location, 1, default_uv_offset);
     glUniform2fv(shader->vuvscale_location, 1, default_uv_scale);
     glUniform2fv(shader->vs9offset_location, 1, default_uv_offset);
-    glUniform1f(shader->alpha_multiplier_location, 1.0f);
+    glUniform1f(shader->alpha_multiplier_location, ui_alpha);
     glUniform1i(shader->diffuse_location, 0); // 0 means GL_TEXTURE0
     glUniform3f(shader->overlay_color_location, 1, 1, 1);
     glUniform1f(shader->overlay_color_ratio_location, 0);
@@ -84,12 +84,12 @@ void render_dir_pad_joystick_type(const LWCONTEXT* pLwc, float x, float y, LW_AT
     glDepthMask(GL_TRUE);
 }
 
-void render_dir_pad_joystick_area(const LWCONTEXT* pLwc, float x, float y) {
-    render_dir_pad_joystick_type(pLwc, x, y, LAE_JOYSTICKAREA);
+void render_dir_pad_joystick_area(const LWCONTEXT* pLwc, float x, float y, float ui_alpha) {
+    render_dir_pad_joystick_type(pLwc, x, y, LAE_JOYSTICKAREA, ui_alpha);
 }
 
-void render_dir_pad_joystick(const LWCONTEXT* pLwc, float x, float y) {
-    render_dir_pad_joystick_type(pLwc, x, y, LAE_JOYSTICK);
+void render_dir_pad_joystick(const LWCONTEXT* pLwc, float x, float y, float ui_alpha) {
+    render_dir_pad_joystick_type(pLwc, x, y, LAE_JOYSTICK, ui_alpha);
 }
 
 
@@ -102,15 +102,14 @@ void render_dir_pad_with_start(const LWCONTEXT* pLwc, const LWDIRPAD* dir_pad) {
     }
 }
 
-void render_dir_pad_with_start_joystick(const LWCONTEXT* pLwc, const LWDIRPAD* dir_pad) {
+void render_dir_pad_with_start_joystick(const LWCONTEXT* pLwc, const LWDIRPAD* dir_pad, float ui_alpha) {
     if (dir_pad->dragging) {
-        render_dir_pad_joystick_area(pLwc, dir_pad->start_x, dir_pad->start_y);
+        render_dir_pad_joystick_area(pLwc, dir_pad->start_x, dir_pad->start_y, ui_alpha);
     } else {
-        render_dir_pad_joystick_area(pLwc, dir_pad->origin_x, dir_pad->origin_y);
+        render_dir_pad_joystick_area(pLwc, dir_pad->origin_x, dir_pad->origin_y, ui_alpha);
     }
-    
     // Current touch position
-    render_dir_pad_joystick(pLwc, dir_pad->x, dir_pad->y);
+    render_dir_pad_joystick(pLwc, dir_pad->x, dir_pad->y, ui_alpha);
 }
 
 float get_dir_pad_size_radius() {

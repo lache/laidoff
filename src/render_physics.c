@@ -313,7 +313,7 @@ static void render_radial_wave(const LWCONTEXT* pLwc,
     glDepthMask(GL_TRUE);
 }
 
-static void render_timer(const LWCONTEXT* pLwc, float remain_sec, float total_sec) {
+static void render_timer(const LWCONTEXT* pLwc, float remain_sec, float total_sec, float ui_alpha) {
     // Render text
     LWTEXTBLOCK text_block;
     text_block.align = LTBA_CENTER_CENTER;
@@ -321,10 +321,10 @@ static void render_timer(const LWCONTEXT* pLwc, float remain_sec, float total_se
     text_block.text_block_line_height = DEFAULT_TEXT_BLOCK_LINE_HEIGHT_F;
     text_block.size = DEFAULT_TEXT_BLOCK_SIZE_D;
     text_block.multiline = 1;
-    SET_COLOR_RGBA_FLOAT(text_block.color_normal_glyph, 1, 1, 1, 1);
-    SET_COLOR_RGBA_FLOAT(text_block.color_normal_outline, 0, 0, 0, 1);
-    SET_COLOR_RGBA_FLOAT(text_block.color_emp_glyph, 1, 1, 0, 1);
-    SET_COLOR_RGBA_FLOAT(text_block.color_emp_outline, 0, 0, 0, 1);
+    SET_COLOR_RGBA_FLOAT(text_block.color_normal_glyph, 1, 1, 1, ui_alpha);
+    SET_COLOR_RGBA_FLOAT(text_block.color_normal_outline, 0, 0, 0, ui_alpha);
+    SET_COLOR_RGBA_FLOAT(text_block.color_emp_glyph, 1, 1, 0, ui_alpha);
+    SET_COLOR_RGBA_FLOAT(text_block.color_emp_outline, 0, 0, 0, ui_alpha);
     char str[32];
     if (remain_sec < 0) {
         sprintf(str, u8"--");
@@ -361,7 +361,7 @@ static void render_timer(const LWCONTEXT* pLwc, float remain_sec, float total_se
         0.0325f,
         0,//pLwc->tex_atlas[LVT_RINGGAUGE],
         LVT_RINGGAUGETHICK,
-        1.0f,
+        ui_alpha,
         0,
         1,
         0,
@@ -372,7 +372,7 @@ static void render_timer(const LWCONTEXT* pLwc, float remain_sec, float total_se
     );
 }
 
-static void render_dash_ring_gauge(const LWCONTEXT* pLwc, vec4 player_pos) {
+static void render_dash_ring_gauge(const LWCONTEXT* pLwc, vec4 player_pos, float ui_alpha) {
     const LWPUCKGAMEDASH* dash = puck_game_single_play_dash_object(pLwc->puck_game);
     float gauge_ratio = puck_game_dash_gauge_ratio(pLwc->puck_game, dash);
     if (gauge_ratio >= 1.0f) {
@@ -397,7 +397,7 @@ static void render_dash_ring_gauge(const LWCONTEXT* pLwc, vec4 player_pos) {
         0.03f,
         0,//pLwc->tex_atlas[LVT_RINGGAUGE],
         LVT_RINGGAUGE,
-        0.75f,
+        0.75f * ui_alpha,
         0,
         1,
         0,
@@ -408,7 +408,7 @@ static void render_dash_ring_gauge(const LWCONTEXT* pLwc, vec4 player_pos) {
     );
 }
 
-static void render_match_state(const LWCONTEXT* pLwc) {
+static void render_match_state(const LWCONTEXT* pLwc, float ui_alpha) {
     // Render text
     LWTEXTBLOCK text_block;
     text_block.align = LTBA_CENTER_BOTTOM;
@@ -416,10 +416,10 @@ static void render_match_state(const LWCONTEXT* pLwc) {
     text_block.text_block_line_height = DEFAULT_TEXT_BLOCK_LINE_HEIGHT_E;
     text_block.size = DEFAULT_TEXT_BLOCK_SIZE_C;
     text_block.multiline = 1;
-    SET_COLOR_RGBA_FLOAT(text_block.color_normal_glyph, 1, 1, 1, 1);
-    SET_COLOR_RGBA_FLOAT(text_block.color_normal_outline, 0, 0, 0, 1);
-    SET_COLOR_RGBA_FLOAT(text_block.color_emp_glyph, 1, 1, 0, 1);
-    SET_COLOR_RGBA_FLOAT(text_block.color_emp_outline, 0, 0, 0, 1);
+    SET_COLOR_RGBA_FLOAT(text_block.color_normal_glyph, 1, 1, 1, ui_alpha);
+    SET_COLOR_RGBA_FLOAT(text_block.color_normal_outline, 0, 0, 0, ui_alpha);
+    SET_COLOR_RGBA_FLOAT(text_block.color_emp_glyph, 1, 1, 0, ui_alpha);
+    SET_COLOR_RGBA_FLOAT(text_block.color_emp_outline, 0, 0, 0, ui_alpha);
     char str[128];
     if (pLwc->puck_game_state.bf.finished) {
         int hp_diff = pLwc->puck_game_state.bf.player_current_hp - pLwc->puck_game_state.bf.target_current_hp;
@@ -457,7 +457,9 @@ static void render_match_state(const LWCONTEXT* pLwc) {
 
 static void render_hp_gauge(const LWCONTEXT* pLwc,
                             float w, float h,
-                            float x, float y, int current_hp, int total_hp, float hp_shake_remain_time, int left, const char* str) {
+                            float x, float y, int current_hp, int total_hp,
+                            float hp_shake_remain_time, int left, const char* str,
+                            float ui_alpha) {
     const float gauge_width = w;
     const float gauge_height = h;
     //const float gauge_flush_height = 0.07f;
@@ -507,7 +509,7 @@ static void render_hp_gauge(const LWCONTEXT* pLwc,
                                gauge_height - cell_border * 2,
                                0,
                                LVT_LEFT_CENTER_ANCHORED_SQUARE,
-                               1, r, g, b, 1);
+                               ui_alpha, r, g, b, 1);
         }
     }
     // Render text
@@ -517,10 +519,10 @@ static void render_hp_gauge(const LWCONTEXT* pLwc,
     text_block.text_block_line_height = DEFAULT_TEXT_BLOCK_LINE_HEIGHT_E;
     text_block.size = DEFAULT_TEXT_BLOCK_SIZE_E;
     text_block.multiline = 1;
-    SET_COLOR_RGBA_FLOAT(text_block.color_normal_glyph, 1, 1, 1, 1);
-    SET_COLOR_RGBA_FLOAT(text_block.color_normal_outline, 0, 0, 0, 1);
-    SET_COLOR_RGBA_FLOAT(text_block.color_emp_glyph, 1, 1, 0, 1);
-    SET_COLOR_RGBA_FLOAT(text_block.color_emp_outline, 0, 0, 0, 1);
+    SET_COLOR_RGBA_FLOAT(text_block.color_normal_glyph, 1, 1, 1, ui_alpha);
+    SET_COLOR_RGBA_FLOAT(text_block.color_normal_outline, 0, 0, 0, ui_alpha);
+    SET_COLOR_RGBA_FLOAT(text_block.color_emp_glyph, 1, 1, 0, ui_alpha);
+    SET_COLOR_RGBA_FLOAT(text_block.color_emp_outline, 0, 0, 0, ui_alpha);
     text_block.text = str;
     text_block.text_bytelen = (int)strlen(text_block.text);
     text_block.begin_index = 0;
@@ -786,8 +788,8 @@ static void render_floor(const LWCONTEXT *pLwc, const mat4x4 proj, const LWPUCKG
     mat4x4_identity(proj_view_model);
     mat4x4_mul(proj_view_model, proj, view_model);
 
-    glUniform3f(shader->overlay_color_location, 0.5f, 0.5f, 0.5f);
-    glUniform1f(shader->overlay_color_ratio_location, 0.0f);
+    glUniform3f(shader->overlay_color_location, 0.2f, 0.2f, 0.2f);
+    glUniform1f(shader->overlay_color_ratio_location, 0.7f);
 
     //glUniformMatrix4fv(shader->mvp_location, 1, GL_FALSE, (const GLfloat*)proj_view_model);
 
@@ -833,7 +835,7 @@ static void render_lwbutton(const LWCONTEXT* pLwc, const LWBUTTONLIST* button_li
                                  pLwc->tex_atlas[b->lae],
                                  pLwc->tex_atlas[b->lae_alpha],
                                  LVT_LEFT_TOP_ANCHORED_SQUARE,
-                                 1.0f,
+                                 b->ui_alpha,
                                  or,
                                  og,
                                  ob,
@@ -875,6 +877,116 @@ void render_caution_popup(const LWCONTEXT* pLwc, const char* str) {
     text_block.text_block_x = x;
     text_block.text_block_y = y;
     render_text_block(pLwc, &text_block);
+}
+
+static void render_popup_ui_layer(const LWCONTEXT* pLwc) {
+    if (pLwc->tcp == 0) {
+        char str[256];
+        sprintf(str, "Could not conect to server.\n(is server ready?)");
+        render_caution_popup(pLwc, str);
+    } else if (pLwc->tcp->send_fail || (pLwc->udp && pLwc->udp->ready == 0)) {
+        char str[256];
+        sprintf(str, "Server disconnected.\nPlease check your internet\nconnection.");
+        render_caution_popup(pLwc, str);
+    }
+}
+
+static void render_battle_ui_layer(const LWCONTEXT* pLwc, const LWPUCKGAME* puck_game,
+                            const mat4x4 view, const mat4x4 proj, const mat4x4 ui_proj,
+                            int remote, const float* player_controlled_pos) {
+    const LWPSTATE* state = &pLwc->puck_game_state;
+    const LWPUCKGAMEPLAYER* player = &puck_game->player;
+    const LWPUCKGAMEPLAYER* target = &puck_game->target;
+    float ui_alpha = puck_game->battle_ui_alpha;
+    // Render damage texts
+    render_damage_text(pLwc, view, proj, ui_proj, ui_alpha);
+    // Render left joystick
+    render_dir_pad_with_start_joystick(pLwc, &pLwc->left_dir_pad, ui_alpha);
+    // Render right joystick
+    if (pLwc->control_flags & LCF_PUCK_GAME_RIGHT_DIR_PAD) {
+        render_dir_pad_with_start(pLwc, &pLwc->right_dir_pad);
+    }
+    // Dash button
+    //render_fist_button(pLwc);
+    // Pull button
+    //render_top_button(pLwc);
+    // Dash cooltime gauge
+    //render_dash_gauge(pLwc);
+    // HP gauges (player & target)
+    const char* target_nickname = puck_game->battle_id ? puck_game->target_nickname : "BOGUS (Searching opponent...)";
+    const float gauge_width = pLwc->aspect_ratio * 0.9f;
+    const float gauge_height = 0.075f;
+    const float gauge1_x = -pLwc->aspect_ratio + gauge_width / 2;
+    const float gauge1_y = 1.0f - gauge_height;
+    const float gauge2_x = pLwc->aspect_ratio - gauge_width / 2;
+    const float gauge2_y = 1.0f - gauge_height;
+    const int player_current_hp = remote ? state->bf.player_current_hp : puck_game->player.current_hp;
+    const int target_current_hp = remote ? state->bf.target_current_hp : puck_game->target.current_hp;
+    const int player_total_hp = remote ? state->bf.player_total_hp : puck_game->player.total_hp;
+    const int target_total_hp = remote ? state->bf.target_total_hp : puck_game->target.total_hp;
+    render_hp_gauge(pLwc, gauge_width, gauge_height, gauge1_x, gauge1_y, player_current_hp, player_total_hp, player->hp_shake_remain_time, 1, puck_game->nickname, ui_alpha);
+    render_hp_gauge(pLwc, gauge_width, gauge_height, gauge2_x, gauge2_y, target_current_hp, target_total_hp, target->hp_shake_remain_time, 0, target_nickname, ui_alpha);
+    // Battle timer (center top of the screen)
+    render_timer(pLwc,
+                 puck_game_remain_time(pLwc->puck_game->total_time, state->update_tick),
+                 pLwc->puck_game->total_time, ui_alpha);
+    // Match state text (bottom of the screen)
+    render_match_state(pLwc, ui_alpha);
+    // Dash ring gauge
+    vec4 player_controlled_pos_vec4 = {
+        player_controlled_pos[0],
+        player_controlled_pos[1],
+        player_controlled_pos[2],
+        1.0f,
+    };
+    vec4 player_controlled_pos_vec4_world_roll;
+    mat4x4 world_roll_mat;
+    mat4x4_identity(world_roll_mat);
+    mult_world_roll(world_roll_mat, puck_game->world_roll_axis, puck_game->world_roll_dir, puck_game->world_roll);
+    mat4x4_mul_vec4(player_controlled_pos_vec4_world_roll, world_roll_mat, player_controlled_pos_vec4);
+    render_dash_ring_gauge(pLwc, player_controlled_pos_vec4_world_roll, ui_alpha);
+
+    // Register as a button
+    const float button_size = 0.35f;
+    const float button_margin_x = 0.025f;
+    const float button_x_interval = button_size + button_margin_x;
+    const float button_x_0 = 0.25f;
+    const float button_y_interval = 0.25f;
+    const float button_y_0 = -0.50f;
+    if (pLwc->control_flags & LCF_PUCK_GAME_PULL) {
+        lwbutton_lae_append(&(((LWCONTEXT*)pLwc)->button_list),
+                            "pull_button",
+                            +1.000f + button_size * 1.75f / 2 - button_size / 2,
+                            +0.175f,
+                            button_size,
+                            button_size,
+                            LAE_BUTTON_PULL,
+                            LAE_BUTTON_PULL_ALPHA,
+                            ui_alpha);
+    }
+    if (pLwc->control_flags & LCF_PUCK_GAME_DASH) {
+        lwbutton_lae_append(&(((LWCONTEXT*)pLwc)->button_list),
+                            "dash_button",
+                            +1.00f,
+                            -0.225f,
+                            button_size * 1.75f,
+                            button_size * 1.75f,
+                            LAE_BUTTON_DASH,
+                            LAE_BUTTON_DASH_ALPHA,
+                            ui_alpha);
+    }
+    if (pLwc->control_flags & LCF_PUCK_GAME_JUMP) {
+        lwbutton_lae_append(&(((LWCONTEXT*)pLwc)->button_list),
+                            "jump_button",
+                            button_x_0 + button_x_interval * 3,
+                            button_y_0 + button_y_interval * 2,
+                            button_size,
+                            button_size,
+                            LAE_BUTTON_JUMP,
+                            LAE_BUTTON_JUMP_ALPHA,
+                            ui_alpha);
+    }
+    render_lwbutton(pLwc, &pLwc->button_list, puck_game->remote_control[0].pull_puck);
 }
 
 void lwc_render_physics(const LWCONTEXT* pLwc, const mat4x4 view, const mat4x4 proj) {
@@ -1109,98 +1221,10 @@ void lwc_render_physics(const LWCONTEXT* pLwc, const mat4x4 view, const mat4x4 p
         };
         render_tower(pLwc, view, proj, puck_game, tower_pos, &puck_game->tower[i], remote);
     }
-    // Render damage texts
-    render_damage_text(pLwc, view, proj, pLwc->proj);
-    render_dir_pad_with_start_joystick(pLwc, &pLwc->left_dir_pad);
-    if (pLwc->control_flags & LCF_PUCK_GAME_RIGHT_DIR_PAD) {
-        render_dir_pad_with_start(pLwc, &pLwc->right_dir_pad);
+    // battle UI layer
+    if (puck_game->battle_ui_alpha) {
+        render_battle_ui_layer(pLwc, puck_game, view, proj, pLwc->proj, remote, player_controlled_pos);
     }
-    // Dash button
-    //render_fist_button(pLwc);
-    // Pull button
-    //render_top_button(pLwc);
-    // Dash cooltime gauge
-    //render_dash_gauge(pLwc);
-    // HP gauges (player & target)
-    const char* target_nickname = puck_game->battle_id ? puck_game->target_nickname : "BOGUS (Searching opponent...)";
-    const float gauge_width = pLwc->aspect_ratio * 0.9f;
-    const float gauge_height = 0.075f;
-    const float gauge1_x = -pLwc->aspect_ratio + gauge_width / 2;
-    const float gauge1_y = 1.0f - gauge_height;
-    const float gauge2_x = pLwc->aspect_ratio - gauge_width / 2;
-    const float gauge2_y = 1.0f - gauge_height;
-    const int player_current_hp = remote ? state->bf.player_current_hp : puck_game->player.current_hp;
-    const int target_current_hp = remote ? state->bf.target_current_hp : puck_game->target.current_hp;
-    const int player_total_hp = remote ? state->bf.player_total_hp : puck_game->player.total_hp;
-    const int target_total_hp = remote ? state->bf.target_total_hp : puck_game->target.total_hp;
-    render_hp_gauge(pLwc, gauge_width, gauge_height, gauge1_x, gauge1_y, player_current_hp, player_total_hp, player->hp_shake_remain_time, 1, puck_game->nickname);
-    render_hp_gauge(pLwc, gauge_width, gauge_height, gauge2_x, gauge2_y, target_current_hp, target_total_hp, target->hp_shake_remain_time, 0, target_nickname);
-    // Battle timer (center top of the screen)
-    render_timer(pLwc,
-                 puck_game_remain_time(pLwc->puck_game->total_time, state->update_tick),
-                 pLwc->puck_game->total_time);
-    // Match state text (bottom of the screen)
-    render_match_state(pLwc);
-    // Dash ring gauge
-    vec4 player_controlled_pos_vec4 = {
-        player_controlled_pos[0],
-        player_controlled_pos[1],
-        player_controlled_pos[2],
-        1.0f,
-    };
-    vec4 player_controlled_pos_vec4_world_roll;
-    mat4x4 world_roll_mat;
-    mat4x4_identity(world_roll_mat);
-    mult_world_roll(world_roll_mat, puck_game->world_roll_axis, puck_game->world_roll_dir, puck_game->world_roll);
-    mat4x4_mul_vec4(player_controlled_pos_vec4_world_roll, world_roll_mat, player_controlled_pos_vec4);
-    render_dash_ring_gauge(pLwc, player_controlled_pos_vec4_world_roll);
-
-    // Register as a button
-    const float button_size = 0.35f;
-    const float button_margin_x = 0.025f;
-    const float button_x_interval = button_size + button_margin_x;
-    const float button_x_0 = 0.25f;
-    const float button_y_interval = 0.25f;
-    const float button_y_0 = -0.50f;
-    if (pLwc->control_flags & LCF_PUCK_GAME_PULL) {
-        lwbutton_lae_append(&(((LWCONTEXT*)pLwc)->button_list),
-                            "pull_button",
-                            +1.000f + button_size * 1.75f / 2 - button_size / 2,
-                            +0.175f,
-                            button_size,
-                            button_size,
-                            LAE_BUTTON_PULL,
-                            LAE_BUTTON_PULL_ALPHA);
-    }
-    if (pLwc->control_flags & LCF_PUCK_GAME_DASH) {
-        lwbutton_lae_append(&(((LWCONTEXT*)pLwc)->button_list),
-                            "dash_button",
-                            +1.00f,
-                            -0.225f,
-                            button_size * 1.75f,
-                            button_size * 1.75f,
-                            LAE_BUTTON_DASH,
-                            LAE_BUTTON_DASH_ALPHA);
-    }
-    if (pLwc->control_flags & LCF_PUCK_GAME_JUMP) {
-        lwbutton_lae_append(&(((LWCONTEXT*)pLwc)->button_list),
-                            "jump_button",
-                            button_x_0 + button_x_interval * 3,
-                            button_y_0 + button_y_interval * 2,
-                            button_size,
-                            button_size,
-                            LAE_BUTTON_JUMP,
-                            LAE_BUTTON_JUMP_ALPHA);
-    }
-    render_lwbutton(pLwc, &pLwc->button_list, puck_game->remote_control[0].pull_puck);
-    
-    if (pLwc->tcp == 0) {
-        char str[256];
-        sprintf(str, "Could not conect to server.\n(is server ready?)");
-        render_caution_popup(pLwc, str);
-    } else if (pLwc->tcp->send_fail || (pLwc->udp && pLwc->udp->ready == 0)) {
-        char str[256];
-        sprintf(str, "Server disconnected.\nPlease check your internet\nconnection.");
-        render_caution_popup(pLwc, str);
-    }
+    // popup UI layer
+    render_popup_ui_layer(pLwc);
 }

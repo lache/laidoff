@@ -4,10 +4,11 @@
 #include <string.h>
 
 LWBUTTON* lwbutton_lae_append(LWBUTTONLIST* button_list, const char* id, float x, float y, float w, float h,
-                              LW_ATLAS_ENUM lae, LW_ATLAS_ENUM lae_alpha) {
+                              LW_ATLAS_ENUM lae, LW_ATLAS_ENUM lae_alpha, float ui_alpha) {
     LWBUTTON* b = lwbutton_append(button_list, id, x, y, w, h);
     b->lae = lae;
     b->lae_alpha = lae_alpha;
+    b->ui_alpha = ui_alpha;
     return b;
 }
 

@@ -24197,12 +24197,14 @@ static int _wrap_render_damage_text(lua_State* L) {
   vec4 *arg2 ;
   vec4 *arg3 ;
   vec4 *arg4 ;
+  float arg5 ;
   
-  SWIG_check_num_args("render_damage_text",4,4)
+  SWIG_check_num_args("render_damage_text",5,5)
   if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("render_damage_text",1,"LWCONTEXT const *");
   if(!SWIG_isptrtype(L,2)) SWIG_fail_arg("render_damage_text",2,"mat4x4 const");
   if(!SWIG_isptrtype(L,3)) SWIG_fail_arg("render_damage_text",3,"mat4x4 const");
   if(!SWIG_isptrtype(L,4)) SWIG_fail_arg("render_damage_text",4,"mat4x4 const");
+  if(!lua_isnumber(L,5)) SWIG_fail_arg("render_damage_text",5,"float");
   
   if (!SWIG_IsOK(SWIG_ConvertPtr(L,1,(void**)&arg1,SWIGTYPE_p__LWCONTEXT,0))){
     SWIG_fail_ptr("render_damage_text",1,SWIGTYPE_p__LWCONTEXT);
@@ -24223,7 +24225,8 @@ static int _wrap_render_damage_text(lua_State* L) {
     SWIG_fail_ptr("render_damage_text",4,SWIGTYPE_p_a_4__float);
   }
   
-  render_damage_text((struct _LWCONTEXT const *)arg1,(float const (*)[4])arg2,(float const (*)[4])arg3,(float const (*)[4])arg4);
+  arg5 = (float)lua_tonumber(L, 5);
+  render_damage_text((struct _LWCONTEXT const *)arg1,(float const (*)[4])arg2,(float const (*)[4])arg3,(float const (*)[4])arg4,arg5);
   
   return SWIG_arg;
   
@@ -42162,12 +42165,12 @@ fail:
 
 static int _wrap_render_text_block(lua_State* L) {
   int SWIG_arg = 0;
-  struct _LWCONTEXT *arg1 = (struct _LWCONTEXT *) 0 ;
-  struct _LWTEXTBLOCK *arg2 = (struct _LWTEXTBLOCK *) 0 ;
+  LWCONTEXT *arg1 = (LWCONTEXT *) 0 ;
+  LWTEXTBLOCK *arg2 = (LWTEXTBLOCK *) 0 ;
   
   SWIG_check_num_args("render_text_block",2,2)
-  if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("render_text_block",1,"struct _LWCONTEXT const *");
-  if(!SWIG_isptrtype(L,2)) SWIG_fail_arg("render_text_block",2,"struct _LWTEXTBLOCK const *");
+  if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("render_text_block",1,"LWCONTEXT const *");
+  if(!SWIG_isptrtype(L,2)) SWIG_fail_arg("render_text_block",2,"LWTEXTBLOCK const *");
   
   if (!SWIG_IsOK(SWIG_ConvertPtr(L,1,(void**)&arg1,SWIGTYPE_p__LWCONTEXT,0))){
     SWIG_fail_ptr("render_text_block",1,SWIGTYPE_p__LWCONTEXT);
@@ -42179,6 +42182,39 @@ static int _wrap_render_text_block(lua_State* L) {
   }
   
   render_text_block((struct _LWCONTEXT const *)arg1,(struct _LWTEXTBLOCK const *)arg2);
+  
+  return SWIG_arg;
+  
+  if(0) SWIG_fail;
+  
+fail:
+  lua_error(L);
+  return SWIG_arg;
+}
+
+
+static int _wrap_render_text_block_alpha(lua_State* L) {
+  int SWIG_arg = 0;
+  LWCONTEXT *arg1 = (LWCONTEXT *) 0 ;
+  LWTEXTBLOCK *arg2 = (LWTEXTBLOCK *) 0 ;
+  float arg3 ;
+  
+  SWIG_check_num_args("render_text_block_alpha",3,3)
+  if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("render_text_block_alpha",1,"LWCONTEXT const *");
+  if(!SWIG_isptrtype(L,2)) SWIG_fail_arg("render_text_block_alpha",2,"LWTEXTBLOCK const *");
+  if(!lua_isnumber(L,3)) SWIG_fail_arg("render_text_block_alpha",3,"float");
+  
+  if (!SWIG_IsOK(SWIG_ConvertPtr(L,1,(void**)&arg1,SWIGTYPE_p__LWCONTEXT,0))){
+    SWIG_fail_ptr("render_text_block_alpha",1,SWIGTYPE_p__LWCONTEXT);
+  }
+  
+  
+  if (!SWIG_IsOK(SWIG_ConvertPtr(L,2,(void**)&arg2,SWIGTYPE_p__LWTEXTBLOCK,0))){
+    SWIG_fail_ptr("render_text_block_alpha",2,SWIGTYPE_p__LWTEXTBLOCK);
+  }
+  
+  arg3 = (float)lua_tonumber(L, 3);
+  render_text_block_alpha((struct _LWCONTEXT const *)arg1,(struct _LWTEXTBLOCK const *)arg2,arg3);
   
   return SWIG_arg;
   
@@ -50194,6 +50230,7 @@ static swig_lua_const_info swig_SwigModule_constants[]= {
     {SWIG_LUA_CONSTTAB_INT("LWST_SPHERE_REFLECT_FLOOR", LWST_SPHERE_REFLECT_FLOOR)},
     {SWIG_LUA_CONSTTAB_INT("LWST_RINGGAUGE", LWST_RINGGAUGE)},
     {SWIG_LUA_CONSTTAB_INT("LWST_RADIALWAVE", LWST_RADIALWAVE)},
+    {SWIG_LUA_CONSTTAB_INT("LWST_DEFAULT_NORMAL", LWST_DEFAULT_NORMAL)},
     {SWIG_LUA_CONSTTAB_INT("LWST_COUNT", LWST_COUNT)},
     {SWIG_LUA_CONSTTAB_INT("MAX_ANIM_COUNT", (10))},
     {SWIG_LUA_CONSTTAB_INT("ANIM_FPS", (60))},
@@ -50783,6 +50820,7 @@ static swig_lua_method swig_SwigModule_methods[]= {
     { "render_solid_vb_ui_flip_y_uv_shader", _wrap_render_solid_vb_ui_flip_y_uv_shader},
     { "render_solid_vb_ui_flip_y_uv_shader_rot", _wrap_render_solid_vb_ui_flip_y_uv_shader_rot},
     { "render_text_block", _wrap_render_text_block},
+    { "render_text_block_alpha", _wrap_render_text_block_alpha},
     { "toggle_font_texture_test_mode", _wrap_toggle_font_texture_test_mode},
     { "init_lua", _wrap_init_lua},
     { "spawn_all_field_object", _wrap_spawn_all_field_object},

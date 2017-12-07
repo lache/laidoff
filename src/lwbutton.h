@@ -10,6 +10,7 @@ typedef struct _LWBUTTON {
     float x, y, w, h;
     LW_ATLAS_ENUM lae;
     LW_ATLAS_ENUM lae_alpha;
+    float ui_alpha;
 } LWBUTTON;
 
 typedef struct _LWBUTTONLIST {
@@ -19,6 +20,6 @@ typedef struct _LWBUTTONLIST {
 
 LWBUTTON* lwbutton_append(LWBUTTONLIST* button_list, const char* id, float x, float y, float w, float h);
 LWBUTTON* lwbutton_lae_append(LWBUTTONLIST* button_list, const char* id, float x, float y, float w, float h,
-                              LW_ATLAS_ENUM lae, LW_ATLAS_ENUM lae_alpha);
+                              LW_ATLAS_ENUM lae, LW_ATLAS_ENUM lae_alpha, float ui_alpha);
 int lwbutton_press(const LWBUTTONLIST* button_list, float x, float y);
 const char* lwbutton_id(const LWBUTTONLIST* button_list, int idx);

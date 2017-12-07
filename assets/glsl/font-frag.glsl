@@ -29,4 +29,5 @@ void main()
     float outline_and_glyph_alpha = smoothstep(0.0, 0.5 + GLYPH_OUTLINE_MIX_THICKNESS, t);
     float outline_alpha = outline_and_glyph_alpha - glyph_alpha;
     fragColor = glyph_alpha * glyph_color + outline_alpha * outline_color;
+	fragColor.a *= alpha_multiplier;
 }

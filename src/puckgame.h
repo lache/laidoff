@@ -166,6 +166,7 @@ typedef struct _LWPUCKGAME {
     float target_dx;
     float target_dy;
     float target_dlen_ratio;
+    float battle_ui_alpha;
 } LWPUCKGAME;
 
 LWPUCKGAME* new_puck_game();
