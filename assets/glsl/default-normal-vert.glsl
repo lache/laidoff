@@ -23,7 +23,7 @@ void main()
     vec3 p = vPos;
     p.xy += vS9 * vS9Offset;
     gl_Position = MVP * vec4(p, 1.0);
-    vec4 n = MVP * vec4(vCol, 1.0);
+    vec4 n = vec4(vCol, 1.0);
 	normal.x = n.x;
 	normal.y = n.y;
 	normal.z = n.z;
