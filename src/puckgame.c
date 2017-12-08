@@ -568,6 +568,7 @@ void puck_game_reset_battle_state(LWPUCKGAME* puck_game) {
     puck_game->player.current_hp = 10;
     puck_game->target.total_hp = 10;
     puck_game->target.current_hp = 10;
+    memset(puck_game->remote_control, 0, sizeof(puck_game->remote_control));
 }
 
 void puck_game_reset(LWPUCKGAME* puck_game) {

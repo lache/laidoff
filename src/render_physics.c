@@ -841,35 +841,6 @@ static void render_floor(const LWCONTEXT *pLwc, const mat4x4 proj, const LWPUCKG
     glDrawArrays(GL_TRIANGLES, 0, pLwc->vertex_buffer[lvt].vertex_count);
 }
 
-static void render_lwbutton(const LWCONTEXT* pLwc, const LWBUTTONLIST* button_list, int pull_puck) {
-    for (int i = 0; i < button_list->button_count; i++) {
-        float or = 1.0f;
-        float og = 1.0f;
-        float ob = 1.0f;
-        // Pull button hardcoding
-        if (i == 0 && pull_puck) {
-            or = 0.2f;
-            ob = 0.2f;
-        }
-        const LWBUTTON* b = &button_list->button[i];
-        if (b->ui_alpha) {
-            render_solid_vb_ui_alpha(pLwc,
-                                     b->x,
-                                     b->y,
-                                     b->w,
-                                     b->h,
-                                     pLwc->tex_atlas[b->lae],
-                                     pLwc->tex_atlas[b->lae_alpha],
-                                     LVT_LEFT_TOP_ANCHORED_SQUARE,
-                                     b->ui_alpha,
-                                     or ,
-                                     og,
-                                     ob,
-                                     1.0f);
-        }
-    }
-}
-
 void render_caution_popup(const LWCONTEXT* pLwc, const char* str) {
     render_solid_vb_ui_alpha(pLwc,
                              0,
@@ -985,7 +956,10 @@ static void render_main_menu_ui_layer(const LWCONTEXT* pLwc, const LWPUCKGAME* p
                         +0.40f,
                         0,
                         0,
-                        puck_game->main_menu_ui_alpha * button_alpha);
+                        puck_game->main_menu_ui_alpha * button_alpha,
+                        1.0f,
+                        1.0f,
+                        1.0f);
     lwbutton_lae_append(&(((LWCONTEXT*)pLwc)->button_list),
                         "tutorial_button",
                         +0.75f - 0.70f,
@@ -994,7 +968,10 @@ static void render_main_menu_ui_layer(const LWCONTEXT* pLwc, const LWPUCKGAME* p
                         +0.40f,
                         0,
                         0,
-                        puck_game->main_menu_ui_alpha * button_alpha);
+                        puck_game->main_menu_ui_alpha * button_alpha,
+                        1.0f,
+                        1.0f,
+                        1.0f);
     lwbutton_lae_append(&(((LWCONTEXT*)pLwc)->button_list),
                         "online_button",
                         -0.75f,
@@ -1003,7 +980,10 @@ static void render_main_menu_ui_layer(const LWCONTEXT* pLwc, const LWPUCKGAME* p
                         +0.50f,
                         0,
                         0,
-                        puck_game->main_menu_ui_alpha * button_alpha);
+                        puck_game->main_menu_ui_alpha * button_alpha,
+                        1.0f,
+                        1.0f,
+                        1.0f);
     lwbutton_lae_append(&(((LWCONTEXT*)pLwc)->button_list),
                         "leaderboard_button",
                         -0.75f,
@@ -1012,7 +992,10 @@ static void render_main_menu_ui_layer(const LWCONTEXT* pLwc, const LWPUCKGAME* p
                         +0.40f,
                         0,
                         0,
-                        puck_game->main_menu_ui_alpha * button_alpha);
+                        puck_game->main_menu_ui_alpha * button_alpha,
+                        1.0f,
+                        1.0f,
+                        1.0f);
 }
 
 static void render_battle_ui_layer(const LWCONTEXT* pLwc, const LWPUCKGAME* puck_game,
@@ -1078,6 +1061,7 @@ static void render_battle_ui_layer(const LWCONTEXT* pLwc, const LWPUCKGAME* puck
     const float button_y_interval = 0.25f;
     const float button_y_0 = -0.50f;
     if (pLwc->control_flags & LCF_PUCK_GAME_PULL) {
+        int pull_puck = puck_game->remote_control[0].pull_puck;
         lwbutton_lae_append(&(((LWCONTEXT*)pLwc)->button_list),
                             "pull_button",
                             +1.000f + button_size * 1.75f / 2 - button_size / 2,
@@ -1086,7 +1070,10 @@ static void render_battle_ui_layer(const LWCONTEXT* pLwc, const LWPUCKGAME* puck
                             button_size,
                             LAE_BUTTON_PULL,
                             LAE_BUTTON_PULL_ALPHA,
-                            ui_alpha);
+                            ui_alpha,
+                            pull_puck ? 0.2f : 1.0f,
+                            1.0f,
+                            pull_puck ? 0.2f : 1.0f);
     }
     if (pLwc->control_flags & LCF_PUCK_GAME_DASH) {
         lwbutton_lae_append(&(((LWCONTEXT*)pLwc)->button_list),
@@ -1097,7 +1084,10 @@ static void render_battle_ui_layer(const LWCONTEXT* pLwc, const LWPUCKGAME* puck
                             button_size * 1.75f,
                             LAE_BUTTON_DASH,
                             LAE_BUTTON_DASH_ALPHA,
-                            ui_alpha);
+                            ui_alpha,
+                            1.0f,
+                            1.0f,
+                            1.0f);
     }
     if (pLwc->control_flags & LCF_PUCK_GAME_JUMP) {
         lwbutton_lae_append(&(((LWCONTEXT*)pLwc)->button_list),
@@ -1108,7 +1098,10 @@ static void render_battle_ui_layer(const LWCONTEXT* pLwc, const LWPUCKGAME* puck
                             button_size,
                             LAE_BUTTON_JUMP,
                             LAE_BUTTON_JUMP_ALPHA,
-                            ui_alpha);
+                            ui_alpha,
+                            1.0f,
+                            1.0f,
+                            1.0f);
     }
     if (remote == 0) {
         lwbutton_lae_append(&(((LWCONTEXT*)pLwc)->button_list),
@@ -1119,7 +1112,10 @@ static void render_battle_ui_layer(const LWCONTEXT* pLwc, const LWPUCKGAME* puck
                             button_size * 1.5f,
                             LAE_UI_BACK_BUTTON,
                             LAE_UI_BACK_BUTTON,
-                            ui_alpha);
+                            ui_alpha,
+                            1.0f,
+                            1.0f,
+                            1.0f);
     }
 }
 
@@ -1375,10 +1371,13 @@ void lwc_render_physics(const LWCONTEXT* pLwc, const mat4x4 view, const mat4x4 p
                             button_size * 1.5f,
                             LAE_UI_BACK_BUTTON,
                             LAE_UI_BACK_BUTTON,
+                            1.0f,
+                            1.0f,
+                            1.0f,
                             1.0f);
     }
     // render buttons (shared)
-    render_lwbutton(pLwc, &pLwc->button_list, puck_game->remote_control[0].pull_puck);
+    render_lwbutton(pLwc, &pLwc->button_list);
     // popup UI layer
     render_popup_ui_layer(pLwc);
 }

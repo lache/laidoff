@@ -109,6 +109,8 @@ function on_ui_event(id)
 		if c.puck_game.game_state == lo.LPGS_SEARCHING then
 			lo.tcp_send_cancelqueue(c.tcp, c.tcp.user_id)
 			c.puck_game.game_state = lo.LPGS_MAIN_MENU
+		elseif c.game_scene == lo.LGS_LEADERBOARD then
+			lo.change_to_physics(c)
 		else
 			lo.lw_go_back(c, nil)
 		end
@@ -119,6 +121,8 @@ function on_ui_event(id)
 		lo.puck_game_set_searching_str(c.puck_game, 'SEARCHING OPPONENT...')
 		lo.puck_game_clear_match_data(c, c.puck_game)
 		lo.tcp_send_queue2(c.tcp, c.tcp.user_id)
+	elseif id == 'leaderboard_button' then
+		lo.show_leaderboard(c)
 	else 
 		lo.construct_set_preview_enable(c.construct, 0)
 		return 0

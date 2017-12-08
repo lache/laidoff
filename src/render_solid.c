@@ -20,26 +20,26 @@ void render_solid_vb_ui_flip_y_uv(const LWCONTEXT* pLwc,
 	float x, float y, float w, float h,
 	GLuint tex_index,
 	enum _LW_VBO_TYPE lvt,
-	float alpha_multiplier, float or, float og, float ob, float oratio, int flip_y_uv) {
+	float alpha_multiplier, float over_r, float over_g, float over_b, float oratio, int flip_y_uv) {
 
 	int shader_index = LWST_DEFAULT;
-	render_solid_vb_ui_flip_y_uv_shader(pLwc, x, y, w, h, tex_index, lvt, alpha_multiplier, or , og, ob, oratio, flip_y_uv, shader_index);
+	render_solid_vb_ui_flip_y_uv_shader(pLwc, x, y, w, h, tex_index, lvt, alpha_multiplier, over_r, over_g, over_b, oratio, flip_y_uv, shader_index);
 }
 
 void render_solid_vb_ui_flip_y_uv_shader(const LWCONTEXT* pLwc,
 	float x, float y, float w, float h,
 	GLuint tex_index,
 	enum _LW_VBO_TYPE lvt,
-	float alpha_multiplier, float or, float og, float ob, float oratio, int flip_y_uv, int shader_index) {
+	float alpha_multiplier, float over_r, float over_g, float over_b, float oratio, int flip_y_uv, int shader_index) {
 
-	render_solid_vb_ui_flip_y_uv_shader_rot(pLwc, x, y, w, h, tex_index, lvt, alpha_multiplier, or, og, ob, oratio, flip_y_uv, shader_index, 0);
+	render_solid_vb_ui_flip_y_uv_shader_rot(pLwc, x, y, w, h, tex_index, lvt, alpha_multiplier, over_r, over_g, over_b, oratio, flip_y_uv, shader_index, 0);
 }
 
 void render_solid_vb_ui_flip_y_uv_shader_rot(const LWCONTEXT* pLwc,
 	float x, float y, float w, float h,
 	GLuint tex_index,
 	enum _LW_VBO_TYPE lvt,
-	float alpha_multiplier, float or, float og, float ob, float oratio, int flip_y_uv, int shader_index, float rot) {
+	float alpha_multiplier, float over_r, float over_g, float over_b, float oratio, int flip_y_uv, int shader_index, float rot) {
 	
 	glUseProgram(pLwc->shader[shader_index].program);
 	glUniform2fv(pLwc->shader[shader_index].vuvoffset_location, 1, default_uv_offset);
@@ -47,7 +47,7 @@ void render_solid_vb_ui_flip_y_uv_shader_rot(const LWCONTEXT* pLwc,
 	glUniform1f(pLwc->shader[shader_index].alpha_multiplier_location, alpha_multiplier);
 	glUniform1i(pLwc->shader[shader_index].diffuse_location, 0); // 0 means GL_TEXTURE0
 	glUniform1i(pLwc->shader[shader_index].alpha_only_location, 1); // 1 means GL_TEXTURE1
-	glUniform3f(pLwc->shader[shader_index].overlay_color_location, or , og, ob);
+	glUniform3f(pLwc->shader[shader_index].overlay_color_location, over_r, over_g, over_b);
 	glUniform1f(pLwc->shader[shader_index].overlay_color_ratio_location, oratio);
 	glUniformMatrix4fv(pLwc->shader[shader_index].mvp_location, 1, GL_FALSE, (const GLfloat*)pLwc->proj);
 
@@ -86,7 +86,7 @@ void render_solid_vb_ui_alpha(const LWCONTEXT* pLwc,
 	float x, float y, float w, float h,
 	GLuint tex_index, GLuint tex_alpha_index,
 	enum _LW_VBO_TYPE lvt,
-	float alpha_multiplier, float or, float og, float ob, float oratio) {
+	float alpha_multiplier, float over_r, float over_g, float over_b, float oratio) {
 	int shader_index = LWST_ETC1;
 
     const LWSHADER* shader = &pLwc->shader[shader_index];
@@ -98,7 +98,7 @@ void render_solid_vb_ui_alpha(const LWCONTEXT* pLwc,
     glUniform1f(shader->alpha_multiplier_location, alpha_multiplier);
 	glUniform1i(shader->diffuse_location, 0); // 0 means GL_TEXTURE0
 	glUniform1i(shader->alpha_only_location, 1); // 1 means GL_TEXTURE1
-	glUniform3f(shader->overlay_color_location, or , og, ob);
+	glUniform3f(shader->overlay_color_location, over_r, over_g, over_b);
 	glUniform1f(shader->overlay_color_ratio_location, oratio);
 	glUniformMatrix4fv(shader->mvp_location, 1, GL_FALSE, (const GLfloat*)pLwc->proj);
 
@@ -139,8 +139,8 @@ void render_solid_vb_ui(const LWCONTEXT* pLwc,
 	float x, float y, float w, float h,
 	GLuint tex_index,
 	enum _LW_VBO_TYPE lvt,
-	float alpha_multiplier, float or, float og, float ob, float oratio) {
+	float alpha_multiplier, float over_r, float over_g, float over_b, float oratio) {
 
-	render_solid_vb_ui_flip_y_uv(pLwc, x, y, w, h, tex_index, lvt, alpha_multiplier, or , og, ob, oratio, 0);
+	render_solid_vb_ui_flip_y_uv(pLwc, x, y, w, h, tex_index, lvt, alpha_multiplier, over_r, over_g, over_b, oratio, 0);
 
 }

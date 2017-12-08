@@ -4,7 +4,9 @@
 #include "render_text_block.h"
 #include <string.h>
 
-static void render_item(const LWCONTEXT* pLwc, int index, const char* rank, const char* nickname, const char* score, int header) {
+static void render_item(const LWCONTEXT* pLwc, int index, const char* rank, const char* nickname, const char* score, int header, float back_button_size) {
+    const float x0 = -pLwc->aspect_ratio + back_button_size + 0.1f;
+    const float y0 = +0.75f;
     LWTEXTBLOCK text_block;
     text_block.align = LTBA_LEFT_BOTTOM;
     text_block.text_block_width = DEFAULT_TEXT_BLOCK_WIDTH;
@@ -15,33 +17,33 @@ static void render_item(const LWCONTEXT* pLwc, int index, const char* rank, cons
     SET_COLOR_RGBA_FLOAT(text_block.color_normal_outline, 0, 0, 0, 1);
     SET_COLOR_RGBA_FLOAT(text_block.color_emp_glyph, 1, 1, 0, 1);
     SET_COLOR_RGBA_FLOAT(text_block.color_emp_outline, 0, 0, 0, 1);
-    text_block.text_block_y = 0.85f - 0.1f * index;
+    text_block.text_block_y = y0 - 0.1f * index;
     
     text_block.text = rank;
     text_block.text_bytelen = (int)strlen(text_block.text);
     text_block.begin_index = 0;
     text_block.end_index = text_block.text_bytelen;
-    text_block.text_block_x = 0;
+    text_block.text_block_x = x0;
     render_text_block(pLwc, &text_block);
     
     text_block.text = nickname;
     text_block.text_bytelen = (int)strlen(text_block.text);
     text_block.begin_index = 0;
     text_block.end_index = text_block.text_bytelen;
-    text_block.text_block_x = 0.3f;
+    text_block.text_block_x = x0 + 0.3f;
     render_text_block(pLwc, &text_block);
 
     text_block.text = score;
     text_block.text_bytelen = (int)strlen(text_block.text);
     text_block.begin_index = 0;
     text_block.end_index = text_block.text_bytelen;
-    text_block.text_block_x = 1.2f;
+    text_block.text_block_x = x0 + 1.2f;
     render_text_block(pLwc, &text_block);
 }
 
 static void render_title(const LWCONTEXT* pLwc) {
     LWTEXTBLOCK text_block;
-    text_block.align = LTBA_LEFT_BOTTOM;
+    text_block.align = LTBA_LEFT_TOP;
     text_block.text_block_width = DEFAULT_TEXT_BLOCK_WIDTH;
     text_block.text_block_line_height = DEFAULT_TEXT_BLOCK_LINE_HEIGHT_F;
     text_block.size = DEFAULT_TEXT_BLOCK_SIZE_A;
@@ -55,8 +57,8 @@ static void render_title(const LWCONTEXT* pLwc) {
     text_block.text_bytelen = (int)strlen(text_block.text);
     text_block.begin_index = 0;
     text_block.end_index = text_block.text_bytelen;
-    text_block.text_block_x = -1.00f;
-    text_block.text_block_y = 0.80f;
+    text_block.text_block_x = -pLwc->aspect_ratio;
+    text_block.text_block_y = 1.0f;
     render_text_block(pLwc, &text_block);
 }
 
@@ -67,8 +69,9 @@ void lwc_render_leaderboard(const LWCONTEXT* pLwc) {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     // Render title
     render_title(pLwc);
+    const float back_button_size = 0.35f * 1.5f;
     // Render leaderboard table header
-    render_item(pLwc, 0, "#", "Nickname", "Score", 1);
+    render_item(pLwc, 0, "#", "Nickname", "Score", 1, back_button_size);
     // Render leaderboard table
     const LWPLEADERBOARD* p = &pLwc->last_leaderboard;
     int rank = p->First_item_rank;
@@ -78,7 +81,7 @@ void lwc_render_leaderboard(const LWCONTEXT* pLwc) {
         sprintf(rank_str, "%d", rank + 1);
         char score_str[64];
         sprintf(score_str, "%d", p->Score[i]);
-        render_item(pLwc, i + 1, rank_str, p->Nickname[i], score_str, 0);
+        render_item(pLwc, i + 1, rank_str, p->Nickname[i], score_str, 0, back_button_size);
         if (i < p->Count - 1) {
             if (p->Score[i] == p->Score[i+1]) {
                 tieCount++;
@@ -92,4 +95,18 @@ void lwc_render_leaderboard(const LWCONTEXT* pLwc) {
             }
         }
     }
+    lwbutton_lae_append(&(((LWCONTEXT*)pLwc)->button_list),
+                        "back_button",
+                        -pLwc->aspect_ratio,
+                        0.8f,
+                        back_button_size,
+                        back_button_size,
+                        LAE_UI_BACK_BUTTON,
+                        LAE_UI_BACK_BUTTON,
+                        1.0f,
+                        1.0f,
+                        1.0f,
+                        1.0f);
+    // render buttons (shared)
+    render_lwbutton(pLwc, &pLwc->button_list);
 }

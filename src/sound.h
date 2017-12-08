@@ -17,7 +17,7 @@ typedef enum _LW_SOUND {
 	LWS_COUNT,
 } LW_SOUND;
 
-const static char* SOUND_FILE[] = {
+static const char* SOUND_FILE[] = {
     ASSETS_BASE_PATH "ogg" PATH_SEPARATOR "sfx_metal_hit.ogg",
     ASSETS_BASE_PATH "ogg" PATH_SEPARATOR "sfx_die.ogg",
     ASSETS_BASE_PATH "ogg" PATH_SEPARATOR "sfx_hit.ogg",

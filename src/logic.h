@@ -26,7 +26,9 @@ void load_field_2_init_runtime_data(LWCONTEXT* pLwc);
 void load_field_3_init_runtime_data(LWCONTEXT* pLwc);
 void load_field_4_init_runtime_data(LWCONTEXT* pLwc);
 void load_field_5_init_runtime_data(LWCONTEXT* pLwc);
+void show_leaderboard(LWCONTEXT* pLwc);
 void change_to_leaderboard(LWCONTEXT* pLwc);
+void change_to_physics(LWCONTEXT* pLwc);
 #ifdef __cplusplus
 };
 #endif
