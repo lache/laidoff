@@ -33,6 +33,13 @@ public class LaidoffNativeActivity extends NativeActivity
     }
 
     private static MediaPlayer mBgmPlayer;
+    private int mSound_MetalHit;
+    private SoundPool mSoundPool;
+    private int mSound_Tapping01;
+    private int mSound_Completed03;
+    private int mSound_GameOver01;
+    private int mSound_GameStart01;
+    private int mSound_Point;
 
     public static native String signalResourceReady(Class<LaidoffNativeActivity> and9NativeActivityClass);
     public static native int pushTextureData(int width, int height, int[] data, int texAtlasIndex);
@@ -83,7 +90,7 @@ public class LaidoffNativeActivity extends NativeActivity
         downloadResFromServer();
 
         //noinspection deprecation
-        SoundPool mSoundPool = new SoundPool(5, AudioManager.STREAM_MUSIC, 0);
+        mSoundPool = new SoundPool(5, AudioManager.STREAM_MUSIC, 0);
         mSoundPool.setOnLoadCompleteListener(new SoundPool.OnLoadCompleteListener() {
             @Override
             public void onLoadComplete(SoundPool soundPool, int sampleId,
@@ -94,11 +101,12 @@ public class LaidoffNativeActivity extends NativeActivity
             }
         });
 
-        int mSound_Tapping01 = mSoundPool.load(getApplicationContext(), R.raw.jump, 1);
-        int mSound_Completed03 = mSoundPool.load(getApplicationContext(), R.raw.completed, 1);
-        int mSound_GameOver01 = mSoundPool.load(getApplicationContext(), R.raw.over, 1);
-        int mSound_GameStart01 = mSoundPool.load(getApplicationContext(), R.raw.start, 1);
-        int mSound_Point = mSoundPool.load(getApplicationContext(), R.raw.point, 1);
+        mSound_Tapping01 = mSoundPool.load(getApplicationContext(), R.raw.jump, 1);
+        mSound_Completed03 = mSoundPool.load(getApplicationContext(), R.raw.completed, 1);
+        mSound_GameOver01 = mSoundPool.load(getApplicationContext(), R.raw.over, 1);
+        mSound_GameStart01 = mSoundPool.load(getApplicationContext(), R.raw.start, 1);
+        mSound_Point = mSoundPool.load(getApplicationContext(), R.raw.point, 1);
+        mSound_MetalHit = mSoundPool.load(getApplicationContext(), R.raw.sfx_metal_hit, 1);
 
         mBgmPlayer = MediaPlayer.create(getApplicationContext(), R.raw.opening); // in 2nd param u have to pass your desire ringtone
         mBgmPlayer.setLooping(true);
@@ -117,6 +125,10 @@ public class LaidoffNativeActivity extends NativeActivity
 
         //Intent intent = new Intent(this, TextInputActivity.class);
         //startActivity(intent);
+    }
+
+    public void playMetalHitSound() {
+        mSoundPool.play(mSound_MetalHit, 1, 1, 0, 0, 1);
     }
 
     private void downloadResFromServer() {
@@ -233,4 +245,7 @@ public class LaidoffNativeActivity extends NativeActivity
         setPushTokenAndSend(FirebaseInstanceId.getInstance().getToken(), pLwc);
     }
 
+    public static void startPlayMetalHitSound(String dummy) {
+        INSTANCE.playMetalHitSound();
+    }
 }

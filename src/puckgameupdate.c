@@ -74,9 +74,26 @@ void update_shake(LWPUCKGAME* puck_game, float delta_time) {
     }
 }
 
-static void puck_game_on_puck_wall_collision(LWPUCKGAME* puck_game, float vdlen) {
+static void puck_game_on_puck_wall_collision(LWPUCKGAME* puck_game, float vdlen, float depth) {
     // play hit sound only if sufficient velocity difference
-    if (vdlen > 0.5f) {
+    LOGIx("puck_game_on_puck_wall_collision vdlen=%f, depth=%f", vdlen, depth);
+    if (vdlen > 0.5f && depth > LWEPSILON) {
+        play_sound(LWS_METAL_HIT);
+    }
+}
+
+static void puck_game_on_puck_tower_collision(LWPUCKGAME* puck_game, float vdlen, float depth) {
+    // play hit sound only if sufficient velocity difference
+    LOGIx("puck_game_on_puck_wall_collision vdlen=%f, depth=%f", vdlen, depth);
+    if (vdlen > 0.5f && depth > LWEPSILON) {
+        play_sound(LWS_METAL_HIT);
+    }
+}
+
+static void puck_game_on_puck_player_collision(LWPUCKGAME* puck_game, float vdlen, float depth) {
+    // play hit sound only if sufficient velocity difference
+    LOGIx("puck_game_on_puck_wall_collision vdlen=%f, depth=%f", vdlen, depth);
+    if (vdlen > 0.5f && depth > LWEPSILON) {
         play_sound(LWS_METAL_HIT);
     }
 }
@@ -89,9 +106,11 @@ void update_puck_game(LWCONTEXT* pLwc, LWPUCKGAME* puck_game, double delta_time)
     puck_game->on_player_damaged = remote ? 0 : puck_game_player_tower_decrease_hp_test;
     puck_game->on_target_damaged = remote ? 0 : puck_game_target_tower_decrease_hp_test;
     puck_game->on_puck_wall_collision = puck_game_on_puck_wall_collision;
+    puck_game->on_puck_tower_collision = puck_game_on_puck_tower_collision;
+    puck_game->on_puck_player_collision = puck_game_on_puck_player_collision;
     puck_game->time += (float)delta_time;
     puck_game->player.puck_contacted = 0;
-    if (puck_game->battle_id == 0) {
+    if (puck_game->battle_id == 0 && puck_game->game_state == LPGS_PRACTICE) {
         dSpaceCollide(puck_game->space, puck_game, puck_game_near_callback);
         //dWorldStep(puck_game->world, 0.005f);
         dWorldQuickStep(puck_game->world, 1.0f / 60);

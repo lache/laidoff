@@ -3,8 +3,20 @@
 #include "lwlog.h"
 #include "lwtimepoint.h"
 #include "numcomp.h"
-//#include "lwcontext.h"
-//#include "input.h"
+
+static void call_collision_callback(LWPUCKGAME* puck_game,
+                                    const dContact* contact,
+                                    void(*on_collision)(LWPUCKGAME*, float, float)) {
+    if (on_collision) {
+        dVector3 zero = { 0,0,0 };
+        const dReal* v1 = dGeomGetBody(contact->geom.g1) ? dBodyGetLinearVel(dGeomGetBody(contact->geom.g1)) : zero;
+        const dReal* v2 = dGeomGetBody(contact->geom.g2) ? dBodyGetLinearVel(dGeomGetBody(contact->geom.g2)) : zero;
+        dVector3 vd;
+        dSubtractVectors3(vd, v1, v2);
+        const float vdlen = (float)dLENGTH(vd);
+        on_collision(puck_game, vdlen, (float)contact->geom.depth);
+    }
+}
 
 static void testgo_move_callback(dBodyID b) {
     LWPUCKGAMEOBJECT* go = (LWPUCKGAMEOBJECT*)dBodyGetData(b);
@@ -255,6 +267,8 @@ static void near_puck_go(LWPUCKGAME* puck_game, int player_no, dContact* contact
             puck_game->target.puck_contacted = 1;
         }
     }
+    // custom collision callback
+    call_collision_callback(puck_game, contact, puck_game->on_puck_player_collision);
 }
 
 static void near_puck_player(LWPUCKGAME* puck_game, dContact* contact) {
@@ -281,7 +295,7 @@ LWPUCKGAMETOWER* get_tower_from_geom(LWPUCKGAME* puck_game, dGeomID maybe_tower_
     return 0;
 }
 
-void near_puck_wall(LWPUCKGAME* puck_game, dGeomID puck_geom, dGeomID wall_geom) {
+void near_puck_wall(LWPUCKGAME* puck_game, dGeomID puck_geom, dGeomID wall_geom, const dContact* contact) {
     LW_PUCK_GAME_BOUNDARY boundary = (LW_PUCK_GAME_BOUNDARY)dGeomGetData(wall_geom);
     if (boundary < LPGB_E || boundary > LPGB_N) {
         LOGE("boundary geom data corrupted");
@@ -289,16 +303,8 @@ void near_puck_wall(LWPUCKGAME* puck_game, dGeomID puck_geom, dGeomID wall_geom)
     }
     puck_game->boundary_impact[boundary] = puck_game->boundary_impact_start;
     puck_game->boundary_impact_player_no[boundary] = puck_game->puck_owner_player_no;
-    if (puck_game->on_puck_wall_collision) {
-        dVector3 zero = { 0,0,0 };
-        const dReal* v1 = dBodyGetLinearVel(dGeomGetBody(puck_geom));
-        const dReal* v2 = dGeomGetBody(wall_geom) ? dBodyGetLinearVel(dGeomGetBody(wall_geom)) : zero;
-        dVector3 vd;
-        dSubtractVectors3(vd, v1, v2);
-        const float vdlen = (float)dLENGTH(vd);
-        LOGI("puck - wall vel diff: %f", vdlen);
-        puck_game->on_puck_wall_collision(puck_game, vdlen);
-    }
+    // custom collision callback
+    call_collision_callback(puck_game, contact, puck_game->on_puck_wall_collision);
 }
 
 void near_puck_tower(LWPUCKGAME* puck_game, dGeomID puck_geom, LWPUCKGAMETOWER* tower, dContact* contact, double now) {
@@ -307,6 +313,8 @@ void near_puck_tower(LWPUCKGAME* puck_game, dGeomID puck_geom, LWPUCKGAMETOWER* 
     contact->surface.mode = dContactSoftCFM | dContactBounce;
     contact->surface.mu = 1.9f;
     contact->surface.bounce_vel = 0;
+    // custom collision callback
+    call_collision_callback(puck_game, contact, puck_game->on_puck_tower_collision);
     // Check puck ownership
     if (puck_game->puck_owner_player_no == tower->owner_player_no) {
         return;
@@ -435,13 +443,13 @@ void puck_game_near_callback(void* data, dGeomID geom1, dGeomID geom2) {
                 contact[i].surface.mode = dContactSoftCFM | dContactBounce;
                 contact[i].surface.mu = 0;//1.9f;
 
-                near_puck_wall(puck_game, geom1, geom2);
+                near_puck_wall(puck_game, geom1, geom2, &contact[i]);
             } else if (geom2 == puck_game->go[LPGO_PUCK].geom && is_wall_geom(puck_game, geom1)) {
                 // Puck - wall contacts
                 contact[i].surface.mode = dContactSoftCFM | dContactBounce;
                 contact[i].surface.mu = 0;//1.9f;
 
-                near_puck_wall(puck_game, geom2, geom1);
+                near_puck_wall(puck_game, geom2, geom1, &contact[i]);
             } else {
                 // Other contacts
                 contact[i].surface.mode = dContactSoftCFM | dContactBounce;
