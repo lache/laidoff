@@ -63,22 +63,6 @@ const float default_uv_offset[2] = { 0, 0 };
 const float default_uv_scale[2] = { 1, 1 };
 const float default_flip_y_uv_scale[2] = { 1, -1 };
 
-// Vertex attributes: Coordinates (3xf) + Normal (3xf) + UV (2xf) + S9 (2xf)
-// See Also: LWVERTEX
-const static GLsizei stride_in_bytes = (GLsizei)(sizeof(float) * (3 + 3 + 2 + 2));
-LwStaticAssert(sizeof(LWVERTEX) == (GLsizei)(sizeof(float) * (3 + 3 + 2 + 2)), "LWVERTEX size error");
-
-// Skin Vertex attributes: Coordinates (3xf) + Normal (3xf) + UV (2xf) + Bone Weight (4xf) + Bone Matrix (4xi)
-// See Also: LWSKINVERTEX
-const static GLsizei skin_stride_in_bytes = (GLsizei)(sizeof(float) * (3 + 3 + 2 + 4) + sizeof(int) * 4);
-LwStaticAssert(sizeof(LWSKINVERTEX) == (GLsizei)(sizeof(float) * (3 + 3 + 2 + 4) + sizeof(int) * 4), "LWSKINVERTEX size error");
-
-// Fan Vertex attributes: Coordinates (3xf)
-// See Also: LWFANVERTEX
-const static GLsizei fan_stride_in_bytes = (GLsizei)(sizeof(float) * 3);
-LwStaticAssert(sizeof(LWFANVERTEX) == (GLsizei)(sizeof(float) * 3), "LWFANVERTEX size error");
-
-
 #if LW_PLATFORM_ANDROID || LW_PLATFORM_IOS || LW_PLATFORM_IOS_SIMULATOR
 #include "lwtimepoint.h"
 double glfwGetTime() {
@@ -554,7 +538,7 @@ void init_gl_shaders(LWCONTEXT* pLwc) {
     release_string(default_normal_frag_glsl);
 }
 
-static void load_vbo(LWCONTEXT* pLwc, const char *filename, LWVBO *pVbo) {
+static void load_vbo(LWCONTEXT* pLwc, const char* filename, LWVBO* pVbo) {
     GLuint vbo = 0;
     glGenBuffers(1, &vbo);
     glBindBuffer(GL_ARRAY_BUFFER, vbo);
@@ -602,6 +586,16 @@ static void load_fan_vbo(LWCONTEXT* pLwc) {
     glBufferData(GL_ARRAY_BUFFER, sizeof(LWFANVERTEX) * FAN_VERTEX_COUNT_PER_ARRAY,
                  fan_vertices, GL_STATIC_DRAW);
     pLwc->fan_vertex_buffer[LFVT_DEFAULT].vertex_count = FAN_VERTEX_COUNT_PER_ARRAY;
+}
+
+static void init_fvbo(LWCONTEXT* pLwc) {
+    load_fvbo(pLwc, ASSETS_BASE_PATH "fvbo" PATH_SEPARATOR "whole-tower_cell.fvbo",
+             &pLwc->fvertex_buffer[LFT_TOWER]);
+}
+
+static void init_fanim(LWCONTEXT* pLwc) {
+    load_fanim(pLwc, ASSETS_BASE_PATH "fanim" PATH_SEPARATOR "whole-tower_cell.fanim",
+              &pLwc->fanim[LFAT_TOWER_COLLAPSE]);
 }
 
 static void init_vbo(LWCONTEXT* pLwc) {
@@ -893,6 +887,20 @@ static void init_vao(LWCONTEXT* pLwc, int shader_index) {
 #endif
 }
 
+static void init_fvao(LWCONTEXT* pLwc, int shader_index) {
+    // Vertex Array Objects for FVBO
+#if LW_SUPPORT_VAO
+    glGenVertexArrays(LFT_COUNT, pLwc->fvao);
+    for (int i = 0; i < LFT_COUNT; i++) {
+        glBindVertexArray(pLwc->fvao[i]);
+        glBindBuffer(GL_ARRAY_BUFFER, pLwc->fvertex_buffer[i].vertex_buffer);
+        set_vertex_attrib_pointer(pLwc, shader_index);
+    }
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+    glBindVertexArray(0);
+#endif
+}
+
 static void init_skin_vao(LWCONTEXT* pLwc, int shader_index) {
     // Skin Vertex Array Objects
 #if LW_SUPPORT_VAO
@@ -952,10 +960,13 @@ static void init_gl_context(LWCONTEXT* pLwc) {
     init_gl_shaders(pLwc);
 
     init_vbo(pLwc);
+    init_fvbo(pLwc);
+    init_fanim(pLwc);
     // Particle system's VAOs are configured here. Should be called before setting VAOs.
     init_ps(pLwc);
 
     init_vao(pLwc, 0/* ??? */);
+    init_fvao(pLwc, 0/* ??? */);
 
     init_skin_vao(pLwc, LWST_SKIN);
 
@@ -1489,6 +1500,14 @@ void lwc_render(const LWCONTEXT* pLwc) {
     lwcontext_set_rendering((LWCONTEXT*)pLwc, 0);
 }
 
+static void bind_all_fvertex_attrib_shader(const LWCONTEXT* pLwc, int shader_index, int fvbo_index) {
+#if LW_PLATFORM_WIN32 || LW_PLATFORM_OSX
+    glBindVertexArray(pLwc->fvao[fvbo_index]);
+#else
+    set_vertex_attrib_pointer(pLwc, shader_index);
+#endif
+}
+
 static void bind_all_vertex_attrib_shader(const LWCONTEXT* pLwc, int shader_index, int vbo_index) {
 #if LW_PLATFORM_WIN32 || LW_PLATFORM_OSX
     glBindVertexArray(pLwc->vao[vbo_index]);
@@ -1519,6 +1538,10 @@ static void bind_all_ps_vertex_attrib_shader(const LWCONTEXT* pLwc, int shader_i
 #else
     set_ps_vertex_attrib_pointer(pLwc, shader_index);
 #endif
+}
+
+void bind_all_fvertex_attrib(const LWCONTEXT* pLwc, int fvbo_index) {
+    bind_all_fvertex_attrib_shader(pLwc, LWST_DEFAULT, fvbo_index);
 }
 
 void bind_all_vertex_attrib(const LWCONTEXT* pLwc, int vbo_index) {
@@ -1900,6 +1923,15 @@ void lw_deinit(LWCONTEXT* pLwc) {
         glDeleteBuffers(1, &pLwc->vertex_buffer[i].vertex_buffer);
     }
 
+    for (int i = 0; i < LFT_COUNT; i++) {
+        glDeleteBuffers(1, &pLwc->fvertex_buffer[i].vertex_buffer);
+    }
+
+    for (int i = 0; i < LFAT_COUNT; i++) {
+        release_binary(pLwc->fanim[i].data);
+        memset(&pLwc->fanim[i], 0, sizeof(pLwc->fanim[i]));
+    }
+
     for (int i = 0; i < LSVT_COUNT; i++) {
         glDeleteBuffers(1, &pLwc->skin_vertex_buffer[i].vertex_buffer);
     }
@@ -1915,6 +1947,7 @@ void lw_deinit(LWCONTEXT* pLwc) {
 
 #if LW_SUPPORT_VAO
     glDeleteVertexArrays(VERTEX_BUFFER_COUNT, pLwc->vao);
+    glDeleteVertexArrays(LFT_COUNT, pLwc->fvao);
     glDeleteVertexArrays(SKIN_VERTEX_BUFFER_COUNT, pLwc->skin_vao);
     glDeleteVertexArrays(FAN_VERTEX_BUFFER_COUNT, pLwc->fan_vao);
     glDeleteVertexArrays(PS_VERTEX_BUFFER_COUNT, pLwc->ps_vao);

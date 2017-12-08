@@ -13,6 +13,7 @@
 #include "lwmath.h"
 #include "puckgameupdate.h"
 #include "lwtcp.h"
+#include "lwfvbo.h"
 
 typedef struct _LWSPHERERENDERUNIFORM {
     float sphere_col_ratio[3];
@@ -1351,6 +1352,9 @@ void lwc_render_physics(const LWCONTEXT* pLwc, const mat4x4 view, const mat4x4 p
         };
         render_tower(pLwc, view, proj, puck_game, tower_pos, &puck_game->tower[i], remote);
     }
+
+    render_fvbo(pLwc, puck_game, view, proj, LFT_TOWER, LFAT_TOWER_COLLAPSE, 0, 0, 0, 0.5f);
+
     if (puck_game->game_state != LPGS_SEARCHING) {
         // battle UI layer
         if (puck_game->battle_ui_alpha) {
