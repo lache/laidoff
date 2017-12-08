@@ -1353,7 +1353,11 @@ void lwc_render_physics(const LWCONTEXT* pLwc, const mat4x4 view, const mat4x4 p
         render_tower(pLwc, view, proj, puck_game, tower_pos, &puck_game->tower[i], remote);
     }
 
-    render_fvbo(pLwc, puck_game, view, proj, LFT_TOWER, LFAT_TOWER_COLLAPSE, 0, 0, 0, 0.5f);
+    // test render fvbo
+    if (0) {
+        const float tower_scale = puck_game->tower_radius / puck_game->tower_mesh_radius;
+        render_fvbo(pLwc, puck_game, view, proj, LFT_TOWER, LFAT_TOWER_COLLAPSE, -puck_game->tower_pos, +puck_game->tower_pos, 0, tower_scale);
+    }
 
     if (puck_game->game_state != LPGS_SEARCHING) {
         // battle UI layer

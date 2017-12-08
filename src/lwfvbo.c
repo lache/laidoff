@@ -37,7 +37,7 @@ void load_fvbo(LWCONTEXT* pLwc, const char* filename, LWFVBO* fvbo) {
 void render_fvbo(const LWCONTEXT* pLwc, const LWPUCKGAME* puck_game, const mat4x4 view, const mat4x4 proj,
                  LW_FVBO_TYPE lft, LW_F_ANIM_TYPE lfat, float x, float y, float z, float scale) {
 
-    int shader_index = LWST_DEFAULT;
+    int shader_index = LWST_DEFAULT_NORMAL;
     const LWSHADER* shader = &pLwc->shader[shader_index];
     glUseProgram(shader->program);
     glUniform2fv(shader->vuvoffset_location, 1, default_uv_offset);
@@ -66,8 +66,10 @@ void render_fvbo(const LWCONTEXT* pLwc, const LWPUCKGAME* puck_game, const mat4x
     
     mat4x4 proj_view;
     mat4x4_mul(proj_view, proj, view);
-    int frame = (int)(pLwc->app_time * 50) % 100;
     const LWFANIM* fanim = &pLwc->fanim[lfat];
+    float frames_per_sec = 50.0f;
+    int frame = (int)(pLwc->app_time * frames_per_sec) % fanim->total_frame_count;
+    //frame = 0;
     
     int vertex_first = 0;
     for (int i = 0; i < fvbo->total_cell_count; i++) {
