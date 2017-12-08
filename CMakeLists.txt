@@ -128,7 +128,6 @@ if (WIN32)
             win32/gl3w.h
             win32/glcorearb.h
             win32/main_vulkan.cpp
-            win32/stb_vorbis.c
             win32/lwxaudio2.cpp
             win32/lwxaudio2.h
             win32/net.c

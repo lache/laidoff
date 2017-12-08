@@ -1,5 +1,5 @@
 #include "lwxaudio2.h"
-#if 0
+#if 1
 #include <windows.h>
 #include <xaudio2.h>
 
