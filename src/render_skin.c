@@ -176,7 +176,7 @@ void render_paramed_skin(const LWCONTEXT* pLwc,
 		}
 
 		mat4x4 bone_mat_anim_rot;
-		mat4x4_from_quat(bone_mat_anim_rot, bone_q[i]);
+		mat4x4_from_quat_skin(bone_mat_anim_rot, bone_q[i]);
 
 		mat4x4 bone_mat_anim_scale;
 		mat4x4_scale_aniso(bone_mat_anim_scale, mat_identity, bone_scale[i][0], bone_scale[i][1], bone_scale[i][2]);

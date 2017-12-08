@@ -1310,20 +1310,20 @@ void linear_interpolate_state(LWPSTATE* p, LWPSTATE* state_buffer, int state_buf
         double ratio = dist / update_tick_diff;
 
         quat player_quat1, puck_quat1, target_quat1;
-        quat_from_mat4x4(player_quat1, state_buffer[sample1_idx].player_rot);
-        quat_from_mat4x4(puck_quat1, state_buffer[sample1_idx].puck_rot);
-        quat_from_mat4x4(target_quat1, state_buffer[sample1_idx].target_rot);
+        quat_from_mat4x4_skin(player_quat1, state_buffer[sample1_idx].player_rot);
+        quat_from_mat4x4_skin(puck_quat1, state_buffer[sample1_idx].puck_rot);
+        quat_from_mat4x4_skin(target_quat1, state_buffer[sample1_idx].target_rot);
         quat player_quat2, puck_quat2, target_quat2;
-        quat_from_mat4x4(player_quat2, state_buffer[sample2_idx].player_rot);
-        quat_from_mat4x4(puck_quat2, state_buffer[sample2_idx].puck_rot);
-        quat_from_mat4x4(target_quat2, state_buffer[sample2_idx].target_rot);
+        quat_from_mat4x4_skin(player_quat2, state_buffer[sample2_idx].player_rot);
+        quat_from_mat4x4_skin(puck_quat2, state_buffer[sample2_idx].puck_rot);
+        quat_from_mat4x4_skin(target_quat2, state_buffer[sample2_idx].target_rot);
         quat player_quatm, puck_quatm, target_quatm;
         slerp(player_quatm, player_quat1, player_quat2, (float)ratio);
         slerp(puck_quatm, puck_quat1, puck_quat2, (float)ratio);
         slerp(target_quatm, target_quat1, target_quat2, (float)ratio);
-        mat4x4_from_quat(p->player_rot, player_quatm);
-        mat4x4_from_quat(p->puck_rot, puck_quatm);
-        mat4x4_from_quat(p->target_rot, target_quatm);
+        mat4x4_from_quat_skin(p->player_rot, player_quatm);
+        mat4x4_from_quat_skin(p->puck_rot, puck_quatm);
+        mat4x4_from_quat_skin(p->target_rot, target_quatm);
         vec3_lerp(p->player, state_buffer[sample1_idx].player, state_buffer[sample2_idx].player, (float)ratio);
         vec3_lerp(p->puck, state_buffer[sample1_idx].puck, state_buffer[sample2_idx].puck, (float)ratio);
         vec3_lerp(p->target, state_buffer[sample1_idx].target, state_buffer[sample2_idx].target, (float)ratio);
@@ -1807,7 +1807,7 @@ LWCONTEXT* lw_init_initial_size(int width, int height) {
 
     init_net(pLwc);
 
-    pLwc->mq = 0;//init_mq(logic_server_addr(pLwc->server_index), pLwc->def_sys_msg);
+    pLwc->mq = init_mq(logic_server_addr(pLwc->server_index), pLwc->def_sys_msg);
 
     init_armature(pLwc);
 

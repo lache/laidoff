@@ -366,9 +366,6 @@ void numcomp_batch_test_quaternion() {
     numcomp_test_quaternion(- 1.234f, - 3.100f,  0.00f, &preset);
     numcomp_test_quaternion(- 1.234f, - 3.100f,  3.00f, &preset);
     numcomp_test_quaternion(- 1.234f, - 3.100f, 30.00f, &preset);
-
-    //mat4x4_from_quat()
-    //quat_from_mat4x4()
 }
 
 void numcomp_test_mat4x4(float ex, float ey, float ez, const LWNUMCOMPQUATERNIONPRESET* preset) {
