@@ -274,6 +274,9 @@
 		56F189BC1EC751950019312F /* zuuid.c in Sources */ = {isa = PBXBuildFile; fileRef = 56F1897F1EC751950019312F /* zuuid.c */; };
 		6C0CB2461FC45AB6006BEDCD /* lwtcpclient.c in Sources */ = {isa = PBXBuildFile; fileRef = 6C0CB2441FC45AB6006BEDCD /* lwtcpclient.c */; };
 		6C0CB6201FC30FC800DA4E51 /* render_leaderboard.c in Sources */ = {isa = PBXBuildFile; fileRef = 6C0CB61F1FC30FC800DA4E51 /* render_leaderboard.c */; };
+		6C2751CC1FDAC8D000D1266A /* stb_vorbis.c in Sources */ = {isa = PBXBuildFile; fileRef = 6C2751CB1FDAC8CF00D1266A /* stb_vorbis.c */; };
+		6C2751D11FDAC8E100D1266A /* lwfanim.c in Sources */ = {isa = PBXBuildFile; fileRef = 6C2751CE1FDAC8E100D1266A /* lwfanim.c */; };
+		6C2751D21FDAC8E100D1266A /* lwfvbo.c in Sources */ = {isa = PBXBuildFile; fileRef = 6C2751CF1FDAC8E100D1266A /* lwfvbo.c */; };
 		6C7739BC1FB4B5AA001014DE /* font.c in Sources */ = {isa = PBXBuildFile; fileRef = 6C7739191FB4B59D001014DE /* font.c */; };
 		6C7739BD1FB4B5AA001014DE /* unicode.c in Sources */ = {isa = PBXBuildFile; fileRef = 6C77391D1FB4B59D001014DE /* unicode.c */; };
 		6C7739BE1FB4B5AA001014DE /* lwcontext.c in Sources */ = {isa = PBXBuildFile; fileRef = 6C77391E1FB4B59D001014DE /* lwcontext.c */; };
@@ -942,6 +945,11 @@
 		6C0CB2451FC45AB6006BEDCD /* lwtcpclient.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = lwtcpclient.h; sourceTree = "<group>"; };
 		6C0CB61E1FC30FC800DA4E51 /* render_leaderboard.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = render_leaderboard.h; sourceTree = "<group>"; };
 		6C0CB61F1FC30FC800DA4E51 /* render_leaderboard.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = render_leaderboard.c; sourceTree = "<group>"; };
+		6C2751CB1FDAC8CF00D1266A /* stb_vorbis.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = stb_vorbis.c; sourceTree = "<group>"; };
+		6C2751CD1FDAC8E100D1266A /* lwfanim.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = lwfanim.h; sourceTree = "<group>"; };
+		6C2751CE1FDAC8E100D1266A /* lwfanim.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = lwfanim.c; sourceTree = "<group>"; };
+		6C2751CF1FDAC8E100D1266A /* lwfvbo.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = lwfvbo.c; sourceTree = "<group>"; };
+		6C2751D01FDAC8E100D1266A /* lwfvbo.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = lwfvbo.h; sourceTree = "<group>"; };
 		6C2A5FED1FC03260005B3DF2 /* laidoff.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = laidoff.entitlements; sourceTree = "<group>"; };
 		6C7739171FB4B59D001014DE /* battlelogic.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = battlelogic.h; sourceTree = "<group>"; };
 		6C7739181FB4B59D001014DE /* etc1.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = etc1.h; sourceTree = "<group>"; };
@@ -2008,12 +2016,6 @@
 		6CA16CF41EA20CA700DB7AF0 /* src */ = {
 			isa = PBXGroup;
 			children = (
-				6CEB73DE1FD3CF5500D92EED /* numcomp_puck_game.c */,
-				6CEB73DD1FD3CF5500D92EED /* numcomp_puck_game.h */,
-				6C0CB2441FC45AB6006BEDCD /* lwtcpclient.c */,
-				6C0CB2451FC45AB6006BEDCD /* lwtcpclient.h */,
-				26457DBB1FBC1C5B00FFEE74 /* lwdirpad.c */,
-				26457DBC1FBC1C5B00FFEE74 /* lwdirpad.h */,
 				6C7739891FB4B5A5001014DE /* armature.c */,
 				6C7739561FB4B5A1001014DE /* armature.h */,
 				6C7739A21FB4B5A7001014DE /* battle_result.c */,
@@ -2072,12 +2074,18 @@
 				6C7739B11FB4B5A9001014DE /* lwdamagetext.h */,
 				6C77393A1FB4B59F001014DE /* lwdeltatime.c */,
 				6C7739B21FB4B5A9001014DE /* lwdeltatime.h */,
+				26457DBB1FBC1C5B00FFEE74 /* lwdirpad.c */,
+				26457DBC1FBC1C5B00FFEE74 /* lwdirpad.h */,
 				6C7739B51FB4B5A9001014DE /* lwenemy.c */,
 				6C7739AF1FB4B5A9001014DE /* lwenemy.h */,
+				6C2751CE1FDAC8E100D1266A /* lwfanim.c */,
+				6C2751CD1FDAC8E100D1266A /* lwfanim.h */,
 				6C77393C1FB4B59F001014DE /* lwfbo.h */,
 				6C7739741FB4B5A4001014DE /* lwfieldobject.h */,
 				6C7739811FB4B5A5001014DE /* lwfieldrendercommand.c */,
 				6C77392C1FB4B59E001014DE /* lwfieldrendercommand.h */,
+				6C2751CF1FDAC8E100D1266A /* lwfvbo.c */,
+				6C2751D01FDAC8E100D1266A /* lwfvbo.h */,
 				6C7739BB1FB4B5AA001014DE /* lwgamescene.h */,
 				6C7739921FB4B5A6001014DE /* lwgl.h */,
 				26457DB51FBACE6600FFEE74 /* lwime.c */,
@@ -2101,6 +2109,8 @@
 				6C77391F1FB4B59D001014DE /* lwskinmesh.h */,
 				6C77392D1FB4B59E001014DE /* lwtcp.c */,
 				6C77398D1FB4B5A6001014DE /* lwtcp.h */,
+				6C0CB2441FC45AB6006BEDCD /* lwtcpclient.c */,
+				6C0CB2451FC45AB6006BEDCD /* lwtcpclient.h */,
 				6C7739391FB4B59F001014DE /* lwtextblock.h */,
 				6C7739751FB4B5A4001014DE /* lwtimepoint.c */,
 				6C7739371FB4B59F001014DE /* lwtimepoint.h */,
@@ -2120,6 +2130,8 @@
 				6C7739A81FB4B5A8001014DE /* nav.cpp */,
 				6C7739431FB4B5A0001014DE /* nav.h */,
 				6C7739991FB4B5A7001014DE /* net.h */,
+				6CEB73DE1FD3CF5500D92EED /* numcomp_puck_game.c */,
+				6CEB73DD1FD3CF5500D92EED /* numcomp_puck_game.h */,
 				6C77394F1FB4B5A1001014DE /* numcomp.c */,
 				6C77395B1FB4B5A2001014DE /* numcomp.h */,
 				6C7739711FB4B5A3001014DE /* pcg_basic.c */,
@@ -2150,6 +2162,8 @@
 				6C7739581FB4B5A1001014DE /* render_field.h */,
 				6C77398F1FB4B5A6001014DE /* render_font_test.c */,
 				6C7739A01FB4B5A7001014DE /* render_font_test.h */,
+				6C0CB61F1FC30FC800DA4E51 /* render_leaderboard.c */,
+				6C0CB61E1FC30FC800DA4E51 /* render_leaderboard.h */,
 				6C7739321FB4B59E001014DE /* render_physics.c */,
 				6C7739491FB4B5A0001014DE /* render_physics.h */,
 				6C7739821FB4B5A5001014DE /* render_ps.c */,
@@ -2174,6 +2188,7 @@
 				6C77398B1FB4B5A6001014DE /* splash.h */,
 				6C7739411FB4B59F001014DE /* sprite_data.h */,
 				6C7739701FB4B5A3001014DE /* sprite.h */,
+				6C2751CB1FDAC8CF00D1266A /* stb_vorbis.c */,
 				6C77399E1FB4B5A7001014DE /* sysmsg.c */,
 				6C77396E1FB4B5A3001014DE /* sysmsg.h */,
 				6C77397F1FB4B5A5001014DE /* tex.c */,
@@ -2185,8 +2200,6 @@
 				6C7739AA1FB4B5A8001014DE /* unicode.h */,
 				6C77398C1FB4B5A6001014DE /* vertices.h */,
 				6C7739601FB4B5A2001014DE /* zhelpers.h */,
-				6C0CB61E1FC30FC800DA4E51 /* render_leaderboard.h */,
-				6C0CB61F1FC30FC800DA4E51 /* render_leaderboard.c */,
 			);
 			name = src;
 			path = ../../src;
@@ -2493,6 +2506,7 @@
 				5663736D1EBA52D4001DA3F4 /* odemath.cpp in Sources */,
 				566373321EBA52D3001DA3F4 /* collision_cylinder_sphere.cpp in Sources */,
 				6CA16D8F1EA210BB00DB7AF0 /* llex.c in Sources */,
+				6C2751CC1FDAC8D000D1266A /* stb_vorbis.c in Sources */,
 				566373631EBA52D4001DA3F4 /* mass.cpp in Sources */,
 				56F189021EC74DB60019312F /* v2_decoder.cpp in Sources */,
 				56F189921EC751950019312F /* zactor.c in Sources */,
@@ -2671,11 +2685,13 @@
 				56F189A61EC751950019312F /* zhash.c in Sources */,
 				6CA16D831EA210BB00DB7AF0 /* lbitlib.c in Sources */,
 				56F189AC1EC751950019312F /* zloop.c in Sources */,
+				6C2751D21FDAC8E100D1266A /* lwfvbo.c in Sources */,
 				56F188AA1EC74DB60019312F /* curve_client.cpp in Sources */,
 				6C7739D41FB4B5AA001014DE /* lwbutton.c in Sources */,
 				6C7739C81FB4B5AA001014DE /* lwudp.c in Sources */,
 				6C7739D71FB4B5AA001014DE /* render_battle.c in Sources */,
 				56ED77BB1EBB9C1C00FABA64 /* DetourNavMeshQuery.cpp in Sources */,
+				6C2751D11FDAC8E100D1266A /* lwfanim.c in Sources */,
 				5663732D1EBA52D3001DA3F4 /* box.cpp in Sources */,
 				6CA16DA21EA210BB00DB7AF0 /* lzio.c in Sources */,
 				56F189A71EC751950019312F /* zhash_primes.inc in Sources */,
