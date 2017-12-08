@@ -55,15 +55,6 @@ typedef struct _LWWAVEHEADER {
     DWORD subChunk2Size; // numSamples * numChannels * bitsPerSample/8 (this is the actual data size in bytes)
 } LWWAVEHEADER;
 
-const static char* SOUND_FILE[] = {
-    ASSETS_BASE_PATH "ogg" PATH_SEPARATOR "sfx_metal_hit.ogg",
-    ASSETS_BASE_PATH "ogg" PATH_SEPARATOR "sfx_die.ogg",
-    ASSETS_BASE_PATH "ogg" PATH_SEPARATOR "sfx_hit.ogg",
-    ASSETS_BASE_PATH "ogg" PATH_SEPARATOR "sfx_point.ogg",
-    ASSETS_BASE_PATH "ogg" PATH_SEPARATOR "sfx_swooshing.ogg",
-    ASSETS_BASE_PATH "ogg" PATH_SEPARATOR "sfx_wing.ogg",
-};
-
 IXAudio2* g_engine = NULL;
 IXAudio2MasteringVoice* g_master = NULL;
 
@@ -214,7 +205,8 @@ extern "C" void play_sound(LW_SOUND lws) {
         stereo_sound_source_pool[stereo_sound_source_pool_index].source->SubmitSourceBuffer(&sound_pool[lws].xa);
         stereo_sound_source_pool_index = (stereo_sound_source_pool_index + 1) % MAX_STEREO_SOUND_SOURCE_POOL;
     }
-    PlaySound(sound_pool[lws].buffer, NULL, SND_MEMORY | SND_ASYNC);
+    // VERY SLOW win32 VERSION - DO NOT USE
+    //PlaySound(sound_pool[lws].buffer, NULL, SND_MEMORY | SND_ASYNC);
 #endif
 }
 

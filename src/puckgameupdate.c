@@ -13,6 +13,7 @@
 #include "puckgameupdate.h"
 #include "lwtcpclient.h"
 #include "lwmath.h"
+#include "sound.h"
 
 void update_world_roll(LWPUCKGAME* puck_game) {
     if (puck_game->world_roll_dirty) {
@@ -73,6 +74,13 @@ void update_shake(LWPUCKGAME* puck_game, float delta_time) {
     }
 }
 
+static void puck_game_on_puck_wall_collision(LWPUCKGAME* puck_game, float vdlen) {
+    // play hit sound only if sufficient velocity difference
+    if (vdlen > 0.5f) {
+        play_sound(LWS_METAL_HIT);
+    }
+}
+
 void update_puck_game(LWCONTEXT* pLwc, LWPUCKGAME* puck_game, double delta_time) {
     if (!puck_game->world) {
         return;
@@ -80,6 +88,7 @@ void update_puck_game(LWCONTEXT* pLwc, LWPUCKGAME* puck_game, double delta_time)
     const int remote = puck_game_remote(pLwc, puck_game);
     puck_game->on_player_damaged = remote ? 0 : puck_game_player_tower_decrease_hp_test;
     puck_game->on_target_damaged = remote ? 0 : puck_game_target_tower_decrease_hp_test;
+    puck_game->on_puck_wall_collision = puck_game_on_puck_wall_collision;
     puck_game->time += (float)delta_time;
     puck_game->player.puck_contacted = 0;
     if (puck_game->battle_id == 0) {

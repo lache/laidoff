@@ -146,6 +146,7 @@ typedef struct _LWPUCKGAME {
 	float last_remote_dy;
 	void(*on_player_damaged)(LWPUCKGAME*);
 	void(*on_target_damaged)(LWPUCKGAME*);
+    void(*on_puck_wall_collision)(LWPUCKGAME*, float);
 	void* server;
 	int battle_id;
 	unsigned int token;

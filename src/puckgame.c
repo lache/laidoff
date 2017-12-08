@@ -289,6 +289,16 @@ void near_puck_wall(LWPUCKGAME* puck_game, dGeomID puck_geom, dGeomID wall_geom)
     }
     puck_game->boundary_impact[boundary] = puck_game->boundary_impact_start;
     puck_game->boundary_impact_player_no[boundary] = puck_game->puck_owner_player_no;
+    if (puck_game->on_puck_wall_collision) {
+        dVector3 zero = { 0,0,0 };
+        const dReal* v1 = dBodyGetLinearVel(dGeomGetBody(puck_geom));
+        const dReal* v2 = dGeomGetBody(wall_geom) ? dBodyGetLinearVel(dGeomGetBody(wall_geom)) : zero;
+        dVector3 vd;
+        dSubtractVectors3(vd, v1, v2);
+        const float vdlen = (float)dLENGTH(vd);
+        LOGI("puck - wall vel diff: %f", vdlen);
+        puck_game->on_puck_wall_collision(puck_game, vdlen);
+    }
 }
 
 void near_puck_tower(LWPUCKGAME* puck_game, dGeomID puck_geom, LWPUCKGAMETOWER* tower, dContact* contact, double now) {
