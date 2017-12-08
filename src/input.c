@@ -184,9 +184,9 @@ void lw_trigger_mouse_release(LWCONTEXT* pLwc, float x, float y, int pointer_id)
     const float top_button_w = 0.75f;
     const float top_button_h = 0.75f;
 
-    // Touch left top corner of the screen
+    // Touch right top corner of the screen
     if (pLwc->game_scene != LGS_ADMIN
-        && x < -pLwc->aspect_ratio + 0.25f
+        && x > +pLwc->aspect_ratio - 0.25f
         && y > 1.0f - 0.25f) {
 
         change_to_admin(pLwc);
