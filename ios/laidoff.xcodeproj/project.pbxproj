@@ -2894,7 +2894,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
 				CODE_SIGN_ENTITLEMENTS = laidoff/laidoff.entitlements;
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution";
 				CODE_SIGN_STYLE = Manual;
 				DEVELOPMENT_TEAM = TG9MHV97AH;
 				GCC_C_LANGUAGE_STANDARD = c11;
@@ -2919,8 +2919,8 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.popsongremix.laidoff;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE = "6c7ce2c3-d0cf-4a0f-9662-772ebd883d9c";
-				PROVISIONING_PROFILE_SPECIFIER = "Laidoff Development";
+				PROVISIONING_PROFILE = "73257faf-fdb7-4f91-a403-1065689dcaec";
+				PROVISIONING_PROFILE_SPECIFIER = "Laidoff Adhoc";
 			};
 			name = Release;
 		};

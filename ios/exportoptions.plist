@@ -6,6 +6,11 @@
     <string>ad-hoc</string>
     <key>teamID</key>
     <string>TG9MHV97AH</string>
+    <key>provisioningProfiles</key>
+    <dict>
+        <key>com.popsongremix.laidoff</key>
+        <string>Laidoff Adhoc</string>
+    </dict>
 </dict>
 </plist>
 
