@@ -870,6 +870,26 @@ static void render_floor(const LWCONTEXT *pLwc, const mat4x4 proj, const LWPUCKG
     glDrawArrays(GL_TRIANGLES, 0, pLwc->vertex_buffer[lvt].vertex_count);
 }
 
+void render_battle_result_popup(const LWCONTEXT* pLwc, int result, float ui_alpha) {
+    const float uv_offset[] = { 0.00f, result == 0 ? 0.00f : 0.75f };
+    const float uv_scale[] = { 1.0f, 1.0f/4.0f };
+    render_solid_vb_ui_alpha_uv(pLwc,
+                                0,
+                                0,
+                                1.5f,
+                                1.5f/4,
+                                pLwc->tex_atlas[LAE_RESULT_TITLE_ATLAS],
+                                pLwc->tex_atlas[LAE_RESULT_TITLE_ATLAS_ALPHA],
+                                LVT_CENTER_CENTER_ANCHORED_SQUARE,
+                                ui_alpha,
+                                0.0f,
+                                0.0f,
+                                0.0f,
+                                0.0f,
+                                uv_offset,
+                                uv_scale);
+}
+
 void render_caution_popup(const LWCONTEXT* pLwc, const char* str) {
     render_solid_vb_ui_alpha(pLwc,
                              0,
@@ -975,7 +995,7 @@ static void render_main_menu_ui_layer(const LWCONTEXT* pLwc, const LWPUCKGAME* p
                                    const mat4x4 view, const mat4x4 proj, const mat4x4 ui_proj,
                                    int remote, const float* player_controlled_pos) {
     render_main_menu(pLwc, puck_game, view, proj, puck_game->main_menu_ui_alpha);
-
+    
     float button_alpha = 0.0f; // alpha zeroed intentially (nonzero only when debugging)
     lwbutton_lae_append(&(((LWCONTEXT*)pLwc)->button_list),
                         "practice_button",
@@ -1082,7 +1102,13 @@ static void render_battle_ui_layer(const LWCONTEXT* pLwc, const LWPUCKGAME* puck
     mult_world_roll(world_roll_mat, puck_game->world_roll_axis, puck_game->world_roll_dir, puck_game->world_roll);
     mat4x4_mul_vec4(player_controlled_pos_vec4_world_roll, world_roll_mat, player_controlled_pos_vec4);
     render_dash_ring_gauge(pLwc, player_controlled_pos_vec4_world_roll, ui_alpha * control_ui_alpha);
-
+    // battle result
+    if (!remote) {
+        if (puck_game->game_state == LPGS_PRACTICE && puck_game->finished) {
+            const int battle_result = puck_game->player.current_hp > puck_game->target.current_hp ? 0 : 1;
+            render_battle_result_popup(pLwc, battle_result, puck_game->battle_ui_alpha);
+        }
+    }
     // Register as a button
     const float button_size = 0.35f;
     const float button_margin_x = 0.025f;

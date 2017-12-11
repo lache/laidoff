@@ -372,6 +372,7 @@ typedef struct _LWCONTEXT {
     LWDIRPAD right_dir_pad;
     LWPLEADERBOARD last_leaderboard;
     int control_flags;
+    LWATLASSPRITEARRAY atlas_conf[LAC_COUNT];
 } LWCONTEXT;
 
 #ifdef __cplusplus

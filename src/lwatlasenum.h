@@ -105,6 +105,8 @@ typedef enum _LW_ATLAS_ENUM {
     LAE_UI_CAUTION_POPUP_ALPHA,
     LAE_UI_MAIN_MENU,
     LAE_UI_BACK_BUTTON,
+    LAE_RESULT_TITLE_ATLAS,
+    LAE_RESULT_TITLE_ATLAS_ALPHA,
 
     LAE_COUNT,
 } LW_ATLAS_ENUM;
@@ -212,6 +214,8 @@ static const char *tex_atlas_filename[] = {
     ASSETS_BASE_PATH "ktx" PATH_SEPARATOR "ui-caution-popup-a_alpha.ktx",
     ASSETS_BASE_PATH "ktx" PATH_SEPARATOR "ui-main-menu.ktx",
     ASSETS_BASE_PATH "ktx" PATH_SEPARATOR "ui-back-button.ktx",
+    ASSETS_BASE_PATH "ktx" PATH_SEPARATOR "result-title-atlas-a.ktx",
+    ASSETS_BASE_PATH "ktx" PATH_SEPARATOR "result-title-atlas-a_alpha.ktx",
 };
 
 #define MAX_TEX_ATLAS LAE_COUNT

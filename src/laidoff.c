@@ -1776,7 +1776,7 @@ static void parse_conf(LWCONTEXT* pLwc) {
     jsmn_parser conf_parser;
     jsmn_init(&conf_parser);
     jsmntok_t conf_token[LW_MAX_CONF_TOKEN];
-    LOGI("sizeof(char) == %d", sizeof(char));
+    LOGI("sizeof(char) == %zu", sizeof(char));
     char *conf_str = create_string_from_file(conf_path);
     if (conf_str) {
         int token_count = jsmn_parse(&conf_parser, conf_str, strlen(conf_str), conf_token, ARRAY_SIZE(conf_token));
@@ -1815,12 +1815,11 @@ static int str2int(const char* str, int len) {
     return ret;
 }
 
-static void parse_atlas(LWCONTEXT* pLwc) {
-    const char *conf_path = ASSETS_BASE_PATH "atlas" PATH_SEPARATOR "result-title-atlas-a.json";
+static void parse_atlas_conf(LWCONTEXT* pLwc, LWATLASSPRITEARRAY* atlas_array, const char* conf_path) {
     jsmn_parser conf_parser;
     jsmn_init(&conf_parser);
     jsmntok_t conf_token[LW_MAX_CONF_TOKEN];
-    LOGI("sizeof(char) == %d", sizeof(char));
+    LOGI("sizeof(char) == %zu", sizeof(char));
     char *conf_str = create_string_from_file(conf_path);
     if (conf_str) {
         int token_count = jsmn_parse(&conf_parser, conf_str, strlen(conf_str), conf_token, ARRAY_SIZE(conf_token));
@@ -1858,13 +1857,23 @@ static void parse_atlas(LWCONTEXT* pLwc) {
                 atlas_sprite[entry_index].height = str2int(conf_str + t[i + 1].start, t[i + 1].end - t[i + 1].start);
             }
         }
-        free(atlas_sprite);
+        atlas_array->count = entry_count;
+        atlas_array->first = atlas_sprite;
+        //free(atlas_sprite);
         release_string(conf_str);
         conf_str = 0;
     } else {
-        LOGE("Conf file not found!");
+        LOGE("Atlas conf file %s not found!", conf_path);
         fflush(stdout);
+        atlas_array->count = 0;
+        atlas_array->first = 0;
         exit(-2);
+    }
+}
+
+static void parse_atlas(LWCONTEXT* pLwc) {
+    for (int i = 0; i < LAC_COUNT; i++) {
+        parse_atlas_conf(pLwc, &pLwc->atlas_conf[i], atlas_conf_filename[i]);
     }
 }
 
@@ -1994,6 +2003,13 @@ int lw_get_render_count(LWCONTEXT* pLwc) {
 }
 
 void lw_deinit(LWCONTEXT* pLwc) {
+    for (int i = 0; i < LAC_COUNT; i++) {
+        if (pLwc->atlas_conf[i].first) {
+            free(pLwc->atlas_conf[i].first);
+            pLwc->atlas_conf[i].first = 0;
+            pLwc->atlas_conf[i].count = 0;
+        }
+    }
 
     for (int i = 0; i < LVT_COUNT; i++) {
         glDeleteBuffers(1, &pLwc->vertex_buffer[i].vertex_buffer);
