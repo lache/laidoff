@@ -966,7 +966,7 @@ static void init_gl_context(LWCONTEXT* pLwc) {
     init_ps(pLwc);
 
     init_vao(pLwc, 0/* ??? */);
-    init_fvao(pLwc, 0/* ??? */);
+    init_fvao(pLwc, LWST_DEFAULT_NORMAL/* ??? */);
 
     init_skin_vao(pLwc, LWST_SKIN);
 
@@ -1541,7 +1541,7 @@ static void bind_all_ps_vertex_attrib_shader(const LWCONTEXT* pLwc, int shader_i
 }
 
 void bind_all_fvertex_attrib(const LWCONTEXT* pLwc, int fvbo_index) {
-    bind_all_fvertex_attrib_shader(pLwc, LWST_DEFAULT, fvbo_index);
+    bind_all_fvertex_attrib_shader(pLwc, LWST_DEFAULT_NORMAL, fvbo_index);
 }
 
 void bind_all_vertex_attrib(const LWCONTEXT* pLwc, int vbo_index) {

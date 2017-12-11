@@ -37,17 +37,17 @@
 
 // Vertex attributes: Coordinates (3xf) + Normal (3xf) + UV (2xf) + S9 (2xf)
 // See Also: LWVERTEX
-const static GLsizei stride_in_bytes = (GLsizei)(sizeof(float) * (3 + 3 + 2 + 2));
+static const GLsizei stride_in_bytes = (GLsizei)(sizeof(float) * (3 + 3 + 2 + 2));
 LwStaticAssert(sizeof(LWVERTEX) == (GLsizei)(sizeof(float) * (3 + 3 + 2 + 2)), "LWVERTEX size error");
 
 // Skin Vertex attributes: Coordinates (3xf) + Normal (3xf) + UV (2xf) + Bone Weight (4xf) + Bone Matrix (4xi)
 // See Also: LWSKINVERTEX
-const static GLsizei skin_stride_in_bytes = (GLsizei)(sizeof(float) * (3 + 3 + 2 + 4) + sizeof(int) * 4);
+static const GLsizei skin_stride_in_bytes = (GLsizei)(sizeof(float) * (3 + 3 + 2 + 4) + sizeof(int) * 4);
 LwStaticAssert(sizeof(LWSKINVERTEX) == (GLsizei)(sizeof(float) * (3 + 3 + 2 + 4) + sizeof(int) * 4), "LWSKINVERTEX size error");
 
 // Fan Vertex attributes: Coordinates (3xf)
 // See Also: LWFANVERTEX
-const static GLsizei fan_stride_in_bytes = (GLsizei)(sizeof(float) * 3);
+static const GLsizei fan_stride_in_bytes = (GLsizei)(sizeof(float) * 3);
 LwStaticAssert(sizeof(LWFANVERTEX) == (GLsizei)(sizeof(float) * 3), "LWFANVERTEX size error");
 
 typedef enum _LW_SHADER_TYPE {

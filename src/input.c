@@ -406,8 +406,15 @@ void lw_press_key_x(LWCONTEXT* pLwc) {
 }
 
 void lw_press_key_q(LWCONTEXT* pLwc) {
-    if (pLwc->tcp && pLwc->puck_game) {
-        tcp_send_suddendeath(pLwc->tcp, pLwc->puck_game->battle_id, pLwc->puck_game->token);
+    if (pLwc->puck_game) {
+        if (pLwc->tcp) {
+            tcp_send_suddendeath(pLwc->tcp, pLwc->puck_game->battle_id, pLwc->puck_game->token);
+        }
+        pLwc->puck_game->player.current_hp = 1;
+        pLwc->puck_game->target.current_hp = 1;
+        for (int i = 0; i < LW_PUCK_GAME_TOWER_COUNT; i++) {
+            pLwc->puck_game->tower[i].collapsing = 0;
+        }
     }
 }
 

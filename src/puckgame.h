@@ -87,6 +87,8 @@ typedef struct _LWPUCKGAMETOWER {
     int owner_player_no;
     double last_damaged_at;
     float shake_remain_time;
+    int collapsing; // 0 if normal state, 1 if collapsing state
+    float collapsing_time; // time elapsed from starting collapsing animation
 } LWPUCKGAMETOWER;
 
 #define LW_PUCK_GAME_TOWER_COUNT (2)
@@ -124,6 +126,7 @@ typedef struct _LWPUCKGAME {
     // ---- Static game data end
     float world_size_half;
     float tower_pos_multiplier[LW_PUCK_GAME_TOWER_COUNT][2];
+    float tower_collapsing_z_rot_angle[LW_PUCK_GAME_TOWER_COUNT];
 	dWorldID world;
 	dSpaceID space;
 	dGeomID boundary[LPGB_COUNT];
@@ -196,10 +199,7 @@ void puck_game_near_callback(void *data, dGeomID o1, dGeomID o2);
 void puck_game_commit_jump(LWPUCKGAME* puck_game, LWPUCKGAMEJUMP* jump, int player_no);
 void puck_game_commit_dash(LWPUCKGAME* puck_game, LWPUCKGAMEDASH* dash, float dx, float dy);
 void puck_game_commit_dash_to_puck(LWPUCKGAME* puck_game, LWPUCKGAMEDASH* dash, int player_no);
-void puck_game_player_decrease_hp_test(LWPUCKGAME* puck_game);
-void puck_game_target_decrease_hp_test(LWPUCKGAME* puck_game);
 float puck_game_remain_time(float total_time, int update_tick);
-void puck_game_go_decrease_hp_test(LWPUCKGAME* puck_game, LWPUCKGAMEPLAYER* go, LWPUCKGAMEDASH* dash, LWPUCKGAMETOWER* tower);
 void puck_game_commit_fire(LWPUCKGAME* puck_game, LWPUCKGAMEFIRE* fire, int player_no, float puck_fire_dx, float puck_fire_dy, float puck_fire_dlen);
 void update_puck_ownership(LWPUCKGAME* puck_game);
 void update_puck_reflect_size(LWPUCKGAME* puck_game, float delta_time);

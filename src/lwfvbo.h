@@ -30,4 +30,5 @@ typedef struct _LWFVBO_FILE_LAYOUT {
 
 void load_fvbo(LWCONTEXT* pLwc, const char* filename, LWFVBO* fvbo);
 void render_fvbo(const LWCONTEXT* pLwc, const LWPUCKGAME* puck_game, const mat4x4 view, const mat4x4 proj,
-                 LW_FVBO_TYPE lft, LW_F_ANIM_TYPE lfat, float x, float y, float z, float scale);
+                 LW_FVBO_TYPE lft, LW_F_ANIM_TYPE lfat, float x, float y, float z, float scale, float z_rot_angle,
+                 float frame_time, int loop, float frames_per_sec);

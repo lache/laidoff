@@ -98,6 +98,14 @@ static void puck_game_on_puck_player_collision(LWPUCKGAME* puck_game, float vdle
     }
 }
 
+static void update_tower(LWPUCKGAME* puck_game, float delta_time) {
+    for (int i = 0; i < LW_PUCK_GAME_TOWER_COUNT; i++) {
+        if (puck_game->tower[i].collapsing) {
+            puck_game->tower[i].collapsing_time += delta_time;
+        }
+    }
+}
+
 void update_puck_game(LWCONTEXT* pLwc, LWPUCKGAME* puck_game, double delta_time) {
     if (!puck_game->world) {
         return;
@@ -192,6 +200,7 @@ void update_puck_game(LWCONTEXT* pLwc, LWPUCKGAME* puck_game, double delta_time)
     update_puck_reflect_size(puck_game, (float)delta_time);
     update_world_roll(puck_game);
     update_boundary_impact(puck_game, (float)delta_time);
+    update_tower(puck_game, (float)delta_time);
 }
 
 void puck_game_jump(LWCONTEXT* pLwc, LWPUCKGAME* puck_game) {
