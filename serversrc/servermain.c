@@ -326,14 +326,6 @@ void broadcast_packet(LWSERVER *server, const LWCONN *conn, int conn_capacity, c
     }
 }
 
-void on_player_damaged(LWPUCKGAME *puck_game) {
-    puck_game_go_decrease_hp_test(puck_game, &puck_game->player, &puck_game->remote_dash[0], &puck_game->tower[0]);
-}
-
-void on_target_damaged(LWPUCKGAME *puck_game) {
-    puck_game_go_decrease_hp_test(puck_game, &puck_game->target, &puck_game->remote_dash[1], &puck_game->tower[1]);
-}
-
 void select_tcp_server(LWTCPSERVER *server) {
     memset(server->buf, '\0', BUFLEN);
     fd_set readfds;
@@ -590,8 +582,6 @@ int tcp_server_entry(void *context) {
             LOGI("LWPCREATEBATTLE: Create a new puck game instance (battle id = %d)", battle_id);
             puck_game->server = server;
             puck_game->battle_id = battle_id;
-            //puck_game->on_player_damaged = on_player_damaged;
-            //puck_game->on_target_damaged = on_target_damaged;
             puck_game->c1_token = pcg32_random();
             puck_game->c2_token = pcg32_random();
             // Build reply packet
@@ -900,8 +890,6 @@ int main(int argc, char *argv[]) {
     // Create a test puck game instance (not used for battle)
     LWPUCKGAME *puck_game = new_puck_game();
     puck_game->server = server;
-    puck_game->on_player_damaged = on_player_damaged;
-    puck_game->on_target_damaged = on_target_damaged;
     const int logic_hz = 125;
     const double logic_timestep = 1.0 / logic_hz;
     const int rendering_hz = 60;

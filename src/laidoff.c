@@ -966,7 +966,7 @@ static void init_gl_context(LWCONTEXT* pLwc) {
     init_ps(pLwc);
 
     init_vao(pLwc, 0/* ??? */);
-    init_fvao(pLwc, 0/* ??? */);
+    init_fvao(pLwc, LWST_DEFAULT_NORMAL/* ??? */);
 
     init_skin_vao(pLwc, LWST_SKIN);
 
@@ -1358,24 +1358,37 @@ static void dequeue_puck_game_state_and_apply(LWCONTEXT* pLwc) {
         const int player_damage = pLwc->puck_game_state.bf.player_current_hp - new_state.bf.player_current_hp;
         if (player_damage > 0) {
             puck_game_shake_player(pLwc->puck_game, &pLwc->puck_game->player);
+            LWPUCKGAMETOWER* tower = &pLwc->puck_game->tower[pLwc->puck_game->player_no == 2 ? 1 : 0/*player*/];
             puck_game_spawn_tower_damage_text(pLwc,
                                               pLwc->puck_game,
-                                              &pLwc->puck_game->tower[pLwc->puck_game->player_no == 2 ? 1 : 0/*player*/],
+                                              tower,
                                               player_damage);
+            // on_death...
+            if (new_state.bf.player_current_hp == 0) {
+                tower->collapsing = 1;
+                tower->collapsing_time = 0;
+            }
         }
         const int target_damage = pLwc->puck_game_state.bf.target_current_hp - new_state.bf.target_current_hp;
         if (target_damage > 0) {
             puck_game_shake_player(pLwc->puck_game, &pLwc->puck_game->target);
+            LWPUCKGAMETOWER* tower = &pLwc->puck_game->tower[pLwc->puck_game->player_no == 2 ? 0 : 1/*target*/];
             puck_game_spawn_tower_damage_text(pLwc,
                                               pLwc->puck_game,
-                                              &pLwc->puck_game->tower[pLwc->puck_game->player_no == 2 ? 0 : 1/*target*/],
+                                              tower,
                                               target_damage);
+            // on_death...
+            if (new_state.bf.target_current_hp == 0) {
+                tower->collapsing = 1;
+                tower->collapsing_time = 0;
+            }
         }
-        // If the battle is finished
-        if (pLwc->puck_game_state.bf.finished < new_state.bf.finished) {
+        // If the battle is finished (called once)
+        if (pLwc->puck_game_state.bf.finished == 0 && new_state.bf.finished == 1) {
             LOGI(LWLOGPOS "Battle finished. Destroying UDP context...");
             destroy_udp(&pLwc->udp);
-            puck_game_roll_to_main_menu(pLwc->puck_game);
+            //puck_game_roll_to_main_menu(pLwc->puck_game);
+            pLwc->puck_game->battle_control_ui_alpha = 0.0f;
         }
         // Overwrite old game state with a new one
         memcpy(&pLwc->puck_game_state, &new_state, sizeof(LWPSTATE));
@@ -1541,7 +1554,7 @@ static void bind_all_ps_vertex_attrib_shader(const LWCONTEXT* pLwc, int shader_i
 }
 
 void bind_all_fvertex_attrib(const LWCONTEXT* pLwc, int fvbo_index) {
-    bind_all_fvertex_attrib_shader(pLwc, LWST_DEFAULT, fvbo_index);
+    bind_all_fvertex_attrib_shader(pLwc, LWST_DEFAULT_NORMAL, fvbo_index);
 }
 
 void bind_all_vertex_attrib(const LWCONTEXT* pLwc, int vbo_index) {

@@ -7,6 +7,7 @@
 precision highp float;
 
 uniform mat4 MVP;
+uniform mat4 M;
 uniform vec2 vUvOffset;
 uniform vec2 vUvScale;
 uniform vec2 vS9Offset;
@@ -23,7 +24,7 @@ void main()
     vec3 p = vPos;
     p.xy += vS9 * vS9Offset;
     gl_Position = MVP * vec4(p, 1.0);
-    vec4 n = vec4(vCol, 1.0);
+    vec4 n = M * vec4(vCol, 1.0);
 	normal.x = n.x;
 	normal.y = n.y;
 	normal.z = n.z;

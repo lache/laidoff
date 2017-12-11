@@ -406,8 +406,15 @@ void lw_press_key_x(LWCONTEXT* pLwc) {
 }
 
 void lw_press_key_q(LWCONTEXT* pLwc) {
-    if (pLwc->tcp && pLwc->puck_game) {
-        tcp_send_suddendeath(pLwc->tcp, pLwc->puck_game->battle_id, pLwc->puck_game->token);
+    if (pLwc->puck_game) {
+        if (pLwc->tcp) {
+            tcp_send_suddendeath(pLwc->tcp, pLwc->puck_game->battle_id, pLwc->puck_game->token);
+        }
+        pLwc->puck_game->player.current_hp = 1;
+        pLwc->puck_game->target.current_hp = 1;
+        for (int i = 0; i < LW_PUCK_GAME_TOWER_COUNT; i++) {
+            pLwc->puck_game->tower[i].collapsing = 0;
+        }
     }
 }
 
@@ -454,6 +461,8 @@ void lw_go_back(LWCONTEXT* pLwc, void* native_context) {
             puck_game_roll_to_main_menu(pLwc->puck_game);
         } else if (pLwc->puck_game->game_state == LPGS_MAIN_MENU) {
             lw_app_quit(pLwc, native_context);
+        } else if (pLwc->puck_game->game_state == LPGS_BATTLE && pLwc->puck_game->battle_control_ui_alpha == 0) {
+            puck_game_roll_to_main_menu(pLwc->puck_game);
         }
     } else {
         lw_app_quit(pLwc, native_context);

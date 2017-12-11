@@ -82,19 +82,19 @@ LWPUCKGAME* new_puck_game() {
     puck_game->puck_damage_contact_speed_threshold = 1.1f;
     puck_game->sphere_mass = 0.1f;
     puck_game->sphere_radius = 0.12f; //0.16f;
-    puck_game->total_time = 80.0f;
+    puck_game->total_time = 60.0f;
     puck_game->fire_max_force = 35.0f;
     puck_game->fire_max_vel = 5.0f;
     puck_game->fire_interval = 1.5f;
     puck_game->fire_duration = 0.2f;
     puck_game->fire_shake_time = 0.5f;
-    puck_game->tower_pos = 1.1f;
-    puck_game->tower_radius = 0.3f; //0.825f / 2;
-    puck_game->tower_mesh_radius = 0.825f / 2; // Check tower.blend file
+    puck_game->tower_pos = 1.1f; // tower world position (+tower_pos, +tower_pos, 0) and (-tower_pos, -tower_pos, 0)
+    puck_game->tower_radius = 0.3f; // rendering radius for towers
+    puck_game->tower_mesh_radius = 0.825f / 2; // Check tower.blend file for radius (radius is half of dimensions)
     puck_game->tower_total_hp = 5;
     puck_game->tower_shake_time = 0.2f;
     puck_game->go_start_pos = 0.6f;
-    puck_game->hp = 10;
+    puck_game->hp = 5;
     puck_game->player_max_move_speed = 1.0f;
     puck_game->player_dash_speed = 6.0f;
     puck_game->boundary_impact_falloff_speed = 10.0f;
@@ -109,12 +109,14 @@ LWPUCKGAME* new_puck_game() {
     int tower_pos_multiplier_index = 0;
     puck_game->tower_pos_multiplier[tower_pos_multiplier_index][0] = -1;
     puck_game->tower_pos_multiplier[tower_pos_multiplier_index][1] = -1;
+    puck_game->tower_collapsing_z_rot_angle[tower_pos_multiplier_index] = (float)LWDEG2RAD(180);
     tower_pos_multiplier_index++;
     /*puck_game->tower_pos_multiplier[tower_pos_multiplier_index][0] = -1;
     puck_game->tower_pos_multiplier[tower_pos_multiplier_index][1] = +1;
     tower_pos_multiplier_index++;*/
     puck_game->tower_pos_multiplier[tower_pos_multiplier_index][0] = +1;
     puck_game->tower_pos_multiplier[tower_pos_multiplier_index][1] = +1;
+    puck_game->tower_collapsing_z_rot_angle[tower_pos_multiplier_index] = (float)LWDEG2RAD(0);
     tower_pos_multiplier_index++;
     /*puck_game->tower_pos_multiplier[tower_pos_multiplier_index][0] = +1;
     puck_game->tower_pos_multiplier[tower_pos_multiplier_index][1] = -1;
@@ -209,44 +211,12 @@ void delete_puck_game(LWPUCKGAME** puck_game) {
     *puck_game = 0;
 }
 
-void puck_game_go_decrease_hp_test(LWPUCKGAME* puck_game, LWPUCKGAMEPLAYER* go, LWPUCKGAMEDASH* dash, LWPUCKGAMETOWER* tower) {
-    LWPUCKGAMEOBJECT* puck = &puck_game->go[LPGO_PUCK];
-    const float puck_speed = (float)dLENGTH(dBodyGetLinearVel(puck->body));
-
-    if (go->last_contact_puck_body != puck->body
-        && puck_speed > puck_game->puck_damage_contact_speed_threshold
-        && !puck_game_dashing(dash)) {
-        // Decrease player hp
-        go->last_contact_puck_body = puck->body;
-        go->current_hp--;
-        if (go->current_hp < 0) {
-            //go->current_hp = go->total_hp;
-        }
-        go->hp_shake_remain_time = puck_game->hp_shake_time;
-    }
-
-    if (tower->hp > 0) {
-        tower->hp--;
-    } else if (tower->hp <= 0) {
-        tower->hp = puck_game->tower_total_hp;
-    }
-}
-
 LWPUCKGAMEDASH* puck_game_single_play_dash_object(LWPUCKGAME* puck_game) {
     return &puck_game->remote_dash[puck_game->player_no == 2 ? 1 : 0];
 }
 
 LWPUCKGAMEJUMP* puck_game_single_play_jump_object(LWPUCKGAME* puck_game) {
     return &puck_game->remote_jump[puck_game->player_no == 2 ? 1 : 0];
-}
-
-void puck_game_player_decrease_hp_test(LWPUCKGAME* puck_game) {
-    LWPUCKGAMEDASH* dash = puck_game_single_play_dash_object(puck_game);
-    puck_game_go_decrease_hp_test(puck_game, &puck_game->player, &puck_game->remote_dash[0], &puck_game->tower[0]);
-}
-
-void puck_game_target_decrease_hp_test(LWPUCKGAME* puck_game) {
-    puck_game_go_decrease_hp_test(puck_game, &puck_game->target, &puck_game->remote_dash[1], &puck_game->tower[1]);
 }
 
 static void near_puck_go(LWPUCKGAME* puck_game, int player_no, dContact* contact) {
@@ -330,13 +300,20 @@ void near_puck_tower(LWPUCKGAME* puck_game, dGeomID puck_geom, LWPUCKGAMETOWER* 
     }
     // Check last damaged cooltime
     if (now - tower->last_damaged_at > 1.0f) {
-        int* player_hp = tower->owner_player_no == 1 ? &puck_game->player.current_hp : &puck_game->target.current_hp;
-        if (tower->hp > 0 || *player_hp > 0) {
+        int* player_hp_ptr = tower->owner_player_no == 1 ? &puck_game->player.current_hp : &puck_game->target.current_hp;
+        if (tower->hp > 0 || *player_hp_ptr > 0) {
             if (tower->hp > 0) {
                 tower->hp--;
             }
-            if (*player_hp > 0) {
-                (*player_hp)--;
+            if (*player_hp_ptr > 0) {
+                const int old_hp = *player_hp_ptr;
+                (*player_hp_ptr)--;
+                const int new_hp = *player_hp_ptr;
+                if (old_hp > 0 && new_hp == 0) {
+                    // on_death...
+                    tower->collapsing = 1;
+                    tower->collapsing_time = 0;
+                }
             }
             tower->shake_remain_time = puck_game->tower_shake_time;
             tower->last_damaged_at = now;
@@ -546,6 +523,7 @@ void update_puck_ownership(LWPUCKGAME* puck_game) {
 void puck_game_reset_battle_state(LWPUCKGAME* puck_game) {
     for (int i = 0; i < LW_PUCK_GAME_TOWER_COUNT; i++) {
         puck_game->tower[i].hp = puck_game->tower_total_hp;
+        puck_game->tower[i].collapsing = 0;
     }
     dBodySetPosition(puck_game->go[LPGO_PUCK].body, 0.0f, 0.0f, puck_game->go[LPGO_PUCK].radius);
     dBodySetPosition(puck_game->go[LPGO_PLAYER].body, -puck_game->go_start_pos, -puck_game->go_start_pos, puck_game->go[LPGO_PUCK].radius);
@@ -564,11 +542,12 @@ void puck_game_reset_battle_state(LWPUCKGAME* puck_game) {
         dBodySetForce(puck_game->go[i].body, 0, 0, 0);
         dBodySetTorque(puck_game->go[i].body, 0, 0, 0);
     }
-    puck_game->player.total_hp = 10;
-    puck_game->player.current_hp = 10;
-    puck_game->target.total_hp = 10;
-    puck_game->target.current_hp = 10;
+    puck_game->player.total_hp = puck_game->hp;
+    puck_game->player.current_hp = puck_game->hp;
+    puck_game->target.total_hp = puck_game->hp;
+    puck_game->target.current_hp = puck_game->hp;
     memset(puck_game->remote_control, 0, sizeof(puck_game->remote_control));
+    puck_game->battle_control_ui_alpha = 1.0f;
 }
 
 void puck_game_reset(LWPUCKGAME* puck_game) {

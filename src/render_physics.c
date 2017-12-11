@@ -48,7 +48,7 @@ void mult_world_roll(mat4x4 model, int axis, int dir, float angle) {
     mat4x4_mul(model, world_roll_rot, model);
 }
 
-static void render_tower(const LWCONTEXT* pLwc, const mat4x4 view, const mat4x4 proj, const LWPUCKGAME* puck_game, const float* pos, const LWPUCKGAMETOWER* tower, int remote) {
+static void render_tower_normal(const LWCONTEXT* pLwc, const mat4x4 view, const mat4x4 proj, const LWPUCKGAME* puck_game, const float* pos, const LWPUCKGAMETOWER* tower, int remote) {
     int shader_index = LWST_DEFAULT_NORMAL;
     const LWSHADER* shader = &pLwc->shader[shader_index];
     glUseProgram(shader->program);
@@ -160,7 +160,35 @@ static void render_tower(const LWCONTEXT* pLwc, const mat4x4 view, const mat4x4 
         set_tex_filter(GL_LINEAR, GL_LINEAR);
         //set_tex_filter(GL_NEAREST, GL_NEAREST);
         glUniformMatrix4fv(shader->mvp_location, 1, GL_FALSE, (const GLfloat*)proj_view_model);
+        glUniformMatrix4fv(shader->m_location, 1, GL_FALSE, (const GLfloat*)model);
         glDrawArrays(GL_TRIANGLES, 0, pLwc->vertex_buffer[lvt].vertex_count);
+    }
+}
+
+static void render_tower_collapsing(const LWCONTEXT* pLwc, const mat4x4 view, const mat4x4 proj, const LWPUCKGAME* puck_game, const float* pos, const LWPUCKGAMETOWER* tower, int remote, float tower_collapsing_z_rot_angle) {
+    // collapsing tower model scale matches current world
+    const float tower_scale = 1.0f; // puck_game->tower_radius / puck_game->tower_mesh_radius;
+    render_fvbo(pLwc,
+                puck_game,
+                view,
+                proj,
+                LFT_TOWER,
+                LFAT_TOWER_COLLAPSE,
+                +1.1f,
+                +1.1f,
+                pos[2],
+                tower_scale,
+                tower_collapsing_z_rot_angle,
+                tower->collapsing_time,
+                0, // no loop
+                50.0f); // frames per sec (animatino speed)
+}
+
+static void render_tower(const LWCONTEXT* pLwc, const mat4x4 view, const mat4x4 proj, const LWPUCKGAME* puck_game, const float* pos, const LWPUCKGAMETOWER* tower, int remote, float tower_collapsing_z_rot_angle) {
+    if (tower->collapsing == 0) {
+        render_tower_normal(pLwc, view, proj, puck_game, pos, tower, remote);
+    } else {
+        render_tower_collapsing(pLwc, view, proj, puck_game, pos, tower, remote, tower_collapsing_z_rot_angle);
     }
 }
 
@@ -1006,10 +1034,11 @@ static void render_battle_ui_layer(const LWCONTEXT* pLwc, const LWPUCKGAME* puck
     const LWPUCKGAMEPLAYER* player = &puck_game->player;
     const LWPUCKGAMEPLAYER* target = &puck_game->target;
     float ui_alpha = puck_game->battle_ui_alpha;
+    float control_ui_alpha = puck_game->battle_control_ui_alpha;
     // Render damage texts
     render_damage_text(pLwc, view, proj, ui_proj, ui_alpha);
     // Render left joystick
-    render_dir_pad_with_start_joystick(pLwc, &pLwc->left_dir_pad, ui_alpha);
+    render_dir_pad_with_start_joystick(pLwc, &pLwc->left_dir_pad, ui_alpha * control_ui_alpha);
     // Render right joystick
     if (pLwc->control_flags & LCF_PUCK_GAME_RIGHT_DIR_PAD) {
         render_dir_pad_with_start(pLwc, &pLwc->right_dir_pad);
@@ -1071,7 +1100,7 @@ static void render_battle_ui_layer(const LWCONTEXT* pLwc, const LWPUCKGAME* puck
                             button_size,
                             LAE_BUTTON_PULL,
                             LAE_BUTTON_PULL_ALPHA,
-                            ui_alpha,
+                            ui_alpha * control_ui_alpha,
                             pull_puck ? 0.2f : 1.0f,
                             1.0f,
                             pull_puck ? 0.2f : 1.0f);
@@ -1085,7 +1114,7 @@ static void render_battle_ui_layer(const LWCONTEXT* pLwc, const LWPUCKGAME* puck
                             button_size * 1.75f,
                             LAE_BUTTON_DASH,
                             LAE_BUTTON_DASH_ALPHA,
-                            ui_alpha,
+                            ui_alpha * control_ui_alpha,
                             1.0f,
                             1.0f,
                             1.0f);
@@ -1099,12 +1128,15 @@ static void render_battle_ui_layer(const LWCONTEXT* pLwc, const LWPUCKGAME* puck
                             button_size,
                             LAE_BUTTON_JUMP,
                             LAE_BUTTON_JUMP_ALPHA,
-                            ui_alpha,
+                            ui_alpha * control_ui_alpha,
                             1.0f,
                             1.0f,
                             1.0f);
     }
-    if (remote == 0) {
+    if (remote == 0 // on pracice mode
+        || pLwc->puck_game->battle_control_ui_alpha == 0 // on battle finished
+        ) {
+        // return to main menu button
         lwbutton_lae_append(&(((LWCONTEXT*)pLwc)->button_list),
                             "back_button",
                             -pLwc->aspect_ratio,
@@ -1350,13 +1382,14 @@ void lwc_render_physics(const LWCONTEXT* pLwc, const mat4x4 view, const mat4x4 p
             puck_game->tower_pos * puck_game->tower_pos_multiplier[i][1],
             0
         };
-        render_tower(pLwc, view, proj, puck_game, tower_pos, &puck_game->tower[i], remote);
-    }
-
-    // test render fvbo
-    if (0) {
-        const float tower_scale = puck_game->tower_radius / puck_game->tower_mesh_radius;
-        render_fvbo(pLwc, puck_game, view, proj, LFT_TOWER, LFAT_TOWER_COLLAPSE, -puck_game->tower_pos, +puck_game->tower_pos, 0, tower_scale);
+        render_tower(pLwc,
+                     view,
+                     proj,
+                     puck_game,
+                     tower_pos,
+                     &puck_game->tower[i],
+                     remote,
+                     puck_game->tower_collapsing_z_rot_angle[i]);
     }
 
     if (puck_game->game_state != LPGS_SEARCHING) {
@@ -1371,6 +1404,7 @@ void lwc_render_physics(const LWCONTEXT* pLwc, const mat4x4 view, const mat4x4 p
     } else {
         render_searching_state(pLwc, puck_game);
         const float button_size = 0.35f;
+        // search cancel button
         lwbutton_lae_append(&(((LWCONTEXT*)pLwc)->button_list),
                             "back_button",
                             +0.0f - button_size * 1.5f / 2,

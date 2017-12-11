@@ -35,7 +35,8 @@ void load_fvbo(LWCONTEXT* pLwc, const char* filename, LWFVBO* fvbo) {
 }
 
 void render_fvbo(const LWCONTEXT* pLwc, const LWPUCKGAME* puck_game, const mat4x4 view, const mat4x4 proj,
-                 LW_FVBO_TYPE lft, LW_F_ANIM_TYPE lfat, float x, float y, float z, float scale) {
+                 LW_FVBO_TYPE lft, LW_F_ANIM_TYPE lfat, float x, float y, float z, float scale, float z_rot_angle,
+                 float frame_time, int loop, float frames_per_sec) {
 
     int shader_index = LWST_DEFAULT_NORMAL;
     const LWSHADER* shader = &pLwc->shader[shader_index];
@@ -67,17 +68,22 @@ void render_fvbo(const LWCONTEXT* pLwc, const LWPUCKGAME* puck_game, const mat4x
     mat4x4 proj_view;
     mat4x4_mul(proj_view, proj, view);
     const LWFANIM* fanim = &pLwc->fanim[lfat];
-    float frames_per_sec = 50.0f;
-    int frame = (int)(pLwc->app_time * frames_per_sec) % fanim->total_frame_count;
-    //frame = 0;
-    
+    int frame = (int)(frame_time * frames_per_sec);
+    if (loop) {
+        frame %= fanim->total_frame_count;
+    } else {
+        frame = LWMIN(frame, fanim->total_frame_count - 1);
+    }
+    mat4x4 identity;
+    mat4x4_identity(identity);
     int vertex_first = 0;
     for (int i = 0; i < fvbo->total_cell_count; i++) {
         const LWFANIMKEY* anim_key = &fanim->anim_key[frame * fanim->total_cell_count + i];
-        mat4x4 rot;
-        mat4x4_from_quat(rot, &anim_key->qw);
+        mat4x4 anim_rot;
         mat4x4 model;
-        mat4x4_dup(model, rot);
+        mat4x4_identity(model);
+        mat4x4_from_quat(anim_rot, &anim_key->qw);
+        mat4x4_mul(model, anim_rot, model);
         mat4x4 model_translate;
         mat4x4_translate(model_translate,
                          x + sx * anim_key->x,
@@ -85,10 +91,12 @@ void render_fvbo(const LWCONTEXT* pLwc, const LWPUCKGAME* puck_game, const mat4x
                          z + sz * anim_key->z);
         mat4x4_scale_aniso(model, model, sx, sy, sz);
         mat4x4_mul(model, model_translate, model);
+        mat4x4_rotate_Z_2(model, model, z_rot_angle);
         mult_world_roll(model, puck_game->world_roll_axis, puck_game->world_roll_dir, puck_game->world_roll);
         mat4x4 proj_view_model;
         mat4x4_mul(proj_view_model, proj_view, model);
         glUniformMatrix4fv(shader->mvp_location, 1, GL_FALSE, (const GLfloat*)proj_view_model);
+        glUniformMatrix4fv(shader->m_location, 1, GL_FALSE, (const GLfloat*)model);
         glDrawArrays(GL_TRIANGLES, vertex_first, fvbo->vertex_count_per_cell[i]);
         vertex_first += fvbo->vertex_count_per_cell[i];
     }
