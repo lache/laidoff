@@ -405,6 +405,12 @@ void lw_press_key_x(LWCONTEXT* pLwc) {
     puck_game_pull_puck_start(pLwc, pLwc->puck_game);
 }
 
+void lw_press_key_w(LWCONTEXT* pLwc) {
+    if (pLwc->puck_game) {
+        pLwc->puck_game->update_tick = (int)(125.0f * (pLwc->puck_game->total_time - 3.0f));
+    }
+}
+
 void lw_press_key_q(LWCONTEXT* pLwc) {
     if (pLwc->puck_game) {
         if (pLwc->tcp) {

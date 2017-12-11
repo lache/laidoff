@@ -117,6 +117,12 @@ void update_puck_game(LWCONTEXT* pLwc, LWPUCKGAME* puck_game, double delta_time)
     puck_game->on_puck_tower_collision = puck_game_on_puck_tower_collision;
     puck_game->on_puck_player_collision = puck_game_on_puck_player_collision;
     puck_game->player.puck_contacted = 0;
+    if (puck_game->game_state == LPGS_PRACTICE) {
+        if (puck_game_remain_time(puck_game->total_time, puck_game->update_tick) <= 0) {
+            puck_game->finished = 1;
+            puck_game->battle_control_ui_alpha = 0;
+        }
+    }
     if (puck_game->game_state == LPGS_PRACTICE && puck_game->finished == 0) {
         puck_game->update_tick++;
         puck_game->time += (float)delta_time;
