@@ -313,6 +313,8 @@ void near_puck_tower(LWPUCKGAME* puck_game, dGeomID puck_geom, LWPUCKGAMETOWER* 
                     // on_death...
                     tower->collapsing = 1;
                     tower->collapsing_time = 0;
+                    puck_game->finished = 1;
+                    puck_game->battle_control_ui_alpha = 0;
                 }
             }
             tower->shake_remain_time = puck_game->tower_shake_time;
@@ -521,6 +523,8 @@ void update_puck_ownership(LWPUCKGAME* puck_game) {
 }
 
 void puck_game_reset_battle_state(LWPUCKGAME* puck_game) {
+    puck_game->update_tick = 0;
+    puck_game->finished = 0;
     for (int i = 0; i < LW_PUCK_GAME_TOWER_COUNT; i++) {
         puck_game->tower[i].hp = puck_game->tower_total_hp;
         puck_game->tower[i].collapsing = 0;

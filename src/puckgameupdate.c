@@ -116,13 +116,16 @@ void update_puck_game(LWCONTEXT* pLwc, LWPUCKGAME* puck_game, double delta_time)
     puck_game->on_puck_wall_collision = puck_game_on_puck_wall_collision;
     puck_game->on_puck_tower_collision = puck_game_on_puck_tower_collision;
     puck_game->on_puck_player_collision = puck_game_on_puck_player_collision;
-    puck_game->time += (float)delta_time;
     puck_game->player.puck_contacted = 0;
-    if (puck_game->battle_id == 0 && puck_game->game_state == LPGS_PRACTICE) {
+    if (puck_game->game_state == LPGS_PRACTICE && puck_game->finished == 0) {
+        puck_game->update_tick++;
+        puck_game->time += (float)delta_time;
         dSpaceCollide(puck_game->space, puck_game, puck_game_near_callback);
         //dWorldStep(puck_game->world, 0.005f);
         dWorldQuickStep(puck_game->world, 1.0f / 60);
         dJointGroupEmpty(puck_game->contact_joint_group);
+    } else if (remote && pLwc->puck_game_state.bf.finished == 0) {
+        puck_game->time += (float)delta_time;
     }
     if (puck_game->player.puck_contacted == 0) {
         puck_game->player.last_contact_puck_body = 0;

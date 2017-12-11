@@ -288,7 +288,7 @@ static void render_radial_wave(const LWCONTEXT* pLwc,
                                const mat4x4 remote_rot,
                                int remote,
                                float speed) {
-    const float uv_offset[2] = { -(float)pLwc->app_time / 2, 0.0f };
+    const float uv_offset[2] = { -(float)puck_game->time / 2, 0.0f };
     const float uv_scale[2] = { 0.75f, 1.0f };
     const float scale = 0.75f;
     const float alpha = 0.20f;
@@ -1065,7 +1065,7 @@ static void render_battle_ui_layer(const LWCONTEXT* pLwc, const LWPUCKGAME* puck
     render_hp_gauge(pLwc, gauge_width, gauge_height, gauge2_x, gauge2_y, target_current_hp, target_total_hp, target->hp_shake_remain_time, 0, target_nickname, ui_alpha);
     // Battle timer (center top of the screen)
     render_timer(pLwc,
-                 puck_game_remain_time(pLwc->puck_game->total_time, state->update_tick),
+                 puck_game_remain_time(pLwc->puck_game->total_time, remote ? state->update_tick : puck_game->update_tick),
                  pLwc->puck_game->total_time, ui_alpha);
     // Match state text (bottom of the screen)
     //render_match_state(pLwc, ui_alpha);
@@ -1081,7 +1081,7 @@ static void render_battle_ui_layer(const LWCONTEXT* pLwc, const LWPUCKGAME* puck
     mat4x4_identity(world_roll_mat);
     mult_world_roll(world_roll_mat, puck_game->world_roll_axis, puck_game->world_roll_dir, puck_game->world_roll);
     mat4x4_mul_vec4(player_controlled_pos_vec4_world_roll, world_roll_mat, player_controlled_pos_vec4);
-    render_dash_ring_gauge(pLwc, player_controlled_pos_vec4_world_roll, ui_alpha);
+    render_dash_ring_gauge(pLwc, player_controlled_pos_vec4_world_roll, ui_alpha * control_ui_alpha);
 
     // Register as a button
     const float button_size = 0.35f;
@@ -1134,7 +1134,7 @@ static void render_battle_ui_layer(const LWCONTEXT* pLwc, const LWPUCKGAME* puck
                             1.0f);
     }
     if (remote == 0 // on pracice mode
-        || pLwc->puck_game->battle_control_ui_alpha == 0 // on battle finished
+        || control_ui_alpha == 0 // on battle finished
         ) {
         // return to main menu button
         lwbutton_lae_append(&(((LWCONTEXT*)pLwc)->button_list),
