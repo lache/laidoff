@@ -1806,6 +1806,68 @@ static void parse_conf(LWCONTEXT* pLwc) {
     }
 }
 
+static int str2int(const char* str, int len) {
+    int i;
+    int ret = 0;
+    for (i = 0; i < len; ++i) {
+        ret = ret * 10 + (str[i] - '0');
+    }
+    return ret;
+}
+
+static void parse_atlas(LWCONTEXT* pLwc) {
+    const char *conf_path = ASSETS_BASE_PATH "atlas" PATH_SEPARATOR "result-title-atlas-a.json";
+    jsmn_parser conf_parser;
+    jsmn_init(&conf_parser);
+    jsmntok_t conf_token[LW_MAX_CONF_TOKEN];
+    LOGI("sizeof(char) == %d", sizeof(char));
+    char *conf_str = create_string_from_file(conf_path);
+    if (conf_str) {
+        int token_count = jsmn_parse(&conf_parser, conf_str, strlen(conf_str), conf_token, ARRAY_SIZE(conf_token));
+        jsmntok_t* t = conf_token;
+        if (token_count < 1 || t[0].type != JSMN_OBJECT) {
+            LOGE("Conf file broken...");
+            fflush(stdout);
+            exit(-1);
+        }
+        LOGI("atlas file: %s", conf_path);
+        int entry_count = 0;
+        for (int i = 1; i < token_count; i++) {
+            if (jsoneq(conf_str, &t[i], "name") == 0) {
+                entry_count++;
+            }
+        }
+        LWATLASSPRITE* atlas_sprite = (LWATLASSPRITE*)calloc(entry_count, sizeof(LWATLASSPRITE));
+        int entry_index = -1;
+        for (int i = 1; i < token_count; i++) {
+            if (jsoneq(conf_str, &t[i], "name") == 0) {
+                LOGI("name: %.*s", t[i + 1].end - t[i + 1].start, conf_str + t[i + 1].start);
+                entry_index++;
+                strncpy(atlas_sprite[entry_index].name, conf_str + t[i + 1].start, t[i + 1].end - t[i + 1].start);
+            } else if (jsoneq(conf_str, &t[i], "x") == 0) {
+                LOGI("x: %.*s", t[i + 1].end - t[i + 1].start, conf_str + t[i + 1].start);
+                atlas_sprite[entry_index].x = str2int(conf_str + t[i + 1].start, t[i + 1].end - t[i + 1].start);
+            } else if (jsoneq(conf_str, &t[i], "y") == 0) {
+                LOGI("y: %.*s", t[i + 1].end - t[i + 1].start, conf_str + t[i + 1].start);
+                atlas_sprite[entry_index].y = str2int(conf_str + t[i + 1].start, t[i + 1].end - t[i + 1].start);
+            } else if (jsoneq(conf_str, &t[i], "width") == 0) {
+                LOGI("width: %.*s", t[i + 1].end - t[i + 1].start, conf_str + t[i + 1].start);
+                atlas_sprite[entry_index].width = str2int(conf_str + t[i + 1].start, t[i + 1].end - t[i + 1].start);
+            } else if (jsoneq(conf_str, &t[i], "height") == 0) {
+                LOGI("height: %.*s", t[i + 1].end - t[i + 1].start, conf_str + t[i + 1].start);
+                atlas_sprite[entry_index].height = str2int(conf_str + t[i + 1].start, t[i + 1].end - t[i + 1].start);
+            }
+        }
+        free(atlas_sprite);
+        release_string(conf_str);
+        conf_str = 0;
+    } else {
+        LOGE("Conf file not found!");
+        fflush(stdout);
+        exit(-2);
+    }
+}
+
 LWCONTEXT* lw_init_initial_size(int width, int height) {
 
     init_ext_image_lib();
@@ -1819,6 +1881,7 @@ LWCONTEXT* lw_init_initial_size(int width, int height) {
     pLwc->control_flags = LCF_PUCK_GAME_DASH | /*LCF_PUCK_GAME_JUMP | */LCF_PUCK_GAME_PULL;
 
     parse_conf(pLwc);
+    parse_atlas(pLwc);
 
     pLwc->width = width;
     pLwc->height = height;
