@@ -585,16 +585,17 @@ void puck_game_tower_pos(vec4 p_out, const LWPUCKGAME* puck_game, int owner_play
 }
 
 void puck_game_control_bogus(LWPUCKGAME* puck_game) {
-    // update target movement actuator (LMotor) according to dir pad input
-    float target_follow_agility = 0.01f; // 0 ~ 1
-    dJointID tcj = puck_game->target_control_joint;
+    const float target_follow_agility = 0.0075f; // 0 ~ 1
+    const float dash_detect_radius = 0.75f;
+    const float dash_frequency = 0.5f; // 0.0f ~ 1.0f
+    const float dash_cooltime_lag_min = 0.4f;
+    const float dash_cooltime_lag_max = 0.6f;
+
     float ideal_target_dx = puck_game->go[LPGO_PUCK].pos[0] - puck_game->go[LPGO_TARGET].pos[0];
     float ideal_target_dy = puck_game->go[LPGO_PUCK].pos[1] - puck_game->go[LPGO_TARGET].pos[1];
     puck_game->target_dx = (1.0f - target_follow_agility) * puck_game->target_dx + target_follow_agility * ideal_target_dx;
     puck_game->target_dy = (1.0f - target_follow_agility) * puck_game->target_dy + target_follow_agility * ideal_target_dy;
-    float target_dx2 = puck_game->target_dx * puck_game->target_dx;
-    float target_dy2 = puck_game->target_dy * puck_game->target_dy;
-    float target_dlen = sqrtf(target_dx2 + target_dy2);
+    
     float ideal_target_dx2 = ideal_target_dx * ideal_target_dx;
     float ideal_target_dy2 = ideal_target_dy * ideal_target_dy;
     float ideal_target_dlen = sqrtf(ideal_target_dx2 + ideal_target_dy2);
@@ -611,15 +612,16 @@ void puck_game_control_bogus(LWPUCKGAME* puck_game) {
     puck_game->remote_control[1].dlen = puck_game->target_dlen_ratio;
     puck_game->remote_control[1].pull_puck = 0;
 
-    /*dJointEnable(tcj);
-    dJointSetLMotorParam(tcj, dParamVel1, puck_game->player_max_move_speed * puck_game->target_dx / target_dlen * puck_game->target_dlen_ratio);
-    dJointSetLMotorParam(tcj, dParamVel2, puck_game->player_max_move_speed * puck_game->target_dy / target_dlen * puck_game->target_dlen_ratio);*/
-
-    int bogus_player_no = puck_game->player_no == 2 ? 1 : 2;
-    LWPUCKGAMEDASH* dash = &puck_game->remote_dash[bogus_player_no - 1];
-    const float dash_cooltime_aware_lag = numcomp_float_random_range(0.4f, 0.7f);
-    if (puck_game_dash_elapsed_since_last(puck_game, dash) >= puck_game->dash_interval + dash_cooltime_aware_lag) {
-        puck_game_dash(puck_game, dash, bogus_player_no);
+    // dash
+    if (ideal_target_dlen < dash_detect_radius) {
+        if (numcomp_float_random_01() < dash_frequency) {
+            int bogus_player_no = puck_game->player_no == 2 ? 1 : 2;
+            LWPUCKGAMEDASH* dash = &puck_game->remote_dash[bogus_player_no - 1];
+            const float dash_cooltime_aware_lag = numcomp_float_random_range(dash_cooltime_lag_min, dash_cooltime_lag_max);
+            if (puck_game_dash_elapsed_since_last(puck_game, dash) >= puck_game->dash_interval + dash_cooltime_aware_lag) {
+                puck_game_dash(puck_game, dash, bogus_player_no);
+            }
+        }
     }
 }
 
