@@ -124,7 +124,25 @@ void update_puck_game(LWCONTEXT* pLwc, LWPUCKGAME* puck_game, double delta_time)
             puck_game->battle_control_ui_alpha = 0;
         }
     }
-    if (puck_game->game_state == LPGS_PRACTICE && puck_game_state_phase_finished(puck_game->battle_phase) == 0) {
+    if (puck_game->game_state == LPGS_PRACTICE) {
+        if (puck_game->battle_phase == LSP_READY) {
+            puck_game->prepare_step_waited_tick++;
+            if (puck_game->prepare_step_waited_tick >= puck_game->prepare_step_wait_tick) {
+                puck_game->battle_phase = LSP_STEADY;
+                puck_game->prepare_step_waited_tick = 0;
+                puck_game->battle_control_ui_alpha = 0.2f;
+            }
+        } else if (puck_game->battle_phase == LSP_STEADY) {
+            puck_game->prepare_step_waited_tick++;
+            if (puck_game->prepare_step_waited_tick >= puck_game->prepare_step_wait_tick) {
+                puck_game->battle_phase = LSP_GO;
+                puck_game->prepare_step_waited_tick = 0;
+                puck_game->battle_control_ui_alpha = 1.0f;
+            }
+        }
+    }
+    if (puck_game->game_state == LPGS_PRACTICE
+        && puck_game_state_phase_battling(puck_game->battle_phase)) {
         puck_game->update_tick++;
         puck_game->time += (float)delta_time;
         dSpaceCollide(puck_game->space, puck_game, puck_game_near_callback);
@@ -304,7 +322,7 @@ void puck_game_clear_match_data(LWCONTEXT* pLwc, LWPUCKGAME* puck_game) {
     puck_game->battle_id = 0;
     puck_game->token = 0;
     puck_game->player_no = 1;
-    puck_game->battle_control_ui_alpha = 1.0f;
+    puck_game->battle_control_ui_alpha = 0;
     memset(&pLwc->puck_game_state, 0, sizeof(pLwc->puck_game_state));
 }
 

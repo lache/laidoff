@@ -124,6 +124,7 @@ typedef struct _LWPUCKGAME {
     float player_dash_speed;
     float boundary_impact_falloff_speed;
     float boundary_impact_start;
+    int prepare_step_wait_tick; // wait ticks for each 'ready....' and 'steady....' battle phases
     // ---- Static game data end
     float world_size_half;
     float tower_pos_multiplier[LW_PUCK_GAME_TOWER_COUNT][2];
@@ -187,9 +188,10 @@ typedef struct _LWPUCKGAME {
     float main_menu_ui_alpha;
     LW_PUCK_GAME_STATE game_state;
     char searching_str[256];
+    int prepare_step_waited_tick;
 } LWPUCKGAME;
 
-LWPUCKGAME* new_puck_game();
+LWPUCKGAME* new_puck_game(int update_frequency);
 void delete_puck_game(LWPUCKGAME** puck_game);
 void puck_game_push(LWPUCKGAME* puck_game);
 float puck_game_dash_gauge_ratio(LWPUCKGAME* puck_game, const LWPUCKGAMEDASH* dash);

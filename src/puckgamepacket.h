@@ -153,6 +153,14 @@ inline int puck_game_state_phase_finished(int v) {
     return v >= LSP_FINISHED_DRAW;
 }
 
+inline int puck_game_state_phase_started(int v) {
+    return v >= LSP_GO;
+}
+
+inline int puck_game_state_phase_battling(int v) {
+    return puck_game_state_phase_started(v) && !puck_game_state_phase_finished(v);
+}
+
 typedef struct _LWPSTATEBITFIELD {
     unsigned int player_current_hp : 4;
     unsigned int player_total_hp : 4;

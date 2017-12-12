@@ -66,7 +66,7 @@ static void create_go(LWPUCKGAME* puck_game, LW_PUCK_GAME_OBJECT lpgo, float mas
     //dBodySetAutoDisableLinearThreshold(go->body, 0.05f);
 }
 
-LWPUCKGAME* new_puck_game() {
+LWPUCKGAME* new_puck_game(int update_frequency) {
     // Static game data
     LWPUCKGAME* puck_game = malloc(sizeof(LWPUCKGAME));
     memset(puck_game, 0, sizeof(LWPUCKGAME));
@@ -99,6 +99,7 @@ LWPUCKGAME* new_puck_game() {
     puck_game->player_dash_speed = 6.0f;
     puck_game->boundary_impact_falloff_speed = 10.0f;
     puck_game->boundary_impact_start = 3.0f;
+    puck_game->prepare_step_wait_tick = 2 * update_frequency;
     // datasheet end
     puck_game->world_size_half = puck_game->world_size / 2;
     puck_game->player.total_hp = puck_game->hp;
@@ -526,30 +527,40 @@ void update_puck_ownership(LWPUCKGAME* puck_game) {
     }
 }
 
-void puck_game_reset_battle_state(LWPUCKGAME* puck_game) {
-    puck_game->update_tick = 0;
-    puck_game->battle_phase = LSP_READY;
-    for (int i = 0; i < LW_PUCK_GAME_TOWER_COUNT; i++) {
-        puck_game->tower[i].hp = puck_game->tower_total_hp;
-        puck_game->tower[i].collapsing = 0;
-    }
-    dBodySetPosition(puck_game->go[LPGO_PUCK].body, 0.0f, 0.0f, puck_game->go[LPGO_PUCK].radius);
-    dBodySetPosition(puck_game->go[LPGO_PLAYER].body, -puck_game->go_start_pos, -puck_game->go_start_pos, puck_game->go[LPGO_PUCK].radius);
-    dBodySetPosition(puck_game->go[LPGO_TARGET].body, +puck_game->go_start_pos, +puck_game->go_start_pos, puck_game->go[LPGO_PUCK].radius);
+void puck_game_reset_go(LWPUCKGAME* puck_game, LWPUCKGAMEOBJECT* go, float x, float y, float z) {
+    // reset physics engine values
+    dBodySetPosition(go->body, x, y, z);
     dMatrix3 rot_identity = {
         1, 0, 0, 0,
         0, 1, 0, 0,
         0, 0, 1, 0,
     };
-    dBodySetRotation(puck_game->go[LPGO_PUCK].body, rot_identity);
-    dBodySetRotation(puck_game->go[LPGO_PLAYER].body, rot_identity);
-    dBodySetRotation(puck_game->go[LPGO_TARGET].body, rot_identity);
-    for (int i = 0; i < LPGO_COUNT; i++) {
-        dBodySetLinearVel(puck_game->go[i].body, 0, 0, 0);
-        dBodySetAngularVel(puck_game->go[i].body, 0, 0, 0);
-        dBodySetForce(puck_game->go[i].body, 0, 0, 0);
-        dBodySetTorque(puck_game->go[i].body, 0, 0, 0);
+    dBodySetRotation(go->body, rot_identity);
+    dBodySetLinearVel(go->body, 0, 0, 0);
+    dBodySetAngularVel(go->body, 0, 0, 0);
+    dBodySetForce(go->body, 0, 0, 0);
+    dBodySetTorque(go->body, 0, 0, 0);
+    // reset cached values
+    go->move_rad = 0;
+    go->pos[0] = x;
+    go->pos[1] = y;
+    go->pos[2] = z;
+    mat4x4_identity(go->rot);
+    go->speed = 0;
+    go->wall_hit_count = 0;
+}
+
+void puck_game_reset_battle_state(LWPUCKGAME* puck_game) {
+    puck_game->update_tick = 0;
+    puck_game->prepare_step_waited_tick = 0;
+    puck_game->battle_phase = LSP_READY;
+    for (int i = 0; i < LW_PUCK_GAME_TOWER_COUNT; i++) {
+        puck_game->tower[i].hp = puck_game->tower_total_hp;
+        puck_game->tower[i].collapsing = 0;
     }
+    puck_game_reset_go(puck_game, &puck_game->go[LPGO_PUCK], 0.0f, 0.0f, puck_game->go[LPGO_PUCK].radius);
+    puck_game_reset_go(puck_game, &puck_game->go[LPGO_PLAYER], -puck_game->go_start_pos, -puck_game->go_start_pos, puck_game->go[LPGO_PUCK].radius);
+    puck_game_reset_go(puck_game, &puck_game->go[LPGO_TARGET], +puck_game->go_start_pos, +puck_game->go_start_pos, puck_game->go[LPGO_PUCK].radius);
     puck_game->player.total_hp = puck_game->hp;
     puck_game->player.current_hp = puck_game->hp;
     puck_game->target.total_hp = puck_game->hp;

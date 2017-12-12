@@ -55249,6 +55249,56 @@ fail:
 }
 
 
+static int _wrap_LWPUCKGAME_prepare_step_wait_tick_set(lua_State* L) {
+  int SWIG_arg = 0;
+  struct _LWPUCKGAME *arg1 = (struct _LWPUCKGAME *) 0 ;
+  int arg2 ;
+  
+  SWIG_check_num_args("_LWPUCKGAME::prepare_step_wait_tick",2,2)
+  if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("_LWPUCKGAME::prepare_step_wait_tick",1,"struct _LWPUCKGAME *");
+  if(!lua_isnumber(L,2)) SWIG_fail_arg("_LWPUCKGAME::prepare_step_wait_tick",2,"int");
+  
+  if (!SWIG_IsOK(SWIG_ConvertPtr(L,1,(void**)&arg1,SWIGTYPE_p__LWPUCKGAME,0))){
+    SWIG_fail_ptr("LWPUCKGAME_prepare_step_wait_tick_set",1,SWIGTYPE_p__LWPUCKGAME);
+  }
+  
+  arg2 = (int)lua_tonumber(L, 2);
+  if (arg1) (arg1)->prepare_step_wait_tick = arg2;
+  
+  return SWIG_arg;
+  
+  if(0) SWIG_fail;
+  
+fail:
+  lua_error(L);
+  return SWIG_arg;
+}
+
+
+static int _wrap_LWPUCKGAME_prepare_step_wait_tick_get(lua_State* L) {
+  int SWIG_arg = 0;
+  struct _LWPUCKGAME *arg1 = (struct _LWPUCKGAME *) 0 ;
+  int result;
+  
+  SWIG_check_num_args("_LWPUCKGAME::prepare_step_wait_tick",1,1)
+  if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("_LWPUCKGAME::prepare_step_wait_tick",1,"struct _LWPUCKGAME *");
+  
+  if (!SWIG_IsOK(SWIG_ConvertPtr(L,1,(void**)&arg1,SWIGTYPE_p__LWPUCKGAME,0))){
+    SWIG_fail_ptr("LWPUCKGAME_prepare_step_wait_tick_get",1,SWIGTYPE_p__LWPUCKGAME);
+  }
+  
+  result = (int) ((arg1)->prepare_step_wait_tick);
+  lua_pushnumber(L, (lua_Number) result); SWIG_arg++;
+  return SWIG_arg;
+  
+  if(0) SWIG_fail;
+  
+fail:
+  lua_error(L);
+  return SWIG_arg;
+}
+
+
 static int _wrap_LWPUCKGAME_world_size_half_set(lua_State* L) {
   int SWIG_arg = 0;
   struct _LWPUCKGAME *arg1 = (struct _LWPUCKGAME *) 0 ;
@@ -58680,6 +58730,7 @@ static swig_lua_attribute swig_LWPUCKGAME_attributes[] = {
     { "player_dash_speed", _wrap_LWPUCKGAME_player_dash_speed_get, _wrap_LWPUCKGAME_player_dash_speed_set },
     { "boundary_impact_falloff_speed", _wrap_LWPUCKGAME_boundary_impact_falloff_speed_get, _wrap_LWPUCKGAME_boundary_impact_falloff_speed_set },
     { "boundary_impact_start", _wrap_LWPUCKGAME_boundary_impact_start_get, _wrap_LWPUCKGAME_boundary_impact_start_set },
+    { "prepare_step_wait_tick", _wrap_LWPUCKGAME_prepare_step_wait_tick_get, _wrap_LWPUCKGAME_prepare_step_wait_tick_set },
     { "world_size_half", _wrap_LWPUCKGAME_world_size_half_get, _wrap_LWPUCKGAME_world_size_half_set },
     { "tower_pos_multiplier", _wrap_LWPUCKGAME_tower_pos_multiplier_get, _wrap_LWPUCKGAME_tower_pos_multiplier_set },
     { "tower_collapsing_z_rot_angle", _wrap_LWPUCKGAME_tower_collapsing_z_rot_angle_get, _wrap_LWPUCKGAME_tower_collapsing_z_rot_angle_set },
@@ -58778,10 +58829,13 @@ static swig_lua_class _wrap_class_LWPUCKGAME = { "LWPUCKGAME", "LWPUCKGAME", &SW
 
 static int _wrap_new_puck_game(lua_State* L) {
   int SWIG_arg = 0;
+  int arg1 ;
   LWPUCKGAME *result = 0 ;
   
-  SWIG_check_num_args("new_puck_game",0,0)
-  result = (LWPUCKGAME *)new_puck_game();
+  SWIG_check_num_args("new_puck_game",1,1)
+  if(!lua_isnumber(L,1)) SWIG_fail_arg("new_puck_game",1,"int");
+  arg1 = (int)lua_tonumber(L, 1);
+  result = (LWPUCKGAME *)new_puck_game(arg1);
   SWIG_NewPointerObj(L,result,SWIGTYPE_p__LWPUCKGAME,0); SWIG_arg++; 
   return SWIG_arg;
   

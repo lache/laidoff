@@ -79,6 +79,7 @@ typedef struct _LWSERVER {
     int battle_counter;
     LWPUCKGAME* puck_game_pool[LW_PUCK_GAME_POOL_CAPACITY];
     LWNUMCOMPPUCKGAME numcomp;
+    int update_frequency;
 } LWSERVER;
 
 typedef struct _LWTCPSERVER {
@@ -148,19 +149,19 @@ static int update_puck_game(LWSERVER *server, LWPUCKGAME *puck_game, double delt
     return 0;
 }
 
-LWSERVER *new_server() {
+LWSERVER* new_server() {
     LWSERVER *server = malloc(sizeof(LWSERVER));
     memset(server, 0, sizeof(LWSERVER));
     server->slen = sizeof(server->si_other);
 #if LW_PLATFORM_WIN32
-    //Initialise winsock
-    LOGI("Initialising Winsock...");
+    // Initialize winsock
+    LOGI("Initializing Winsock...");
     if (WSAStartup(MAKEWORD(2, 2), &server->wsa) != 0)
     {
         printf("Failed. Error Code : %d", WSAGetLastError());
         exit(EXIT_FAILURE);
     }
-    LOGI("Initialised.\n");
+    LOGI("Initialized.\n");
 #endif
     //Create a socket
     if ((server->s = socket(AF_INET, SOCK_DGRAM, 0)) == INVALID_SOCKET) {
@@ -573,7 +574,7 @@ int tcp_server_entry(void *context) {
             LOGI("LWPCREATEBATTLE received");
             LWPCREATEBATTLEOK reply_p;
             LWPCREATEBATTLE* p = (LWPCREATEBATTLE*)base;
-            LWPUCKGAME *puck_game = new_puck_game();
+            LWPUCKGAME *puck_game = new_puck_game(server->update_frequency);
             memcpy(puck_game->id1, p->Id1, sizeof(puck_game->id1));
             memcpy(puck_game->id2, p->Id2, sizeof(puck_game->id2));
             memcpy(puck_game->nickname, p->Nickname1, sizeof(puck_game->nickname));
@@ -874,7 +875,9 @@ int main(int argc, char *argv[]) {
     while (!directory_exists("assets") && LwChangeDirectory("..")) {
     }
     // Create main server instance
+    const int logic_hz = 125;
     LWSERVER *server = new_server();
+    server->update_frequency = logic_hz;
     // TCP listen & reply thread (listen requests from match server)
     thrd_t thr;
     thrd_create(&thr, tcp_server_entry, server);
@@ -888,7 +891,6 @@ int main(int argc, char *argv[]) {
                                     reward_service_on_connect,
                                     reward_service_on_recv_packets);
     // Create a test puck game instance (not used for battle)
-    const int logic_hz = 125;
     const double logic_timestep = 1.0 / logic_hz;
     const int rendering_hz = 60;
     const double sim_timestep = 0.02; // 1.0f / rendering_hz; // sec

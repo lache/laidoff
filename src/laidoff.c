@@ -1928,7 +1928,10 @@ LWCONTEXT* lw_init_initial_size(int width, int height) {
 
     lwparabola_test();
 
-    pLwc->puck_game = new_puck_game();
+    pLwc->update_frequency = 125;
+    pLwc->update_interval = 1.0 / pLwc->update_frequency;// 1 / 120.0;// 0.02; // seconds
+
+    pLwc->puck_game = new_puck_game(pLwc->update_frequency);
     pLwc->puck_game->pLwc = pLwc;
 
     float dir_pad_origin_x, dir_pad_origin_y;

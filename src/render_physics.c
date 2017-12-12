@@ -192,7 +192,17 @@ static void render_tower(const LWCONTEXT* pLwc, const mat4x4 view, const mat4x4 
     }
 }
 
-static void render_go(const LWCONTEXT* pLwc, const mat4x4 view, const mat4x4 proj, const LWPUCKGAME* puck_game, const LWPUCKGAMEOBJECT* go, int tex_index, float render_scale, const float* remote_pos, const mat4x4 remote_rot, int remote, float speed) {
+static void render_go(const LWCONTEXT* pLwc,
+                      const mat4x4 view,
+                      const mat4x4 proj,
+                      const LWPUCKGAME* puck_game,
+                      const LWPUCKGAMEOBJECT* go,
+                      int tex_index,
+                      float render_scale,
+                      const float* remote_pos,
+                      const mat4x4 remote_rot,
+                      int remote,
+                      float speed) {
     int shader_index = LWST_DEFAULT;
     const LWSHADER* shader = &pLwc->shader[shader_index];
     glUseProgram(shader->program);
@@ -870,29 +880,38 @@ static void render_floor(const LWCONTEXT *pLwc, const mat4x4 proj, const LWPUCKG
     glDrawArrays(GL_TRIANGLES, 0, pLwc->vertex_buffer[lvt].vertex_count);
 }
 
-void render_battle_result_popup(const LWCONTEXT* pLwc, LWP_STATE_PHASE battle_phase, float ui_alpha) {
+void render_battle_result_popup(const LWCONTEXT* pLwc, int update_tick, LWP_STATE_PHASE battle_phase, float ui_alpha) {
     const char* sprite_name;
     LW_ATLAS_ENUM lae;
     LW_ATLAS_ENUM lae_alpha;
     LW_ATLAS_CONF lac;
+    const float sprite_width = 1.5f;
+    const float x = 0.0f;
+    float y = 0.0f;
     switch (battle_phase) {
     case LSP_READY:
         sprite_name = "ready.png";
         lae = LAE_PREPARE_TITLE_ATLAS;
         lae_alpha = LAE_PREPARE_TITLE_ATLAS_ALPHA;
         lac = LAC_PREPARE_TITLE;
+        y = 0.5f;
         break;
     case LSP_STEADY:
         sprite_name = "steady.png";
         lae = LAE_PREPARE_TITLE_ATLAS;
         lae_alpha = LAE_PREPARE_TITLE_ATLAS_ALPHA;
         lac = LAC_PREPARE_TITLE;
+        y = 0.5f;
         break;
     case LSP_GO:
+        if (update_tick > 50) {
+            return;
+        }
         sprite_name = "go.png";
         lae = LAE_PREPARE_TITLE_ATLAS;
         lae_alpha = LAE_PREPARE_TITLE_ATLAS_ALPHA;
         lac = LAC_PREPARE_TITLE;
+        y = 0.5f;
         break;
     case LSP_FINISHED_DRAW: // same as timeout
         sprite_name = "timeout.png";
@@ -915,9 +934,6 @@ void render_battle_result_popup(const LWCONTEXT* pLwc, LWP_STATE_PHASE battle_ph
     default:
         break;
     }
-    const float sprite_width = 1.5f;
-    const float x = 0.0f;
-    const float y = 0.0f;
     render_atlas_sprite(pLwc,
                         lac,
                         sprite_name,
@@ -1146,7 +1162,7 @@ static void render_battle_ui_layer(const LWCONTEXT* pLwc, const LWPUCKGAME* puck
     mat4x4_mul_vec4(player_controlled_pos_vec4_world_roll, world_roll_mat, player_controlled_pos_vec4);
     render_dash_ring_gauge(pLwc, player_controlled_pos_vec4_world_roll, ui_alpha * control_ui_alpha);
     // battle result
-    render_battle_result_popup(pLwc, puck_game->battle_phase, puck_game->battle_ui_alpha);
+    render_battle_result_popup(pLwc, puck_game->update_tick, puck_game->battle_phase, puck_game->battle_ui_alpha);
     // Register as a button
     const float button_size = 0.35f;
     const float button_margin_x = 0.025f;
