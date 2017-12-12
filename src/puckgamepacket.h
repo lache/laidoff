@@ -149,17 +149,9 @@ typedef enum _LWP_STATE_PHASE {
     LSP_FINISHED_VICTORY_P2 = 5,
 } LWP_STATE_PHASE;
 
-inline int puck_game_state_phase_finished(int v) {
-    return v >= LSP_FINISHED_DRAW;
-}
-
-inline int puck_game_state_phase_started(int v) {
-    return v >= LSP_GO;
-}
-
-inline int puck_game_state_phase_battling(int v) {
-    return puck_game_state_phase_started(v) && !puck_game_state_phase_finished(v);
-}
+#define puck_game_state_phase_finished(v) ((v) >= LSP_FINISHED_DRAW)
+#define puck_game_state_phase_started(v) ((v) >= LSP_GO)
+#define puck_game_state_phase_battling(v) (puck_game_state_phase_started((v)) && !puck_game_state_phase_finished((v)))
 
 typedef struct _LWPSTATEBITFIELD {
     unsigned int player_current_hp : 4;
