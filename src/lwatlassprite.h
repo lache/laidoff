@@ -4,8 +4,12 @@
 #include "lwmacro.h"
 
 typedef struct _LWCONTEXT LWCONTEXT;
+
+#ifndef __cplusplus
 typedef enum _LW_VBO_TYPE LW_VBO_TYPE;
 typedef enum _LW_ATLAS_ENUM LW_ATLAS_ENUM;
+#endif
+
 
 typedef enum _LW_ATLAS_SPRITE
 {
@@ -53,6 +57,7 @@ LwStaticAssert(ARRAY_SIZE(atlas_conf_filename) == LAC_COUNT, "LAC_COUNT error");
 
 const LWATLASSPRITE* atlas_sprite_name(const LWCONTEXT* pLwc, LW_ATLAS_CONF lac, const char* name);
 void atlas_sprite_uv(const LWATLASSPRITE* sprite, int width, int height, float uv_offset[2], float uv_scale[2]);
+#ifndef __cplusplus
 void render_atlas_sprite(const LWCONTEXT* pLwc,
                          LW_ATLAS_CONF atlas_conf,
                          const char* sprite_name,
@@ -63,3 +68,4 @@ void render_atlas_sprite(const LWCONTEXT* pLwc,
                          float y,
                          float ui_alpha,
                          LW_VBO_TYPE lvt);
+#endif
