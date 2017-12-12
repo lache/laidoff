@@ -116,46 +116,9 @@ void update_puck_game(LWCONTEXT* pLwc, LWPUCKGAME* puck_game, double delta_time)
     puck_game->on_puck_wall_collision = puck_game_on_puck_wall_collision;
     puck_game->on_puck_tower_collision = puck_game_on_puck_tower_collision;
     puck_game->on_puck_player_collision = puck_game_on_puck_player_collision;
-    puck_game->player.puck_contacted = 0;
     if (puck_game->game_state == LPGS_PRACTICE) {
-        if (puck_game_remain_time(puck_game->total_time, puck_game->update_tick, pLwc->update_frequency) <= 0) {
-            const int hp_diff = puck_game->player.current_hp - puck_game->target.current_hp;
-            puck_game->battle_phase = hp_diff > 0 ? LSP_FINISHED_VICTORY_P1 : hp_diff < 0 ? LSP_FINISHED_VICTORY_P2 : LSP_FINISHED_DRAW;
-            puck_game->battle_control_ui_alpha = 0;
-        }
+        puck_game_update_tick(puck_game, pLwc->update_frequency, (float)delta_time);
     }
-    if (puck_game->game_state == LPGS_PRACTICE) {
-        if (puck_game->battle_phase == LSP_READY) {
-            puck_game->prepare_step_waited_tick++;
-            if (puck_game->prepare_step_waited_tick >= puck_game->prepare_step_wait_tick) {
-                puck_game->battle_phase = LSP_STEADY;
-                puck_game->prepare_step_waited_tick = 0;
-                puck_game->battle_control_ui_alpha = 0.2f;
-            }
-        } else if (puck_game->battle_phase == LSP_STEADY) {
-            puck_game->prepare_step_waited_tick++;
-            if (puck_game->prepare_step_waited_tick >= puck_game->prepare_step_wait_tick) {
-                puck_game->battle_phase = LSP_GO;
-                puck_game->prepare_step_waited_tick = 0;
-                puck_game->battle_control_ui_alpha = 1.0f;
-            }
-        }
-    }
-    if (puck_game->game_state == LPGS_PRACTICE
-        && puck_game_state_phase_battling(puck_game->battle_phase)) {
-        puck_game->update_tick++;
-        puck_game->time += (float)delta_time;
-        dSpaceCollide(puck_game->space, puck_game, puck_game_near_callback);
-        //dWorldStep(puck_game->world, 0.005f);
-        dWorldQuickStep(puck_game->world, 1.0f / 60);
-        dJointGroupEmpty(puck_game->contact_joint_group);
-    } else if (remote && puck_game_state_phase_finished(pLwc->puck_game_state.bf.phase) == 0) {
-        puck_game->time += (float)delta_time;
-    }
-    if (puck_game->player.puck_contacted == 0) {
-        puck_game->player.last_contact_puck_body = 0;
-    }
-
     float dx, dy, dlen;
     int dir_pad_dragging = lw_get_normalized_dir_pad_input(pLwc, &pLwc->left_dir_pad, &dx, &dy, &dlen);
     const float dlen_max = pLwc->left_dir_pad.max_follow_distance;

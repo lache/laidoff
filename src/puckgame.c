@@ -781,3 +781,47 @@ void puck_game_roll_to_main_menu(LWPUCKGAME* puck_game) {
 void puck_game_set_searching_str(LWPUCKGAME* puck_game, const char* str) {
     strcpy(puck_game->searching_str, str);
 }
+
+void puck_game_update_tick(LWPUCKGAME* puck_game, int update_frequency, float delta_time) {
+    // reset per-frame caches
+    puck_game->player.puck_contacted = 0;
+    puck_game->target.puck_contacted = 0;
+    // check timeout condition
+    if (puck_game_remain_time(puck_game->total_time, puck_game->update_tick, update_frequency) <= 0) {
+        const int hp_diff = puck_game->player.current_hp - puck_game->target.current_hp;
+        puck_game->battle_phase = hp_diff > 0 ? LSP_FINISHED_VICTORY_P1 : hp_diff < 0 ? LSP_FINISHED_VICTORY_P2 : LSP_FINISHED_DRAW;
+        puck_game->battle_control_ui_alpha = 0;
+    }
+    // transition from READY to STEADY to GO
+    if (puck_game->battle_phase == LSP_READY) {
+        puck_game->prepare_step_waited_tick++;
+        if (puck_game->prepare_step_waited_tick >= puck_game->prepare_step_wait_tick) {
+            puck_game->battle_phase = LSP_STEADY;
+            puck_game->prepare_step_waited_tick = 0;
+            puck_game->battle_control_ui_alpha = 0.2f;
+        }
+    } else if (puck_game->battle_phase == LSP_STEADY) {
+        puck_game->prepare_step_waited_tick++;
+        if (puck_game->prepare_step_waited_tick >= puck_game->prepare_step_wait_tick) {
+            puck_game->battle_phase = LSP_GO;
+            puck_game->prepare_step_waited_tick = 0;
+            puck_game->battle_control_ui_alpha = 1.0f;
+        }
+    }
+    // stepping physics only if battling
+    if (puck_game_state_phase_battling(puck_game->battle_phase)) {
+        puck_game->update_tick++;
+        puck_game->time += delta_time;
+        dSpaceCollide(puck_game->space, puck_game, puck_game_near_callback);
+        //dWorldStep(puck_game->world, 0.005f);
+        dWorldQuickStep(puck_game->world, 1.0f / 60);
+        dJointGroupEmpty(puck_game->contact_joint_group);
+    }
+    // update last contact puck body
+    if (puck_game->player.puck_contacted == 0) {
+        puck_game->player.last_contact_puck_body = 0;
+    }
+    if (puck_game->target.puck_contacted == 0) {
+        puck_game->target.last_contact_puck_body = 0;
+    }
+}

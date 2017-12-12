@@ -223,3 +223,4 @@ void puck_game_roll_to_practice(LWPUCKGAME* puck_game);
 void puck_game_roll_to_main_menu(LWPUCKGAME* puck_game);
 void puck_game_reset_battle_state(LWPUCKGAME* puck_game);
 void puck_game_set_searching_str(LWPUCKGAME* puck_game, const char* str);
+void puck_game_update_tick(LWPUCKGAME* puck_game, int update_frequency, float delta_time);
