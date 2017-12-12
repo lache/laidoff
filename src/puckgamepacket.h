@@ -149,6 +149,13 @@ typedef enum _LWP_STATE_PHASE {
     LSP_FINISHED_VICTORY_P2 = 5,
 } LWP_STATE_PHASE;
 
+typedef enum _LWP_STATE_WALL_HIT_BIT {
+    LSWHB_EAST = 1 << 0,
+    LSWHB_WEST = 1 << 1,
+    LSWHB_SOUTH = 1 << 2,
+    LSWHB_NORTH = 1 << 3,
+} LWP_STATE_WALL_HIT_BIT;
+
 #define puck_game_state_phase_finished(v) ((v) >= LSP_FINISHED_DRAW)
 #define puck_game_state_phase_started(v) ((v) >= LSP_GO)
 #define puck_game_state_phase_battling(v) (puck_game_state_phase_started((v)) && !puck_game_state_phase_finished((v)))
@@ -160,8 +167,9 @@ typedef struct _LWPSTATEBITFIELD {
     unsigned int target_total_hp : 4;
     unsigned int puck_owner_player_no : 2;
     unsigned int phase : 3; // LWP_STATE_PHASE
-    unsigned int player_pull: 1;
+    unsigned int player_pull : 1;
     unsigned int target_pull : 1;
+    unsigned int wall_hit_bit : 4; // LWP_STATE_WALL_HIT_BIT (ORing)
 } LWPSTATEBITFIELD;
 
 // UDP

@@ -647,11 +647,13 @@ void send_puck_game_state2(LWSERVER* server,
                            struct sockaddr* sa) {
     LW_PUCK_GAME_OBJECT player_go_enum = LPGO_PLAYER;
     LW_PUCK_GAME_OBJECT target_go_enum = LPGO_TARGET;
-    const LWPUCKGAMEPLAYER *player = &puck_game->player;
-    const LWPUCKGAMEPLAYER *target = &puck_game->target;
+    const LWPUCKGAMEPLAYER* player = &puck_game->player;
+    const LWPUCKGAMEPLAYER* target = &puck_game->target;
+    const int* wall_hit_bit = &puck_game->wall_hit_bit_send_buf_1;
     if (player_no == 2) {
         player = &puck_game->target;
         target = &puck_game->player;
+        wall_hit_bit = &puck_game->wall_hit_bit_send_buf_2;
     }
     LWPSTATE2 packet_state;
     packet_state.type = LPGP_LWPSTATE2;
@@ -670,6 +672,10 @@ void send_puck_game_state2(LWSERVER* server,
     packet_state.bf.phase = (unsigned int)puck_game->battle_phase;
     packet_state.bf.player_pull = (unsigned int)puck_game->remote_control[0].pull_puck;
     packet_state.bf.target_pull = (unsigned int)puck_game->remote_control[1].pull_puck;
+    packet_state.bf.wall_hit_bit = (unsigned int)*wall_hit_bit;
+    if (*wall_hit_bit && player_no == 1) {
+        LOGI("WALL HIT BIT: %d", *wall_hit_bit);
+    }
     // send!
     double tp = lwtimepoint_now_seconds();
     sendto(server->s,
@@ -747,7 +753,7 @@ void broadcast_state_packet(LWSERVER *server, const LWCONN *conn, int conn_capac
             && check_player_no(conn[i].player_no)
             && conn[i].battle_id >= 1
             && conn[i].battle_id <= LW_PUCK_GAME_POOL_CAPACITY) {
-            const LWPUCKGAME *puck_game = server->puck_game_pool[conn[i].battle_id - 1];
+            LWPUCKGAME *puck_game = server->puck_game_pool[conn[i].battle_id - 1];
             if (puck_game) {
 //                send_puck_game_state(server,
 //                                     puck_game,
@@ -757,6 +763,13 @@ void broadcast_state_packet(LWSERVER *server, const LWCONN *conn, int conn_capac
                                       puck_game,
                                       conn[i].player_no,
                                       (struct sockaddr*)&conn[i].si);
+                // clear wall hit bit send buf for each player
+                if (conn[i].player_no == 1) {
+                    puck_game->wall_hit_bit_send_buf_1 = 0;
+                } else {
+                    puck_game->wall_hit_bit_send_buf_2 = 0;
+                }
+                // sent okay
                 sent = 1;
             }
         }

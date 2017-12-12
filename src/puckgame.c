@@ -272,8 +272,9 @@ void near_puck_wall(LWPUCKGAME* puck_game, dGeomID puck_geom, dGeomID wall_geom,
         LOGE("boundary geom data corrupted");
         return;
     }
-    puck_game->boundary_impact[boundary] = puck_game->boundary_impact_start;
-    puck_game->boundary_impact_player_no[boundary] = puck_game->puck_owner_player_no;
+    puck_game->wall_hit_bit |= 1 << (boundary - LPGB_E);
+    puck_game->wall_hit_bit_send_buf_1 |= puck_game->wall_hit_bit;
+    puck_game->wall_hit_bit_send_buf_2 |= puck_game->wall_hit_bit;
     // custom collision callback
     call_collision_callback(puck_game, contact, puck_game->on_puck_wall_collision);
 }
@@ -786,6 +787,8 @@ void puck_game_update_tick(LWPUCKGAME* puck_game, int update_frequency, float de
     // reset per-frame caches
     puck_game->player.puck_contacted = 0;
     puck_game->target.puck_contacted = 0;
+    // reset wall hit bits
+    puck_game->wall_hit_bit = 0;
     // check timeout condition
     if (puck_game_remain_time(puck_game->total_time, puck_game->update_tick, update_frequency) <= 0) {
         const int hp_diff = puck_game->player.current_hp - puck_game->target.current_hp;

@@ -1393,8 +1393,11 @@ static void dequeue_puck_game_state_and_apply(LWCONTEXT* pLwc) {
         }
         // Overwrite old game state with a new one
         memcpy(&pLwc->puck_game_state, &new_state, sizeof(LWPSTATE));
+        // Overwrite various sync state variables
         pLwc->puck_game->battle_phase = new_state.bf.phase;
         pLwc->puck_game->update_tick = new_state.update_tick;
+        pLwc->puck_game->wall_hit_bit = new_state.bf.wall_hit_bit;
+        pLwc->puck_game->puck_owner_player_no = new_state.bf.puck_owner_player_no;
     } else {
         LOGE("State buffer dequeue failed.");
     }

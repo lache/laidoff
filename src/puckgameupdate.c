@@ -120,6 +120,18 @@ void update_puck_game(LWCONTEXT* pLwc, LWPUCKGAME* puck_game, double delta_time)
     if (puck_game->game_state == LPGS_PRACTICE) {
         puck_game_update_tick(puck_game, pLwc->update_frequency, (float)delta_time);
     }
+    // set boundary impact according to wall hit bits
+    for (int i = 0; i < 4; i++) {
+        if ((puck_game->wall_hit_bit >> i) & 1) {
+            int boundary = LPGB_E + i;
+            puck_game->boundary_impact[boundary] = puck_game->boundary_impact_start;
+            puck_game->boundary_impact_player_no[boundary] = puck_game->puck_owner_player_no;
+        }
+    }
+    // clear wall hit bit here only on online mode
+    if (puck_game->game_state == LPGS_BATTLE) {
+        puck_game->wall_hit_bit = 0;
+    }
     // TODO temporarily use time for dash cooltime
     puck_game->time += (float)delta_time;
     // change control UI alpha according to the battle phase

@@ -189,6 +189,9 @@ typedef struct _LWPUCKGAME {
     LW_PUCK_GAME_STATE game_state;
     char searching_str[256];
     int prepare_step_waited_tick;
+    int wall_hit_bit; // LWP_STATE_WALL_HIT_BIT (ORing) - reset at every tick
+    int wall_hit_bit_send_buf_1; // reset at every UDP state sync send (P1)
+    int wall_hit_bit_send_buf_2; // reset at every UDP state sync send (P2)
 } LWPUCKGAME;
 
 LWPUCKGAME* new_puck_game(int update_frequency);
