@@ -130,7 +130,7 @@ void update_puck_game(LWCONTEXT* pLwc, LWPUCKGAME* puck_game, double delta_time)
         //dWorldStep(puck_game->world, 0.005f);
         dWorldQuickStep(puck_game->world, 1.0f / 60);
         dJointGroupEmpty(puck_game->contact_joint_group);
-    } else if (remote && pLwc->puck_game_state.bf.finished == 0) {
+    } else if (remote && puck_game_state_phase_finished(pLwc->puck_game_state.bf.phase) == 0) {
         puck_game->time += (float)delta_time;
     }
     if (puck_game->player.puck_contacted == 0) {
@@ -152,7 +152,7 @@ void update_puck_game(LWCONTEXT* pLwc, LWPUCKGAME* puck_game, double delta_time)
     puck_game->remote_control[0].dy = dy;
     puck_game->remote_control[0].dlen = dlen_ratio;
 
-    const int send_udp = remote && pLwc->puck_game_state.bf.finished == 0;
+    const int send_udp = remote && puck_game_state_phase_finished(pLwc->puck_game_state.bf.phase) == 0;
     
     if (dir_pad_dragging) {
         LOGIx("dx=%.2f, dy=%.2f, dlen=%.2f, dlen_max=%.2f", dx, dy, dlen, dlen_max);
@@ -238,7 +238,7 @@ void puck_game_jump(LWCONTEXT* pLwc, LWPUCKGAME* puck_game) {
 
     const int remote = puck_game_remote(pLwc, puck_game);
 
-    if (pLwc->puck_game_state.bf.finished == 0
+    if (puck_game_state_phase_finished(pLwc->puck_game_state.bf.phase) == 0
         && remote) {
         LWPJUMP packet_jump;
         packet_jump.type = LPGP_LWPJUMP;
@@ -252,7 +252,7 @@ void puck_game_dash_and_send(LWCONTEXT* pLwc, LWPUCKGAME* puck_game) {
     LWPUCKGAMEDASH* dash = &puck_game->remote_dash[puck_game->player_no == 2 ? 1 : 0];
     if (puck_game_dash(puck_game, dash, puck_game->player_no == 2 ? 2 : 1) == 0) {
         const int remote = puck_game_remote(pLwc, puck_game);
-        const int send_udp = remote && pLwc->puck_game_state.bf.finished == 0;
+        const int send_udp = remote && puck_game_state_phase_finished(pLwc->puck_game_state.bf.phase) == 0;
         if (send_udp) {
             LWPDASH packet_dash;
             packet_dash.type = LPGP_LWPDASH;
@@ -311,7 +311,7 @@ void puck_game_rematch(LWCONTEXT* pLwc, LWPUCKGAME* puck_game) {
     // queue again after game ended
     if (puck_game->battle_id
         && puck_game->token
-        && pLwc->puck_game_state.bf.finished) {
+        && puck_game_state_phase_finished(pLwc->puck_game_state.bf.phase)) {
         puck_game_clear_match_data(pLwc, puck_game);
         puck_game_reset_view_proj(pLwc, puck_game);
         puck_game_reset(puck_game);

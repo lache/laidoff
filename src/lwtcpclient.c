@@ -200,7 +200,7 @@ int parse_recv_packets(LWTCP* tcp) {
             show_sys_msg(pLwc->def_sys_msg, "server internal error");
             pLwc->puck_game->battle_id = 99999;
             pLwc->puck_game->token = 99999;
-            pLwc->puck_game_state.bf.finished = 1;
+            pLwc->puck_game_state.bf.phase = LSP_FINISHED_DRAW;
         } else if (CHECK_PACKET(packet_type, packet_size, LWPMAYBEMATCHED)) {
             LOGI("LWPMAYBEMATCHED received");
             //show_sys_msg(pLwc->def_sys_msg, "LWPMAYBEMATCHED received");

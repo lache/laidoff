@@ -1384,7 +1384,8 @@ static void dequeue_puck_game_state_and_apply(LWCONTEXT* pLwc) {
             }
         }
         // If the battle is finished (called once)
-        if (pLwc->puck_game_state.bf.finished == 0 && new_state.bf.finished == 1) {
+        if (puck_game_state_phase_finished(pLwc->puck_game_state.bf.phase) == 0
+            && puck_game_state_phase_finished(new_state.bf.phase) == 1) {
             LOGI(LWLOGPOS "Battle finished. Destroying UDP context...");
             destroy_udp(&pLwc->udp);
             //puck_game_roll_to_main_menu(pLwc->puck_game);

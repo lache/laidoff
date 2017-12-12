@@ -683,7 +683,7 @@ void send_puck_game_state2(LWSERVER* server,
     packet_state.bf.target_current_hp = (unsigned int)target->current_hp;
     packet_state.bf.target_total_hp = (unsigned int)target->total_hp;
     packet_state.bf.puck_owner_player_no = (unsigned int)puck_game->puck_owner_player_no;
-    packet_state.bf.finished = (unsigned int)puck_game->finished;
+    packet_state.bf.phase = (unsigned int)(puck_game->finished ? LSP_FINISHED_DRAW : LSP_GO);
     packet_state.bf.player_pull = (unsigned int)puck_game->remote_control[0].pull_puck;
     packet_state.bf.target_pull = (unsigned int)puck_game->remote_control[1].pull_puck;
     // send!
@@ -740,7 +740,7 @@ void send_puck_game_state(LWSERVER* server,
     packet_state.bf.target_current_hp = (unsigned int)target->current_hp;
     packet_state.bf.target_total_hp = (unsigned int)target->total_hp;
     packet_state.bf.puck_owner_player_no = (unsigned int)puck_game->puck_owner_player_no;
-    packet_state.bf.finished = (unsigned int)puck_game->finished;
+    packet_state.bf.phase = (unsigned int)(puck_game->finished ? LSP_FINISHED_DRAW : LSP_GO);
     packet_state.bf.player_pull = (unsigned int)puck_game->remote_control[0].pull_puck;
     packet_state.bf.target_pull = (unsigned int)puck_game->remote_control[1].pull_puck;
     // send!

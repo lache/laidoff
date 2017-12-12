@@ -475,7 +475,7 @@ static void render_match_state(const LWCONTEXT* pLwc, float ui_alpha) {
     SET_COLOR_RGBA_FLOAT(text_block.color_emp_glyph, 1, 1, 0, ui_alpha);
     SET_COLOR_RGBA_FLOAT(text_block.color_emp_outline, 0, 0, 0, ui_alpha);
     char str[128];
-    if (pLwc->puck_game_state.bf.finished) {
+    if (puck_game_state_phase_finished(pLwc->puck_game_state.bf.phase)) {
         int hp_diff = pLwc->puck_game_state.bf.player_current_hp - pLwc->puck_game_state.bf.target_current_hp;
         if (hp_diff == 0) {
             sprintf(str, u8"DRAW (BID:%d) (TOUCH 'JUMP' TO REMATCH)", pLwc->puck_game->battle_id);

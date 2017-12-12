@@ -140,13 +140,26 @@ typedef struct _LWPPULLSTOP {
 	int token;
 } LWPPULLSTOP;
 
+typedef enum _LWP_STATE_PHASE {
+    LSP_READY = 0,
+    LSP_STEADY = 1,
+    LSP_GO = 2,
+    LSP_FINISHED_DRAW = 3,
+    LSP_FINISHED_VICTORY_P1 = 4,
+    LSP_FINISHED_VICTORY_P2 = 5,
+} LWP_STATE_PHASE;
+
+inline int puck_game_state_phase_finished(int v) {
+    return v >= LSP_FINISHED_DRAW;
+}
+
 typedef struct _LWPSTATEBITFIELD {
     unsigned int player_current_hp : 4;
     unsigned int player_total_hp : 4;
     unsigned int target_current_hp : 4;
     unsigned int target_total_hp : 4;
     unsigned int puck_owner_player_no : 2;
-    unsigned int finished : 1;
+    unsigned int phase : 3; // LWP_STATE_PHASE
     unsigned int player_pull: 1;
     unsigned int target_pull : 1;
 } LWPSTATEBITFIELD;
