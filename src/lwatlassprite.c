@@ -1,6 +1,7 @@
 #include "lwatlassprite.h"
 #include "lwcontext.h"
 #include "render_solid.h"
+#include <string.h>
 
 const LWATLASSPRITE* atlas_sprite_name(const LWCONTEXT* pLwc, LW_ATLAS_CONF lac, const char* name) {
     const LWATLASSPRITEARRAY* a = &pLwc->atlas_conf[lac];
