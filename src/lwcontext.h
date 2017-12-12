@@ -320,6 +320,8 @@ typedef struct _LWCONTEXT {
 	GLuint particle_buffer;
 	// Particle system buffer (explosion)
 	GLuint particle_buffer2;
+    // Logic update frequency (in Hz)
+    int update_frequency;
 	// Logic update interval (in seconds)
 	double update_interval;
 	// 1 if safe to render, 0 if otherwise

@@ -407,7 +407,7 @@ void lw_press_key_x(LWCONTEXT* pLwc) {
 
 void lw_press_key_w(LWCONTEXT* pLwc) {
     if (pLwc->puck_game) {
-        pLwc->puck_game->update_tick = (int)(125.0f * (pLwc->puck_game->total_time - 3.0f));
+        pLwc->puck_game->update_tick = (int)(pLwc->update_frequency * (pLwc->puck_game->total_time - 3.0f));
     }
 }
 

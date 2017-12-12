@@ -313,7 +313,7 @@ void near_puck_tower(LWPUCKGAME* puck_game, dGeomID puck_geom, LWPUCKGAMETOWER* 
                     // on_death...
                     tower->collapsing = 1;
                     tower->collapsing_time = 0;
-                    puck_game->finished = 1;
+                    puck_game->battle_phase = tower->owner_player_no == 1 ? LSP_FINISHED_VICTORY_P2 : LSP_FINISHED_VICTORY_P1;
                     puck_game->battle_control_ui_alpha = 0;
                 }
             }
@@ -495,8 +495,12 @@ void puck_game_commit_dash_to_puck(LWPUCKGAME* puck_game, LWPUCKGAMEDASH* dash, 
     puck_game_commit_dash(puck_game, dash, dx, dy);
 }
 
-float puck_game_remain_time(float total_time, int update_tick) {
-    return floorf(LWMAX(0, total_time - update_tick * 1.0f / 125));
+float puck_game_remain_time(float total_time, int update_tick, int update_frequency) {
+    return LWMAX(0, total_time - update_tick * 1.0f / update_frequency);
+}
+
+int puck_game_remain_time_floor(float total_time, int update_tick, int update_frequency) {
+    return (int)floorf(puck_game_remain_time(total_time, update_tick, update_frequency));
 }
 
 void puck_game_commit_fire(LWPUCKGAME* puck_game, LWPUCKGAMEFIRE* fire, int player_no, float puck_fire_dx, float puck_fire_dy, float puck_fire_dlen) {
@@ -524,7 +528,7 @@ void update_puck_ownership(LWPUCKGAME* puck_game) {
 
 void puck_game_reset_battle_state(LWPUCKGAME* puck_game) {
     puck_game->update_tick = 0;
-    puck_game->finished = 0;
+    puck_game->battle_phase = LSP_READY;
     for (int i = 0; i < LW_PUCK_GAME_TOWER_COUNT; i++) {
         puck_game->tower[i].hp = puck_game->tower_total_hp;
         puck_game->tower[i].collapsing = 0;

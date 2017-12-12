@@ -118,12 +118,13 @@ void update_puck_game(LWCONTEXT* pLwc, LWPUCKGAME* puck_game, double delta_time)
     puck_game->on_puck_player_collision = puck_game_on_puck_player_collision;
     puck_game->player.puck_contacted = 0;
     if (puck_game->game_state == LPGS_PRACTICE) {
-        if (puck_game_remain_time(puck_game->total_time, puck_game->update_tick) <= 0) {
-            puck_game->finished = 1;
+        if (puck_game_remain_time(puck_game->total_time, puck_game->update_tick, pLwc->update_frequency) <= 0) {
+            const int hp_diff = puck_game->player.current_hp - puck_game->target.current_hp;
+            puck_game->battle_phase = hp_diff > 0 ? LSP_FINISHED_VICTORY_P1 : hp_diff < 0 ? LSP_FINISHED_VICTORY_P2 : LSP_FINISHED_DRAW;
             puck_game->battle_control_ui_alpha = 0;
         }
     }
-    if (puck_game->game_state == LPGS_PRACTICE && puck_game->finished == 0) {
+    if (puck_game->game_state == LPGS_PRACTICE && puck_game_state_phase_finished(puck_game->battle_phase) == 0) {
         puck_game->update_tick++;
         puck_game->time += (float)delta_time;
         dSpaceCollide(puck_game->space, puck_game, puck_game_near_callback);

@@ -164,7 +164,7 @@ typedef struct _LWPUCKGAME {
     LWPUCKGAMEJUMP remote_jump[2];
     LWPUCKGAMEFIRE remote_fire[2];
 	int init_ready;
-	int finished;
+    LWP_STATE_PHASE battle_phase;
 	int update_tick;
 	char nickname[LW_NICKNAME_MAX_LEN];
 	char target_nickname[LW_NICKNAME_MAX_LEN];
@@ -201,7 +201,8 @@ void puck_game_near_callback(void *data, dGeomID o1, dGeomID o2);
 void puck_game_commit_jump(LWPUCKGAME* puck_game, LWPUCKGAMEJUMP* jump, int player_no);
 void puck_game_commit_dash(LWPUCKGAME* puck_game, LWPUCKGAMEDASH* dash, float dx, float dy);
 void puck_game_commit_dash_to_puck(LWPUCKGAME* puck_game, LWPUCKGAMEDASH* dash, int player_no);
-float puck_game_remain_time(float total_time, int update_tick);
+float puck_game_remain_time(float total_time, int update_tick, int update_frequency);
+int puck_game_remain_time_floor(float total_time, int update_tick, int update_frequency);
 void puck_game_commit_fire(LWPUCKGAME* puck_game, LWPUCKGAMEFIRE* fire, int player_no, float puck_fire_dx, float puck_fire_dy, float puck_fire_dlen);
 void update_puck_ownership(LWPUCKGAME* puck_game);
 void update_puck_reflect_size(LWPUCKGAME* puck_game, float delta_time);

@@ -77,7 +77,7 @@ typedef struct _LWSERVER {
     int broadcast_count;
     int token_counter;
     int battle_counter;
-    LWPUCKGAME *puck_game_pool[LW_PUCK_GAME_POOL_CAPACITY];
+    LWPUCKGAME* puck_game_pool[LW_PUCK_GAME_POOL_CAPACITY];
     LWNUMCOMPPUCKGAME numcomp;
 } LWSERVER;
 
@@ -401,7 +401,7 @@ int control_index_from_player_no(int player_no) {
     return player_no - 1;
 }
 
-void select_server(LWSERVER *server, LWPUCKGAME *puck_game, LWCONN *conn, int conn_capacity) {
+void select_server(LWSERVER *server, LWCONN *conn, int conn_capacity) {
     //clear the buffer by filling null, it might have previously received data
     memset(server->buf, '\0', BUFLEN);
     fd_set readfds;
@@ -630,7 +630,7 @@ int tcp_server_entry(void *context) {
                 // index out of range
             } else {
                 LWPUCKGAME *pg = server->puck_game_pool[p->Battle_id - 1];
-                reply_p.Valid = (pg && pg->finished == 0);
+                reply_p.Valid = (pg && puck_game_state_phase_finished(pg->battle_phase) == 0);
             }
             send(client_sock, (const char*)&reply_p, sizeof(LWPBATTLEVALID), 0);
         } else {
@@ -683,7 +683,7 @@ void send_puck_game_state2(LWSERVER* server,
     packet_state.bf.target_current_hp = (unsigned int)target->current_hp;
     packet_state.bf.target_total_hp = (unsigned int)target->total_hp;
     packet_state.bf.puck_owner_player_no = (unsigned int)puck_game->puck_owner_player_no;
-    packet_state.bf.phase = (unsigned int)(puck_game->finished ? LSP_FINISHED_DRAW : LSP_GO);
+    packet_state.bf.phase = (unsigned int)puck_game->battle_phase;
     packet_state.bf.player_pull = (unsigned int)puck_game->remote_control[0].pull_puck;
     packet_state.bf.target_pull = (unsigned int)puck_game->remote_control[1].pull_puck;
     // send!
@@ -740,7 +740,7 @@ void send_puck_game_state(LWSERVER* server,
     packet_state.bf.target_current_hp = (unsigned int)target->current_hp;
     packet_state.bf.target_total_hp = (unsigned int)target->total_hp;
     packet_state.bf.puck_owner_player_no = (unsigned int)puck_game->puck_owner_player_no;
-    packet_state.bf.phase = (unsigned int)(puck_game->finished ? LSP_FINISHED_DRAW : LSP_GO);
+    packet_state.bf.phase = (unsigned int)puck_game->battle_phase;
     packet_state.bf.player_pull = (unsigned int)puck_game->remote_control[0].pull_puck;
     packet_state.bf.target_pull = (unsigned int)puck_game->remote_control[1].pull_puck;
     // send!
@@ -888,8 +888,6 @@ int main(int argc, char *argv[]) {
                                     reward_service_on_connect,
                                     reward_service_on_recv_packets);
     // Create a test puck game instance (not used for battle)
-    LWPUCKGAME *puck_game = new_puck_game();
-    puck_game->server = server;
     const int logic_hz = 125;
     const double logic_timestep = 1.0 / logic_hz;
     const int rendering_hz = 60;
@@ -911,13 +909,14 @@ int main(int argc, char *argv[]) {
             for (int i = 0; i < iter; i++) {
                 //update_puck_game(server, puck_game, logic_timestep);
                 for (int j = 0; j < LW_PUCK_GAME_POOL_CAPACITY; j++) {
-                    if (server->puck_game_pool[j]
-                        && server->puck_game_pool[j]->init_ready) {
-                        if (server->puck_game_pool[j]->finished == 0
-                            && update_puck_game(server, server->puck_game_pool[j], logic_timestep) < 0) {
-                            server->puck_game_pool[j]->finished = 1;
-                            LOGI("Battle finished. (battle id = %d)", server->puck_game_pool[j]->battle_id);
-                            process_battle_reward(server->puck_game_pool[j], reward_service);
+                    LWPUCKGAME* puck_game = server->puck_game_pool[j];
+                    if (puck_game && puck_game->init_ready) {
+                        if (puck_game_state_phase_finished(puck_game->battle_phase) == 0
+                            && update_puck_game(server, puck_game, logic_timestep) < 0) {
+                            const int hp_diff = puck_game->player.current_hp - puck_game->target.current_hp;
+                            puck_game->battle_phase = hp_diff > 0 ? LSP_FINISHED_VICTORY_P1 : hp_diff < 0 ? LSP_FINISHED_VICTORY_P2 : LSP_FINISHED_DRAW;
+                            LOGI("Battle finished. (battle id = %d)", puck_game->battle_id);
+                            process_battle_reward(puck_game, reward_service);
                         }
                     }
                 }
@@ -938,14 +937,14 @@ int main(int argc, char *argv[]) {
         //LOGI("Waiting for data...");
         fflush(stdout);
 
-        select_server(server, puck_game, conn, LW_CONN_CAPACITY);
+        select_server(server, conn, LW_CONN_CAPACITY);
 
         double loop_time = lwtimepoint_now_seconds() - loop_start;
         logic_elapsed_ms += loop_time * 1000;
         sync_elapsed_ms += loop_time * 1000;
         //LOGI("Loop time: %.3f ms", loop_time * 1000);
     }
-    delete_puck_game(&puck_game);
+    //delete_puck_game(&puck_game);
     destroy_tcp(&reward_service);
     return 0;
 }

@@ -887,7 +887,8 @@ static void s_logic_worker(zsock_t *pipe, void *args) {
 	LWTIMEPOINT last_time;
 	lwtimepoint_now(&last_time);
 	double delta_time_accum = 0;
-	pLwc->update_interval = 1 / 125.0;// 1 / 120.0;// 0.02; // seconds
+    pLwc->update_frequency = 125;
+	pLwc->update_interval = 1.0 / pLwc->update_frequency;// 1 / 120.0;// 0.02; // seconds
 
 	// Create a new udp instance here since
 	// WSAStartup should be called within
