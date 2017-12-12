@@ -117,35 +117,18 @@ static int lw_get_normalized_dir_pad_input(const LWREMOTEPLAYERCONTROL *control,
     return 1;
 }
 
-static int update_puck_game(LWSERVER *server, LWPUCKGAME *puck_game, double delta_time) {
-    puck_game->time += (float) delta_time;
-    if (puck_game->player.current_hp <= 0
-        || puck_game->target.current_hp <= 0
-        || puck_game->time >= puck_game->total_time) {
+static int update_puck_game(LWSERVER* server, LWPUCKGAME* puck_game, double delta_time) {
+    // update tick (server-client shared portion)
+    puck_game_update_tick(puck_game, server->update_frequency, (float)delta_time);
+    // check for termination condition
+    if (puck_game_state_phase_finished(puck_game->battle_phase)) {
         return -1;
     }
-    puck_game->player.puck_contacted = 0;
-    puck_game->target.puck_contacted = 0;
-    dSpaceCollide(puck_game->space, puck_game, puck_game_near_callback);
-    //dWorldStep(puck_game->world, 0.005f);
-    dWorldQuickStep(puck_game->world, 1.0f / 60);
-    dJointGroupEmpty(puck_game->contact_joint_group);
-    if (puck_game->player.puck_contacted == 0) {
-        puck_game->player.last_contact_puck_body = 0;
-    }
-    if (puck_game->target.puck_contacted == 0) {
-        puck_game->target.last_contact_puck_body = 0;
-    }
-
-    const dReal *p = dBodyGetPosition(puck_game->go[LPGO_PUCK].body);
-    LOGIx("pos %.2f %.2f %.2f", p[0], p[1], p[2]);
-
     for (int i = 0; i < 2; i++) {
         puck_game_update_remote_player(puck_game, (float)delta_time, i);
     }
     update_puck_ownership(puck_game);
     update_puck_reflect_size(puck_game, (float)delta_time);
-    puck_game->update_tick++;
     return 0;
 }
 
@@ -909,14 +892,11 @@ int main(int argc, char *argv[]) {
         if (logic_elapsed_ms > 0) {
             int iter = (int) (logic_elapsed_ms / (logic_timestep * 1000));
             for (int i = 0; i < iter; i++) {
-                //update_puck_game(server, puck_game, logic_timestep);
                 for (int j = 0; j < LW_PUCK_GAME_POOL_CAPACITY; j++) {
                     LWPUCKGAME* puck_game = server->puck_game_pool[j];
                     if (puck_game && puck_game->init_ready) {
                         if (puck_game_state_phase_finished(puck_game->battle_phase) == 0
                             && update_puck_game(server, puck_game, logic_timestep) < 0) {
-                            const int hp_diff = puck_game->player.current_hp - puck_game->target.current_hp;
-                            puck_game->battle_phase = hp_diff > 0 ? LSP_FINISHED_VICTORY_P1 : hp_diff < 0 ? LSP_FINISHED_VICTORY_P2 : LSP_FINISHED_DRAW;
                             LOGI("Battle finished. (battle id = %d)", puck_game->battle_id);
                             process_battle_reward(puck_game, reward_service);
                         }

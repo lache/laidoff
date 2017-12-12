@@ -116,8 +116,19 @@ void update_puck_game(LWCONTEXT* pLwc, LWPUCKGAME* puck_game, double delta_time)
     puck_game->on_puck_wall_collision = puck_game_on_puck_wall_collision;
     puck_game->on_puck_tower_collision = puck_game_on_puck_tower_collision;
     puck_game->on_puck_player_collision = puck_game_on_puck_player_collision;
+    // tick physics engine only if practice mode (single play mode)
     if (puck_game->game_state == LPGS_PRACTICE) {
         puck_game_update_tick(puck_game, pLwc->update_frequency, (float)delta_time);
+    }
+    // TODO temporarily use time for dash cooltime
+    puck_game->time += (float)delta_time;
+    // change control UI alpha according to the battle phase
+    if (puck_game->battle_phase == LSP_READY) {
+        puck_game->battle_control_ui_alpha = 0.0f;
+    } else if (puck_game->battle_phase == LSP_STEADY) {
+        puck_game->battle_control_ui_alpha = 0.2f;
+    } else if (puck_game->battle_phase == LSP_GO) {
+        puck_game->battle_control_ui_alpha = 1.0f;
     }
     float dx, dy, dlen;
     int dir_pad_dragging = lw_get_normalized_dir_pad_input(pLwc, &pLwc->left_dir_pad, &dx, &dy, &dlen);

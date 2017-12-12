@@ -811,9 +811,7 @@ void puck_game_update_tick(LWPUCKGAME* puck_game, int update_frequency, float de
     // stepping physics only if battling
     if (puck_game_state_phase_battling(puck_game->battle_phase)) {
         puck_game->update_tick++;
-        puck_game->time += delta_time;
         dSpaceCollide(puck_game->space, puck_game, puck_game_near_callback);
-        //dWorldStep(puck_game->world, 0.005f);
         dWorldQuickStep(puck_game->world, 1.0f / 60);
         dJointGroupEmpty(puck_game->contact_joint_group);
     }

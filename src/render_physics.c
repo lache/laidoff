@@ -880,7 +880,11 @@ static void render_floor(const LWCONTEXT *pLwc, const mat4x4 proj, const LWPUCKG
     glDrawArrays(GL_TRIANGLES, 0, pLwc->vertex_buffer[lvt].vertex_count);
 }
 
-void render_battle_result_popup(const LWCONTEXT* pLwc, int update_tick, LWP_STATE_PHASE battle_phase, float ui_alpha) {
+static void render_battle_result_popup(const LWCONTEXT* pLwc,
+                                       int player_no,
+                                       int update_tick,
+                                       LWP_STATE_PHASE battle_phase,
+                                       float ui_alpha) {
     const char* sprite_name;
     LW_ATLAS_ENUM lae;
     LW_ATLAS_ENUM lae_alpha;
@@ -920,13 +924,13 @@ void render_battle_result_popup(const LWCONTEXT* pLwc, int update_tick, LWP_STAT
         lac = LAC_PREPARE_TITLE;
         break;
     case LSP_FINISHED_VICTORY_P1:
-        sprite_name = "victory.png";
+        sprite_name = player_no == 2 ? "defeat.png" : "victory.png";
         lae = LAE_RESULT_TITLE_ATLAS;
         lae_alpha = LAE_RESULT_TITLE_ATLAS_ALPHA;
         lac = LAC_RESULT_TITLE;
         break;
     case LSP_FINISHED_VICTORY_P2:
-        sprite_name = "defeat.png";
+        sprite_name = player_no == 2 ? "victory.png" : "defeat.png";
         lae = LAE_RESULT_TITLE_ATLAS;
         lae_alpha = LAE_RESULT_TITLE_ATLAS_ALPHA;
         lac = LAC_RESULT_TITLE;
@@ -1162,7 +1166,11 @@ static void render_battle_ui_layer(const LWCONTEXT* pLwc, const LWPUCKGAME* puck
     mat4x4_mul_vec4(player_controlled_pos_vec4_world_roll, world_roll_mat, player_controlled_pos_vec4);
     render_dash_ring_gauge(pLwc, player_controlled_pos_vec4_world_roll, ui_alpha * control_ui_alpha);
     // battle result
-    render_battle_result_popup(pLwc, puck_game->update_tick, puck_game->battle_phase, puck_game->battle_ui_alpha);
+    render_battle_result_popup(pLwc,
+                               puck_game->player_no,
+                               puck_game->update_tick,
+                               puck_game->battle_phase,
+                               puck_game->battle_ui_alpha);
     // Register as a button
     const float button_size = 0.35f;
     const float button_margin_x = 0.025f;
