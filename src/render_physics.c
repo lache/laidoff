@@ -1221,9 +1221,8 @@ static void render_battle_ui_layer(const LWCONTEXT* pLwc, const LWPUCKGAME* puck
                             1.0f,
                             1.0f);
     }
-    if (remote == 0 // on practice mode
-        || control_ui_alpha == 0 // on battle finished
-        ) {
+    if (puck_game->game_state == LPGS_PRACTICE
+        || puck_game_state_phase_finished(puck_game->battle_phase)) {
         // return to main menu button
         lwbutton_lae_append(&(((LWCONTEXT*)pLwc)->button_list),
                             "back_button",
