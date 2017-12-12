@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		2601224A1FDFDF03005941B7 /* lwatlassprite.c in Sources */ = {isa = PBXBuildFile; fileRef = 260122491FDFDF03005941B7 /* lwatlassprite.c */; };
 		2641822E1FB6FD0300BF2D42 /* lwdamagetext.c in Sources */ = {isa = PBXBuildFile; fileRef = 2641822D1FB6FD0300BF2D42 /* lwdamagetext.c */; };
 		264182301FB6FD0900BF2D42 /* lwmath.c in Sources */ = {isa = PBXBuildFile; fileRef = 2641822F1FB6FD0900BF2D42 /* lwmath.c */; };
 		26457DB71FBACE6600FFEE74 /* lwime.c in Sources */ = {isa = PBXBuildFile; fileRef = 26457DB51FBACE6600FFEE74 /* lwime.c */; };
@@ -388,6 +389,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		260122491FDFDF03005941B7 /* lwatlassprite.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = lwatlassprite.c; sourceTree = "<group>"; };
 		2601AFFC1EE1549700989AA6 /* platform.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = platform.h; path = ../build/include/platform.h; sourceTree = "<group>"; };
 		2641822D1FB6FD0300BF2D42 /* lwdamagetext.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = lwdamagetext.c; sourceTree = "<group>"; };
 		2641822F1FB6FD0900BF2D42 /* lwmath.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = lwmath.c; sourceTree = "<group>"; };
@@ -2056,6 +2058,7 @@
 				6C7739571FB4B5A1001014DE /* lwanim.c */,
 				6C77393E1FB4B59F001014DE /* lwanim.h */,
 				6C7739381FB4B59F001014DE /* lwatlasenum.h */,
+				260122491FDFDF03005941B7 /* lwatlassprite.c */,
 				6C77391B1FB4B59D001014DE /* lwatlassprite.h */,
 				6C77393F1FB4B59F001014DE /* lwattrib.h */,
 				6C7739771FB4B5A4001014DE /* lwbattlecommand.h */,
@@ -2619,6 +2622,7 @@
 				6C7739F61FB4B5AA001014DE /* construct.c in Sources */,
 				6C7739D91FB4B5AA001014DE /* render_ui.c in Sources */,
 				56ED77B61EBB9C1C00FABA64 /* DetourAlloc.cpp in Sources */,
+				2601224A1FDFDF03005941B7 /* lwatlassprite.c in Sources */,
 				56F188E31EC74DB60019312F /* reaper.cpp in Sources */,
 				56F189A91EC751950019312F /* ziflist.c in Sources */,
 				56F188EF1EC74DB60019312F /* socks_connecter.cpp in Sources */,
