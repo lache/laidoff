@@ -38,7 +38,7 @@ unsigned char FileIdentifier[] =
 	0xAB, 0x4B, 0x54, 0x58, 0x20, 0x31, 0x31, 0xBB, 0x0D, 0x0A, 0x1A, 0x0A
 };
 
-int load_ktx_hw_or_sw(const char* tex_atlas_filename)
+int load_ktx_hw_or_sw(const char* tex_atlas_filename, int* width, int* height)
 {
 	size_t file_size = 0;
 	char *b = create_binary_from_file(tex_atlas_filename, &file_size);
@@ -71,6 +71,9 @@ int load_ktx_hw_or_sw(const char* tex_atlas_filename)
 		short extended_width = big_endian ? swap_4_bytes(pKtx->pixelWidth) : pKtx->pixelWidth;
 		short extended_height = big_endian ? swap_4_bytes(pKtx->pixelHeight) : pKtx->pixelHeight;
 		short mip_levels = big_endian ? swap_4_bytes(pKtx->numberOfMipmapLevels) : pKtx->numberOfMipmapLevels;
+
+        *width = extended_width;
+        *height = extended_height;
 
 		GLenum error_enum;
 

@@ -107,6 +107,8 @@ typedef enum _LW_ATLAS_ENUM {
     LAE_UI_BACK_BUTTON,
     LAE_RESULT_TITLE_ATLAS,
     LAE_RESULT_TITLE_ATLAS_ALPHA,
+    LAE_PREPARE_TITLE_ATLAS,
+    LAE_PREPARE_TITLE_ATLAS_ALPHA,
 
     LAE_COUNT,
 } LW_ATLAS_ENUM;
@@ -117,6 +119,7 @@ static const char *tex_atlas_filename[] = {
     ASSETS_BASE_PATH "tex" PATH_SEPARATOR "Twirl.png",
     ASSETS_BASE_PATH "tex" PATH_SEPARATOR "bg-road.png",
 
+
     ASSETS_BASE_PATH "pkm" PATH_SEPARATOR "bg-kitchen.pkm",
     ASSETS_BASE_PATH "pkm" PATH_SEPARATOR "bg-mart-in.pkm",
     ASSETS_BASE_PATH "pkm" PATH_SEPARATOR "bg-mart-out.pkm",
@@ -124,10 +127,12 @@ static const char *tex_atlas_filename[] = {
     ASSETS_BASE_PATH "pkm" PATH_SEPARATOR "bg-room.pkm",
     ASSETS_BASE_PATH "pkm" PATH_SEPARATOR "bg-room-ceiling.pkm",
 
+
     ASSETS_BASE_PATH "pkm" PATH_SEPARATOR "p-dohee.pkm",
     ASSETS_BASE_PATH "pkm" PATH_SEPARATOR "p-dohee_alpha.pkm",
     ASSETS_BASE_PATH "pkm" PATH_SEPARATOR "p-mother.pkm",
     ASSETS_BASE_PATH "pkm" PATH_SEPARATOR "p-mother_alpha.pkm",
+
 
     ASSETS_BASE_PATH "pkm" PATH_SEPARATOR "u-dialog-balloon.pkm",
 
@@ -152,6 +157,7 @@ static const char *tex_atlas_filename[] = {
     ASSETS_BASE_PATH "ktx" PATH_SEPARATOR "u-player-turn-a_alpha.ktx",
     ASSETS_BASE_PATH "ktx" PATH_SEPARATOR "u-fist-icon-a.ktx",
     ASSETS_BASE_PATH "ktx" PATH_SEPARATOR "u-fist-icon-a_alpha.ktx",
+
 
     ASSETS_BASE_PATH "ktx" PATH_SEPARATOR "c-biker-a.ktx",
     ASSETS_BASE_PATH "ktx" PATH_SEPARATOR "c-biker-a_alpha.ktx",
@@ -187,6 +193,7 @@ static const char *tex_atlas_filename[] = {
     ASSETS_BASE_PATH "ktx" PATH_SEPARATOR "puck-player.ktx",
     ASSETS_BASE_PATH "ktx" PATH_SEPARATOR "puck-floor.ktx",
 
+
     ASSETS_BASE_PATH "ktx" PATH_SEPARATOR "bb-catapult.ktx",
     ASSETS_BASE_PATH "ktx" PATH_SEPARATOR "bb-crossbow.ktx",
     ASSETS_BASE_PATH "ktx" PATH_SEPARATOR "bb-guntower.ktx",
@@ -216,6 +223,8 @@ static const char *tex_atlas_filename[] = {
     ASSETS_BASE_PATH "ktx" PATH_SEPARATOR "ui-back-button.ktx",
     ASSETS_BASE_PATH "ktx" PATH_SEPARATOR "result-title-atlas-a.ktx",
     ASSETS_BASE_PATH "ktx" PATH_SEPARATOR "result-title-atlas-a_alpha.ktx",
+    ASSETS_BASE_PATH "ktx" PATH_SEPARATOR "prepare-title-atlas-a.ktx",
+    ASSETS_BASE_PATH "ktx" PATH_SEPARATOR "prepare-title-atlas-a_alpha.ktx",
 };
 
 #define MAX_TEX_ATLAS LAE_COUNT

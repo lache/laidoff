@@ -871,23 +871,22 @@ static void render_floor(const LWCONTEXT *pLwc, const mat4x4 proj, const LWPUCKG
 }
 
 void render_battle_result_popup(const LWCONTEXT* pLwc, int result, float ui_alpha) {
-    const float uv_offset[] = { 0.00f, result == 0 ? 0.00f : 0.75f };
-    const float uv_scale[] = { 1.0f, 1.0f/4.0f };
-    render_solid_vb_ui_alpha_uv(pLwc,
-                                0,
-                                0,
-                                1.5f,
-                                1.5f/4,
-                                pLwc->tex_atlas[LAE_RESULT_TITLE_ATLAS],
-                                pLwc->tex_atlas[LAE_RESULT_TITLE_ATLAS_ALPHA],
-                                LVT_CENTER_CENTER_ANCHORED_SQUARE,
-                                ui_alpha,
-                                0.0f,
-                                0.0f,
-                                0.0f,
-                                0.0f,
-                                uv_offset,
-                                uv_scale);
+    const char* sprite_name = result == 0 ? "victory.png" : "defeat.png";
+    const LW_ATLAS_ENUM lae = LAE_RESULT_TITLE_ATLAS;
+    const LW_ATLAS_ENUM lae_alpha = LAE_RESULT_TITLE_ATLAS_ALPHA;
+    const float sprite_width = 1.5f;
+    const float x = 0.0f;
+    const float y = 0.0f;
+    render_atlas_sprite(pLwc,
+                        LAC_RESULT_TITLE,
+                        sprite_name,
+                        lae,
+                        lae_alpha,
+                        sprite_width,
+                        x,
+                        y,
+                        ui_alpha,
+                        LVT_CENTER_CENTER_ANCHORED_SQUARE);
 }
 
 void render_caution_popup(const LWCONTEXT* pLwc, const char* str) {

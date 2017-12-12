@@ -590,12 +590,12 @@ static void load_fan_vbo(LWCONTEXT* pLwc) {
 
 static void init_fvbo(LWCONTEXT* pLwc) {
     load_fvbo(pLwc, ASSETS_BASE_PATH "fvbo" PATH_SEPARATOR "whole-tower_cell.fvbo",
-             &pLwc->fvertex_buffer[LFT_TOWER]);
+              &pLwc->fvertex_buffer[LFT_TOWER]);
 }
 
 static void init_fanim(LWCONTEXT* pLwc) {
     load_fanim(pLwc, ASSETS_BASE_PATH "fanim" PATH_SEPARATOR "whole-tower_cell.fanim",
-              &pLwc->fanim[LFAT_TOWER_COLLAPSE]);
+               &pLwc->fanim[LFAT_TOWER_COLLAPSE]);
 }
 
 static void init_vbo(LWCONTEXT* pLwc) {
@@ -1664,26 +1664,29 @@ static void load_tex_files(LWCONTEXT* pLwc) {
         }
 
         if (strcmp(tex_atlas_filename[i] + tex_atlas_filename_len - 4, ".ktx") == 0) {
-            if (load_ktx_hw_or_sw(tex_atlas_filename[i]) < 0) {
+            int width = 0, height = 0;
+            if (load_ktx_hw_or_sw(tex_atlas_filename[i], &width, &height) < 0) {
                 LOGE("load_tex_files: load_ktx_hw_or_sw failure - %s", tex_atlas_filename[i]);
-            }
-            } else if (strcmp(tex_atlas_filename[i] + tex_atlas_filename_len - 4, ".png") == 0) {
-                // Software decoding of PNG
-                load_png_pkm_sw_decoding(pLwc, i);
-            } else if (strcmp(tex_atlas_filename[i] + tex_atlas_filename_len - 4, ".pkm") == 0) {
-#if LW_SUPPORT_ETC1_HARDWARE_DECODING
-                load_pkm_hw_decoding(tex_atlas_filename[i]);
-#else
-                load_png_pkm_sw_decoding(pLwc, i);
-#endif
             } else {
-                LOGE("load_tex_files: unknown tex file extension - %s", tex_atlas_filename[i]);
+                pLwc->tex_atlas_width[i] = width;
+                pLwc->tex_atlas_height[i] = height;
             }
-
-            pLwc->tex_atlas_hash[i] = hash(
-                (const unsigned char *)&tex_atlas_filename[i][filename_index]);
+        } else if (strcmp(tex_atlas_filename[i] + tex_atlas_filename_len - 4, ".png") == 0) {
+            // Software decoding of PNG
+            load_png_pkm_sw_decoding(pLwc, i);
+        } else if (strcmp(tex_atlas_filename[i] + tex_atlas_filename_len - 4, ".pkm") == 0) {
+#if LW_SUPPORT_ETC1_HARDWARE_DECODING
+            load_pkm_hw_decoding(tex_atlas_filename[i]);
+#else
+            load_png_pkm_sw_decoding(pLwc, i);
+#endif
+        } else {
+            LOGE("load_tex_files: unknown tex file extension - %s", tex_atlas_filename[i]);
         }
+
+        pLwc->tex_atlas_hash[i] = hash((const unsigned char*)&tex_atlas_filename[i][filename_index]);
     }
+}
 
 void init_load_textures(LWCONTEXT* pLwc) {
     // Sprites
