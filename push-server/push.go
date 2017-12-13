@@ -319,12 +319,21 @@ func startAdminService(pushService *PushService) {
 const (
 	ANDROID_KEY_PATH = "cert/dev/fcmserverkey"
 	APPLE_KEY_PATH = "cert/dev/cert.p12"
+	APPLE_PROD_KEY_PATH = "cert/prod/cert.p12"
 )
+
+var apple_key_path string
 
 func main() {
 	// Set default log format
 	log.SetFlags(log.Lshortfile | log.LstdFlags)
 	log.Println("Greetings from push server")
+	if len(os.Args) >= 2 && os.Args[1] == "prod" {
+		log.Println("PRODUCTION MODE")
+		apple_key_path = APPLE_PROD_KEY_PATH
+	} else {
+		apple_key_path = APPLE_KEY_PATH
+	}
 	// Create db directory to save user database
 	os.MkdirAll("db", os.ModePerm)
 	os.MkdirAll("pages", os.ModePerm)
@@ -384,7 +393,7 @@ func main() {
 }
 
 func PostIosMessage(pushToken string, body string) {
-	cert, err := certificate.FromP12File(APPLE_KEY_PATH, "")
+	cert, err := certificate.FromP12File(apple_key_path, "")
 	if err != nil {
 		log.Fatal("Cert Error:", err)
 	}
