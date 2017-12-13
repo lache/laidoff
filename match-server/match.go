@@ -55,7 +55,7 @@ func main() {
 	ongoingBattleMap := make(map[user.UserId]battle.Ok)
 	battleService := battle.Service{ conf }
 	// Start match worker goroutine
-	go matchWorker(battleService, matchQueue, battleOkQueue)
+	go matchWorker(battleService, matchQueue, battleOkQueue, serviceList)
 	// Start battle ok worker goroutine
 	go battle.OkWorker(conf, battleOkQueue, ongoingBattleMap)
 	// Open TCP service port and listen for game clients
@@ -91,11 +91,12 @@ func testRpc(serviceList *service.ServiceList) {
 	log.Println(serviceList.Rank.Get(300*time.Millisecond, user.UserId{5}))
 }
 
-func matchWorker(battleService battle.Service, matchQueue <-chan user.UserAgent, battleOkQueue chan<- battle.Ok) {
+func matchWorker(battleService battle.Service, matchQueue <-chan user.UserAgent, battleOkQueue chan<- battle.Ok, serviceList *service.ServiceList) {
 	for {
 		log.Printf("Match queue empty")
 		c1 := <-matchQueue
 		log.Printf("Match queue size 1")
+		serviceList.Arith.Broadcast(300*time.Millisecond, "BALL RUMBLE", c1.Db.Nickname + " provokes you!")
 		c2 := <-matchQueue
 		log.Printf("Match queue size 2")
 		if c1.Conn == c2.Conn {

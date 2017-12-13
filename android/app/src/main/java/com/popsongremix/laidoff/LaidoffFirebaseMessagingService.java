@@ -3,6 +3,8 @@ package com.popsongremix.laidoff;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.os.Handler;
+import android.os.Looper;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -14,7 +16,7 @@ import java.util.Map;
 public class LaidoffFirebaseMessagingService extends FirebaseMessagingService {
     @Override
     public void onMessageReceived(RemoteMessage remoteMessage) {
-        // This handler only called when the app is in foreground.
+        // ************* This handler only called when the app is in "FOREGROUND". *************
 
         // TODO(developer): Handle FCM messages here.
         // Not getting messages here? See why this may be: https://goo.gl/39bRNJ
@@ -41,6 +43,13 @@ public class LaidoffFirebaseMessagingService extends FirebaseMessagingService {
         // Check if message contains a notification payload.
         if (remoteMessage.getNotification() != null) {
             Log.d(LaidoffNativeActivity.LOG_TAG, "Message Notification Body: " + remoteMessage.getNotification().getBody());
+            Handler handler = new Handler(Looper.getMainLooper());
+            final String notificationBody = remoteMessage.getNotification().getBody();
+            handler.post(new Runnable() {
+                public void run() {
+                    Toast.makeText(getApplicationContext(), notificationBody, Toast.LENGTH_SHORT).show();
+                }
+            });
         }
 
         // Also if you intend on generating your own notifications as a result of a received FCM

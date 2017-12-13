@@ -65,6 +65,24 @@ func (t *Arith) RegisterPushToken(backoff time.Duration, id user.UserId, domain 
 	return reply
 }
 
+func (t *Arith) Broadcast(backoff time.Duration, title, body string) int {
+	args := &shared_server.BroadcastPush{title, body}
+	var reply int
+	err := t.client.Call("PushService.Broadcast", args, &reply)
+	if err != nil {
+		log.Printf("Arith error: %v", err)
+		if backoff > 10*time.Second {
+			log.Printf("Error - Broadcast Push failed: %v", err)
+			return 0
+		} else if backoff > 0 {
+			time.Sleep(backoff)
+		}
+		t.client, err = dialNewRpc(PushServiceAddr)
+		return t.Broadcast(backoff*2, title, body)
+	}
+	return reply
+}
+
 func (t *RankClient) Set(backoff time.Duration, id [16]byte, score int, nickname string) int {
 	args := &shared_server.ScoreItem{Id: id, Score: score, Nickname: nickname}
 	var reply int

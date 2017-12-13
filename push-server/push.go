@@ -87,6 +87,26 @@ func (t *PushService) RegisterPushToken(args *shared_server.PushToken, reply *in
 	*reply = 1
 	return nil
 }
+
+func (t *PushService) Broadcast(args *shared_server.BroadcastPush, reply *int) error {
+	log.Printf("Broadcast: %v", args)
+	log.Printf("Broadcasting message to the entire push pool (len=%v)", len(t.data.PushTokenMap))
+	for pushToken, pushUserData := range t.data.PushTokenMap {
+		domain := pushUserData.Domain
+		if domain == 2 {
+			go PostAndroidMessage(t.fcmServerKey, pushToken, args.Title, args.Body)
+		} else if domain == 1 {
+			go PostIosMessage(pushToken, args.Body)
+		} else {
+			log.Printf("Unknown domain: %v", domain)
+			*reply = 0
+			return nil
+		}
+	}
+	*reply = 1
+	return nil
+}
+
 func writePushServiceData(pushServiceData *PushServiceData) {
 	pushKeyDbFile, err := os.Create("db/pushkeydb")
 	if err != nil {

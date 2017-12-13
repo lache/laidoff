@@ -7,6 +7,7 @@ type Arith interface {
 
 type PushService interface {
 	RegisterPushToken(args *PushToken, reply *int) error
+	Broadcast(args *BroadcastPush, reply *int) error
 }
 
 type RankService interface {

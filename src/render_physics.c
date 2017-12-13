@@ -709,12 +709,12 @@ static void render_wall(const LWCONTEXT* pLwc, const mat4x4 proj, const LWPUCKGA
     int boundary_player_no = puck_game->boundary_impact_player_no[boundary];
     float boundary_impact = puck_game->boundary_impact[boundary];
     float boundary_impact_ratio = boundary_impact / puck_game->boundary_impact_start;
-    if (boundary_player_no == 1) {
+    if (puck_game->player_no != 2 ? boundary_player_no == 1 : boundary_player_no == 2) {
         glUniform3f(shader->overlay_color_location,
                     0.1f + 0.0f * boundary_impact_ratio,
                     0.1f + 0.0f * boundary_impact_ratio,
                     0.1f + 0.9f * boundary_impact_ratio);
-    } else if (boundary_player_no == 2) {
+    } else if (puck_game->player_no != 2 ? boundary_player_no == 2 : boundary_player_no == 1) {
         glUniform3f(shader->overlay_color_location,
                     0.1f + 0.9f * boundary_impact_ratio,
                     0.1f + 0.0f * boundary_impact_ratio,

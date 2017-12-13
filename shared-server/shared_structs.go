@@ -14,6 +14,11 @@ type PushToken struct {
 	UserId    [16]byte
 }
 
+type BroadcastPush struct {
+	Title string
+	Body  string
+}
+
 type ScoreItem struct {
 	Id       [16]byte
 	Score    int
