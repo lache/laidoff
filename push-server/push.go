@@ -322,7 +322,7 @@ const (
 	APPLE_PROD_KEY_PATH = "cert/prod/cert.p12"
 )
 
-var apple_key_path string
+var prod bool
 
 func main() {
 	// Set default log format
@@ -330,9 +330,9 @@ func main() {
 	log.Println("Greetings from push server")
 	if len(os.Args) >= 2 && os.Args[1] == "prod" {
 		log.Println("PRODUCTION MODE")
-		apple_key_path = APPLE_PROD_KEY_PATH
+		prod = true
 	} else {
-		apple_key_path = APPLE_KEY_PATH
+		prod = false
 	}
 	// Create db directory to save user database
 	os.MkdirAll("db", os.ModePerm)
@@ -393,7 +393,13 @@ func main() {
 }
 
 func PostIosMessage(pushToken string, body string) {
-	cert, err := certificate.FromP12File(apple_key_path, "")
+	var appleKeyPath string
+	if prod {
+		appleKeyPath = APPLE_PROD_KEY_PATH
+	} else {
+		appleKeyPath = APPLE_KEY_PATH
+	}
+	cert, err := certificate.FromP12File(appleKeyPath, "")
 	if err != nil {
 		log.Fatal("Cert Error:", err)
 	}
@@ -403,12 +409,17 @@ func PostIosMessage(pushToken string, body string) {
 	notification.Topic = "com.popsongremix.laidoff"
 	notification.Payload = []byte(fmt.Sprintf(`{"aps":{"alert":"%s"}}`, body))
 
-	client := apns2.NewClient(cert).Development()
+	var client *apns2.Client
+	if prod {
+		client = apns2.NewClient(cert).Production()
+	} else {
+		client = apns2.NewClient(cert).Development()
+	}
 	res, err := client.Push(notification)
 
 	if err != nil {
 		log.Fatal("Error:", err)
 	}
 
-	log.Printf("Ios push result: %v %v %v", res.StatusCode, res.ApnsID, res.Reason)
+	log.Printf("Ios push (token %v) result: %v %v %v", pushToken, res.StatusCode, res.ApnsID, res.Reason)
 }
