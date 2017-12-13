@@ -917,11 +917,11 @@ static void render_battle_result_popup(const LWCONTEXT* pLwc,
         lac = LAC_PREPARE_TITLE;
         y = 0.5f;
         break;
-    case LSP_FINISHED_DRAW: // same as timeout
+    case LSP_FINISHED_DRAW: // DRAW == TIMEOUT
         sprite_name = "timeout.png";
-        lae = LAE_PREPARE_TITLE_ATLAS;
-        lae_alpha = LAE_PREPARE_TITLE_ATLAS_ALPHA;
-        lac = LAC_PREPARE_TITLE;
+        lae = LAE_RESULT_TITLE_ATLAS;
+        lae_alpha = LAE_RESULT_TITLE_ATLAS_ALPHA;
+        lac = LAC_RESULT_TITLE;
         break;
     case LSP_FINISHED_VICTORY_P1:
         sprite_name = player_no == 2 ? "defeat.png" : "victory.png";
