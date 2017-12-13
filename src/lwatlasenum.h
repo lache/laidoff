@@ -109,7 +109,10 @@ typedef enum _LW_ATLAS_ENUM {
     LAE_RESULT_TITLE_ATLAS_ALPHA,
     LAE_PREPARE_TITLE_ATLAS,
     LAE_PREPARE_TITLE_ATLAS_ALPHA,
-
+        LAE_ENERGY_ICON,
+        LAE_ENERGY_ICON_ALPHA,
+        LAE_RANK_ICON,
+        LAE_RANK_ICON_ALPHA,
     LAE_COUNT,
 } LW_ATLAS_ENUM;
 
@@ -225,6 +228,10 @@ static const char *tex_atlas_filename[] = {
     ASSETS_BASE_PATH "ktx" PATH_SEPARATOR "result-title-atlas-a_alpha.ktx",
     ASSETS_BASE_PATH "ktx" PATH_SEPARATOR "prepare-title-atlas-a.ktx",
     ASSETS_BASE_PATH "ktx" PATH_SEPARATOR "prepare-title-atlas-a_alpha.ktx",
+        ASSETS_BASE_PATH "ktx" PATH_SEPARATOR "energy-icon-a.ktx",
+        ASSETS_BASE_PATH "ktx" PATH_SEPARATOR "energy-icon-a_alpha.ktx",
+        ASSETS_BASE_PATH "ktx" PATH_SEPARATOR "rank-icon-a.ktx",
+        ASSETS_BASE_PATH "ktx" PATH_SEPARATOR "rank-icon-a_alpha.ktx",
 };
 
 #define MAX_TEX_ATLAS LAE_COUNT

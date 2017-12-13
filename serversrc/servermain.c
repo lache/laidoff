@@ -674,7 +674,7 @@ void send_puck_game_state2(LWSERVER* server,
     packet_state.bf.target_pull = (unsigned int)puck_game->remote_control[1].pull_puck;
     packet_state.bf.wall_hit_bit = (unsigned int)*wall_hit_bit;
     if (*wall_hit_bit && player_no == 1) {
-        LOGI("WALL HIT BIT: %d", *wall_hit_bit);
+        LOGIx("WALL HIT BIT: %d", *wall_hit_bit);
     }
     // send!
     double tp = lwtimepoint_now_seconds();

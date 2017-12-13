@@ -1051,12 +1051,96 @@ static void render_main_menu(const LWCONTEXT* pLwc, const LWPUCKGAME* puck_game,
     glDepthMask(GL_TRUE);
 }
 
+static void render_icon_amount(const LWCONTEXT* pLwc,
+                               const LWPUCKGAME* puck_game,
+                               float x,
+                               float y,
+                               float width,
+                               float height,
+                               int amount,
+                               LW_ATLAS_ENUM lae,
+                               LW_ATLAS_ENUM lae_alpha,
+                               float font_r,
+                               float font_g,
+                               float font_b) {
+    render_solid_vb_ui(pLwc,
+                       x,
+                       y,
+                       width,
+                       height,
+                       0,
+                       LVT_CENTER_CENTER_ANCHORED_SQUARE,
+                       0.5f,
+                       0.0f,
+                       0.0f,
+                       0.0f,
+                       1.0f);
+    render_solid_vb_ui_alpha(pLwc,
+                             x - width / 2 + 0.025f,
+                             y,
+                             height - 0.025f,
+                             height - 0.025f,
+                             pLwc->tex_atlas[lae],
+                             pLwc->tex_atlas[lae_alpha],
+                             LVT_LEFT_CENTER_ANCHORED_SQUARE,
+                             1.0f,
+                             0.0f,
+                             0.0f,
+                             0.0f,
+                             0.0f);
+    // Render text
+    LWTEXTBLOCK text_block;
+    text_block.align = LTBA_RIGHT_CENTER;
+    text_block.text_block_width = DEFAULT_TEXT_BLOCK_WIDTH;
+    text_block.text_block_line_height = DEFAULT_TEXT_BLOCK_LINE_HEIGHT_F;
+    text_block.size = DEFAULT_TEXT_BLOCK_SIZE_C;
+    text_block.multiline = 1;
+    SET_COLOR_RGBA_FLOAT(text_block.color_normal_glyph, font_r, font_g, font_b, puck_game->main_menu_ui_alpha);
+    SET_COLOR_RGBA_FLOAT(text_block.color_normal_outline, 0, 0, 0, puck_game->main_menu_ui_alpha);
+    SET_COLOR_RGBA_FLOAT(text_block.color_emp_glyph, 1, 1, 0, puck_game->main_menu_ui_alpha);
+    SET_COLOR_RGBA_FLOAT(text_block.color_emp_outline, 0, 0, 0, puck_game->main_menu_ui_alpha);
+    char str[32];
+    sprintf(str, "%d", amount);
+    float tx = x + width / 2 - 0.05f;
+    float ty = y;
+    text_block.text = str;
+    text_block.text_bytelen = (int)strlen(text_block.text);
+    text_block.begin_index = 0;
+    text_block.end_index = text_block.text_bytelen;
+    text_block.text_block_x = tx;
+    text_block.text_block_y = ty;
+    render_text_block(pLwc, &text_block);
+}
+
 static void render_main_menu_ui_layer(const LWCONTEXT* pLwc, const LWPUCKGAME* puck_game,
-                                   const mat4x4 view, const mat4x4 proj, const mat4x4 ui_proj,
-                                   int remote, const float* player_controlled_pos) {
+                                      const mat4x4 view, const mat4x4 proj, const mat4x4 ui_proj,
+                                      int remote, const float* player_controlled_pos) {
+    // render buttons as a single sprite
     render_main_menu(pLwc, puck_game, view, proj, puck_game->main_menu_ui_alpha);
-    
-    float button_alpha = 0.0f; // alpha zeroed intentially (nonzero only when debugging)
+    // energy (background, icon, text)
+    {
+        const float x = 0;
+        const float y = 0.9f;
+        const float width = 0.4f;
+        const float height = 0.15f;
+        const int amount = 198;
+        const LW_ATLAS_ENUM lae = LAE_ENERGY_ICON;
+        const LW_ATLAS_ENUM lae_alpha = LAE_ENERGY_ICON_ALPHA;
+        render_icon_amount(pLwc, puck_game, x, y, width, height, amount, lae, lae_alpha, 0.4f, 0.9f, 1.0f);
+    }
+    // rank (background, icon, text)
+    {
+        const float x = 0.5f;
+        const float y = 0.9f;
+        const float width = 0.4f;
+        const float height = 0.15f;
+        const int amount = 4;
+        const LW_ATLAS_ENUM lae = LAE_RANK_ICON;
+        const LW_ATLAS_ENUM lae_alpha = LAE_RANK_ICON_ALPHA;
+        render_icon_amount(pLwc, puck_game, x, y, width, height, amount, lae, lae_alpha, 0.9f, 1.0f, 0.9f);
+    }
+    // buttons
+    float button_alpha = 0.0f; // alpha zeroed intentionally (nonzero only when debugging)
     lwbutton_lae_append(&(((LWCONTEXT*)pLwc)->button_list),
                         "practice_button",
                         -0.75f,
