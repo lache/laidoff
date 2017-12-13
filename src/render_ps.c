@@ -93,7 +93,7 @@ void ps_render_explosion(const LWCONTEXT* pLwc, const LWEMITTER2OBJECT* emit_obj
 }
 
 void lwc_render_ps(const LWCONTEXT* pLwc) {
-	glViewport(0, 0, pLwc->width, pLwc->height);
+	LW_GL_VIEWPORT();
 	lw_clear_color();
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	//glEnable(GL_BLEND);

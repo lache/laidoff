@@ -208,7 +208,7 @@ void render_footer_button(const struct _LWCONTEXT* pLwc) {
 }
 
 void lwc_render_battle_result(const struct _LWCONTEXT* pLwc) {
-	glViewport(0, 0, pLwc->width, pLwc->height);
+	LW_GL_VIEWPORT();
 	lw_clear_color();
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 

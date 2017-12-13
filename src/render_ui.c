@@ -425,7 +425,7 @@ static void s_render_full_panel(const LWCONTEXT* pLwc, LWBUTTONLIST* button_list
 }
 
 void lwc_render_ui(const LWCONTEXT* pLwc) {
-	glViewport(0, 0, pLwc->width, pLwc->height);
+	LW_GL_VIEWPORT();
 	lw_clear_color();
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	// Button count to zero (ignoring const-ness......)

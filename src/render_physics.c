@@ -1359,7 +1359,7 @@ static void render_battle_ui_layer(const LWCONTEXT* pLwc, const LWPUCKGAME* puck
 void lwc_render_physics(const LWCONTEXT* pLwc, const mat4x4 view, const mat4x4 proj) {
     const LWPUCKGAME* puck_game = pLwc->puck_game;
     const LWPSTATE* state = &pLwc->puck_game_state;
-    glViewport(0, 0, pLwc->width, pLwc->height);
+    LW_GL_VIEWPORT();
     lw_clear_color();
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 

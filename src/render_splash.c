@@ -11,7 +11,7 @@ static void s_render_logo(const LWCONTEXT* pLwc) {
 }
 
 void lwc_render_splash(const LWCONTEXT* pLwc) {
-	glViewport(0, 0, pLwc->width, pLwc->height);
+	LW_GL_VIEWPORT();
 	glClearColor(0, 0, 0, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 

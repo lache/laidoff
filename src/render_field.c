@@ -585,7 +585,7 @@ static void s_render_test_particle(const LWCONTEXT* pLwc, const mat4x4 view, con
 }
 
 void lwc_render_field(const LWCONTEXT* pLwc) {
-    glViewport(0, 0, pLwc->width, pLwc->height);
+    LW_GL_VIEWPORT();
     lw_clear_color();
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     

@@ -13,7 +13,14 @@ import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.WindowManager;
+import android.widget.Toast;
 
+import com.google.android.gms.ads.AdRequest;
+import com.google.android.gms.ads.AdView;
+import com.google.android.gms.ads.MobileAds;
+import com.google.android.gms.ads.reward.RewardItem;
+import com.google.android.gms.ads.reward.RewardedVideoAd;
+import com.google.android.gms.ads.reward.RewardedVideoAdListener;
 import com.google.firebase.iid.FirebaseInstanceId;
 
 import java.io.File;
@@ -22,7 +29,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Locale;
 
-public class LaidoffNativeActivity extends NativeActivity
+public class LaidoffNativeActivity extends NativeActivity implements RewardedVideoAdListener
 {
     private static boolean mBgmOn;
 
@@ -53,13 +60,18 @@ public class LaidoffNativeActivity extends NativeActivity
     private static LaidoffNativeActivity INSTANCE;
     
     public static final String LOG_TAG = "and9";
-
+    private RewardedVideoAd mRewardedVideoAd;
     /** Called when the activity is first created. */
     @Override
     public void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
-        //setContentView(R.layout.main);
+        setContentView(R.layout.main);
+        // AdMob
+        MobileAds.initialize(this, "ca-app-pub-5072035175916776~3533761034");
+        // Interstitial
+        mRewardedVideoAd = MobileAds.getRewardedVideoAdInstance(this);
+        mRewardedVideoAd.setRewardedVideoAdListener(this);
 
         //getWindow().getDecorView().setKeepScreenOn(true);
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED |
@@ -125,6 +137,12 @@ public class LaidoffNativeActivity extends NativeActivity
 
         //Intent intent = new Intent(this, TextInputActivity.class);
         //startActivity(intent);
+    }
+
+    private void loadRewardedVideoAd() {
+        // production: ca-app-pub-5072035175916776/9587253247
+        mRewardedVideoAd.loadAd("ca-app-pub-3940256099942544/5224354917",
+                new AdRequest.Builder().build());
     }
 
     public void playMetalHitSound() {
@@ -203,6 +221,7 @@ public class LaidoffNativeActivity extends NativeActivity
 
     @Override
     public void onDestroy() {
+        mRewardedVideoAd.destroy(this);
         super.onDestroy();
 
         Log.d(LOG_TAG, "onDestroy()");
@@ -210,6 +229,7 @@ public class LaidoffNativeActivity extends NativeActivity
 
     @Override
     public void onPause() {
+        mRewardedVideoAd.pause(this);
         super.onPause();
 
         if (mBgmOn)
@@ -222,6 +242,7 @@ public class LaidoffNativeActivity extends NativeActivity
 
     @Override
     public void onResume() {
+        mRewardedVideoAd.resume(this);
         super.onResume();
 
         if (mBgmOn)
@@ -239,6 +260,16 @@ public class LaidoffNativeActivity extends NativeActivity
 //        String message = editText.getText().toString();
 //        intent.putExtra(EXTRA_MESSAGE, message);
         INSTANCE.startActivity(intent);
+
+        // test interstitial
+        INSTANCE.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                INSTANCE.loadRewardedVideoAd();
+            }
+        });
+
+
     }
 
     public static void requestPushToken(long pLwc) {
@@ -247,5 +278,41 @@ public class LaidoffNativeActivity extends NativeActivity
 
     public static void startPlayMetalHitSound(String dummy) {
         INSTANCE.playMetalHitSound();
+    }
+
+    // AdMob reward video callbacks
+
+    public void onRewarded(RewardItem reward) {
+        Toast.makeText(this, "onRewarded! currency: " + reward.getType() + "  amount: " +
+                reward.getAmount(), Toast.LENGTH_SHORT).show();
+        // Reward the user.
+    }
+
+    public void onRewardedVideoAdLeftApplication() {
+        Toast.makeText(this, "onRewardedVideoAdLeftApplication",
+                Toast.LENGTH_SHORT).show();
+    }
+
+    public void onRewardedVideoAdClosed() {
+        Toast.makeText(this, "onRewardedVideoAdClosed", Toast.LENGTH_SHORT).show();
+    }
+
+    public void onRewardedVideoAdFailedToLoad(int errorCode) {
+        Toast.makeText(this, "onRewardedVideoAdFailedToLoad", Toast.LENGTH_SHORT).show();
+    }
+
+    public void onRewardedVideoAdLoaded() {
+        Toast.makeText(this, "onRewardedVideoAdLoaded", Toast.LENGTH_SHORT).show();
+        if (mRewardedVideoAd.isLoaded()) {
+            mRewardedVideoAd.show();
+        }
+    }
+
+    public void onRewardedVideoAdOpened() {
+        Toast.makeText(this, "onRewardedVideoAdOpened", Toast.LENGTH_SHORT).show();
+    }
+
+    public void onRewardedVideoStarted() {
+        Toast.makeText(this, "onRewardedVideoStarted", Toast.LENGTH_SHORT).show();
     }
 }

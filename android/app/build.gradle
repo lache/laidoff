@@ -128,7 +128,8 @@ dependencies {
     //compile 'com.jakewharton.timber:timber:4.5.1'
     //compile 'com.squareup.okhttp3:okhttp:3.6.0'
     //compile 'com.squareup.okhttp3:logging-interceptor:3.6.0'
-    implementation 'com.google.firebase:firebase-messaging:11.6.0'
+    implementation 'com.google.firebase:firebase-messaging:11.6.2'
+    implementation 'com.google.firebase:firebase-ads:11.6.2'
 }
 
 

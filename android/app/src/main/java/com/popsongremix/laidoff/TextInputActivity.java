@@ -12,6 +12,9 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
+import com.google.android.gms.ads.AdRequest;
+import com.google.android.gms.ads.AdView;
+
 import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
 
@@ -24,12 +27,18 @@ public class TextInputActivity extends Activity {
     private Button mConfirmButton;
 
     public static native void sendInputText(String text);
+    private AdView mAdView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         //this.requestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.activity_text_input);
+        // AdMob
+        mAdView = (AdView) findViewById(R.id.adView);
+        AdRequest adRequest = new AdRequest.Builder().build();
+        mAdView.loadAd(adRequest);
+
         mInputText = (EditText) findViewById(R.id.input_text);
         mInputText.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override

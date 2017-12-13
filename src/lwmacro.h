@@ -92,3 +92,5 @@
 #if LW_PLATFORM_WIN32
 typedef int socklen_t;
 #endif
+
+#define LW_GL_VIEWPORT() glViewport(0, 0, pLwc->width, pLwc->height)

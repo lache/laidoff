@@ -129,7 +129,7 @@ void lwc_render_font_test_fbo(const struct _LWCONTEXT* pLwc) {
 }
 
 void lwc_render_font_test(const struct _LWCONTEXT* pLwc) {
-	glViewport(0, 0, pLwc->width, pLwc->height);
+	LW_GL_VIEWPORT();
 	lw_clear_color();
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	render_solid_box_ui_lvt_flip_y_uv(pLwc, 0, 0, 2 * pLwc->aspect_ratio, 2/*flip_y*/, pLwc->font_fbo.color_tex, LVT_CENTER_CENTER_ANCHORED_SQUARE, 1);

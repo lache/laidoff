@@ -875,7 +875,7 @@ void render_center_image(const LWCONTEXT* pLwc) {
 }
 
 void lwc_render_battle(const LWCONTEXT* pLwc) {
-	glViewport(0, 0, pLwc->width, pLwc->height);
+	LW_GL_VIEWPORT();
 	lw_clear_color();
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 

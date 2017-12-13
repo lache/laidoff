@@ -38,7 +38,7 @@ void get_but_pos(const ADMIN_BUTTON_LAYOUT* abl, int r, int c, vec2 but_pos) {
 }
 
 void lwc_render_admin(const struct _LWCONTEXT* pLwc) {
-	glViewport(0, 0, pLwc->width, pLwc->height);
+	LW_GL_VIEWPORT();
 	glClearColor(189 / 255.f, 82 / 255.f, 232 / 255.f, 1);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	

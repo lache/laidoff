@@ -22,4 +22,6 @@
     <string name="title_activity_login">Input Text</string>
     <string name="text_input_button">확인</string>
     <string name="text_input_header">벼..별로 입력을 받을 생각이 있는 건 아니니까..</string>
+    <string name="banner_ad_unit_id">ca-app-pub-3940256099942544/6300978111</string>
+    <string name="hello_world_main">Hello World, main</string>
 </resources>
