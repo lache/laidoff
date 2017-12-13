@@ -1057,7 +1057,7 @@ static void render_icon_amount(const LWCONTEXT* pLwc,
                                float y,
                                float width,
                                float height,
-                               int amount,
+                               const char* str,
                                LW_ATLAS_ENUM lae,
                                LW_ATLAS_ENUM lae_alpha,
                                float font_r,
@@ -1075,22 +1075,37 @@ static void render_icon_amount(const LWCONTEXT* pLwc,
                        0.0f,
                        0.0f,
                        1.0f);
-    render_solid_vb_ui_alpha(pLwc,
-                             x - width / 2 + 0.025f,
-                             y,
-                             height - 0.025f,
-                             height - 0.025f,
-                             pLwc->tex_atlas[lae],
-                             pLwc->tex_atlas[lae_alpha],
-                             LVT_LEFT_CENTER_ANCHORED_SQUARE,
-                             1.0f,
-                             0.0f,
-                             0.0f,
-                             0.0f,
-                             0.0f);
+    if (lae_alpha == LAE_DONTCARE) {
+        render_solid_vb_ui(pLwc,
+                           x - width / 2 + 0.025f,
+                           y,
+                           height - 0.025f,
+                           height - 0.025f,
+                           pLwc->tex_atlas[lae],
+                           LVT_LEFT_CENTER_ANCHORED_SQUARE,
+                           1.0f,
+                           0.0f,
+                           0.0f,
+                           0.0f,
+                           0.0f);
+    } else {
+        render_solid_vb_ui_alpha(pLwc,
+                                 x - width / 2 + 0.025f,
+                                 y,
+                                 height - 0.025f,
+                                 height - 0.025f,
+                                 pLwc->tex_atlas[lae],
+                                 pLwc->tex_atlas[lae_alpha],
+                                 LVT_LEFT_CENTER_ANCHORED_SQUARE,
+                                 1.0f,
+                                 0.0f,
+                                 0.0f,
+                                 0.0f,
+                                 0.0f);
+    }
     // Render text
     LWTEXTBLOCK text_block;
-    text_block.align = LTBA_RIGHT_CENTER;
+    text_block.align = LTBA_LEFT_CENTER;
     text_block.text_block_width = DEFAULT_TEXT_BLOCK_WIDTH;
     text_block.text_block_line_height = DEFAULT_TEXT_BLOCK_LINE_HEIGHT_F;
     text_block.size = DEFAULT_TEXT_BLOCK_SIZE_C;
@@ -1099,9 +1114,7 @@ static void render_icon_amount(const LWCONTEXT* pLwc,
     SET_COLOR_RGBA_FLOAT(text_block.color_normal_outline, 0, 0, 0, puck_game->main_menu_ui_alpha);
     SET_COLOR_RGBA_FLOAT(text_block.color_emp_glyph, 1, 1, 0, puck_game->main_menu_ui_alpha);
     SET_COLOR_RGBA_FLOAT(text_block.color_emp_outline, 0, 0, 0, puck_game->main_menu_ui_alpha);
-    char str[32];
-    sprintf(str, "%d", amount);
-    float tx = x + width / 2 - 0.05f;
+    float tx = x - (width / 2) + (height - 0.025f) + 0.05f;
     float ty = y;
     text_block.text = str;
     text_block.text_bytelen = (int)strlen(text_block.text);
@@ -1117,27 +1130,47 @@ static void render_main_menu_ui_layer(const LWCONTEXT* pLwc, const LWPUCKGAME* p
                                       int remote, const float* player_controlled_pos) {
     // render buttons as a single sprite
     render_main_menu(pLwc, puck_game, view, proj, puck_game->main_menu_ui_alpha);
+    // nickname (background, icon, text)
+    float top_bar_x_cursor = -pLwc->aspect_ratio;
+    const float top_bar_x_cursor_margin = 0.05f;
+    {
+        const float width = 1.2f;
+        const float height = 0.15f;
+        const float x = top_bar_x_cursor + width / 2;
+        const float y = 1.0f - height / 2;
+        const int amount = 198;
+        const LW_ATLAS_ENUM lae = LAE_PROFILE_ICON;
+        const char* str = pLwc->puck_game->nickname;
+        render_icon_amount(pLwc, puck_game, x, y, width, height, str, lae, LAE_DONTCARE, 1.0f, 1.0f, 1.0f);
+        top_bar_x_cursor += width + top_bar_x_cursor_margin;
+    }
     // energy (background, icon, text)
     {
-        const float x = 0;
-        const float y = 0.9f;
         const float width = 0.4f;
         const float height = 0.15f;
+        const float x = top_bar_x_cursor + width / 2;
+        const float y = 1.0f - height / 2;
         const int amount = 198;
         const LW_ATLAS_ENUM lae = LAE_ENERGY_ICON;
         const LW_ATLAS_ENUM lae_alpha = LAE_ENERGY_ICON_ALPHA;
-        render_icon_amount(pLwc, puck_game, x, y, width, height, amount, lae, lae_alpha, 0.4f, 0.9f, 1.0f);
+        char str[32];
+        sprintf(str, "%d", amount);
+        render_icon_amount(pLwc, puck_game, x, y, width, height, str, lae, lae_alpha, 0.4f, 0.9f, 1.0f);
+        top_bar_x_cursor += width + top_bar_x_cursor_margin;
     }
     // rank (background, icon, text)
     {
-        const float x = 0.5f;
-        const float y = 0.9f;
         const float width = 0.4f;
         const float height = 0.15f;
+        const float x = top_bar_x_cursor + width / 2;
+        const float y = 1.0f - height / 2;
         const int amount = 4;
         const LW_ATLAS_ENUM lae = LAE_RANK_ICON;
         const LW_ATLAS_ENUM lae_alpha = LAE_RANK_ICON_ALPHA;
-        render_icon_amount(pLwc, puck_game, x, y, width, height, amount, lae, lae_alpha, 0.9f, 1.0f, 0.9f);
+        char str[32];
+        sprintf(str, "%d", amount);
+        render_icon_amount(pLwc, puck_game, x, y, width, height, str, lae, lae_alpha, 0.9f, 1.0f, 0.9f);
+        top_bar_x_cursor += width + top_bar_x_cursor_margin;
     }
     // buttons
     float button_alpha = 0.0f; // alpha zeroed intentionally (nonzero only when debugging)
@@ -1192,8 +1225,8 @@ static void render_main_menu_ui_layer(const LWCONTEXT* pLwc, const LWPUCKGAME* p
 }
 
 static void render_battle_ui_layer(const LWCONTEXT* pLwc, const LWPUCKGAME* puck_game,
-                            const mat4x4 view, const mat4x4 proj, const mat4x4 ui_proj,
-                            int remote, const float* player_controlled_pos) {
+                                   const mat4x4 view, const mat4x4 proj, const mat4x4 ui_proj,
+                                   int remote, const float* player_controlled_pos) {
     const LWPSTATE* state = &pLwc->puck_game_state;
     const LWPUCKGAMEPLAYER* player = &puck_game->player;
     const LWPUCKGAMEPLAYER* target = &puck_game->target;
