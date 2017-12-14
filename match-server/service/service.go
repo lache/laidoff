@@ -14,7 +14,7 @@ const (
 	RankServiceAddr = ":20172"
 )
 
-type ServiceList struct {
+type List struct {
 	Arith *Arith
 	Rank  *RankClient
 }
@@ -28,7 +28,7 @@ type RankClient struct {
 }
 
 func (t *Arith) Divide(a, b int) shared_server.Quotient {
-	args := &shared_server.Args{a, b}
+	args := &shared_server.Args{A: a, B: b}
 	var reply shared_server.Quotient
 	err := t.client.Call("Arithmetic.Divide", args, &reply)
 	if err != nil {
@@ -38,7 +38,7 @@ func (t *Arith) Divide(a, b int) shared_server.Quotient {
 }
 
 func (t *Arith) Multiply(a, b int) int {
-	args := &shared_server.Args{a, b}
+	args := &shared_server.Args{A: a, B: b}
 	var reply int
 	err := t.client.Call("Arithmetic.Multiply", args, &reply)
 	if err != nil {
@@ -48,7 +48,7 @@ func (t *Arith) Multiply(a, b int) int {
 }
 
 func (t *Arith) RegisterPushToken(backoff time.Duration, id user.Id, domain int, pushToken string) int {
-	args := &shared_server.PushToken{domain, pushToken, id}
+	args := &shared_server.PushToken{Domain: domain, PushToken: pushToken, UserId: id}
 	var reply int
 	err := t.client.Call("PushService.RegisterPushToken", args, &reply)
 	if err != nil {
@@ -66,7 +66,7 @@ func (t *Arith) RegisterPushToken(backoff time.Duration, id user.Id, domain int,
 }
 
 func (t *Arith) Broadcast(backoff time.Duration, title, body string) int {
-	args := &shared_server.BroadcastPush{title, body}
+	args := &shared_server.BroadcastPush{Title: title, Body: body}
 	var reply int
 	err := t.client.Call("PushService.Broadcast", args, &reply)
 	if err != nil {
@@ -120,7 +120,7 @@ func (t *RankClient) Get(backoff time.Duration, id user.Id) *shared_server.Score
 }
 
 func (t *RankClient) GetLeaderboard(backoff time.Duration, startIndex int, count int) *shared_server.LeaderboardReply {
-	args := &shared_server.LeaderboardRequest{startIndex, count}
+	args := &shared_server.LeaderboardRequest{StartIndex: startIndex, Count: count}
 	var reply shared_server.LeaderboardReply
 	err := t.client.Call("RankService.GetLeaderboard", args, &reply)
 	if err != nil {
@@ -147,8 +147,8 @@ func dialNewRpc(address string) (*rpc.Client, error) {
 	return rpc.NewClient(conn), nil
 }
 
-func NewServiceList() *ServiceList {
-	return &ServiceList{
+func NewServiceList() *List {
+	return &List{
 		DialPushService(),
 		DialRankService(),
 	}

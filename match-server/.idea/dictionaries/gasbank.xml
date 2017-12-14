@@ -12,6 +12,8 @@
       <w>lpgplwpsetnickname</w>
       <w>lpgplwpsuddendeath</w>
       <w>mathrand</w>
+      <w>maybematched</w>
+      <w>queueok</w>
       <w>recv</w>
     </words>
   </dictionary>

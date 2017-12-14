@@ -8,7 +8,7 @@ import (
 	"../convert"
 )
 
-func HandleGetLeaderboard(buf []byte, conn net.Conn, serviceList *service.ServiceList) {
+func HandleGetLeaderboard(buf []byte, conn net.Conn, serviceList *service.List) {
 	log.Printf("GETLEADERBOARD received")
 	// Parse
 	recvPacket, err := convert.ParseGetLeaderboard(buf)

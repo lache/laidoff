@@ -10,7 +10,7 @@ import (
 	"../convert"
 )
 
-func HandlePushToken(buf []byte, conn net.Conn, serviceList *service.ServiceList) {
+func HandlePushToken(buf []byte, conn net.Conn, serviceList *service.List) {
 	log.Printf("PUSHTOKEN received")
 	// Parse
 	recvPacket, err := convert.ParsePushToken(buf)

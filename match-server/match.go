@@ -72,7 +72,7 @@ func main() {
 }
 
 //noinspection GoUnusedFunction
-func testRpc(serviceList *service.ServiceList) {
+func testRpc(serviceList *service.List) {
 	log.Println(serviceList.Arith.Multiply(5, 6))
 	log.Println(serviceList.Arith.Divide(500, 10))
 	log.Println(serviceList.Arith.RegisterPushToken(300*time.Millisecond, user.Id{1, 2, 3, 4}, 500, "test-push-token"))
@@ -88,7 +88,7 @@ func testRpc(serviceList *service.ServiceList) {
 	log.Println(serviceList.Rank.Get(300*time.Millisecond, user.Id{5}))
 }
 
-func matchWorker(battleService battle.Service, matchQueue <-chan user.Agent, battleOkQueue chan<- battle.Ok, serviceList *service.ServiceList) {
+func matchWorker(battleService battle.Service, matchQueue <-chan user.Agent, battleOkQueue chan<- battle.Ok, serviceList *service.List) {
 	for {
 		log.Printf("Match queue empty")
 		c1 := <-matchQueue
@@ -133,7 +133,7 @@ func checkMatchError(err error, conn net.Conn) {
 	}
 }
 
-func handleRequest(conf config.ServerConfig, nickDb *Nickdb.NickDb, conn net.Conn, matchQueue chan<- user.Agent, serviceList *service.ServiceList, ongoingBattleMap map[user.Id]battle.Ok, battleService battle.Service, battleOkQueue chan<- battle.Ok) {
+func handleRequest(conf config.ServerConfig, nickDb *Nickdb.NickDb, conn net.Conn, matchQueue chan<- user.Agent, serviceList *service.List, ongoingBattleMap map[user.Id]battle.Ok, battleService battle.Service, battleOkQueue chan<- battle.Ok) {
 	log.Printf("Accepting from %v", conn.RemoteAddr())
 	for {
 		buf := make([]byte, 1024)
@@ -156,7 +156,7 @@ func handleRequest(conf config.ServerConfig, nickDb *Nickdb.NickDb, conn net.Con
 		case convert.LPGPLWPQUEUE2:
 			handler.HandleQueue2(conf, matchQueue, buf, conn, ongoingBattleMap, battleService, battleOkQueue)
 		case convert.LPGPLWPCANCELQUEUE:
-			handler.HandleCancelQueue(conf, matchQueue, buf, conn, ongoingBattleMap, battleService, battleOkQueue)
+			handler.HandleCancelQueue(matchQueue, buf, conn, ongoingBattleMap)
 		case convert.LPGPLWPSUDDENDEATH:
 			handler.HandleSuddenDeath(conf, buf) // relay 'buf' to battle service
 		case convert.LPGPLWPNEWUSER:

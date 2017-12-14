@@ -8,7 +8,7 @@ import (
 	"fmt"
 	"net"
 	"io"
-	cryptorand "crypto/rand"
+	"crypto/rand"
 )
 
 type Id [16]byte
@@ -28,7 +28,7 @@ type Agent struct {
 func NewUuid() ([]byte, string, error) {
 	uuid := make([]byte, 16)
 
-	n, err := io.ReadFull(cryptorand.Reader, uuid)
+	n, err := io.ReadFull(rand.Reader, uuid)
 	if n != len(uuid) || err != nil {
 		return nil, "", err
 	}
