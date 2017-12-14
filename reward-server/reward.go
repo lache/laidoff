@@ -1,7 +1,6 @@
 package main
 
 import (
-	//"../shared-server"
 	"log"
 	"net"
 	"./helpers"
@@ -61,7 +60,7 @@ func handleRequest(conn net.Conn, rank *helpers.RankClient) {
 		log.Printf("  Type %v", packetType)
 		switch packetType {
 		case C.LPGP_LWPBATTLERESULT:
-			handleBattleResult(buf, conn, rank)
+			handleBattleResult(buf, rank)
 		}
 	}
 	conn.Close()
@@ -69,14 +68,14 @@ func handleRequest(conn net.Conn, rank *helpers.RankClient) {
 }
 
 func convertCCharArrayToGoString(strIn *[C.LW_NICKNAME_MAX_LEN]C.char, strOut *string) {
-	bytes := make([]byte, len(strIn))
+	buf := make([]byte, len(strIn))
 	for i, b := range strIn {
-		bytes[i] = byte(b)
+		buf[i] = byte(b)
 	}
-	*strOut = string(bytes)
+	*strOut = string(buf)
 }
 
-func handleBattleResult(buf []byte, conn net.Conn, rank *helpers.RankClient) {
+func handleBattleResult(buf []byte, rank *helpers.RankClient) {
 	log.Printf("BATTLERESULT received")
 	// Parse
 	bufReader := bytes.NewReader(buf)
