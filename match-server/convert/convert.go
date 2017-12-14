@@ -2,7 +2,6 @@ package convert
 
 import (
 	"encoding/binary"
-	"fmt"
 	"github.com/gasbank/laidoff/db-server/user"
 	"unsafe"
 	"bytes"
@@ -151,11 +150,6 @@ func NewLwpSysMsg(sysMsg []byte) *C.LWPSYSMSG {
 /////////////////////////////////////////////////////////////////////////////////////
 // SECTION: Convert Utility Functions
 /////////////////////////////////////////////////////////////////////////////////////
-//func Int2ByteArray(v C.int) [4]byte {
-//	var byteArray [4]byte
-//	binary.LittleEndian.PutUint32(byteArray[0:], uint32(v))
-//	return byteArray
-//}
 
 func GoStringToCCharArray(strIn *string, strOut *[C.LW_NICKNAME_MAX_LEN]C.char) {
 	for i, b := range []byte(*strIn) {
@@ -217,10 +211,6 @@ func NicknameToCArray(nickname string) [C.LW_NICKNAME_MAX_LEN]C.char {
 	nicknameCchar[C.LW_NICKNAME_MAX_LEN-1] = 0
 	return nicknameCchar
 }
-
-//func IdArrayToString(id [4]C.uint) string {
-//	return fmt.Sprintf("%08x-%08x-%08x-%08x", id[0], id[1], id[2], id[3])
-//}
 
 func NewCreateBattle(id1, id2 user.Id, nickname1, nickname2 string) *C.LWPCREATEBATTLE {
 	var c1Nickname [C.LW_NICKNAME_MAX_LEN]C.char

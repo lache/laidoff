@@ -7,6 +7,7 @@ import (
 	"github.com/gasbank/laidoff/db-server/user"
 	"github.com/gasbank/laidoff/shared-server"
 	"net"
+	"github.com/gasbank/laidoff/match-server/rpchelper"
 )
 
 const (
@@ -172,16 +173,12 @@ func DialRankService() *RankClient {
 }
 
 func CreateNewUserDb() {
-	client, err := dialNewRpc(":20181")
-	if err != nil {
-		log.Printf("rpc connection error")
-		return
-	}
+	dbService := rpchelper.NewContext("DbService", ":20181")
 	var userId user.Id
 	// Create test
 	{
 		var reply user.Db
-		err = client.Call("DbService.Create", 0, &reply)
+		err := dbService.Call("Create", 0, &reply)
 		if err != nil {
 			log.Printf("rpc call error: %v", err.Error())
 		} else {
@@ -192,7 +189,7 @@ func CreateNewUserDb() {
 	// Create test
 	{
 		var reply user.Db
-		err = client.Call("DbService.Get", &userId, &reply)
+		err := dbService.Call("Get", &userId, &reply)
 		if err != nil {
 			log.Printf("rpc call error: %v", err.Error())
 		} else {
@@ -203,7 +200,7 @@ func CreateNewUserDb() {
 	{
 		var reply user.LeaseDb
 		// Lease
-		err = client.Call("DbService.Lease", &userId, &reply)
+		err := dbService.Call("Lease", &userId, &reply)
 		if err != nil {
 			log.Printf("rpc call error: %v", err.Error())
 		} else {
@@ -213,7 +210,7 @@ func CreateNewUserDb() {
 		// Write
 		var writeReply int
 		reply.Db.Nickname = "CanYouSeeMe"
-		err = client.Call("DbService.Write", &reply, &writeReply)
+		err = dbService.Call("Write", &reply, &writeReply)
 		if err != nil {
 			log.Printf("rpc call error: %v", err.Error())
 		} else {
