@@ -16,7 +16,7 @@ func HandleNewUser(nickDb *Nickdb.NickDb, conn net.Conn) {
 	}
 	log.Printf("  - New user guid: %v", uuidStr)
 	newNick := Nickdb.PickRandomNick(nickDb)
-	newUserDataBuf := convert.Packet2Buf(convert.NewNewUserData(uuid, newNick))
+	newUserDataBuf := convert.Packet2Buf(convert.NewLwpNewUserData(uuid, newNick))
 	// Write to disk
 	var id user.UserId
 	copy(id[:], uuid)

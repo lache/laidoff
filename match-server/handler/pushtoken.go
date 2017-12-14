@@ -26,7 +26,7 @@ func HandlePushToken(buf []byte, conn net.Conn, serviceList *service.ServiceList
 	log.Printf("Push result: %v", pushResult)
 	if pushResult == 1 {
 		sysMsg := []byte(fmt.Sprintf("토큰 등록 완료! %v", pushToken))
-		queueOkBuf := convert.Packet2Buf(convert.NewSysMsg(sysMsg))
+		queueOkBuf := convert.Packet2Buf(convert.NewLwpSysMsg(sysMsg))
 		conn.Write(queueOkBuf)
 	}
 }

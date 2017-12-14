@@ -153,21 +153,21 @@ func handleRequest(conf config.ServerConfig, nickDb *Nickdb.NickDb, conn net.Con
 		log.Printf("  Type %v", packetType)
 
 		switch packetType {
-		case convert.LPGP_LWPQUEUE2:
+		case convert.LPGPLWPQUEUE2:
 			handler.HandleQueue2(conf, matchQueue, buf, conn, ongoingBattleMap, battleService, battleOkQueue)
-		case convert.LPGP_LWPCANCELQUEUE:
+		case convert.LPGPLWPCANCELQUEUE:
 			handler.HandleCancelQueue(conf, matchQueue, buf, conn, ongoingBattleMap, battleService, battleOkQueue)
-		case convert.LPGP_LWPSUDDENDEATH:
+		case convert.LPGPLWPSUDDENDEATH:
 			handler.HandleSuddenDeath(conf, buf) // relay 'buf' to battle service
-		case convert.LPGP_LWPNEWUSER:
+		case convert.LPGPLWPNEWUSER:
 			handler.HandleNewUser(nickDb, conn)
-		case convert.LPGP_LWPQUERYNICK:
+		case convert.LPGPLWPQUERYNICK:
 			handler.HandleQueryNick(buf, conn, nickDb)
-		case convert.LPGP_LWPPUSHTOKEN:
+		case convert.LPGPLWPPUSHTOKEN:
 			handler.HandlePushToken(buf, conn, serviceList)
-		case convert.LPGP_LWPGETLEADERBOARD:
+		case convert.LPGPLWPGETLEADERBOARD:
 			handler.HandleGetLeaderboard(buf, conn, serviceList)
-		case convert.LPGP_LWPSETNICKNAME:
+		case convert.LPGPLWPSETNICKNAME:
 			handler.HandleSetNickname(buf, conn)
 		}
 	}

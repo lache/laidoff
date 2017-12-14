@@ -20,7 +20,7 @@ func HandleSetNickname(buf []byte, conn net.Conn) {
 		log.Printf("user db load failed: %v", err.Error())
 	} else {
 		var newNickname string
-		convert.ConvertCCharArrayToGoString(&recvPacket.Nickname, &newNickname)
+		convert.CCharArrayToGoString(&recvPacket.Nickname, &newNickname)
 		oldNickname := userDb.Nickname
 		userDb.Nickname = newNickname
 		user.WriteUserDb(userDb)

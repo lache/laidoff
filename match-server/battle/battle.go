@@ -16,7 +16,7 @@ import (
 type Ok struct {
 	RemoveCache    bool
 	BattleId       int
-	createBattleOk convert.CreateBattleOk // C.LWPCREATEBATTLEOK
+	createBattleOk convert.CreateBattleOk
 	c1             user.UserAgent
 	c2             user.UserAgent
 	RemoveUserId   user.UserId
@@ -133,7 +133,7 @@ func createMatched2Buf(conf config.ServerConfig, createBattleOk convert.CreateBa
 	}
 	publicAddrIpv4 := publicAddr.IP.To4()
 
-	return convert.Packet2Buf(convert.NewMatched2(
+	return convert.Packet2Buf(convert.NewLwpMatched2(
 		publicAddr.Port,
 		publicAddrIpv4,
 		int(createBattleOk.S.Battle_id),

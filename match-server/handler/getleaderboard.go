@@ -18,7 +18,7 @@ func HandleGetLeaderboard(buf []byte, conn net.Conn, serviceList *service.Servic
 	startIndex := int(recvPacket.Start_index)
 	count := int(recvPacket.Count)
 	leaderboardReply := serviceList.Rank.GetLeaderboard(300*time.Millisecond, startIndex, count)
-	reply := convert.NewLeaderboard(leaderboardReply)
+	reply := convert.NewLwpLeaderboard(leaderboardReply)
 	replyBuf := convert.Packet2Buf(reply)
 	conn.Write(replyBuf)
 }
