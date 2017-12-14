@@ -1,9 +1,6 @@
 package user
 
 import (
-	"os"
-	"log"
-	"encoding/gob"
 	"time"
 	"fmt"
 	"net"
@@ -47,49 +44,4 @@ func NewUuid() ([]byte, string, error) {
 
 func IdByteArrayToString(id Id) string {
 	return fmt.Sprintf("%08x-%08x-%08x-%08x", id[0:4], id[4:8], id[8:12], id[12:16])
-}
-
-func LoadUserDb(id Id) (*Db, error) {
-	uuidStr := IdByteArrayToString(id)
-	userDbFile, err := os.Open("db/" + uuidStr)
-	if err != nil {
-		log.Printf("disk open failed: %v", err.Error())
-		return nil, err
-	} else {
-		defer userDbFile.Close()
-		decoder := gob.NewDecoder(userDbFile)
-		userDb := &Db{}
-		decoder.Decode(userDb)
-		return userDb, nil
-	}
-}
-
-func CreateNewUser(uuid Id, nickname string) (*Db, *os.File, error) {
-	userDb := &Db{
-		uuid,
-		time.Now(),
-		nickname,
-	}
-	uuidStr := IdByteArrayToString(uuid)
-	userDbFile, err := os.Create("db/" + uuidStr)
-	if err != nil {
-		log.Fatalf("User db file creation failed: %v", err.Error())
-		return nil, nil, err
-	}
-	encoder := gob.NewEncoder(userDbFile)
-	encoder.Encode(userDb)
-	userDbFile.Close()
-	return userDb, userDbFile, nil
-}
-
-func WriteUserDb(userDb *Db) error {
-	userDbFile, err := os.Create("db/" + IdByteArrayToString(userDb.Id))
-	if err != nil {
-		log.Fatalf("User db file creation failed: %v", err.Error())
-		return err
-	}
-	encoder := gob.NewEncoder(userDbFile)
-	encoder.Encode(userDb)
-	userDbFile.Close()
-	return nil
 }

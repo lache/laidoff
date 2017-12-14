@@ -8,16 +8,18 @@ import (
 	"github.com/gasbank/laidoff/match-server/battle"
 	"github.com/gasbank/laidoff/match-server/config"
 	"unsafe"
+	"github.com/gasbank/laidoff/match-server/rpchelper"
 )
 
-func HandleQueue2(conf config.ServerConfig, matchQueue chan<- user.Agent, buf []byte, conn net.Conn, ongoingBattleMap map[user.Id]battle.Ok, battleService battle.Service, battleOkQueue chan<- battle.Ok) {
+func HandleQueue2(conf config.ServerConfig, matchQueue chan<- user.Agent, buf []byte, conn net.Conn, ongoingBattleMap map[user.Id]battle.Ok, battleService battle.Service, battleOkQueue chan<- battle.Ok, dbService *rpchelper.Context) {
 	log.Printf("QUEUE2 received")
 	recvPacket, err := convert.ParseQueue2(buf)
 	if err != nil {
 		log.Printf("HandleQueue2 fail: %v", err.Error())
 		return
 	}
-	userDb, err := user.LoadUserDb(convert.IdCuintToByteArray(recvPacket.Id))
+	var userDb user.Db
+	err = dbService.Call("Get", convert.IdCuintToByteArray(recvPacket.Id), &userDb)
 	if err != nil {
 		log.Printf("user db load failed: %v", err.Error())
 	} else {
@@ -66,7 +68,7 @@ func HandleQueue2(conf config.ServerConfig, matchQueue chan<- user.Agent, buf []
 			}
 		}
 		// Queue connection
-		matchQueue <- user.Agent{conn, *userDb, false }
+		matchQueue <- user.Agent{conn, userDb, false }
 		// Send reply
 		queueOkBuf := convert.Packet2Buf(convert.NewLwpQueueOk())
 		conn.Write(queueOkBuf)

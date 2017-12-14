@@ -6,27 +6,21 @@ import (
 	"github.com/gasbank/laidoff/db-server/user"
 	"github.com/gasbank/laidoff/match-server/nickdb"
 	"github.com/gasbank/laidoff/match-server/convert"
+	"github.com/gasbank/laidoff/match-server/rpchelper"
 )
 
-func HandleNewUser(nickDb *nickdb.NickDb, conn net.Conn) {
+func HandleNewUser(nickDb *nickdb.NickDb, conn net.Conn, dbService *rpchelper.Context) {
 	log.Printf("NEWUSER received")
-	uuid, uuidStr, err := user.NewUuid()
+	var userDb user.Db
+	err := dbService.Call("Create", 0, &userDb)
 	if err != nil {
-		log.Fatalf("new uuid failed: %v", err.Error())
-	}
-	log.Printf("  - New user guid: %v", uuidStr)
-	newNick := nickdb.PickRandomNick(nickDb)
-	// Write to disk
-	var id user.Id
-	copy(id[:], uuid)
-	_, _, err = user.CreateNewUser(id, newNick)
-	if err != nil {
-		log.Fatalf("CreateNewUser failed: %v", err.Error())
-	}
-	// reply to client
-	newUserDataBuf := convert.Packet2Buf(convert.NewLwpNewUserData(uuid, newNick))
-	_, err = conn.Write(newUserDataBuf)
-	if err != nil {
-		log.Fatalf("NEWUSERDATA send failed: %v", err.Error())
+		log.Printf("DB service Create failed: %v", err.Error())
+	} else {
+		// reply to client
+		newUserDataBuf := convert.Packet2Buf(convert.NewLwpNewUserData(userDb.Id, userDb.Nickname))
+		_, err = conn.Write(newUserDataBuf)
+		if err != nil {
+			log.Fatalf("NEWUSERDATA send failed: %v", err.Error())
+		}
 	}
 }

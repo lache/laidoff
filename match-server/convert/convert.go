@@ -130,7 +130,7 @@ func NewLwpLeaderboard(leaderboardReply *shared_server.LeaderboardReply) *C.LWPL
 		scoreList,
 	}
 }
-func NewLwpNewUserData(uuid []byte, newNick string) *C.LWPNEWUSERDATA {
+func NewLwpNewUserData(uuid user.Id, newNick string) *C.LWPNEWUSERDATA {
 	cNewNickBytes := NicknameToCArray(newNick)
 	return &C.LWPNEWUSERDATA{
 		C.ushort(unsafe.Sizeof(C.LWPNEWUSERDATA{})),

@@ -21,8 +21,6 @@ func main() {
 	// Set default log format
 	log.SetFlags(log.Lshortfile | log.LstdFlags)
 	log.Println("Greetings from match server")
-	// Create db directory to save user database
-	os.MkdirAll("db", os.ModePerm)
 	// Test Db service
 	service.CreateNewUserDb()
 	// Seed a new random number
@@ -156,21 +154,21 @@ func handleRequest(conf config.ServerConfig, nickDb *nickdb.NickDb, conn net.Con
 
 		switch packetType {
 		case convert.LPGPLWPQUEUE2:
-			handler.HandleQueue2(conf, matchQueue, buf, conn, ongoingBattleMap, battleService, battleOkQueue)
+			handler.HandleQueue2(conf, matchQueue, buf, conn, ongoingBattleMap, battleService, battleOkQueue, serviceList.Db)
 		case convert.LPGPLWPCANCELQUEUE:
-			handler.HandleCancelQueue(matchQueue, buf, conn, ongoingBattleMap)
+			handler.HandleCancelQueue(matchQueue, buf, conn, ongoingBattleMap, serviceList.Db)
 		case convert.LPGPLWPSUDDENDEATH:
 			handler.HandleSuddenDeath(conf, buf) // relay 'buf' to battle service
 		case convert.LPGPLWPNEWUSER:
-			handler.HandleNewUser(nickDb, conn)
+			handler.HandleNewUser(nickDb, conn, serviceList.Db)
 		case convert.LPGPLWPQUERYNICK:
-			handler.HandleQueryNick(buf, conn, nickDb)
+			handler.HandleQueryNick(buf, conn, serviceList.Db)
 		case convert.LPGPLWPPUSHTOKEN:
 			handler.HandlePushToken(buf, conn, serviceList)
 		case convert.LPGPLWPGETLEADERBOARD:
 			handler.HandleGetLeaderboard(buf, conn, serviceList)
 		case convert.LPGPLWPSETNICKNAME:
-			handler.HandleSetNickname(buf, conn)
+			handler.HandleSetNickname(buf, conn, serviceList.Db)
 		}
 	}
 	conn.Close()

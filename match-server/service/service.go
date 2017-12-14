@@ -18,6 +18,7 @@ const (
 type List struct {
 	Arith *Arith
 	Rank  *RankClient
+	Db    *rpchelper.Context
 }
 
 type Arith struct {
@@ -152,6 +153,7 @@ func NewServiceList() *List {
 	return &List{
 		DialPushService(),
 		DialRankService(),
+		rpchelper.NewContext("DbService", ":20181"),
 	}
 }
 
@@ -186,7 +188,7 @@ func CreateNewUserDb() {
 		}
 		userId = reply.Id
 	}
-	// Create test
+	// Get test
 	{
 		var reply user.Db
 		err := dbService.Call("Get", &userId, &reply)
