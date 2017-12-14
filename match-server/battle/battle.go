@@ -17,9 +17,9 @@ type Ok struct {
 	RemoveCache    bool
 	BattleId       int
 	createBattleOk convert.CreateBattleOk
-	c1             user.UserAgent
-	c2             user.UserAgent
-	RemoveUserId   user.UserId
+	c1             user.Agent
+	c2             user.Agent
+	RemoveUserId   user.Id
 }
 
 type Service struct {
@@ -63,7 +63,7 @@ func WaitForReply(connToBattle net.Conn, replyPacketRef interface{}, expectedRep
 	return errors.New("parsed size or type error")
 }
 
-func CreateBattleInstance(battleService Service, c1 user.UserAgent, c2 user.UserAgent, battleOkQueue chan<- Ok) {
+func CreateBattleInstance(battleService Service, c1 user.Agent, c2 user.Agent, battleOkQueue chan<- Ok) {
 	connToBattle, err := battleService.Connection()
 	if err != nil {
 		log.Printf("battleService error! %v", err.Error())
@@ -96,13 +96,13 @@ func CreateBattleInstance(battleService Service, c1 user.UserAgent, c2 user.User
 				createBattleOkWrap,
 				c1,
 				c2,
-				user.UserId{},
+				user.Id{},
 			}
 		}
 	}
 }
 
-func OkWorker(conf config.ServerConfig, battleOkQueue <-chan Ok, ongoingBattleMap map[user.UserId]Ok) {
+func OkWorker(conf config.ServerConfig, battleOkQueue <-chan Ok, ongoingBattleMap map[user.Id]Ok) {
 	for {
 		battleOk := <-battleOkQueue
 		if battleOk.RemoveCache == false {
@@ -118,7 +118,7 @@ func OkWorker(conf config.ServerConfig, battleOkQueue <-chan Ok, ongoingBattleMa
 	}
 }
 
-func WriteMatched2(conf config.ServerConfig, conn net.Conn, battleOk Ok, id user.UserId) {
+func WriteMatched2(conf config.ServerConfig, conn net.Conn, battleOk Ok, id user.Id) {
 	if battleOk.c1.Db.Id == id {
 		conn.Write(createMatched2Buf(conf, battleOk.createBattleOk, uint32(battleOk.createBattleOk.S.C1_token), 1, battleOk.c2.Db.Nickname))
 	} else if battleOk.c2.Db.Id == id {

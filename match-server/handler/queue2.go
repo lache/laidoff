@@ -10,7 +10,7 @@ import (
 	"unsafe"
 )
 
-func HandleQueue2(conf config.ServerConfig, matchQueue chan<- user.UserAgent, buf []byte, conn net.Conn, ongoingBattleMap map[user.UserId]battle.Ok, battleService battle.Service, battleOkQueue chan<- battle.Ok) {
+func HandleQueue2(conf config.ServerConfig, matchQueue chan<- user.Agent, buf []byte, conn net.Conn, ongoingBattleMap map[user.Id]battle.Ok, battleService battle.Service, battleOkQueue chan<- battle.Ok) {
 	log.Printf("QUEUE2 received")
 	recvPacket, err := convert.ParseQueue2(buf)
 	if err != nil {
@@ -66,7 +66,7 @@ func HandleQueue2(conf config.ServerConfig, matchQueue chan<- user.UserAgent, bu
 			}
 		}
 		// Queue connection
-		matchQueue <- user.UserAgent{conn, *userDb, false }
+		matchQueue <- user.Agent{conn, *userDb, false }
 		// Send reply
 		queueOkBuf := convert.Packet2Buf(convert.NewLwpQueueOk())
 		conn.Write(queueOkBuf)

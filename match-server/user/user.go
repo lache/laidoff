@@ -11,17 +11,17 @@ import (
 	cryptorand "crypto/rand"
 )
 
-type UserId [16]byte
+type Id [16]byte
 
-type UserDb struct {
-	Id       UserId
+type Db struct {
+	Id       Id
 	Created  time.Time
 	Nickname string
 }
 
-type UserAgent struct {
+type Agent struct {
 	Conn        net.Conn
-	Db          UserDb
+	Db          Db
 	CancelQueue bool
 }
 
@@ -39,11 +39,11 @@ func NewUuid() ([]byte, string, error) {
 	return uuid, fmt.Sprintf("%08x-%08x-%08x-%08x", uuid[0:4], uuid[4:8], uuid[8:12], uuid[12:16]), nil
 }
 
-func IdByteArrayToString(id UserId) string {
+func IdByteArrayToString(id Id) string {
 	return fmt.Sprintf("%08x-%08x-%08x-%08x", id[0:4], id[4:8], id[8:12], id[12:16])
 }
 
-func LoadUserDb(id UserId) (*UserDb, error) {
+func LoadUserDb(id Id) (*Db, error) {
 	uuidStr := IdByteArrayToString(id)
 	userDbFile, err := os.Open("db/" + uuidStr)
 	if err != nil {
@@ -52,14 +52,14 @@ func LoadUserDb(id UserId) (*UserDb, error) {
 	} else {
 		defer userDbFile.Close()
 		decoder := gob.NewDecoder(userDbFile)
-		userDb := &UserDb{}
+		userDb := &Db{}
 		decoder.Decode(userDb)
 		return userDb, nil
 	}
 }
 
-func CreateNewUser(uuid UserId, nickname string) (*UserDb, *os.File, error) {
-	userDb := &UserDb{
+func CreateNewUser(uuid Id, nickname string) (*Db, *os.File, error) {
+	userDb := &Db{
 		uuid,
 		time.Now(),
 		nickname,
@@ -76,7 +76,7 @@ func CreateNewUser(uuid UserId, nickname string) (*UserDb, *os.File, error) {
 	return userDb, userDbFile, nil
 }
 
-func WriteUserDb(userDb *UserDb) error {
+func WriteUserDb(userDb *Db) error {
 	userDbFile, err := os.Create("db/" + IdByteArrayToString(userDb.Id))
 	if err != nil {
 		log.Fatalf("User db file creation failed: %v", err.Error())

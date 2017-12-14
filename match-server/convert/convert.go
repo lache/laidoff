@@ -183,7 +183,7 @@ func ByteArrayToCcharArray256(b []byte) [256]C.char {
 	return ret
 }
 
-func UserIdToCuint(id user.UserId) [4]C.uint {
+func UserIdToCuint(id user.Id) [4]C.uint {
 	var b [4]C.uint
 	b[0] = C.uint(binary.BigEndian.Uint32(id[0:4]))
 	b[1] = C.uint(binary.BigEndian.Uint32(id[4:8]))
@@ -192,8 +192,8 @@ func UserIdToCuint(id user.UserId) [4]C.uint {
 	return b
 }
 
-func IdCuintToByteArray(id [4]C.uint) user.UserId {
-	var b user.UserId
+func IdCuintToByteArray(id [4]C.uint) user.Id {
+	var b user.Id
 	binary.BigEndian.PutUint32(b[0:], uint32(id[0]))
 	binary.BigEndian.PutUint32(b[4:], uint32(id[1]))
 	binary.BigEndian.PutUint32(b[8:], uint32(id[2]))
@@ -217,7 +217,7 @@ func IdArrayToString(id [4]C.uint) string {
 	return fmt.Sprintf("%08x-%08x-%08x-%08x", id[0], id[1], id[2], id[3])
 }
 
-func NewCreateBattle(id1, id2 user.UserId, nickname1, nickname2 string) *C.LWPCREATEBATTLE {
+func NewCreateBattle(id1, id2 user.Id, nickname1, nickname2 string) *C.LWPCREATEBATTLE {
 	var c1Nickname [C.LW_NICKNAME_MAX_LEN]C.char
 	var c2Nickname [C.LW_NICKNAME_MAX_LEN]C.char
 	GoStringToCCharArray(&nickname1, &c1Nickname)

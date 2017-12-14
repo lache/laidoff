@@ -47,7 +47,7 @@ func (t *Arith) Multiply(a, b int) int {
 	return reply
 }
 
-func (t *Arith) RegisterPushToken(backoff time.Duration, id user.UserId, domain int, pushToken string) int {
+func (t *Arith) RegisterPushToken(backoff time.Duration, id user.Id, domain int, pushToken string) int {
 	args := &shared_server.PushToken{domain, pushToken, id}
 	var reply int
 	err := t.client.Call("PushService.RegisterPushToken", args, &reply)
@@ -101,7 +101,7 @@ func (t *RankClient) Set(backoff time.Duration, id [16]byte, score int, nickname
 	return reply
 }
 
-func (t *RankClient) Get(backoff time.Duration, id user.UserId) *shared_server.ScoreRankItem {
+func (t *RankClient) Get(backoff time.Duration, id user.Id) *shared_server.ScoreRankItem {
 	args := id
 	var reply shared_server.ScoreRankItem
 	err := t.client.Call("RankService.Get", args, &reply)

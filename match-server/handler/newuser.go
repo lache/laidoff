@@ -18,7 +18,7 @@ func HandleNewUser(nickDb *Nickdb.NickDb, conn net.Conn) {
 	newNick := Nickdb.PickRandomNick(nickDb)
 	newUserDataBuf := convert.Packet2Buf(convert.NewLwpNewUserData(uuid, newNick))
 	// Write to disk
-	var id user.UserId
+	var id user.Id
 	copy(id[:], uuid)
 	_, _, err = user.CreateNewUser(id, newNick)
 	if err != nil {

@@ -9,7 +9,7 @@ import (
 	"../config"
 )
 
-func HandleCancelQueue(conf config.ServerConfig, matchQueue chan<- user.UserAgent, buf []byte, conn net.Conn, ongoingBattleMap map[user.UserId]battle.Ok, battleService battle.Service, battleOkQueue chan<- battle.Ok) {
+func HandleCancelQueue(conf config.ServerConfig, matchQueue chan<- user.Agent, buf []byte, conn net.Conn, ongoingBattleMap map[user.Id]battle.Ok, battleService battle.Service, battleOkQueue chan<- battle.Ok) {
 	log.Printf("CANCELQUEUE received")
 	recvPacket, err := convert.ParseCancelQueue(buf)
 	if err != nil {
@@ -26,6 +26,6 @@ func HandleCancelQueue(conf config.ServerConfig, matchQueue chan<- user.UserAgen
 			log.Printf("Nickname '%v' has the ongoing battle session. CANCELQUEUE?!", userDb.Nickname)
 		}
 		// Queue connection
-		matchQueue <- user.UserAgent{conn, *userDb, true }
+		matchQueue <- user.Agent{conn, *userDb, true }
 	}
 }
