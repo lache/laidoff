@@ -4,13 +4,11 @@ import (
 	"log"
 	"net"
 	"github.com/gasbank/laidoff/reward-server/helpers"
+	"github.com/gasbank/laidoff/match-server/convert"
 	"encoding/binary"
 	"bytes"
 	"time"
 )
-
-// #include "../src/puckgamepacket.h"
-import "C"
 
 const (
 	ServiceName = "reward"
@@ -59,7 +57,7 @@ func handleRequest(conn net.Conn, rank *helpers.RankClient) {
 		log.Printf("  Size %v", packetSize)
 		log.Printf("  Type %v", packetType)
 		switch packetType {
-		case C.LPGP_LWPBATTLERESULT:
+		case convert.LPGPLWPBATTLERESULT:
 			handleBattleResult(buf, rank)
 		}
 	}
@@ -67,30 +65,22 @@ func handleRequest(conn net.Conn, rank *helpers.RankClient) {
 	log.Printf("Conn closed %v", conn.RemoteAddr())
 }
 
-func convertCCharArrayToGoString(strIn *[C.LW_NICKNAME_MAX_LEN]C.char, strOut *string) {
-	buf := make([]byte, len(strIn))
-	for i, b := range strIn {
-		buf[i] = byte(b)
-	}
-	*strOut = string(buf)
-}
-
 func handleBattleResult(buf []byte, rank *helpers.RankClient) {
 	log.Printf("BATTLERESULT received")
 	// Parse
 	bufReader := bytes.NewReader(buf)
-	recvPacket := C.LWPBATTLERESULT{}
+	recvPacket, _ := convert.NewLwpBattleResult()
 	err := binary.Read(bufReader, binary.LittleEndian, &recvPacket)
 	if err != nil {
 		log.Printf("binary.Read fail: %v", err.Error())
 		return
 	}
-	id1 := IdCuintToByteArray(recvPacket.Id1)
-	id2 := IdCuintToByteArray(recvPacket.Id2)
+	id1 := convert.IdCuintToByteArray(recvPacket.Id1)
+	id2 := convert.IdCuintToByteArray(recvPacket.Id2)
 	var nickname1 string
 	var nickname2 string
-	convertCCharArrayToGoString(&recvPacket.Nickname1, &nickname1)
-	convertCCharArrayToGoString(&recvPacket.Nickname2, &nickname2)
+	convert.CCharArrayToGoString(&recvPacket.Nickname1, &nickname1)
+	convert.CCharArrayToGoString(&recvPacket.Nickname2, &nickname2)
 	winner := int(recvPacket.Winner)
 	log.Printf("Battle result received; id1=%v, id2=%v, winner=%v", id1, id2, winner)
 	backoff := 300 * time.Millisecond
@@ -116,15 +106,4 @@ func handleBattleResult(buf []byte, rank *helpers.RankClient) {
 	}
 	rank.Set(backoff, id1, newScore1, nickname1)
 	rank.Set(backoff, id2, newScore2, nickname2)
-}
-
-type UserId [16]byte
-
-func IdCuintToByteArray(id [4]C.uint) UserId {
-	var b UserId
-	binary.BigEndian.PutUint32(b[0:], uint32(id[0]))
-	binary.BigEndian.PutUint32(b[4:], uint32(id[1]))
-	binary.BigEndian.PutUint32(b[8:], uint32(id[2]))
-	binary.BigEndian.PutUint32(b[12:], uint32(id[3]))
-	return b
 }

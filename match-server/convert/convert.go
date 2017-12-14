@@ -26,6 +26,7 @@ const (
 	LPGPLWPPUSHTOKEN      = C.LPGP_LWPPUSHTOKEN
 	LPGPLWPGETLEADERBOARD = C.LPGP_LWPGETLEADERBOARD
 	LPGPLWPSETNICKNAME    = C.LPGP_LWPSETNICKNAME
+	LPGPLWPBATTLERESULT   = C.LPGP_LWPBATTLERESULT
 )
 
 /////////////////////////////////////////////////////////////////////////////////////
@@ -44,6 +45,10 @@ func NewLwpBattleValid() (*C.LWPBATTLEVALID, int) {
 
 func NewLwpCreateBattleOk() (*C.LWPCREATEBATTLEOK, int) {
 	return &C.LWPCREATEBATTLEOK{}, int(C.LPGP_LWPCREATEBATTLEOK)
+}
+
+func NewLwpBattleResult() (*C.LWPBATTLERESULT, int) {
+	return &C.LWPBATTLERESULT{}, int(C.LPGP_LWPBATTLERESULT)
 }
 
 func NewLwpRetryQueueLater() *C.LWPRETRYQUEUELATER {
@@ -100,7 +105,7 @@ func NewLwpMatched2(port int, ipv4 net.IP, battleId int, token uint, playerNo in
 		C.ushort(unsafe.Sizeof(C.LWPMATCHED2{})),
 		C.LPGP_LWPMATCHED2,
 		C.ushort(port), // createBattleOk.Port
-		C.ushort(0),               // padding
+		C.ushort(0),    // padding
 		[4]C.uchar{C.uchar(ipv4[0]), C.uchar(ipv4[1]), C.uchar(ipv4[2]), C.uchar(ipv4[3]),},
 		C.int(battleId),
 		C.uint(token),
