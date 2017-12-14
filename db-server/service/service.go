@@ -3,8 +3,8 @@ package service
 import "github.com/gasbank/laidoff/db-server/user"
 
 type Db interface {
-	Create(args *user.Db, reply *int) error
-	Read(args *user.Id, reply *user.Db) error
-	Update(args *user.Db, reply *int) error
-	Delete(args *user.Db) error
+	Create(args int, reply *user.Db) error
+	Get(args *user.Id, reply *user.Db) error
+	Lease(args *user.Id, reply *user.LeaseDb) error
+	Write(args *user.LeaseDb, reply *int) error
 }

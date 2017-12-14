@@ -2,7 +2,7 @@ package handler
 
 import (
 	"log"
-	"github.com/gasbank/laidoff/match-server/user"
+	"github.com/gasbank/laidoff/db-server/user"
 	"github.com/gasbank/laidoff/match-server/convert"
 	"net"
 )

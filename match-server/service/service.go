@@ -4,7 +4,7 @@ import (
 	"net/rpc"
 	"time"
 	"log"
-	"github.com/gasbank/laidoff/match-server/user"
+	"github.com/gasbank/laidoff/db-server/user"
 	"github.com/gasbank/laidoff/shared-server"
 	"net"
 )
@@ -169,4 +169,55 @@ func DialRankService() *RankClient {
 		log.Printf("dialNewRpc error: %v", err.Error())
 	}
 	return &RankClient{client: client}
+}
+
+func CreateNewUserDb() {
+	client, err := dialNewRpc(":20181")
+	if err != nil {
+		log.Printf("rpc connection error")
+		return
+	}
+	var userId user.Id
+	// Create test
+	{
+		var reply user.Db
+		err = client.Call("DbService.Create", 0, &reply)
+		if err != nil {
+			log.Printf("rpc call error: %v", err.Error())
+		} else {
+			log.Printf("DbService.Create reply: %v", reply.Nickname)
+		}
+		userId = reply.Id
+	}
+	// Create test
+	{
+		var reply user.Db
+		err = client.Call("DbService.Get", &userId, &reply)
+		if err != nil {
+			log.Printf("rpc call error: %v", err.Error())
+		} else {
+			log.Printf("DbService.Get reply: %v", reply.Nickname)
+		}
+	}
+	// Lease & Write test
+	{
+		var reply user.LeaseDb
+		// Lease
+		err = client.Call("DbService.Lease", &userId, &reply)
+		if err != nil {
+			log.Printf("rpc call error: %v", err.Error())
+		} else {
+			log.Printf("DbService.Lease reply: Nickname %v, Lease ID %v",
+				reply.Db.Nickname, reply.LeaseId)
+		}
+		// Write
+		var writeReply int
+		reply.Db.Nickname = "CanYouSeeMe"
+		err = client.Call("DbService.Write", &reply, &writeReply)
+		if err != nil {
+			log.Printf("rpc call error: %v", err.Error())
+		} else {
+			log.Printf("DbService.Write reply: %v", writeReply)
+		}
+	}
 }

@@ -6,7 +6,7 @@ import (
 	"net"
 	"github.com/gasbank/laidoff/match-server/nickdb"
 	"github.com/gasbank/laidoff/match-server/convert"
-	"github.com/gasbank/laidoff/match-server/user"
+	"github.com/gasbank/laidoff/db-server/user"
 )
 
 func HandleQueryNick(buf []byte, conn net.Conn, ndb *nickdb.NickDb) {

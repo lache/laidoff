@@ -12,11 +12,17 @@ import (
 )
 
 type Id [16]byte
+type LeaseId [16]byte
 
 type Db struct {
 	Id       Id
 	Created  time.Time
 	Nickname string
+}
+
+type LeaseDb struct {
+	LeaseId LeaseId
+	Db      Db
 }
 
 type Agent struct {

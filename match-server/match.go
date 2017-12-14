@@ -10,7 +10,7 @@ import (
 	"math/rand"
 	"github.com/gasbank/laidoff/match-server/nickdb"
 	"github.com/gasbank/laidoff/match-server/convert"
-	"github.com/gasbank/laidoff/match-server/user"
+	"github.com/gasbank/laidoff/db-server/user"
 	"github.com/gasbank/laidoff/match-server/service"
 	"github.com/gasbank/laidoff/match-server/handler"
 	"github.com/gasbank/laidoff/match-server/config"
@@ -23,6 +23,8 @@ func main() {
 	log.Println("Greetings from match server")
 	// Create db directory to save user database
 	os.MkdirAll("db", os.ModePerm)
+	// Test Db service
+	service.CreateNewUserDb()
 	// Seed a new random number
 	rand.Seed(time.Now().Unix())
 	// Load nick name database
