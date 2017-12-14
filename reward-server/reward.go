@@ -3,7 +3,7 @@ package main
 import (
 	"log"
 	"net"
-	"./helpers"
+	"github.com/gasbank/laidoff/reward-server/helpers"
 	"encoding/binary"
 	"bytes"
 	"time"

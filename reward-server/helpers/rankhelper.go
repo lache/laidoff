@@ -5,7 +5,7 @@ import (
 	"log"
 	"net/rpc"
 	"net"
-	"../../shared-server"
+	"github.com/gasbank/laidoff/shared-server"
 	"strings"
 )
 
