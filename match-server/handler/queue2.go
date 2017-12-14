@@ -9,8 +9,6 @@ import (
 	"../config"
 	"unsafe"
 )
-// #include "../../src/puckgamepacket.h"
-import "C"
 
 func HandleQueue2(conf config.ServerConfig, matchQueue chan<- user.UserAgent, buf []byte, conn net.Conn, ongoingBattleMap map[user.UserId]battle.Ok, battleService battle.Service, battleOkQueue chan<- battle.Ok) {
 	log.Printf("QUEUE2 received")
@@ -40,8 +38,8 @@ func HandleQueue2(conf config.ServerConfig, matchQueue chan<- user.UserAgent, bu
 			} else {
 				checkBattleValidBuf := convert.Packet2Buf(convert.NewCheckBattleValid(battleOk.BattleId))
 				connToBattle.Write(checkBattleValidBuf)
-				battleValid := &C.LWPBATTLEVALID{}
-				err = battle.WaitForReply(connToBattle, battleValid, unsafe.Sizeof(*battleValid), int(C.LPGP_LWPBATTLEVALID))
+				battleValid, battleValidEnum := convert.NewLwpBattleValid()
+				err = battle.WaitForReply(connToBattle, battleValid, unsafe.Sizeof(*battleValid), battleValidEnum)
 				if err != nil {
 					log.Printf("WaitForReply failed - %v", err.Error())
 				} else {

@@ -2,6 +2,7 @@
   <dictionary name="gasbank">
     <words>
       <w>cchar</w>
+      <w>mathrand</w>
       <w>recv</w>
     </words>
   </dictionary>

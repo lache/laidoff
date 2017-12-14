@@ -12,13 +12,11 @@ import (
 	"errors"
 	"unsafe"
 )
-// #include "../../src/puckgamepacket.h"
-import "C"
 
 type Ok struct {
 	RemoveCache    bool
 	BattleId       int
-	createBattleOk C.LWPCREATEBATTLEOK
+	createBattleOk convert.CreateBattleOk // C.LWPCREATEBATTLEOK
 	c1             user.UserAgent
 	c2             user.UserAgent
 	RemoveUserId   user.UserId
@@ -84,17 +82,18 @@ func CreateBattleInstance(battleService Service, c1 user.UserAgent, c2 user.User
 			log.Fatalf("Send LSBPT_LWSPHEREBATTLEPACKETCREATEBATTLE failed")
 		}
 		// Wait for a reply
-		createBattleOk := &C.LWPCREATEBATTLEOK{}
-		err = WaitForReply(connToBattle, createBattleOk, unsafe.Sizeof(*createBattleOk), int(C.LPGP_LWPCREATEBATTLEOK))
+		createBattleOk, createBattleOkEnum := convert.NewLwpCreateBattleOk()
+		err = WaitForReply(connToBattle, createBattleOk, unsafe.Sizeof(*createBattleOk), createBattleOkEnum)
 		if err != nil {
 			log.Printf("WaitForReply failed - %v", err.Error())
 		} else {
 			// No error! so far ... proceed battle
 			log.Printf("MATCH %v and %v matched successfully!", c1.Conn.RemoteAddr(), c2.Conn.RemoteAddr())
+			createBattleOkWrap := convert.CreateBattleOk{S: *createBattleOk}
 			battleOkQueue <- Ok {
 				false,
 				int(createBattleOk.Battle_id),
-				*createBattleOk,
+				createBattleOkWrap,
 				c1,
 				c2,
 				user.UserId{},
@@ -121,13 +120,13 @@ func OkWorker(conf config.ServerConfig, battleOkQueue <-chan Ok, ongoingBattleMa
 
 func WriteMatched2(conf config.ServerConfig, conn net.Conn, battleOk Ok, id user.UserId) {
 	if battleOk.c1.Db.Id == id {
-		conn.Write(createMatched2Buf(conf, battleOk.createBattleOk, battleOk.createBattleOk.C1_token, 1, battleOk.c2.Db.Nickname))
+		conn.Write(createMatched2Buf(conf, battleOk.createBattleOk, uint32(battleOk.createBattleOk.S.C1_token), 1, battleOk.c2.Db.Nickname))
 	} else if battleOk.c2.Db.Id == id {
-		conn.Write(createMatched2Buf(conf, battleOk.createBattleOk, battleOk.createBattleOk.C2_token, 2, battleOk.c1.Db.Nickname))
+		conn.Write(createMatched2Buf(conf, battleOk.createBattleOk, uint32(battleOk.createBattleOk.S.C2_token), 2, battleOk.c1.Db.Nickname))
 	}
 }
 
-func createMatched2Buf(conf config.ServerConfig, createBattleOk C.LWPCREATEBATTLEOK, token C.uint, playerNo C.int, targetNickname string) []byte {
+func createMatched2Buf(conf config.ServerConfig, createBattleOk convert.CreateBattleOk, token uint32, playerNo int, targetNickname string) []byte {
 	publicAddr, err := net.ResolveTCPAddr(conf.BattlePublicServiceConnType, conf.BattlePublicServiceHost+":"+conf.BattlePublicServicePort)
 	if err != nil {
 		log.Panicf("BattlePublicService conf parse error: %v", err.Error())
@@ -137,7 +136,7 @@ func createMatched2Buf(conf config.ServerConfig, createBattleOk C.LWPCREATEBATTL
 	return convert.Packet2Buf(convert.NewMatched2(
 		publicAddr.Port,
 		publicAddrIpv4,
-		int(createBattleOk.Battle_id),
+		int(createBattleOk.S.Battle_id),
 		uint(token),
 		int(playerNo),
 		targetNickname,
@@ -145,10 +144,7 @@ func createMatched2Buf(conf config.ServerConfig, createBattleOk C.LWPCREATEBATTL
 }
 
 func SendRetryQueue(conn net.Conn) {
-	retryQueueBuf := convert.Packet2Buf(&C.LWPRETRYQUEUE{
-		C.ushort(unsafe.Sizeof(C.LWPRETRYQUEUE{})),
-		C.LPGP_LWPRETRYQUEUE,
-	})
+	retryQueueBuf := convert.Packet2Buf(convert.NewLwpRetryQueue())
 	_, retrySendErr := conn.Write(retryQueueBuf)
 	if retrySendErr != nil {
 		log.Printf("%v: %v error!", conn.RemoteAddr(), retrySendErr.Error())
@@ -158,10 +154,7 @@ func SendRetryQueue(conn net.Conn) {
 }
 
 func SendRetryQueueLater(conn net.Conn) {
-	retryQueueLaterBuf := convert.Packet2Buf(&C.LWPRETRYQUEUELATER{
-		C.ushort(unsafe.Sizeof(C.LWPRETRYQUEUELATER{})),
-		C.LPGP_LWPRETRYQUEUELATER,
-	})
+	retryQueueLaterBuf := convert.Packet2Buf(convert.NewLwpRetryQueueLater())
 	_, retrySendErr := conn.Write(retryQueueLaterBuf)
 	if retrySendErr != nil {
 		log.Printf("%v: %v error!", conn.RemoteAddr(), retrySendErr.Error())

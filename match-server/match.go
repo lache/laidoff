@@ -4,7 +4,6 @@ import (
 	"log"
 	"net"
 	"encoding/binary"
-	"unsafe"
 	"os"
 	"encoding/json"
 	"time"
@@ -17,9 +16,6 @@ import (
 	"./config"
 	"./battle"
 	)
-
-// #include "../src/puckgamepacket.h"
-import "C"
 
 func main() {
 	// Set default log format
@@ -53,7 +49,7 @@ func main() {
 	battleOkQueue := make(chan battle.Ok)
 	// Ongoing battle map
 	ongoingBattleMap := make(map[user.UserId]battle.Ok)
-	battleService := battle.Service{ conf }
+	battleService := battle.Service{ Conf: conf }
 	// Start match worker goroutine
 	go matchWorker(battleService, matchQueue, battleOkQueue, serviceList)
 	// Start battle ok worker goroutine
@@ -75,6 +71,7 @@ func main() {
 	}
 }
 
+//noinspection GoUnusedFunction
 func testRpc(serviceList *service.ServiceList) {
 	log.Println(serviceList.Arith.Multiply(5, 6))
 	log.Println(serviceList.Arith.Divide(500, 10))
@@ -114,10 +111,7 @@ func matchWorker(battleService battle.Service, matchQueue <-chan user.UserAgent,
 			battle.SendRetryQueue(c2.Conn)
 		} else {
 			log.Printf("%v and %v matched! (maybe)", c1.Conn.RemoteAddr(), c2.Conn.RemoteAddr())
-			maybeMatchedBuf := convert.Packet2Buf(&C.LWPMAYBEMATCHED{
-				C.ushort(unsafe.Sizeof(C.LWPMAYBEMATCHED{})),
-				C.LPGP_LWPMAYBEMATCHED,
-			})
+			maybeMatchedBuf := convert.Packet2Buf(convert.NewLwpMaybeMatched())
 			n1, err1 := c1.Conn.Write(maybeMatchedBuf)
 			n2, err2 := c2.Conn.Write(maybeMatchedBuf)
 			if n1 == 4 && n2 == 4 && err1 == nil && err2 == nil {
@@ -157,22 +151,23 @@ func handleRequest(conf config.ServerConfig, nickDb *Nickdb.NickDb, conn net.Con
 		packetType := binary.LittleEndian.Uint16(buf[2:])
 		log.Printf("  Size %v", packetSize)
 		log.Printf("  Type %v", packetType)
+
 		switch packetType {
-		case C.LPGP_LWPQUEUE2:
+		case convert.LPGP_LWPQUEUE2:
 			handler.HandleQueue2(conf, matchQueue, buf, conn, ongoingBattleMap, battleService, battleOkQueue)
-		case C.LPGP_LWPCANCELQUEUE:
+		case convert.LPGP_LWPCANCELQUEUE:
 			handler.HandleCancelQueue(conf, matchQueue, buf, conn, ongoingBattleMap, battleService, battleOkQueue)
-		case C.LPGP_LWPSUDDENDEATH:
+		case convert.LPGP_LWPSUDDENDEATH:
 			handler.HandleSuddenDeath(conf, buf) // relay 'buf' to battle service
-		case C.LPGP_LWPNEWUSER:
+		case convert.LPGP_LWPNEWUSER:
 			handler.HandleNewUser(nickDb, conn)
-		case C.LPGP_LWPQUERYNICK:
+		case convert.LPGP_LWPQUERYNICK:
 			handler.HandleQueryNick(buf, conn, nickDb)
-		case C.LPGP_LWPPUSHTOKEN:
+		case convert.LPGP_LWPPUSHTOKEN:
 			handler.HandlePushToken(buf, conn, serviceList)
-		case C.LPGP_LWPGETLEADERBOARD:
+		case convert.LPGP_LWPGETLEADERBOARD:
 			handler.HandleGetLeaderboard(buf, conn, serviceList)
-		case C.LPGP_LWPSETNICKNAME:
+		case convert.LPGP_LWPSETNICKNAME:
 			handler.HandleSetNickname(buf, conn)
 		}
 	}
