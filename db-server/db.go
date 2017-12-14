@@ -83,7 +83,7 @@ func (t *DbService) Lease(args *user.Id, reply *user.LeaseDb) error {
 	return nil
 }
 
-func (t *DbService) CommitLease(leaseRequest *LeaseWriteRequest) {
+func CommitLease(t *DbService, leaseRequest *LeaseWriteRequest) {
 	args := *leaseRequest.Id
 	_, exist := t.leaseMap[args]
 	if exist == false {
@@ -121,7 +121,7 @@ func (t *DbService) Write(args *user.LeaseDb, reply *int) error {
 	return nil
 }
 
-func (t *DbService) CommitWrite(writeRequest *LeaseWriteRequest) {
+func CommitWrite(t *DbService, writeRequest *LeaseWriteRequest) {
 	leaseData, exist := t.leaseMap[writeRequest.LeaseDb.Db.Id]
 	if exist {
 		if leaseData.LeaseId == writeRequest.LeaseDb.LeaseId {
@@ -149,9 +149,9 @@ func ProcessLeaseWriteRequest(t *DbService) {
 	for {
 		request := <-t.leaseWriteRequestQueue
 		if request.LeaseReplyChan != nil {
-			t.CommitLease(&request)
+			CommitLease(t, &request)
 		} else if request.WriteReplyChan != nil {
-			t.CommitWrite(&request)
+			CommitWrite(t, &request)
 		}
 	}
 }
@@ -159,7 +159,7 @@ func ProcessLeaseWriteRequest(t *DbService) {
 func main() {
 	// Create db directory to save user database
 	os.MkdirAll("db", os.ModePerm)
-	createTestUserDb()
+	//createTestUserDb()
 	server := rpc.NewServer()
 	dbService := new(DbService)
 	dbService.nickDb = nickdb.LoadNickDb()
