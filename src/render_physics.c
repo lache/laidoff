@@ -226,28 +226,36 @@ static void render_go(const LWCONTEXT* pLwc,
     const float e = 2.718f;
     const float red_overlay_ratio = go->red_overlay ? LWMIN(1.0f, speed / go->puck_game->puck_damage_contact_speed_threshold) : 0;
     const float red_overlay_logistic_ratio = LWMIN(0.3f, 1 / (1 + powf(e, -(20.0f * (red_overlay_ratio - 0.8f)))));
+    static const float red_overlay[] = { 1.0f, 1.0f, 1.0f };
+    static const float red_multiply[] = { 1.0f, 0.3f, 0.3f };
+    static const float blue_overlay[] = { 1.0f, 1.0f, 1.0f };
+    static const float blue_multiply[] = { 0.3f, 0.5f, 1.0f };
+    static const float white_overlay[] = { 1.0f, 1.0f, 1.0f };
+    static const float white_multiply[] = { 1.0f, 1.0f, 1.0f };
     if (go->red_overlay) {
         if (puck_owner_player_no == 1) {
             if (pLwc->puck_game->player_no == 2) {
-                glUniform3f(shader->overlay_color_location, 1, 0, 0);
-                glUniform3f(shader->multiply_color_location, 1, 0, 0);
+                glUniform3fv(shader->overlay_color_location, 1, red_overlay);
+                glUniform3fv(shader->multiply_color_location, 1, red_multiply);
             } else {
-                glUniform3f(shader->overlay_color_location, 0, 0, 1);
-                glUniform3f(shader->multiply_color_location, 0, 0, 1);
+                glUniform3fv(shader->overlay_color_location, 1, blue_overlay);
+                glUniform3fv(shader->multiply_color_location, 1, blue_multiply);
             }
         } else if (puck_owner_player_no == 2) {
             if (pLwc->puck_game->player_no == 2) {
-                glUniform3f(shader->overlay_color_location, 0, 0, 1);
-                glUniform3f(shader->multiply_color_location, 0, 0, 1);
+                glUniform3fv(shader->overlay_color_location, 1, blue_overlay);
+                glUniform3fv(shader->multiply_color_location, 1, blue_multiply);
             } else {
-                glUniform3f(shader->overlay_color_location, 1, 0, 0);
-                glUniform3f(shader->multiply_color_location, 1, 0, 0);
+                glUniform3fv(shader->overlay_color_location, 1, red_overlay);
+                glUniform3fv(shader->multiply_color_location, 1, red_multiply);
             }
         } else {
-            glUniform3f(shader->multiply_color_location, 1, 1, 1);
+            glUniform3fv(shader->overlay_color_location, 1, white_overlay);
+            glUniform3fv(shader->multiply_color_location, 1, white_multiply);
         }
     } else {
-        glUniform3f(shader->multiply_color_location, 1, 1, 1);
+        glUniform3fv(shader->overlay_color_location, 1, white_overlay);
+        glUniform3fv(shader->multiply_color_location, 1, white_multiply);
     }
     glUniform1f(shader->overlay_color_ratio_location, red_overlay_logistic_ratio);
 
@@ -1402,31 +1410,25 @@ void lwc_render_physics(const LWCONTEXT* pLwc, const mat4x4 view, const mat4x4 p
         arrow_scale *= -1;
     }
 
-    float puck_sphere_col[3];
+    const float* puck_sphere_col;
     int puck_owner_player_no = remote ? state->bf.puck_owner_player_no : puck_game->puck_owner_player_no;
+    // these are ground lighting colors, NOT sphere colors itself
+    static const float gray_sphere[3] = { 0.6f, 0.6f, 0.6f };
+    static const float reddish_sphere[3] = { 1.0f, 0.0f, 0.0f };
+    static const float bluish_sphere[3] = { 0.0f, 0.0f, 1.0f };
     if (puck_owner_player_no == 0) {
-        puck_sphere_col[0] = 0.3f;
-        puck_sphere_col[1] = 0.3f;
-        puck_sphere_col[2] = 0.3f;
+        puck_sphere_col = gray_sphere;
     } else if (puck_owner_player_no == 1) {
         if (puck_game->player_no == 2) {
-            puck_sphere_col[0] = 1.0f;
-            puck_sphere_col[1] = 0.1f;
-            puck_sphere_col[2] = 0.2f;
+            puck_sphere_col = reddish_sphere;
         } else {
-            puck_sphere_col[0] = 0.2f;
-            puck_sphere_col[1] = 0.1f;
-            puck_sphere_col[2] = 1.0f;
+            puck_sphere_col = bluish_sphere;
         }
     } else {
         if (puck_game->player_no == 2) {
-            puck_sphere_col[0] = 0.2f;
-            puck_sphere_col[1] = 0.1f;
-            puck_sphere_col[2] = 1.0f;
+            puck_sphere_col = bluish_sphere;
         } else {
-            puck_sphere_col[0] = 1.0f;
-            puck_sphere_col[1] = 0.1f;
-            puck_sphere_col[2] = 0.2f;
+            puck_sphere_col = reddish_sphere;
         }
     }
     LWSPHERERENDERUNIFORM sphere_render_uniform = {
@@ -1438,7 +1440,7 @@ void lwc_render_physics(const LWCONTEXT* pLwc, const mat4x4 view, const mat4x4 p
             { remote_target_pos[0], remote_target_pos[1], remote_target_pos[2] },
             { remote_puck_pos[0], remote_puck_pos[1], remote_puck_pos[2] }
         },
-        // float sphere_col[3][3];
+        // float sphere_col[3][3]; --- ground lighting color, NOT sphere color itself
         {
             { 0.0f, 1.0f, 0.8f },
             { 1.0f, 0.0f, 0.0f },
@@ -1448,7 +1450,7 @@ void lwc_render_physics(const LWCONTEXT* pLwc, const mat4x4 view, const mat4x4 p
         {
             !remote ? puck_game->go[LPGO_PLAYER].speed : state->player_speed,
             !remote ? puck_game->go[LPGO_TARGET].speed : state->target_speed,
-            !remote ? puck_game->go[LPGO_PUCK].speed : state->puck_speed
+            1.5f * (!remote ? puck_game->go[LPGO_PUCK].speed : state->puck_speed)
         },
         // float sphere_move_rad[3];
         {
@@ -1486,8 +1488,6 @@ void lwc_render_physics(const LWCONTEXT* pLwc, const mat4x4 view, const mat4x4 p
         sphere_render_uniform.sphere_col[1][2] = 0.8f;
     }
     const float wall_height = 1.6f;
-    const LWPUCKGAMEPLAYER* player = &puck_game->player;
-    const LWPUCKGAMEPLAYER* target = &puck_game->target;
 
     render_physics_menu(pLwc, proj, view, puck_game);
 
