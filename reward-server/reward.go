@@ -11,8 +11,8 @@ import (
 )
 
 const (
-	ServiceName = "reward"
-	ServiceAddr = ":10290"
+	ServiceName     = "reward"
+	ServiceAddr     = ":10290"
 	RankServiceAddr = ":20172"
 )
 
@@ -70,7 +70,7 @@ func handleBattleResult(buf []byte, rank *helpers.RankClient) {
 	// Parse
 	bufReader := bytes.NewReader(buf)
 	recvPacket, _ := convert.NewLwpBattleResult()
-	err := binary.Read(bufReader, binary.LittleEndian, &recvPacket)
+	err := binary.Read(bufReader, binary.LittleEndian, recvPacket)
 	if err != nil {
 		log.Printf("binary.Read fail: %v", err.Error())
 		return

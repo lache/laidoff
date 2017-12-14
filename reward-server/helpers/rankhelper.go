@@ -11,7 +11,7 @@ import (
 
 type RankClient struct {
 	client *rpc.Client
-	addr string
+	addr   string
 }
 
 func NewRankClient(address string) *RankClient {
@@ -19,7 +19,7 @@ func NewRankClient(address string) *RankClient {
 	if err != nil {
 		log.Fatalf("Rank service connection error: %v", err.Error())
 	}
-	return &RankClient{rankRpc, address }
+	return &RankClient{rankRpc, address}
 }
 
 func dialNewRpc(address string) (*rpc.Client, error) {
