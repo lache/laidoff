@@ -3,9 +3,9 @@ package handler
 import (
 	"net"
 	"log"
-	"../user"
-	"../convert"
-	"../battle"
+	"github.com/gasbank/laidoff/match-server/user"
+	"github.com/gasbank/laidoff/match-server/convert"
+	"github.com/gasbank/laidoff/match-server/battle"
 )
 
 func HandleCancelQueue(matchQueue chan<- user.Agent, buf []byte, conn net.Conn, ongoingBattleMap map[user.Id]battle.Ok) {

@@ -2,8 +2,8 @@ package handler
 
 import (
 	"log"
-	"../user"
-	"../convert"
+	"github.com/gasbank/laidoff/match-server/user"
+	"github.com/gasbank/laidoff/match-server/convert"
 	"net"
 )
 

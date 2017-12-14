@@ -3,9 +3,9 @@ package handler
 import (
 	"net"
 	"log"
-	"../user"
-	"../nickdb"
-	"../convert"
+	"github.com/gasbank/laidoff/match-server/user"
+	"github.com/gasbank/laidoff/match-server/nickdb"
+	"github.com/gasbank/laidoff/match-server/convert"
 )
 
 func HandleNewUser(nickDb *Nickdb.NickDb, conn net.Conn) {

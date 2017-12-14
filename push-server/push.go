@@ -5,7 +5,7 @@ import (
 	"net/rpc"
 	"github.com/sideshow/apns2"
 	"github.com/sideshow/apns2/certificate"
-	"../shared-server"
+	"github.com/gasbank/laidoff/shared-server"
 	"net"
 	"errors"
 	"encoding/gob"

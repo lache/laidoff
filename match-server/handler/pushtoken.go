@@ -6,8 +6,8 @@ import (
 	"time"
 	"fmt"
 	"net"
-	"../service"
-	"../convert"
+	"github.com/gasbank/laidoff/match-server/service"
+	"github.com/gasbank/laidoff/match-server/convert"
 )
 
 func HandlePushToken(buf []byte, conn net.Conn, serviceList *service.List) {

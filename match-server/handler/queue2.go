@@ -3,10 +3,10 @@ package handler
 import (
 	"net"
 	"log"
-	"../user"
-	"../convert"
-	"../battle"
-	"../config"
+	"github.com/gasbank/laidoff/match-server/user"
+	"github.com/gasbank/laidoff/match-server/convert"
+	"github.com/gasbank/laidoff/match-server/battle"
+	"github.com/gasbank/laidoff/match-server/config"
 	"unsafe"
 )
 

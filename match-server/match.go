@@ -8,13 +8,13 @@ import (
 	"encoding/json"
 	"time"
 	"math/rand"
-	"./nickdb"
-	"./convert"
-	"./user"
-	"./service"
-	"./handler"
-	"./config"
-	"./battle"
+	"github.com/gasbank/laidoff/match-server/nickdb"
+	"github.com/gasbank/laidoff/match-server/convert"
+	"github.com/gasbank/laidoff/match-server/user"
+	"github.com/gasbank/laidoff/match-server/service"
+	"github.com/gasbank/laidoff/match-server/handler"
+	"github.com/gasbank/laidoff/match-server/config"
+	"github.com/gasbank/laidoff/match-server/battle"
 	)
 
 func main() {

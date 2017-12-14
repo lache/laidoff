@@ -3,7 +3,7 @@ package handler
 import (
 	"log"
 	"net"
-	"../config"
+	"github.com/gasbank/laidoff/match-server/config"
 )
 
 func HandleSuddenDeath(conf config.ServerConfig, buf []byte) {

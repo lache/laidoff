@@ -4,8 +4,8 @@ import (
 	"net"
 	"log"
 	"time"
-	"../service"
-	"../convert"
+	"github.com/gasbank/laidoff/match-server/service"
+	"github.com/gasbank/laidoff/match-server/convert"
 )
 
 func HandleGetLeaderboard(buf []byte, conn net.Conn, serviceList *service.List) {

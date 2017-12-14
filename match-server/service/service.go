@@ -4,8 +4,8 @@ import (
 	"net/rpc"
 	"time"
 	"log"
-	"../user"
-	"../../shared-server"
+	"github.com/gasbank/laidoff/match-server/user"
+	"github.com/gasbank/laidoff/shared-server"
 	"net"
 )
 

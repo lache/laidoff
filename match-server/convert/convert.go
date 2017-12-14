@@ -3,11 +3,11 @@ package convert
 import (
 	"encoding/binary"
 	"fmt"
-	"../user"
+	"github.com/gasbank/laidoff/match-server/user"
 	"unsafe"
 	"bytes"
 	"net"
-	"../../shared-server"
+	"github.com/gasbank/laidoff/shared-server"
 	"log"
 )
 // #include "../../src/puckgamepacket.h"
