@@ -8,15 +8,14 @@ import (
 	"github.com/gasbank/laidoff/match-server/convert"
 )
 
-func HandleNewUser(nickDb *Nickdb.NickDb, conn net.Conn) {
+func HandleNewUser(nickDb *nickdb.NickDb, conn net.Conn) {
 	log.Printf("NEWUSER received")
 	uuid, uuidStr, err := user.NewUuid()
 	if err != nil {
 		log.Fatalf("new uuid failed: %v", err.Error())
 	}
 	log.Printf("  - New user guid: %v", uuidStr)
-	newNick := Nickdb.PickRandomNick(nickDb)
-	newUserDataBuf := convert.Packet2Buf(convert.NewLwpNewUserData(uuid, newNick))
+	newNick := nickdb.PickRandomNick(nickDb)
 	// Write to disk
 	var id user.Id
 	copy(id[:], uuid)
@@ -24,6 +23,8 @@ func HandleNewUser(nickDb *Nickdb.NickDb, conn net.Conn) {
 	if err != nil {
 		log.Fatalf("CreateNewUser failed: %v", err.Error())
 	}
+	// reply to client
+	newUserDataBuf := convert.Packet2Buf(convert.NewLwpNewUserData(uuid, newNick))
 	_, err = conn.Write(newUserDataBuf)
 	if err != nil {
 		log.Fatalf("NEWUSERDATA send failed: %v", err.Error())

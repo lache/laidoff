@@ -1,4 +1,4 @@
-package Nickdb
+package nickdb
 
 import (
 	"os"

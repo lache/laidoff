@@ -94,6 +94,7 @@ func handleBattleResult(buf []byte, rank *helpers.RankClient) {
 			newScore1++
 		}
 	} else {
+		log.Printf("rank.Get returned nil!")
 		newScore1 = 1
 	}
 	if oldScore2 != nil {
@@ -102,6 +103,7 @@ func handleBattleResult(buf []byte, rank *helpers.RankClient) {
 			newScore2++
 		}
 	} else {
+		log.Printf("rank.Get returned nil!")
 		newScore2 = 1
 	}
 	rank.Set(backoff, id1, newScore1, nickname1)

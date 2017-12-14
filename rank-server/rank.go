@@ -11,18 +11,18 @@ import (
 
 type UserId [16]byte
 
-type Rank struct {
+type RankData struct {
 	IdScoreMap    map[UserId]int
 	ScoreArray    []int
 	IdArray       []UserId
 	NicknameArray []string
 }
 
-func (t *Rank) Set(id UserId, newScore int) (int, int) {
+func (t *RankData) Set(id UserId, newScore int) (int, int) {
 	return t.SetWithNickname(id, newScore, "")
 }
 
-func (t *Rank) SetWithNickname(id UserId, newScore int, nickname string) (int, int) {
+func (t *RankData) SetWithNickname(id UserId, newScore int, nickname string) (int, int) {
 	if oldScore, ok := t.IdScoreMap[id]; ok {
 		// Existing id
 		oldRank, oldTieCount := getRankAndTieCountZeroBasedDesc(&t.ScoreArray, oldScore)
@@ -64,7 +64,7 @@ func (t *Rank) SetWithNickname(id UserId, newScore int, nickname string) (int, i
 	return -1, -1
 }
 
-func (t *Rank) Get(id UserId) (int, int, int, error) {
+func (t *RankData) Get(id UserId) (int, int, int, error) {
 	if oldScore, ok := t.IdScoreMap[id]; ok {
 		rank, tieCount := getRankAndTieCountZeroBasedDesc(&t.ScoreArray, oldScore)
 		return oldScore, rank, tieCount, nil
@@ -72,11 +72,11 @@ func (t *Rank) Get(id UserId) (int, int, int, error) {
 	return -1, -1, -1, errors.New("id not exist")
 }
 
-func (t *Rank) PrintAll() {
+func (t *RankData) PrintAll() {
 	rank := 0
 	tieCount := 1
 	for i, c := 0, len(t.IdArray); i < c; i++ {
-		log.Printf("Rank.%v: %v %v", rank, t.IdArray[i], t.ScoreArray[i])
+		log.Printf("RankData.%v: %v %v", rank, t.IdArray[i], t.ScoreArray[i])
 		if i < c-1 {
 			if t.ScoreArray[i+1] == t.ScoreArray[i] {
 				tieCount++
@@ -177,8 +177,8 @@ func insertNewScoreDesc(descArr *[]int, newScore int) (int, int) {
 	return insertRank, insertTieCount + 1
 }
 
-func newRank() *Rank {
-	return &Rank{
+func newRank() *RankData {
+	return &RankData{
 		IdScoreMap: make(map[UserId]int),
 		ScoreArray: make([]int, 0),
 		IdArray:    make([]UserId, 0),
@@ -186,7 +186,7 @@ func newRank() *Rank {
 }
 
 type RankService struct {
-	rank *Rank
+	rank *RankData
 }
 
 func (t *RankService) Set(args *shared_server.ScoreItem, reply *int) error {
@@ -210,6 +210,10 @@ func (t *RankService) Get(args *[16]byte, reply *shared_server.ScoreRankItem) er
 
 func (t *RankService) GetLeaderboard(args *shared_server.LeaderboardRequest, reply *shared_server.LeaderboardReply) error {
 	scoreCount := len(t.rank.ScoreArray)
+	if scoreCount == 0 {
+		log.Printf("Score empty")
+		return nil
+	}
 	if scoreCount <= args.StartIndex || args.StartIndex < 0 {
 		log.Printf("StartIndex out of bounds error")
 		return nil
@@ -259,6 +263,8 @@ func main() {
 	}
 	server.Accept(l)
 }
+
+//noinspection GoUnusedFunction
 func selfTest() {
 	descArr := &[]int{11, 9, 7, 7, 6, 5, 4, 4, 4, 3, 3, 2, 1, 1, 1, 1, 1, 0, 0, 0, -1}
 	log.Print(descArr)
@@ -291,7 +297,7 @@ func selfTest() {
 	log.Print(descArr)
 	log.Printf("rank zero based: %v, tie count: %v", r, t)
 	rank := newRank()
-	// Rank.Set test
+	// RankData.Set test
 	r, t = rank.Set(UserId{1}, 100)
 	log.Printf("RANK: rank zero based: %v, tie count: %v", r, t)
 	r, t = rank.Set(UserId{1}, 200)
@@ -320,9 +326,9 @@ func selfTest() {
 	log.Printf("RANK: rank zero based: %v, tie count: %v", r, t)
 	r, t = rank.Set(UserId{7}, 100)
 	log.Printf("RANK: rank zero based: %v, tie count: %v", r, t)
-	// Rank.PrintAll test
+	// RankData.PrintAll test
 	rank.PrintAll()
-	// Rank.Get test
+	// RankData.Get test
 	score, r, t, err := rank.Get(UserId{1})
 	if err != nil {
 		log.Printf("rank get error! %v", err.Error())
@@ -330,11 +336,11 @@ func selfTest() {
 		log.Printf("RANK GET: score %v, rank zero based: %v, tie count: %v", score, r, t)
 	}
 	userIdList := &[]UserId{
-		UserId{1},
-		UserId{2},
-		UserId{3},
-		UserId{4},
-		UserId{5},
+		{1},
+		{2},
+		{3},
+		{4},
+		{5},
 	}
 	log.Print(userIdList)
 	moveUserIdWithinSlice(userIdList, 0, 1)

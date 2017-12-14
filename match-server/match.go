@@ -26,10 +26,10 @@ func main() {
 	// Seed a new random number
 	rand.Seed(time.Now().Unix())
 	// Load nick name database
-	nickDb := Nickdb.LoadNickDb()
+	nickDb := nickdb.LoadNickDb()
 	// Service List
 	serviceList := service.NewServiceList()
-	log.Printf("Sample nick: %v", Nickdb.PickRandomNick(&nickDb))
+	log.Printf("Sample nick: %v", nickdb.PickRandomNick(&nickDb))
 	// Load conf.json
 	confFile, err := os.Open("conf.json")
 	if err != nil {
@@ -133,7 +133,7 @@ func checkMatchError(err error, conn net.Conn) {
 	}
 }
 
-func handleRequest(conf config.ServerConfig, nickDb *Nickdb.NickDb, conn net.Conn, matchQueue chan<- user.Agent, serviceList *service.List, ongoingBattleMap map[user.Id]battle.Ok, battleService battle.Service, battleOkQueue chan<- battle.Ok) {
+func handleRequest(conf config.ServerConfig, nickDb *nickdb.NickDb, conn net.Conn, matchQueue chan<- user.Agent, serviceList *service.List, ongoingBattleMap map[user.Id]battle.Ok, battleService battle.Service, battleOkQueue chan<- battle.Ok) {
 	log.Printf("Accepting from %v", conn.RemoteAddr())
 	for {
 		buf := make([]byte, 1024)

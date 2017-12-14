@@ -9,7 +9,7 @@ import (
 	"github.com/gasbank/laidoff/match-server/user"
 )
 
-func HandleQueryNick(buf []byte, conn net.Conn, ndb *Nickdb.NickDb) {
+func HandleQueryNick(buf []byte, conn net.Conn, ndb *nickdb.NickDb) {
 	log.Printf("QUERYNICK received")
 	recvPacket, err := convert.ParseQueryNick(buf)
 	if err != nil {
@@ -19,7 +19,7 @@ func HandleQueryNick(buf []byte, conn net.Conn, ndb *Nickdb.NickDb) {
 	userDb, err := user.LoadUserDb(convert.IdCuintToByteArray(recvPacket.Id))
 	if err != nil {
 		if os.IsNotExist(err) {
-			userDb, _, err = user.CreateNewUser(convert.IdCuintToByteArray(recvPacket.Id), Nickdb.PickRandomNick(ndb))
+			userDb, _, err = user.CreateNewUser(convert.IdCuintToByteArray(recvPacket.Id), nickdb.PickRandomNick(ndb))
 			if err != nil {
 				log.Fatalf("load user db failed -> create new user failed")
 			}
