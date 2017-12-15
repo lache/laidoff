@@ -1,6 +1,5 @@
 // Microsoft Visual C++ generated resource script.
 //
-#include <Windows.h>
 #include "resource.h"
 /////////////////////////////////////////////////////////////////////////////
 // Korean (Korea) resources
@@ -44,19 +43,6 @@ END
 #endif    // APSTUDIO_INVOKED
 
 
-/////////////////////////////////////////////////////////////////////////////
-//
-// Dialog
-//
-
-IDD_DIALOG2 DIALOGEX 0, 0, 323, 72
-STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
-CAPTION "입력하고 엔터 혹은 ESC로 취소.."
-FONT 8, "MS Shell Dlg", 400, 0, 0x1
-BEGIN
-    EDITTEXT        IDC_EDIT1,7,26,309,14,ES_AUTOHSCROLL
-END
-
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -81,12 +67,12 @@ BEGIN
         BLOCK "040904b0"
         BEGIN
             VALUE "CompanyName", "Plus Alpha Game Studio"
-            VALUE "FileDescription", "Ball Rumble"
+            VALUE "FileDescription", "Ball Rumble - Battle Service"
             VALUE "FileVersion", "1.0.0.1"
-            VALUE "InternalName", "laidoff.rc"
+            VALUE "InternalName", "laidoff-server.rc"
             VALUE "LegalCopyright", "Copyright (C) 2017 Plus Alpha Game Studio"
-            VALUE "OriginalFilename", "laidoff.rc"
-            VALUE "ProductName", "Ball Rumble"
+            VALUE "OriginalFilename", "laidoff-server.rc"
+            VALUE "ProductName", "Ball Rumble - Battle Service"
             VALUE "ProductVersion", "1.0.0.1"
         END
     END

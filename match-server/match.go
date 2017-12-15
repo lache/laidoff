@@ -22,7 +22,9 @@ func main() {
 	log.SetFlags(log.Lshortfile | log.LstdFlags)
 	log.Println("Greetings from match server")
 	// Test Db service
-	//service.CreateNewUserDb()
+	if len(os.Args) > 1 && os.Args[1] == "test" {
+		service.CreateNewUserDb()
+	}
 	// Seed a new random number
 	rand.Seed(time.Now().Unix())
 	// Load nick name database

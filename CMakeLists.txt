@@ -97,6 +97,7 @@ add_definitions(-DdDOUBLE)
 
 if (WIN32)
     set(ICON win32/laidoff.rc)
+	set(SERVERICON win32/server/laidoff-server.rc)
     set(WINCODEC Windowscodecs) # Windows Imaging Codecs
     set(WINDSHOW Strmiids) # DirectShow
     set(WINMM Winmm) # PlaySound
@@ -256,7 +257,7 @@ add_executable(laidoff-server
         ${LAIDOFF_SERVER_LIB}
         ${SERVER_WIN32_DEPS}
         ${ODE_LIB}
-        ${ICON})
+        ${SERVERICON})
 target_compile_definitions(laidoff-server PRIVATE LW_IS_SERVER=1 _WINSOCK_DEPRECATED_NO_WARNINGS)
 
 target_link_libraries(laidoff-server

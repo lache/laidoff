@@ -5,10 +5,10 @@ import (
 	"github.com/gasbank/laidoff/db-server/user"
 	"github.com/gasbank/laidoff/match-server/convert"
 	"net"
-	"github.com/gasbank/laidoff/match-server/rpchelper"
+	"github.com/gasbank/laidoff/db-server/dbservice"
 )
 
-func HandleSetNickname(buf []byte, conn net.Conn, dbService *rpchelper.Context) {
+func HandleSetNickname(buf []byte, conn net.Conn, dbService dbservice.Db) {
 	log.Printf("SETNICKNAME received")
 	// Parse
 	recvPacket, err := convert.ParseSetNickname(buf)
@@ -18,7 +18,8 @@ func HandleSetNickname(buf []byte, conn net.Conn, dbService *rpchelper.Context) 
 	}
 	//userDb, err := user.LoadUserDb(convert.IdCuintToByteArray(recvPacket.Id))
 	var userLeaseDb user.LeaseDb
-	err = dbService.Call("Lease", convert.IdCuintToByteArray(recvPacket.Id), &userLeaseDb)
+	userId := convert.IdCuintToByteArray(recvPacket.Id)
+	err = dbService.Lease(&userId, &userLeaseDb)
 	if err != nil {
 		log.Printf("user db load failed: %v", err.Error())
 	} else {
@@ -28,7 +29,7 @@ func HandleSetNickname(buf []byte, conn net.Conn, dbService *rpchelper.Context) 
 		userLeaseDb.Db.Nickname = newNickname
 		//user.WriteUserDb(userDb)
 		var writeReply int
-		err = dbService.Call("Write", &userLeaseDb, &writeReply)
+		err = dbService.Write(&userLeaseDb, &writeReply)
 		if err != nil {
 			log.Printf("DB service Write failed: %v", err)
 		} else {

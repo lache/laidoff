@@ -8,10 +8,10 @@ import (
 	"github.com/gasbank/laidoff/match-server/battle"
 	"github.com/gasbank/laidoff/match-server/config"
 	"unsafe"
-	"github.com/gasbank/laidoff/match-server/rpchelper"
+	"github.com/gasbank/laidoff/db-server/dbservice"
 )
 
-func HandleQueue2(conf config.ServerConfig, matchQueue chan<- user.Agent, buf []byte, conn net.Conn, ongoingBattleMap map[user.Id]battle.Ok, battleService battle.Service, battleOkQueue chan<- battle.Ok, dbService *rpchelper.Context) {
+func HandleQueue2(conf config.ServerConfig, matchQueue chan<- user.Agent, buf []byte, conn net.Conn, ongoingBattleMap map[user.Id]battle.Ok, battleService battle.Service, battleOkQueue chan<- battle.Ok, dbService dbservice.Db) {
 	log.Printf("QUEUE2 received")
 	recvPacket, err := convert.ParseQueue2(buf)
 	if err != nil {
@@ -19,7 +19,8 @@ func HandleQueue2(conf config.ServerConfig, matchQueue chan<- user.Agent, buf []
 		return
 	}
 	var userDb user.Db
-	err = dbService.Call("Get", convert.IdCuintToByteArray(recvPacket.Id), &userDb)
+	userId := convert.IdCuintToByteArray(recvPacket.Id)
+	err = dbService.Get(&userId, &userDb)
 	if err != nil {
 		log.Printf("user db load failed: %v", err.Error())
 	} else {

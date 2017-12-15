@@ -5,10 +5,10 @@ import (
 	"net"
 	"github.com/gasbank/laidoff/match-server/convert"
 	"github.com/gasbank/laidoff/db-server/user"
-	"github.com/gasbank/laidoff/match-server/rpchelper"
+	"github.com/gasbank/laidoff/db-server/dbservice"
 )
 
-func HandleQueryNick(buf []byte, conn net.Conn, dbService *rpchelper.Context) {
+func HandleQueryNick(buf []byte, conn net.Conn, dbService dbservice.Db) {
 	log.Printf("QUERYNICK received")
 	recvPacket, err := convert.ParseQueryNick(buf)
 	if err != nil {
@@ -18,13 +18,14 @@ func HandleQueryNick(buf []byte, conn net.Conn, dbService *rpchelper.Context) {
 	log.Printf("QUERYNICK User ID: %v", user.IdByteArrayToString(convert.IdCuintToByteArray(recvPacket.Id)))
 	//userDb, err := user.LoadUserDb(convert.IdCuintToByteArray(recvPacket.Id))
 	var userDb user.Db
-	err = dbService.Call("Get", convert.IdCuintToByteArray(recvPacket.Id), &userDb)
+	userId := convert.IdCuintToByteArray(recvPacket.Id)
+	err = dbService.Get(&userId, &userDb)
 	if err != nil {
 		if err.Error() == "user db not exist" {
 			// Client sends previously stored user ID, but server does not have that ID
 			// Treat as a new user
 			//userDb, _, err = user.CreateNewUser(convert.IdCuintToByteArray(recvPacket.Id), nickdb.PickRandomNick(ndb))
-			err = dbService.Call("Create", 0, &userDb)
+			err = dbService.Create(0, &userDb)
 			if err != nil {
 				log.Fatalf("load user db failed -> create new user failed")
 			} else {

@@ -14,7 +14,7 @@ type Context struct {
 	address string
 }
 
-func NewContext(baseName string, address string) (*Context) {
+func New(baseName string, address string) (*Context) {
 	context := &Context{nil, baseName, address}
 	return context
 }
@@ -32,7 +32,7 @@ func (c *Context) callWithRetry(methodName string, args interface{}, reply inter
 			if retryCount > 0 {
 				return c.callWithRetry(methodName, args, reply, retryCount - 1, 2 * retryDelayMs)
 			} else {
-				return errors.New("retry count exceed")
+				return errors.New("rpc dial retry count exceed")
 			}
 		}
 	}
@@ -48,7 +48,7 @@ func (c *Context) callWithRetry(methodName string, args interface{}, reply inter
 			c.client = nil
 			return c.callWithRetry(methodName, args, reply, retryCount-1, 2*retryDelayMs)
 		} else {
-			return errors.New("retry count exceed")
+			return errors.New("rpc call retry count exceeded")
 		}
 	}
 	return err

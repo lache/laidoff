@@ -6,13 +6,13 @@ import (
 	"github.com/gasbank/laidoff/db-server/user"
 	"github.com/gasbank/laidoff/match-server/nickdb"
 	"github.com/gasbank/laidoff/match-server/convert"
-	"github.com/gasbank/laidoff/match-server/rpchelper"
+	"github.com/gasbank/laidoff/db-server/dbservice"
 )
 
-func HandleNewUser(nickDb *nickdb.NickDb, conn net.Conn, dbService *rpchelper.Context) {
+func HandleNewUser(nickDb *nickdb.NickDb, conn net.Conn, dbService dbservice.Db) {
 	log.Printf("NEWUSER received")
 	var userDb user.Db
-	err := dbService.Call("Create", 0, &userDb)
+	err := dbService.Create(0, &userDb)
 	if err != nil {
 		log.Printf("DB service Create failed: %v", err.Error())
 	} else {
