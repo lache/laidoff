@@ -193,6 +193,8 @@ typedef struct _LWPUCKGAME {
     int wall_hit_bit_send_buf_1; // reset at every UDP state sync send (P1)
     int wall_hit_bit_send_buf_2; // reset at every UDP state sync send (P2)
     LWPBATTLERESULT_STAT battle_stat[2];
+    int score;
+    int rank;
 } LWPUCKGAME;
 
 LWPUCKGAME* new_puck_game(int update_frequency);

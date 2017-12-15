@@ -1146,7 +1146,6 @@ static void render_main_menu_ui_layer(const LWCONTEXT* pLwc, const LWPUCKGAME* p
         const float height = 0.15f;
         const float x = top_bar_x_cursor + width / 2;
         const float y = 1.0f - height / 2;
-        const int amount = 198;
         const LW_ATLAS_ENUM lae = LAE_PROFILE_ICON;
         const char* str = pLwc->puck_game->nickname;
         render_icon_amount(pLwc, puck_game, x, y, width, height, str, lae, LAE_DONTCARE, 1.0f, 1.0f, 1.0f);
@@ -1158,11 +1157,10 @@ static void render_main_menu_ui_layer(const LWCONTEXT* pLwc, const LWPUCKGAME* p
         const float height = 0.15f;
         const float x = top_bar_x_cursor + width / 2;
         const float y = 1.0f - height / 2;
-        const int amount = 198;
         const LW_ATLAS_ENUM lae = LAE_ENERGY_ICON;
         const LW_ATLAS_ENUM lae_alpha = LAE_ENERGY_ICON_ALPHA;
         char str[32];
-        sprintf(str, "%d", amount);
+        sprintf(str, "%d", puck_game->score);
         render_icon_amount(pLwc, puck_game, x, y, width, height, str, lae, lae_alpha, 0.4f, 0.9f, 1.0f);
         top_bar_x_cursor += width + top_bar_x_cursor_margin;
     }
@@ -1172,11 +1170,10 @@ static void render_main_menu_ui_layer(const LWCONTEXT* pLwc, const LWPUCKGAME* p
         const float height = 0.15f;
         const float x = top_bar_x_cursor + width / 2;
         const float y = 1.0f - height / 2;
-        const int amount = 4;
         const LW_ATLAS_ENUM lae = LAE_RANK_ICON;
         const LW_ATLAS_ENUM lae_alpha = LAE_RANK_ICON_ALPHA;
         char str[32];
-        sprintf(str, "%d", amount);
+        sprintf(str, "%d", puck_game->rank + 1); // rank is zero-based
         render_icon_amount(pLwc, puck_game, x, y, width, height, str, lae, lae_alpha, 0.9f, 1.0f, 0.9f);
         top_bar_x_cursor += width + top_bar_x_cursor_margin;
     }

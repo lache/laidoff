@@ -6,9 +6,10 @@ import (
 	"github.com/gasbank/laidoff/match-server/convert"
 	"github.com/gasbank/laidoff/db-server/user"
 	"github.com/gasbank/laidoff/db-server/dbservice"
+	"github.com/gasbank/laidoff/shared-server"
 )
 
-func HandleQueryNick(buf []byte, conn net.Conn, dbService dbservice.Db) {
+func HandleQueryNick(buf []byte, conn net.Conn, rankService shared_server.RankService, dbService dbservice.Db) {
 	log.Printf("QUERYNICK received")
 	recvPacket, err := convert.ParseQueryNick(buf)
 	if err != nil {
@@ -42,9 +43,14 @@ func HandleQueryNick(buf []byte, conn net.Conn, dbService dbservice.Db) {
 		// Previously stored user db correctly loaded.
 		// Reply to client
 		log.Printf("User nick: %v", userDb.Nickname)
+		var scoreRankItem shared_server.ScoreRankItem
+		err = rankService.Get(&userDb.Id, &scoreRankItem)
+		if err != nil {
+			log.Printf("rank rpc get failed: %v", err.Error())
+		}
 		// Send a reply
 		nickname := userDb.Nickname
-		nickBuf := convert.Packet2Buf(convert.NewLwpNick(nickname))
+		nickBuf := convert.Packet2Buf(convert.NewLwpNick(nickname, &scoreRankItem))
 		_, err = conn.Write(nickBuf)
 		if err != nil {
 			log.Fatalf("LWPNICK send failed: %v", err.Error())

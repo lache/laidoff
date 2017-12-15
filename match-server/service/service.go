@@ -8,6 +8,7 @@ import (
 	"github.com/gasbank/laidoff/shared-server"
 	"net"
 	"github.com/gasbank/laidoff/db-server/dbservice"
+	"github.com/gasbank/laidoff/rank-server/rankservice"
 )
 
 const (
@@ -17,7 +18,7 @@ const (
 
 type List struct {
 	Arith *Arith
-	Rank  *RankClient
+	Rank  shared_server.RankService
 	Db    dbservice.Db
 }
 
@@ -152,7 +153,7 @@ func dialNewRpc(address string) (*rpc.Client, error) {
 func NewServiceList() *List {
 	return &List{
 		DialPushService(),
-		DialRankService(),
+		rankservice.New(":20172"),
 		dbservice.New(":20181"),
 	}
 }
@@ -164,14 +165,6 @@ func DialPushService() *Arith {
 	}
 	arith := &Arith{client: client}
 	return arith
-}
-
-func DialRankService() *RankClient {
-	client, err := dialNewRpc(RankServiceAddr)
-	if err != nil {
-		log.Printf("dialNewRpc error: %v", err.Error())
-	}
-	return &RankClient{client: client}
 }
 
 func CreateNewUserDb() {

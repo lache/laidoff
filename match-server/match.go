@@ -15,7 +15,8 @@ import (
 	"github.com/gasbank/laidoff/match-server/handler"
 	"github.com/gasbank/laidoff/match-server/config"
 	"github.com/gasbank/laidoff/match-server/battle"
-	)
+	"github.com/gasbank/laidoff/shared-server"
+)
 
 func main() {
 	// Set default log format
@@ -73,21 +74,49 @@ func main() {
 	}
 }
 
+func testRankRpc(rankService shared_server.RankService, id byte, score int, nickname string) {
+	scoreItem := shared_server.ScoreItem{Id: user.Id{id}, Score: score, Nickname: nickname}
+	var reply int
+	err := rankService.Set(&scoreItem, &reply)
+	if err != nil {
+		log.Printf("rank rpc error: %v", err.Error())
+	} else {
+		log.Println(reply)
+	}
+}
+
 //noinspection GoUnusedFunction
 func testRpc(serviceList *service.List) {
 	log.Println(serviceList.Arith.Multiply(5, 6))
 	log.Println(serviceList.Arith.Divide(500, 10))
 	log.Println(serviceList.Arith.RegisterPushToken(300*time.Millisecond, user.Id{1, 2, 3, 4}, 500, "test-push-token"))
-	log.Println(serviceList.Rank.Set(300*time.Millisecond, user.Id{1}, 100, "TestUser1"))
-	log.Println(serviceList.Rank.Set(300*time.Millisecond, user.Id{2}, 200, "TestUser2"))
-	log.Println(serviceList.Rank.Set(300*time.Millisecond, user.Id{3}, 300, "TestUser3"))
-	log.Println(serviceList.Rank.Set(300*time.Millisecond, user.Id{4}, 50, "TestUser4"))
-	log.Println(serviceList.Rank.Set(300*time.Millisecond, user.Id{5}, 20, "TestUser5"))
-	log.Println(serviceList.Rank.Set(300*time.Millisecond, user.Id{6}, 20, "TestUser6"))
-	log.Println(serviceList.Rank.Set(300*time.Millisecond, user.Id{7}, 20, "TestUser7"))
-	log.Println(serviceList.Rank.Set(300*time.Millisecond, user.Id{8}, 10, "한글닉넴8"))
-	log.Println(serviceList.Rank.GetLeaderboard(300*time.Millisecond, 0, 20))
-	log.Println(serviceList.Rank.Get(300*time.Millisecond, user.Id{5}))
+	testRankRpc(serviceList.Rank, 1, 100, "TestUser1")
+	testRankRpc(serviceList.Rank, 2, 200, "TestUser2")
+	testRankRpc(serviceList.Rank, 3, 300, "TestUser3")
+	testRankRpc(serviceList.Rank, 4, 50, "TestUser4")
+	testRankRpc(serviceList.Rank, 5, 20, "TestUser5")
+	testRankRpc(serviceList.Rank, 6, 20, "TestUser6")
+	testRankRpc(serviceList.Rank, 7, 20, "TestUser7")
+	testRankRpc(serviceList.Rank, 8, 10, "TestUser8")
+	leaderboardRequest := shared_server.LeaderboardRequest{
+		StartIndex: 0,
+		Count:      20,
+	}
+	var leaderboardReply shared_server.LeaderboardReply
+	err := serviceList.Rank.GetLeaderboard(&leaderboardRequest, &leaderboardReply)
+	if err != nil {
+		log.Printf("rank rpc get leaderboard returned error: %v", err.Error())
+	} else {
+		log.Println(leaderboardReply)
+	}
+	userId := user.Id{5}
+	var scoreRankItem shared_server.ScoreRankItem
+	err = serviceList.Rank.Get(&userId, &scoreRankItem)
+	if err != nil {
+		log.Printf("rank rpc get returned error: %v", err.Error())
+	} else {
+		log.Println(scoreRankItem)
+	}
 }
 
 func matchWorker(battleService battle.Service, matchQueue <-chan user.Agent, battleOkQueue chan<- battle.Ok, serviceList *service.List) {
@@ -164,7 +193,7 @@ func handleRequest(conf config.ServerConfig, nickDb *nickdb.NickDb, conn net.Con
 		case convert.LPGPLWPNEWUSER:
 			handler.HandleNewUser(nickDb, conn, serviceList.Db)
 		case convert.LPGPLWPQUERYNICK:
-			handler.HandleQueryNick(buf, conn, serviceList.Db)
+			handler.HandleQueryNick(buf, conn, serviceList.Rank, serviceList.Db)
 		case convert.LPGPLWPPUSHTOKEN:
 			handler.HandlePushToken(buf, conn, serviceList)
 		case convert.LPGPLWPGETLEADERBOARD:

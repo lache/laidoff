@@ -234,6 +234,8 @@ typedef struct _LWPNICK {
 	unsigned short size;
 	unsigned short type;
 	char nickname[LW_NICKNAME_MAX_LEN];
+    int score;
+    int rank;
 } LWPNICK;
 
 typedef struct _LWPNEWUSERDATA {

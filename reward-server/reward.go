@@ -3,13 +3,13 @@ package main
 import (
 	"log"
 	"net"
-	"github.com/gasbank/laidoff/reward-server/helpers"
 	"github.com/gasbank/laidoff/match-server/convert"
 	"encoding/binary"
 	"bytes"
-	"time"
 	"github.com/gasbank/laidoff/db-server/dbservice"
 	"github.com/gasbank/laidoff/db-server/user"
+	"github.com/gasbank/laidoff/rank-server/rankservice"
+	"github.com/gasbank/laidoff/shared-server"
 )
 
 const (
@@ -23,7 +23,7 @@ func main() {
 	log.SetFlags(log.Lshortfile | log.LstdFlags)
 	log.Printf("Greetings from %v service", ServiceName)
 	// Connect to rank service
-	rank := helpers.NewRankClient(RankServiceAddr)
+	rankService := rankservice.New(":20172")
 	// Start listening
 	l, err := net.Listen("tcp", ServiceAddr)
 	if err != nil {
@@ -37,11 +37,11 @@ func main() {
 		if err != nil {
 			log.Println("Error accepting: ", err.Error())
 		} else {
-			go handleRequest(conn, rank, dbService)
+			go handleRequest(conn, rankService, dbService)
 		}
 	}
 }
-func handleRequest(conn net.Conn, rank *helpers.RankClient, dbService dbservice.Db) {
+func handleRequest(conn net.Conn, rankService shared_server.RankService, dbService dbservice.Db) {
 	log.Printf("Accepting from %v", conn.RemoteAddr())
 	for {
 		buf := make([]byte, 1024)
@@ -61,14 +61,14 @@ func handleRequest(conn net.Conn, rank *helpers.RankClient, dbService dbservice.
 		log.Printf("  Type %v", packetType)
 		switch packetType {
 		case convert.LPGPLWPBATTLERESULT:
-			handleBattleResult(buf, rank, dbService)
+			handleBattleResult(buf, rankService, dbService)
 		}
 	}
 	conn.Close()
 	log.Printf("Conn closed %v", conn.RemoteAddr())
 }
 
-func handleBattleResult(buf []byte, rank *helpers.RankClient, dbService dbservice.Db) {
+func handleBattleResult(buf []byte, rankService shared_server.RankService, dbService dbservice.Db) {
 	log.Printf("BATTLERESULT received")
 	// Parse
 	bufReader := bytes.NewReader(buf)
@@ -88,31 +88,34 @@ func handleBattleResult(buf []byte, rank *helpers.RankClient, dbService dbservic
 	convert.CCharArrayToGoString(&player2.Nickname, &nickname2)
 	winner := int(recvPacket.S.Winner)
 	log.Printf("Battle result received; id1=%v, id2=%v, winner=%v", id1, id2, winner)
-	backoff := 300 * time.Millisecond
 	newScore1 := 0
 	newScore2 := 0
-	oldScore1 := rank.Get(backoff, id1)
-	oldScore2 := rank.Get(backoff, id2)
-	if oldScore1 != nil {
-		newScore1 = oldScore1.Score + 1
-		if winner == 1 {
-			newScore1++
-		}
-	} else {
-		log.Printf("rank.Get returned nil!")
-		newScore1 = 1
+	var oldScore1, oldScore2 shared_server.ScoreRankItem
+	err = rankService.Get(&id1, &oldScore1)
+	if err != nil {
+		log.Printf("rpc rank get failed: %v", err.Error())
 	}
-	if oldScore2 != nil {
-		newScore2 = oldScore2.Score + 1
-		if winner == 2 {
-			newScore2++
-		}
-	} else {
-		log.Printf("rank.Get returned nil!")
-		newScore2 = 1
+	err = rankService.Get(&id2, &oldScore2)
+	if err != nil {
+		log.Printf("rpc rank get failed: %v", err.Error())
 	}
-	rank.Set(backoff, id1, newScore1, nickname1)
-	rank.Set(backoff, id2, newScore2, nickname2)
+	newScore1 = oldScore1.Score + 1
+	if winner == 1 {
+		newScore1++
+	}
+	newScore2 = oldScore2.Score + 1
+	if winner == 2 {
+		newScore2++
+	}
+	var reply1, reply2 int
+	err = rankService.Set(&shared_server.ScoreItem{Id: id1, Score: newScore1, Nickname: nickname1}, &reply1)
+	if err != nil {
+		log.Printf("rpc rank set failed: %v", err.Error())
+	}
+	err = rankService.Set(&shared_server.ScoreItem{Id: id2, Score: newScore2, Nickname: nickname2}, &reply2)
+	if err != nil {
+		log.Printf("rpc rank set failed: %v", err.Error())
+	}
 	// update user db battle stat
 	updateUserDbBattleStat(recvPacket, int(recvPacket.S.BattleTimeSec), int(recvPacket.S.Winner), dbService, 1)
 	updateUserDbBattleStat(recvPacket, int(recvPacket.S.BattleTimeSec), int(recvPacket.S.Winner), dbService, 2)

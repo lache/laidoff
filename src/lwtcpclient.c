@@ -222,6 +222,8 @@ int parse_recv_packets(LWTCP* tcp) {
             LWPNICK* p = (LWPNICK*)cursor;
             LOGI("Cached user nick: %s", p->nickname);
             memcpy(pLwc->puck_game->nickname, p->nickname, sizeof(char) * LW_NICKNAME_MAX_LEN);
+            pLwc->puck_game->score = p->score;
+            pLwc->puck_game->rank = p->rank;
             //tcp_send_queue2(tcp, &pLwc->tcp->user_id);
         } else if (CHECK_PACKET(packet_type, packet_size, LWPSYSMSG)) {
             LOGI("LWPSYSMSG received");

@@ -89,12 +89,14 @@ func NewLwpMaybeMatched() *C.LWPMAYBEMATCHED {
 		C.LPGP_LWPMAYBEMATCHED,
 	}
 }
-func NewLwpNick(nick string) *C.LWPNICK {
+func NewLwpNick(nick string, scoreRankItem *shared_server.ScoreRankItem) *C.LWPNICK {
 	cNewNickBytes := NicknameToCArray(nick)
 	return &C.LWPNICK{
 		C.ushort(unsafe.Sizeof(C.LWPNICK{})),
 		C.LPGP_LWPNICK,
 		cNewNickBytes,
+		C.int(scoreRankItem.Score),
+		C.int(scoreRankItem.Rank),
 	}
 }
 func NewLwpQueueOk() *C.LWPQUEUEOK {

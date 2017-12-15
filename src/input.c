@@ -468,6 +468,8 @@ void lw_go_back(LWCONTEXT* pLwc, void* native_context) {
         } else if (pLwc->puck_game->game_state == LPGS_MAIN_MENU) {
             lw_app_quit(pLwc, native_context);
         } else if (pLwc->puck_game->game_state == LPGS_BATTLE && pLwc->puck_game->battle_control_ui_alpha == 0) {
+            // retrieve updated score and rank for main menu top bar
+            tcp_send_querynick(pLwc->tcp, &pLwc->tcp->user_id);
             puck_game_roll_to_main_menu(pLwc->puck_game);
         }
     } else {

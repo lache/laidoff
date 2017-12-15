@@ -3,9 +3,9 @@ package handler
 import (
 	"net"
 	"log"
-	"time"
 	"github.com/gasbank/laidoff/match-server/service"
 	"github.com/gasbank/laidoff/match-server/convert"
+	"github.com/gasbank/laidoff/shared-server"
 )
 
 func HandleGetLeaderboard(buf []byte, conn net.Conn, serviceList *service.List) {
@@ -15,10 +15,17 @@ func HandleGetLeaderboard(buf []byte, conn net.Conn, serviceList *service.List) 
 	if err != nil {
 		log.Printf("HandleGetLeaderboard fail: %v", err.Error())
 	}
-	startIndex := int(recvPacket.Start_index)
-	count := int(recvPacket.Count)
-	leaderboardReply := serviceList.Rank.GetLeaderboard(300*time.Millisecond, startIndex, count)
-	reply := convert.NewLwpLeaderboard(leaderboardReply)
-	replyBuf := convert.Packet2Buf(reply)
-	conn.Write(replyBuf)
+	leaderboardRequest := shared_server.LeaderboardRequest{
+		StartIndex: int(recvPacket.Start_index),
+		Count:      int(recvPacket.Count),
+	}
+	var leaderboardReply shared_server.LeaderboardReply
+	err = serviceList.Rank.GetLeaderboard(&leaderboardRequest, &leaderboardReply)
+	if err != nil {
+		log.Printf("rank rpc error: %v", err.Error())
+	} else {
+		reply := convert.NewLwpLeaderboard(&leaderboardReply)
+		replyBuf := convert.Packet2Buf(reply)
+		conn.Write(replyBuf)
+	}
 }
