@@ -815,7 +815,7 @@ static void render_floor(const LWCONTEXT *pLwc, const mat4x4 proj, const LWPUCKG
     const LWSHADER* shader = &pLwc->shader[shader_index];
     glUseProgram(shader->program);
     glUniform2fv(shader->vuvoffset_location, 1, default_uv_offset);
-    const float uv_scale[2] = { 1, 1 };
+    const float uv_scale[2] = { 4, 4 };
     glUniform2fv(shader->vuvscale_location, 1, uv_scale);
     glUniform2fv(shader->vs9offset_location, 1, default_uv_offset);
     glUniform1f(shader->alpha_multiplier_location, 1.0f);
