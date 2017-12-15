@@ -804,23 +804,29 @@ static int puck_game_winner(const LWPUCKGAME *puck_game) {
 
 int tcp_send_battle_result(LWTCP *tcp,
                            int backoffMs,
+                           const LWPUCKGAME* puck_game,
                            const unsigned int *id1,
                            const unsigned int *id2,
                            const char *nickname1,
                            const char *nickname2,
-                           int winner) {
+                           int winner,
+                           int logic_hz) {
     if (tcp == 0) {
         LOGE("tcp null");
         return -1;
     }
     NEW_TCP_PACKET_CAPITAL(LWPBATTLERESULT, p);
-    memcpy(p.Id1, id1, sizeof(p.Id1));
-    memcpy(p.Id2, id2, sizeof(p.Id2));
     p.Winner = winner;
-    memcpy(p.Nickname1, nickname1, sizeof(p.Nickname1));
-    memcpy(p.Nickname2, nickname2, sizeof(p.Nickname2));
+    memcpy(p.Player[0].Id, id1, sizeof(p.Player[0].Id));
+    memcpy(p.Player[1].Id, id2, sizeof(p.Player[1].Id));
+    memcpy(p.Player[0].Nickname, nickname1, sizeof(p.Player[0].Id));
+    memcpy(p.Player[1].Nickname, nickname2, sizeof(p.Player[1].Id));
+    p.Player[0].Stat = puck_game->battle_stat[0];
+    p.Player[1].Stat = puck_game->battle_stat[1];
+    p.BattleTimeSec = (int)roundf(puck_game_elapsed_time(puck_game->update_tick, logic_hz));
+    p.TotalHp = puck_game->player.total_hp;
     memcpy(tcp->sendbuf, &p, sizeof(p));
-    int send_result = (int) send(tcp->ConnectSocket, tcp->sendbuf, sizeof(p), 0);
+    int send_result = (int)send(tcp->ConnectSocket, tcp->sendbuf, sizeof(p), 0);
     if (send_result < 0) {
         LOGI("Send result error: %d", send_result);
         if (backoffMs > 10 * 1000 /* 10 seconds */) {
@@ -835,23 +841,27 @@ int tcp_send_battle_result(LWTCP *tcp,
         tcp_connect(tcp);
         return tcp_send_battle_result(tcp,
                                       backoffMs * 2,
+                                      puck_game,
                                       id1,
                                       id2,
                                       nickname1,
                                       nickname2,
-                                      winner);
+                                      winner,
+                                      logic_hz);
     }
     return send_result;
 }
 
-void process_battle_reward(LWPUCKGAME *puck_game, LWTCP *reward_service) {
+void process_battle_reward(LWPUCKGAME *puck_game, LWTCP *reward_service, int logic_hz) {
     tcp_send_battle_result(reward_service,
                            300,
+                           puck_game,
                            puck_game->id1,
                            puck_game->id2,
                            puck_game->nickname,
                            puck_game->target_nickname,
-                           puck_game_winner(puck_game));
+                           puck_game_winner(puck_game),
+                           logic_hz);
 }
 
 void reward_service_on_connect(LWTCP *tcp, const char *path_prefix) {
@@ -911,7 +921,11 @@ int main(int argc, char *argv[]) {
                         if (puck_game_state_phase_finished(puck_game->battle_phase) == 0
                             && update_puck_game(server, puck_game, logic_timestep) < 0) {
                             LOGI("Battle finished. (battle id = %d)", puck_game->battle_id);
-                            process_battle_reward(puck_game, reward_service);
+                            // update last HP stat
+                            puck_game->battle_stat[0].Hp = puck_game->player.current_hp;
+                            puck_game->battle_stat[1].Hp = puck_game->target.current_hp;
+                            // process reward
+                            process_battle_reward(puck_game, reward_service, logic_hz);
                         }
                     }
                 }

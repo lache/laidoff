@@ -192,6 +192,7 @@ typedef struct _LWPUCKGAME {
     int wall_hit_bit; // LWP_STATE_WALL_HIT_BIT (ORing) - reset at every tick
     int wall_hit_bit_send_buf_1; // reset at every UDP state sync send (P1)
     int wall_hit_bit_send_buf_2; // reset at every UDP state sync send (P2)
+    LWPBATTLERESULT_STAT battle_stat[2];
 } LWPUCKGAME;
 
 LWPUCKGAME* new_puck_game(int update_frequency);
@@ -207,6 +208,7 @@ void puck_game_commit_jump(LWPUCKGAME* puck_game, LWPUCKGAMEJUMP* jump, int play
 void puck_game_commit_dash(LWPUCKGAME* puck_game, LWPUCKGAMEDASH* dash, float dx, float dy);
 void puck_game_commit_dash_to_puck(LWPUCKGAME* puck_game, LWPUCKGAMEDASH* dash, int player_no);
 float puck_game_remain_time(float total_time, int update_tick, int update_frequency);
+float puck_game_elapsed_time(int update_tick, int update_frequency);
 int puck_game_remain_time_floor(float total_time, int update_tick, int update_frequency);
 void puck_game_commit_fire(LWPUCKGAME* puck_game, LWPUCKGAMEFIRE* fire, int player_no, float puck_fire_dx, float puck_fire_dy, float puck_fire_dlen);
 void update_puck_ownership(LWPUCKGAME* puck_game);

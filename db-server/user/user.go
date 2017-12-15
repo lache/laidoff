@@ -11,10 +11,37 @@ import (
 type Id [16]byte
 type LeaseId [16]byte
 
+type BattleStat struct {
+	// statistics which can be calculated only from REWARD service
+	Victory               int // how many victories got so far
+	Defeat                int // how many defeats got so far
+	ConsecutiveVictory    int // how many consecutive victories got so far (reset to 0 when not victory)
+	ConsecutiveDefeat     int // how many consecutive defeats got so far (reset to 0 when not defeat)
+	MaxConsecutiveVictory int // highest record of ConsecutiveVictory (updated when it is less than ConsecutiveVictory)
+	MaxConsecutiveDefeat  int // highest record of ConsecutiveDefeat (updated when it is less than ConsecutiveDefeat)
+	Battle                int // how many battles finished so far
+	// statistics which can be calculated from BATTLE service
+	PerfectVictory  int // how many perfect victories (5:0) got so far
+	PerfectDefeat   int // how many perfect defeats (0:5) got so far
+	PuckWallHit     int // how many wall hits when puck is owned by player
+	PuckTowerAttack int // how many tower hits to enemy when puck is owned by player
+	PuckTowerDamage int // how many tower damages taken from enemy
+	Dash            int // how many dashes
+	TravelDistance  int // how many distance traveled so far (point 2 precision)
+	MaxPuckSpeed    int // how fast owned puck moved (point 2 precision)
+	BattleTimeSec   int // how many seconds elapsed of battling
+	// statistics which can be calculated from MATCH service
+	Search        int // how many searches started so far
+	SearchWaitSec int // how many seconds elapsed while waiting
+}
+
 type Db struct {
-	Id       Id
-	Created  time.Time
-	Nickname string
+	Id          Id         // unique id
+	Created     time.Time  // creation date time
+	Nickname    string     // nickname
+	BattleStat  BattleStat // battle statistics
+	LastLogin   time.Time  // last login date time
+	WeeklyScore int        // weekly score
 }
 
 type LeaseDb struct {

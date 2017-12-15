@@ -372,14 +372,27 @@ typedef struct _LWPSYSMSG {
     char message[LW_SYS_MSG_LENGTH];
 } LWPSYSMSG;
 
+typedef struct _LWPBATTLERESULT_STAT {
+    int Hp;
+    int PuckWallHit;
+    int Dash;
+    float TravelDistance;
+    float MaxPuckSpeed;
+} LWPBATTLERESULT_STAT;
+
+typedef struct _LWPBATTLERESULT_PLAYER {
+    unsigned int Id[4];
+    char Nickname[LW_NICKNAME_MAX_LEN];
+    LWPBATTLERESULT_STAT Stat;
+} LWPBATTLERESULT_PLAYER;
+
 typedef struct _LWPBATTLERESULT {
     unsigned short Size;
     unsigned short Type;
     int Winner; // 0:draw, 1:Id1 wins, 2:Id2 wins
-    unsigned int Id1[4];
-    unsigned int Id2[4];
-    char Nickname1[LW_NICKNAME_MAX_LEN];
-    char Nickname2[LW_NICKNAME_MAX_LEN];
+    int BattleTimeSec;
+    int TotalHp;
+    LWPBATTLERESULT_PLAYER Player[2];
 } LWPBATTLERESULT;
 
 typedef struct _LWPSETNICKNAME {

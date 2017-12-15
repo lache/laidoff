@@ -3,18 +3,27 @@
 #include "lwlog.h"
 #include "lwtimepoint.h"
 #include "numcomp.h"
+#include <assert.h>
 
 static void call_collision_callback(LWPUCKGAME* puck_game,
                                     const dContact* contact,
                                     void(*on_collision)(LWPUCKGAME*, float, float)) {
+    dVector3 zero = { 0,0,0 };
+    const dReal* v1 = dGeomGetBody(contact->geom.g1) ? dBodyGetLinearVel(dGeomGetBody(contact->geom.g1)) : zero;
+    const dReal* v2 = dGeomGetBody(contact->geom.g2) ? dBodyGetLinearVel(dGeomGetBody(contact->geom.g2)) : zero;
+    dVector3 vd;
+    dSubtractVectors3(vd, v1, v2);
+    const float vdlen = (float)dLENGTH(vd);
+    const float depth = (float)contact->geom.depth;
+
+    if (vdlen > 0.5f && depth > LWEPSILON && puck_game->puck_owner_player_no > 0) {
+        int idx = puck_game->puck_owner_player_no - 1;
+        assert(idx == 0 || idx == 1);
+        puck_game->battle_stat[idx].PuckWallHit++;
+    }
+
     if (on_collision) {
-        dVector3 zero = { 0,0,0 };
-        const dReal* v1 = dGeomGetBody(contact->geom.g1) ? dBodyGetLinearVel(dGeomGetBody(contact->geom.g1)) : zero;
-        const dReal* v2 = dGeomGetBody(contact->geom.g2) ? dBodyGetLinearVel(dGeomGetBody(contact->geom.g2)) : zero;
-        dVector3 vd;
-        dSubtractVectors3(vd, v1, v2);
-        const float vdlen = (float)dLENGTH(vd);
-        on_collision(puck_game, vdlen, (float)contact->geom.depth);
+        on_collision(puck_game, vdlen, depth);
     }
 }
 
@@ -495,10 +504,16 @@ void puck_game_commit_dash_to_puck(LWPUCKGAME* puck_game, LWPUCKGAMEDASH* dash, 
     dx /= ddlen;
     dy /= ddlen;
     puck_game_commit_dash(puck_game, dash, dx, dy);
+    assert(player_no == 1 || player_no == 2);
+    puck_game->battle_stat[player_no - 1].Dash++;
+}
+
+float puck_game_elapsed_time(int update_tick, int update_frequency) {
+    return update_tick * 1.0f / update_frequency;
 }
 
 float puck_game_remain_time(float total_time, int update_tick, int update_frequency) {
-    return LWMAX(0, total_time - update_tick * 1.0f / update_frequency);
+    return LWMAX(0, total_time - puck_game_elapsed_time(update_tick, update_frequency));
 }
 
 int puck_game_remain_time_floor(float total_time, int update_tick, int update_frequency) {
@@ -825,4 +840,14 @@ void puck_game_update_tick(LWPUCKGAME* puck_game, int update_frequency, float de
     if (puck_game->target.puck_contacted == 0) {
         puck_game->target.last_contact_puck_body = 0;
     }
+    // update battle stat stat (max puck speed)
+    const float puck_speed_int = puck_game->go[LPGO_PUCK].speed;
+    if (puck_game->puck_owner_player_no == 1) {
+        puck_game->battle_stat[0].MaxPuckSpeed = LWMAX(puck_speed_int, puck_game->battle_stat[0].MaxPuckSpeed);
+    } else if (puck_game->puck_owner_player_no == 2) {
+        puck_game->battle_stat[1].MaxPuckSpeed = LWMAX(puck_speed_int, puck_game->battle_stat[1].MaxPuckSpeed);
+    }
+    // update battle stat stat (travel distance)
+    puck_game->battle_stat[0].TravelDistance += puck_game->go[LPGO_PLAYER].speed / update_frequency;
+    puck_game->battle_stat[1].TravelDistance += puck_game->go[LPGO_TARGET].speed / update_frequency;
 }

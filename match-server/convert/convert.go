@@ -35,6 +35,10 @@ type CreateBattleOk struct {
 	S C.LWPCREATEBATTLEOK
 }
 
+type BattleResult struct {
+	S C.LWPBATTLERESULT
+}
+
 /////////////////////////////////////////////////////////////////////////////////////
 // SECTION:  Packets
 /////////////////////////////////////////////////////////////////////////////////////
@@ -46,8 +50,17 @@ func NewLwpCreateBattleOk() (*C.LWPCREATEBATTLEOK, int) {
 	return &C.LWPCREATEBATTLEOK{}, int(C.LPGP_LWPCREATEBATTLEOK)
 }
 
-func NewLwpBattleResult() (*C.LWPBATTLERESULT, int) {
-	return &C.LWPBATTLERESULT{}, int(C.LPGP_LWPBATTLERESULT)
+func NewLwpBattleResult() (*BattleResult, int) {
+	return &BattleResult{}, int(C.LPGP_LWPBATTLERESULT)
+}
+
+func LwpBattleResultPlayer(battleResult *C.LWPBATTLERESULT, i int) (*C.LWPBATTLERESULT_PLAYER) {
+	return &battleResult.Player[i]
+}
+
+func LwpBattleResultPlayerStat(battleResult *C.LWPBATTLERESULT, i int) (*C.LWPBATTLERESULT_STAT) {
+	player := LwpBattleResultPlayer(battleResult, i)
+	return &player.Stat
 }
 
 func NewLwpRetryQueueLater() *C.LWPRETRYQUEUELATER {

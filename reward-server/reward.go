@@ -8,6 +8,8 @@ import (
 	"encoding/binary"
 	"bytes"
 	"time"
+	"github.com/gasbank/laidoff/db-server/dbservice"
+	"github.com/gasbank/laidoff/db-server/user"
 )
 
 const (
@@ -28,17 +30,18 @@ func main() {
 		log.Fatalln("Error listening:", err.Error())
 	}
 	defer l.Close()
+	dbService := dbservice.New(":20181")
 	log.Printf("Listening %v for %v service...", ServiceAddr, ServiceName)
 	for {
 		conn, err := l.Accept()
 		if err != nil {
 			log.Println("Error accepting: ", err.Error())
 		} else {
-			go handleRequest(conn, rank)
+			go handleRequest(conn, rank, dbService)
 		}
 	}
 }
-func handleRequest(conn net.Conn, rank *helpers.RankClient) {
+func handleRequest(conn net.Conn, rank *helpers.RankClient, dbService dbservice.Db) {
 	log.Printf("Accepting from %v", conn.RemoteAddr())
 	for {
 		buf := make([]byte, 1024)
@@ -58,30 +61,32 @@ func handleRequest(conn net.Conn, rank *helpers.RankClient) {
 		log.Printf("  Type %v", packetType)
 		switch packetType {
 		case convert.LPGPLWPBATTLERESULT:
-			handleBattleResult(buf, rank)
+			handleBattleResult(buf, rank, dbService)
 		}
 	}
 	conn.Close()
 	log.Printf("Conn closed %v", conn.RemoteAddr())
 }
 
-func handleBattleResult(buf []byte, rank *helpers.RankClient) {
+func handleBattleResult(buf []byte, rank *helpers.RankClient, dbService dbservice.Db) {
 	log.Printf("BATTLERESULT received")
 	// Parse
 	bufReader := bytes.NewReader(buf)
 	recvPacket, _ := convert.NewLwpBattleResult()
-	err := binary.Read(bufReader, binary.LittleEndian, recvPacket)
+	err := binary.Read(bufReader, binary.LittleEndian, &recvPacket.S)
 	if err != nil {
 		log.Printf("binary.Read fail: %v", err.Error())
 		return
 	}
-	id1 := convert.IdCuintToByteArray(recvPacket.Id1)
-	id2 := convert.IdCuintToByteArray(recvPacket.Id2)
+	player1 := convert.LwpBattleResultPlayer(&recvPacket.S, 0)
+	player2 := convert.LwpBattleResultPlayer(&recvPacket.S, 1)
+	id1 := convert.IdCuintToByteArray(player1.Id)
+	id2 := convert.IdCuintToByteArray(player2.Id)
 	var nickname1 string
 	var nickname2 string
-	convert.CCharArrayToGoString(&recvPacket.Nickname1, &nickname1)
-	convert.CCharArrayToGoString(&recvPacket.Nickname2, &nickname2)
-	winner := int(recvPacket.Winner)
+	convert.CCharArrayToGoString(&player1.Nickname, &nickname1)
+	convert.CCharArrayToGoString(&player2.Nickname, &nickname2)
+	winner := int(recvPacket.S.Winner)
 	log.Printf("Battle result received; id1=%v, id2=%v, winner=%v", id1, id2, winner)
 	backoff := 300 * time.Millisecond
 	newScore1 := 0
@@ -108,4 +113,64 @@ func handleBattleResult(buf []byte, rank *helpers.RankClient) {
 	}
 	rank.Set(backoff, id1, newScore1, nickname1)
 	rank.Set(backoff, id2, newScore2, nickname2)
+	// update user db battle stat
+	updateUserDbBattleStat(recvPacket, int(recvPacket.S.BattleTimeSec), int(recvPacket.S.Winner), dbService, 1)
+	updateUserDbBattleStat(recvPacket, int(recvPacket.S.BattleTimeSec), int(recvPacket.S.Winner), dbService, 2)
+}
+
+func updateUserDbBattleStat(recvPacket *convert.BattleResult, battleTimeSec, winner int, dbService dbservice.Db, playerNo int) {
+	player := convert.LwpBattleResultPlayer(&recvPacket.S, playerNo - 1)
+	stat := convert.LwpBattleResultPlayerStat(&recvPacket.S, playerNo - 1)
+	statOther := convert.LwpBattleResultPlayerStat(&recvPacket.S, playerNo % 2)
+	totalHp := int(recvPacket.S.TotalHp)
+	var leaseDb user.LeaseDb
+	userId := convert.IdCuintToByteArray(player.Id)
+	err := dbService.Lease(&userId, &leaseDb)
+	if err != nil {
+		log.Printf("lease failed with error: %v", err.Error())
+	} else {
+		//v := player.Stat.Hp
+		bs := &leaseDb.Db.BattleStat
+		bs.BattleTimeSec += battleTimeSec
+		bs.Battle++
+		if winner == 0 {
+			bs.ConsecutiveVictory = 0
+			bs.ConsecutiveDefeat = 0
+		} else if winner == playerNo {
+			bs.Victory++
+			if int(stat.Hp) == totalHp && statOther.Hp == 0 {
+				bs.PerfectVictory++
+			}
+			bs.ConsecutiveVictory++
+			if bs.MaxConsecutiveVictory < bs.ConsecutiveVictory {
+				bs.MaxConsecutiveVictory = bs.ConsecutiveVictory
+			}
+			bs.ConsecutiveDefeat = 0
+		} else {
+			bs.Defeat++
+			if stat.Hp == 0 && int(statOther.Hp) == totalHp {
+				bs.PerfectDefeat++
+			}
+			bs.ConsecutiveDefeat++
+			if bs.MaxConsecutiveDefeat < bs.ConsecutiveDefeat {
+				bs.MaxConsecutiveDefeat = bs.ConsecutiveDefeat
+			}
+			bs.ConsecutiveVictory = 0
+		}
+		bs.Dash += int(stat.Dash)
+		maxPuckSpeed := int(stat.MaxPuckSpeed * 100)
+		if bs.MaxPuckSpeed < maxPuckSpeed {
+			bs.MaxPuckSpeed = maxPuckSpeed
+		}
+		bs.PuckTowerAttack += totalHp - int(statOther.Hp)
+		bs.PuckTowerDamage += totalHp - int(stat.Hp)
+		bs.PuckWallHit += int(stat.PuckWallHit)
+		travelDistance := int(stat.TravelDistance * 100)
+		bs.TravelDistance += travelDistance
+		var reply int
+		err = dbService.Write(&leaseDb, &reply)
+		if err != nil {
+			log.Printf("DB service write failed: %v", err.Error())
+		}
+	}
 }

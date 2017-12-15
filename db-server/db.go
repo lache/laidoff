@@ -85,7 +85,7 @@ func (t *DbService) Lease(args *user.Id, reply *user.LeaseDb) error {
 
 func CommitLease(t *DbService, leaseRequest *LeaseWriteRequest) {
 	args := *leaseRequest.Id
-	_, exist := t.leaseMap[args]
+	leaseData, exist := t.leaseMap[args]
 	if exist == false {
 		// You can lease
 		db, err := loadUserDb(args)
@@ -104,6 +104,13 @@ func CommitLease(t *DbService, leaseRequest *LeaseWriteRequest) {
 		leaseRequest.LeaseReplyChan <- LeaseReply{&user.LeaseDb{leaseId, *db}, nil}
 		log.Printf("[Service] Lease ok (user ID %v)", args)
 	} else {
+		leaseDuration := time.Now().Sub(leaseData.LeasedAt)
+		if leaseDuration > 1 * time.Second {
+			log.Printf("Lease data already exists, but it is too old. (%v) Force remove lease data...", leaseDuration)
+			delete(t.leaseMap, args)
+			CommitLease(t, leaseRequest)
+			return
+		}
 		leaseRequest.LeaseReplyChan <- LeaseReply{nil, errors.New("already leased")}
 		return
 	}
@@ -242,5 +249,6 @@ func writeUserDb(userDb *user.Db) error {
 	encoder := gob.NewEncoder(userDbFile)
 	encoder.Encode(userDb)
 	userDbFile.Close()
+	log.Printf("DB written: %+v", userDb)
 	return nil
 }
