@@ -360,6 +360,33 @@ static void render_radial_wave(const LWCONTEXT* pLwc,
     glDepthMask(GL_TRUE);
 }
 
+static void render_hp_star(const LWCONTEXT* pLwc, float ui_alpha, int hp, int left, float hp_shake_remain_time) {
+    float x = left ? -pLwc->aspect_ratio + 0.4f : pLwc->aspect_ratio - 0.4f;
+    float y = 0.55f;
+    float size = 0.4f;
+    if (hp_shake_remain_time > 0) {
+        const float ratio = hp_shake_remain_time / pLwc->puck_game->hp_shake_time;
+        const float shake_magnitude = 0.02f;
+        x += ratio * (2 * rand() / (float)RAND_MAX - 1.0f) * shake_magnitude * pLwc->aspect_ratio;
+        y += ratio * (2 * rand() / (float)RAND_MAX - 1.0f) * shake_magnitude;
+    }
+    render_solid_vb_ui_alpha_uv(pLwc,
+                                x,
+                                y,
+                                size,
+                                size,
+                                pLwc->tex_atlas[LAE_HP_STAR_0 + 2 * hp],
+                                pLwc->tex_atlas[LAE_HP_STAR_0 + 2 * hp + 1],
+                                LVT_CENTER_CENTER_ANCHORED_SQUARE,
+                                ui_alpha,
+                                0.0f,
+                                0.0f,
+                                0.0f,
+                                0.0f,
+                                default_uv_offset,
+                                default_uv_scale);
+}
+
 static void render_timer(const LWCONTEXT* pLwc, float remain_sec, float total_sec, float ui_alpha) {
     // Render text
     LWTEXTBLOCK text_block;
@@ -574,19 +601,20 @@ static void render_hp_gauge(const LWCONTEXT* pLwc,
             }
 
             // Render foreground (green or red)
-            render_solid_vb_ui(pLwc,
+            /*render_solid_vb_ui(pLwc,
                                cell_x_0 + cell_x_stride * i,
                                y + gauge_height / 2,
                                cell_width,
                                gauge_height - cell_border * 2,
                                0,
                                LVT_LEFT_CENTER_ANCHORED_SQUARE,
-                               ui_alpha, r, g, b, 1);
+                               ui_alpha, r, g, b, 1);*/
         }
     }
     // Render text
     LWTEXTBLOCK text_block;
-    text_block.align = left ? LTBA_LEFT_TOP : LTBA_RIGHT_TOP;
+    //text_block.align = left ? LTBA_LEFT_TOP : LTBA_RIGHT_TOP;
+    text_block.align = left ? LTBA_CENTER_TOP : LTBA_CENTER_TOP;
     text_block.text_block_width = DEFAULT_TEXT_BLOCK_WIDTH;
     text_block.text_block_line_height = DEFAULT_TEXT_BLOCK_LINE_HEIGHT_E;
     text_block.size = DEFAULT_TEXT_BLOCK_SIZE_E;
@@ -599,8 +627,10 @@ static void render_hp_gauge(const LWCONTEXT* pLwc,
     text_block.text_bytelen = (int)strlen(text_block.text);
     text_block.begin_index = 0;
     text_block.end_index = text_block.text_bytelen;
-    text_block.text_block_x = left ? -pLwc->aspect_ratio : +pLwc->aspect_ratio;
-    text_block.text_block_y = y;
+    //text_block.text_block_x = left ? -pLwc->aspect_ratio : +pLwc->aspect_ratio;
+    text_block.text_block_x = left ? (-pLwc->aspect_ratio + 0.4f) : (pLwc->aspect_ratio - 0.4f);
+    //text_block.text_block_y = y;
+    text_block.text_block_y = y - 0.6f;
     render_text_block(pLwc, &text_block);
 }
 
@@ -1269,9 +1299,13 @@ static void render_battle_ui_layer(const LWCONTEXT* pLwc, const LWPUCKGAME* puck
     const float remain_time = puck_game_remain_time(pLwc->puck_game->total_time,
                                                     remote ? state->update_tick : puck_game->update_tick,
                                                     pLwc->update_frequency);
+    // battle timer
     render_timer(pLwc,
                  remain_time,
                  pLwc->puck_game->total_time, ui_alpha);
+    // HP star (test)
+    render_hp_star(pLwc, ui_alpha, player_current_hp, 1, player->hp_shake_remain_time);
+    render_hp_star(pLwc, ui_alpha, target_current_hp, 0, target->hp_shake_remain_time);
     // Match state text (bottom of the screen)
     //render_match_state(pLwc, ui_alpha);
     // Dash ring gauge
@@ -1349,7 +1383,7 @@ static void render_battle_ui_layer(const LWCONTEXT* pLwc, const LWPUCKGAME* puck
         lwbutton_lae_append(&(((LWCONTEXT*)pLwc)->button_list),
                             "back_button",
                             -pLwc->aspect_ratio,
-                            0.8f,
+                            1.0f,//0.8f,
                             button_size * 1.5f,
                             button_size * 1.5f,
                             LAE_UI_BACK_BUTTON,
