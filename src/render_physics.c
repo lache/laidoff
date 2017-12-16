@@ -449,6 +449,28 @@ static void render_timer(const LWCONTEXT* pLwc, float remain_sec, float total_se
     );
 }
 
+static void render_tutorial_guide(const LWCONTEXT* pLwc, const LWPUCKGAME* puck_game, float ui_alpha) {
+    if (puck_game->game_state == LPGS_TUTORIAL) {
+        LWTEXTBLOCK text_block;
+        text_block.align = LTBA_CENTER_CENTER;
+        text_block.text_block_width = DEFAULT_TEXT_BLOCK_WIDTH;
+        text_block.text_block_line_height = DEFAULT_TEXT_BLOCK_LINE_HEIGHT_E;
+        text_block.size = DEFAULT_TEXT_BLOCK_SIZE_A;
+        text_block.multiline = 1;
+        SET_COLOR_RGBA_FLOAT(text_block.color_normal_glyph, 1, 1, 1, ui_alpha);
+        SET_COLOR_RGBA_FLOAT(text_block.color_normal_outline, 0, 0, 0, ui_alpha);
+        SET_COLOR_RGBA_FLOAT(text_block.color_emp_glyph, 1, 1, 0, ui_alpha);
+        SET_COLOR_RGBA_FLOAT(text_block.color_emp_outline, 0, 0, 0, ui_alpha);
+        text_block.text = puck_game->tutorial_guide_str;
+        text_block.text_bytelen = (int)strlen(text_block.text);
+        text_block.begin_index = 0;
+        text_block.end_index = text_block.text_bytelen;
+        text_block.text_block_x = 0;
+        text_block.text_block_y = 0.6f;
+        render_text_block(pLwc, &text_block);
+    }
+}
+
 static void render_dash_ring_gauge(const LWCONTEXT* pLwc, vec4 player_pos, float ui_alpha) {
     const LWPUCKGAMEDASH* dash = puck_game_single_play_dash_object(pLwc->puck_game);
     float gauge_ratio = puck_game_dash_gauge_ratio(pLwc->puck_game, dash);
@@ -1304,14 +1326,14 @@ static void render_battle_ui_layer(const LWCONTEXT* pLwc, const LWPUCKGAME* puck
         render_hp_gauge(pLwc, gauge_width, gauge_height, gauge2_x, gauge2_y, target_current_hp, target_total_hp, target->hp_shake_remain_time, 0, target_nickname, ui_alpha);
     }
     // Battle timer (center top of the screen)
-    const float remain_time = puck_game_remain_time(pLwc->puck_game->total_time,
+    const float remain_time = puck_game_remain_time(puck_game->total_time,
                                                     remote ? state->update_tick : puck_game->update_tick,
                                                     pLwc->update_frequency);
     // battle timer
     if ((puck_game->control_flags & LPGCF_HIDE_TIMER) == 0) {
         render_timer(pLwc,
                      remain_time,
-                     pLwc->puck_game->total_time,
+                     puck_game->total_time,
                      ui_alpha);
     }
     // HP star (test)
@@ -1336,6 +1358,8 @@ static void render_battle_ui_layer(const LWCONTEXT* pLwc, const LWPUCKGAME* puck
     mult_world_roll(world_roll_mat, puck_game->world_roll_axis, puck_game->world_roll_dir, puck_game->world_roll);
     mat4x4_mul_vec4(player_controlled_pos_vec4_world_roll, world_roll_mat, player_controlled_pos_vec4);
     render_dash_ring_gauge(pLwc, player_controlled_pos_vec4_world_roll, ui_alpha * control_ui_alpha);
+    // tutorial guide text
+    render_tutorial_guide(pLwc, puck_game, ui_alpha);
     // battle result
     render_battle_result_popup(pLwc,
                                puck_game->player_no,

@@ -902,6 +902,10 @@ void puck_game_set_searching_str(LWPUCKGAME* puck_game, const char* str) {
     strcpy(puck_game->searching_str, str);
 }
 
+void puck_game_set_tutorial_guide_str(LWPUCKGAME* puck_game, const char* str) {
+    strcpy(puck_game->tutorial_guide_str, str);
+}
+
 void puck_game_update_tick(LWPUCKGAME* puck_game, int update_frequency, float delta_time) {
     // reset per-frame caches
     puck_game->player.puck_contacted = 0;

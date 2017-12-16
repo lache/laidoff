@@ -200,6 +200,7 @@ typedef struct _LWPUCKGAME {
     int score;
     int rank;
     int control_flags;
+    char tutorial_guide_str[512];
 } LWPUCKGAME;
 
 LWPUCKGAME* new_puck_game(int update_frequency);
@@ -237,4 +238,5 @@ void puck_game_roll_to_main_menu(LWPUCKGAME* puck_game);
 void puck_game_reset_battle_state(LWPUCKGAME* puck_game);
 void puck_game_reset_tutorial_state(LWPUCKGAME* puck_game);
 void puck_game_set_searching_str(LWPUCKGAME* puck_game, const char* str);
+void puck_game_set_tutorial_guide_str(LWPUCKGAME* puck_game, const char* str);
 void puck_game_update_tick(LWPUCKGAME* puck_game, int update_frequency, float delta_time);

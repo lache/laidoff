@@ -749,7 +749,7 @@ void lwc_update(LWCONTEXT* pLwc, double delta_time) {
 		ps_test_update(pLwc);
 	}
 
-	if (pLwc->game_scene == LGS_FIELD) {
+	if (pLwc->game_scene == LGS_FIELD || pLwc->game_scene == LGS_PHYSICS) {
 		script_update(pLwc);
 	}
 
