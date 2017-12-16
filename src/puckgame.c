@@ -62,7 +62,9 @@ static void create_go(LWPUCKGAME* puck_game, LW_PUCK_GAME_OBJECT lpgo, float mas
     go->puck_game = puck_game;
     go->radius = radius;
     const float testgo_radius = go->radius;
+    assert(go->geom == 0);
     go->geom = dCreateSphere(puck_game->space, testgo_radius);
+    assert(go->body == 0);
     go->body = dBodyCreate(puck_game->world);
     dMass m;
     dMassSetSphereTotal(&m, mass, testgo_radius);
@@ -73,6 +75,57 @@ static void create_go(LWPUCKGAME* puck_game, LW_PUCK_GAME_OBJECT lpgo, float mas
     dGeomSetBody(go->geom, go->body);
     //dBodySetDamping(go->body, 1e-2f, 1e-2f);
     //dBodySetAutoDisableLinearThreshold(go->body, 0.05f);
+}
+
+static void destroy_go(LWPUCKGAME* puck_game, LW_PUCK_GAME_OBJECT lpgo) {
+    LWPUCKGAMEOBJECT* go = &puck_game->go[lpgo];
+    assert(go->geom);
+    dGeomDestroy(go->geom);
+    go->geom = 0;
+    assert(go->body);
+    dBodyDestroy(go->body);
+    go->body = 0;
+}
+
+static void create_tower_geom(LWPUCKGAME* puck_game, int i) {
+    LWPUCKGAMETOWER* tower = &puck_game->tower[i];
+    assert(tower->geom == 0);
+    tower->geom = dCreateCapsule(puck_game->space, puck_game->tower_radius, 10.0f);
+    dGeomSetPosition(tower->geom,
+                        puck_game->tower_pos * puck_game->tower_pos_multiplier[i][0],
+                        puck_game->tower_pos * puck_game->tower_pos_multiplier[i][1],
+                        0.0f);
+    dGeomSetData(tower->geom, tower);
+    // Tower #0(NW), #1(NE) --> player 1
+    // Tower #2(SW), #3(SE) --> player 2
+    tower->owner_player_no = i < LW_PUCK_GAME_TOWER_COUNT / 2 ? 1 : 2;
+}
+
+static void destroy_tower_geom(LWPUCKGAME* puck_game, int i) {
+    LWPUCKGAMETOWER* tower = &puck_game->tower[i];
+    assert(tower->geom);
+    dGeomDestroy(tower->geom);
+    tower->geom = 0;
+}
+
+static void create_control_joint(LWPUCKGAME* puck_game, LW_PUCK_GAME_OBJECT attach_target, dJointGroupID* joint_group, dJointID* control_joint) {
+    assert(*control_joint == 0);
+    *joint_group = dJointGroupCreate(0);
+    *control_joint = dJointCreateLMotor(puck_game->world, *joint_group);
+    dJointSetLMotorNumAxes(*control_joint, 2); // XY plane
+    dJointSetLMotorAxis(*control_joint, 0, 0, 1, 0, 0); // x-axis actuator
+    dJointSetLMotorAxis(*control_joint, 1, 0, 0, 1, 0); // y-axis actuator
+    dJointAttach(*control_joint, puck_game->go[attach_target].body, 0);
+    dJointSetLMotorParam(*control_joint, dParamFMax1, 10.0f);
+    dJointSetLMotorParam(*control_joint, dParamFMax2, 10.0f);
+}
+
+static void destroy_control_joint(LWPUCKGAME* puck_game, dJointGroupID* joint_group, dJointID* control_joint) {
+    assert(joint_group);
+    dJointGroupDestroy(*joint_group);
+    *joint_group = 0;
+    // all joints within joint_group destroyed as a whole
+    *control_joint = 0;
 }
 
 LWPUCKGAME* new_puck_game(int update_frequency) {
@@ -146,8 +199,8 @@ LWPUCKGAME* new_puck_game(int update_frequency) {
     puck_game->boundary[LPGB_GROUND] = dCreatePlane(puck_game->space, 0, 0, 1, 0);
     puck_game->boundary[LPGB_E] = dCreatePlane(puck_game->space, -1, 0, 0, -puck_game->world_size_half);
     puck_game->boundary[LPGB_W] = dCreatePlane(puck_game->space, 1, 0, 0, -puck_game->world_size_half);
-    puck_game->boundary[LPGB_N] = dCreatePlane(puck_game->space, 0, -1, 0, -puck_game->world_size_half);
     puck_game->boundary[LPGB_S] = dCreatePlane(puck_game->space, 0, 1, 0, -puck_game->world_size_half);
+    puck_game->boundary[LPGB_N] = dCreatePlane(puck_game->space, 0, -1, 0, -puck_game->world_size_half);
     //puck_game->boundary[LPGB_DIAGONAL_1] = dCreatePlane(puck_game->space, -1, -1, 0, 0);
     //puck_game->boundary[LPGB_DIAGONAL_2] = dCreatePlane(puck_game->space, +1, +1, 0, 0);
     for (int i = 0; i < LPGB_COUNT; i++) {
@@ -155,53 +208,28 @@ LWPUCKGAME* new_puck_game(int update_frequency) {
             dGeomSetData(puck_game->boundary[i], (void*)i);
         }
     }
+    // set global physics engine parameters
     dWorldSetGravity(puck_game->world, 0, 0, -9.81f);
     dWorldSetCFM(puck_game->world, 1e-5f);
-
+    // create tower geoms
     for (int i = 0; i < LW_PUCK_GAME_TOWER_COUNT; i++) {
-        puck_game->tower[i].geom = dCreateCapsule(puck_game->space, puck_game->tower_radius, 10.0f);
-        dGeomSetPosition(puck_game->tower[i].geom,
-                         puck_game->tower_pos * puck_game->tower_pos_multiplier[i][0],
-                         puck_game->tower_pos * puck_game->tower_pos_multiplier[i][1],
-                         0.0f);
-        dGeomSetData(puck_game->tower[i].geom, &puck_game->tower[i]);
-        // Tower #0(NW), #1(NE) --> player 1
-        // Tower #2(SW), #3(SE) --> player 2
-        puck_game->tower[i].owner_player_no = i < LW_PUCK_GAME_TOWER_COUNT / 2 ? 1 : 2;
+        create_tower_geom(puck_game, i);
     }
-
+    // create game objects (puck, player, target)
     create_go(puck_game, LPGO_PUCK, puck_game->sphere_mass, puck_game->sphere_radius);
     create_go(puck_game, LPGO_PLAYER, puck_game->sphere_mass, puck_game->sphere_radius);
     create_go(puck_game, LPGO_TARGET, puck_game->sphere_mass, puck_game->sphere_radius);
-
+    // joint group for physical contacts
     puck_game->contact_joint_group = dJointGroupCreate(0);
-    puck_game->player_control_joint_group = dJointGroupCreate(0);
-
     // Create target control joint
-    puck_game->target_control_joint = dJointCreateLMotor(puck_game->world, puck_game->target_control_joint_group);
-    dJointID tcj = puck_game->target_control_joint;
-    dJointSetLMotorNumAxes(tcj, 2);
-    dJointSetLMotorAxis(tcj, 0, 0, 1, 0, 0); // x-axis actuator
-    dJointSetLMotorAxis(tcj, 1, 0, 0, 1, 0); // y-axis actuator
-    dJointAttach(tcj, puck_game->go[LPGO_TARGET].body, 0);
-    dJointSetLMotorParam(tcj, dParamFMax1, 10.0f);
-    dJointSetLMotorParam(tcj, dParamFMax2, 10.0f);
-
+    create_control_joint(puck_game, LPGO_TARGET, &puck_game->target_control_joint_group, &puck_game->target_control_joint);
     // Create player control joint
-    puck_game->player_control_joint = dJointCreateLMotor(puck_game->world, puck_game->player_control_joint_group);
-    dJointID pcj = puck_game->player_control_joint;
-    dJointSetLMotorNumAxes(pcj, 2);
-    dJointSetLMotorAxis(pcj, 0, 0, 1, 0, 0); // x-axis actuator
-    dJointSetLMotorAxis(pcj, 1, 0, 0, 1, 0); // y-axis actuator
-    dJointAttach(pcj, puck_game->go[LPGO_PLAYER].body, 0);
-    dJointSetLMotorParam(pcj, dParamFMax1, 10.0f);
-    dJointSetLMotorParam(pcj, dParamFMax2, 10.0f);
-
+    create_control_joint(puck_game, LPGO_PLAYER, &puck_game->player_control_joint_group, &puck_game->player_control_joint);
+    // only puck has a red overlay light for indicating ownership update
     puck_game->go[LPGO_PUCK].red_overlay = 1;
-
     // Puck game runtime reset
     puck_game_reset(puck_game);
-
+    // flag this instance is ready to run simulation
     puck_game->init_ready = 1;
     return puck_game;
 }
@@ -545,17 +573,19 @@ void update_puck_ownership(LWPUCKGAME* puck_game) {
 
 void puck_game_reset_go(LWPUCKGAME* puck_game, LWPUCKGAMEOBJECT* go, float x, float y, float z) {
     // reset physics engine values
-    dBodySetPosition(go->body, x, y, z);
-    dMatrix3 rot_identity = {
-        1, 0, 0, 0,
-        0, 1, 0, 0,
-        0, 0, 1, 0,
-    };
-    dBodySetRotation(go->body, rot_identity);
-    dBodySetLinearVel(go->body, 0, 0, 0);
-    dBodySetAngularVel(go->body, 0, 0, 0);
-    dBodySetForce(go->body, 0, 0, 0);
-    dBodySetTorque(go->body, 0, 0, 0);
+    if (go->body) {
+        dBodySetPosition(go->body, x, y, z);
+        dMatrix3 rot_identity = {
+            1, 0, 0, 0,
+            0, 1, 0, 0,
+            0, 0, 1, 0,
+        };
+        dBodySetRotation(go->body, rot_identity);
+        dBodySetLinearVel(go->body, 0, 0, 0);
+        dBodySetAngularVel(go->body, 0, 0, 0);
+        dBodySetForce(go->body, 0, 0, 0);
+        dBodySetTorque(go->body, 0, 0, 0);
+    }
     // reset cached values
     go->move_rad = 0;
     go->pos[0] = x;
@@ -567,6 +597,24 @@ void puck_game_reset_go(LWPUCKGAME* puck_game, LWPUCKGAMEOBJECT* go, float x, fl
 }
 
 void puck_game_reset_battle_state(LWPUCKGAME* puck_game) {
+    puck_game->update_tick = 0;
+    puck_game->prepare_step_waited_tick = 0;
+    puck_game->battle_phase = LSP_READY;
+    for (int i = 0; i < LW_PUCK_GAME_TOWER_COUNT; i++) {
+        puck_game->tower[i].hp = puck_game->tower_total_hp;
+        puck_game->tower[i].collapsing = 0;
+    }
+    puck_game_reset_go(puck_game, &puck_game->go[LPGO_PUCK], 0.0f, 0.0f, puck_game->go[LPGO_PUCK].radius);
+    puck_game_reset_go(puck_game, &puck_game->go[LPGO_PLAYER], -puck_game->go_start_pos, -puck_game->go_start_pos, puck_game->go[LPGO_PUCK].radius);
+    puck_game_reset_go(puck_game, &puck_game->go[LPGO_TARGET], +puck_game->go_start_pos, +puck_game->go_start_pos, puck_game->go[LPGO_PUCK].radius);
+    puck_game->player.total_hp = puck_game->hp;
+    puck_game->player.current_hp = puck_game->hp;
+    puck_game->target.total_hp = puck_game->hp;
+    puck_game->target.current_hp = puck_game->hp;
+    memset(puck_game->remote_control, 0, sizeof(puck_game->remote_control));
+}
+
+void puck_game_reset_tutorial_state(LWPUCKGAME* puck_game) {
     puck_game->update_tick = 0;
     puck_game->prepare_step_waited_tick = 0;
     puck_game->battle_phase = LSP_READY;
@@ -666,33 +714,33 @@ void puck_game_update_remote_player(LWPUCKGAME* puck_game, float delta_time, int
         LPGO_TARGET,
     };
     
-    if (puck_game->remote_control[i].dir_pad_dragging) {
-        float dx, dy, dlen;
-        dx = puck_game->remote_control[i].dx;
-        dy = puck_game->remote_control[i].dy;
-        dlen = puck_game->remote_control[i].dlen;
-        if (dlen > 1.0f) {
-            dlen = 1.0f;
+    if (pcj[i]) {
+        if (puck_game->remote_control[i].dir_pad_dragging) {
+            float dx, dy, dlen;
+            dx = puck_game->remote_control[i].dx;
+            dy = puck_game->remote_control[i].dy;
+            dlen = puck_game->remote_control[i].dlen;
+            if (dlen > 1.0f) {
+                dlen = 1.0f;
+            }
+            dJointEnable(pcj[i]);
+            dJointSetLMotorParam(pcj[i], dParamVel1, puck_game->player_max_move_speed * dx * dlen);
+            dJointSetLMotorParam(pcj[i], dParamVel2, puck_game->player_max_move_speed * dy * dlen);
+        } else {
+            dJointSetLMotorParam(pcj[i], dParamVel1, 0);
+            dJointSetLMotorParam(pcj[i], dParamVel2, 0);
         }
-        dJointEnable(pcj[i]);
-        dJointSetLMotorParam(pcj[i], dParamVel1, puck_game->player_max_move_speed * dx * dlen);
-        dJointSetLMotorParam(pcj[i], dParamVel2, puck_game->player_max_move_speed * dy * dlen);
-    } else {
-        dJointSetLMotorParam(pcj[i], dParamVel1, 0);
-        dJointSetLMotorParam(pcj[i], dParamVel2, 0);
+        // Move direction fixed while dashing
+        if (puck_game->remote_dash[i].remain_time > 0) {
+            float dx, dy;
+            dx = puck_game->remote_dash[i].dir_x;
+            dy = puck_game->remote_dash[i].dir_y;
+            dJointSetLMotorParam(pcj[i], dParamVel1, puck_game->player_dash_speed * dx);
+            dJointSetLMotorParam(pcj[i], dParamVel2, puck_game->player_dash_speed * dy);
+            puck_game->remote_dash[i].remain_time = LWMAX(0,
+                                                          puck_game->remote_dash[i].remain_time - delta_time);
+        }
     }
-
-    // Move direction fixed while dashing
-    if (puck_game->remote_dash[i].remain_time > 0) {
-        float dx, dy;
-        dx = puck_game->remote_dash[i].dir_x;
-        dy = puck_game->remote_dash[i].dir_y;
-        dJointSetLMotorParam(pcj[i], dParamVel1, puck_game->player_dash_speed * dx);
-        dJointSetLMotorParam(pcj[i], dParamVel2, puck_game->player_dash_speed * dy);
-        puck_game->remote_dash[i].remain_time = LWMAX(0,
-                                                      puck_game->remote_dash[i].remain_time - delta_time);
-    }
-
     // Jump
     if (puck_game->remote_jump[i].remain_time > 0) {
         puck_game->remote_jump[i].remain_time = 0;
@@ -720,7 +768,9 @@ void puck_game_update_remote_player(LWPUCKGAME* puck_game, float delta_time, int
         puck_game->fire.remain_time = LWMAX(0, puck_game->fire.remain_time - (float)delta_time);*/
 
         // [2] Impulse Force Version
-        dJointDisable(pcj[i]);
+        if (pcj[i]) {
+            dJointDisable(pcj[i]);
+        }
         dBodySetLinearVel(puck_game->go[control_enum[i]].body, 0, 0, 0);
         dBodyAddForce(puck_game->go[control_enum[i]].body,
                       puck_game->remote_fire[i].dir_x * puck_game->fire_max_force *
@@ -782,6 +832,15 @@ void puck_game_roll_to_practice(LWPUCKGAME* puck_game) {
     if (puck_game->world_roll_dirty == 0) {
         puck_game->game_state = LPGS_PRACTICE;
         LOGI("World roll to practice began...");
+        puck_game->world_roll_target = 0;
+        puck_game->world_roll_dirty = 1;
+    }
+}
+
+void puck_game_roll_to_tutorial(LWPUCKGAME* puck_game) {
+    if (puck_game->world_roll_dirty == 0) {
+        puck_game->game_state = LPGS_TUTORIAL;
+        LOGI("World roll to tutorial began...");
         puck_game->world_roll_target = 0;
         puck_game->world_roll_dirty = 1;
     }

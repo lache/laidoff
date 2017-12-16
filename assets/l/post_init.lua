@@ -115,7 +115,12 @@ function on_ui_event(id)
 			lo.lw_go_back(c, nil)
 		end
 	elseif id == 'tutorial_button' then
-		lo.show_sys_msg(c.def_sys_msg, 'TUTORIAL: under construction')
+		--lo.show_sys_msg(c.def_sys_msg, 'TUTORIAL: under construction')
+		print('[script]tutorial_button')
+		lo.puck_game_reset_tutorial_state(c.puck_game)
+		lo.puck_game_clear_match_data(c, c.puck_game)
+		lo.puck_game_reset_view_proj(c, c.puck_game)
+		lo.puck_game_roll_to_tutorial(c.puck_game)
 	elseif id == 'online_button' then
 		c.puck_game.game_state = lo.LPGS_SEARCHING
 		lo.puck_game_set_searching_str(c.puck_game, 'SEARCHING OPPONENT...')

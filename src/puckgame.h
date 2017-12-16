@@ -137,9 +137,9 @@ typedef struct _LWPUCKGAME {
     LWPUCKGAMETOWER tower[LW_PUCK_GAME_TOWER_COUNT];
 	LWPUCKGAMEOBJECT go[LPGO_COUNT];
 	dJointGroupID contact_joint_group;
-	dJointGroupID  player_control_joint_group;
-	dJointGroupID  target_control_joint_group;
-	dJointGroupID  puck_pull_control_joint_group;
+	dJointGroupID player_control_joint_group;
+	dJointGroupID target_control_joint_group;
+	dJointGroupID puck_pull_control_joint_group;
 	dJointID player_control_joint; // player 1
 	dJointID target_control_joint; // player 2
 	dJointID puck_pull_control_joint;
@@ -227,7 +227,9 @@ int puck_game_dash_can_cast(const LWPUCKGAME* puck_game, const LWPUCKGAMEDASH* d
 void puck_game_roll_world(LWPUCKGAME* puck_game, int dir, int axis, float target);
 void puck_game_roll_to_battle(LWPUCKGAME* puck_game);
 void puck_game_roll_to_practice(LWPUCKGAME* puck_game);
+void puck_game_roll_to_tutorial(LWPUCKGAME* puck_game);
 void puck_game_roll_to_main_menu(LWPUCKGAME* puck_game);
 void puck_game_reset_battle_state(LWPUCKGAME* puck_game);
+void puck_game_reset_tutorial_state(LWPUCKGAME* puck_game);
 void puck_game_set_searching_str(LWPUCKGAME* puck_game, const char* str);
 void puck_game_update_tick(LWPUCKGAME* puck_game, int update_frequency, float delta_time);

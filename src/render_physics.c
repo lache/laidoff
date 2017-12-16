@@ -203,6 +203,9 @@ static void render_go(const LWCONTEXT* pLwc,
                       const mat4x4 remote_rot,
                       int remote,
                       float speed) {
+    if (go->body == 0) {
+        return;
+    }
     int shader_index = LWST_DEFAULT;
     const LWSHADER* shader = &pLwc->shader[shader_index];
     glUseProgram(shader->program);
@@ -1491,9 +1494,9 @@ void lwc_render_physics(const LWCONTEXT* pLwc, const mat4x4 view, const mat4x4 p
         },
         // float reflect_size[3];
         {
-            1.0f,
-            1.0f,
-            remote ? state->puck_reflect_size : puck_game->puck_reflect_size,
+            puck_game->go[LPGO_PLAYER].body ? 1.0f : 0.0f,
+            puck_game->go[LPGO_TARGET].body ? 1.0f : 0.0f,
+            puck_game->go[LPGO_PUCK].body ? (remote ? state->puck_reflect_size : puck_game->puck_reflect_size) : 0.0f,
         },
         // float arrowRotMat[2][2];
         {
@@ -1612,6 +1615,9 @@ void lwc_render_physics(const LWCONTEXT* pLwc, const mat4x4 view, const mat4x4 p
     }
     // Towers
     for (int i = 0; i < LW_PUCK_GAME_TOWER_COUNT; i++) {
+        if (puck_game->tower[i].geom == 0) {
+            continue;
+        }
         float tower_pos[] = {
             puck_game->tower_pos * puck_game->tower_pos_multiplier[i][0],
             puck_game->tower_pos * puck_game->tower_pos_multiplier[i][1],
