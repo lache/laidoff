@@ -722,6 +722,9 @@ static void init_vbo(LWCONTEXT* pLwc) {
     // LVT_PHYSICS_MENU
     load_vbo(pLwc, ASSETS_BASE_PATH "vbo" PATH_SEPARATOR "physics-menu.vbo",
              &pLwc->vertex_buffer[LVT_PHYSICS_MENU]);
+    // LVT_PUCK_FLOOR_COVER
+    load_vbo(pLwc, ASSETS_BASE_PATH "vbo" PATH_SEPARATOR "puck-floor-cover.vbo",
+             &pLwc->vertex_buffer[LVT_PUCK_FLOOR_COVER]);
 
     // LVT_LEFT_TOP_ANCHORED_SQUARE ~ LVT_RIGHT_BOTTOM_ANCHORED_SQUARE
     // 9 anchored squares...

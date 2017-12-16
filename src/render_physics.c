@@ -867,6 +867,43 @@ static void render_physics_menu(const LWCONTEXT *pLwc, const mat4x4 proj, const 
     glDrawArrays(GL_TRIANGLES, 0, pLwc->vertex_buffer[lvt].vertex_count);
 }
 
+static void render_floor_cover(const LWCONTEXT *pLwc, const mat4x4 proj, const mat4x4 view, const LWPUCKGAME* puck_game) {
+    int shader_index = LWST_DEFAULT;
+    const LWSHADER* shader = &pLwc->shader[shader_index];
+    glUseProgram(shader->program);
+    glUniform2fv(shader->vuvoffset_location, 1, default_uv_offset);
+    glUniform2fv(shader->vuvscale_location, 1, default_uv_scale);
+    glUniform2fv(shader->vs9offset_location, 1, default_uv_offset);
+    glUniform1f(shader->alpha_multiplier_location, 1.0f);
+    glUniform1i(shader->diffuse_location, 0); // 0 means GL_TEXTURE0
+    glUniform1i(shader->alpha_only_location, 1); // 1 means GL_TEXTURE1
+    glUniform3f(shader->overlay_color_location, 1, 1, 1);
+    glUniform1f(shader->overlay_color_ratio_location, 0);
+    mat4x4 rot;
+    mat4x4_identity(rot);
+    mat4x4 model;
+    mat4x4_identity(model);
+    mat4x4_mul(model, model, rot);
+    mat4x4_scale_aniso(model, model, 1, 1, 1);
+    mat4x4 model_translate;
+    mat4x4_translate(model_translate, 0, 0, 0);
+    mat4x4_mul(model, model_translate, model);
+    mult_world_roll(model, puck_game->world_roll_axis, puck_game->world_roll_dir, puck_game->world_roll);
+    mat4x4 view_model;
+    mat4x4_mul(view_model, view, model);
+    mat4x4 proj_view_model;
+    mat4x4_identity(proj_view_model);
+    mat4x4_mul(proj_view_model, proj, view_model);
+    glBindBuffer(GL_ARRAY_BUFFER, pLwc->vertex_buffer[LVT_PUCK_FLOOR_COVER].vertex_buffer);
+    bind_all_vertex_attrib(pLwc, LVT_PUCK_FLOOR_COVER);
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D, pLwc->tex_atlas[LAE_PUCK_FLOOR_COVER]);
+    set_tex_filter(GL_LINEAR, GL_LINEAR);
+    glUniformMatrix4fv(shader->mvp_location, 1, GL_FALSE, (const GLfloat*)proj_view_model);
+    glUniformMatrix4fv(shader->m_location, 1, GL_FALSE, (const GLfloat*)model);
+    glDrawArrays(GL_TRIANGLES, 0, pLwc->vertex_buffer[LVT_PUCK_FLOOR_COVER].vertex_count);
+}
+
 static void render_floor(const LWCONTEXT *pLwc, const mat4x4 proj, const LWPUCKGAME *puck_game, int shader_index, const mat4x4 view,
                          const LWSPHERERENDERUNIFORM* sphere_render_uniform) {
 
@@ -1569,6 +1606,8 @@ void lwc_render_physics(const LWCONTEXT* pLwc, const mat4x4 view, const mat4x4 p
 
     render_physics_menu(pLwc, proj, view, puck_game);
 
+    // Floor cover
+    render_floor_cover(pLwc, proj, view, puck_game);
     // Floor
     render_floor(pLwc, proj, puck_game, floor_shader_index, view, &sphere_render_uniform);
     // North wall
