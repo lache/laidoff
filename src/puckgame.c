@@ -674,6 +674,8 @@ void puck_game_reset_battle_state(LWPUCKGAME* puck_game) {
     puck_game->target.current_hp = puck_game->hp;
     memset(puck_game->remote_control, 0, sizeof(puck_game->remote_control));
     puck_game->control_flags &= ~LPGCF_HIDE_TIMER;
+    puck_game->control_flags &= ~LPGCF_HIDE_PULL_BUTTON;
+    puck_game->control_flags &= ~LPGCF_HIDE_DASH_BUTTON;
 }
 
 void puck_game_reset_tutorial_state(LWPUCKGAME* puck_game) {
