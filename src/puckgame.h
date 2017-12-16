@@ -96,6 +96,9 @@ typedef struct _LWPUCKGAMETOWER {
 
 typedef enum _LW_PUCK_GAME_CONTROL_FLAGS {
     LPGCF_HIDE_TIMER = 1 << 0,
+    LPGCF_HIDE_LEFT_DIR_PAD = 1 << 1,
+    LPGCF_HIDE_DASH_BUTTON = 1 << 2,
+    LPGCF_HIDE_PULL_BUTTON = 1 << 3,
 } LW_PUCK_GAME_CONTROL_FLAGS;
 
 typedef struct _LWPUCKGAME {
@@ -240,3 +243,8 @@ void puck_game_reset_tutorial_state(LWPUCKGAME* puck_game);
 void puck_game_set_searching_str(LWPUCKGAME* puck_game, const char* str);
 void puck_game_set_tutorial_guide_str(LWPUCKGAME* puck_game, const char* str);
 void puck_game_update_tick(LWPUCKGAME* puck_game, int update_frequency, float delta_time);
+void puck_game_create_go(LWPUCKGAME* puck_game, int lpgo, float x, float y, float z);
+void puck_game_create_control_joint(LWPUCKGAME* puck_game, int lpgo);
+void puck_game_reset_go(LWPUCKGAME* puck_game, LWPUCKGAMEOBJECT* go, float x, float y, float z);
+void puck_game_create_tower_geom(LWPUCKGAME* puck_game, int i);
+

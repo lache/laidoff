@@ -7,6 +7,7 @@
 #include "puckgame.h"
 #include "key.h"
 #include "input.h"
+#include "script.h"
 #if LW_PLATFORM_WIN32
 #include "lwimgui.h"
 #endif
@@ -102,7 +103,8 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
 	LWCONTEXT* pLwc = (LWCONTEXT*)glfwGetWindowUserPointer(window);
 
 	if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS) {
-        lw_go_back(pLwc, 0);
+        //lw_go_back(pLwc, 0);
+        script_emit_ui_event(pLwc->L, "back_button");
 		return;
 	}
 

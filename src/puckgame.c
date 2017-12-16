@@ -87,7 +87,7 @@ static void destroy_go(LWPUCKGAME* puck_game, LW_PUCK_GAME_OBJECT lpgo) {
     go->body = 0;
 }
 
-static void create_tower_geom(LWPUCKGAME* puck_game, int i) {
+void puck_game_create_tower_geom(LWPUCKGAME* puck_game, int i) {
     LWPUCKGAMETOWER* tower = &puck_game->tower[i];
     assert(tower->geom == 0);
     tower->geom = dCreateCapsule(puck_game->space, puck_game->tower_radius, 10.0f);
@@ -128,6 +128,21 @@ static void destroy_control_joint(LWPUCKGAME* puck_game, dJointGroupID* joint_gr
     *control_joint = 0;
 }
 
+void puck_game_create_go(LWPUCKGAME* puck_game, int lpgo, float x, float y, float z) {
+    create_go(puck_game, lpgo, puck_game->sphere_mass, puck_game->sphere_radius);
+    puck_game_reset_go(puck_game, &puck_game->go[lpgo], x, y, z);
+}
+
+void puck_game_create_control_joint(LWPUCKGAME* puck_game, int lpgo) {
+    if (lpgo == LPGO_TARGET) {
+        create_control_joint(puck_game, lpgo, &puck_game->target_control_joint_group, &puck_game->target_control_joint);
+    } else if (lpgo == LPGO_PLAYER) {
+        create_control_joint(puck_game, lpgo, &puck_game->player_control_joint_group, &puck_game->player_control_joint);
+    } else {
+        LOGE(LWLOGPOS "invalid lpgo");
+    }
+}
+
 // This function setup all dynamic objects needed for 1vs1 battle.
 // It allows a 'partial' creation state.
 // (can be called safely even if subset of battle objects exist)
@@ -135,26 +150,26 @@ static void create_all_battle_objects(LWPUCKGAME* puck_game) {
     // create tower geoms
     for (int i = 0; i < LW_PUCK_GAME_TOWER_COUNT; i++) {
         if (puck_game->tower[i].geom == 0) {
-            create_tower_geom(puck_game, i);
+            puck_game_create_tower_geom(puck_game, i);
         }
     }
     // create game objects (puck, player, target)
     if (puck_game->go[LPGO_PUCK].geom == 0) {
-        create_go(puck_game, LPGO_PUCK, puck_game->sphere_mass, puck_game->sphere_radius);
+        puck_game_create_go(puck_game, LPGO_PUCK, 0, 0, 0);
     }
     if (puck_game->go[LPGO_PLAYER].geom == 0) {
-        create_go(puck_game, LPGO_PLAYER, puck_game->sphere_mass, puck_game->sphere_radius);
+        puck_game_create_go(puck_game, LPGO_PLAYER, 0, 0, 0);
     }
     if (puck_game->go[LPGO_TARGET].geom == 0) {
-        create_go(puck_game, LPGO_TARGET, puck_game->sphere_mass, puck_game->sphere_radius);
+        puck_game_create_go(puck_game, LPGO_TARGET, 0, 0, 0);
     }
     // Create target control joint
     if (puck_game->target_control_joint_group == 0) {
-        create_control_joint(puck_game, LPGO_TARGET, &puck_game->target_control_joint_group, &puck_game->target_control_joint);
+        puck_game_create_control_joint(puck_game, LPGO_TARGET);
     }
     // Create player control joint
     if (puck_game->player_control_joint_group == 0) {
-        create_control_joint(puck_game, LPGO_PLAYER, &puck_game->player_control_joint_group, &puck_game->player_control_joint);
+        puck_game_create_control_joint(puck_game, LPGO_PLAYER);
     }
 }
 
@@ -273,8 +288,6 @@ LWPUCKGAME* new_puck_game(int update_frequency) {
     puck_game->contact_joint_group = dJointGroupCreate(0);
     // only puck has a red overlay light for indicating ownership update
     puck_game->go[LPGO_PUCK].red_overlay = 1;
-    // create all battle dynamic objects (dynamic objects can be created/destroyed during runtime)
-    create_all_battle_objects(puck_game);
     // Puck game runtime reset
     puck_game_reset(puck_game);
     // flag this instance is ready to run simulation
@@ -667,6 +680,10 @@ void puck_game_reset_tutorial_state(LWPUCKGAME* puck_game) {
     puck_game->update_tick = 0;
     puck_game->prepare_step_waited_tick = 0;
     puck_game->battle_phase = LSP_TUTORIAL;
+    for (int i = 0; i < LW_PUCK_GAME_TOWER_COUNT; i++) {
+        puck_game->tower[i].hp = puck_game->tower_total_hp;
+        puck_game->tower[i].collapsing = 0;
+    }
     // tutorial starts with an empty scene
     destroy_all_battle_objects(puck_game);
     puck_game->player.total_hp = puck_game->hp;
@@ -913,7 +930,8 @@ void puck_game_update_tick(LWPUCKGAME* puck_game, int update_frequency, float de
     // reset wall hit bits
     puck_game->wall_hit_bit = 0;
     // check timeout condition
-    if (puck_game_remain_time(puck_game->total_time, puck_game->update_tick, update_frequency) <= 0) {
+    if (puck_game_remain_time(puck_game->total_time, puck_game->update_tick, update_frequency) <= 0
+        && puck_game->game_state != LPGS_TUTORIAL) {
         const int hp_diff = puck_game->player.current_hp - puck_game->target.current_hp;
         puck_game->battle_phase = hp_diff > 0 ? LSP_FINISHED_VICTORY_P1 : hp_diff < 0 ? LSP_FINISHED_VICTORY_P2 : LSP_FINISHED_DRAW;
         puck_game->battle_control_ui_alpha = 0;
@@ -935,7 +953,8 @@ void puck_game_update_tick(LWPUCKGAME* puck_game, int update_frequency, float de
         }
     }
     // stepping physics only if battling
-    if (puck_game_state_phase_battling(puck_game->battle_phase)) {
+    if (puck_game_state_phase_battling(puck_game->battle_phase)
+        || puck_game->battle_phase == LSP_TUTORIAL) {
         puck_game->update_tick++;
         dSpaceCollide(puck_game->space, puck_game, puck_game_near_callback);
         dWorldQuickStep(puck_game->world, 1.0f / 60);

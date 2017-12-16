@@ -199,3 +199,5 @@
 %include <carrays.i>
 %array_functions(int,int)
 %array_functions(float,float)
+%array_functions(LWPUCKGAMEOBJECT,PUCKGAMEOBJECT)
+%array_functions(LWPUCKGAMETOWER,PUCKGAMETOWER)

@@ -469,7 +469,7 @@ static void render_tutorial_guide(const LWCONTEXT* pLwc, const LWPUCKGAME* puck_
         text_block.begin_index = 0;
         text_block.end_index = text_block.text_bytelen;
         text_block.text_block_x = 0;
-        text_block.text_block_y = 0.6f;
+        text_block.text_block_y = 0.7f;
         render_text_block(pLwc, &text_block);
     }
 }
@@ -1298,8 +1298,10 @@ static void render_battle_ui_layer(const LWCONTEXT* pLwc, const LWPUCKGAME* puck
     float control_ui_alpha = puck_game->battle_control_ui_alpha;
     // Render damage texts
     render_damage_text(pLwc, view, proj, ui_proj, ui_alpha);
-    // Render left joystick
-    render_dir_pad_with_start_joystick(pLwc, &pLwc->left_dir_pad, ui_alpha * control_ui_alpha);
+    // Render left dir pad
+    if ((puck_game->control_flags & LPGCF_HIDE_LEFT_DIR_PAD) == 0) {
+        render_dir_pad_with_start_joystick(pLwc, &pLwc->left_dir_pad, ui_alpha * control_ui_alpha);
+    }
     // Render right joystick
     if (pLwc->control_flags & LCF_PUCK_GAME_RIGHT_DIR_PAD) {
         render_dir_pad_with_start(pLwc, &pLwc->right_dir_pad);
@@ -1376,7 +1378,8 @@ static void render_battle_ui_layer(const LWCONTEXT* pLwc, const LWPUCKGAME* puck
     const float button_x_0 = 0.25f;
     const float button_y_interval = 0.25f;
     const float button_y_0 = -0.50f;
-    if (pLwc->control_flags & LCF_PUCK_GAME_PULL) {
+    if ((pLwc->control_flags & LCF_PUCK_GAME_PULL)
+        && ((puck_game->control_flags & LPGCF_HIDE_PULL_BUTTON) == 0)) {
         int pull_puck = puck_game->remote_control[0].pull_puck;
         lwbutton_lae_append(&(((LWCONTEXT*)pLwc)->button_list),
                             "pull_button",
@@ -1391,7 +1394,8 @@ static void render_battle_ui_layer(const LWCONTEXT* pLwc, const LWPUCKGAME* puck
                             1.0f,
                             pull_puck ? 0.2f : 1.0f);
     }
-    if (pLwc->control_flags & LCF_PUCK_GAME_DASH) {
+    if (pLwc->control_flags & LCF_PUCK_GAME_DASH
+        && ((puck_game->control_flags & LPGCF_HIDE_DASH_BUTTON) == 0)) {
         lwbutton_lae_append(&(((LWCONTEXT*)pLwc)->button_list),
                             "dash_button",
                             +1.00f,
