@@ -309,6 +309,9 @@ static void render_radial_wave(const LWCONTEXT* pLwc,
                                const mat4x4 remote_rot,
                                int remote,
                                float speed) {
+    if (go->geom == 0) {
+        return;
+    }
     const float uv_offset[2] = { -(float)puck_game->time / 2, 0.0f };
     const float uv_scale[2] = { 0.75f, 1.0f };
     const float scale = 0.75f;

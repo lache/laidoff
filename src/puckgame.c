@@ -792,7 +792,7 @@ void puck_game_update_remote_player(LWPUCKGAME* puck_game, float delta_time, int
         dBodyAddForce(puck_game->go[control_enum[i]].body, 0, 0, puck_game->jump_force);
     }
     // Pull
-    if (puck_game->remote_control[i].pull_puck) {
+    if (puck_game->remote_control[i].pull_puck && puck_game->go[LPGO_PUCK].body) {
         const dReal *puck_pos = dBodyGetPosition(puck_game->go[LPGO_PUCK].body);
         const dReal *player_pos = dBodyGetPosition(puck_game->go[control_enum[i]].body);
         const dVector3 f = {
