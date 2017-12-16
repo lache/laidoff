@@ -111,6 +111,9 @@ function on_ui_event(id)
 			c.puck_game.game_state = lo.LPGS_MAIN_MENU
 		elseif c.game_scene == lo.LGS_LEADERBOARD then
 			lo.change_to_physics(c)
+		elseif c.game_scene == lo.LGS_TUTORIAL then
+			c.puck_game.game_state = lo.LPGS_MAIN_MENU
+			lo.lw_go_back(c, nil)
 		else
 			lo.lw_go_back(c, nil)
 		end

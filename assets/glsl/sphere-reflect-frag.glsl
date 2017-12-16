@@ -19,6 +19,7 @@ uniform vec3 sphere_col[3];
 uniform float sphere_col_ratio[3];
 uniform float sphere_speed[3];
 uniform float sphere_move_rad[3];
+uniform vec3 reflect_size;
 varying vec3 color;
 varying vec2 uv;
 varying vec3 v;
@@ -69,9 +70,9 @@ void main()
 	
 	float w = 0.5;
 	
-	float r0 = 1.0 / (1.0 + exp(power * (w*d0 - offset)));
-	float r1 = 1.0 / (1.0 + exp(power * (w*d1 - offset)));
-	float r2 = 1.0 / (1.0 + exp(power * (w*d2 - offset)));
+	float r0 = 1.0 / (1.0 + exp(power * (w*d0 - offset))) * reflect_size[0];
+	float r1 = 1.0 / (1.0 + exp(power * (w*d1 - offset))) * reflect_size[1];
+	float r2 = 1.0 / (1.0 + exp(power * (w*d2 - offset))) * reflect_size[2];
 	
 	fragColor.rgb += r0 * sphere_col[0] * sphere_col_ratio[0];
 	fragColor.rgb += r1 * sphere_col[1] * sphere_col_ratio[1];

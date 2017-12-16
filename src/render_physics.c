@@ -566,7 +566,7 @@ static void render_hp_gauge(const LWCONTEXT* pLwc,
     const float gauge_height = h;
     //const float gauge_flush_height = 0.07f;
     const float base_color = 0.1f;
-    // Positioinal offset by shake
+    // Positional offset by shake
     if (hp_shake_remain_time > 0) {
         const float ratio = hp_shake_remain_time / pLwc->puck_game->hp_shake_time;
         const float shake_magnitude = 0.02f;
@@ -977,7 +977,8 @@ static void render_battle_result_popup(const LWCONTEXT* pLwc,
         lac = LAC_RESULT_TITLE;
         break;
     default:
-        break;
+        // required parameters will be invalid if this is the case.
+        return;
     }
     render_atlas_sprite(pLwc,
                         lac,
@@ -1296,19 +1297,30 @@ static void render_battle_ui_layer(const LWCONTEXT* pLwc, const LWPUCKGAME* puck
     const int target_current_hp = remote ? state->bf.target_current_hp : puck_game->target.current_hp;
     const int player_total_hp = remote ? state->bf.player_total_hp : puck_game->player.total_hp;
     const int target_total_hp = remote ? state->bf.target_total_hp : puck_game->target.total_hp;
-    render_hp_gauge(pLwc, gauge_width, gauge_height, gauge1_x, gauge1_y, player_current_hp, player_total_hp, player->hp_shake_remain_time, 1, puck_game->nickname, ui_alpha);
-    render_hp_gauge(pLwc, gauge_width, gauge_height, gauge2_x, gauge2_y, target_current_hp, target_total_hp, target->hp_shake_remain_time, 0, target_nickname, ui_alpha);
+    if (puck_game->tower[0].geom) {
+        render_hp_gauge(pLwc, gauge_width, gauge_height, gauge1_x, gauge1_y, player_current_hp, player_total_hp, player->hp_shake_remain_time, 1, puck_game->nickname, ui_alpha);
+    }
+    if (puck_game->tower[1].geom) {
+        render_hp_gauge(pLwc, gauge_width, gauge_height, gauge2_x, gauge2_y, target_current_hp, target_total_hp, target->hp_shake_remain_time, 0, target_nickname, ui_alpha);
+    }
     // Battle timer (center top of the screen)
     const float remain_time = puck_game_remain_time(pLwc->puck_game->total_time,
                                                     remote ? state->update_tick : puck_game->update_tick,
                                                     pLwc->update_frequency);
     // battle timer
-    render_timer(pLwc,
-                 remain_time,
-                 pLwc->puck_game->total_time, ui_alpha);
+    if ((puck_game->control_flags & LPGCF_HIDE_TIMER) == 0) {
+        render_timer(pLwc,
+                     remain_time,
+                     pLwc->puck_game->total_time,
+                     ui_alpha);
+    }
     // HP star (test)
-    render_hp_star(pLwc, ui_alpha, player_current_hp, 1, player->hp_shake_remain_time);
-    render_hp_star(pLwc, ui_alpha, target_current_hp, 0, target->hp_shake_remain_time);
+    if (puck_game->tower[0].geom) {
+        render_hp_star(pLwc, ui_alpha, player_current_hp, 1, player->hp_shake_remain_time);
+    }
+    if (puck_game->tower[1].geom) {
+        render_hp_star(pLwc, ui_alpha, target_current_hp, 0, target->hp_shake_remain_time);
+    }
     // Match state text (bottom of the screen)
     //render_match_state(pLwc, ui_alpha);
     // Dash ring gauge
@@ -1381,6 +1393,7 @@ static void render_battle_ui_layer(const LWCONTEXT* pLwc, const LWPUCKGAME* puck
                             1.0f);
     }
     if (puck_game->game_state == LPGS_PRACTICE
+        || puck_game->game_state == LPGS_TUTORIAL
         || puck_game_state_phase_finished(puck_game->battle_phase)) {
         // return to main menu button
         lwbutton_lae_append(&(((LWCONTEXT*)pLwc)->button_list),

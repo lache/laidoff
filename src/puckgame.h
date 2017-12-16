@@ -94,6 +94,10 @@ typedef struct _LWPUCKGAMETOWER {
 
 #define LW_PUCK_GAME_TOWER_COUNT (2)
 
+typedef enum _LW_PUCK_GAME_CONTROL_FLAGS {
+    LPGCF_HIDE_TIMER = 1 << 0,
+} LW_PUCK_GAME_CONTROL_FLAGS;
+
 typedef struct _LWPUCKGAME {
 	// ---- Static game data begin
 	float world_size;
@@ -195,6 +199,7 @@ typedef struct _LWPUCKGAME {
     LWPBATTLERESULT_STAT battle_stat[2];
     int score;
     int rank;
+    int control_flags;
 } LWPUCKGAME;
 
 LWPUCKGAME* new_puck_game(int update_frequency);

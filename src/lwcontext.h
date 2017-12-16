@@ -107,12 +107,12 @@ typedef struct _LWPUCKGAME LWPUCKGAME;
 typedef struct _LWUDP LWUDP;
 typedef struct _LWTCP LWTCP;
 
-enum LW_CONTROL_FLAGS {
+typedef enum _LW_CONTROL_FLAGS {
     LCF_PUCK_GAME_RIGHT_DIR_PAD = 1 << 0,
     LCF_PUCK_GAME_DASH = 1 << 1,
     LCF_PUCK_GAME_JUMP = 1 << 2,
     LCF_PUCK_GAME_PULL = 1 << 3,
-};
+} LW_CONTROL_FLAGS;
 
 typedef struct _LWCONTEXT {
 	// Window instance
