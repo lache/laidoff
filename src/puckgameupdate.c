@@ -15,7 +15,7 @@
 #include "lwmath.h"
 #include "sound.h"
 
-void update_world_roll(LWPUCKGAME* puck_game) {
+void puck_game_update_world_roll(LWPUCKGAME* puck_game) {
     if (puck_game->world_roll_dirty) {
         const float world_roll_diff = puck_game->world_roll_target - puck_game->world_roll;
         if (fabsf(world_roll_diff) < LWEPSILON) {
@@ -212,7 +212,8 @@ void update_puck_game(LWCONTEXT* pLwc, LWPUCKGAME* puck_game, double delta_time)
     update_shake(puck_game, (float)delta_time);
     update_puck_ownership(puck_game);
     update_puck_reflect_size(puck_game, (float)delta_time);
-    update_world_roll(puck_game);
+    // update_world_roll() call makes race condition with rendering thread... move to rendering thread.
+    //update_world_roll(puck_game);
     update_boundary_impact(puck_game, (float)delta_time);
     update_tower(puck_game, (float)delta_time);
 }

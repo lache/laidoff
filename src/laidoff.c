@@ -1468,6 +1468,10 @@ static void dequeue_from_state2_queue(LWCONTEXT* pLwc) {
 }
 
 void lwc_prerender_mutable_context(LWCONTEXT* pLwc) {
+    // update world roll angle
+    if (pLwc->puck_game) {
+        puck_game_update_world_roll(pLwc->puck_game);
+    }
     if (pLwc->udp == 0 || pLwc->udp->ready == 0) {
         return;
     }

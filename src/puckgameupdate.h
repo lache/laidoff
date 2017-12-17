@@ -23,3 +23,5 @@ void puck_game_target_tower_decrease_hp_test(LWPUCKGAME* puck_game);
 int puck_game_remote(const LWCONTEXT* pLwc, const LWPUCKGAME* puck_game);
 void puck_game_dash_and_send(LWCONTEXT* pLwc, LWPUCKGAME* puck_game);
 void puck_game_clear_match_data(LWCONTEXT* pLwc, LWPUCKGAME* puck_game);
+void puck_game_update_world_roll(LWPUCKGAME* puck_game);
+
