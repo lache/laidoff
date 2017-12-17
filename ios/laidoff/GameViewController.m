@@ -10,6 +10,7 @@
 #import "lwgl.h"
 #import "laidoff.h"
 #import "AppDelegate.h"
+#import "UIDeviceHardware.h"
 
 @interface GameViewController () {
     
@@ -51,6 +52,8 @@ char internal_data_path[1024];
     CGFloat screenHeight = screenScale * screenRect.size.height;
     
     self.pLwc = lw_init_initial_size((int)screenWidth, (int)screenHeight);
+    NSString *platformString = [UIDeviceHardware platformString];
+    lw_set_device_model(self.pLwc, [platformString UTF8String]);
     lw_set_size(self.pLwc, (int)screenWidth, (int)screenHeight);
     self.pLwc->internal_data_path = internal_data_path;
     self.pLwc->user_data_path = internal_data_path;

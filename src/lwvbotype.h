@@ -46,6 +46,7 @@ typedef enum _LW_VBO_TYPE
 	LVT_UI_BUTTON_BG,
     
     LVT_PUCK_FLOOR_COVER,
+    LVT_TOWER_BASE_2,
 
 	LVT_COUNT,
 } LW_VBO_TYPE;

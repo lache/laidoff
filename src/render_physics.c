@@ -165,6 +165,81 @@ static void render_tower_normal(const LWCONTEXT* pLwc, const mat4x4 view, const 
     }
 }
 
+static void render_tower_normal_2(const LWCONTEXT* pLwc, const mat4x4 view, const mat4x4 proj, const LWPUCKGAME* puck_game, const float* pos, const LWPUCKGAMETOWER* tower, int remote) {
+    int shader_index = LWST_DEFAULT_NORMAL;
+    const LWSHADER* shader = &pLwc->shader[shader_index];
+    glUseProgram(shader->program);
+    glUniform2fv(shader->vuvoffset_location, 1, default_uv_offset);
+    glUniform2fv(shader->vuvscale_location, 1, default_uv_scale);
+    glUniform2fv(shader->vs9offset_location, 1, default_uv_offset);
+    glUniform1f(shader->alpha_multiplier_location, 1.0f);
+    glUniform1i(shader->diffuse_location, 0); // 0 means GL_TEXTURE0
+    glUniform1i(shader->alpha_only_location, 1); // 1 means GL_TEXTURE1
+    glUniform3f(shader->overlay_color_location, 1, 1, 1);
+    glUniform1f(shader->overlay_color_ratio_location, 0);
+    
+    mat4x4 rot;
+    mat4x4_identity(rot);
+    float sx = puck_game->tower_radius / puck_game->tower_mesh_radius;
+    float sy = sx;
+    float sz = sx;
+    
+    glUniform1f(shader->overlay_color_ratio_location, 0);
+    
+    LWTOWERRENDERDATA tower_render_data[] = {
+        { LVT_TOWER_BASE_2, 0.1f, 0.1f, 0.1f },
+    };
+    for (int i = 0; i < ARRAY_SIZE(tower_render_data); i++) {
+        float x = pos[0];
+        float y = pos[1];
+        float z = pos[2];
+        // Positional offset by shake
+        if (tower->shake_remain_time > 0) {
+            const float ratio = tower->shake_remain_time / pLwc->puck_game->tower_shake_time;
+            const float shake_magnitude = 0.03f;
+            x += ratio * (2 * rand() / (float)RAND_MAX - 1.0f) * shake_magnitude * pLwc->aspect_ratio;
+            y += ratio * (2 * rand() / (float)RAND_MAX - 1.0f) * shake_magnitude;
+        }
+        
+        mat4x4 model;
+        mat4x4_identity(model);
+        mat4x4_mul(model, model, rot);
+        mat4x4_scale_aniso(model, model, sx, sy, sz);
+        //mat4x4_scale_aniso(model, model, 5, 5, 5);
+        
+        mat4x4 model_translate;
+        mat4x4_translate(model_translate, x, y, z);
+        
+        mat4x4_mul(model, model_translate, model);
+        
+        mult_world_roll(model, puck_game->world_roll_axis, puck_game->world_roll_dir, puck_game->world_roll);
+        
+        mat4x4 view_model;
+        mat4x4_mul(view_model, view, model);
+        
+        mat4x4 proj_view_model;
+        mat4x4_identity(proj_view_model);
+        mat4x4_mul(proj_view_model, proj, view_model);
+        
+        const LWTOWERRENDERDATA* d = tower_render_data + i;
+        float r = d->r;
+        float g = d->g;
+        float b = d->b;
+        glUniform3f(shader->overlay_color_location, r, g, b);
+        const LW_VBO_TYPE lvt = d->lvt;
+        
+        glBindBuffer(GL_ARRAY_BUFFER, pLwc->vertex_buffer[lvt].vertex_buffer);
+        bind_all_vertex_attrib(pLwc, lvt);
+        glActiveTexture(GL_TEXTURE0);
+        
+        glBindTexture(GL_TEXTURE_2D, pLwc->tex_atlas[tower->owner_player_no == 2 ? LAE_TOWER_BASE_2_TARGET : LAE_TOWER_BASE_2_PLAYER]);
+        set_tex_filter(GL_LINEAR, GL_LINEAR);
+        glUniformMatrix4fv(shader->mvp_location, 1, GL_FALSE, (const GLfloat*)proj_view_model);
+        glUniformMatrix4fv(shader->m_location, 1, GL_FALSE, (const GLfloat*)model);
+        glDrawArrays(GL_TRIANGLES, 0, pLwc->vertex_buffer[lvt].vertex_count);
+    }
+}
+
 static void render_tower_collapsing(const LWCONTEXT* pLwc, const mat4x4 view, const mat4x4 proj, const LWPUCKGAME* puck_game, const float* pos, const LWPUCKGAMETOWER* tower, int remote, float tower_collapsing_z_rot_angle) {
     // collapsing tower model scale matches current world
     const float tower_scale = 1.0f; // puck_game->tower_radius / puck_game->tower_mesh_radius;
@@ -186,7 +261,7 @@ static void render_tower_collapsing(const LWCONTEXT* pLwc, const mat4x4 view, co
 
 static void render_tower(const LWCONTEXT* pLwc, const mat4x4 view, const mat4x4 proj, const LWPUCKGAME* puck_game, const float* pos, const LWPUCKGAMETOWER* tower, int remote, float tower_collapsing_z_rot_angle) {
     if (tower->collapsing == 0) {
-        render_tower_normal(pLwc, view, proj, puck_game, pos, tower, remote);
+        render_tower_normal_2(pLwc, view, proj, puck_game, pos, tower, remote);
     } else {
         render_tower_collapsing(pLwc, view, proj, puck_game, pos, tower, remote, tower_collapsing_z_rot_angle);
     }
@@ -1487,8 +1562,8 @@ void lwc_render_physics(const LWCONTEXT* pLwc, const mat4x4 view, const mat4x4 p
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     //int shader_index = LWST_DEFAULT;
-    int wall_shader_index = LWST_SPHERE_REFLECT;
-    int floor_shader_index = LWST_SPHERE_REFLECT_FLOOR;
+    int wall_shader_index = pLwc->lowend_device ? LWST_DEFAULT : LWST_SPHERE_REFLECT;
+    int floor_shader_index = pLwc->lowend_device ? LWST_DEFAULT : LWST_SPHERE_REFLECT_FLOOR;
 
     const int remote = puck_game_remote(pLwc, pLwc->puck_game);
     const float* player_pos = puck_game->go[LPGO_PLAYER].pos;

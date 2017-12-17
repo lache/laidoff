@@ -376,6 +376,8 @@ typedef struct _LWCONTEXT {
     int control_flags;
     LWATLASSPRITEARRAY atlas_conf[LAC_COUNT];
 	void* android_native_activity;
+    char device_model[64];
+    int lowend_device;
 } LWCONTEXT;
 
 #ifdef __cplusplus

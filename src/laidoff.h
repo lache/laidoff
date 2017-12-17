@@ -86,7 +86,8 @@ void reset_battle_context(LWCONTEXT* pLwc);
 void lwc_start_logic_thread(LWCONTEXT* pLwc);
 void delete_all_rmsgs(LWCONTEXT* pLwc);
 void lw_start_text_input_activity(LWCONTEXT* pLwc, int tag); // Native text input activity
-
+void lw_set_device_model(LWCONTEXT* pLwc, const char* model);
+    
 extern const float default_uv_offset[2];
 extern const float default_uv_scale[2];
 extern const float default_flip_y_uv_scale[2];

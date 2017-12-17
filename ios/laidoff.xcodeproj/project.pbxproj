@@ -275,6 +275,7 @@
 		56F189BC1EC751950019312F /* zuuid.c in Sources */ = {isa = PBXBuildFile; fileRef = 56F1897F1EC751950019312F /* zuuid.c */; };
 		6C0CB2461FC45AB6006BEDCD /* lwtcpclient.c in Sources */ = {isa = PBXBuildFile; fileRef = 6C0CB2441FC45AB6006BEDCD /* lwtcpclient.c */; };
 		6C0CB6201FC30FC800DA4E51 /* render_leaderboard.c in Sources */ = {isa = PBXBuildFile; fileRef = 6C0CB61F1FC30FC800DA4E51 /* render_leaderboard.c */; };
+		6C20CE8E1FE6C2E500A85583 /* UIDeviceHardware.m in Sources */ = {isa = PBXBuildFile; fileRef = 6C20CE8C1FE6C2E500A85583 /* UIDeviceHardware.m */; };
 		6C2751CC1FDAC8D000D1266A /* stb_vorbis.c in Sources */ = {isa = PBXBuildFile; fileRef = 6C2751CB1FDAC8CF00D1266A /* stb_vorbis.c */; };
 		6C2751D11FDAC8E100D1266A /* lwfanim.c in Sources */ = {isa = PBXBuildFile; fileRef = 6C2751CE1FDAC8E100D1266A /* lwfanim.c */; };
 		6C2751D21FDAC8E100D1266A /* lwfvbo.c in Sources */ = {isa = PBXBuildFile; fileRef = 6C2751CF1FDAC8E100D1266A /* lwfvbo.c */; };
@@ -947,6 +948,8 @@
 		6C0CB2451FC45AB6006BEDCD /* lwtcpclient.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = lwtcpclient.h; sourceTree = "<group>"; };
 		6C0CB61E1FC30FC800DA4E51 /* render_leaderboard.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = render_leaderboard.h; sourceTree = "<group>"; };
 		6C0CB61F1FC30FC800DA4E51 /* render_leaderboard.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = render_leaderboard.c; sourceTree = "<group>"; };
+		6C20CE8C1FE6C2E500A85583 /* UIDeviceHardware.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = UIDeviceHardware.m; sourceTree = "<group>"; };
+		6C20CE8D1FE6C2E500A85583 /* UIDeviceHardware.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = UIDeviceHardware.h; sourceTree = "<group>"; };
 		6C2751CB1FDAC8CF00D1266A /* stb_vorbis.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = stb_vorbis.c; sourceTree = "<group>"; };
 		6C2751CD1FDAC8E100D1266A /* lwfanim.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = lwfanim.h; sourceTree = "<group>"; };
 		6C2751CE1FDAC8E100D1266A /* lwfanim.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = lwfanim.c; sourceTree = "<group>"; };
@@ -1981,7 +1984,6 @@
 		6CA16CD51EA20B5600DB7AF0 /* laidoff */ = {
 			isa = PBXGroup;
 			children = (
-				6C2A5FED1FC03260005B3DF2 /* laidoff.entitlements */,
 				6CA16CD91EA20B5600DB7AF0 /* AppDelegate.h */,
 				6CA16CDA1EA20B5600DB7AF0 /* AppDelegate.m */,
 				6CA16CE61EA20B5600DB7AF0 /* Assets.xcassets */,
@@ -1991,6 +1993,7 @@
 				6CA16CE11EA20B5600DB7AF0 /* GameViewController.m */,
 				567F39BF1EA2A2F70081EB67 /* image.cpp */,
 				6CA16CEB1EA20B5600DB7AF0 /* Info.plist */,
+				6C2A5FED1FC03260005B3DF2 /* laidoff.entitlements */,
 				6CA16CE81EA20B5600DB7AF0 /* LaunchScreen.storyboard */,
 				56F187C01EC74DA60019312F /* libzmq */,
 				6CA16D421EA210BB00DB7AF0 /* lua-5.3.4 */,
@@ -2003,6 +2006,8 @@
 				6CA16CDE1EA20B5600DB7AF0 /* Shader.vsh */,
 				6CA16CF41EA20CA700DB7AF0 /* src */,
 				6CA16CD61EA20B5600DB7AF0 /* Supporting Files */,
+				6C20CE8D1FE6C2E500A85583 /* UIDeviceHardware.h */,
+				6C20CE8C1FE6C2E500A85583 /* UIDeviceHardware.m */,
 			);
 			path = laidoff;
 			sourceTree = "<group>";
@@ -2629,6 +2634,7 @@
 				56F189BA1EC751950019312F /* ztimerset.c in Sources */,
 				6C7739E51FB4B5AA001014DE /* physics.c in Sources */,
 				6C7739E21FB4B5AA001014DE /* playersm.c in Sources */,
+				6C20CE8E1FE6C2E500A85583 /* UIDeviceHardware.m in Sources */,
 				56F189AA1EC751950019312F /* zlist.c in Sources */,
 				56F189981EC751950019312F /* zchunk.c in Sources */,
 				56F188CA1EC74DB60019312F /* norm_engine.cpp in Sources */,

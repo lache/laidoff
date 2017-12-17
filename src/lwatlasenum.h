@@ -127,6 +127,8 @@ typedef enum _LW_ATLAS_ENUM {
     LAE_HP_STAR_5,
     LAE_HP_STAR_5_ALPHA,
     LAE_PUCK_FLOOR_COVER,
+    LAE_TOWER_BASE_2_PLAYER,
+    LAE_TOWER_BASE_2_TARGET,
     LAE_COUNT,
 
         LAE_DONTCARE,
@@ -262,6 +264,8 @@ static const char *tex_atlas_filename[] = {
     ASSETS_BASE_PATH "ktx" PATH_SEPARATOR "hpstar5-a.ktx",
     ASSETS_BASE_PATH "ktx" PATH_SEPARATOR "hpstar5-a_alpha.ktx",
     ASSETS_BASE_PATH "ktx" PATH_SEPARATOR "puck-floor-cover.ktx",
+    ASSETS_BASE_PATH "ktx" PATH_SEPARATOR "tower-base-2-player.ktx",
+    ASSETS_BASE_PATH "ktx" PATH_SEPARATOR "tower-base-2-target.ktx",
 };
 
 #define MAX_TEX_ATLAS LAE_COUNT

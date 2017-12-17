@@ -725,7 +725,10 @@ static void init_vbo(LWCONTEXT* pLwc) {
     // LVT_PUCK_FLOOR_COVER
     load_vbo(pLwc, ASSETS_BASE_PATH "vbo" PATH_SEPARATOR "puck-floor-cover.vbo",
              &pLwc->vertex_buffer[LVT_PUCK_FLOOR_COVER]);
-
+    // LVT_TOWER_BASE_2
+    load_vbo(pLwc, ASSETS_BASE_PATH "vbo" PATH_SEPARATOR "tower-base-2.vbo",
+             &pLwc->vertex_buffer[LVT_TOWER_BASE_2]);
+    
     // LVT_LEFT_TOP_ANCHORED_SQUARE ~ LVT_RIGHT_BOTTOM_ANCHORED_SQUARE
     // 9 anchored squares...
     const float anchored_square_offset[][2] = {
@@ -1959,6 +1962,18 @@ LWCONTEXT* lw_init_initial_size(int width, int height) {
 
 LWCONTEXT *lw_init(void) {
     return lw_init_initial_size(0, 0);
+}
+
+int prefix(const char* pre, const char* str)
+{
+    return strncmp(pre, str, strlen(pre)) == 0;
+}
+
+void lw_set_device_model(LWCONTEXT* pLwc, const char* model) {
+    strcpy(pLwc->device_model, model);
+    if (prefix("iPhone 4", model) || prefix("iPhone 3", model) || prefix("iPhone 1", model)) {
+        pLwc->lowend_device = 1;
+    }
 }
 
 void lw_set_size(LWCONTEXT* pLwc, int w, int h) {
