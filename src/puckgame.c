@@ -223,7 +223,7 @@ LWPUCKGAME* new_puck_game(int update_frequency) {
     puck_game->fire_interval = 1.5f;
     puck_game->fire_duration = 0.2f;
     puck_game->fire_shake_time = 0.5f;
-    puck_game->tower_pos = 1.3f;
+    puck_game->tower_pos = 1.1f;
     puck_game->tower_radius = 0.3f; //0.825f / 2;
     puck_game->tower_mesh_radius = 0.825f / 2; // Check tower.blend file
     puck_game->tower_total_hp = 5;
@@ -244,14 +244,14 @@ LWPUCKGAME* new_puck_game(int update_frequency) {
     puck_game->puck_reflect_size = 1.0f;
     int tower_pos_multiplier_index = 0;
     puck_game->tower_pos_multiplier[tower_pos_multiplier_index][0] = -1;
-    puck_game->tower_pos_multiplier[tower_pos_multiplier_index][1] = 0; /*-1;*/
+    puck_game->tower_pos_multiplier[tower_pos_multiplier_index][1] = -1;
     puck_game->tower_collapsing_z_rot_angle[tower_pos_multiplier_index] = (float)LWDEG2RAD(180);
     tower_pos_multiplier_index++;
     /*puck_game->tower_pos_multiplier[tower_pos_multiplier_index][0] = -1;
     puck_game->tower_pos_multiplier[tower_pos_multiplier_index][1] = +1;
     tower_pos_multiplier_index++;*/
     puck_game->tower_pos_multiplier[tower_pos_multiplier_index][0] = +1;
-    puck_game->tower_pos_multiplier[tower_pos_multiplier_index][1] = 0; /*+1;*/
+    puck_game->tower_pos_multiplier[tower_pos_multiplier_index][1] = +1;
     puck_game->tower_collapsing_z_rot_angle[tower_pos_multiplier_index] = (float)LWDEG2RAD(0);
     tower_pos_multiplier_index++;
     /*puck_game->tower_pos_multiplier[tower_pos_multiplier_index][0] = +1;
@@ -666,8 +666,8 @@ void puck_game_reset_battle_state(LWPUCKGAME* puck_game) {
         puck_game->tower[i].collapsing = 0;
     }
     puck_game_reset_go(puck_game, &puck_game->go[LPGO_PUCK], 0.0f, 0.0f, puck_game->go[LPGO_PUCK].radius);
-    puck_game_reset_go(puck_game, &puck_game->go[LPGO_PLAYER], -puck_game->go_start_pos, 0 /*-puck_game->go_start_pos*/, puck_game->go[LPGO_PUCK].radius);
-    puck_game_reset_go(puck_game, &puck_game->go[LPGO_TARGET], +puck_game->go_start_pos, 0 /*+puck_game->go_start_pos*/, puck_game->go[LPGO_PUCK].radius);
+    puck_game_reset_go(puck_game, &puck_game->go[LPGO_PLAYER], -puck_game->go_start_pos, -puck_game->go_start_pos, puck_game->go[LPGO_PUCK].radius);
+    puck_game_reset_go(puck_game, &puck_game->go[LPGO_TARGET], +puck_game->go_start_pos, +puck_game->go_start_pos, puck_game->go[LPGO_PUCK].radius);
     puck_game->player.total_hp = puck_game->hp;
     puck_game->player.current_hp = puck_game->hp;
     puck_game->target.total_hp = puck_game->hp;

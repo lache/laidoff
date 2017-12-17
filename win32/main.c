@@ -219,9 +219,15 @@ int main(int argc, char* argv[]) {
     glfwGetFramebufferSize(window, &width, &height);
 #if LW_PLATFORM_WIN32
     int client_instance_id = make_multiple_instances_nonoverlapping(window, &work_area, window_rect_to_client_rect_dx, window_rect_to_client_rect_dy, width, height);
+#else
+    int client_instance_id = 0;
+    if (argc >= 2) {
+        client_instance_id = atoi(argv[1]);
+    }
 #endif
     LWCONTEXT* pLwc = lw_init_initial_size(width, height);
-#if LW_PLATFORM_WIN32
+    // multiple clients with different user data path enable
+    // multiplayer testing environment on a single desktop.
     switch (client_instance_id) {
     case 0:
         break;
@@ -235,7 +241,7 @@ int main(int argc, char* argv[]) {
         pLwc->user_data_path = "user3";
         break;
     }
-#endif
+
 
     lw_set_window(pLwc, window);
 

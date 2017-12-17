@@ -174,8 +174,8 @@ static void render_tower_collapsing(const LWCONTEXT* pLwc, const mat4x4 view, co
                 proj,
                 LFT_TOWER,
                 LFAT_TOWER_COLLAPSE,
-                +1.1f,
-                +1.1f,
+                fabsf(pos[0]),
+                fabsf(pos[1]),
                 pos[2],
                 tower_scale,
                 tower_collapsing_z_rot_angle,
@@ -368,8 +368,8 @@ static void render_radial_wave(const LWCONTEXT* pLwc,
 
 static void render_hp_star(const LWCONTEXT* pLwc, float ui_alpha, int hp, int left, float hp_shake_remain_time) {
     float x = left ? -pLwc->aspect_ratio + 0.4f : pLwc->aspect_ratio - 0.4f;
-    float y = 0.55f;
-    float size = 0.4f;
+    float y = 0.575f;
+    float size = 0.5f;
     if (hp_shake_remain_time > 0) {
         const float ratio = hp_shake_remain_time / pLwc->puck_game->hp_shake_time;
         const float shake_magnitude = 0.02f;
@@ -1602,7 +1602,7 @@ void lwc_render_physics(const LWCONTEXT* pLwc, const mat4x4 view, const mat4x4 p
         sphere_render_uniform.sphere_col[1][1] = 1.0f;
         sphere_render_uniform.sphere_col[1][2] = 0.8f;
     }
-    const float wall_height = 1.6f;
+    const float wall_height = 0.8f;
 
     render_physics_menu(pLwc, proj, view, puck_game);
 
