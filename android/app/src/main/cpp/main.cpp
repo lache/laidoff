@@ -545,7 +545,10 @@ static int32_t engine_handle_input(struct android_app* app, AInputEvent* event) 
 			if (AKeyEvent_getKeyCode(event) == AKEYCODE_BACK) {
 				if(AKeyEvent_getAction(event) == AKEY_EVENT_ACTION_DOWN) {
 					// actions on back key
-					lw_go_back(engine->pLwc, engine->app->activity);
+                    // !! THREAD SAFETY !!
+					//lw_go_back(engine->pLwc, engine->app->activity);
+                    engine->pLwc->android_native_activity = engine->app->activity;
+                    logic_emit_ui_event_async(engine->pLwc, "back_button");
 				}
 				return 1; // <-- uncomment this line to prevent default back button handler called
 			};

@@ -115,9 +115,9 @@ function on_ui_event(id)
 		elseif c.puck_game.game_state == lo.LPGS_TUTORIAL then
 			lo.script_cleanup_all_coros(c)
 			--c.puck_game.game_state = lo.LPGS_MAIN_MENU
-			lo.lw_go_back(c, nil)
+			lo.lw_go_back(c, c.android_native_activity)
 		else
-			lo.lw_go_back(c, nil)
+			lo.lw_go_back(c, c.android_native_activity)
 		end
 	elseif id == 'tutorial_button' then
 		--lo.show_sys_msg(c.def_sys_msg, 'TUTORIAL: under construction')

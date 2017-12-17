@@ -375,6 +375,7 @@ typedef struct _LWCONTEXT {
     LWPLEADERBOARD last_leaderboard;
     int control_flags;
     LWATLASSPRITEARRAY atlas_conf[LAC_COUNT];
+	void* android_native_activity;
 } LWCONTEXT;
 
 #ifdef __cplusplus

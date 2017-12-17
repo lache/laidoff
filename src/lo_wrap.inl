@@ -24435,6 +24435,56 @@ fail:
 }
 
 
+static int _wrap_LWCONTEXT_android_native_activity_set(lua_State* L) {
+  int SWIG_arg = 0;
+  struct _LWCONTEXT *arg1 = (struct _LWCONTEXT *) 0 ;
+  void *arg2 = (void *) 0 ;
+  
+  SWIG_check_num_args("_LWCONTEXT::android_native_activity",2,2)
+  if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("_LWCONTEXT::android_native_activity",1,"struct _LWCONTEXT *");
+  if(!SWIG_isptrtype(L,2)) SWIG_fail_arg("_LWCONTEXT::android_native_activity",2,"void *");
+  
+  if (!SWIG_IsOK(SWIG_ConvertPtr(L,1,(void**)&arg1,SWIGTYPE_p__LWCONTEXT,0))){
+    SWIG_fail_ptr("LWCONTEXT_android_native_activity_set",1,SWIGTYPE_p__LWCONTEXT);
+  }
+  
+  arg2=(void *)SWIG_MustGetPtr(L,2,0,0,2,"LWCONTEXT_android_native_activity_set");
+  if (arg1) (arg1)->android_native_activity = arg2;
+  
+  return SWIG_arg;
+  
+  if(0) SWIG_fail;
+  
+fail:
+  lua_error(L);
+  return SWIG_arg;
+}
+
+
+static int _wrap_LWCONTEXT_android_native_activity_get(lua_State* L) {
+  int SWIG_arg = 0;
+  struct _LWCONTEXT *arg1 = (struct _LWCONTEXT *) 0 ;
+  void *result = 0 ;
+  
+  SWIG_check_num_args("_LWCONTEXT::android_native_activity",1,1)
+  if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("_LWCONTEXT::android_native_activity",1,"struct _LWCONTEXT *");
+  
+  if (!SWIG_IsOK(SWIG_ConvertPtr(L,1,(void**)&arg1,SWIGTYPE_p__LWCONTEXT,0))){
+    SWIG_fail_ptr("LWCONTEXT_android_native_activity_get",1,SWIGTYPE_p__LWCONTEXT);
+  }
+  
+  result = (void *) ((arg1)->android_native_activity);
+  SWIG_NewPointerObj(L,result,SWIGTYPE_p_void,0); SWIG_arg++; 
+  return SWIG_arg;
+  
+  if(0) SWIG_fail;
+  
+fail:
+  lua_error(L);
+  return SWIG_arg;
+}
+
+
 static int _wrap_new_LWCONTEXT(lua_State* L) {
   int SWIG_arg = 0;
   struct _LWCONTEXT *result = 0 ;
@@ -24601,6 +24651,7 @@ static swig_lua_attribute swig_LWCONTEXT_attributes[] = {
     { "last_leaderboard", _wrap_LWCONTEXT_last_leaderboard_get, _wrap_LWCONTEXT_last_leaderboard_set },
     { "control_flags", _wrap_LWCONTEXT_control_flags_get, _wrap_LWCONTEXT_control_flags_set },
     { "atlas_conf", _wrap_LWCONTEXT_atlas_conf_get, _wrap_LWCONTEXT_atlas_conf_set },
+    { "android_native_activity", _wrap_LWCONTEXT_android_native_activity_get, _wrap_LWCONTEXT_android_native_activity_set },
     {0,0,0}
 };
 static swig_lua_method swig_LWCONTEXT_methods[]= {
@@ -62530,6 +62581,7 @@ static swig_lua_const_info swig_SwigModule_constants[]= {
     {SWIG_LUA_CONSTTAB_INT("LAE_HP_STAR_4_ALPHA", LAE_HP_STAR_4_ALPHA)},
     {SWIG_LUA_CONSTTAB_INT("LAE_HP_STAR_5", LAE_HP_STAR_5)},
     {SWIG_LUA_CONSTTAB_INT("LAE_HP_STAR_5_ALPHA", LAE_HP_STAR_5_ALPHA)},
+    {SWIG_LUA_CONSTTAB_INT("LAE_PUCK_FLOOR_COVER", LAE_PUCK_FLOOR_COVER)},
     {SWIG_LUA_CONSTTAB_INT("LAE_COUNT", LAE_COUNT)},
     {SWIG_LUA_CONSTTAB_INT("LAE_DONTCARE", LAE_DONTCARE)},
     {SWIG_LUA_CONSTTAB_INT("LAS_COMMAND_SELECTED_BG", LAS_COMMAND_SELECTED_BG)},
@@ -62756,6 +62808,7 @@ static swig_lua_const_info swig_SwigModule_constants[]= {
     {SWIG_LUA_CONSTTAB_INT("LVT_UI_LEFT_BUTTON_BG", LVT_UI_LEFT_BUTTON_BG)},
     {SWIG_LUA_CONSTTAB_INT("LVT_UI_FULL_PANEL_BG", LVT_UI_FULL_PANEL_BG)},
     {SWIG_LUA_CONSTTAB_INT("LVT_UI_BUTTON_BG", LVT_UI_BUTTON_BG)},
+    {SWIG_LUA_CONSTTAB_INT("LVT_PUCK_FLOOR_COVER", LVT_PUCK_FLOOR_COVER)},
     {SWIG_LUA_CONSTTAB_INT("LVT_COUNT", LVT_COUNT)},
     {SWIG_LUA_CONSTTAB_INT("LSVT_TRIANGLE", LSVT_TRIANGLE)},
     {SWIG_LUA_CONSTTAB_INT("LSVT_TREEPLANE", LSVT_TREEPLANE)},
