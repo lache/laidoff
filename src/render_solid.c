@@ -41,7 +41,7 @@ void render_solid_vb_ui_flip_y_uv_shader_rot(const LWCONTEXT* pLwc,
                                              enum _LW_VBO_TYPE lvt,
                                              float alpha_multiplier, float over_r, float over_g, float over_b, float oratio, int flip_y_uv, int shader_index, float rot) {
     
-    glUseProgram(pLwc->shader[shader_index].program);
+    lazy_glUseProgram(pLwc, shader_index);
     glUniform2fv(pLwc->shader[shader_index].vuvoffset_location, 1, default_uv_offset);
     glUniform2fv(pLwc->shader[shader_index].vuvscale_location, 1, flip_y_uv ? default_flip_y_uv_scale : default_uv_scale);
     glUniform1f(pLwc->shader[shader_index].alpha_multiplier_location, alpha_multiplier);
@@ -103,7 +103,7 @@ void render_solid_vb_ui_alpha_uv(const LWCONTEXT* pLwc,
     
     const LWSHADER* shader = &pLwc->shader[shader_index];
     
-    glUseProgram(shader->program);
+    lazy_glUseProgram(pLwc, shader_index);
     glUniform2fv(shader->vuvoffset_location, 1, uv_offset);
     glUniform2fv(shader->vuvscale_location, 1, uv_scale);
     glUniform2fv(shader->vs9offset_location, 1, default_uv_offset);

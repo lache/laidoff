@@ -330,7 +330,7 @@ static void s_render_full_panel(const LWCONTEXT* pLwc, LWBUTTONLIST* button_list
 
     int panel_shader_index = LWST_COLOR; //LWST_PANEL;
 
-	glUseProgram(pLwc->shader[panel_shader_index].program);
+    lazy_glUseProgram(pLwc, panel_shader_index);
 	glUniform1f(pLwc->shader[panel_shader_index].time, (float)pLwc->app_time);
 	glUniform2f(pLwc->shader[panel_shader_index].resolution, (float)pLwc->width, (float)pLwc->height);
 	// Panel background

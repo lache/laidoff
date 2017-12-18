@@ -37,7 +37,7 @@ void render_fan(const struct _LWCONTEXT *pLwc, const mat4x4 proj, const mat4x4 v
 
 	float thetascale = (float)(sector_theta / (2 * M_PI));
 
-	glUseProgram(pLwc->shader[shader_index].program);
+	lazy_glUseProgram(pLwc, shader_index);
 	glUniform1fv(pLwc->shader[shader_index].rscale_location, FAN_VERTEX_COUNT_PER_ARRAY, rscale);
 	glUniform1f(pLwc->shader[shader_index].thetascale_location, thetascale);
 	glUniformMatrix4fv(pLwc->shader[shader_index].mvp_location, 1, GL_FALSE, (const GLfloat*)proj_view_model);

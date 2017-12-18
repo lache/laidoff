@@ -111,7 +111,7 @@ void render_enemy_scope(const LWCONTEXT* pLwc, float ux, float uy, float width, 
 		color_preset_index = 3;
 	}
 
-	glUseProgram(pLwc->shader[shader_index].program);
+	lazy_glUseProgram(pLwc, shader_index);
 	glUniform2fv(pLwc->shader[shader_index].vuvoffset_location, 1, default_uv_offset);
 	glUniform2fv(pLwc->shader[shader_index].vuvscale_location, 1, default_uv_scale);
 	glUniform2fv(pLwc->shader[shader_index].vs9offset_location, 1, s9_offset);
@@ -155,7 +155,7 @@ void render_enemy_scope(const LWCONTEXT* pLwc, float ux, float uy, float width, 
 	glBindTexture(GL_TEXTURE_2D, 0);
 	glActiveTexture(GL_TEXTURE0);
 
-	glUseProgram(pLwc->shader[0].program);
+    lazy_glUseProgram(pLwc, 0);
 }
 
 void render_enemy_shadow_3d(
@@ -188,7 +188,7 @@ void render_enemy_shadow_3d(
 
 	int shader_index = LWST_DEFAULT;
 
-	glUseProgram(pLwc->shader[shader_index].program);
+	lazy_glUseProgram(pLwc, shader_index);
 	glUniform2fv(pLwc->shader[shader_index].vuvoffset_location, 1, default_uv_offset);
 	glUniform2fv(pLwc->shader[shader_index].vuvscale_location, 1, default_uv_scale);
 	glUniform1f(pLwc->shader[shader_index].alpha_multiplier_location, alpha_multiplier);
@@ -349,7 +349,7 @@ void render_attack_trail_3d(
 
 	const float uv_offset[2] = { trail->tex_coord, 0 };
 
-	glUseProgram(pLwc->shader[shader_index].program);
+	lazy_glUseProgram(pLwc, shader_index);
 	glUniform2fv(pLwc->shader[shader_index].vuvoffset_location, 1, uv_offset);
 	glUniform2fv(pLwc->shader[shader_index].vuvscale_location, 1, default_uv_scale);
 	glUniform1f(pLwc->shader[shader_index].alpha_multiplier_location, 1);
@@ -383,13 +383,13 @@ void render_attack_trail_3d(
 
 	glUniform1f(pLwc->shader[shader_index].overlay_color_ratio_location, 0);
 
-	glUseProgram(pLwc->shader[0].program);
+    lazy_glUseProgram(pLwc, 0);
 }
 
 static void render_battle_twirl(const LWCONTEXT* pLwc, const mat4x4 view, const mat4x4 proj) {
 	int shader_index = LWST_DEFAULT;
 
-	glUseProgram(pLwc->shader[shader_index].program);
+	lazy_glUseProgram(pLwc, shader_index);
 	glUniform1f(pLwc->shader[shader_index].overlay_color_ratio_location, 0);
 
 	// render vbo #2 (Wall)
@@ -886,7 +886,7 @@ void lwc_render_battle(const LWCONTEXT* pLwc) {
 
 	int shader_index = LWST_DEFAULT;
 
-	glUseProgram(pLwc->shader[shader_index].program);
+	lazy_glUseProgram(pLwc, shader_index);
 
 	glUniform2fv(pLwc->shader[shader_index].vuvoffset_location, 1, default_uv_offset);
 	glUniform2fv(pLwc->shader[shader_index].vuvscale_location, 1, default_uv_scale);

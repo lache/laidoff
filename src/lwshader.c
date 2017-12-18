@@ -121,3 +121,29 @@ void lw_delete_all_shader_program(LWCONTEXT* pLwc) {
         glDeleteProgram(pLwc->shader[i].program);
     }
 }
+
+void lw_create_lazy_shader_program(const LWCONTEXT* _pLwc, LW_SHADER_TYPE shader_index) {
+    LWCONTEXT* pLwc = (LWCONTEXT*)_pLwc;
+    // early-pruning
+    if (pLwc->shader[shader_index].program) {
+        return;
+    }
+    // create vertex shader if not created
+    LW_VERTEX_SHADER lwvs = shader_filename[shader_index].lwvs;
+    if (pLwc->vertex_shader[lwvs] == 0)         {
+        pLwc->vertex_shader[lwvs] = lw_create_vertex_shader(lwvs, vertex_shader_filename[lwvs]);
+    }
+    // create frag shader if not created
+    LW_FRAG_SHADER lwfs = shader_filename[shader_index].lwfs;
+    if (pLwc->frag_shader[lwfs] == 0) {
+        pLwc->frag_shader[lwfs] = lw_create_frag_shader(lwfs, frag_shader_filename[lwfs]);
+    }
+    // create shader program if not created
+    if (pLwc->shader[shader_index].program == 0) {
+        const char* debug_shader_name = shader_filename[shader_index].debug_shader_name;
+        lw_create_shader_program(debug_shader_name,
+                                 &pLwc->shader[shader_index],
+                                 pLwc->vertex_shader[lwvs],
+                                 pLwc->frag_shader[lwfs]);
+    }
+}

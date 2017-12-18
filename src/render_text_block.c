@@ -219,7 +219,7 @@ void render_text_block_alpha(const LWCONTEXT* pLwc, const LWTEXTBLOCK* text_bloc
 
     int shader_index = LWST_FONT;
 
-    glUseProgram(pLwc->shader[shader_index].program);
+    lazy_glUseProgram(pLwc, shader_index);
 
     glUniform2fv(pLwc->shader[shader_index].vuvoffset_location, 1, default_uv_offset);
     glUniform2fv(pLwc->shader[shader_index].vuvscale_location, 1, default_uv_scale);

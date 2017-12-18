@@ -15,7 +15,7 @@ extern LWEMITTER2OBJECT emitter2_object;
 
 static void s_render_rose(const LWCONTEXT* pLwc) {
 	int shader_index = LWST_EMITTER;
-	glUseProgram(pLwc->shader[shader_index].program);
+	lazy_glUseProgram(pLwc, shader_index);
 	glBindBuffer(GL_ARRAY_BUFFER, pLwc->particle_buffer);
 	mat4x4 identity;
 	mat4x4_identity(identity);
@@ -37,7 +37,7 @@ static void s_render_rose(const LWCONTEXT* pLwc) {
 
 void ps_render_explosion(const LWCONTEXT* pLwc, const LWEMITTER2OBJECT* emit_object, const mat4x4 proj_view, const mat4x4 model) {
 	int shader_index = LWST_EMITTER2;
-	glUseProgram(pLwc->shader[shader_index].program);
+	lazy_glUseProgram(pLwc, shader_index);
 	// Uniforms
 	glUniformMatrix4fv(pLwc->shader[shader_index].u_ProjectionViewMatrix, 1, 0, (const GLfloat*)proj_view);
 	glUniformMatrix4fv(pLwc->shader[shader_index].u_ModelMatrix, 1, 0, (const GLfloat*)model);

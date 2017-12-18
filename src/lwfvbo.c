@@ -40,7 +40,7 @@ void render_fvbo(const LWCONTEXT* pLwc, const LWPUCKGAME* puck_game, const mat4x
 
     int shader_index = LWST_DEFAULT_NORMAL;
     const LWSHADER* shader = &pLwc->shader[shader_index];
-    glUseProgram(shader->program);
+    lazy_glUseProgram(pLwc, shader_index);
     glUniform2fv(shader->vuvoffset_location, 1, default_uv_offset);
     glUniform2fv(shader->vuvscale_location, 1, default_uv_scale);
     glUniform2fv(shader->vs9offset_location, 1, default_uv_offset);

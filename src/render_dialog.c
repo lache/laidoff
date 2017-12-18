@@ -11,7 +11,7 @@ static void render_portrait(const LWCONTEXT* pLwc)
 {
 	int shader_index = LWST_ETC1;
 
-	glUseProgram(pLwc->shader[shader_index].program);
+	lazy_glUseProgram(pLwc, shader_index);
 	glUniform2fv(pLwc->shader[shader_index].vuvoffset_location, 1, default_uv_offset);
 	glUniform2fv(pLwc->shader[shader_index].vuvscale_location, 1, default_uv_scale);
 	glUniform1f(pLwc->shader[shader_index].alpha_multiplier_location, 1);
@@ -35,7 +35,7 @@ static void render_dialog_balloon(const LWCONTEXT* pLwc)
 {
 	int shader_index = LWST_DEFAULT;
 
-	glUseProgram(pLwc->shader[shader_index].program);
+	lazy_glUseProgram(pLwc, shader_index);
 	glUniform2fv(pLwc->shader[shader_index].vuvoffset_location, 1, default_uv_offset);
 	glUniform2fv(pLwc->shader[shader_index].vuvscale_location, 1, default_uv_scale);
 	glUniform1f(pLwc->shader[shader_index].alpha_multiplier_location, 0.75f);
@@ -119,7 +119,7 @@ static void render_bg(const LWCONTEXT* pLwc)
 
 	GLenum error_enum;
 	{
-		glUseProgram(pLwc->shader[shader_index].program);
+		lazy_glUseProgram(pLwc, shader_index);
 		error_enum = glGetError();
 		glBindBuffer(GL_ARRAY_BUFFER, pLwc->vertex_buffer[LVT_CENTER_CENTER_ANCHORED_SQUARE].vertex_buffer);
 		error_enum = glGetError();
@@ -154,7 +154,7 @@ void lwc_render_dialog(const LWCONTEXT* pLwc)
 
 	int shader_index = LWST_DEFAULT;
 
-	glUseProgram(pLwc->shader[shader_index].program);
+	lazy_glUseProgram(pLwc, shader_index);
 	glUniform2fv(pLwc->shader[shader_index].vuvoffset_location, 1, default_uv_offset);
 	glUniform2fv(pLwc->shader[shader_index].vuvscale_location, 1, default_uv_scale);
 	glUniform1f(pLwc->shader[shader_index].alpha_multiplier_location, 1);

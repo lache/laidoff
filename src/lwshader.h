@@ -25,12 +25,13 @@ typedef enum _LW_SHADER_TYPE {
     LWST_COUNT,
 } LW_SHADER_TYPE;
 #define MAX_SHADER (LWST_COUNT)
-static const struct {
+typedef struct _LWSHADERFILENAME {
     LW_SHADER_TYPE shader_type;
     const char* debug_shader_name;
     LW_VERTEX_SHADER lwvs;
     LW_FRAG_SHADER lwfs;
-} shader_filename[] = {
+} LWSHADERFILENAME;
+static const LWSHADERFILENAME shader_filename[] = {
     { LWST_DEFAULT, "Default Shader", LWVS_DEFAULT, LWFS_DEFAULT, },
     { LWST_FONT, "Font Shader", LWVS_DEFAULT, LWFS_FONT, },
     { LWST_ETC1, "ETC1 with Alpha Shader", LWVS_DEFAULT, LWFS_ETC1, },
@@ -129,3 +130,4 @@ typedef struct _LWSHADER {
 int lw_create_shader_program(const char* shader_name, LWSHADER* pShader, GLuint vs, GLuint fs);
 void lw_create_all_shader_program(LWCONTEXT* pLwc);
 void lw_delete_all_shader_program(LWCONTEXT* pLwc);
+void lw_create_lazy_shader_program(const LWCONTEXT* _pLwc, LW_SHADER_TYPE shader_index);

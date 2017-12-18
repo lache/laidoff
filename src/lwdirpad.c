@@ -24,7 +24,7 @@ void render_dir_pad(const LWCONTEXT* pLwc, float x, float y) {
     mat4x4 proj_view_model;
     mat4x4_identity(proj_view_model);
     mat4x4_mul(proj_view_model, pLwc->proj, view_model);
-    glUseProgram(pLwc->shader[shader_index].program);
+    lazy_glUseProgram(pLwc, shader_index);
     glBindBuffer(GL_ARRAY_BUFFER, pLwc->vertex_buffer[vbo_index].vertex_buffer);
     bind_all_vertex_attrib(pLwc, vbo_index);
     glUniformMatrix4fv(pLwc->shader[shader_index].mvp_location, 1, GL_FALSE, (const GLfloat*)proj_view_model);
@@ -57,7 +57,7 @@ void render_dir_pad_joystick_type(const LWCONTEXT* pLwc, float x, float y, LW_AT
 
     const LWSHADER* shader = &pLwc->shader[shader_index];
 
-    glUseProgram(shader->program);
+    lazy_glUseProgram(pLwc, shader_index);
     glUniform2fv(shader->vuvoffset_location, 1, default_uv_offset);
     glUniform2fv(shader->vuvscale_location, 1, default_uv_scale);
     glUniform2fv(shader->vs9offset_location, 1, default_uv_offset);

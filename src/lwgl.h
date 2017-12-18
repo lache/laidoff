@@ -2,6 +2,8 @@
 
 #include "platform_detection.h"
 
+typedef struct _LWCONTEXT LWCONTEXT;
+
 #if LW_PLATFORM_WIN32 || LW_PLATFORM_OSX || LW_PLATFORM_LINUX
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
@@ -32,3 +34,5 @@
 #include <EGL/egl.h>
 #include <EGL/eglext.h>
 #endif
+
+void lazy_glUseProgram(const LWCONTEXT* pLwc, int/*LW_SHADER_TYPE*/ shader_index);

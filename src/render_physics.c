@@ -51,7 +51,7 @@ void mult_world_roll(mat4x4 model, int axis, int dir, float angle) {
 static void render_tower_normal(const LWCONTEXT* pLwc, const mat4x4 view, const mat4x4 proj, const LWPUCKGAME* puck_game, const float* pos, const LWPUCKGAMETOWER* tower, int remote) {
     int shader_index = LWST_DEFAULT_NORMAL;
     const LWSHADER* shader = &pLwc->shader[shader_index];
-    glUseProgram(shader->program);
+    lazy_glUseProgram(pLwc, shader_index);
     glUniform2fv(shader->vuvoffset_location, 1, default_uv_offset);
     glUniform2fv(shader->vuvscale_location, 1, default_uv_scale);
     glUniform2fv(shader->vs9offset_location, 1, default_uv_offset);
@@ -168,7 +168,7 @@ static void render_tower_normal(const LWCONTEXT* pLwc, const mat4x4 view, const 
 static void render_tower_normal_2(const LWCONTEXT* pLwc, const mat4x4 view, const mat4x4 proj, const LWPUCKGAME* puck_game, const float* pos, const LWPUCKGAMETOWER* tower, int remote) {
     int shader_index = LWST_DEFAULT_NORMAL;
     const LWSHADER* shader = &pLwc->shader[shader_index];
-    glUseProgram(shader->program);
+    lazy_glUseProgram(pLwc, shader_index);
     glUniform2fv(shader->vuvoffset_location, 1, default_uv_offset);
     glUniform2fv(shader->vuvscale_location, 1, default_uv_scale);
     glUniform2fv(shader->vs9offset_location, 1, default_uv_offset);
@@ -283,7 +283,7 @@ static void render_go(const LWCONTEXT* pLwc,
         return;
     }
     const LWSHADER* shader = &pLwc->shader[shader_index];
-    glUseProgram(shader->program);
+    lazy_glUseProgram(pLwc, shader_index);
     glUniform2fv(shader->vuvoffset_location, 1, default_uv_offset);
     glUniform2fv(shader->vuvscale_location, 1, default_uv_scale);
     glUniform2fv(shader->vs9offset_location, 1, default_uv_offset);
@@ -394,7 +394,7 @@ static void render_radial_wave(const LWCONTEXT* pLwc,
 
     int shader_index = LWST_RADIALWAVE;
     const LWSHADER* shader = &pLwc->shader[shader_index];
-    glUseProgram(shader->program);
+    lazy_glUseProgram(pLwc, shader_index);
     glUniform2fv(shader->vuvoffset_location, 1, uv_offset);
     glUniform2fv(shader->vuvscale_location, 1, uv_scale);
     glUniform2fv(shader->vs9offset_location, 1, default_uv_offset);
@@ -502,7 +502,7 @@ static void render_timer(const LWCONTEXT* pLwc, float remain_sec, float total_se
 
     const LWSHADER* shader = &pLwc->shader[LWST_RINGGAUGE];
 
-    glUseProgram(shader->program);
+    lazy_glUseProgram(pLwc, LWST_RINGGAUGE);
     glUniform3f(shader->full_color, 0, 1, 0);
     glUniform3f(shader->empty_color, 1, 0, 0);
     glUniform1f(shader->gauge_ratio, remain_ratio);
@@ -561,7 +561,7 @@ static void render_dash_ring_gauge(const LWCONTEXT* pLwc, vec4 player_pos, float
     vec2 ui_point;
     calculate_ui_point_from_world_point(pLwc->aspect_ratio, proj_view, player_pos, ui_point);
 
-    glUseProgram(pLwc->shader[LWST_RINGGAUGE].program);
+    lazy_glUseProgram(pLwc, LWST_RINGGAUGE);
     glUniform3f(pLwc->shader[LWST_RINGGAUGE].full_color, 0, 1, 0);
     glUniform3f(pLwc->shader[LWST_RINGGAUGE].empty_color, 1, 0, 0);
     glUniform1f(pLwc->shader[LWST_RINGGAUGE].gauge_ratio, gauge_ratio);
@@ -804,7 +804,7 @@ static void render_wall(const LWCONTEXT* pLwc, const mat4x4 proj, const LWPUCKGA
                         float x_rot, float y_rot, LW_VBO_TYPE lvt, float sx, float sy, float sz,
                         const LWSPHERERENDERUNIFORM* sphere_render_uniform, LW_PUCK_GAME_BOUNDARY boundary) {
     const LWSHADER* shader = &pLwc->shader[shader_index];
-    glUseProgram(shader->program);
+    lazy_glUseProgram(pLwc, shader_index);
     glUniform2fv(shader->vuvoffset_location, 1, default_uv_offset);
     glUniform2fv(shader->vuvscale_location, 1, default_uv_scale);
     glUniform2fv(shader->vs9offset_location, 1, default_uv_offset);
@@ -884,7 +884,7 @@ static void render_wall(const LWCONTEXT* pLwc, const mat4x4 proj, const LWPUCKGA
 static void render_physics_menu(const LWCONTEXT *pLwc, const mat4x4 proj, const mat4x4 view, const LWPUCKGAME *puck_game) {
     int shader_index = LWST_DEFAULT;
     const LWSHADER* shader = &pLwc->shader[shader_index];
-    glUseProgram(shader->program);
+    lazy_glUseProgram(pLwc, shader_index);
     glUniform2fv(shader->vuvoffset_location, 1, default_uv_offset);
     glUniform2fv(shader->vuvscale_location, 1, default_uv_scale);
     glUniform2fv(shader->vs9offset_location, 1, default_uv_offset);
@@ -945,7 +945,7 @@ static void render_physics_menu(const LWCONTEXT *pLwc, const mat4x4 proj, const 
 static void render_floor_cover(const LWCONTEXT *pLwc, const mat4x4 proj, const mat4x4 view, const LWPUCKGAME* puck_game) {
     int shader_index = LWST_DEFAULT;
     const LWSHADER* shader = &pLwc->shader[shader_index];
-    glUseProgram(shader->program);
+    lazy_glUseProgram(pLwc, shader_index);
     glUniform2fv(shader->vuvoffset_location, 1, default_uv_offset);
     glUniform2fv(shader->vuvscale_location, 1, default_uv_scale);
     glUniform2fv(shader->vs9offset_location, 1, default_uv_offset);
@@ -983,7 +983,7 @@ static void render_floor(const LWCONTEXT *pLwc, const mat4x4 proj, const LWPUCKG
                          const LWSPHERERENDERUNIFORM* sphere_render_uniform) {
 
     const LWSHADER* shader = &pLwc->shader[shader_index];
-    glUseProgram(shader->program);
+    lazy_glUseProgram(pLwc, shader_index);
     glUniform2fv(shader->vuvoffset_location, 1, default_uv_offset);
     const float uv_scale[2] = { 4, 4 };
     glUniform2fv(shader->vuvscale_location, 1, uv_scale);
@@ -1203,7 +1203,7 @@ static void render_main_menu(const LWCONTEXT* pLwc, const LWPUCKGAME* puck_game,
 
     const LWSHADER* shader = &pLwc->shader[shader_index];
 
-    glUseProgram(shader->program);
+    lazy_glUseProgram(pLwc, shader_index);
     glUniform2fv(shader->vuvoffset_location, 1, default_uv_offset);
     glUniform2fv(shader->vuvscale_location, 1, default_uv_scale);
     glUniform2fv(shader->vs9offset_location, 1, default_uv_offset);

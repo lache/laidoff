@@ -34,7 +34,7 @@ static void render_field_object_rot(const LWCONTEXT* pLwc, int vbo_index, GLuint
     mat4x4_identity(proj_view_model);
     mat4x4_mul(proj_view_model, proj, view_model);
     
-    glUseProgram(pLwc->shader[shader_index].program);
+    lazy_glUseProgram(pLwc, shader_index);
     glBindBuffer(GL_ARRAY_BUFFER, pLwc->vertex_buffer[vbo_index].vertex_buffer);
     bind_all_vertex_attrib(pLwc, vbo_index);
     glUniformMatrix4fv(pLwc->shader[shader_index].mvp_location, 1, GL_FALSE, (const GLfloat*)proj_view_model);
@@ -591,7 +591,7 @@ void lwc_render_field(const LWCONTEXT* pLwc) {
     
     int shader_index = LWST_DEFAULT;
     
-    glUseProgram(pLwc->shader[shader_index].program);
+    lazy_glUseProgram(pLwc, shader_index);
     glUniform2fv(pLwc->shader[shader_index].vuvoffset_location, 1, default_uv_offset);
     glUniform2fv(pLwc->shader[shader_index].vuvscale_location, 1, default_uv_scale);
     glUniform1f(pLwc->shader[shader_index].alpha_multiplier_location, 1);
