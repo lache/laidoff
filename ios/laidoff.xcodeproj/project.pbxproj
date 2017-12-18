@@ -12,7 +12,7 @@
 		2640E1751FE7E22200504A37 /* lwgl.c in Sources */ = {isa = PBXBuildFile; fileRef = 2640E1711FE7E22200504A37 /* lwgl.c */; };
 		2640E1761FE7E22200504A37 /* lwvertexshader.c in Sources */ = {isa = PBXBuildFile; fileRef = 2640E1721FE7E22200504A37 /* lwvertexshader.c */; };
 		2640E1781FE7E25800504A37 /* lwshader.c in Sources */ = {isa = PBXBuildFile; fileRef = 2640E1771FE7E25800504A37 /* lwshader.c */; };
-		2640E17A1FE7F74E00504A37 /* lwvbo.c in Sources */ = {isa = PBXBuildFile; fileRef = 2640E1791FE7F74E00504A37 /* lwvbo.c */; };
+		2640E17C1FE7F9A900504A37 /* lwvbo.c in Sources */ = {isa = PBXBuildFile; fileRef = 2640E17B1FE7F9A900504A37 /* lwvbo.c */; };
 		2641822E1FB6FD0300BF2D42 /* lwdamagetext.c in Sources */ = {isa = PBXBuildFile; fileRef = 2641822D1FB6FD0300BF2D42 /* lwdamagetext.c */; };
 		264182301FB6FD0900BF2D42 /* lwmath.c in Sources */ = {isa = PBXBuildFile; fileRef = 2641822F1FB6FD0900BF2D42 /* lwmath.c */; };
 		26457DB71FBACE6600FFEE74 /* lwime.c in Sources */ = {isa = PBXBuildFile; fileRef = 26457DB51FBACE6600FFEE74 /* lwime.c */; };
@@ -403,7 +403,7 @@
 		2640E1721FE7E22200504A37 /* lwvertexshader.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = lwvertexshader.c; sourceTree = "<group>"; };
 		2640E1731FE7E22200504A37 /* lwvertexshader.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = lwvertexshader.h; sourceTree = "<group>"; };
 		2640E1771FE7E25800504A37 /* lwshader.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = lwshader.c; sourceTree = "<group>"; };
-		2640E1791FE7F74E00504A37 /* lwvbo.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = lwvbo.c; path = ../../TeamCity/buildAgent/work/e6830395726391b5/src/lwvbo.c; sourceTree = "<group>"; };
+		2640E17B1FE7F9A900504A37 /* lwvbo.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = lwvbo.c; sourceTree = "<group>"; };
 		2641822D1FB6FD0300BF2D42 /* lwdamagetext.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = lwdamagetext.c; sourceTree = "<group>"; };
 		2641822F1FB6FD0900BF2D42 /* lwmath.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = lwmath.c; sourceTree = "<group>"; };
 		26457DB51FBACE6600FFEE74 /* lwime.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = lwime.c; sourceTree = "<group>"; };
@@ -2147,7 +2147,7 @@
 				6C7739A71FB4B5A8001014DE /* lwuidim.c */,
 				6C77392B1FB4B59E001014DE /* lwuidim.h */,
 				6C7739721FB4B5A4001014DE /* lwuniqueid.h */,
-				2640E1791FE7F74E00504A37 /* lwvbo.c */,
+				2640E17B1FE7F9A900504A37 /* lwvbo.c */,
 				6C77399C1FB4B5A7001014DE /* lwvbo.h */,
 				6C7739A61FB4B5A8001014DE /* lwvbotype.h */,
 				2640E1721FE7E22200504A37 /* lwvertexshader.c */,
@@ -2545,7 +2545,7 @@
 				5663733C1EBA52D3001DA3F4 /* collision_trimesh_gimpact.cpp in Sources */,
 				56F188B11EC74DB60019312F /* dist.cpp in Sources */,
 				56F188B01EC74DB60019312F /* dish.cpp in Sources */,
-				2640E17A1FE7F74E00504A37 /* lwvbo.c in Sources */,
+				2640E17C1FE7F9A900504A37 /* lwvbo.c in Sources */,
 				566373301EBA52D3001DA3F4 /* collision_cylinder_box.cpp in Sources */,
 				566373701EBA52D4001DA3F4 /* plane.cpp in Sources */,
 				26457DBD1FBC1C5B00FFEE74 /* lwdirpad.c in Sources */,
