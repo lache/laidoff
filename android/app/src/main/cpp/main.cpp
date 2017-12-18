@@ -11,6 +11,7 @@
 #include <stdlib.h>
 #include <lwtimepoint.h>
 #include <input.h>
+#include <puckgame.h>
 #include "laidoff.h"
 #include "lwlog.h"
 #include "czmq.h"
@@ -543,15 +544,19 @@ static int32_t engine_handle_input(struct android_app* app, AInputEvent* event) 
 			return 1;
         case AINPUT_EVENT_TYPE_KEY:
 			if (AKeyEvent_getKeyCode(event) == AKEYCODE_BACK) {
-				if(AKeyEvent_getAction(event) == AKEY_EVENT_ACTION_DOWN) {
-					// actions on back key
-                    // !! THREAD SAFETY !!
-					//lw_go_back(engine->pLwc, engine->app->activity);
-                    engine->pLwc->android_native_activity = engine->app->activity;
-                    logic_emit_ui_event_async(engine->pLwc, "back_button");
+				if (engine->pLwc && engine->pLwc->puck_game) {
+					if (engine->pLwc->puck_game->game_state == LPGS_MAIN_MENU
+						&& engine->pLwc->game_scene != LGS_LEADERBOARD) {
+						// just android handle this case --> destroy and stop this app "gracefully"
+					} else {
+						if(AKeyEvent_getAction(event) == AKEY_EVENT_ACTION_DOWN) {
+							engine->pLwc->android_native_activity = engine->app;// engine->app->activity;
+							logic_emit_ui_event_async(engine->pLwc, "back_button");
+						}
+						return 1;
+					}
 				}
-				return 1; // <-- uncomment this line to prevent default back button handler called
-			};
+			}
             // handle key input...
             break;
     } // end switch
@@ -608,9 +613,9 @@ static void engine_handle_cmd(struct android_app* app, int32_t cmd) {
         case APP_CMD_TERM_WINDOW:
             LOGI("APP_CMD_TERM_WINDOW");
             // The window is being hidden or closed, clean it up.
-            //eglMakeCurrent(engine->display, EGL_NO_SURFACE, EGL_NO_SURFACE, EGL_NO_CONTEXT);
-            //glFlush();
-            //engine_term_display(engine);
+            eglMakeCurrent(engine->display, EGL_NO_SURFACE, EGL_NO_SURFACE, EGL_NO_CONTEXT);
+            glFlush();
+            engine_term_display(engine);
 
             break;
         case APP_CMD_GAINED_FOCUS:
@@ -885,9 +890,12 @@ extern "C" JNIEXPORT jstring JNICALL Java_com_popsongremix_laidoff_LaidoffNative
     return env->NewStringUTF(hello.c_str());
 }
 
-extern "C" void lw_app_quit(struct _LWCONTEXT* pLwc, void* native_context)
+extern "C" void lw_app_quit(LWCONTEXT* pLwc, void* native_context)
 {
-	ANativeActivity_finish(reinterpret_cast<ANativeActivity*>(native_context));
+	// 'native_context' is 'android_app'
+	struct android_app* android_app = (struct android_app*)native_context;
+	ANativeActivity_finish(android_app->activity);
+	android_app->destroyRequested = 1;
 }
 
 extern "C" void lw_start_text_input_activity(LWCONTEXT* pLwc, int tag) {

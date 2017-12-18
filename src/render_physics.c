@@ -277,11 +277,11 @@ static void render_go(const LWCONTEXT* pLwc,
                       const float* remote_pos,
                       const mat4x4 remote_rot,
                       int remote,
-                      float speed) {
+                      float speed,
+                      int shader_index) {
     if (go->body == 0) {
         return;
     }
-    int shader_index = LWST_DEFAULT;
     const LWSHADER* shader = &pLwc->shader[shader_index];
     glUseProgram(shader->program);
     glUniform2fv(shader->vuvoffset_location, 1, default_uv_offset);
@@ -361,7 +361,7 @@ static void render_go(const LWCONTEXT* pLwc,
     mat4x4_identity(proj_view_model);
     mat4x4_mul(proj_view_model, proj, view_model);
 
-    const LW_VBO_TYPE lvt = LVT_PUCK;
+    const LW_VBO_TYPE lvt = go->red_overlay ? LVT_PUCK : LVT_PUCK_PLAYER;
     glBindBuffer(GL_ARRAY_BUFFER, pLwc->vertex_buffer[lvt].vertex_buffer);
     bind_all_vertex_attrib(pLwc, lvt);
     glActiveTexture(GL_TEXTURE0);
@@ -1756,17 +1756,20 @@ void lwc_render_physics(const LWCONTEXT* pLwc, const mat4x4 view, const mat4x4 p
     const int player_no = pLwc->puck_game->player_no;
     // Game object: Puck
     render_go(pLwc, view, proj, puck_game, &puck_game->go[LPGO_PUCK], pLwc->tex_atlas[LAE_PUCK_GRAY_KTX],
-              1.0f, remote_puck_pos, state->puck_rot, remote, !remote ? puck_game->go[LPGO_PUCK].speed : state->puck_speed);
+              1.0f, remote_puck_pos, state->puck_rot, remote, !remote ? puck_game->go[LPGO_PUCK].speed : state->puck_speed,
+              LWST_DEFAULT);
     // Game object: Player
     render_go(pLwc, view, proj, puck_game, &puck_game->go[LPGO_PLAYER], pLwc->tex_atlas[player_no == 2 ? LAE_PUCK_ENEMY_KTX : LAE_PUCK_PLAYER_KTX],
-              1.0f, remote_player_pos, state->player_rot, remote, 0);
+              1.0f, remote_player_pos, state->player_rot, remote, 0,
+              LWST_DEFAULT);
     if (remote ? state->bf.player_pull : puck_game->remote_control[0].pull_puck) {
         render_radial_wave(pLwc, view, proj, puck_game, &puck_game->go[LPGO_PLAYER], pLwc->tex_atlas[player_no == 2 ? LAE_PUCK_ENEMY_KTX : LAE_PUCK_PLAYER_KTX],
                            1.0f, remote_player_pos, state->player_rot, remote, 0);
     }
     // Game object: Enemy
     render_go(pLwc, view, proj, puck_game, &puck_game->go[LPGO_TARGET], pLwc->tex_atlas[player_no == 2 ? LAE_PUCK_PLAYER_KTX : LAE_PUCK_ENEMY_KTX],
-              1.0f, remote_target_pos, state->target_rot, remote, 0);
+              1.0f, remote_target_pos, state->target_rot, remote, 0,
+              LWST_DEFAULT);
     if (state->bf.target_pull) {
         render_radial_wave(pLwc, view, proj, puck_game, &puck_game->go[LPGO_TARGET], pLwc->tex_atlas[player_no == 2 ? LAE_PUCK_PLAYER_KTX : LAE_PUCK_ENEMY_KTX],
                            1.0f, remote_target_pos, state->target_rot, remote, 0);

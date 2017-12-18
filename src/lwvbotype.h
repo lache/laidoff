@@ -27,7 +27,8 @@ typedef enum _LW_VBO_TYPE
 	LVT_DEVIL,
 	LVT_CRYSTAL,
 	LVT_SPIRAL,
-	LVT_PUCK,
+	LVT_PUCK, // puck itself
+    LVT_PUCK_PLAYER, // player and target
     LVT_TOWER_BASE,
     LVT_TOWER_1,
     LVT_TOWER_2,

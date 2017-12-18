@@ -13,6 +13,7 @@
 #include "puckgame.h"
 #include "lwdirpad.h"
 #include "lwtcpclient.h"
+#include "rmsg.h"
 
 static void convert_touch_coord_to_ui_coord(LWCONTEXT* pLwc, float *x, float *y) {
     if (pLwc->height < pLwc->width) {
@@ -466,13 +467,16 @@ void lw_go_back(LWCONTEXT* pLwc, void* native_context) {
         if (pLwc->puck_game->game_state == LPGS_PRACTICE || pLwc->puck_game->game_state == LPGS_TUTORIAL) {
             puck_game_roll_to_main_menu(pLwc->puck_game);
         } else if (pLwc->puck_game->game_state == LPGS_MAIN_MENU) {
-            lw_app_quit(pLwc, native_context);
+            // if lw_go_back called in logic thread, call to 'lw_app_quit()' will block app forever.
+            // not good.
+            //lw_app_quit(pLwc, native_context);
+            rmsg_quitapp(pLwc, native_context);
         } else if (pLwc->puck_game->game_state == LPGS_BATTLE && pLwc->puck_game->battle_control_ui_alpha == 0) {
             // retrieve updated score and rank for main menu top bar
             tcp_send_querynick(pLwc->tcp, &pLwc->tcp->user_id);
             puck_game_roll_to_main_menu(pLwc->puck_game);
         }
     } else {
-        lw_app_quit(pLwc, native_context);
+        rmsg_quitapp(pLwc, native_context);
     }
 }

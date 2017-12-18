@@ -692,6 +692,9 @@ static void init_vbo(LWCONTEXT* pLwc) {
     // LVT_PUCK
     load_vbo(pLwc, ASSETS_BASE_PATH "vbo" PATH_SEPARATOR "puck.vbo",
              &pLwc->vertex_buffer[LVT_PUCK]);
+    // LVT_PLAYER
+    load_vbo(pLwc, ASSETS_BASE_PATH "vbo" PATH_SEPARATOR "puck-player.vbo",
+             &pLwc->vertex_buffer[LVT_PUCK_PLAYER]);
     // LVT_TOWER_BASE
     load_vbo(pLwc, ASSETS_BASE_PATH "vbo" PATH_SEPARATOR "tower-base.vbo",
              &pLwc->vertex_buffer[LVT_TOWER_BASE]);
@@ -1210,6 +1213,20 @@ void handle_rmsg_bulletspawnheight(LWCONTEXT* pLwc, const LWFIELDRENDERCOMMAND* 
     abort();
 }
 
+void lw_flag_logic_actor_to_quit_and_wait(LWCONTEXT* pLwc) {
+    // set quit request flag to 1 to make notify logic loop quit
+    pLwc->quit_request = 1;
+    // wait for logic loop exit
+    zsock_wait(pLwc->logic_actor);
+}
+
+void handle_rmsg_quitapp(LWCONTEXT* pLwc, const LWFIELDRENDERCOMMAND* cmd) {
+    // quit logic actor(loop)
+    lw_flag_logic_actor_to_quit_and_wait(pLwc);
+    // execute platform-dependent quit process at the end
+    lw_app_quit(pLwc, cmd->native_context);
+}
+
 void delete_all_rmsgs(LWCONTEXT* pLwc) {
     zmq_msg_t rmsg;
     while (1) {
@@ -1257,6 +1274,9 @@ static void read_all_rmsgs(LWCONTEXT* pLwc) {
             break;
         case LRCT_BULLETSPAWNHEIGHT:
             handle_rmsg_bulletspawnheight(pLwc, cmd);
+            break;
+        case LRCT_QUITAPP:
+            handle_rmsg_quitapp(pLwc, cmd);
             break;
         }
         zmq_msg_close(&rmsg);

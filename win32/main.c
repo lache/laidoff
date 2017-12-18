@@ -15,6 +15,7 @@
 #define GLFW_EXPOSE_NATIVE_WIN32
 #include "GLFW/glfw3native.h"
 #endif
+#include "rmsg.h"
 
 #ifndef BOOL
 #define BOOL int
@@ -266,11 +267,11 @@ int main(int argc, char* argv[]) {
         glfwSwapBuffers(window);
 
     }
-    // If glfw loop is terminated without calling 'lw_app_quit'
+    // If glfw loop is terminated without a proper exit procedure ('rmsg_quitapp()')
     // (i.e., by clicking 'X' button on the window)
-    // call lw_app_quit to cleanup the logic thread.
+    // since glfw loop is finished, we just need to close logic loop.
     if (!pLwc->quit_request) {
-        lw_app_quit(pLwc, 0);
+        lw_flag_logic_actor_to_quit_and_wait(pLwc);
     }
 #if LW_PLATFORM_WIN32
     lwimgui_shutdown();
@@ -290,8 +291,6 @@ int main(int argc, char* argv[]) {
 }
 
 void lw_app_quit(LWCONTEXT* pLwc, void* native_context) {
-    pLwc->quit_request = 1;
-    zsock_wait(pLwc->logic_actor);
     glfwSetWindowShouldClose(lw_get_window(pLwc), GLFW_TRUE);
 }
 

@@ -84,3 +84,12 @@ void rmsg_rparams(LWCONTEXT* pLwc, int key, int atlas, int skin_vbo, int armatur
 	cmd->scale[2] = sz;
 	s_send_and_close_rmsg(pLwc, &rmsg);
 }
+
+void rmsg_quitapp(LWCONTEXT* pLwc, void* native_context) {
+    zmq_msg_t rmsg;
+    zmq_msg_init_size(&rmsg, sizeof(LWFIELDRENDERCOMMAND));
+    LWFIELDRENDERCOMMAND* cmd = zmq_msg_data(&rmsg);
+    cmd->cmdtype = LRCT_QUITAPP;
+    cmd->native_context = native_context;
+    s_send_and_close_rmsg(pLwc, &rmsg);
+}

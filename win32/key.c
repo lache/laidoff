@@ -8,6 +8,7 @@
 #include "key.h"
 #include "input.h"
 #include "script.h"
+#include "logic.h"
 #if LW_PLATFORM_WIN32
 #include "lwimgui.h"
 #endif
@@ -104,7 +105,9 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
 
 	if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS) {
         //lw_go_back(pLwc, 0);
-        script_emit_ui_event(pLwc->L, "back_button");
+        // thread-safety.. do not use 'script_emit_ui_event' directly
+        //script_emit_ui_event(pLwc->L, "back_button");
+        logic_emit_ui_event_async(pLwc, "back_button");
 		return;
 	}
 

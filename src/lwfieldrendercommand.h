@@ -13,6 +13,7 @@ typedef enum _LW_RENDER_COMMAND_TYPE {
 	LRCT_ANIM,
 	LRCT_RPARAMS,
 	LRCT_BULLETSPAWNHEIGHT,
+    LRCT_QUITAPP, // render thread == main thread
 } LW_RENDER_COMMAND_TYPE;
 
 typedef struct _LWFIELDRENDERCOMMAND {
@@ -46,6 +47,8 @@ typedef struct _LWFIELDRENDERCOMMAND {
 	LW_VBO_TYPE vbo;
 	// Starting anim marker index for scanning events
 	int anim_marker_search_begin;
+    // native context
+    void* native_context;
 } LWFIELDRENDERCOMMAND;
 
 double rendercommand_animtime(const LWFIELDRENDERCOMMAND* rcmd, double now);
