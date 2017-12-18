@@ -94,3 +94,10 @@ typedef int socklen_t;
 #endif
 
 #define LW_GL_VIEWPORT() glViewport(0, 0, pLwc->width, pLwc->height)
+
+#if LW_PLATFORM_WIN32 || LW_PLATFORM_OSX
+#define LW_GLSL_VERSION_STATEMENT "#version 150\n"
+#else
+#define LW_GLSL_VERSION_STATEMENT "#version 100\n"
+#endif
+#define GLSL_DIR_NAME "glsl"

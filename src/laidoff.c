@@ -55,7 +55,6 @@
 // SWIG output file
 #include "lo_wrap.inl"
 
-#define GLSL_DIR_NAME "glsl"
 #define LW_SUPPORT_ETC1_HARDWARE_DECODING LW_PLATFORM_ANDROID
 #define LW_SUPPORT_VAO (LW_PLATFORM_WIN32 || LW_PLATFORM_OSX || LW_PLATFORM_LINUX)
 
@@ -207,7 +206,7 @@ create_shader(const char *shader_name, LWSHADER *pShader, const GLchar *vst, con
         LOGE("'%s' Vertex Shader Error (length:%d): %s", shader_name, maxLength, errorLog);
         free(errorLog);
 
-        // Provide the infolog in whatever manor you deem best.
+        // Provide the info log in whatever manor you deem best.
         // Exit with failure.
         glDeleteShader(pShader->vertex_shader); // Don't leak the shader.
         return;
@@ -230,7 +229,7 @@ create_shader(const char *shader_name, LWSHADER *pShader, const GLchar *vst, con
         LOGE("'%s' Fragment Shader Error: %s", shader_name, errorLog);
         free(errorLog);
 
-        // Provide the infolog in whatever manor you deem best.
+        // Provide the info log in whatever manor you deem best.
         // Exit with failure.
         glDeleteShader(pShader->fragment_shader); // Don't leak the shader.
         return;
@@ -343,199 +342,9 @@ create_shader(const char *shader_name, LWSHADER *pShader, const GLchar *vst, con
 }
 
 void init_gl_shaders(LWCONTEXT* pLwc) {
-    // Vertex Shader
-    char* default_vert_glsl = create_string_from_file(ASSETS_BASE_PATH
-                                                      GLSL_DIR_NAME PATH_SEPARATOR
-                                                      "default-vert.glsl");
-    char* skin_vert_glsl = create_string_from_file(ASSETS_BASE_PATH
-                                                   GLSL_DIR_NAME PATH_SEPARATOR
-                                                   "skin-vert.glsl");
-    char* fan_vert_glsl = create_string_from_file(ASSETS_BASE_PATH
-                                                  GLSL_DIR_NAME PATH_SEPARATOR
-                                                  "fan-vert.glsl");
-    char* emitter_vert_glsl = create_string_from_file(ASSETS_BASE_PATH
-                                                      GLSL_DIR_NAME PATH_SEPARATOR
-                                                      "emitter-vert.glsl");
-    char* emitter2_vert_glsl = create_string_from_file(ASSETS_BASE_PATH
-                                                       GLSL_DIR_NAME PATH_SEPARATOR
-                                                       "emitter2-vert.glsl");
-    char* sphere_reflect_vert_glsl = create_string_from_file(ASSETS_BASE_PATH
-                                                             GLSL_DIR_NAME PATH_SEPARATOR
-                                                             "sphere-reflect-vert.glsl");
-    char* default_normal_vert_glsl = create_string_from_file(ASSETS_BASE_PATH
-                                                             GLSL_DIR_NAME PATH_SEPARATOR
-                                                             "default-normal-vert.glsl");
-    // Fragment Shader
-    char* default_frag_glsl = create_string_from_file(ASSETS_BASE_PATH
-                                                      GLSL_DIR_NAME PATH_SEPARATOR
-                                                      "default-frag.glsl");
-    char* color_frag_glsl = create_string_from_file(ASSETS_BASE_PATH
-                                                    GLSL_DIR_NAME PATH_SEPARATOR
-                                                    "color-frag.glsl");
-    char* panel_frag_glsl = create_string_from_file(ASSETS_BASE_PATH
-                                                    GLSL_DIR_NAME PATH_SEPARATOR
-                                                    "panel-frag.glsl");
-    char* font_frag_glsl = create_string_from_file(ASSETS_BASE_PATH
-                                                   GLSL_DIR_NAME PATH_SEPARATOR
-                                                   "font-frag.glsl");
-    char* etc1_frag_glsl = create_string_from_file(ASSETS_BASE_PATH
-                                                   GLSL_DIR_NAME PATH_SEPARATOR
-                                                   "etc1-frag.glsl");
-    char* fan_frag_glsl = create_string_from_file(ASSETS_BASE_PATH
-                                                  GLSL_DIR_NAME PATH_SEPARATOR
-                                                  "fan-frag.glsl");
-    char* emitter_frag_glsl = create_string_from_file(ASSETS_BASE_PATH
-                                                      GLSL_DIR_NAME PATH_SEPARATOR
-                                                      "emitter-frag.glsl");
-    char* emitter2_frag_glsl = create_string_from_file(ASSETS_BASE_PATH
-                                                       GLSL_DIR_NAME PATH_SEPARATOR
-                                                       "emitter2-frag.glsl");
-    char* sphere_reflect_frag_glsl = create_string_from_file(ASSETS_BASE_PATH
-                                                             GLSL_DIR_NAME PATH_SEPARATOR
-                                                             "sphere-reflect-frag.glsl");
-    char* sphere_reflect_floor_frag_glsl = create_string_from_file(ASSETS_BASE_PATH
-                                                                   GLSL_DIR_NAME PATH_SEPARATOR
-                                                                   "sphere-reflect-floor-frag.glsl");
-    char* ringgauge_frag_glsl = create_string_from_file(ASSETS_BASE_PATH
-                                                        GLSL_DIR_NAME PATH_SEPARATOR
-                                                        "ringgauge-frag.glsl");
-    char* radialwave_frag_glsl = create_string_from_file(ASSETS_BASE_PATH
-                                                         GLSL_DIR_NAME PATH_SEPARATOR
-                                                         "radialwave-frag.glsl");
-    char* default_normal_frag_glsl = create_string_from_file(ASSETS_BASE_PATH
-                                                             GLSL_DIR_NAME PATH_SEPARATOR
-                                                             "default-normal-frag.glsl");
-
-    if (!default_vert_glsl) {
-        LOGE("init_gl_shaders: default-vert.glsl not loaded. Abort...");
-        return;
-    }
-
-    if (!skin_vert_glsl) {
-        LOGE("init_gl_shaders: skin-vert.glsl not loaded. Abort...");
-        return;
-    }
-
-    if (!fan_vert_glsl) {
-        LOGE("init_gl_shaders: fan-vert.glsl not loaded. Abort...");
-        return;
-    }
-
-    if (!emitter_vert_glsl) {
-        LOGE("init_gl_shaders: emitter-vert.glsl not loaded. Abort...");
-        return;
-    }
-
-    if (!sphere_reflect_vert_glsl) {
-        LOGE("init_gl_shaders: sphere-reflect-vert.glsl not loaded. Abort...");
-        return;
-    }
-
-    if (!default_normal_vert_glsl) {
-        LOGE("init_gl_shaders: default-normal-vert.glsl not loaded. Abort...");
-        return;
-    }
-
-    if (!default_frag_glsl) {
-        LOGE("init_gl_shaders: default-frag.glsl not loaded. Abort...");
-        return;
-    }
-
-    if (!color_frag_glsl) {
-        LOGE("init_gl_shaders: color-frag.glsl not loaded. Abort...");
-        return;
-    }
-
-    if (!panel_frag_glsl) {
-        LOGE("init_gl_shaders: panel-frag.glsl not loaded. Abort...");
-        return;
-    }
-
-    if (!font_frag_glsl) {
-        LOGE("init_gl_shaders: font-frag.glsl not loaded. Abort...");
-        return;
-    }
-
-    if (!etc1_frag_glsl) {
-        LOGE("init_gl_shaders: etc1-frag.glsl not loaded. Abort...");
-        return;
-    }
-
-    if (!fan_frag_glsl) {
-        LOGE("init_gl_shaders: fan-frag.glsl not loaded. Abort...");
-        return;
-    }
-
-    if (!emitter_frag_glsl) {
-        LOGE("init_gl_shaders: emitter-frag.glsl not loaded. Abort...");
-        return;
-    }
-
-    if (!emitter2_frag_glsl) {
-        LOGE("init_gl_shaders: emitter2-frag.glsl not loaded. Abort...");
-        return;
-    }
-
-    if (!sphere_reflect_frag_glsl) {
-        LOGE("init_gl_shaders: sphere-reflect-frag.glsl not loaded. Abort...");
-        return;
-    }
-
-    if (!sphere_reflect_floor_frag_glsl) {
-        LOGE("init_gl_shaders: sphere-reflect-floor-frag.glsl not loaded. Abort...");
-        return;
-    }
-
-    if (!ringgauge_frag_glsl) {
-        LOGE("init_gl_shaders: ringgauge-frag.glsl not loaded. Abort...");
-        return;
-    }
-
-    if (!radialwave_frag_glsl) {
-        LOGE("init_gl_shaders: radialwave-frag.glsl not loaded. Abort...");
-        return;
-    }
-
-    if (!default_normal_frag_glsl) {
-        LOGE("init_gl_shaders: default-normal-frag.glsl not loaded. Abort...");
-        return;
-    }
-
-    create_shader("Default Shader", &pLwc->shader[LWST_DEFAULT], default_vert_glsl, default_frag_glsl);
-    create_shader("Font Shader", &pLwc->shader[LWST_FONT], default_vert_glsl, font_frag_glsl);
-    create_shader("ETC1 with Alpha Shader", &pLwc->shader[LWST_ETC1], default_vert_glsl, etc1_frag_glsl);
-    create_shader("Skin Shader", &pLwc->shader[LWST_SKIN], skin_vert_glsl, default_frag_glsl);
-    create_shader("Fan Shader", &pLwc->shader[LWST_FAN], fan_vert_glsl, fan_frag_glsl);
-    create_shader("Emitter Shader", &pLwc->shader[LWST_EMITTER], emitter_vert_glsl, emitter_frag_glsl);
-    create_shader("Emitter2 Shader", &pLwc->shader[LWST_EMITTER2], emitter2_vert_glsl, emitter2_frag_glsl);
-    create_shader("Color Shader", &pLwc->shader[LWST_COLOR], default_vert_glsl, color_frag_glsl);
-    create_shader("Panel Shader", &pLwc->shader[LWST_PANEL], default_vert_glsl, panel_frag_glsl);
-    create_shader("Sphere Reflect Shader", &pLwc->shader[LWST_SPHERE_REFLECT], sphere_reflect_vert_glsl, sphere_reflect_frag_glsl);
-    create_shader("Sphere Reflect Floor Shader", &pLwc->shader[LWST_SPHERE_REFLECT_FLOOR], sphere_reflect_vert_glsl, sphere_reflect_floor_frag_glsl);
-    create_shader("Ringgauge Shader", &pLwc->shader[LWST_RINGGAUGE], default_vert_glsl, ringgauge_frag_glsl);
-    create_shader("Radial wave Shader", &pLwc->shader[LWST_RADIALWAVE], default_vert_glsl, radialwave_frag_glsl);
-    create_shader("Default Normal Shader", &pLwc->shader[LWST_DEFAULT_NORMAL], default_normal_vert_glsl, default_normal_frag_glsl);
-
-    release_string(default_vert_glsl);
-    release_string(skin_vert_glsl);
-    release_string(fan_vert_glsl);
-    release_string(emitter_vert_glsl);
-    release_string(emitter2_vert_glsl);
-    release_string(sphere_reflect_vert_glsl);
-    release_string(default_normal_vert_glsl);
-    release_string(default_frag_glsl);
-    release_string(color_frag_glsl);
-    release_string(panel_frag_glsl);
-    release_string(font_frag_glsl);
-    release_string(etc1_frag_glsl);
-    release_string(fan_frag_glsl);
-    release_string(emitter_frag_glsl);
-    release_string(emitter2_frag_glsl);
-    release_string(sphere_reflect_frag_glsl);
-    release_string(sphere_reflect_floor_frag_glsl);
-    release_string(ringgauge_frag_glsl);
-    release_string(radialwave_frag_glsl);
-    release_string(default_normal_frag_glsl);
+    lw_create_all_vertex_shader(pLwc);
+    lw_create_all_frag_shader(pLwc);
+    lw_create_all_shader_program(pLwc);
 }
 
 static void load_vbo(LWCONTEXT* pLwc, const char* filename, LWVBO* pVbo) {
@@ -957,7 +766,7 @@ static void init_ps_vao(LWCONTEXT* pLwc, int shader_index) {
 
 void lw_clear_color() {
     // Alpha component should be 1 in RPI platform.
-    glClearColor(90 / 255.f, 173 / 255.f, 255 / 255.f, 1);
+    glClearColor(0x44 / 255.f, 0x4c / 255.f, 0x50 / 255.f, 1);
 }
 
 void init_ps(LWCONTEXT* pLwc) {
@@ -982,6 +791,10 @@ static void init_gl_context(LWCONTEXT* pLwc) {
     init_fan_vao(pLwc, LWST_FAN);
 
     init_ps_vao(pLwc, LWST_EMITTER2);
+
+    init_load_textures(pLwc);
+
+    pLwc->pFnt = load_fnt(ASSETS_BASE_PATH "fnt" PATH_SEPARATOR "test6.fnt");
 
     // Enable culling (CCW is default)
     glEnable(GL_CULL_FACE);
@@ -1938,10 +1751,6 @@ LWCONTEXT* lw_init_initial_size(int width, int height) {
 
     init_gl_context(pLwc);
 
-    init_load_textures(pLwc);
-
-    pLwc->pFnt = load_fnt(ASSETS_BASE_PATH "fnt" PATH_SEPARATOR "test6.fnt");
-
     pLwc->def_sys_msg = init_sys_msg();
 
     pLwc->update_dt = deltatime_new();
@@ -2099,9 +1908,9 @@ void lw_deinit(LWCONTEXT* pLwc) {
     glDeleteVertexArrays(PS_VERTEX_BUFFER_COUNT, pLwc->ps_vao);
 #endif
 
-    for (int i = 0; i < LWST_COUNT; i++) {
-        delete_shader(&pLwc->shader[i]);
-    }
+    lw_delete_all_shader_program(pLwc);
+    lw_delete_all_vertex_shader(pLwc);
+    lw_delete_all_frag_shader(pLwc);
 
     for (int i = 0; i < LWAC_COUNT; i++) {
         unload_action(&pLwc->action[i]);

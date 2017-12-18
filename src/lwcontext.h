@@ -50,26 +50,6 @@ LwStaticAssert(sizeof(LWSKINVERTEX) == (GLsizei)(sizeof(float) * (3 + 3 + 2 + 4)
 static const GLsizei fan_stride_in_bytes = (GLsizei)(sizeof(float) * 3);
 LwStaticAssert(sizeof(LWFANVERTEX) == (GLsizei)(sizeof(float) * 3), "LWFANVERTEX size error");
 
-typedef enum _LW_SHADER_TYPE {
-	LWST_DEFAULT,
-	LWST_FONT,
-	LWST_ETC1,
-	LWST_SKIN,
-	LWST_FAN,
-	LWST_EMITTER,
-	LWST_EMITTER2,
-	LWST_COLOR,
-	LWST_PANEL,
-	LWST_SPHERE_REFLECT,
-    LWST_SPHERE_REFLECT_FLOOR,
-    LWST_RINGGAUGE,
-    LWST_RADIALWAVE,
-    LWST_DEFAULT_NORMAL,
-
-	LWST_COUNT,
-} LW_SHADER_TYPE;
-
-#define MAX_SHADER (LWST_COUNT)
 #define MAX_ANIM_COUNT (10)
 #define ANIM_FPS (60)
 #define MAX_TOUCHPROC_COUNT (10)
@@ -123,7 +103,11 @@ typedef struct _LWCONTEXT {
 	int height;
     // Screen aspect ratio
     float aspect_ratio;
-	// Shader array
+    // Vertex shader array
+    GLuint vertex_shader[LWVS_COUNT];
+    // Fragment shader array
+    GLuint frag_shader[LWFS_COUNT];
+	// Shader program array
 	LWSHADER shader[MAX_SHADER];
 	// General VBO
 	LWVBO vertex_buffer[VERTEX_BUFFER_COUNT];

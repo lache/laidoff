@@ -1,6 +1,52 @@
 #pragma once
 
 #include "lwgl.h"
+#include "lwvertexshader.h"
+#include "lwfragshader.h"
+
+typedef struct _LWCONTEXT LWCONTEXT;
+
+typedef enum _LW_SHADER_TYPE {
+    LWST_DEFAULT,
+    LWST_FONT,
+    LWST_ETC1,
+    LWST_SKIN,
+    LWST_FAN,
+    LWST_EMITTER,
+    LWST_EMITTER2,
+    LWST_COLOR,
+    LWST_PANEL,
+    LWST_SPHERE_REFLECT,
+    LWST_SPHERE_REFLECT_FLOOR,
+    LWST_RINGGAUGE,
+    LWST_RADIALWAVE,
+    LWST_DEFAULT_NORMAL,
+
+    LWST_COUNT,
+} LW_SHADER_TYPE;
+#define MAX_SHADER (LWST_COUNT)
+static const struct {
+    LW_SHADER_TYPE shader_type;
+    const char* debug_shader_name;
+    LW_VERTEX_SHADER lwvs;
+    LW_FRAG_SHADER lwfs;
+} shader_filename[] = {
+    { LWST_DEFAULT, "Default Shader", LWVS_DEFAULT, LWFS_DEFAULT, },
+    { LWST_FONT, "Font Shader", LWVS_DEFAULT, LWFS_FONT, },
+    { LWST_ETC1, "ETC1 with Alpha Shader", LWVS_DEFAULT, LWFS_ETC1, },
+    { LWST_SKIN, "Skin Shader", LWVS_SKIN, LWFS_DEFAULT, },
+    { LWST_FAN, "Fan Shader", LWVS_FAN, LWFS_FAN, },
+    { LWST_EMITTER, "Emitter Shader", LWVS_EMITTER, LWFS_EMITTER, },
+    { LWST_EMITTER2, "Emitter2 Shader", LWVS_EMITTER2, LWFS_EMITTER2, },
+    { LWST_COLOR, "Color Shader", LWVS_DEFAULT, LWFS_COLOR, },
+    { LWST_PANEL, "Panel Shader", LWVS_DEFAULT, LWFS_PANEL, },
+    { LWST_SPHERE_REFLECT, "Sphere Reflect Shader", LWVS_SPHERE_REFLECT, LWFS_SPHERE_REFLECT, },
+    { LWST_SPHERE_REFLECT_FLOOR, "Sphere Reflect Floor Shader", LWVS_SPHERE_REFLECT, LWFS_SPHERE_REFLECT_FLOOR, },
+    { LWST_RINGGAUGE, "Ringgauge Shader", LWVS_DEFAULT, LWFS_RINGGAUGE, },
+    { LWST_RADIALWAVE, "Radial wave Shader", LWVS_DEFAULT, LWFS_RADIALWAVE, },
+    { LWST_DEFAULT_NORMAL, "Default Normal Shader", LWVS_DEFAULT_NORMAL, LWFS_DEFAULT_NORMAL, },
+};
+LwStaticAssert(ARRAY_SIZE(shader_filename) == LWST_COUNT, "LWST_COUNT error");
 
 typedef struct _LWSHADER {
 	int valid;
@@ -79,3 +125,7 @@ typedef struct _LWSHADER {
     GLint empty_color;
     GLint wrap_offset;
 } LWSHADER;
+
+int lw_create_shader_program(const char* shader_name, LWSHADER* pShader, GLuint vs, GLuint fs);
+void lw_create_all_shader_program(LWCONTEXT* pLwc);
+void lw_delete_all_shader_program(LWCONTEXT* pLwc);
