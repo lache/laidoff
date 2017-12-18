@@ -1,12 +1,16 @@
+#include "platform_detection.h"
 #include <stdio.h>
 #include "lwlog.h"
 #include "lwuniqueid.h"
 #include "lwmacro.h"
 #include <string.h>
 #include <stdlib.h>
+// needed for 'mkdir()' call
+#if !LW_PLATFORM_WIN32
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <unistd.h>
+#endif
 
 void concat_path(char* path, const char* path1, const char* path2) {
 	if (path1) {
@@ -45,10 +49,12 @@ int get_cached_user_id(const char* path_prefix, LWUNIQUEID* id) {
 }
 
 int save_cached_user_id(const char* path_prefix, const LWUNIQUEID* id) {
+#if !LW_PLATFORM_WIN32
     struct stat st = {0};
     if (stat(path_prefix, &st) == -1) {
         mkdir(path_prefix, 0700);
     }
+#endif
 	FILE* f;
 	char path[1024] = { 0, };
 	concat_path(path, path_prefix, LW_USER_ID_CACHE_FILE);
