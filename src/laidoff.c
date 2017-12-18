@@ -504,10 +504,18 @@ void set_ps_vertex_attrib_pointer(const LWCONTEXT* pLwc, int shader_index) {
     glVertexAttribPointer(pLwc->shader[shader_index].a_pColorOffset, 3, GL_FLOAT, GL_FALSE, sizeof(LWPARTICLE2), (void*)(LWOFFSETOF(LWPARTICLE2, pColorOffset)));
 }
 
-static void init_vao(LWCONTEXT* pLwc, int shader_index) {
+static void gen_all_vao(LWCONTEXT* pLwc) {
     // Vertex Array Objects
 #if LW_SUPPORT_VAO
     glGenVertexArrays(VERTEX_BUFFER_COUNT, pLwc->vao);
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+    glBindVertexArray(0);
+#endif
+}
+
+static void init_vao(LWCONTEXT* pLwc) {
+    // Vertex Array Objects
+#if LW_SUPPORT_VAO
     for (int i = 0; i < VERTEX_BUFFER_COUNT; i++) {
         glBindVertexArray(pLwc->vao[i]);
         glBindBuffer(GL_ARRAY_BUFFER, pLwc->vertex_buffer[i].vertex_buffer);
@@ -527,7 +535,7 @@ static void init_vao(LWCONTEXT* pLwc, int shader_index) {
                    || i == LVT_TOWER_5) {
             set_vertex_attrib_pointer(pLwc, LWST_DEFAULT_NORMAL);
         } else {
-            set_vertex_attrib_pointer(pLwc, shader_index);
+            set_vertex_attrib_pointer(pLwc, LWST_DEFAULT);
         }
     }
     glBindBuffer(GL_ARRAY_BUFFER, 0);
@@ -606,41 +614,32 @@ void init_ps(LWCONTEXT* pLwc) {
 
 static void init_gl_context(LWCONTEXT* pLwc) {
     init_gl_shaders(pLwc);
-
     init_vbo(pLwc);
     init_fvbo(pLwc);
     init_fanim(pLwc);
     // Particle system's VAOs are configured here. Should be called before setting VAOs.
     init_ps(pLwc);
-
-    init_vao(pLwc, 0/* ??? */);
-    init_fvao(pLwc, LWST_DEFAULT_NORMAL/* ??? */);
-
+    // Vertex Array Objects (used only when LW_SUPPORT_VAO is set)
+    gen_all_vao(pLwc);
+    init_vao(pLwc);
+    init_fvao(pLwc, LWST_DEFAULT_NORMAL);
     init_skin_vao(pLwc, LWST_SKIN);
-
     init_fan_vao(pLwc, LWST_FAN);
-
     init_ps_vao(pLwc, LWST_EMITTER2);
-
+    // load all textures
     init_load_textures(pLwc);
-
+    // load font metadata
     pLwc->pFnt = load_fnt(ASSETS_BASE_PATH "fnt" PATH_SEPARATOR "test6.fnt");
-
     // Enable culling (CCW is default)
     glEnable(GL_CULL_FACE);
-
-    //glEnable(GL_ALPHA_TEST);
-    //glCullFace(GL_CW);
-    //glDisable(GL_CULL_FACE);
+    // set default clear color
     lw_clear_color();
-
+    // set default blend mode
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-    //glBlendFunc(GL_ONE, GL_ONE);
-
+    // enable depth test
     glEnable(GL_DEPTH_TEST);
     glDepthFunc(GL_LEQUAL);
-    //glDepthMask(GL_TRUE);
 }
 
 void delete_font_fbo(LWCONTEXT* pLwc) {
