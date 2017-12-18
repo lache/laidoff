@@ -19,7 +19,7 @@ static void render_portrait(const LWCONTEXT* pLwc)
 	glUniform1i(pLwc->shader[shader_index].alpha_only_location, 1); // 1 means GL_TEXTURE1
 	glUniformMatrix4fv(pLwc->shader[shader_index].mvp_location, 1, GL_FALSE, (const GLfloat*)pLwc->proj);
 
-	glBindBuffer(GL_ARRAY_BUFFER, pLwc->vertex_buffer[LVT_CENTER_CENTER_ANCHORED_SQUARE].vertex_buffer);
+    lazy_glBindBuffer(pLwc, LVT_CENTER_CENTER_ANCHORED_SQUARE);
 	bind_all_vertex_attrib_etc1_with_alpha(pLwc, LVT_CENTER_CENTER_ANCHORED_SQUARE);
 	glUniform1f(pLwc->shader[shader_index].overlay_color_ratio_location, 0);
 	glActiveTexture(GL_TEXTURE0);
@@ -73,7 +73,7 @@ static void render_dialog_balloon(const LWCONTEXT* pLwc)
 	mat4x4_identity(proj_view_model);
 	mat4x4_mul(proj_view_model, pLwc->proj, view_model);
 
-	glBindBuffer(GL_ARRAY_BUFFER, pLwc->vertex_buffer[LVT_CENTER_BOTTOM_ANCHORED_SQUARE].vertex_buffer);
+    lazy_glBindBuffer(pLwc, LVT_CENTER_BOTTOM_ANCHORED_SQUARE);
 	bind_all_vertex_attrib(pLwc, LVT_CENTER_BOTTOM_ANCHORED_SQUARE);
 	glUniform1f(pLwc->shader[shader_index].overlay_color_ratio_location, 0);
 	glActiveTexture(GL_TEXTURE0);
@@ -121,7 +121,7 @@ static void render_bg(const LWCONTEXT* pLwc)
 	{
 		lazy_glUseProgram(pLwc, shader_index);
 		error_enum = glGetError();
-		glBindBuffer(GL_ARRAY_BUFFER, pLwc->vertex_buffer[LVT_CENTER_CENTER_ANCHORED_SQUARE].vertex_buffer);
+        lazy_glBindBuffer(pLwc, LVT_CENTER_CENTER_ANCHORED_SQUARE);
 		error_enum = glGetError();
 		bind_all_vertex_attrib(pLwc, LVT_CENTER_CENTER_ANCHORED_SQUARE);
 		glUniformMatrix4fv(pLwc->shader[shader_index].mvp_location, 1, GL_FALSE, (const GLfloat *)proj_view_model);

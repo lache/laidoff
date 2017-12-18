@@ -101,3 +101,5 @@ typedef int socklen_t;
 #define LW_GLSL_VERSION_STATEMENT "#version 100\n"
 #endif
 #define GLSL_DIR_NAME "glsl"
+
+#define LW_SUPPORT_VAO (LW_PLATFORM_WIN32 || LW_PLATFORM_OSX || LW_PLATFORM_LINUX)

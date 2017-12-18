@@ -35,7 +35,7 @@ static void render_field_object_rot(const LWCONTEXT* pLwc, int vbo_index, GLuint
     mat4x4_mul(proj_view_model, proj, view_model);
     
     lazy_glUseProgram(pLwc, shader_index);
-    glBindBuffer(GL_ARRAY_BUFFER, pLwc->vertex_buffer[vbo_index].vertex_buffer);
+    lazy_glBindBuffer(pLwc, vbo_index);
     bind_all_vertex_attrib(pLwc, vbo_index);
     glUniformMatrix4fv(pLwc->shader[shader_index].mvp_location, 1, GL_FALSE, (const GLfloat*)proj_view_model);
     glBindTexture(GL_TEXTURE_2D, tex_id);
@@ -74,7 +74,7 @@ static void render_ground(const LWCONTEXT* pLwc, const mat4x4 view, const mat4x4
     mat4x4_identity(proj_view_model);
     mat4x4_mul(proj_view_model, proj, view_model);
     
-    glBindBuffer(GL_ARRAY_BUFFER, pLwc->vertex_buffer[vbo_index].vertex_buffer);
+    lazy_glBindBuffer(pLwc, vbo_index);
     bind_all_vertex_attrib(pLwc, vbo_index);
     glUniformMatrix4fv(pLwc->shader[shader_index].mvp_location, 1, GL_FALSE, (const GLfloat*)proj_view_model);
     glBindTexture(GL_TEXTURE_2D, pLwc->tex_programmed[LPT_GRID]);

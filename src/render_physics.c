@@ -153,7 +153,7 @@ static void render_tower_normal(const LWCONTEXT* pLwc, const mat4x4 view, const 
         glUniform3f(shader->overlay_color_location, r, g, b);
         const LW_VBO_TYPE lvt = d->lvt;
 
-        glBindBuffer(GL_ARRAY_BUFFER, pLwc->vertex_buffer[lvt].vertex_buffer);
+        lazy_glBindBuffer(pLwc, lvt);
         bind_all_vertex_attrib(pLwc, lvt);
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, 0);
@@ -228,7 +228,7 @@ static void render_tower_normal_2(const LWCONTEXT* pLwc, const mat4x4 view, cons
         glUniform3f(shader->overlay_color_location, r, g, b);
         const LW_VBO_TYPE lvt = d->lvt;
         
-        glBindBuffer(GL_ARRAY_BUFFER, pLwc->vertex_buffer[lvt].vertex_buffer);
+        lazy_glBindBuffer(pLwc, lvt);
         bind_all_vertex_attrib(pLwc, lvt);
         glActiveTexture(GL_TEXTURE0);
         
@@ -362,7 +362,7 @@ static void render_go(const LWCONTEXT* pLwc,
     mat4x4_mul(proj_view_model, proj, view_model);
 
     const LW_VBO_TYPE lvt = go->red_overlay ? LVT_PUCK : LVT_PUCK_PLAYER;
-    glBindBuffer(GL_ARRAY_BUFFER, pLwc->vertex_buffer[lvt].vertex_buffer);
+    lazy_glBindBuffer(pLwc, lvt);
     bind_all_vertex_attrib(pLwc, lvt);
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, tex_index);
@@ -427,7 +427,7 @@ static void render_radial_wave(const LWCONTEXT* pLwc,
     glDepthMask(GL_FALSE);
 
     const LW_VBO_TYPE lvt = LVT_RADIALWAVE;
-    glBindBuffer(GL_ARRAY_BUFFER, pLwc->vertex_buffer[lvt].vertex_buffer);
+    lazy_glBindBuffer(pLwc, lvt);
     bind_all_vertex_attrib(pLwc, lvt);
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, pLwc->tex_atlas[LAE_LINEARWAVE]);
@@ -870,7 +870,7 @@ static void render_wall(const LWCONTEXT* pLwc, const mat4x4 proj, const LWPUCKGA
 
     //glUniformMatrix4fv(shader->mvp_location, 1, GL_FALSE, (const GLfloat*)proj_view_model);
 
-    glBindBuffer(GL_ARRAY_BUFFER, pLwc->vertex_buffer[lvt].vertex_buffer);
+    lazy_glBindBuffer(pLwc, lvt);
     bind_all_vertex_attrib(pLwc, lvt);
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, tex_index);
@@ -928,7 +928,7 @@ static void render_physics_menu(const LWCONTEXT *pLwc, const mat4x4 proj, const 
 
     const LW_VBO_TYPE lvt = LVT_PHYSICS_MENU;
 
-    glBindBuffer(GL_ARRAY_BUFFER, pLwc->vertex_buffer[lvt].vertex_buffer);
+    lazy_glBindBuffer(pLwc, lvt);
     bind_all_vertex_attrib(pLwc, lvt);
 
     glActiveTexture(GL_TEXTURE0);
@@ -969,7 +969,7 @@ static void render_floor_cover(const LWCONTEXT *pLwc, const mat4x4 proj, const m
     mat4x4 proj_view_model;
     mat4x4_identity(proj_view_model);
     mat4x4_mul(proj_view_model, proj, view_model);
-    glBindBuffer(GL_ARRAY_BUFFER, pLwc->vertex_buffer[LVT_PUCK_FLOOR_COVER].vertex_buffer);
+    lazy_glBindBuffer(pLwc, LVT_PUCK_FLOOR_COVER);
     bind_all_vertex_attrib(pLwc, LVT_PUCK_FLOOR_COVER);
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, pLwc->tex_atlas[LAE_PUCK_FLOOR_COVER]);
@@ -1037,7 +1037,7 @@ static void render_floor(const LWCONTEXT *pLwc, const mat4x4 proj, const LWPUCKG
 
     const LW_VBO_TYPE lvt = LVT_CENTER_CENTER_ANCHORED_SQUARE;
 
-    glBindBuffer(GL_ARRAY_BUFFER, pLwc->vertex_buffer[lvt].vertex_buffer);
+    lazy_glBindBuffer(pLwc, lvt);
     bind_all_vertex_attrib(pLwc, lvt);
 
     glActiveTexture(GL_TEXTURE0);
@@ -1212,7 +1212,7 @@ static void render_main_menu(const LWCONTEXT* pLwc, const LWPUCKGAME* puck_game,
     glUniform3f(shader->overlay_color_location, 1, 1, 1);
     glUniform1f(shader->overlay_color_ratio_location, 0);
 
-    glBindBuffer(GL_ARRAY_BUFFER, pLwc->vertex_buffer[vbo_index].vertex_buffer);
+    lazy_glBindBuffer(pLwc, vbo_index);
     bind_all_vertex_attrib(pLwc, vbo_index);
     glUniformMatrix4fv(shader->mvp_location, 1, GL_FALSE, (const GLfloat*)proj_view_model);
     glActiveTexture(GL_TEXTURE0);

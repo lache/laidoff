@@ -10,3 +10,5 @@ typedef struct _LWVBO
 
 void lw_load_vbo(LWCONTEXT* pLwc, const char* filename, LWVBO* pVbo);
 void lw_load_all_vbo(LWCONTEXT* pLwc);
+void lazy_glBindBuffer(const LWCONTEXT* pLwc, int lvt);
+void lw_setup_vao(LWCONTEXT* pLwc, int lvt);

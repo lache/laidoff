@@ -119,7 +119,7 @@ void render_enemy_scope(const LWCONTEXT* pLwc, float ux, float uy, float width, 
 	glUniform1i(pLwc->shader[shader_index].diffuse_location, 0); // 0 means GL_TEXTURE0
 	glUniform1i(pLwc->shader[shader_index].alpha_only_location, 1); // 1 means GL_TEXTURE1
 
-	glBindBuffer(GL_ARRAY_BUFFER, pLwc->vertex_buffer[lvt].vertex_buffer);
+	lazy_glBindBuffer(pLwc, lvt);
 	bind_all_vertex_attrib_etc1_with_alpha(pLwc, lvt);
 	glUniformMatrix4fv(pLwc->shader[shader_index].mvp_location, 1, GL_FALSE,
 		(const GLfloat *)proj_view_model);
@@ -197,7 +197,7 @@ void render_enemy_shadow_3d(
 
 	LW_VBO_TYPE lvt = LVT_CENTER_CENTER_ANCHORED_SQUARE;
 
-	glBindBuffer(GL_ARRAY_BUFFER, pLwc->vertex_buffer[lvt].vertex_buffer);
+	lazy_glBindBuffer(pLwc, lvt);
 	bind_all_vertex_attrib(pLwc, lvt);
 	glUniformMatrix4fv(pLwc->shader[shader_index].mvp_location, 1, GL_FALSE,
 		(const GLfloat *)pvm);
@@ -260,7 +260,7 @@ void render_enemy_3d(
 	glUniform1f(pLwc->shader[shader_index].alpha_multiplier_location, 1.0f - overlay[4]);
 
 	{
-		glBindBuffer(GL_ARRAY_BUFFER, pLwc->vertex_buffer[lvt].vertex_buffer);
+		lazy_glBindBuffer(pLwc, lvt);
 		bind_all_vertex_attrib(pLwc, lvt);
 		glUniformMatrix4fv(pLwc->shader[shader_index].mvp_location, 1, GL_FALSE,
 			(const GLfloat *)proj_view_model);
@@ -356,7 +356,7 @@ void render_attack_trail_3d(
 	glUniform1i(pLwc->shader[shader_index].diffuse_location, 0); // 0 means GL_TEXTURE0
 	glUniform1i(pLwc->shader[shader_index].alpha_only_location, 1); // 1 means GL_TEXTURE1
 
-	glBindBuffer(GL_ARRAY_BUFFER, pLwc->vertex_buffer[lvt].vertex_buffer);
+	lazy_glBindBuffer(pLwc, lvt);
 	bind_all_vertex_attrib(pLwc, lvt);
 	glUniformMatrix4fv(pLwc->shader[shader_index].mvp_location, 1, GL_FALSE,
 		(const GLfloat *)proj_view_model);
@@ -411,7 +411,7 @@ static void render_battle_twirl(const LWCONTEXT* pLwc, const mat4x4 view, const 
 		const float uv_scale[2] = { 1, 1 };
 		glUniform2fv(pLwc->shader[shader_index].vuvscale_location, 1, uv_scale);
 
-		glBindBuffer(GL_ARRAY_BUFFER, pLwc->vertex_buffer[LVT_BATTLE_BOWL_INNER].vertex_buffer);
+        lazy_glBindBuffer(pLwc, LVT_BATTLE_BOWL_INNER);
 		bind_all_vertex_attrib(pLwc, LVT_BATTLE_BOWL_INNER);
 		glUniformMatrix4fv(pLwc->shader[shader_index].mvp_location, 1, GL_FALSE, (const GLfloat*)proj_view_model);
 		glBindTexture(GL_TEXTURE_2D, pLwc->tex_atlas[LAE_TWIRL_PNG]);
@@ -438,7 +438,7 @@ static void render_battle_twirl(const LWCONTEXT* pLwc, const mat4x4 view, const 
 		const float uv_scale[2] = { 1, 1 };
 		glUniform2fv(pLwc->shader[shader_index].vuvscale_location, 1, uv_scale);
 
-		glBindBuffer(GL_ARRAY_BUFFER, pLwc->vertex_buffer[LVT_BATTLE_BOWL_OUTER].vertex_buffer);
+        lazy_glBindBuffer(pLwc, LVT_BATTLE_BOWL_OUTER);
 		bind_all_vertex_attrib(pLwc, LVT_BATTLE_BOWL_OUTER);
 		glUniformMatrix4fv(pLwc->shader[shader_index].mvp_location, 1, GL_FALSE, (const GLfloat*)proj_view_model);
 		glBindTexture(GL_TEXTURE_2D, pLwc->tex_atlas[LAE_TWIRL_PNG]);

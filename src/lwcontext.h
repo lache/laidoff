@@ -121,6 +121,7 @@ typedef struct _LWCONTEXT {
     LWFANIM fanim[LFAT_COUNT];
 	// General mesh VAO
 	GLuint vao[VERTEX_BUFFER_COUNT];
+    int vao_ready[VERTEX_BUFFER_COUNT];
     // General fracture VAO
     GLuint fvao[LFT_COUNT];
 	// Skinned mesh VAO

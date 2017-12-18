@@ -108,7 +108,7 @@ static void s_create_left_button_bg_vbo(LWCONTEXT* pLwc) {
 	const LW_VBO_TYPE lvt = LVT_UI_LEFT_BUTTON_BG;
 
 	glGenBuffers(1, &pLwc->vertex_buffer[lvt].vertex_buffer);
-	glBindBuffer(GL_ARRAY_BUFFER, pLwc->vertex_buffer[lvt].vertex_buffer);
+    glBindBuffer(GL_ARRAY_BUFFER, pLwc->vertex_buffer[lvt].vertex_buffer);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(LWVERTEX) * ARRAY_SIZE(left_button_bg),
 		square_vertices, GL_STATIC_DRAW);
 	pLwc->vertex_buffer[lvt].vertex_count = ARRAY_SIZE(left_button_bg);
@@ -148,7 +148,7 @@ static void s_create_full_panel_bg_vbo(LWCONTEXT* pLwc) {
 	const LW_VBO_TYPE lvt = LVT_UI_FULL_PANEL_BG;
 
 	glGenBuffers(1, &pLwc->vertex_buffer[lvt].vertex_buffer);
-	glBindBuffer(GL_ARRAY_BUFFER, pLwc->vertex_buffer[lvt].vertex_buffer);
+    glBindBuffer(GL_ARRAY_BUFFER, pLwc->vertex_buffer[lvt].vertex_buffer);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(LWVERTEX) * ARRAY_SIZE(full_panel_bg),
 		square_vertices, GL_STATIC_DRAW);
 	pLwc->vertex_buffer[lvt].vertex_count = ARRAY_SIZE(full_panel_bg);
@@ -214,7 +214,7 @@ static void s_create_button_bg_vbo(LWCONTEXT* pLwc) {
 	const LW_VBO_TYPE lvt = LVT_UI_BUTTON_BG;
 
 	glGenBuffers(1, &pLwc->vertex_buffer[lvt].vertex_buffer);
-	glBindBuffer(GL_ARRAY_BUFFER, pLwc->vertex_buffer[lvt].vertex_buffer);
+    glBindBuffer(GL_ARRAY_BUFFER, pLwc->vertex_buffer[lvt].vertex_buffer);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(LWVERTEX) * ARRAY_SIZE(btn_bg),
 		square_vertices, GL_STATIC_DRAW);
 	pLwc->vertex_buffer[lvt].vertex_count = ARRAY_SIZE(btn_bg);

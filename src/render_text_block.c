@@ -236,7 +236,7 @@ void render_text_block_alpha(const LWCONTEXT* pLwc, const LWTEXTBLOCK* text_bloc
 
     LW_VBO_TYPE lvt = LVT_LEFT_TOP_ANCHORED_SQUARE + (text_block->align - LTBA_LEFT_TOP);
 
-    glBindBuffer(GL_ARRAY_BUFFER, pLwc->vertex_buffer[lvt].vertex_buffer);
+    lazy_glBindBuffer(pLwc, lvt);
     bind_all_vertex_attrib_font(pLwc, lvt);
     glUniform2fv(pLwc->shader[shader_index].vuvoffset_location, 1, default_uv_offset);
     glUniform2fv(pLwc->shader[shader_index].vuvscale_location, 1, default_uv_scale);

@@ -72,7 +72,7 @@ void render_solid_vb_ui_flip_y_uv_shader_rot(const LWCONTEXT* pLwc,
     mat4x4_identity(proj_view_model);
     mat4x4_mul(proj_view_model, pLwc->proj, view_model);
     
-    glBindBuffer(GL_ARRAY_BUFFER, pLwc->vertex_buffer[lvt].vertex_buffer);
+    lazy_glBindBuffer(pLwc, lvt);
     bind_all_vertex_attrib(pLwc, lvt);
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, tex_index);
@@ -133,7 +133,7 @@ void render_solid_vb_ui_alpha_uv(const LWCONTEXT* pLwc,
     mat4x4_identity(proj_view_model);
     mat4x4_mul(proj_view_model, pLwc->proj, view_model);
     
-    glBindBuffer(GL_ARRAY_BUFFER, pLwc->vertex_buffer[lvt].vertex_buffer);
+    lazy_glBindBuffer(pLwc, lvt);
     bind_all_vertex_attrib_etc1_with_alpha(pLwc, lvt);
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, tex_index);

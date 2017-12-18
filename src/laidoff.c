@@ -57,7 +57,6 @@
 #include "lo_wrap.inl"
 
 #define LW_SUPPORT_ETC1_HARDWARE_DECODING LW_PLATFORM_ANDROID
-#define LW_SUPPORT_VAO (LW_PLATFORM_WIN32 || LW_PLATFORM_OSX || LW_PLATFORM_LINUX)
 
 const float default_uv_offset[2] = { 0, 0 };
 const float default_uv_scale[2] = { 1, 1 };
@@ -225,7 +224,7 @@ static void init_fanim(LWCONTEXT* pLwc) {
 static void init_vbo(LWCONTEXT* pLwc) {
 
     // === STATIC MESHES ===
-    lw_load_all_vbo(pLwc);
+    //lw_load_all_vbo(pLwc);
 
     // LVT_LEFT_TOP_ANCHORED_SQUARE ~ LVT_RIGHT_BOTTOM_ANCHORED_SQUARE
     // 9 anchored squares...
@@ -296,6 +295,7 @@ static void init_vbo(LWCONTEXT* pLwc) {
 }
 
 void set_vertex_attrib_pointer(const LWCONTEXT* pLwc, int shader_index) {
+    lw_create_lazy_shader_program(pLwc, shader_index);
     // vertex coordinates
     glEnableVertexAttribArray(pLwc->shader[shader_index].vpos_location);
     glVertexAttribPointer(pLwc->shader[shader_index].vpos_location, 3, GL_FLOAT, GL_FALSE,
@@ -315,6 +315,7 @@ void set_vertex_attrib_pointer(const LWCONTEXT* pLwc, int shader_index) {
 }
 
 void set_skin_vertex_attrib_pointer(const LWCONTEXT* pLwc, int shader_index) {
+    lw_create_lazy_shader_program(pLwc, shader_index);
     // vertex coordinates
     glEnableVertexAttribArray(pLwc->shader[shader_index].vpos_location);
     glVertexAttribPointer(pLwc->shader[shader_index].vpos_location, 3, GL_FLOAT, GL_FALSE,
@@ -338,6 +339,7 @@ void set_skin_vertex_attrib_pointer(const LWCONTEXT* pLwc, int shader_index) {
 }
 
 void set_fan_vertex_attrib_pointer(const LWCONTEXT* pLwc, int shader_index) {
+    lw_create_lazy_shader_program(pLwc, shader_index);
     // vertex coordinates
     glEnableVertexAttribArray(pLwc->shader[shader_index].vpos_location);
     glVertexAttribPointer(pLwc->shader[shader_index].vpos_location, 3, GL_FLOAT, GL_FALSE,
@@ -345,6 +347,7 @@ void set_fan_vertex_attrib_pointer(const LWCONTEXT* pLwc, int shader_index) {
 }
 
 void set_ps_vertex_attrib_pointer(const LWCONTEXT* pLwc, int shader_index) {
+    lw_create_lazy_shader_program(pLwc, shader_index);
     glEnableVertexAttribArray(pLwc->shader[shader_index].a_pID);
     glEnableVertexAttribArray(pLwc->shader[shader_index].a_pRadiusOffset);
     glEnableVertexAttribArray(pLwc->shader[shader_index].a_pVelocityOffset);
@@ -369,30 +372,11 @@ static void gen_all_vao(LWCONTEXT* pLwc) {
 #endif
 }
 
-static void init_vao(LWCONTEXT* pLwc) {
+static void init_all_vao(LWCONTEXT* pLwc) {
     // Vertex Array Objects
 #if LW_SUPPORT_VAO
     for (int i = 0; i < VERTEX_BUFFER_COUNT; i++) {
-        glBindVertexArray(pLwc->vao[i]);
-        glBindBuffer(GL_ARRAY_BUFFER, pLwc->vertex_buffer[i].vertex_buffer);
-        if (i == LVT_UI_SCRAP_BG
-            || i == LVT_UI_TOWER_BUTTON_BG
-            || i == LVT_UI_LEFT_BUTTON_BG
-            || i == LVT_UI_BUTTON_BG) {
-            set_vertex_attrib_pointer(pLwc, LWST_COLOR);
-        } else if (i == LVT_UI_FULL_PANEL_BG) {
-            //set_vertex_attrib_pointer(pLwc, LWST_PANEL);
-            set_vertex_attrib_pointer(pLwc, LWST_COLOR);
-        } else if (i == LVT_TOWER_BASE
-                   || i == LVT_TOWER_1
-                   || i == LVT_TOWER_2
-                   || i == LVT_TOWER_3
-                   || i == LVT_TOWER_4
-                   || i == LVT_TOWER_5) {
-            set_vertex_attrib_pointer(pLwc, LWST_DEFAULT_NORMAL);
-        } else {
-            set_vertex_attrib_pointer(pLwc, LWST_DEFAULT);
-        }
+        lw_setup_vao(pLwc, i);
     }
     glBindBuffer(GL_ARRAY_BUFFER, 0);
     glBindVertexArray(0);
@@ -469,7 +453,7 @@ void init_ps(LWCONTEXT* pLwc) {
 }
 
 static void init_gl_context(LWCONTEXT* pLwc) {
-    init_gl_shaders(pLwc);
+    //init_gl_shaders(pLwc);
     init_vbo(pLwc);
     init_fvbo(pLwc);
     init_fanim(pLwc);
@@ -477,7 +461,7 @@ static void init_gl_context(LWCONTEXT* pLwc) {
     init_ps(pLwc);
     // Vertex Array Objects (used only when LW_SUPPORT_VAO is set)
     gen_all_vao(pLwc);
-    init_vao(pLwc);
+    //init_all_vao(pLwc);
     init_fvao(pLwc, LWST_DEFAULT_NORMAL);
     init_skin_vao(pLwc, LWST_SKIN);
     init_fan_vao(pLwc, LWST_FAN);
