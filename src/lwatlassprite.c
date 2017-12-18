@@ -39,6 +39,8 @@ void render_atlas_sprite(const LWCONTEXT* pLwc,
                     uv_offset,
                     uv_scale);
     const float sprite_aspect_ratio = uv_scale[0] / uv_scale[1];
+    lw_load_tex(pLwc, lae);
+    lw_load_tex(pLwc, lae_alpha);
     render_solid_vb_ui_alpha_uv(pLwc,
                                 x,
                                 y,

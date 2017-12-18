@@ -392,6 +392,7 @@
 		6CA16DA21EA210BB00DB7AF0 /* lzio.c in Sources */ = {isa = PBXBuildFile; fileRef = 6CA16D7E1EA210BB00DB7AF0 /* lzio.c */; };
 		6CA16DA41EA2110E00DB7AF0 /* lwios.m in Sources */ = {isa = PBXBuildFile; fileRef = 6CA16DA31EA2110E00DB7AF0 /* lwios.m */; };
 		6CEB73DF1FD3CF5500D92EED /* numcomp_puck_game.c in Sources */ = {isa = PBXBuildFile; fileRef = 6CEB73DE1FD3CF5500D92EED /* numcomp_puck_game.c */; };
+		6CFFC41F1FE82250005FBFDE /* lwatlasenum.c in Sources */ = {isa = PBXBuildFile; fileRef = 6CFFC41E1FE8224F005FBFDE /* lwatlasenum.c */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -1209,6 +1210,7 @@
 		6CA16DA31EA2110E00DB7AF0 /* lwios.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = lwios.m; sourceTree = "<group>"; };
 		6CEB73DD1FD3CF5500D92EED /* numcomp_puck_game.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = numcomp_puck_game.h; sourceTree = "<group>"; };
 		6CEB73DE1FD3CF5500D92EED /* numcomp_puck_game.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = numcomp_puck_game.c; sourceTree = "<group>"; };
+		6CFFC41E1FE8224F005FBFDE /* lwatlasenum.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = lwatlasenum.c; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -2074,6 +2076,7 @@
 				6C7739651FB4B5A2001014DE /* logic.h */,
 				6C7739571FB4B5A1001014DE /* lwanim.c */,
 				6C77393E1FB4B59F001014DE /* lwanim.h */,
+				6CFFC41E1FE8224F005FBFDE /* lwatlasenum.c */,
 				6C7739381FB4B59F001014DE /* lwatlasenum.h */,
 				260122491FDFDF03005941B7 /* lwatlassprite.c */,
 				6C77391B1FB4B59D001014DE /* lwatlassprite.h */,
@@ -2693,6 +2696,7 @@
 				566373431EBA52D4001DA3F4 /* collision_trimesh_trimesh_old.cpp in Sources */,
 				5663737D1EBA52D4001DA3F4 /* atomic.cpp in Sources */,
 				6CA16D921EA210BB00DB7AF0 /* loadlib.c in Sources */,
+				6CFFC41F1FE82250005FBFDE /* lwatlasenum.c in Sources */,
 				566373481EBA52D4001DA3F4 /* export-dif.cpp in Sources */,
 				56F188BB1EC74DB60019312F /* ip.cpp in Sources */,
 				5663733F1EBA52D4001DA3F4 /* collision_trimesh_plane.cpp in Sources */,

@@ -231,8 +231,9 @@ static void render_tower_normal_2(const LWCONTEXT* pLwc, const mat4x4 view, cons
         lazy_glBindBuffer(pLwc, lvt);
         bind_all_vertex_attrib(pLwc, lvt);
         glActiveTexture(GL_TEXTURE0);
-        
-        glBindTexture(GL_TEXTURE_2D, pLwc->tex_atlas[tower->owner_player_no == 2 ? LAE_TOWER_BASE_2_TARGET : LAE_TOWER_BASE_2_PLAYER]);
+
+        int tower_lae = tower->owner_player_no == 2 ? LAE_TOWER_BASE_2_TARGET : LAE_TOWER_BASE_2_PLAYER;
+        lazy_tex_atlas_glBindTexture(pLwc, tower_lae);
         set_tex_filter(GL_LINEAR, GL_LINEAR);
         glUniformMatrix4fv(shader->mvp_location, 1, GL_FALSE, (const GLfloat*)proj_view_model);
         glUniformMatrix4fv(shader->m_location, 1, GL_FALSE, (const GLfloat*)model);
@@ -365,6 +366,7 @@ static void render_go(const LWCONTEXT* pLwc,
     lazy_glBindBuffer(pLwc, lvt);
     bind_all_vertex_attrib(pLwc, lvt);
     glActiveTexture(GL_TEXTURE0);
+    assert(tex_index);
     glBindTexture(GL_TEXTURE_2D, tex_index);
     set_tex_filter(GL_LINEAR, GL_LINEAR);
     //set_tex_filter(GL_NEAREST, GL_NEAREST);
@@ -430,7 +432,7 @@ static void render_radial_wave(const LWCONTEXT* pLwc,
     lazy_glBindBuffer(pLwc, lvt);
     bind_all_vertex_attrib(pLwc, lvt);
     glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, pLwc->tex_atlas[LAE_LINEARWAVE]);
+    lazy_tex_atlas_glBindTexture(pLwc, LAE_LINEARWAVE);
     set_tex_filter(GL_LINEAR, GL_LINEAR);
     //set_tex_filter(GL_NEAREST, GL_NEAREST);
     glUniformMatrix4fv(shader->mvp_location, 1, GL_FALSE, (const GLfloat*)proj_view_model);
@@ -451,6 +453,8 @@ static void render_hp_star(const LWCONTEXT* pLwc, float ui_alpha, int hp, int le
         x += ratio * (2 * rand() / (float)RAND_MAX - 1.0f) * shake_magnitude * pLwc->aspect_ratio;
         y += ratio * (2 * rand() / (float)RAND_MAX - 1.0f) * shake_magnitude;
     }
+    lw_load_tex(pLwc, LAE_HP_STAR_0 + 2 * hp);
+    lw_load_tex(pLwc, LAE_HP_STAR_0 + 2 * hp + 1);
     render_solid_vb_ui_alpha_uv(pLwc,
                                 x,
                                 y,
@@ -873,6 +877,7 @@ static void render_wall(const LWCONTEXT* pLwc, const mat4x4 proj, const LWPUCKGA
     lazy_glBindBuffer(pLwc, lvt);
     bind_all_vertex_attrib(pLwc, lvt);
     glActiveTexture(GL_TEXTURE0);
+    //assert(tex_index); // tex_index is 0 for now
     glBindTexture(GL_TEXTURE_2D, tex_index);
     set_tex_filter(GL_LINEAR, GL_LINEAR);
     //set_tex_filter(GL_NEAREST, GL_NEAREST);
@@ -895,6 +900,7 @@ static void render_physics_menu(const LWCONTEXT *pLwc, const mat4x4 proj, const 
     glUniform1f(shader->overlay_color_ratio_location, 0);
 
     const int tex_index = pLwc->tex_atlas[LAE_PHYSICS_MENU];
+    lw_load_tex(pLwc, LAE_PHYSICS_MENU);
     mat4x4 rot;
     mat4x4_identity(rot);
     mat4x4_rotate_Y(rot, rot, (float)LWDEG2RAD(180));
@@ -932,6 +938,7 @@ static void render_physics_menu(const LWCONTEXT *pLwc, const mat4x4 proj, const 
     bind_all_vertex_attrib(pLwc, lvt);
 
     glActiveTexture(GL_TEXTURE0);
+    assert(tex_index);
     glBindTexture(GL_TEXTURE_2D, tex_index);
     glUniform1i(pLwc->shader[shader_index].diffuse_location, 0);
     set_tex_filter(GL_LINEAR, GL_LINEAR);
@@ -972,7 +979,7 @@ static void render_floor_cover(const LWCONTEXT *pLwc, const mat4x4 proj, const m
     lazy_glBindBuffer(pLwc, LVT_PUCK_FLOOR_COVER);
     bind_all_vertex_attrib(pLwc, LVT_PUCK_FLOOR_COVER);
     glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, pLwc->tex_atlas[LAE_PUCK_FLOOR_COVER]);
+    lazy_tex_atlas_glBindTexture(pLwc, LAE_PUCK_FLOOR_COVER);
     set_tex_filter(GL_LINEAR, GL_LINEAR);
     glUniformMatrix4fv(shader->mvp_location, 1, GL_FALSE, (const GLfloat*)proj_view_model);
     glUniformMatrix4fv(shader->m_location, 1, GL_FALSE, (const GLfloat*)model);
@@ -1005,6 +1012,8 @@ static void render_floor(const LWCONTEXT *pLwc, const mat4x4 proj, const LWPUCKG
 
     const int tex_index = pLwc->tex_atlas[LAE_PUCK_FLOOR_KTX];
     const int arrow_tex_index = pLwc->tex_atlas[LAE_ARROW];
+    lw_load_tex(pLwc, LAE_PUCK_FLOOR_KTX);
+    lw_load_tex(pLwc, LAE_ARROW);
     mat4x4 rot;
     mat4x4_identity(rot);
 
@@ -1041,11 +1050,13 @@ static void render_floor(const LWCONTEXT *pLwc, const mat4x4 proj, const LWPUCKG
     bind_all_vertex_attrib(pLwc, lvt);
 
     glActiveTexture(GL_TEXTURE0);
+    assert(tex_index);
     glBindTexture(GL_TEXTURE_2D, tex_index);
     glUniform1i(pLwc->shader[shader_index].diffuse_location, 0);
     set_tex_filter(GL_LINEAR, GL_LINEAR);
 
     glActiveTexture(GL_TEXTURE1);
+    assert(arrow_tex_index);
     glBindTexture(GL_TEXTURE_2D, arrow_tex_index);
     glUniform1i(pLwc->shader[shader_index].diffuse_arrow_location, 1);
     set_tex_filter(GL_LINEAR, GL_LINEAR);
@@ -1130,6 +1141,8 @@ static void render_battle_result_popup(const LWCONTEXT* pLwc,
 }
 
 void render_caution_popup(const LWCONTEXT* pLwc, const char* str) {
+    lw_load_tex(pLwc, LAE_UI_CAUTION_POPUP);
+    lw_load_tex(pLwc, LAE_UI_CAUTION_POPUP_ALPHA);
     render_solid_vb_ui_alpha(pLwc,
                              0,
                              0,
@@ -1217,7 +1230,7 @@ static void render_main_menu(const LWCONTEXT* pLwc, const LWPUCKGAME* puck_game,
     glUniformMatrix4fv(shader->mvp_location, 1, GL_FALSE, (const GLfloat*)proj_view_model);
     glActiveTexture(GL_TEXTURE0);
     glUniform1i(shader->diffuse_location, 0); // 0 means GL_TEXTURE0
-    glBindTexture(GL_TEXTURE_2D, pLwc->tex_atlas[LAE_UI_MAIN_MENU]);
+    lazy_tex_atlas_glBindTexture(pLwc, LAE_UI_MAIN_MENU);
     set_tex_filter(GL_LINEAR, GL_LINEAR);
 
     glEnable(GL_BLEND);
@@ -1255,6 +1268,7 @@ static void render_icon_amount(const LWCONTEXT* pLwc,
                        0.0f,
                        1.0f);
     if (lae_alpha == LAE_DONTCARE) {
+        lw_load_tex(pLwc, lae);
         render_solid_vb_ui(pLwc,
                            x - width / 2 + 0.025f,
                            y,
@@ -1268,6 +1282,8 @@ static void render_icon_amount(const LWCONTEXT* pLwc,
                            0.0f,
                            0.0f);
     } else {
+        lw_load_tex(pLwc, lae);
+        lw_load_tex(pLwc, lae_alpha);
         render_solid_vb_ui_alpha(pLwc,
                                  x - width / 2 + 0.025f,
                                  y,
@@ -1319,6 +1335,7 @@ static void render_main_menu_ui_layer(const LWCONTEXT* pLwc, const LWPUCKGAME* p
         const float y = 1.0f - height / 2;
         const LW_ATLAS_ENUM lae = LAE_PROFILE_ICON;
         const char* str = pLwc->puck_game->nickname;
+        lw_load_tex(pLwc, lae);
         render_icon_amount(pLwc, puck_game, x, y, width, height, str, lae, LAE_DONTCARE, 1.0f, 1.0f, 1.0f);
         top_bar_x_cursor += width + top_bar_x_cursor_margin;
     }
@@ -1755,23 +1772,28 @@ void lwc_render_physics(const LWCONTEXT* pLwc, const mat4x4 view, const mat4x4 p
                 LPGB_W);
     const int player_no = pLwc->puck_game->player_no;
     // Game object: Puck
+    lw_load_tex(pLwc, LAE_PUCK_GRAY_KTX);
     render_go(pLwc, view, proj, puck_game, &puck_game->go[LPGO_PUCK], pLwc->tex_atlas[LAE_PUCK_GRAY_KTX],
               1.0f, remote_puck_pos, state->puck_rot, remote, !remote ? puck_game->go[LPGO_PUCK].speed : state->puck_speed,
               LWST_DEFAULT);
     // Game object: Player
-    render_go(pLwc, view, proj, puck_game, &puck_game->go[LPGO_PLAYER], pLwc->tex_atlas[player_no == 2 ? LAE_PUCK_ENEMY_KTX : LAE_PUCK_PLAYER_KTX],
+    int player_lae = player_no == 2 ? LAE_PUCK_ENEMY_KTX : LAE_PUCK_PLAYER_KTX;
+    lw_load_tex(pLwc, player_lae);
+    render_go(pLwc, view, proj, puck_game, &puck_game->go[LPGO_PLAYER], pLwc->tex_atlas[player_lae],
               1.0f, remote_player_pos, state->player_rot, remote, 0,
               LWST_DEFAULT);
     if (remote ? state->bf.player_pull : puck_game->remote_control[0].pull_puck) {
-        render_radial_wave(pLwc, view, proj, puck_game, &puck_game->go[LPGO_PLAYER], pLwc->tex_atlas[player_no == 2 ? LAE_PUCK_ENEMY_KTX : LAE_PUCK_PLAYER_KTX],
+        render_radial_wave(pLwc, view, proj, puck_game, &puck_game->go[LPGO_PLAYER], pLwc->tex_atlas[player_lae],
                            1.0f, remote_player_pos, state->player_rot, remote, 0);
     }
     // Game object: Enemy
-    render_go(pLwc, view, proj, puck_game, &puck_game->go[LPGO_TARGET], pLwc->tex_atlas[player_no == 2 ? LAE_PUCK_PLAYER_KTX : LAE_PUCK_ENEMY_KTX],
+    int target_lae = player_no == 2 ? LAE_PUCK_PLAYER_KTX : LAE_PUCK_ENEMY_KTX;
+    lw_load_tex(pLwc, target_lae);
+    render_go(pLwc, view, proj, puck_game, &puck_game->go[LPGO_TARGET], pLwc->tex_atlas[target_lae],
               1.0f, remote_target_pos, state->target_rot, remote, 0,
               LWST_DEFAULT);
     if (state->bf.target_pull) {
-        render_radial_wave(pLwc, view, proj, puck_game, &puck_game->go[LPGO_TARGET], pLwc->tex_atlas[player_no == 2 ? LAE_PUCK_PLAYER_KTX : LAE_PUCK_ENEMY_KTX],
+        render_radial_wave(pLwc, view, proj, puck_game, &puck_game->go[LPGO_TARGET], pLwc->tex_atlas[target_lae],
                            1.0f, remote_target_pos, state->target_rot, remote, 0);
     }
     // Towers

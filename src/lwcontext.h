@@ -132,6 +132,7 @@ typedef struct _LWCONTEXT {
 	GLuint ps_vao[PS_VERTEX_BUFFER_COUNT];
 	// General texture atlas
 	GLuint tex_atlas[MAX_TEX_ATLAS];
+    int tex_atlas_ready[MAX_TEX_ATLAS];
 	// Width for text atlas array
 	int tex_atlas_width[MAX_TEX_ATLAS];
 	// Height for text atlas array

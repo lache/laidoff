@@ -1,4 +1,4 @@
-﻿#include "render_splash.h"
+#include "render_splash.h"
 #include "lwgl.h"
 #include "lwcontext.h"
 #include "laidoff.h"
@@ -7,7 +7,19 @@
 #include "lwmacro.h"
 
 static void s_render_logo(const LWCONTEXT* pLwc) {
-	render_solid_vb_ui(pLwc, 0, 0, 2, 2, pLwc->tex_atlas[LAE_SPLASH512512], LVT_CENTER_CENTER_ANCHORED_SQUARE, 1, 0, 0, 0, 0);
+    lw_load_tex(pLwc, LAE_SPLASH512512);
+	render_solid_vb_ui(pLwc,
+                       0,
+                       0,
+                       2,
+                       2,
+                       pLwc->tex_atlas[LAE_SPLASH512512],
+                       LVT_CENTER_CENTER_ANCHORED_SQUARE,
+                       1,
+                       0,
+                       0,
+                       0,
+                       0);
 }
 
 void lwc_render_splash(const LWCONTEXT* pLwc) {

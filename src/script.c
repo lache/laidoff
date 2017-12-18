@@ -226,7 +226,19 @@ int l_spawn_oil_truck(lua_State* L) {
 		float x = (float)lua_tonumber(L, 2);
 		float y = (float)lua_tonumber(L, 3);
 		int field_event_id = (int)lua_tonumber(L, 4);
-		int r = spawn_field_object(pLwc->field, x, y, 1, 1, LVT_OIL_TRUCK, pLwc->tex_atlas[LAE_3D_OIL_TRUCK_TEX_KTX], 1, 1, 1.0f, field_event_id, 0);
+        lw_load_tex(pLwc, LAE_3D_OIL_TRUCK_TEX_KTX); // TODO safe?
+		int r = spawn_field_object(pLwc->field,
+                                   x,
+                                   y,
+                                   1,
+                                   1,
+                                   LVT_OIL_TRUCK,
+                                   pLwc->tex_atlas[LAE_3D_OIL_TRUCK_TEX_KTX],
+                                   1,
+                                   1,
+                                   1.0f,
+                                   field_event_id,
+                                   0);
 		lua_pushinteger(L, r);
 	}
 	return 1;
@@ -238,7 +250,19 @@ int l_spawn_devil(lua_State* L) {
 		float x = (float)lua_tonumber(L, 2);
 		float y = (float)lua_tonumber(L, 3);
 		int field_event_id = (int)lua_tonumber(L, 4);
-		int r = spawn_field_object(pLwc->field, x, y, 1, 1, LVT_DEVIL, pLwc->tex_atlas[LAE_DEVIL_KTX], 1, 1, 1.0f, field_event_id, 0);
+        lw_load_tex(pLwc, LAE_DEVIL_KTX);
+		int r = spawn_field_object(pLwc->field,
+                                   x,
+                                   y,
+                                   1,
+                                   1,
+                                   LVT_DEVIL,
+                                   pLwc->tex_atlas[LAE_DEVIL_KTX],
+                                   1,
+                                   1,
+                                   1.0f,
+                                   field_event_id,
+                                   0);
 		lua_pushinteger(L, r);
 	}
 	return 1;

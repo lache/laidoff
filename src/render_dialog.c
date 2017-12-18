@@ -23,10 +23,10 @@ static void render_portrait(const LWCONTEXT* pLwc)
 	bind_all_vertex_attrib_etc1_with_alpha(pLwc, LVT_CENTER_CENTER_ANCHORED_SQUARE);
 	glUniform1f(pLwc->shader[shader_index].overlay_color_ratio_location, 0);
 	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_2D, pLwc->tex_atlas[LAE_P_DOHEE]);
+    lazy_tex_atlas_glBindTexture(pLwc, LAE_P_DOHEE);
 	set_tex_filter(GL_LINEAR, GL_LINEAR);
 	glActiveTexture(GL_TEXTURE1);
-	glBindTexture(GL_TEXTURE_2D, pLwc->tex_atlas[LAE_P_DOHEE_ALPHA]);
+    lazy_tex_atlas_glBindTexture(pLwc, LAE_P_DOHEE_ALPHA);
 	set_tex_filter(GL_LINEAR, GL_LINEAR);
 	glDrawArrays(GL_TRIANGLES, 0, pLwc->vertex_buffer[LVT_CENTER_CENTER_ANCHORED_SQUARE].vertex_count);
 }
@@ -77,7 +77,7 @@ static void render_dialog_balloon(const LWCONTEXT* pLwc)
 	bind_all_vertex_attrib(pLwc, LVT_CENTER_BOTTOM_ANCHORED_SQUARE);
 	glUniform1f(pLwc->shader[shader_index].overlay_color_ratio_location, 0);
 	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_2D, pLwc->tex_atlas[LAE_U_DIALOG_BALLOON]);
+    lazy_tex_atlas_glBindTexture(pLwc, LAE_U_DIALOG_BALLOON);
 	set_tex_filter(GL_LINEAR, GL_LINEAR);
 	glUniformMatrix4fv(pLwc->shader[shader_index].mvp_location, 1, GL_FALSE, (const GLfloat*)proj_view_model);
 	glDrawArrays(GL_TRIANGLES, 0, pLwc->vertex_buffer[LVT_CENTER_BOTTOM_ANCHORED_SQUARE].vertex_count);
@@ -128,7 +128,7 @@ static void render_bg(const LWCONTEXT* pLwc)
 		error_enum = glGetError();
 		glUniform1f(pLwc->shader[shader_index].overlay_color_ratio_location, 0);
 		error_enum = glGetError();
-		glBindTexture(GL_TEXTURE_2D, pLwc->tex_atlas[pLwc->dialog_bg_tex_index]);
+        lazy_tex_atlas_glBindTexture(pLwc, pLwc->dialog_bg_tex_index);
 		error_enum = glGetError();
 		set_tex_filter(GL_LINEAR_MIPMAP_LINEAR, GL_LINEAR); // when mip-map enabled
 		error_enum = glGetError();
@@ -162,7 +162,7 @@ void lwc_render_dialog(const LWCONTEXT* pLwc)
 	glUniformMatrix4fv(pLwc->shader[shader_index].mvp_location, 1, GL_FALSE, (const GLfloat*)pLwc->proj);
 
 	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_2D, pLwc->tex_atlas[pLwc->tex_atlas_index]);
+    lazy_tex_atlas_glBindTexture(pLwc, pLwc->tex_atlas_index);
 
 	if (pLwc->dialog_bg_tex_index)
 	{

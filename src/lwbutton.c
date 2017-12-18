@@ -66,6 +66,8 @@ void render_lwbutton(const LWCONTEXT* pLwc, const LWBUTTONLIST* button_list) {
     for (int i = 0; i < button_list->button_count; i++) {
         const LWBUTTON* b = &button_list->button[i];
         if (b->ui_alpha) {
+            lw_load_tex(pLwc, b->lae);
+            lw_load_tex(pLwc, b->lae_alpha);
             render_solid_vb_ui_alpha(pLwc,
                                      b->x,
                                      b->y,

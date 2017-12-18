@@ -89,7 +89,8 @@ void lw_start_text_input_activity(LWCONTEXT* pLwc, int tag); // Native text inpu
 void lw_set_device_model(LWCONTEXT* pLwc, const char* model);
 void lw_flag_logic_actor_to_quit_and_wait(LWCONTEXT* pLwc);
 void set_vertex_attrib_pointer(const LWCONTEXT* pLwc, int shader_index);
-
+void load_png_pkm_sw_decoding(LWCONTEXT* pLwc, int i);
+    
 extern const float default_uv_offset[2];
 extern const float default_uv_scale[2];
 extern const float default_flip_y_uv_scale[2];

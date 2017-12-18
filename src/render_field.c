@@ -15,6 +15,9 @@
 #include "lwfieldobject.h"
 #include "render_ui.h"
 #include <float.h>
+#include "platform_detection.h"
+#include "lwatlasenum.h"
+#include <assert.h>
 
 static void render_field_object_rot(const LWCONTEXT* pLwc, int vbo_index, GLuint tex_id, const mat4x4 view, const mat4x4 proj, float x, float y, float z, float sx, float sy, float sz, float alpha_multiplier, int mipmap, const mat4x4 rot) {
     int shader_index = LWST_DEFAULT;
@@ -38,6 +41,7 @@ static void render_field_object_rot(const LWCONTEXT* pLwc, int vbo_index, GLuint
     lazy_glBindBuffer(pLwc, vbo_index);
     bind_all_vertex_attrib(pLwc, vbo_index);
     glUniformMatrix4fv(pLwc->shader[shader_index].mvp_location, 1, GL_FALSE, (const GLfloat*)proj_view_model);
+    assert(tex_id);
     glBindTexture(GL_TEXTURE_2D, tex_id);
     set_tex_filter(mipmap ? GL_LINEAR_MIPMAP_LINEAR : GL_LINEAR, GL_LINEAR);
     
@@ -93,10 +97,21 @@ void render_fist_button(const LWCONTEXT* pLwc) {
     const float fist_icon_margin_y = 0.2f;
     const float fist_icon_width = 0.75f;
     const float fist_icon_height = 0.75f;
-    render_solid_vb_ui_alpha(pLwc, pLwc->aspect_ratio - fist_icon_margin_x, -1 + fist_icon_margin_y,
-                             fist_icon_width, fist_icon_height,
-                             pLwc->tex_atlas[LAE_U_FIST_ICON_KTX], pLwc->tex_atlas[LAE_U_FIST_ICON_ALPHA_KTX],
-                             LVT_RIGHT_BOTTOM_ANCHORED_SQUARE, 1, 0, 0, 0, 0);
+    lw_load_tex(pLwc, LAE_U_FIST_ICON_KTX);
+    lw_load_tex(pLwc, LAE_U_FIST_ICON_ALPHA_KTX);
+    render_solid_vb_ui_alpha(pLwc,
+                             pLwc->aspect_ratio - fist_icon_margin_x,
+                             -1 + fist_icon_margin_y,
+                             fist_icon_width,
+                             fist_icon_height,
+                             pLwc->tex_atlas[LAE_U_FIST_ICON_KTX],
+                             pLwc->tex_atlas[LAE_U_FIST_ICON_ALPHA_KTX],
+                             LVT_RIGHT_BOTTOM_ANCHORED_SQUARE,
+                             1,
+                             0,
+                             0,
+                             0,
+                             0);
 }
 
 void render_top_button(const LWCONTEXT* pLwc) {
@@ -104,9 +119,21 @@ void render_top_button(const LWCONTEXT* pLwc) {
     const float fist_icon_margin_y = 0.2f;
     const float fist_icon_width = 0.75f;
     const float fist_icon_height = 0.75f;
-    render_solid_vb_ui_alpha(pLwc, pLwc->aspect_ratio - fist_icon_margin_x, 1 - fist_icon_margin_y, fist_icon_width, fist_icon_height,
-                             pLwc->tex_atlas[LAE_U_FIST_ICON_KTX], pLwc->tex_atlas[LAE_U_FIST_ICON_ALPHA_KTX],
-                             LVT_RIGHT_TOP_ANCHORED_SQUARE, 1, 0, 0, 0, 0);
+    lw_load_tex(pLwc, LAE_U_FIST_ICON_KTX);
+    lw_load_tex(pLwc, LAE_U_FIST_ICON_ALPHA_KTX);
+    render_solid_vb_ui_alpha(pLwc,
+                             pLwc->aspect_ratio - fist_icon_margin_x,
+                             1 - fist_icon_margin_y,
+                             fist_icon_width,
+                             fist_icon_height,
+                             pLwc->tex_atlas[LAE_U_FIST_ICON_KTX],
+                             pLwc->tex_atlas[LAE_U_FIST_ICON_ALPHA_KTX],
+                             LVT_RIGHT_TOP_ANCHORED_SQUARE,
+                             1,
+                             0,
+                             0,
+                             0,
+                             0);
 }
 
 static void s_render_ui(const LWCONTEXT* pLwc) {
@@ -156,7 +183,7 @@ void render_tower_yaw(const LWCONTEXT* pLwc, const mat4x4 perspective, const mat
     mat4x4_mul(skin_model, skin_trans, skin_model);
     
     const float flash = 0;
-    
+    lw_load_tex(pLwc, atlas);
     render_yaw_skin(pLwc,
                     pLwc->tex_atlas[atlas],
                     skin_vbo,
@@ -224,7 +251,7 @@ static void s_render_path_query_test_player(const LWCONTEXT* pLwc, const mat4x4 
         mat4x4_mul(skin_model, skin_rot, skin_model);
         mat4x4_mul(skin_model, skin_scale, skin_model);
         mat4x4_mul(skin_model, skin_trans, skin_model);
-        
+        lw_load_tex(pLwc, LAE_3D_PLAYER_TEX_KTX);
         render_skin(pLwc,
                     pLwc->tex_atlas[LAE_3D_PLAYER_TEX_KTX],
                     LSVT_HUMAN,
@@ -268,6 +295,7 @@ static void s_render_player_model(const LWCONTEXT* pLwc, const mat4x4 view, cons
     mat4x4_mul(skin_model, skin_trans, skin_model);
     
     if (pLwc->player_action) {
+        lw_load_tex(pLwc, LAE_3D_PLAYER_TEX_KTX);
         render_skin(pLwc,
                     pLwc->tex_atlas[LAE_3D_PLAYER_TEX_KTX],
                     LSVT_HUMAN,
@@ -295,6 +323,7 @@ static void s_render_field_sphere(const LWCONTEXT* pLwc, struct _LWFIELD* const 
             } else {
                 mat4x4_identity(rot);
             }
+            lw_load_tex(pLwc, LAE_BEAM_KTX);
             render_field_object_rot(pLwc,
                                     LVT_BEAM,
                                     pLwc->tex_atlas[LAE_BEAM_KTX],
@@ -328,6 +357,7 @@ static void s_render_field_sphere(const LWCONTEXT* pLwc, struct _LWFIELD* const 
             } else {
                 mat4x4_identity(rot);
             }
+            lw_load_tex(pLwc, LAE_BEAM_KTX);
             render_field_object_rot(pLwc,
                                     LVT_BEAM,
                                     pLwc->tex_atlas[LAE_BEAM_KTX],
@@ -354,6 +384,7 @@ static void s_render_field_sphere_shadow(const LWCONTEXT* pLwc, struct _LWFIELD*
     for (int i = 0; i < MAX_FIELD_SPHERE; i++) {
         float pos[3];
         if (field_sphere_pos(field, i, pos)) {
+            lw_load_tex(pLwc, LAE_CIRCLE_SHADOW_KTX);
             render_field_object(pLwc,
                                 LVT_CENTER_CENTER_ANCHORED_SQUARE,
                                 pLwc->tex_atlas[LAE_CIRCLE_SHADOW_KTX],
@@ -373,6 +404,7 @@ static void s_render_field_sphere_shadow(const LWCONTEXT* pLwc, struct _LWFIELD*
     for (int i = 0; i < MAX_FIELD_REMOTE_SPHERE; i++) {
         float pos[3];
         if (field_remote_sphere_pos(field, i, pos)) {
+            lw_load_tex(pLwc, LAE_CIRCLE_SHADOW_KTX);
             render_field_object(pLwc,
                                 LVT_CENTER_CENTER_ANCHORED_SQUARE,
                                 pLwc->tex_atlas[LAE_CIRCLE_SHADOW_KTX],
@@ -410,6 +442,7 @@ static void s_render_render_command(const LWCONTEXT* pLwc, mat4x4 view, mat4x4 p
             mat4x4_identity(rot);
             mat4x4_identity(iden);
             mat4x4_rotate_Z(rot, iden, cmd->angle);
+            lw_load_tex(pLwc, cmd->atlas);
             render_field_object_rot(pLwc,
                                     cmd->vbo,
                                     pLwc->tex_atlas[cmd->atlas],
@@ -442,6 +475,7 @@ static void s_render_render_command_shadow(const LWCONTEXT* pLwc, mat4x4 view, m
         if (cmd->objtype == 1) {
             // No shadows for guntowers
         } else {
+            lw_load_tex(pLwc, LAE_CIRCLE_SHADOW_KTX);
             render_field_object(pLwc,
                                 LVT_CENTER_CENTER_ANCHORED_SQUARE,
                                 pLwc->tex_atlas[LAE_CIRCLE_SHADOW_KTX],
@@ -472,6 +506,7 @@ static void s_render_field_object_shadow(const LWCONTEXT* pLwc, const mat4x4 vie
         LWFIELDOBJECT* fo = field_object(pLwc->field, i);
         if (fo->valid) {
             if (fo->skin == 0) {
+                lw_load_tex(pLwc, LAE_CIRCLE_SHADOW_KTX);
                 render_field_object(pLwc,
                                     LVT_CENTER_CENTER_ANCHORED_SQUARE,
                                     pLwc->tex_atlas[LAE_CIRCLE_SHADOW_KTX],
@@ -597,7 +632,7 @@ void lwc_render_field(const LWCONTEXT* pLwc) {
     glUniform1f(pLwc->shader[shader_index].alpha_multiplier_location, 1);
     glActiveTexture(GL_TEXTURE0);
     glUniform1i(pLwc->shader[shader_index].diffuse_location, 0);
-    glBindTexture(GL_TEXTURE_2D, pLwc->tex_atlas[pLwc->tex_atlas_index]);
+    lazy_tex_atlas_glBindTexture(pLwc, pLwc->tex_atlas_index);
     glUniform1f(pLwc->shader[shader_index].overlay_color_ratio_location, 0);
     glUniformMatrix4fv(pLwc->shader[shader_index].mvp_location, 1, GL_FALSE, (const GLfloat*)pLwc->proj);
     

@@ -124,13 +124,13 @@ void render_enemy_scope(const LWCONTEXT* pLwc, float ux, float uy, float width, 
 	glUniformMatrix4fv(pLwc->shader[shader_index].mvp_location, 1, GL_FALSE,
 		(const GLfloat *)proj_view_model);
 	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_2D, pLwc->tex_atlas[LAE_U_ENEMY_SCOPE_KTX]);
+    lazy_tex_atlas_glBindTexture(pLwc, LAE_U_ENEMY_SCOPE_KTX);
 	//glBindTexture(GL_TEXTURE_2D, pLwc->tex_programmed[LPT_SOLID_RED]);
 	set_tex_filter(GL_LINEAR, GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 	glActiveTexture(GL_TEXTURE1);
-	glBindTexture(GL_TEXTURE_2D, pLwc->tex_atlas[LAE_U_ENEMY_SCOPE_ALPHA_KTX]);
+    lazy_tex_atlas_glBindTexture(pLwc, LAE_U_ENEMY_SCOPE_ALPHA_KTX);
 	//glBindTexture(GL_TEXTURE_2D, pLwc->tex_programmed[LPT_SOLID_WHITE_WITH_ALPHA]);
 	set_tex_filter(GL_LINEAR, GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
@@ -202,7 +202,7 @@ void render_enemy_shadow_3d(
 	glUniformMatrix4fv(pLwc->shader[shader_index].mvp_location, 1, GL_FALSE,
 		(const GLfloat *)pvm);
 	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_2D, pLwc->tex_atlas[LAE_C2_PNG]);
+    lazy_tex_atlas_glBindTexture(pLwc, LAE_C2_PNG);
 	set_tex_filter(GL_LINEAR_MIPMAP_LINEAR, GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
@@ -266,7 +266,7 @@ void render_enemy_3d(
 			(const GLfloat *)proj_view_model);
 		glUniform3f(pLwc->shader[shader_index].overlay_color_location, 1, 0, 0);
 		glUniform1f(pLwc->shader[shader_index].overlay_color_ratio_location, 0.0f);
-		glBindTexture(GL_TEXTURE_2D, pLwc->tex_atlas[LAE_C2_PNG]);
+        lazy_tex_atlas_glBindTexture(pLwc, LAE_C2_PNG);
 		//glBindTexture(GL_TEXTURE_2D, pLwc->tex_programmed[LPT_SOLID_BLUE]);
 		set_tex_filter(GL_LINEAR_MIPMAP_LINEAR, GL_LINEAR);
 
@@ -361,12 +361,12 @@ void render_attack_trail_3d(
 	glUniformMatrix4fv(pLwc->shader[shader_index].mvp_location, 1, GL_FALSE,
 		(const GLfloat *)proj_view_model);
 	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_2D, pLwc->tex_atlas[LAE_FX_TRAIL]);
+	lazy_tex_atlas_glBindTexture(pLwc, LAE_FX_TRAIL);
 	set_tex_filter(GL_LINEAR, GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 	glActiveTexture(GL_TEXTURE1);
-	glBindTexture(GL_TEXTURE_2D, pLwc->tex_atlas[LAE_FX_TRAIL_ALPHA]);
+	lazy_tex_atlas_glBindTexture(pLwc, LAE_FX_TRAIL_ALPHA);
 	set_tex_filter(GL_LINEAR, GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
@@ -414,7 +414,7 @@ static void render_battle_twirl(const LWCONTEXT* pLwc, const mat4x4 view, const 
         lazy_glBindBuffer(pLwc, LVT_BATTLE_BOWL_INNER);
 		bind_all_vertex_attrib(pLwc, LVT_BATTLE_BOWL_INNER);
 		glUniformMatrix4fv(pLwc->shader[shader_index].mvp_location, 1, GL_FALSE, (const GLfloat*)proj_view_model);
-		glBindTexture(GL_TEXTURE_2D, pLwc->tex_atlas[LAE_TWIRL_PNG]);
+        lazy_tex_atlas_glBindTexture(pLwc, LAE_TWIRL_PNG);
 		set_tex_filter(GL_LINEAR_MIPMAP_LINEAR, GL_LINEAR);
 		glDrawArrays(GL_TRIANGLES, 0, pLwc->vertex_buffer[LVT_BATTLE_BOWL_INNER].vertex_count);
 	}
@@ -441,7 +441,7 @@ static void render_battle_twirl(const LWCONTEXT* pLwc, const mat4x4 view, const 
         lazy_glBindBuffer(pLwc, LVT_BATTLE_BOWL_OUTER);
 		bind_all_vertex_attrib(pLwc, LVT_BATTLE_BOWL_OUTER);
 		glUniformMatrix4fv(pLwc->shader[shader_index].mvp_location, 1, GL_FALSE, (const GLfloat*)proj_view_model);
-		glBindTexture(GL_TEXTURE_2D, pLwc->tex_atlas[LAE_TWIRL_PNG]);
+        lazy_tex_atlas_glBindTexture(pLwc, LAE_TWIRL_PNG);
 		set_tex_filter(GL_LINEAR_MIPMAP_NEAREST, GL_LINEAR);
 		glDrawArrays(GL_TRIANGLES, 0, pLwc->vertex_buffer[LVT_BATTLE_BOWL_OUTER].vertex_count);
 	}
@@ -532,6 +532,8 @@ void render_player_creature_ui(const LWCONTEXT* pLwc, const LWBATTLECREATURE* c,
 		const float turn_token_y = left_top_y - block_y_margin - turn_token_size / 2;
 
 		if (!c->turn_consumed && c->selected) {
+            lw_load_tex(pLwc, LAE_U_GLOW);
+            lw_load_tex(pLwc, LAE_U_GLOW_ALPHA);
 			render_solid_vb_ui_alpha(
 				pLwc,
 				turn_token_x,
@@ -867,9 +869,21 @@ void render_center_image(const LWCONTEXT* pLwc) {
 	if (pLwc->center_image_anim.t > 0) {
 		const float s = LWCLAMP(5 * lwanim_get_1d(&pLwc->center_image_anim), 0, 1);
 		if (s > 0) {
-			render_solid_vb_ui_alpha(pLwc, 0, 0, s, s,
-				pLwc->tex_atlas[pLwc->center_image], pLwc->tex_atlas[pLwc->center_image + 1],
-				LVT_CENTER_CENTER_ANCHORED_SQUARE, 1, 0, 0, 0, 0);
+            lw_load_tex(pLwc, pLwc->center_image);
+            lw_load_tex(pLwc, pLwc->center_image + 1);
+			render_solid_vb_ui_alpha(pLwc,
+                                     0,
+                                     0,
+                                     s,
+                                     s,
+                                     pLwc->tex_atlas[pLwc->center_image],
+                                     pLwc->tex_atlas[pLwc->center_image + 1],
+                                     LVT_CENTER_CENTER_ANCHORED_SQUARE,
+                                     1,
+                                     0,
+                                     0,
+                                     0,
+                                     0);
 		}
 	}
 }
@@ -895,7 +909,7 @@ void lwc_render_battle(const LWCONTEXT* pLwc) {
 	glUniform1i(pLwc->shader[shader_index].diffuse_location, 0); // 0 means GL_TEXTURE0
 
 	// default texture param
-	glBindTexture(GL_TEXTURE_2D, pLwc->tex_atlas[pLwc->tex_atlas_index]);
+	lazy_tex_atlas_glBindTexture(pLwc, pLwc->tex_atlas_index);
 
 
 	glUniformMatrix4fv(pLwc->shader[shader_index].mvp_location, 1, GL_FALSE, (const GLfloat*)pLwc->proj);

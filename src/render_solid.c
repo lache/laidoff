@@ -3,6 +3,7 @@
 #include "laidoff.h"
 #include "lwanim.h"
 #include "lwlog.h"
+#include <assert.h>
 
 void render_solid_box_ui_lvt_flip_y_uv(const LWCONTEXT* pLwc, float x, float y, float w, float h, GLuint tex_index, enum _LW_VBO_TYPE lvt, int flip_y_uv) {
     render_solid_vb_ui_flip_y_uv(pLwc, x, y, w, h, tex_index, lvt, 1, 1, 1, 1, 0, flip_y_uv);
@@ -75,6 +76,7 @@ void render_solid_vb_ui_flip_y_uv_shader_rot(const LWCONTEXT* pLwc,
     lazy_glBindBuffer(pLwc, lvt);
     bind_all_vertex_attrib(pLwc, lvt);
     glActiveTexture(GL_TEXTURE0);
+    //assert(tex_index);
     glBindTexture(GL_TEXTURE_2D, tex_index);
     set_tex_filter(GL_LINEAR, GL_LINEAR);
     //set_tex_filter(GL_NEAREST, GL_NEAREST);
@@ -136,9 +138,11 @@ void render_solid_vb_ui_alpha_uv(const LWCONTEXT* pLwc,
     lazy_glBindBuffer(pLwc, lvt);
     bind_all_vertex_attrib_etc1_with_alpha(pLwc, lvt);
     glActiveTexture(GL_TEXTURE0);
+    assert(tex_index);
     glBindTexture(GL_TEXTURE_2D, tex_index);
     set_tex_filter(GL_LINEAR, GL_LINEAR);
     glActiveTexture(GL_TEXTURE1);
+    assert(tex_index);
     glBindTexture(GL_TEXTURE_2D, tex_alpha_index);
     set_tex_filter(GL_LINEAR, GL_LINEAR);
     glUniformMatrix4fv(shader->mvp_location, 1, GL_FALSE, (const GLfloat*)proj_view_model);

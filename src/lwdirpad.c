@@ -4,6 +4,7 @@
 #include "linmath.h"
 #include "laidoff.h"
 #include <string.h>
+#include "lwatlasenum.h"
 
 void render_dir_pad(const LWCONTEXT* pLwc, float x, float y) {
     int shader_index = LWST_DEFAULT;
@@ -71,7 +72,7 @@ void render_dir_pad_joystick_type(const LWCONTEXT* pLwc, float x, float y, LW_AT
     glUniformMatrix4fv(shader->mvp_location, 1, GL_FALSE, (const GLfloat*)proj_view_model);
     glActiveTexture(GL_TEXTURE0);
     glUniform1i(shader->diffuse_location, 0); // 0 means GL_TEXTURE0
-    glBindTexture(GL_TEXTURE_2D, pLwc->tex_atlas[lae]);
+    lazy_tex_atlas_glBindTexture(pLwc, lae);
     set_tex_filter(GL_LINEAR, GL_LINEAR);
 
     glEnable(GL_BLEND);
