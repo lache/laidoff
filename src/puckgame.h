@@ -1,8 +1,5 @@
 #pragma once
-#include "lwatlasenum.h"
-#include "lwvbotype.h"
-#include "armature.h"
-#include "lwanim.h"
+#include "linmath.h"
 #include "puckgamepacket.h"
 #include <ode/ode.h>
 

@@ -52,6 +52,7 @@
 #include "puckgameupdate.h"
 #include "render_leaderboard.h"
 #include "numcomp_puck_game.h"
+#include "lwvbo.h"
 // SWIG output file
 #include "lo_wrap.inl"
 
@@ -177,22 +178,6 @@ static void init_gl_shaders(LWCONTEXT* pLwc) {
     lw_create_all_shader_program(pLwc);
 }
 
-static void load_vbo(LWCONTEXT* pLwc, const char* filename, LWVBO* pVbo) {
-    GLuint vbo = 0;
-    glGenBuffers(1, &vbo);
-    glBindBuffer(GL_ARRAY_BUFFER, vbo);
-
-    size_t mesh_file_size = 0;
-    char *mesh_vbo_data = create_binary_from_file(filename, &mesh_file_size);
-    glBufferData(GL_ARRAY_BUFFER, mesh_file_size, mesh_vbo_data, GL_STATIC_DRAW);
-    release_binary(mesh_vbo_data);
-
-    glBindBuffer(GL_ARRAY_BUFFER, 0);
-
-    pVbo->vertex_buffer = vbo;
-    pVbo->vertex_count = (int)(mesh_file_size / stride_in_bytes);
-}
-
 static void load_skin_vbo(LWCONTEXT* pLwc, const char *filename, LWVBO *pSvbo) {
     GLuint vbo = 0;
     glGenBuffers(1, &vbo);
@@ -240,136 +225,7 @@ static void init_fanim(LWCONTEXT* pLwc) {
 static void init_vbo(LWCONTEXT* pLwc) {
 
     // === STATIC MESHES ===
-
-    // LVT_BATTLE_BOWL_OUTER
-    load_vbo(pLwc, ASSETS_BASE_PATH "vbo" PATH_SEPARATOR "Bowl_Outer.vbo",
-             &pLwc->vertex_buffer[LVT_BATTLE_BOWL_OUTER]);
-
-    // LVT_BATTLE_BOWL_INNER
-    load_vbo(pLwc, ASSETS_BASE_PATH "vbo" PATH_SEPARATOR "Bowl_Inner.vbo",
-             &pLwc->vertex_buffer[LVT_BATTLE_BOWL_INNER]);
-
-    // LVT_ENEMY_SCOPE
-    load_vbo(pLwc, ASSETS_BASE_PATH "vbo" PATH_SEPARATOR "EnemyScope.vbo",
-             &pLwc->vertex_buffer[LVT_ENEMY_SCOPE]);
-
-    // LVT_PLAYER
-    load_vbo(pLwc, ASSETS_BASE_PATH "vbo" PATH_SEPARATOR "Player.vbo",
-             &pLwc->vertex_buffer[LVT_PLAYER]);
-
-    // LVT_CUBE_WALL
-    load_vbo(pLwc, ASSETS_BASE_PATH "vbo" PATH_SEPARATOR "CubeWall.vbo",
-             &pLwc->vertex_buffer[LVT_CUBE_WALL]);
-
-    // LVT_HOME
-    load_vbo(pLwc, ASSETS_BASE_PATH "vbo" PATH_SEPARATOR "Home.vbo",
-             &pLwc->vertex_buffer[LVT_HOME]);
-
-    // LVT_TRAIL
-    load_vbo(pLwc, ASSETS_BASE_PATH "vbo" PATH_SEPARATOR "Trail.vbo",
-             &pLwc->vertex_buffer[LVT_TRAIL]);
-
-    // LVT_FLOOR
-    load_vbo(pLwc, ASSETS_BASE_PATH "vbo" PATH_SEPARATOR "Floor.vbo",
-             &pLwc->vertex_buffer[LVT_FLOOR]);
-
-    // LVT_FLOOR2
-    load_vbo(pLwc, ASSETS_BASE_PATH "vbo" PATH_SEPARATOR "Floor2.vbo",
-             &pLwc->vertex_buffer[LVT_FLOOR2]);
-
-    // LVT_ROOM
-    load_vbo(pLwc, ASSETS_BASE_PATH "vbo" PATH_SEPARATOR "room.vbo",
-             &pLwc->vertex_buffer[LVT_ROOM]);
-
-    // LVT_BATTLEGROUND_FLOOR
-    load_vbo(pLwc, ASSETS_BASE_PATH "vbo" PATH_SEPARATOR "battleground-floor.vbo",
-             &pLwc->vertex_buffer[LVT_BATTLEGROUND_FLOOR]);
-
-    // LVT_BATTLEGROUND_WALL
-    load_vbo(pLwc, ASSETS_BASE_PATH "vbo" PATH_SEPARATOR "battleground-wall.vbo",
-             &pLwc->vertex_buffer[LVT_BATTLEGROUND_WALL]);
-
-    // LVT_SPHERE
-    load_vbo(pLwc, ASSETS_BASE_PATH "vbo" PATH_SEPARATOR "Sphere.vbo",
-             &pLwc->vertex_buffer[LVT_SPHERE]);
-
-    // LVT_APT
-    load_vbo(pLwc, ASSETS_BASE_PATH "vbo" PATH_SEPARATOR "Apt.vbo",
-             &pLwc->vertex_buffer[LVT_APT]);
-
-    // LVT_BEAM
-    load_vbo(pLwc, ASSETS_BASE_PATH "vbo" PATH_SEPARATOR "Beam.vbo",
-             &pLwc->vertex_buffer[LVT_BEAM]);
-
-    // LVT_PUMP
-    load_vbo(pLwc, ASSETS_BASE_PATH "vbo" PATH_SEPARATOR "Pump.vbo",
-             &pLwc->vertex_buffer[LVT_PUMP]);
-
-    // LVT_OIL_TRUCK
-    load_vbo(pLwc, ASSETS_BASE_PATH "vbo" PATH_SEPARATOR "OilTruck.vbo",
-             &pLwc->vertex_buffer[LVT_OIL_TRUCK]);
-
-    // LVT_CROSSBOW_ARROW
-    load_vbo(pLwc, ASSETS_BASE_PATH "vbo" PATH_SEPARATOR "crossbow-arrow.vbo",
-             &pLwc->vertex_buffer[LVT_CROSSBOW_ARROW]);
-
-    // LVT_CATAPULT_BALL
-    load_vbo(pLwc, ASSETS_BASE_PATH "vbo" PATH_SEPARATOR "catapult-ball.vbo",
-             &pLwc->vertex_buffer[LVT_CATAPULT_BALL]);
-
-    // LVT_DEVIL
-    load_vbo(pLwc, ASSETS_BASE_PATH "vbo" PATH_SEPARATOR "devil.vbo",
-             &pLwc->vertex_buffer[LVT_DEVIL]);
-
-    // LVT_CRYSTAL
-    load_vbo(pLwc, ASSETS_BASE_PATH "vbo" PATH_SEPARATOR "crystal.vbo",
-             &pLwc->vertex_buffer[LVT_CRYSTAL]);
-
-    // LVT_SPIRAL
-    load_vbo(pLwc, ASSETS_BASE_PATH "vbo" PATH_SEPARATOR "spiral.vbo",
-             &pLwc->vertex_buffer[LVT_SPIRAL]);
-    // LVT_PUCK
-    load_vbo(pLwc, ASSETS_BASE_PATH "vbo" PATH_SEPARATOR "puck.vbo",
-             &pLwc->vertex_buffer[LVT_PUCK]);
-    // LVT_PLAYER
-    load_vbo(pLwc, ASSETS_BASE_PATH "vbo" PATH_SEPARATOR "puck-player.vbo",
-             &pLwc->vertex_buffer[LVT_PUCK_PLAYER]);
-    // LVT_TOWER_BASE
-    load_vbo(pLwc, ASSETS_BASE_PATH "vbo" PATH_SEPARATOR "tower-base.vbo",
-             &pLwc->vertex_buffer[LVT_TOWER_BASE]);
-    // LVT_TOWER_1
-    load_vbo(pLwc, ASSETS_BASE_PATH "vbo" PATH_SEPARATOR "tower-1.vbo",
-             &pLwc->vertex_buffer[LVT_TOWER_1]);
-    // LVT_TOWER_2
-    load_vbo(pLwc, ASSETS_BASE_PATH "vbo" PATH_SEPARATOR "tower-2.vbo",
-             &pLwc->vertex_buffer[LVT_TOWER_2]);
-    // LVT_TOWER_3
-    load_vbo(pLwc, ASSETS_BASE_PATH "vbo" PATH_SEPARATOR "tower-3.vbo",
-             &pLwc->vertex_buffer[LVT_TOWER_3]);
-    // LVT_TOWER_4
-    load_vbo(pLwc, ASSETS_BASE_PATH "vbo" PATH_SEPARATOR "tower-4.vbo",
-             &pLwc->vertex_buffer[LVT_TOWER_4]);
-    // LVT_TOWER_5
-    load_vbo(pLwc, ASSETS_BASE_PATH "vbo" PATH_SEPARATOR "tower-5.vbo",
-             &pLwc->vertex_buffer[LVT_TOWER_5]);
-    // LVT_RINGGAUGE
-    load_vbo(pLwc, ASSETS_BASE_PATH "vbo" PATH_SEPARATOR "ringgauge.vbo",
-             &pLwc->vertex_buffer[LVT_RINGGAUGE]);
-    // LVT_RINGGAUGETHICK
-    load_vbo(pLwc, ASSETS_BASE_PATH "vbo" PATH_SEPARATOR "ringgaugethick.vbo",
-             &pLwc->vertex_buffer[LVT_RINGGAUGETHICK]);
-    // LVT_RADIALWAVE
-    load_vbo(pLwc, ASSETS_BASE_PATH "vbo" PATH_SEPARATOR "radialwave.vbo",
-             &pLwc->vertex_buffer[LVT_RADIALWAVE]);
-    // LVT_PHYSICS_MENU
-    load_vbo(pLwc, ASSETS_BASE_PATH "vbo" PATH_SEPARATOR "physics-menu.vbo",
-             &pLwc->vertex_buffer[LVT_PHYSICS_MENU]);
-    // LVT_PUCK_FLOOR_COVER
-    load_vbo(pLwc, ASSETS_BASE_PATH "vbo" PATH_SEPARATOR "puck-floor-cover.vbo",
-             &pLwc->vertex_buffer[LVT_PUCK_FLOOR_COVER]);
-    // LVT_TOWER_BASE_2
-    load_vbo(pLwc, ASSETS_BASE_PATH "vbo" PATH_SEPARATOR "tower-base-2.vbo",
-             &pLwc->vertex_buffer[LVT_TOWER_BASE_2]);
+    lw_load_all_vbo(pLwc);
 
     // LVT_LEFT_TOP_ANCHORED_SQUARE ~ LVT_RIGHT_BOTTOM_ANCHORED_SQUARE
     // 9 anchored squares...
