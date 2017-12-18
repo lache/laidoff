@@ -8,6 +8,10 @@
 
 /* Begin PBXBuildFile section */
 		2601224A1FDFDF03005941B7 /* lwatlassprite.c in Sources */ = {isa = PBXBuildFile; fileRef = 260122491FDFDF03005941B7 /* lwatlassprite.c */; };
+		2640E1741FE7E22200504A37 /* lwfragshader.c in Sources */ = {isa = PBXBuildFile; fileRef = 2640E16F1FE7E22200504A37 /* lwfragshader.c */; };
+		2640E1751FE7E22200504A37 /* lwgl.c in Sources */ = {isa = PBXBuildFile; fileRef = 2640E1711FE7E22200504A37 /* lwgl.c */; };
+		2640E1761FE7E22200504A37 /* lwvertexshader.c in Sources */ = {isa = PBXBuildFile; fileRef = 2640E1721FE7E22200504A37 /* lwvertexshader.c */; };
+		2640E1781FE7E25800504A37 /* lwshader.c in Sources */ = {isa = PBXBuildFile; fileRef = 2640E1771FE7E25800504A37 /* lwshader.c */; };
 		2641822E1FB6FD0300BF2D42 /* lwdamagetext.c in Sources */ = {isa = PBXBuildFile; fileRef = 2641822D1FB6FD0300BF2D42 /* lwdamagetext.c */; };
 		264182301FB6FD0900BF2D42 /* lwmath.c in Sources */ = {isa = PBXBuildFile; fileRef = 2641822F1FB6FD0900BF2D42 /* lwmath.c */; };
 		26457DB71FBACE6600FFEE74 /* lwime.c in Sources */ = {isa = PBXBuildFile; fileRef = 26457DB51FBACE6600FFEE74 /* lwime.c */; };
@@ -392,6 +396,12 @@
 /* Begin PBXFileReference section */
 		260122491FDFDF03005941B7 /* lwatlassprite.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = lwatlassprite.c; sourceTree = "<group>"; };
 		2601AFFC1EE1549700989AA6 /* platform.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = platform.h; path = ../build/include/platform.h; sourceTree = "<group>"; };
+		2640E16F1FE7E22200504A37 /* lwfragshader.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = lwfragshader.c; sourceTree = "<group>"; };
+		2640E1701FE7E22200504A37 /* lwfragshader.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = lwfragshader.h; sourceTree = "<group>"; };
+		2640E1711FE7E22200504A37 /* lwgl.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = lwgl.c; sourceTree = "<group>"; };
+		2640E1721FE7E22200504A37 /* lwvertexshader.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = lwvertexshader.c; sourceTree = "<group>"; };
+		2640E1731FE7E22200504A37 /* lwvertexshader.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = lwvertexshader.h; sourceTree = "<group>"; };
+		2640E1771FE7E25800504A37 /* lwshader.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = lwshader.c; sourceTree = "<group>"; };
 		2641822D1FB6FD0300BF2D42 /* lwdamagetext.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = lwdamagetext.c; sourceTree = "<group>"; };
 		2641822F1FB6FD0900BF2D42 /* lwmath.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = lwmath.c; sourceTree = "<group>"; };
 		26457DB51FBACE6600FFEE74 /* lwime.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = lwime.c; sourceTree = "<group>"; };
@@ -2092,9 +2102,12 @@
 				6C7739741FB4B5A4001014DE /* lwfieldobject.h */,
 				6C7739811FB4B5A5001014DE /* lwfieldrendercommand.c */,
 				6C77392C1FB4B59E001014DE /* lwfieldrendercommand.h */,
+				2640E16F1FE7E22200504A37 /* lwfragshader.c */,
+				2640E1701FE7E22200504A37 /* lwfragshader.h */,
 				6C2751CF1FDAC8E100D1266A /* lwfvbo.c */,
 				6C2751D01FDAC8E100D1266A /* lwfvbo.h */,
 				6C7739BB1FB4B5AA001014DE /* lwgamescene.h */,
+				2640E1711FE7E22200504A37 /* lwgl.c */,
 				6C7739921FB4B5A6001014DE /* lwgl.h */,
 				26457DB51FBACE6600FFEE74 /* lwime.c */,
 				26457DB61FBACE6600FFEE74 /* lwime.h */,
@@ -2108,6 +2121,7 @@
 				6C7739A51FB4B5A8001014DE /* lwprogrammedtex.h */,
 				6C7739281FB4B59E001014DE /* lwringbuffer.c */,
 				6C7739521FB4B5A1001014DE /* lwringbuffer.h */,
+				2640E1771FE7E25800504A37 /* lwshader.c */,
 				6C7739611FB4B5A2001014DE /* lwshader.h */,
 				6C77398E1FB4B5A6001014DE /* lwsimpleanim.c */,
 				6C77393D1FB4B59F001014DE /* lwsimpleanim.h */,
@@ -2133,6 +2147,8 @@
 				6C7739721FB4B5A4001014DE /* lwuniqueid.h */,
 				6C77399C1FB4B5A7001014DE /* lwvbo.h */,
 				6C7739A61FB4B5A8001014DE /* lwvbotype.h */,
+				2640E1721FE7E22200504A37 /* lwvertexshader.c */,
+				2640E1731FE7E22200504A37 /* lwvertexshader.h */,
 				6C7739461FB4B5A0001014DE /* mq.c */,
 				6C7739531FB4B5A1001014DE /* mq.h */,
 				6C7739A81FB4B5A8001014DE /* nav.cpp */,
@@ -2554,6 +2570,7 @@
 				56F189B91EC751950019312F /* zsys.c in Sources */,
 				6CA16D841EA210BB00DB7AF0 /* lcode.c in Sources */,
 				56F188FB1EC74DB60019312F /* tipc_listener.cpp in Sources */,
+				2640E1751FE7E22200504A37 /* lwgl.c in Sources */,
 				56F189B81EC751950019312F /* zstr.c in Sources */,
 				6CA16D911EA210BB00DB7AF0 /* lmem.c in Sources */,
 				5663735F1EBA52D4001DA3F4 /* transmission.cpp in Sources */,
@@ -2568,6 +2585,7 @@
 				56F188E61EC74DB60019312F /* router.cpp in Sources */,
 				56F188A71EC74DB60019312F /* client.cpp in Sources */,
 				6C7739EF1FB4B5AA001014DE /* lwbattlecreature.c in Sources */,
+				2640E1761FE7E22200504A37 /* lwvertexshader.c in Sources */,
 				6CA16D8B1EA210BB00DB7AF0 /* lfunc.c in Sources */,
 				5663733D1EBA52D3001DA3F4 /* collision_trimesh_internal.cpp in Sources */,
 				6C7739D21FB4B5AA001014DE /* battlelogic.c in Sources */,
@@ -2682,6 +2700,7 @@
 				56F188D81EC74DB60019312F /* poller_base.cpp in Sources */,
 				6CA16CE21EA20B5600DB7AF0 /* GameViewController.m in Sources */,
 				56F188B41EC74DB60019312F /* fq.cpp in Sources */,
+				2640E1781FE7E25800504A37 /* lwshader.c in Sources */,
 				56F1899C1EC751950019312F /* zdir.c in Sources */,
 				56F188AC1EC74DB60019312F /* dealer.cpp in Sources */,
 				56F189931EC751950019312F /* zarmour.c in Sources */,
@@ -2693,6 +2712,7 @@
 				6C0CB6201FC30FC800DA4E51 /* render_leaderboard.c in Sources */,
 				56F188F01EC74DB60019312F /* stream.cpp in Sources */,
 				56F189A61EC751950019312F /* zhash.c in Sources */,
+				2640E1741FE7E22200504A37 /* lwfragshader.c in Sources */,
 				6CA16D831EA210BB00DB7AF0 /* lbitlib.c in Sources */,
 				56F189AC1EC751950019312F /* zloop.c in Sources */,
 				6C2751D21FDAC8E100D1266A /* lwfvbo.c in Sources */,

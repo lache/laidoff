@@ -3,6 +3,7 @@
 #include "lwgl.h"
 #include "file.h"
 #include "lwcontext.h"
+#include <stdlib.h>
 
 GLuint lw_create_vertex_shader(LW_VERTEX_SHADER lwvs, const char* path) {
     char* vst = create_string_from_file(path);

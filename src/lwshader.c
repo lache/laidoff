@@ -1,6 +1,7 @@
 #include "lwshader.h"
 #include "lwlog.h"
 #include "lwcontext.h"
+#include <stdlib.h>
 
 int lw_create_shader_program(const char* shader_name, LWSHADER* pShader, GLuint vs, GLuint fs) {
     pShader->valid = 0;

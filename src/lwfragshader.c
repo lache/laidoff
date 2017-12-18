@@ -4,6 +4,7 @@
 #include "lwgl.h"
 #include "file.h"
 #include "lwcontext.h"
+#include <stdlib.h>
 
 GLuint lw_create_frag_shader(LW_FRAG_SHADER lwfs, const char* path) {
     char* vst = create_string_from_file(path);
