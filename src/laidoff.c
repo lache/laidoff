@@ -564,12 +564,13 @@ void render_stat(const LWCONTEXT* pLwc) {
     SET_COLOR_RGBA_FLOAT(text_block.color_emp_glyph, 1, 1, 0, 1);
     SET_COLOR_RGBA_FLOAT(text_block.color_emp_outline, 0, 0, 0, 1);
     char msg[128];
-    sprintf(msg, "L:%.1f R:%.1f RMSG:%d(%d-%d)",
+    sprintf(msg, "L:%.1f R:%.1f RMSG:%d(%d-%d) v%s",
         (float)(1.0 / deltatime_history_avg(pLwc->update_dt)),
             (float)(1.0 / deltatime_history_avg(pLwc->render_dt)),
             pLwc->rmsg_send_count - pLwc->rmsg_recv_count,
             pLwc->rmsg_send_count,
-            pLwc->rmsg_recv_count
+            pLwc->rmsg_recv_count,
+            package_version()
     );
     text_block.text = msg;
     text_block.text_bytelen = (int)strlen(text_block.text);
@@ -1586,4 +1587,12 @@ double lwcontext_delta_time(const LWCONTEXT* pLwc) {
 
 void lw_set_push_token(LWCONTEXT* pLwc, int domain, const char* token) {
     tcp_send_push_token(pLwc->tcp, 300, domain, token);
+}
+
+static char packageVersion[64];
+void set_package_version(const char* package_version) {
+    strcpy(packageVersion, package_version);
+}
+const char* package_version() {
+    return packageVersion;
 }

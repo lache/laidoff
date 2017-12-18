@@ -90,6 +90,7 @@ void lw_set_device_model(LWCONTEXT* pLwc, const char* model);
 void lw_flag_logic_actor_to_quit_and_wait(LWCONTEXT* pLwc);
 void set_vertex_attrib_pointer(const LWCONTEXT* pLwc, int shader_index);
 void load_png_pkm_sw_decoding(LWCONTEXT* pLwc, int i);
+void set_package_version(const char* package_version);
     
 extern const float default_uv_offset[2];
 extern const float default_uv_scale[2];

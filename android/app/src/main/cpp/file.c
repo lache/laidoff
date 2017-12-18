@@ -12,8 +12,7 @@
 #define  LOGD(...)  __android_log_print(ANDROID_LOG_DEBUG,LOG_TAG,__VA_ARGS__)
 #define  LOGI(...)  __android_log_print(ANDROID_LOG_INFO,LOG_TAG,__VA_ARGS__)
 
-typedef struct _NativeAsset
-{
+typedef struct _NativeAsset {
     unsigned long asset_hash;
     int start_offset;
     int length;
@@ -24,29 +23,23 @@ static int nativeAssetLength;
 static char apkPath[2048];
 static char filesPath[2048];
 
-void set_apk_path(const char* apk_path)
-{
+void set_apk_path(const char* apk_path) {
     strcpy(apkPath, apk_path);
 }
 
-void set_files_path(const char* files_path)
-{
+void set_files_path(const char* files_path) {
     strcpy(filesPath, files_path);
 }
 
-void release_string(char* d)
-{
+void release_string(char* d) {
     free(d);
 }
 
-char* create_asset_file(const char* filename, size_t* size, int binary)
-{
-    unsigned long asset_hash = hash((const unsigned char*)filename);
+char* create_asset_file(const char* filename, size_t* size, int binary) {
+    unsigned long asset_hash = hash((const unsigned char*) filename);
 
-    for (int i = 0; i < nativeAssetLength; i++)
-    {
-        if (nativeAssetArray[i].asset_hash == asset_hash)
-        {
+    for (int i = 0; i < nativeAssetLength; i++) {
+        if (nativeAssetArray[i].asset_hash == asset_hash) {
             FILE* f = fopen(apkPath, binary ? "rb" : "r");
 
             char* p = malloc(nativeAssetArray[i].length + (binary ? 0 : 1));
@@ -55,8 +48,7 @@ char* create_asset_file(const char* filename, size_t* size, int binary)
 
             int freadResult = fread(p, nativeAssetArray[i].length, 1, f);
 
-            if (!binary)
-            {
+            if (!binary) {
                 p[nativeAssetArray[i].length] = '\0'; // null termination for string data needed
             }
 
@@ -80,89 +72,85 @@ char* create_asset_file(const char* filename, size_t* size, int binary)
 }
 
 const char* get_filename_only(const char* filename) {
-	size_t l = strlen(filename);
-	for (int i = l - 1; i >= 0; i--) {
-		if (filename[i] == '/') {
-			return &filename[i + 1];
-		}
-	}
+    size_t l = strlen(filename);
+    for (int i = l - 1; i >= 0; i--) {
+        if (filename[i] == '/') {
+            return &filename[i + 1];
+        }
+    }
 
-	return filename;
+    return filename;
 }
 
-char* create_asset_file_from_downloaded(const char* filename, size_t* size, int binary)
-{
-	char download_path[1024] = {0,};
-	strcat(download_path, filesPath);
-	strcat(download_path, "/");
-	strcat(download_path, get_filename_only(filename));
+char* create_asset_file_from_downloaded(const char* filename, size_t* size, int binary) {
+    char download_path[1024] = {0,};
+    strcat(download_path, filesPath);
+    strcat(download_path, "/");
+    strcat(download_path, get_filename_only(filename));
 
-	FILE* f = fopen(download_path, binary ? "rb" : "r");
+    FILE* f = fopen(download_path, binary ? "rb" : "r");
     if (f == 0) {
         LOGE("create_asset_file_from_downloaded fopen failed! %s", download_path);
         return 0;
     }
-	int fseekResult = fseek(f, 0, SEEK_END);
-	*size = ftell(f);
-	fseek(f, 0, SEEK_SET);
+    int fseekResult = fseek(f, 0, SEEK_END);
+    *size = ftell(f);
+    fseek(f, 0, SEEK_SET);
 
-	char* p = malloc(*size + (binary ? 0 : 1));
+    char* p = malloc(*size + (binary ? 0 : 1));
 
-	int freadResult = fread(p, *size, 1, f);
+    int freadResult = fread(p, *size, 1, f);
 
-	if (!binary)
-	{
-		p[*size] = '\0'; // null termination for string data needed
-	}
+    if (!binary) {
+        p[*size] = '\0'; // null termination for string data needed
+    }
 
-	LOGI("create_asset_file_from_downloaded: %s size: %d, fseekResult: %d, errno: %d, binary: %d, test: %s",
-		 filename,
-		 *size,
-		 fseekResult,
-		 errno,
-		 binary,
-		 p
-	);
+    LOGI("create_asset_file_from_downloaded: %s size: %d, fseekResult: %d, errno: %d, binary: %d, test: %s",
+         filename,
+         *size,
+         fseekResult,
+         errno,
+         binary,
+         p
+    );
 
-	fclose(f);
-	return p;
+    fclose(f);
+    return p;
 }
 
-char* create_binary_from_file(const char* filename, size_t* size)
-{
-	int from_downloaded = 1;
-	if (from_downloaded) {
-		return create_asset_file_from_downloaded(filename, size, 1);
-	} else {
-		return create_asset_file(filename, size, 1);
-	}
+char* create_binary_from_file(const char* filename, size_t* size) {
+    int from_downloaded = 1;
+    if (from_downloaded) {
+        return create_asset_file_from_downloaded(filename, size, 1);
+    } else {
+        return create_asset_file(filename, size, 1);
+    }
 }
 
-char* create_string_from_file(const char* filename)
-{
-	LOGI("create_string_from_file: %s", filename);
-	int from_downloaded = 1;
-	size_t size;
-	if (from_downloaded) {
-		return create_asset_file_from_downloaded(filename, &size, 0);
-	} else {
-		return create_asset_file(filename, &size, 0);
-	}
+char* create_string_from_file(const char* filename) {
+    LOGI("create_string_from_file: %s", filename);
+    int from_downloaded = 1;
+    size_t size;
+    if (from_downloaded) {
+        return create_asset_file_from_downloaded(filename, &size, 0);
+    } else {
+        return create_asset_file(filename, &size, 0);
+    }
 }
 
-void release_binary(char* d)
-{
+void release_binary(char* d) {
     free(d);
 }
 
 void register_asset(const char* asset_path, int start_offset, int length) {
 
-    nativeAssetArray[nativeAssetLength].asset_hash = hash((unsigned char *)asset_path);
+    nativeAssetArray[nativeAssetLength].asset_hash = hash((unsigned char*) asset_path);
     nativeAssetArray[nativeAssetLength].start_offset = start_offset;
     nativeAssetArray[nativeAssetLength].length = length;
 
     LOGI("Asset #%d (hash=%lu) registered: %s, start_offset=%d, length=%d",
-         nativeAssetLength, nativeAssetArray[nativeAssetLength].asset_hash, asset_path, start_offset, length);
+         nativeAssetLength, nativeAssetArray[nativeAssetLength].asset_hash, asset_path,
+         start_offset, length);
 
     nativeAssetLength++;
 }

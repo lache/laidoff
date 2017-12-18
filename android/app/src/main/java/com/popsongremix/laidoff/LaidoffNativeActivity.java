@@ -3,6 +3,8 @@ package com.popsongremix.laidoff;
 import android.app.NativeActivity;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
 import android.content.res.AssetManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -51,7 +53,7 @@ public class LaidoffNativeActivity extends NativeActivity implements RewardedVid
     public static native String signalResourceReady(Class<LaidoffNativeActivity> and9NativeActivityClass);
     public static native int pushTextureData(int width, int height, int[] data, int texAtlasIndex);
     public static native void registerAsset(String assetPath, int startOffset, int length);
-    private static native void sendApkPath(String apkPath, String filesPath);
+    private static native void sendApkPath(String apkPath, String filesPath, String packageVersion);
     public static native void setPushTokenAndSend(String text, long pLwcLong);
 
     public static final String PREFS_NAME = "LaidoffPrefs";
@@ -65,6 +67,7 @@ public class LaidoffNativeActivity extends NativeActivity implements RewardedVid
     @Override
     public void onCreate(Bundle savedInstanceState)
     {
+        INSTANCE = this;
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main);
         // AdMob
@@ -97,7 +100,7 @@ public class LaidoffNativeActivity extends NativeActivity implements RewardedVid
         assetsLoader.registerAllAssetsOfType("l");
         assetsLoader.registerAllAssetsOfType("field");
         assetsLoader.registerAllAssetsOfType("nav");
-        sendApkPath(assetsLoader.GetAPKPath(), getApplicationContext().getFilesDir().getAbsolutePath());
+        sendApkPath(assetsLoader.GetAPKPath(), getApplicationContext().getFilesDir().getAbsolutePath(), getPackageVersion());
 
         downloadResFromServer();
 
@@ -124,8 +127,6 @@ public class LaidoffNativeActivity extends NativeActivity implements RewardedVid
         mBgmPlayer.setLooping(true);
         //mBgmPlayer.prepare();
         //mBgmPlayer.start();
-
-        INSTANCE = this;
 
         /*
         final int atlasCount = 3;
@@ -278,6 +279,17 @@ public class LaidoffNativeActivity extends NativeActivity implements RewardedVid
 
     public static void startPlayMetalHitSound(String dummy) {
         INSTANCE.playMetalHitSound();
+    }
+
+    public static String getPackageVersion() {
+        String packageVersionName = "0.0.0";
+        try {
+            PackageInfo packageInfo = INSTANCE.getPackageManager().getPackageInfo(INSTANCE.getPackageName(), 0);
+            packageVersionName = packageInfo.versionName;
+        } catch (PackageManager.NameNotFoundException e) {
+            e.printStackTrace();
+        }
+        return packageVersionName;
     }
 
     // AdMob reward video callbacks

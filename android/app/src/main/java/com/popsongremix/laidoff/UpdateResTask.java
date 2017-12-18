@@ -83,13 +83,7 @@ class UpdateResTask extends AsyncTask<UpdateResTaskParam, Void, File> {
     }
 
     private void checkNewVersion(UpdateResTaskParam param) throws Exception {
-        String packageVersionName = "";
-        try {
-            PackageInfo packageInfo = activity.getPackageManager().getPackageInfo(activity.getPackageName(), 0);
-            packageVersionName = packageInfo.versionName;
-        } catch (PackageManager.NameNotFoundException e) {
-            e.printStackTrace();
-        }
+        String packageVersionName = LaidoffNativeActivity.getPackageVersion();
 
         if (packageVersionName.compareTo("0.1.0") == 0) {
             Log.i(LaidoffNativeActivity.LOG_TAG, "Development version name detected. Version check will be skipped.");

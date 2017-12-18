@@ -52,7 +52,9 @@ char internal_data_path[1024];
     CGFloat screenHeight = screenScale * screenRect.size.height;
     
     self.pLwc = lw_init_initial_size((int)screenWidth, (int)screenHeight);
-    NSString *platformString = [UIDeviceHardware platformString];
+    NSString* platformString = [UIDeviceHardware platformString];
+    NSString* bundleVersion = [[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleShortVersionString"];
+    set_package_version([bundleVersion UTF8String]);
     lw_set_device_model(self.pLwc, [platformString UTF8String]);
     lw_set_size(self.pLwc, (int)screenWidth, (int)screenHeight);
     self.pLwc->internal_data_path = internal_data_path;
