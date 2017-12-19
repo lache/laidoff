@@ -105,7 +105,7 @@ func CommitLease(t *DbService, leaseRequest *LeaseWriteRequest) {
 		log.Printf("[Service] Lease ok (user ID %v)", args)
 	} else {
 		leaseDuration := time.Now().Sub(leaseData.LeasedAt)
-		if leaseDuration > 1 * time.Second {
+		if leaseDuration > 1*time.Second {
 			log.Printf("Lease data already exists, but it is too old. (%v) Force remove lease data...", leaseDuration)
 			delete(t.leaseMap, args)
 			CommitLease(t, leaseRequest)
@@ -227,6 +227,7 @@ func createNewUser(uuid user.Id, nickname string) (*user.Db, *os.File, error) {
 		Id:       uuid,
 		Created:  time.Now(),
 		Nickname: nickname,
+		Rating:   1500,
 	}
 	uuidStr := user.IdByteArrayToString(uuid)
 	userDbFile, err := os.Create("db/" + uuidStr)

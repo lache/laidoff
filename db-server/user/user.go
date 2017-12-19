@@ -42,6 +42,7 @@ type Db struct {
 	BattleStat  BattleStat // battle statistics
 	LastLogin   time.Time  // last login date time
 	WeeklyScore int        // weekly score
+	Rating      int        // Elo rating
 }
 
 type LeaseDb struct {

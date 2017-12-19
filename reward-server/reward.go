@@ -10,6 +10,7 @@ import (
 	"github.com/gasbank/laidoff/db-server/user"
 	"github.com/gasbank/laidoff/rank-server/rankservice"
 	"github.com/gasbank/laidoff/shared-server"
+	"math"
 )
 
 const (
@@ -23,7 +24,7 @@ func main() {
 	log.SetFlags(log.Lshortfile | log.LstdFlags)
 	log.Printf("Greetings from %v service", ServiceName)
 	// Connect to rank service
-	rankService := rankservice.New(":20172")
+	rankService := rankservice.New(RankServiceAddr)
 	// Start listening
 	l, err := net.Listen("tcp", ServiceAddr)
 	if err != nil {
@@ -88,40 +89,51 @@ func handleBattleResult(buf []byte, rankService shared_server.RankService, dbSer
 	convert.CCharArrayToGoString(&player2.Nickname, &nickname2)
 	winner := int(recvPacket.S.Winner)
 	log.Printf("Battle result received; id1=%v, id2=%v, winner=%v", id1, id2, winner)
-	newScore1 := 0
-	newScore2 := 0
-	var oldScore1, oldScore2 shared_server.ScoreRankItem
-	err = rankService.Get(&id1, &oldScore1)
+
+	var oldRating1, oldRating2 shared_server.ScoreRankItem
+	err = rankService.Get(&id1, &oldRating1)
 	if err != nil {
 		log.Printf("rpc rank get failed: %v", err.Error())
 	}
-	err = rankService.Get(&id2, &oldScore2)
+	err = rankService.Get(&id2, &oldRating2)
 	if err != nil {
 		log.Printf("rpc rank get failed: %v", err.Error())
 	}
-	newScore1 = oldScore1.Score + 1
-	if winner == 1 {
-		newScore1++
-	}
-	newScore2 = oldScore2.Score + 1
-	if winner == 2 {
-		newScore2++
-	}
+	newRating1, newRating2 := calculateNewRating(oldRating1, oldRating2, winner)
 	var reply1, reply2 int
-	err = rankService.Set(&shared_server.ScoreItem{Id: id1, Score: newScore1, Nickname: nickname1}, &reply1)
+	err = rankService.Set(&shared_server.ScoreItem{Id: id1, Score: newRating1, Nickname: nickname1}, &reply1)
 	if err != nil {
 		log.Printf("rpc rank set failed: %v", err.Error())
 	}
-	err = rankService.Set(&shared_server.ScoreItem{Id: id2, Score: newScore2, Nickname: nickname2}, &reply2)
+	err = rankService.Set(&shared_server.ScoreItem{Id: id2, Score: newRating2, Nickname: nickname2}, &reply2)
 	if err != nil {
 		log.Printf("rpc rank set failed: %v", err.Error())
 	}
 	// update user db battle stat
-	updateUserDbBattleStat(recvPacket, int(recvPacket.S.BattleTimeSec), int(recvPacket.S.Winner), dbService, 1)
-	updateUserDbBattleStat(recvPacket, int(recvPacket.S.BattleTimeSec), int(recvPacket.S.Winner), dbService, 2)
+	updateUserDbBattleStat(recvPacket, int(recvPacket.S.BattleTimeSec), int(recvPacket.S.Winner), dbService, 1, newRating1)
+	updateUserDbBattleStat(recvPacket, int(recvPacket.S.BattleTimeSec), int(recvPacket.S.Winner), dbService, 2, newRating2)
 }
 
-func updateUserDbBattleStat(recvPacket *convert.BattleResult, battleTimeSec, winner int, dbService dbservice.Db, playerNo int) {
+func calculateNewRating(old1 shared_server.ScoreRankItem, old2 shared_server.ScoreRankItem, winner int) (int, int) {
+	e1 := 1.0 / (1.0 + math.Pow(10.0, (float64)(old2.Score - old1.Score)/400))
+	e2 := 1.0 / (1.0 + math.Pow(10.0, (float64)(old1.Score - old2.Score)/400))
+	K := 32
+	var s1, s2 float64
+	if winner == 0 {
+		s1, s2 = 0.5, 0.5
+	} else if winner == 1 {
+		s1, s2 = 1.0, 0.0
+	} else if winner == 2 {
+		s1, s2 = 0.0, 1.0
+	} else {
+		log.Printf("invalid winner %v", winner)
+	}
+	new1 := float64(old1.Score) + float64(K) * (s1 - e1)
+	new2 := float64(old2.Score) + float64(K) * (s2 - e2)
+	return int(new1), int(new2)
+}
+
+func updateUserDbBattleStat(recvPacket *convert.BattleResult, battleTimeSec, winner int, dbService dbservice.Db, playerNo int, rating int) {
 	player := convert.LwpBattleResultPlayer(&recvPacket.S, playerNo - 1)
 	stat := convert.LwpBattleResultPlayerStat(&recvPacket.S, playerNo - 1)
 	statOther := convert.LwpBattleResultPlayerStat(&recvPacket.S, playerNo % 2)
@@ -132,6 +144,7 @@ func updateUserDbBattleStat(recvPacket *convert.BattleResult, battleTimeSec, win
 	if err != nil {
 		log.Printf("lease failed with error: %v", err.Error())
 	} else {
+		leaseDb.Db.Rating = rating
 		//v := player.Stat.Hp
 		bs := &leaseDb.Db.BattleStat
 		bs.BattleTimeSec += battleTimeSec

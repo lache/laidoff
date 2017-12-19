@@ -200,6 +200,8 @@ func (t *RankService) Get(args *[16]byte, reply *shared_server.ScoreRankItem) er
 	if err != nil {
 		log.Printf("Get failed: %v", err)
 		reply.Id = *args
+		reply.Score = 1500
+		reply.Rank = -1
 	} else {
 		reply.Id = *args
 		reply.Score = score
