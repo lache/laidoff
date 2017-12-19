@@ -1340,6 +1340,7 @@ static void render_main_menu_ui_layer(const LWCONTEXT* pLwc, const LWPUCKGAME* p
         render_icon_amount(pLwc, puck_game, x, y, width, height, str, lae, LAE_DONTCARE, 1.0f, 1.0f, 1.0f);
         top_bar_x_cursor += width + top_bar_x_cursor_margin;
     }
+    const int no_record = puck_game->score == 0 && puck_game->rank == 0;
     // energy (background, icon, text)
     {
         const float width = 0.4f;
@@ -1349,7 +1350,11 @@ static void render_main_menu_ui_layer(const LWCONTEXT* pLwc, const LWPUCKGAME* p
         const LW_ATLAS_ENUM lae = LAE_ENERGY_ICON;
         const LW_ATLAS_ENUM lae_alpha = LAE_ENERGY_ICON_ALPHA;
         char str[32];
-        sprintf(str, "%d", puck_game->score);
+        if (no_record == 0) {
+            sprintf(str, "%d", puck_game->score);
+        } else {
+            sprintf(str, "--");
+        }
         render_icon_amount(pLwc, puck_game, x, y, width, height, str, lae, lae_alpha, 0.4f, 0.9f, 1.0f);
         top_bar_x_cursor += width + top_bar_x_cursor_margin;
     }
@@ -1362,7 +1367,11 @@ static void render_main_menu_ui_layer(const LWCONTEXT* pLwc, const LWPUCKGAME* p
         const LW_ATLAS_ENUM lae = LAE_RANK_ICON;
         const LW_ATLAS_ENUM lae_alpha = LAE_RANK_ICON_ALPHA;
         char str[32];
-        sprintf(str, "%d", puck_game->rank + 1); // rank is zero-based
+        if (no_record == 0) {
+            sprintf(str, "%d", puck_game->rank + 1); // rank is zero-based
+        } else {
+            sprintf(str, "--");
+        }
         render_icon_amount(pLwc, puck_game, x, y, width, height, str, lae, lae_alpha, 0.9f, 1.0f, 0.9f);
         top_bar_x_cursor += width + top_bar_x_cursor_margin;
     }
