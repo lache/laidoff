@@ -563,7 +563,8 @@ int tcp_server_entry(void *context) {
             memcpy(puck_game->nickname, p->Nickname1, sizeof(puck_game->nickname));
             memcpy(puck_game->target_nickname, p->Nickname2, sizeof(puck_game->target_nickname));
             const int battle_id = server->battle_counter + 1; // battle id is 1-based index
-            LOGI("LWPCREATEBATTLE: Create a new puck game instance (battle id = %d)", battle_id);
+            LOGI("LWPCREATEBATTLE: Create a new puck game instance '%s' vs '%s' (battle id = %d)",
+                 p->Nickname1, p->Nickname2, battle_id);
             puck_game->server = server;
             puck_game->battle_id = battle_id;
             puck_game->c1_token = pcg32_random();
@@ -819,8 +820,8 @@ int tcp_send_battle_result(LWTCP *tcp,
     p.Winner = winner;
     memcpy(p.Player[0].Id, id1, sizeof(p.Player[0].Id));
     memcpy(p.Player[1].Id, id2, sizeof(p.Player[1].Id));
-    memcpy(p.Player[0].Nickname, nickname1, sizeof(p.Player[0].Id));
-    memcpy(p.Player[1].Nickname, nickname2, sizeof(p.Player[1].Id));
+    memcpy(p.Player[0].Nickname, nickname1, sizeof(p.Player[0].Nickname));
+    memcpy(p.Player[1].Nickname, nickname2, sizeof(p.Player[1].Nickname));
     p.Player[0].Stat = puck_game->battle_stat[0];
     p.Player[1].Stat = puck_game->battle_stat[1];
     p.BattleTimeSec = (int)roundf(puck_game_elapsed_time(puck_game->update_tick, logic_hz));
