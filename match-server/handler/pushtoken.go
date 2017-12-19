@@ -3,11 +3,11 @@ package handler
 import (
 	"bytes"
 	"log"
-	"time"
 	"fmt"
 	"net"
 	"github.com/gasbank/laidoff/match-server/service"
 	"github.com/gasbank/laidoff/match-server/convert"
+	"github.com/gasbank/laidoff/shared-server"
 )
 
 func HandlePushToken(buf []byte, conn net.Conn, serviceList *service.List) {
@@ -22,12 +22,24 @@ func HandlePushToken(buf []byte, conn net.Conn, serviceList *service.List) {
 	pushTokenLength := bytes.IndexByte(pushTokenBytes, 0)
 	pushToken := string(pushTokenBytes[:pushTokenLength])
 	log.Printf("Push token domain %v, token: %v, id: %v", recvPacket.Domain, pushToken, idBytes)
-	pushResult := serviceList.Arith.RegisterPushToken(300*time.Millisecond, idBytes, int(recvPacket.Domain), pushToken)
-	log.Printf("Push result: %v", pushResult)
+	var pushResult int
+	err = serviceList.Push.RegisterPushToken(&shared_server.PushToken{
+		Domain:    int(recvPacket.Domain),
+		PushToken: pushToken,
+		UserId:    idBytes,
+	}, &pushResult)
+	if err != nil {
+		log.Printf("RegisterPushToken returned error: %v", err.Error())
+	} else {
+		log.Printf("Push result: %v", pushResult)
+	}
 	if pushResult == 1 {
 		sysMsg := []byte(fmt.Sprintf("토큰 등록 완료! %v", pushToken))
 		queueOkBuf := convert.Packet2Buf(convert.NewLwpSysMsg(sysMsg))
 		conn.Write(queueOkBuf)
+	} else {
+		sysMsg := []byte(fmt.Sprintf("토큰 등록 실패 - 서버 오류"))
+		queueOkBuf := convert.Packet2Buf(convert.NewLwpSysMsg(sysMsg))
+		conn.Write(queueOkBuf)
 	}
 }
-

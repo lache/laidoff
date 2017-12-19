@@ -87,9 +87,13 @@ func testRankRpc(rankService shared_server.RankService, id byte, score int, nick
 
 //noinspection GoUnusedFunction
 func testRpc(serviceList *service.List) {
-	log.Println(serviceList.Arith.Multiply(5, 6))
-	log.Println(serviceList.Arith.Divide(500, 10))
-	log.Println(serviceList.Arith.RegisterPushToken(300*time.Millisecond, user.Id{1, 2, 3, 4}, 500, "test-push-token"))
+	pushToken := shared_server.PushToken{
+		Domain:    500,
+		PushToken: "test-push-token",
+		UserId:    user.Id{1, 2, 3, 4},
+	}
+	var registerReply int
+	log.Println(serviceList.Push.RegisterPushToken(&pushToken, &registerReply))
 	testRankRpc(serviceList.Rank, 1, 100, "TestUser1")
 	testRankRpc(serviceList.Rank, 2, 200, "TestUser2")
 	testRankRpc(serviceList.Rank, 3, 300, "TestUser3")
@@ -124,7 +128,12 @@ func matchWorker(battleService battle.Service, matchQueue <-chan user.Agent, bat
 		log.Printf("Match queue empty")
 		c1 := <-matchQueue
 		log.Printf("Match queue size 1")
-		serviceList.Arith.Broadcast(300*time.Millisecond, "BALL RUMBLE", c1.Db.Nickname + " provokes you!")
+		broadcastPush := shared_server.BroadcastPush{
+			Title: "RUMBLE",
+			Body:  c1.Db.Nickname + " provokes you!",
+		}
+		var broadcastReply int
+		log.Printf("Broadcast result(return error): %v", serviceList.Push.Broadcast(&broadcastPush, &broadcastReply));
 		c2 := <-matchQueue
 		log.Printf("Match queue size 2")
 		if c1.Conn == c2.Conn {

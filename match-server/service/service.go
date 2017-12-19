@@ -9,6 +9,7 @@ import (
 	"net"
 	"github.com/gasbank/laidoff/db-server/dbservice"
 	"github.com/gasbank/laidoff/rank-server/rankservice"
+	"github.com/gasbank/laidoff/push-server/pushservice"
 )
 
 const (
@@ -17,9 +18,9 @@ const (
 )
 
 type List struct {
-	Arith *Arith
-	Rank  shared_server.RankService
-	Db    dbservice.Db
+	Push shared_server.PushService
+	Rank shared_server.RankService
+	Db   dbservice.Db
 }
 
 type Arith struct {
@@ -35,7 +36,7 @@ func (t *Arith) Divide(a, b int) shared_server.Quotient {
 	var reply shared_server.Quotient
 	err := t.client.Call("Arithmetic.Divide", args, &reply)
 	if err != nil {
-		log.Fatal("Arith error:", err)
+		log.Fatal("Push error:", err)
 	}
 	return reply
 }
@@ -45,7 +46,7 @@ func (t *Arith) Multiply(a, b int) int {
 	var reply int
 	err := t.client.Call("Arithmetic.Multiply", args, &reply)
 	if err != nil {
-		log.Fatal("Arith error:", err)
+		log.Fatal("Push error:", err)
 	}
 	return reply
 }
@@ -55,7 +56,7 @@ func (t *Arith) RegisterPushToken(backoff time.Duration, id user.Id, domain int,
 	var reply int
 	err := t.client.Call("PushService.RegisterPushToken", args, &reply)
 	if err != nil {
-		log.Printf("Arith error: %v", err)
+		log.Printf("Push error: %v", err)
 		if backoff > 10*time.Second {
 			log.Printf("Error - Register Push Token failed: %v", err)
 			return 0
@@ -73,7 +74,7 @@ func (t *Arith) Broadcast(backoff time.Duration, title, body string) int {
 	var reply int
 	err := t.client.Call("PushService.Broadcast", args, &reply)
 	if err != nil {
-		log.Printf("Arith error: %v", err)
+		log.Printf("Push error: %v", err)
 		if backoff > 10*time.Second {
 			log.Printf("Error - Broadcast Push failed: %v", err)
 			return 0
@@ -81,6 +82,10 @@ func (t *Arith) Broadcast(backoff time.Duration, title, body string) int {
 			time.Sleep(backoff)
 		}
 		t.client, err = dialNewRpc(PushServiceAddr)
+		if err != nil {
+			t.client = nil
+			log.Printf("dialNewRpc failed with error %v. try again...", err)
+		}
 		return t.Broadcast(backoff*2, title, body)
 	}
 	return reply
@@ -152,19 +157,10 @@ func dialNewRpc(address string) (*rpc.Client, error) {
 
 func NewServiceList() *List {
 	return &List{
-		DialPushService(),
+		pushservice.New(":20171"),
 		rankservice.New(":20172"),
 		dbservice.New(":20181"),
 	}
-}
-
-func DialPushService() *Arith {
-	client, err := dialNewRpc(PushServiceAddr)
-	if err != nil {
-		log.Printf("dialNewRpc error: %v", err.Error())
-	}
-	arith := &Arith{client: client}
-	return arith
 }
 
 func CreateNewUserDb() {
