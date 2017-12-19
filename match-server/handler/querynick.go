@@ -30,7 +30,7 @@ func HandleQueryNick(buf []byte, conn net.Conn, rankService shared_server.RankSe
 			if err != nil {
 				log.Fatalf("load user db failed -> create new user failed")
 			} else {
-				newUserDataBuf := convert.Packet2Buf(convert.NewLwpNewUserData(userDb.Id, userDb.Nickname))
+				newUserDataBuf := convert.Packet2Buf(convert.NewLwpNewUserData(userDb.Id, userDb.Nickname, userDb.Rating, -1))
 				_, err = conn.Write(newUserDataBuf)
 				if err != nil {
 					log.Fatalf("NEWUSERDATA send failed: %v", err.Error())

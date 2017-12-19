@@ -244,6 +244,8 @@ typedef struct _LWPNEWUSERDATA {
 	unsigned short type;
 	unsigned int id[4];
 	char nickname[32];
+    int score;
+    int rank;
 } LWPNEWUSERDATA;
 
 typedef struct _LWPQUEUE2 {

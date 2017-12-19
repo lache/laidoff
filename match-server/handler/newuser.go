@@ -17,7 +17,7 @@ func HandleNewUser(nickDb *nickdb.NickDb, conn net.Conn, dbService dbservice.Db)
 		log.Printf("DB service Create failed: %v", err.Error())
 	} else {
 		// reply to client
-		newUserDataBuf := convert.Packet2Buf(convert.NewLwpNewUserData(userDb.Id, userDb.Nickname))
+		newUserDataBuf := convert.Packet2Buf(convert.NewLwpNewUserData(userDb.Id, userDb.Nickname, userDb.Rating, -1))
 		_, err = conn.Write(newUserDataBuf)
 		if err != nil {
 			log.Fatalf("NEWUSERDATA send failed: %v", err.Error())

@@ -216,6 +216,8 @@ int parse_recv_packets(LWTCP* tcp) {
                  pLwc->tcp->user_id.v[2],
                  pLwc->tcp->user_id.v[3]);
             memcpy(pLwc->puck_game->nickname, p->nickname, sizeof(char) * LW_NICKNAME_MAX_LEN);
+            pLwc->puck_game->rank = p->rank;
+            pLwc->puck_game->score = p->score;
             //tcp_send_queue2(tcp, &pLwc->tcp->user_id);
         } else if (CHECK_PACKET(packet_type, packet_size, LWPNICK)) {
             LOGI("LWPNICK received");
