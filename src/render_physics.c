@@ -14,6 +14,7 @@
 #include "puckgameupdate.h"
 #include "lwtcp.h"
 #include "lwfvbo.h"
+#include <assert.h>
 
 typedef struct _LWSPHERERENDERUNIFORM {
     float sphere_col_ratio[3];
