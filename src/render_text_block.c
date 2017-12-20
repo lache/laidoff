@@ -263,6 +263,9 @@ void render_text_block_alpha(const LWCONTEXT* pLwc, const LWTEXTBLOCK* text_bloc
     int first_width_set = 0;
     for (size_t i = 0; i < unicode_strlen; i++) {
         bc[i] = font_binary_search_char(pLwc->pFnt, unicode_str[i]);
+        if (unicode_str[i] == '<' || unicode_str[i] == '>') {
+            continue;
+        }
         if (bc[i]) {
             const float width = bc[i]->xadvance; // : bc[i]->width);
             width_sum += width;
