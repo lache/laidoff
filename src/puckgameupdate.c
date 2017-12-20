@@ -203,24 +203,28 @@ void update_puck_game(LWCONTEXT* pLwc, LWPUCKGAME* puck_game, double delta_time)
         }
     }
     // control bogus (AI player)
-    if (puck_game->game_state == LPGS_TUTORIAL) {
-        LWPUCKGAMEBOGUSPARAM bogus_param = {
-            0.0075f, // target_follow_agility
-            0.30f, // dash_detect_radius
-            0.2f, // dash_frequency
-            0.8f, // dash_cooltime_lag_min
-            1.2f, // dash_cooltime_lag_max
-        };
-        puck_game_control_bogus(puck_game, &bogus_param);
-    } else {
-        LWPUCKGAMEBOGUSPARAM bogus_param = {
-            0.0075f, // target_follow_agility
-            0.75f, // dash_detect_radius
-            0.5f, // dash_frequency
-            0.4f, // dash_cooltime_lag_min
-            0.6f, // dash_cooltime_lag_max
-        };
-        puck_game_control_bogus(puck_game, &bogus_param);
+    if (puck_game->bogus_disabled == 0) {
+        if (puck_game->game_state == LPGS_TUTORIAL) {
+            LWPUCKGAMEBOGUSPARAM bogus_param = {
+                0.0075f, // target_follow_agility
+                0.30f, // dash_detect_radius
+                0.2f, // dash_frequency
+                0.8f, // dash_cooltime_lag_min
+                1.2f, // dash_cooltime_lag_max
+            };
+            puck_game_control_bogus(puck_game, &bogus_param);
+        } else {
+            LWPUCKGAMEBOGUSPARAM bogus_param = {
+                0.0075f, // target_follow_agility
+                0.75f, // dash_detect_radius
+                0.5f, // dash_frequency
+                0.4f, // dash_cooltime_lag_min
+                0.6f, // dash_cooltime_lag_max
+            };
+            if (puck_game_state_phase_battling(puck_game->battle_phase)) {
+                puck_game_control_bogus(puck_game, &bogus_param);
+            }
+        }
     }
     for (int i = 0; i < 2; i++) {
         puck_game_update_remote_player(puck_game, (float)delta_time, i);

@@ -110,6 +110,7 @@ function on_ui_event(id)
 		lo.puck_game_set_tower_invincible(c.puck_game, 0, 0)
 		lo.puck_game_set_tower_invincible(c.puck_game, 1, 0)
 		lo.puck_game_set_dash_disabled(c.puck_game, 1, 0)
+		lo.puck_game_set_bogus_disabled(c.puck_game, 0)
 		if c.puck_game.game_state == lo.LPGS_SEARCHING then
 			lo.tcp_send_cancelqueue(c.tcp, c.tcp.user_id)
 			c.puck_game.game_state = lo.LPGS_MAIN_MENU
@@ -127,7 +128,8 @@ function on_ui_event(id)
 		print('[script]tutorial_button')
 		lo.puck_game_set_tower_invincible(c.puck_game, 0, 0)
 		lo.puck_game_set_tower_invincible(c.puck_game, 1, 0)
-		lo.puck_game_set_dash_disabled(c.puck_game, 1, 0)
+		lo.puck_game_set_dash_disabled(c.puck_game, 1, 1)
+		lo.puck_game_set_bogus_disabled(c.puck_game, 1)
 		lo.puck_game_reset_tutorial_state(c.puck_game)
 		lo.puck_game_clear_match_data(c, c.puck_game)
 		lo.puck_game_reset_view_proj(c, c.puck_game)
@@ -211,19 +213,21 @@ function on_ui_event(id)
 			lo.puck_game_set_tutorial_guide_str(c.puck_game, '마지막으로 <적 플레이어>을 소환하겠습니다.')
 			yield_wait_ms(2000)
 			lo.puck_game_create_go(c.puck_game, lo.LPGO_TARGET, 1, 0, 10);
+			-- at first, bogus does not use dash
+			lo.puck_game_set_dash_disabled(c.puck_game, 1, 1)
+			
+			lo.puck_game_create_control_joint(c.puck_game, lo.LPGO_TARGET)
 			yield_wait_ms(2000)
 			lo.puck_game_set_tutorial_guide_str(c.puck_game, '적에게 닿은 공은 빨간색 공이 됩니다.')
 			yield_wait_ms(4000)
 			lo.puck_game_set_tutorial_guide_str(c.puck_game, '빨간색 공이 <아군 타워>에 맞지 않도록 주의하세요.')
 			yield_wait_ms(4000)
 			lo.puck_game_set_tutorial_guide_str(c.puck_game, '적의 방해를 피해 <적군 타워>를 파괴하십시오!')
+			lo.puck_game_set_bogus_disabled(c.puck_game, 0)
 			-- make enemy tower can be damaged
 			lo.puck_game_set_tower_invincible(c.puck_game, 1, 0)
-			-- at first, bogus does not use dash
-			lo.puck_game_set_dash_disabled(c.puck_game, 1, 1)
-			lo.puck_game_create_control_joint(c.puck_game, lo.LPGO_TARGET)
 			start_coro(function()
-				yield_wait_ms(2000)
+				yield_wait_ms(5000)
 				lo.puck_game_set_dash_disabled(c.puck_game, 1, 0)
 			end)
 			local victory = 0

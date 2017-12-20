@@ -728,7 +728,15 @@ void puck_game_tower_pos(vec4 p_out, const LWPUCKGAME* puck_game, int owner_play
 }
 
 void puck_game_set_dash_disabled(LWPUCKGAME* puck_game, int index, int v) {
+    // should reset all dash data to prevent already committed dash to be shown
+    if (v == 1) {
+        memset(&puck_game->remote_dash[index], 0, sizeof(puck_game->remote_dash[index]));
+    }
     puck_game->remote_dash[index].disabled = v;
+}
+
+void puck_game_set_bogus_disabled(LWPUCKGAME* puck_game, int v) {
+    puck_game->bogus_disabled = v;
 }
 
 void puck_game_control_bogus(LWPUCKGAME* puck_game, const LWPUCKGAMEBOGUSPARAM* bogus_param) {

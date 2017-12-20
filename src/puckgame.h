@@ -210,6 +210,7 @@ typedef struct _LWPUCKGAME {
     int rank;
     int control_flags;
     char tutorial_guide_str[512];
+    int bogus_disabled;
 } LWPUCKGAME;
 
 LWPUCKGAME* new_puck_game(int update_frequency);
@@ -255,4 +256,4 @@ void puck_game_reset_go(LWPUCKGAME* puck_game, LWPUCKGAMEOBJECT* go, float x, fl
 void puck_game_create_tower_geom(LWPUCKGAME* puck_game, int i);
 void puck_game_set_tower_invincible(LWPUCKGAME* puck_game, int tower_index, int v);
 void puck_game_set_dash_disabled(LWPUCKGAME* puck_game, int index, int v);
-
+void puck_game_set_bogus_disabled(LWPUCKGAME* puck_game, int v);

@@ -61098,6 +61098,56 @@ fail:
 }
 
 
+static int _wrap_LWPUCKGAME_bogus_disabled_set(lua_State* L) {
+  int SWIG_arg = 0;
+  struct _LWPUCKGAME *arg1 = (struct _LWPUCKGAME *) 0 ;
+  int arg2 ;
+  
+  SWIG_check_num_args("_LWPUCKGAME::bogus_disabled",2,2)
+  if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("_LWPUCKGAME::bogus_disabled",1,"struct _LWPUCKGAME *");
+  if(!lua_isnumber(L,2)) SWIG_fail_arg("_LWPUCKGAME::bogus_disabled",2,"int");
+  
+  if (!SWIG_IsOK(SWIG_ConvertPtr(L,1,(void**)&arg1,SWIGTYPE_p__LWPUCKGAME,0))){
+    SWIG_fail_ptr("LWPUCKGAME_bogus_disabled_set",1,SWIGTYPE_p__LWPUCKGAME);
+  }
+  
+  arg2 = (int)lua_tonumber(L, 2);
+  if (arg1) (arg1)->bogus_disabled = arg2;
+  
+  return SWIG_arg;
+  
+  if(0) SWIG_fail;
+  
+fail:
+  lua_error(L);
+  return SWIG_arg;
+}
+
+
+static int _wrap_LWPUCKGAME_bogus_disabled_get(lua_State* L) {
+  int SWIG_arg = 0;
+  struct _LWPUCKGAME *arg1 = (struct _LWPUCKGAME *) 0 ;
+  int result;
+  
+  SWIG_check_num_args("_LWPUCKGAME::bogus_disabled",1,1)
+  if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("_LWPUCKGAME::bogus_disabled",1,"struct _LWPUCKGAME *");
+  
+  if (!SWIG_IsOK(SWIG_ConvertPtr(L,1,(void**)&arg1,SWIGTYPE_p__LWPUCKGAME,0))){
+    SWIG_fail_ptr("LWPUCKGAME_bogus_disabled_get",1,SWIGTYPE_p__LWPUCKGAME);
+  }
+  
+  result = (int) ((arg1)->bogus_disabled);
+  lua_pushnumber(L, (lua_Number) result); SWIG_arg++;
+  return SWIG_arg;
+  
+  if(0) SWIG_fail;
+  
+fail:
+  lua_error(L);
+  return SWIG_arg;
+}
+
+
 static int _wrap_new_LWPUCKGAME(lua_State* L) {
   int SWIG_arg = 0;
   struct _LWPUCKGAME *result = 0 ;
@@ -61228,6 +61278,7 @@ static swig_lua_attribute swig_LWPUCKGAME_attributes[] = {
     { "rank", _wrap_LWPUCKGAME_rank_get, _wrap_LWPUCKGAME_rank_set },
     { "control_flags", _wrap_LWPUCKGAME_control_flags_get, _wrap_LWPUCKGAME_control_flags_set },
     { "tutorial_guide_str", _wrap_LWPUCKGAME_tutorial_guide_str_get, _wrap_LWPUCKGAME_tutorial_guide_str_set },
+    { "bogus_disabled", _wrap_LWPUCKGAME_bogus_disabled_get, _wrap_LWPUCKGAME_bogus_disabled_set },
     {0,0,0}
 };
 static swig_lua_method swig_LWPUCKGAME_methods[]= {
@@ -62449,6 +62500,32 @@ static int _wrap_puck_game_set_dash_disabled(lua_State* L) {
   arg2 = (int)lua_tonumber(L, 2);
   arg3 = (int)lua_tonumber(L, 3);
   puck_game_set_dash_disabled(arg1,arg2,arg3);
+  
+  return SWIG_arg;
+  
+  if(0) SWIG_fail;
+  
+fail:
+  lua_error(L);
+  return SWIG_arg;
+}
+
+
+static int _wrap_puck_game_set_bogus_disabled(lua_State* L) {
+  int SWIG_arg = 0;
+  LWPUCKGAME *arg1 = (LWPUCKGAME *) 0 ;
+  int arg2 ;
+  
+  SWIG_check_num_args("puck_game_set_bogus_disabled",2,2)
+  if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("puck_game_set_bogus_disabled",1,"LWPUCKGAME *");
+  if(!lua_isnumber(L,2)) SWIG_fail_arg("puck_game_set_bogus_disabled",2,"int");
+  
+  if (!SWIG_IsOK(SWIG_ConvertPtr(L,1,(void**)&arg1,SWIGTYPE_p__LWPUCKGAME,0))){
+    SWIG_fail_ptr("puck_game_set_bogus_disabled",1,SWIGTYPE_p__LWPUCKGAME);
+  }
+  
+  arg2 = (int)lua_tonumber(L, 2);
+  puck_game_set_bogus_disabled(arg1,arg2);
   
   return SWIG_arg;
   
@@ -65382,6 +65459,7 @@ static swig_lua_method swig_SwigModule_methods[]= {
     { "puck_game_create_tower_geom", _wrap_puck_game_create_tower_geom},
     { "puck_game_set_tower_invincible", _wrap_puck_game_set_tower_invincible},
     { "puck_game_set_dash_disabled", _wrap_puck_game_set_dash_disabled},
+    { "puck_game_set_bogus_disabled", _wrap_puck_game_set_bogus_disabled},
     { "new_tcp", _wrap_new_tcp},
     { "destroy_tcp", _wrap_destroy_tcp},
     { "tcp_update", _wrap_tcp_update},
