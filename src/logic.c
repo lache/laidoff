@@ -168,13 +168,16 @@ void logic_stop_logic_update_job_async(LWCONTEXT* pLwc) {
 
 void load_field_1_init_runtime_data_async(LWCONTEXT* pLwc, zactor_t* actor) {
 	pLwc->next_game_scene = LGS_FIELD;
+    // should load stage texture here
+    const int lae = LAE_3D_APT_TEX_MIP_KTX;
+    lw_load_tex(pLwc, lae);
 	zmsg_t* msg = zmsg_new();
 	LWMSGINITFIELD m = {
 		LM_LWMSGINITFIELD,
 		ASSETS_BASE_PATH "field" PATH_SEPARATOR "testfield.field",
 		ASSETS_BASE_PATH "nav" PATH_SEPARATOR "apt.nav",
 		1, {
-			{ LVT_APT, pLwc->tex_atlas[LAE_3D_APT_TEX_MIP_KTX], 1, },
+			{ LVT_APT, pLwc->tex_atlas[lae], 1, },
 		},
 		0.9f,
 		0,
@@ -192,13 +195,16 @@ void load_field_1_init_runtime_data(LWCONTEXT* pLwc) {
 
 void load_field_2_init_runtime_data_async(LWCONTEXT* pLwc, zactor_t* actor) {
 	pLwc->next_game_scene = LGS_FIELD;
+    // should load stage texture here
+    const int lae = LAE_3D_FLOOR_TEX_KTX;
+    lw_load_tex(pLwc, lae);
 	zmsg_t* msg = zmsg_new();
 	LWMSGINITFIELD m = {
 		LM_LWMSGINITFIELD,
 		ASSETS_BASE_PATH "field" PATH_SEPARATOR "testfield.field",
 		ASSETS_BASE_PATH "nav" PATH_SEPARATOR "test.nav",
 		1, {
-			{ LVT_FLOOR, pLwc->tex_atlas[LAE_3D_FLOOR_TEX_KTX], 0, },
+			{ LVT_FLOOR, pLwc->tex_atlas[lae], 0, },
 		},
 		0.35f,
 		1,
@@ -216,13 +222,16 @@ void load_field_2_init_runtime_data(LWCONTEXT* pLwc) {
 
 void load_field_3_init_runtime_data_async(LWCONTEXT* pLwc, zactor_t* actor) {
 	pLwc->next_game_scene = LGS_FIELD;
+    // should load stage texture here
+    const int lae = LAE_3D_FLOOR2_TEX_KTX;
+    lw_load_tex(pLwc, lae);
 	zmsg_t* msg = zmsg_new();
 	LWMSGINITFIELD m = {
 		LM_LWMSGINITFIELD,
 		ASSETS_BASE_PATH "field" PATH_SEPARATOR "testfield2.field",
 		ASSETS_BASE_PATH "nav" PATH_SEPARATOR "test2.nav",
 		1, {
-			{ LVT_FLOOR2, pLwc->tex_atlas[LAE_3D_FLOOR2_TEX_KTX], 0, },
+			{ LVT_FLOOR2, pLwc->tex_atlas[lae], 0, },
 		},
 		0.35f,
 		1,
@@ -240,13 +249,16 @@ void load_field_3_init_runtime_data(LWCONTEXT* pLwc) {
 
 void load_field_4_init_runtime_data_async(LWCONTEXT* pLwc, zactor_t* actor) {
 	pLwc->next_game_scene = LGS_FIELD;
+    // should load stage texture here
+    const int lae = LAE_3D_ROOM_TEX_KTX;
+    lw_load_tex(pLwc, lae);
 	zmsg_t* msg = zmsg_new();
 	LWMSGINITFIELD m = {
 		LM_LWMSGINITFIELD,
 		ASSETS_BASE_PATH "field" PATH_SEPARATOR "room.field",
 		ASSETS_BASE_PATH "nav" PATH_SEPARATOR "room.nav",
 		1, {
-			{ LVT_ROOM, pLwc->tex_atlas[LAE_3D_ROOM_TEX_KTX], 0, },
+			{ LVT_ROOM, pLwc->tex_atlas[lae], 0, },
 		},
 		0.35f,
 		1,
@@ -264,14 +276,19 @@ void load_field_4_init_runtime_data(LWCONTEXT* pLwc) {
 
 void load_field_5_init_runtime_data_async(LWCONTEXT* pLwc, zactor_t* actor) {
 	pLwc->next_game_scene = LGS_FIELD;
+    // should load stage texture here
+    const int lae1 = LAE_3D_BATTLEGROUND_FLOOR_BAKE_TEX_KTX;
+    lw_load_tex(pLwc, lae1);
+    const int lae2 = LAE_3D_BATTLEGROUND_WALL_BAKE_TEX_KTX;
+    lw_load_tex(pLwc, lae1);
 	zmsg_t* msg = zmsg_new();
 	LWMSGINITFIELD m = {
 		LM_LWMSGINITFIELD,
 		ASSETS_BASE_PATH "field" PATH_SEPARATOR "battleground.field",
 		ASSETS_BASE_PATH "nav" PATH_SEPARATOR "battleground.nav",
 		2, {
-			{ LVT_BATTLEGROUND_FLOOR, pLwc->tex_atlas[LAE_3D_BATTLEGROUND_FLOOR_BAKE_TEX_KTX], 0, },
-			{ LVT_BATTLEGROUND_WALL, pLwc->tex_atlas[LAE_3D_BATTLEGROUND_WALL_BAKE_TEX_KTX], 0, },
+			{ LVT_BATTLEGROUND_FLOOR, pLwc->tex_atlas[lae1], 0, },
+			{ LVT_BATTLEGROUND_WALL, pLwc->tex_atlas[lae2], 0, },
 		},
 		0.35f,
 		1,
@@ -290,12 +307,15 @@ void load_field_5_init_runtime_data(LWCONTEXT* pLwc) {
 void load_field_6_init_runtime_data_async(LWCONTEXT* pLwc, zactor_t* actor) {
 	pLwc->next_game_scene = LGS_FIELD;
 	zmsg_t* msg = zmsg_new();
+    // should load stage texture here
+    const int lae = LAE_SPIRAL_KTX;
+    lw_load_tex(pLwc, lae);
 	LWMSGINITFIELD m = {
 		LM_LWMSGINITFIELD,
 		ASSETS_BASE_PATH "field" PATH_SEPARATOR "spiral.field",
 		ASSETS_BASE_PATH "nav" PATH_SEPARATOR "spiral.nav",
 		1,{
-			{ LVT_SPIRAL, pLwc->tex_atlas[LAE_SPIRAL_KTX], 0, },
+			{ LVT_SPIRAL, pLwc->tex_atlas[lae], 0, },
 		},
 		0.35f,
 		1,
@@ -313,6 +333,7 @@ void load_field_6_init_runtime_data(LWCONTEXT* pLwc) {
 
 void load_scene_async(LWCONTEXT* pLwc, zactor_t* actor, LW_GAME_SCENE next_game_scene) {
 	pLwc->next_game_scene = next_game_scene;
+    // should load stage texture here
 	zmsg_t* msg = zmsg_new();
 	LWMSGINITSCENE m = {
 		LM_LWMSGINITSCENE,
