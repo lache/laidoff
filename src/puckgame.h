@@ -97,6 +97,14 @@ typedef enum _LW_PUCK_GAME_CONTROL_FLAGS {
     LPGCF_HIDE_PULL_BUTTON = 1 << 3,
 } LW_PUCK_GAME_CONTROL_FLAGS;
 
+typedef struct _LWPUCKGAMEBOGUSPARAM {
+    float target_follow_agility;
+    float dash_detect_radius;
+    float dash_frequency;
+    float dash_cooltime_lag_min;
+    float dash_cooltime_lag_max;
+} LWPUCKGAMEBOGUSPARAM;
+
 typedef struct _LWPUCKGAME {
 	// ---- Static game data begin
 	float world_size;
@@ -223,7 +231,7 @@ void update_puck_reflect_size(LWPUCKGAME* puck_game, float delta_time);
 void puck_game_reset(LWPUCKGAME* puck_game);
 void puck_game_remote_state_reset(LWPUCKGAME* puck_game, LWPSTATE* state);
 void puck_game_tower_pos(vec4 p_out, const LWPUCKGAME* puck_game, int owner_player_no);
-void puck_game_control_bogus(LWPUCKGAME* puck_game);
+void puck_game_control_bogus(LWPUCKGAME* puck_game, const LWPUCKGAMEBOGUSPARAM* bogus_param);
 void puck_game_update_remote_player(LWPUCKGAME* puck_game, float delta_time, int i);
 LWPUCKGAMEDASH* puck_game_single_play_dash_object(LWPUCKGAME* puck_game);
 LWPUCKGAMEJUMP* puck_game_single_play_jump_object(LWPUCKGAME* puck_game);

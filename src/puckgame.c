@@ -727,17 +727,11 @@ void puck_game_tower_pos(vec4 p_out, const LWPUCKGAME* puck_game, int owner_play
     p_out[3] = 1.0f;
 }
 
-void puck_game_control_bogus(LWPUCKGAME* puck_game) {
-    const float target_follow_agility = 0.0075f; // 0 ~ 1
-    const float dash_detect_radius = 0.75f;
-    const float dash_frequency = 0.5f; // 0.0f ~ 1.0f
-    const float dash_cooltime_lag_min = 0.4f;
-    const float dash_cooltime_lag_max = 0.6f;
-
+void puck_game_control_bogus(LWPUCKGAME* puck_game, const LWPUCKGAMEBOGUSPARAM* bogus_param) {
     float ideal_target_dx = puck_game->go[LPGO_PUCK].pos[0] - puck_game->go[LPGO_TARGET].pos[0];
     float ideal_target_dy = puck_game->go[LPGO_PUCK].pos[1] - puck_game->go[LPGO_TARGET].pos[1];
-    puck_game->target_dx = (1.0f - target_follow_agility) * puck_game->target_dx + target_follow_agility * ideal_target_dx;
-    puck_game->target_dy = (1.0f - target_follow_agility) * puck_game->target_dy + target_follow_agility * ideal_target_dy;
+    puck_game->target_dx = (1.0f - bogus_param->target_follow_agility) * puck_game->target_dx + bogus_param->target_follow_agility * ideal_target_dx;
+    puck_game->target_dy = (1.0f - bogus_param->target_follow_agility) * puck_game->target_dy + bogus_param->target_follow_agility * ideal_target_dy;
     
     float ideal_target_dx2 = ideal_target_dx * ideal_target_dx;
     float ideal_target_dy2 = ideal_target_dy * ideal_target_dy;
@@ -747,7 +741,7 @@ void puck_game_control_bogus(LWPUCKGAME* puck_game) {
     if (ideal_target_dlen < 0.5f) {
         ideal_target_dlen_ratio = 0.5f;
     }
-    puck_game->target_dlen_ratio = (1.0f - target_follow_agility) * puck_game->target_dlen_ratio + target_follow_agility * ideal_target_dlen_ratio;
+    puck_game->target_dlen_ratio = (1.0f - bogus_param->target_follow_agility) * puck_game->target_dlen_ratio + bogus_param->target_follow_agility * ideal_target_dlen_ratio;
 
     puck_game->remote_control[1].dir_pad_dragging = 1;
     puck_game->remote_control[1].dx = puck_game->target_dx;
@@ -756,11 +750,11 @@ void puck_game_control_bogus(LWPUCKGAME* puck_game) {
     puck_game->remote_control[1].pull_puck = 0;
 
     // dash
-    if (ideal_target_dlen < dash_detect_radius) {
-        if (numcomp_float_random_01() < dash_frequency) {
+    if (ideal_target_dlen < bogus_param->dash_detect_radius) {
+        if (numcomp_float_random_01() < bogus_param->dash_frequency) {
             int bogus_player_no = puck_game->player_no == 2 ? 1 : 2;
             LWPUCKGAMEDASH* dash = &puck_game->remote_dash[bogus_player_no - 1];
-            const float dash_cooltime_aware_lag = numcomp_float_random_range(dash_cooltime_lag_min, dash_cooltime_lag_max);
+            const float dash_cooltime_aware_lag = numcomp_float_random_range(bogus_param->dash_cooltime_lag_min, bogus_param->dash_cooltime_lag_max);
             if (puck_game_dash_elapsed_since_last(puck_game, dash) >= puck_game->dash_interval + dash_cooltime_aware_lag) {
                 puck_game_dash(puck_game, dash, bogus_player_no);
             }

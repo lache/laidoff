@@ -33,6 +33,9 @@ typedef struct _LWCORO {
 	int valid;
 	lua_State* L;
 	double yield_remain;
+    int yield_wait_near_puck_player; // reset when near_puck_player is called
+    int yield_wait_near_puck_player_with_dash; // reset when near_puck_player is called with player-dash state
+    int yield_wait_player_attack; // reset when player attacked enemy(target) tower
 } LWCORO;
 
 typedef struct _LWSCRIPT {
@@ -53,6 +56,90 @@ int l_ink(lua_State *L)
 static int lua_cb(lua_State *L) {
 	//printf("called lua_cb\n");
 	return 0;
+}
+
+int l_yield_wait_player_attack(lua_State* L) {
+    if (!lua_isinteger(L, 1)) {
+        lua_pushliteral(L, "incorrect argument");
+    }
+    // Get wait ms from function argument (lua integer is 64-bit)
+    int attack_count = (int)lua_tointeger(L, 1);
+    // Get coroutine metadata table from registry
+    lua_pushlightuserdata(L, L);
+    lua_gettable(L, LUA_REGISTRYINDEX);
+    int table_index = lua_gettop(L);
+    if (!lua_istable(L, -1)) {
+        lua_pushliteral(L, "incorrect argument");
+        lua_error(L);
+    }
+    // Get first table value from metadata table (which is coroutine index)
+    lua_pushinteger(L, LSMTK_COROUTINE_INDEX);
+    lua_gettable(L, table_index);
+    int coro_index = (int)lua_tointeger(L, -1);
+    LWCONTEXT* pLwc = context;
+    LWSCRIPT* script = (LWSCRIPT*)pLwc->script;
+    script->coro[coro_index].yield_wait_player_attack = attack_count;
+    //LOGI("Coro[%d] Set yield remain %f", coro_index, script->coro[coro_index].yield_remain);
+    lua_pushnumber(L, 1);
+    lua_pushnumber(L, 2);
+    lua_pushcfunction(L, lua_cb);
+    return lua_yield(L, 3);
+}
+
+int l_yield_wait_near_puck_player_with_dash(lua_State* L) {
+    if (!lua_isinteger(L, 1)) {
+        lua_pushliteral(L, "incorrect argument");
+    }
+    // Get wait ms from function argument (lua integer is 64-bit)
+    int near_count = (int)lua_tointeger(L, 1);
+    // Get coroutine metadata table from registry
+    lua_pushlightuserdata(L, L);
+    lua_gettable(L, LUA_REGISTRYINDEX);
+    int table_index = lua_gettop(L);
+    if (!lua_istable(L, -1)) {
+        lua_pushliteral(L, "incorrect argument");
+        lua_error(L);
+    }
+    // Get first table value from metadata table (which is coroutine index)
+    lua_pushinteger(L, LSMTK_COROUTINE_INDEX);
+    lua_gettable(L, table_index);
+    int coro_index = (int)lua_tointeger(L, -1);
+    LWCONTEXT* pLwc = context;
+    LWSCRIPT* script = (LWSCRIPT*)pLwc->script;
+    script->coro[coro_index].yield_wait_near_puck_player_with_dash = near_count;
+    //LOGI("Coro[%d] Set yield remain %f", coro_index, script->coro[coro_index].yield_remain);
+    lua_pushnumber(L, 1);
+    lua_pushnumber(L, 2);
+    lua_pushcfunction(L, lua_cb);
+    return lua_yield(L, 3);
+}
+
+int l_yield_wait_near_puck_player(lua_State* L) {
+    if (!lua_isinteger(L, 1)) {
+        lua_pushliteral(L, "incorrect argument");
+    }
+    // Get wait ms from function argument (lua integer is 64-bit)
+    int near_count = (int)lua_tointeger(L, 1);
+    // Get coroutine metadata table from registry
+    lua_pushlightuserdata(L, L);
+    lua_gettable(L, LUA_REGISTRYINDEX);
+    int table_index = lua_gettop(L);
+    if (!lua_istable(L, -1)) {
+        lua_pushliteral(L, "incorrect argument");
+        lua_error(L);
+    }
+    // Get first table value from metadata table (which is coroutine index)
+    lua_pushinteger(L, LSMTK_COROUTINE_INDEX);
+    lua_gettable(L, table_index);
+    int coro_index = (int)lua_tointeger(L, -1);
+    LWCONTEXT* pLwc = context;
+    LWSCRIPT* script = (LWSCRIPT*)pLwc->script;
+    script->coro[coro_index].yield_wait_near_puck_player = near_count;
+    //LOGI("Coro[%d] Set yield remain %f", coro_index, script->coro[coro_index].yield_remain);
+    lua_pushnumber(L, 1);
+    lua_pushnumber(L, 2);
+    lua_pushcfunction(L, lua_cb);
+    return lua_yield(L, 3);
 }
 
 int l_yield_wait_ms(lua_State* L) {
@@ -89,7 +176,7 @@ void push_recursive_traceback(lua_State* L_coro, lua_State* L) {
 	lua_gettable(L, LUA_REGISTRYINDEX);
 	if (!lua_istable(L, -1)) {
 		// No metadata table exists (L is main thread)
-		// Pop everyhing and add main thread's traceback
+		// Pop everything and add main thread's traceback
 		lua_pop(L, 1);
 		// Push L's traceback to L_coro
 		luaL_traceback(L_coro, L, NULL, 1);
@@ -326,6 +413,18 @@ void init_lua(LWCONTEXT* pLwc)
 	lua_pushlightuserdata(L, pLwc);
 	lua_pushcclosure(L, l_yield_wait_ms, 1);
 	lua_setglobal(L, "yield_wait_ms");
+    // yield_near_puck_player
+    lua_pushlightuserdata(L, pLwc);
+    lua_pushcclosure(L, l_yield_wait_near_puck_player, 1);
+    lua_setglobal(L, "yield_wait_near_puck_player");
+    // yield_near_puck_player_with_dash
+    lua_pushlightuserdata(L, pLwc);
+    lua_pushcclosure(L, l_yield_wait_near_puck_player_with_dash, 1);
+    lua_setglobal(L, "yield_wait_near_puck_player_with_dash");
+    // yield_wait_player_attack
+    lua_pushlightuserdata(L, pLwc);
+    lua_pushcclosure(L, l_yield_wait_player_attack, 1);
+    lua_setglobal(L, "yield_wait_player_attack");
 	// spawn_red_cube_wall
 	lua_register(L, "spawn_red_cube_wall", l_spawn_red_cube_wall);
 	// spawn_pump
@@ -469,11 +568,17 @@ void script_update(LWCONTEXT* pLwc) {
 	LWSCRIPT* script = (LWSCRIPT*)pLwc->script;
 	for (int i = 0; i < LW_MAX_CORO; i++) {
 		if (script->coro[i].valid) {
-			// Only process if yieldable
+			// Only process if yield-able
 			if (script->coro[i].yield_remain > 0) {
-				// Wait
+				// Wait some time
 				script->coro[i].yield_remain -= lwcontext_delta_time(pLwc);
-			} else {
+            } else if (script->coro[i].yield_wait_near_puck_player == 1) {
+                // Wait yield_wait_near_puck_player flag to be reset
+            } else if (script->coro[i].yield_wait_near_puck_player_with_dash == 1) {
+                // Wait yield_wait_near_puck_player_with_dash flag to be reset
+            } else if (script->coro[i].yield_wait_player_attack == 1) {
+                // Wait yield_wait_player_attack flag to be reset
+            } else {
 				// Resume immediately
 				lua_State* L_coro = script->coro[i].L;
 				int status = lua_resume(L_coro, NULL, 0);
@@ -587,4 +692,33 @@ int script_emit_ui_event(void* L, const char* id) {
 	ret = (int)lua_tonumber(L, -1);
 	lua_pop(L, 1); // pop returned value
 	return ret;
+}
+
+void script_on_near_puck_player(void* _script, int dashing) {
+    LWSCRIPT* script = (LWSCRIPT*)_script;
+    if (script) {
+        for (int i = 0; i < LW_MAX_CORO; i++) {
+            if (script->coro[i].valid) {
+                if (script->coro[i].yield_wait_near_puck_player > 0) {
+                    script->coro[i].yield_wait_near_puck_player--;
+                }
+                if (dashing && script->coro[i].yield_wait_near_puck_player_with_dash > 0) {
+                    script->coro[i].yield_wait_near_puck_player_with_dash--;
+                }
+            }
+        }
+    }
+}
+
+void script_on_player_attack(void* _script) {
+    LWSCRIPT* script = (LWSCRIPT*)_script;
+    if (script) {
+        for (int i = 0; i < LW_MAX_CORO; i++) {
+            if (script->coro[i].valid) {
+                if (script->coro[i].yield_wait_player_attack > 0) {
+                    script->coro[i].yield_wait_player_attack--;
+                }
+            }
+        }
+    }
 }

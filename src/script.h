@@ -13,3 +13,5 @@ int script_emit_anim_marker(void* L, int key, const char* name);
 int script_emit_near(void* L, int key1, int key2);
 int script_emit_logic_frame_finish(void* L, float dt);
 int script_emit_ui_event(void* L, const char* id);
+void script_on_near_puck_player(void* _script, int dashing);
+void script_on_player_attack(void* _script);

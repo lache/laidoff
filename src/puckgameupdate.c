@@ -14,6 +14,7 @@
 #include "lwtcpclient.h"
 #include "lwmath.h"
 #include "sound.h"
+#include "script.h"
 
 void puck_game_update_world_roll(LWPUCKGAME* puck_game) {
     if (puck_game->world_roll_dirty) {
@@ -96,6 +97,8 @@ static void puck_game_on_puck_player_collision(LWPUCKGAME* puck_game, float vdle
     if (vdlen > 0.5f && depth > LWEPSILON) {
         play_sound(LWS_METAL_HIT);
     }
+    LWCONTEXT* pLwc = (LWCONTEXT*)puck_game->pLwc;
+    script_on_near_puck_player(pLwc->script, puck_game_dashing(&puck_game->remote_dash[0]));
 }
 
 static void update_tower(LWPUCKGAME* puck_game, float delta_time) {
@@ -199,10 +202,26 @@ void update_puck_game(LWCONTEXT* pLwc, LWPUCKGAME* puck_game, double delta_time)
             udp_send(pLwc->udp, (const char*)&p, sizeof(p));
         }
     }
-
     // control bogus (AI player)
-    puck_game_control_bogus(puck_game);
-
+    if (puck_game->game_state == LPGS_TUTORIAL) {
+        LWPUCKGAMEBOGUSPARAM bogus_param = {
+            0.0050f, // target_follow_agility
+            0.15f, // dash_detect_radius
+            0.1f, // dash_frequency
+            0.8f, // dash_cooltime_lag_min
+            1.2f, // dash_cooltime_lag_max
+        };
+        puck_game_control_bogus(puck_game, &bogus_param);
+    } else {
+        LWPUCKGAMEBOGUSPARAM bogus_param = {
+            0.0075f, // target_follow_agility
+            0.75f, // dash_detect_radius
+            0.5f, // dash_frequency
+            0.4f, // dash_cooltime_lag_min
+            0.6f, // dash_cooltime_lag_max
+        };
+        puck_game_control_bogus(puck_game, &bogus_param);
+    }
     for (int i = 0; i < 2; i++) {
         puck_game_update_remote_player(puck_game, (float)delta_time, i);
     }
@@ -383,6 +402,8 @@ void puck_game_player_tower_decrease_hp_test(LWPUCKGAME* puck_game) {
 
 void puck_game_target_tower_decrease_hp_test(LWPUCKGAME* puck_game) {
     puck_game_tower_damage_test(puck_game->pLwc, puck_game, &puck_game->target, &puck_game->tower[1], 1);
+    LWCONTEXT* pLwc = (LWCONTEXT*)puck_game->pLwc;
+    script_on_player_attack(pLwc->script);
 }
 
 int puck_game_remote(const LWCONTEXT* pLwc, const LWPUCKGAME* puck_game) {

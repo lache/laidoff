@@ -127,67 +127,68 @@ function on_ui_event(id)
 		lo.puck_game_reset_view_proj(c, c.puck_game)
 		lo.puck_game_roll_to_tutorial(c.puck_game)
 		start_coro(function()
+			-- restore to full HP
 			c.puck_game.target.current_hp = c.puck_game.hp;
+			-- hide pull and dash buttons
+			-- (left dir pad not already hidden since UI alpha is 0)
 			c.puck_game.control_flags = c.puck_game.control_flags | lo.LPGCF_HIDE_PULL_BUTTON | lo.LPGCF_HIDE_DASH_BUTTON
-			lo.puck_game_set_tutorial_guide_str(c.puck_game, '튜토리얼에 오신 것을 환영합니다.')
+			lo.puck_game_set_tutorial_guide_str(c.puck_game, '환영합니다!')
 			yield_wait_ms(1500)
-			lo.puck_game_set_tutorial_guide_str(c.puck_game, '플레이어를 소환합니다.')
-			yield_wait_ms(1500)
-			lo.puck_game_set_tutorial_guide_str(c.puck_game, '쨘~~~')
 			lo.puck_game_create_go(c.puck_game, lo.LPGO_PLAYER, 0, 0, 10);
-			--lo.puck_game_reset_go(c.puck_game, lo.PUCKGAMEOBJECT_getitem(c.puck_game.go, lo.LPGO_PLAYER), 0, 0, 10)
-			yield_wait_ms(2000)
-			lo.puck_game_set_tutorial_guide_str(c.puck_game, '얘가 플레이어입니다.')
-			yield_wait_ms(2000)
-			lo.puck_game_set_tutorial_guide_str(c.puck_game, '즉, 여러분이죠.')
-			yield_wait_ms(2000)
-			lo.puck_game_set_tutorial_guide_str(c.puck_game, '화면 왼쪽에 생긴 <스틱>으로 움직여보세요.')
+			lo.puck_game_set_tutorial_guide_str(c.puck_game, '왼쪽 <스틱>으로 플레이어를 움직여 보세요.')
 			lo.puck_game_create_control_joint(c.puck_game, lo.LPGO_PLAYER)
 			c.puck_game.battle_control_ui_alpha = 1
 			yield_wait_ms(4000)
-			lo.puck_game_set_tutorial_guide_str(c.puck_game, '<왼손 엄지>로 터치하는 것을 추천합니다.')
-			yield_wait_ms(4000)
-			lo.puck_game_set_tutorial_guide_str(c.puck_game, '다음으로 공을 소환하겠습니다.')
-			yield_wait_ms(2500)
-			lo.puck_game_set_tutorial_guide_str(c.puck_game, '위험하니 벽 쪽으로 이동해주시기 바랍니다.')
-			yield_wait_ms(2500)
-			lo.puck_game_set_tutorial_guide_str(c.puck_game, '쨘~~~~~~~')
-			lo.puck_game_create_go(c.puck_game, lo.LPGO_PUCK, 0, 0, 10);
-			yield_wait_ms(2500)
-			lo.puck_game_set_tutorial_guide_str(c.puck_game, '얘가 공입니다. 원래는 흰색이지만...')
-			yield_wait_ms(2500)
-			lo.puck_game_set_tutorial_guide_str(c.puck_game, '플레이어와 부딪치면 공이 파란색으로 바뀝니다.')
-			yield_wait_ms(3000)
-			lo.puck_game_set_tutorial_guide_str(c.puck_game, '공에 부딪쳐보세요.')
-			yield_wait_ms(5000)
-			lo.puck_game_set_tutorial_guide_str(c.puck_game, '플레이어는 <대시>도 가능합니다.')
-			yield_wait_ms(3000)
-			lo.puck_game_set_tutorial_guide_str(c.puck_game, '화면 오른쪽의 <대시 버튼>을 눌러보세요.')
-			c.puck_game.control_flags = c.puck_game.control_flags & ~lo.LPGCF_HIDE_DASH_BUTTON
-			yield_wait_ms(4000)
-			lo.puck_game_set_tutorial_guide_str(c.puck_game, '대시 직후 플레이어에 생긴 원형 게이지를 보세요.')
-			yield_wait_ms(6000)
-			lo.puck_game_set_tutorial_guide_str(c.puck_game, '게이지가 보일 땐 다시 대시를 못 합니다.')
-			yield_wait_ms(5000)
-			lo.puck_game_set_tutorial_guide_str(c.puck_game, '공에 가까이 가서 대시를 쓰는 것이 중요합니다.')
-			yield_wait_ms(5000)
-			lo.puck_game_set_tutorial_guide_str(c.puck_game, '기본 조작은 여기까지입니다.')
-			yield_wait_ms(2500)
-			lo.puck_game_set_tutorial_guide_str(c.puck_game, '이제 승리 규칙으로 넘어가죠.')
-			yield_wait_ms(2500)
-			lo.puck_game_set_tutorial_guide_str(c.puck_game, '<적 타워>를 먼저 부순 쪽이 승리합니다.')
-			yield_wait_ms(4000)
-			lo.puck_game_set_tutorial_guide_str(c.puck_game, '그럼 바로 적 타워를 소환하겠습니다.')
-			yield_wait_ms(3000)
-			lo.puck_game_set_tutorial_guide_str(c.puck_game, '쨘~~~~~~~~')
-			lo.puck_game_create_tower_geom(c.puck_game, 1);
+			lo.puck_game_create_go(c.puck_game, lo.LPGO_PUCK, 1.1, 1.1, 10);
+			--------------------------------------
+			local near_count = 2
+			local near_msg = '흰색 공과 부딪쳐보세요. (%d/%d)'
+			for i=1,near_count do
+				lo.puck_game_set_tutorial_guide_str(c.puck_game, string.format(near_msg, i-1, near_count))
+				yield_wait_near_puck_player(1)
+			end
+			lo.puck_game_set_tutorial_guide_str(c.puck_game, string.format(near_msg, near_count, near_count))
+			yield_wait_ms(1000)
+			lo.puck_game_set_tutorial_guide_str(c.puck_game, '잘했습니다!')
 			yield_wait_ms(2000)
-			lo.puck_game_set_tutorial_guide_str(c.puck_game, '방향을 잘 잡아 적 타워를 공으로 공격 해 보세요!')
-			yield_wait_ms(6000)
-			lo.puck_game_set_tutorial_guide_str(c.puck_game, '대시를 활용하면 쉽습니다.')
-			yield_wait_ms(5000)
-			lo.puck_game_set_tutorial_guide_str(c.puck_game, '왼손 엄지에 힘빼고 하세요.')
-			yield_wait_ms(5000)
+			--------------------------------------
+			lo.puck_game_set_tutorial_guide_str(c.puck_game, '오른쪽 <대시 버튼>으로 <대시>도 가능합니다.')
+			yield_wait_ms(2000)
+			c.puck_game.control_flags = c.puck_game.control_flags & ~lo.LPGCF_HIDE_DASH_BUTTON
+			--------------------------------------
+			local dash_near_count = 2
+			local dash_near_msg = '<대시>를 사용해 공과 부딪쳐보세요. (%d/%d)'
+			for i=1,dash_near_count do
+				lo.puck_game_set_tutorial_guide_str(c.puck_game, string.format(dash_near_msg, i-1, dash_near_count))
+				yield_wait_near_puck_player_with_dash(1)
+			end
+			lo.puck_game_set_tutorial_guide_str(c.puck_game, string.format(dash_near_msg, dash_near_count, dash_near_count))
+			yield_wait_ms(1000)
+			lo.puck_game_set_tutorial_guide_str(c.puck_game, '아주 잘했습니다!')
+			yield_wait_ms(2000)
+			--------------------------------------
+			lo.puck_game_set_tutorial_guide_str(c.puck_game, '<적군 타워>를 소환하겠습니다.')
+			yield_wait_ms(2500)
+			lo.puck_game_create_tower_geom(c.puck_game, 1);
+			--------------------------------------
+			local damage_count = 3
+			local damage_msg = '공으로 <적군 타워>에 데미지를 입히세요. (%d/%d)'
+			for i=1,damage_count do
+				lo.puck_game_set_tutorial_guide_str(c.puck_game, string.format(damage_msg, i-1, damage_count))
+				yield_wait_player_attack(1)
+			end
+			lo.puck_game_set_tutorial_guide_str(c.puck_game, string.format(damage_msg, damage_count, damage_count))
+			yield_wait_ms(1000)
+			lo.puck_game_set_tutorial_guide_str(c.puck_game, '대단히 잘했습니다!')
+			yield_wait_ms(2000)
+			--------------------------------------
+			lo.puck_game_set_tutorial_guide_str(c.puck_game, '마지막으로 <아군 타워>와 <적>을 소환하겠습니다.')
+			yield_wait_ms(4000)
+			lo.puck_game_create_tower_geom(c.puck_game, 0);
+			lo.puck_game_create_go(c.puck_game, lo.LPGO_TARGET, 0, 1.1, 10);
+			lo.puck_game_set_tutorial_guide_str(c.puck_game, '적의 방해를 피해 <적군 타워>를 파괴하세요!')
+			yield_wait_ms(10000)
+			lo.puck_game_create_control_joint(c.puck_game, lo.LPGO_TARGET)
 			lo.puck_game_set_tutorial_guide_str(c.puck_game, '')
 		end)
 		
