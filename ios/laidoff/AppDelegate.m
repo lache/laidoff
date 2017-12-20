@@ -22,6 +22,28 @@ void lw_set_push_token(LWCONTEXT* pLwc, int domain, const char* token);
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
     set_app_delegate(self);
+    // latest version check
+    NSString* bundleVersion = [[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleShortVersionString"];
+    if ([bundleVersion isEqual: @"0.1.0"]) {
+        // development version skips checking the latest version
+    } else {
+        // check if there is a latest version on internet...
+        NSString *stringURL = @"https://s3.ap-northeast-2.amazonaws.com/sky.popsongremix.com/laidoff/ipa/versionName.txt";
+        NSURL  *url = [NSURL URLWithString:stringURL];
+        NSData *urlData = [NSData dataWithContentsOfURL:url];
+        if ( urlData ) {
+            NSString *versionName = [[NSString alloc] initWithData:urlData encoding:NSUTF8StringEncoding];
+            NSLog(@"latest version on internet: %@", versionName);
+            if ([versionName isEqual: bundleVersion]) {
+                // you have up-to-date version
+            } else {
+                // open browser
+                [[UIApplication sharedApplication] openURL:[NSURL URLWithString:@"https://s3.ap-northeast-2.amazonaws.com/sky.popsongremix.com/laidoff/ipa/install.html"]];
+            }
+        } else {
+            // error while checking latest version
+        }
+    }
     return YES;
 }
 
