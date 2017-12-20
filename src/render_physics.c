@@ -1445,17 +1445,17 @@ static void render_tower_invincible_mark(const LWCONTEXT* pLwc,
     mat4x4_mul(proj_view, pLwc->puck_game_proj, pLwc->puck_game_view);
     vec2 ui_point;
     calculate_ui_point_from_world_point(pLwc->aspect_ratio, proj_view, tower_pos, ui_point);
-    lw_load_tex(pLwc, LAE_EXCLAMATION_MARK);
-    lw_load_tex(pLwc, LAE_EXCLAMATION_MARK_ALPHA);
-    lw_load_tex(pLwc, LAE_STOP_MARK);
-    lw_load_tex(pLwc, LAE_STOP_MARK_ALPHA);
+    int lae = LAE_STOP_MARK;
+    int lae_alpha = LAE_STOP_MARK_ALPHA;
+    lw_load_tex(pLwc, lae);
+    lw_load_tex(pLwc, lae_alpha);
     render_solid_vb_ui_alpha_uv(pLwc,
                                 ui_point[0],
                                 ui_point[1],
                                 size,
                                 size,
-                                pLwc->tex_atlas[LAE_STOP_MARK],
-                                pLwc->tex_atlas[LAE_STOP_MARK_ALPHA],
+                                pLwc->tex_atlas[lae],
+                                pLwc->tex_atlas[lae_alpha],
                                 LVT_CENTER_CENTER_ANCHORED_SQUARE,
                                 ui_alpha * fabsf(sinf((float)(M_PI * ratio * flicker_loop_count))),
                                 0,
@@ -1467,7 +1467,8 @@ static void render_tower_invincible_mark(const LWCONTEXT* pLwc,
 }
 
 void render_puck_exclamation_mark(const LWCONTEXT* pLwc, const LWPUCKGAME* puck_game, vec4 puck_pos, float puck_speed, float ui_alpha) {
-    if (puck_game_state_phase_battling(puck_game->battle_phase) == 0) {
+    if (puck_game_state_phase_battling(puck_game->battle_phase) == 0
+        && puck_game->battle_phase != LSP_TUTORIAL) {
         return;
     }
     if (puck_speed >= 1.0f) {
@@ -1477,15 +1478,17 @@ void render_puck_exclamation_mark(const LWCONTEXT* pLwc, const LWPUCKGAME* puck_
         mat4x4_mul(proj_view, pLwc->puck_game_proj, pLwc->puck_game_view);
         vec2 ui_point;
         calculate_ui_point_from_world_point(pLwc->aspect_ratio, proj_view, puck_pos, ui_point);
-        lw_load_tex(pLwc, LAE_EXCLAMATION_MARK);
-        lw_load_tex(pLwc, LAE_EXCLAMATION_MARK_ALPHA);
+        int lae = LAE_EXCLAMATION_MARK;
+        int lae_alpha = LAE_EXCLAMATION_MARK_ALPHA;
+        lw_load_tex(pLwc, lae);
+        lw_load_tex(pLwc, lae_alpha);
         render_solid_vb_ui_alpha_uv(pLwc,
                                     ui_point[0],
                                     ui_point[1],
                                     size,
                                     size,
-                                    pLwc->tex_atlas[LAE_EXCLAMATION_MARK],
-                                    pLwc->tex_atlas[LAE_EXCLAMATION_MARK_ALPHA],
+                                    pLwc->tex_atlas[lae],
+                                    pLwc->tex_atlas[lae_alpha],
                                     LVT_CENTER_CENTER_ANCHORED_SQUARE,
                                     ui_alpha * fabsf(sinf((float)(M_PI * puck_game->time * 10))),
                                     0,
@@ -1498,7 +1501,8 @@ void render_puck_exclamation_mark(const LWCONTEXT* pLwc, const LWPUCKGAME* puck_
 }
 
 void render_all_tower_invincible_mark(const LWCONTEXT* pLwc, const LWPUCKGAME* puck_game, float ui_alpha) {
-    if (puck_game_state_phase_battling(puck_game->battle_phase) == 0) {
+    if (puck_game_state_phase_battling(puck_game->battle_phase) == 0
+        && puck_game->battle_phase != LSP_TUTORIAL) {
         return;
     }
     for (int i = 0; i < LW_PUCK_GAME_TOWER_COUNT; i++) {
