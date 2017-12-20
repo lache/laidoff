@@ -1536,22 +1536,6 @@ static void render_battle_ui_layer(const LWCONTEXT* pLwc, const LWPUCKGAME* puck
     const LWPUCKGAMEPLAYER* target = &puck_game->target;
     float ui_alpha = puck_game->battle_ui_alpha;
     float control_ui_alpha = puck_game->battle_control_ui_alpha;
-    // Render damage texts
-    render_damage_text(pLwc, view, proj, ui_proj, ui_alpha);
-    // Render left dir pad
-    if ((puck_game->control_flags & LPGCF_HIDE_LEFT_DIR_PAD) == 0) {
-        render_dir_pad_with_start_joystick(pLwc, &pLwc->left_dir_pad, ui_alpha * control_ui_alpha);
-    }
-    // Render right joystick
-    if (pLwc->control_flags & LCF_PUCK_GAME_RIGHT_DIR_PAD) {
-        render_dir_pad_with_start(pLwc, &pLwc->right_dir_pad);
-    }
-    // Dash button
-    //render_fist_button(pLwc);
-    // Pull button
-    //render_top_button(pLwc);
-    // Dash cooltime gauge
-    //render_dash_gauge(pLwc);
     // HP gauges (player & target)
     const char* target_nickname = puck_game->battle_id ? puck_game->target_nickname : "Bogus Opponent";
     const float gauge_width = pLwc->aspect_ratio * 0.9f;
@@ -1613,6 +1597,22 @@ static void render_battle_ui_layer(const LWCONTEXT* pLwc, const LWPUCKGAME* puck
     render_all_tower_invincible_mark(pLwc, puck_game, ui_alpha);
     // tutorial guide text
     render_tutorial_guide(pLwc, puck_game, ui_alpha);
+    // Render damage texts
+    render_damage_text(pLwc, view, proj, ui_proj, ui_alpha);
+    // Render left dir pad
+    if ((puck_game->control_flags & LPGCF_HIDE_LEFT_DIR_PAD) == 0) {
+        render_dir_pad_with_start_joystick(pLwc, &pLwc->left_dir_pad, ui_alpha * control_ui_alpha);
+    }
+    // Render right joystick
+    if (pLwc->control_flags & LCF_PUCK_GAME_RIGHT_DIR_PAD) {
+        render_dir_pad_with_start(pLwc, &pLwc->right_dir_pad);
+    }
+    // Dash button
+    //render_fist_button(pLwc);
+    // Pull button
+    //render_top_button(pLwc);
+    // Dash cooltime gauge
+    //render_dash_gauge(pLwc);
     // battle result
     render_battle_result_popup(pLwc,
                                puck_game->player_no,
