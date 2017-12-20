@@ -103,7 +103,9 @@ class UpdateResTask extends AsyncTask<UpdateResTaskParam, Void, File> {
                         Toast.makeText(activity.getApplicationContext(), "최신 버전이 있습니다.", Toast.LENGTH_SHORT).show();
                     }
                 });
-                Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(param.remoteApkBasePath + "/laidoff.apk"));
+                String installUrl = String.format("%s/%s?currentVersion=%s&latestVersion=%s",
+                        param.remoteApkBasePath, "install.html", packageVersionName, versionNameFromServer);
+                Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(installUrl));
                 activity.startActivity(browserIntent);
             }
         }
