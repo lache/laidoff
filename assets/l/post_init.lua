@@ -109,6 +109,7 @@ function on_ui_event(id)
 		print('[script]back_button')
 		lo.puck_game_set_tower_invincible(c.puck_game, 0, 0)
 		lo.puck_game_set_tower_invincible(c.puck_game, 1, 0)
+		lo.puck_game_set_dash_disabled(c.puck_game, 1, 0)
 		if c.puck_game.game_state == lo.LPGS_SEARCHING then
 			lo.tcp_send_cancelqueue(c.tcp, c.tcp.user_id)
 			c.puck_game.game_state = lo.LPGS_MAIN_MENU
@@ -124,25 +125,29 @@ function on_ui_event(id)
 	elseif id == 'tutorial_button' then
 		--lo.show_sys_msg(c.def_sys_msg, 'TUTORIAL: under construction')
 		print('[script]tutorial_button')
+		lo.puck_game_set_tower_invincible(c.puck_game, 0, 0)
+		lo.puck_game_set_tower_invincible(c.puck_game, 1, 0)
+		lo.puck_game_set_dash_disabled(c.puck_game, 1, 0)
 		lo.puck_game_reset_tutorial_state(c.puck_game)
 		lo.puck_game_clear_match_data(c, c.puck_game)
 		lo.puck_game_reset_view_proj(c, c.puck_game)
 		lo.puck_game_roll_to_tutorial(c.puck_game)
 		start_coro(function()
+			lo.puck_game_set_tutorial_guide_str(c.puck_game, '')
 			-- restore to full HP
+			c.puck_game.player.current_hp = c.puck_game.hp;
 			c.puck_game.target.current_hp = c.puck_game.hp;
-			lo.puck_game_set_tower_invincible(c.puck_game, 1, 0)
 			-- hide pull and dash buttons
 			-- (left dir pad not already hidden since UI alpha is 0)
 			c.puck_game.control_flags = c.puck_game.control_flags | lo.LPGCF_HIDE_PULL_BUTTON | lo.LPGCF_HIDE_DASH_BUTTON
 			lo.puck_game_set_tutorial_guide_str(c.puck_game, '환영합니다!')
 			yield_wait_ms(1500)
 			lo.puck_game_create_go(c.puck_game, lo.LPGO_PLAYER, 0, 0, 10);
-			lo.puck_game_set_tutorial_guide_str(c.puck_game, '왼쪽 <스틱>으로 플레이어를 움직여 보세요.')
+			lo.puck_game_set_tutorial_guide_str(c.puck_game, '왼쪽 <스틱>으로 플레이어를 움직여보세요.')
 			lo.puck_game_create_control_joint(c.puck_game, lo.LPGO_PLAYER)
 			c.puck_game.battle_control_ui_alpha = 1
 			yield_wait_ms(4000)
-			lo.puck_game_create_go(c.puck_game, lo.LPGO_PUCK, 1.1, 1.1, 10);
+			lo.puck_game_create_go(c.puck_game, lo.LPGO_PUCK, 1, 0, 10);
 			--------------------------------------
 			local near_count = 2
 			local near_msg = '흰색 공과 부딪쳐보세요. (%d/%d)'
@@ -159,8 +164,8 @@ function on_ui_event(id)
 			yield_wait_ms(2000)
 			--------------------------------------
 			lo.puck_game_set_tutorial_guide_str(c.puck_game, '오른쪽 <대시 버튼>으로 <대시>도 가능합니다.')
-			yield_wait_ms(2000)
 			c.puck_game.control_flags = c.puck_game.control_flags & ~lo.LPGCF_HIDE_DASH_BUTTON
+			yield_wait_ms(2000)
 			--------------------------------------
 			local dash_near_count = 2
 			local dash_near_msg = '<대시>를 사용해 공과 부딪쳐보세요. (%d/%d)'
@@ -176,9 +181,14 @@ function on_ui_event(id)
 			lo.puck_game_set_tutorial_guide_str(c.puck_game, '아주 잘했습니다!')
 			yield_wait_ms(2000)
 			--------------------------------------
-			lo.puck_game_set_tutorial_guide_str(c.puck_game, '<적군 타워>를 소환하겠습니다.')
+			lo.puck_game_set_tutorial_guide_str(c.puck_game, '그럼 <타워>를 소환하겠습니다.')
 			yield_wait_ms(2500)
+			lo.puck_game_set_tutorial_guide_str(c.puck_game, '왼쪽 하단에 생긴 것은 <아군 타워>입니다.')
+			lo.puck_game_create_tower_geom(c.puck_game, 0);
+			yield_wait_ms(3500)
+			lo.puck_game_set_tutorial_guide_str(c.puck_game, '오른쪽 상단에 생긴 것은 <적군 타워>입니다.')
 			lo.puck_game_create_tower_geom(c.puck_game, 1);
+			yield_wait_ms(3500)
 			--------------------------------------
 			local damage_count = 2
 			local damage_msg = '공으로 <적군 타워>에 데미지를 입히세요. (%d/%d)'
@@ -192,23 +202,43 @@ function on_ui_event(id)
 			yield_wait_ms(1000)
 			lo.puck_game_set_tutorial_guide_str(c.puck_game, '대단히 잘했습니다!')
 			yield_wait_ms(2000)
-			--------------------------------------
-			lo.puck_game_set_tutorial_guide_str(c.puck_game, '마지막으로 <아군 타워>와 <적>을 소환하겠습니다.')
+			lo.puck_game_set_tutorial_guide_str(c.puck_game, '파란색 공은 <아군 타워>에 피해를 주지 않습니다.')
 			yield_wait_ms(4000)
-			lo.puck_game_create_tower_geom(c.puck_game, 0);
-			lo.puck_game_create_go(c.puck_game, lo.LPGO_TARGET, 0, 1.1, 10);
-			lo.puck_game_set_tutorial_guide_str(c.puck_game, '적의 방해를 피해 <적군 타워>를 파괴하세요!')
-			-- remove guide text after some time passed
-			start_coro(function()
-				yield_wait_ms(2000)
-				lo.puck_game_set_tutorial_guide_str(c.puck_game, '')
-			end)
+			--------------------------------------
+			lo.puck_game_set_tutorial_guide_str(c.puck_game, '마지막으로 <적 플레이어>을 소환하겠습니다.')
+			yield_wait_ms(2000)
+			lo.puck_game_create_go(c.puck_game, lo.LPGO_TARGET, 1, 0, 10);
+			yield_wait_ms(2000)
+			lo.puck_game_set_tutorial_guide_str(c.puck_game, '적에게 닿은 공은 빨간색 공이 됩니다.')
+			yield_wait_ms(4000)
+			lo.puck_game_set_tutorial_guide_str(c.puck_game, '빨간색 공이 <아군 타워>에 맞지 않도록 주의하세요.')
+			yield_wait_ms(4000)
+			lo.puck_game_set_tutorial_guide_str(c.puck_game, '적의 방해를 피해 <적군 타워>를 파괴하십시오!')
 			-- make enemy tower can be damaged
 			lo.puck_game_set_tower_invincible(c.puck_game, 1, 0)
+			-- at first, bogus does not use dash
+			lo.puck_game_set_dash_disabled(c.puck_game, 1, 1)
 			lo.puck_game_create_control_joint(c.puck_game, lo.LPGO_TARGET)
-			yield_wait_target_attack(4)
-			-- make player tower invincible at emergency
-			lo.puck_game_set_tower_invincible(c.puck_game, 0, 1)
+			start_coro(function()
+				yield_wait_ms(2000)
+				lo.puck_game_set_dash_disabled(c.puck_game, 1, 0)
+			end)
+			local victory = 0
+			-- remove guide text after some time passed
+			start_coro(function()
+				yield_wait_ms(4000)
+				if victory == 0 then
+					lo.puck_game_set_tutorial_guide_str(c.puck_game, '')
+				end
+			end)
+			start_coro(function()
+				yield_wait_target_attack(4)
+				-- make player tower invincible at emergency
+				lo.puck_game_set_tower_invincible(c.puck_game, 0, 1)
+			end)
+			yield_wait_player_attack(3)
+			victory = 1
+			lo.puck_game_set_tutorial_guide_str(c.puck_game, '축하합니다! 실전에서도 건투를 빕니다.')
 		end)
 		
 	elseif id == 'online_button' then

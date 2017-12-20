@@ -51,6 +51,7 @@ typedef struct _LWPUCKGAMEDASH {
 	float dir_x;
 	float dir_y;
 	float shake_remain_time;
+    int disabled;
 } LWPUCKGAMEDASH;
 
 typedef struct _LWPUCKGAMEFIRE {
@@ -253,3 +254,5 @@ void puck_game_create_control_joint(LWPUCKGAME* puck_game, int lpgo);
 void puck_game_reset_go(LWPUCKGAME* puck_game, LWPUCKGAMEOBJECT* go, float x, float y, float z);
 void puck_game_create_tower_geom(LWPUCKGAME* puck_game, int i);
 void puck_game_set_tower_invincible(LWPUCKGAME* puck_game, int tower_index, int v);
+void puck_game_set_dash_disabled(LWPUCKGAME* puck_game, int index, int v);
+

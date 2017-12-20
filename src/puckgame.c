@@ -727,6 +727,10 @@ void puck_game_tower_pos(vec4 p_out, const LWPUCKGAME* puck_game, int owner_play
     p_out[3] = 1.0f;
 }
 
+void puck_game_set_dash_disabled(LWPUCKGAME* puck_game, int index, int v) {
+    puck_game->remote_dash[index].disabled = v;
+}
+
 void puck_game_control_bogus(LWPUCKGAME* puck_game, const LWPUCKGAMEBOGUSPARAM* bogus_param) {
     float ideal_target_dx = puck_game->go[LPGO_PUCK].pos[0] - puck_game->go[LPGO_TARGET].pos[0];
     float ideal_target_dy = puck_game->go[LPGO_PUCK].pos[1] - puck_game->go[LPGO_TARGET].pos[1];
@@ -750,10 +754,10 @@ void puck_game_control_bogus(LWPUCKGAME* puck_game, const LWPUCKGAMEBOGUSPARAM* 
     puck_game->remote_control[1].pull_puck = 0;
 
     // dash
-    if (ideal_target_dlen < bogus_param->dash_detect_radius) {
+    int bogus_player_no = puck_game->player_no == 2 ? 1 : 2;
+    LWPUCKGAMEDASH* dash = &puck_game->remote_dash[bogus_player_no - 1];
+    if (dash->disabled == 0 && ideal_target_dlen < bogus_param->dash_detect_radius) {
         if (numcomp_float_random_01() < bogus_param->dash_frequency) {
-            int bogus_player_no = puck_game->player_no == 2 ? 1 : 2;
-            LWPUCKGAMEDASH* dash = &puck_game->remote_dash[bogus_player_no - 1];
             const float dash_cooltime_aware_lag = numcomp_float_random_range(bogus_param->dash_cooltime_lag_min, bogus_param->dash_cooltime_lag_max);
             if (puck_game_dash_elapsed_since_last(puck_game, dash) >= puck_game->dash_interval + dash_cooltime_aware_lag) {
                 puck_game_dash(puck_game, dash, bogus_player_no);

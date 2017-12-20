@@ -45403,6 +45403,25 @@ fail:
 }
 
 
+static int _wrap_script_on_target_attack(lua_State* L) {
+  int SWIG_arg = 0;
+  void *arg1 = (void *) 0 ;
+  
+  SWIG_check_num_args("script_on_target_attack",1,1)
+  if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("script_on_target_attack",1,"void *");
+  arg1=(void *)SWIG_MustGetPtr(L,1,0,0,1,"script_on_target_attack");
+  script_on_target_attack(arg1);
+  
+  return SWIG_arg;
+  
+  if(0) SWIG_fail;
+  
+fail:
+  lua_error(L);
+  return SWIG_arg;
+}
+
+
 static int _wrap_SOUND_FILE_get(lua_State* L) {
   int SWIG_arg = 0;
   char **result = 0 ;
@@ -53850,6 +53869,56 @@ fail:
 }
 
 
+static int _wrap_LWPUCKGAMEDASH_disabled_set(lua_State* L) {
+  int SWIG_arg = 0;
+  struct _LWPUCKGAMEDASH *arg1 = (struct _LWPUCKGAMEDASH *) 0 ;
+  int arg2 ;
+  
+  SWIG_check_num_args("_LWPUCKGAMEDASH::disabled",2,2)
+  if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("_LWPUCKGAMEDASH::disabled",1,"struct _LWPUCKGAMEDASH *");
+  if(!lua_isnumber(L,2)) SWIG_fail_arg("_LWPUCKGAMEDASH::disabled",2,"int");
+  
+  if (!SWIG_IsOK(SWIG_ConvertPtr(L,1,(void**)&arg1,SWIGTYPE_p__LWPUCKGAMEDASH,0))){
+    SWIG_fail_ptr("LWPUCKGAMEDASH_disabled_set",1,SWIGTYPE_p__LWPUCKGAMEDASH);
+  }
+  
+  arg2 = (int)lua_tonumber(L, 2);
+  if (arg1) (arg1)->disabled = arg2;
+  
+  return SWIG_arg;
+  
+  if(0) SWIG_fail;
+  
+fail:
+  lua_error(L);
+  return SWIG_arg;
+}
+
+
+static int _wrap_LWPUCKGAMEDASH_disabled_get(lua_State* L) {
+  int SWIG_arg = 0;
+  struct _LWPUCKGAMEDASH *arg1 = (struct _LWPUCKGAMEDASH *) 0 ;
+  int result;
+  
+  SWIG_check_num_args("_LWPUCKGAMEDASH::disabled",1,1)
+  if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("_LWPUCKGAMEDASH::disabled",1,"struct _LWPUCKGAMEDASH *");
+  
+  if (!SWIG_IsOK(SWIG_ConvertPtr(L,1,(void**)&arg1,SWIGTYPE_p__LWPUCKGAMEDASH,0))){
+    SWIG_fail_ptr("LWPUCKGAMEDASH_disabled_get",1,SWIGTYPE_p__LWPUCKGAMEDASH);
+  }
+  
+  result = (int) ((arg1)->disabled);
+  lua_pushnumber(L, (lua_Number) result); SWIG_arg++;
+  return SWIG_arg;
+  
+  if(0) SWIG_fail;
+  
+fail:
+  lua_error(L);
+  return SWIG_arg;
+}
+
+
 static int _wrap_new_LWPUCKGAMEDASH(lua_State* L) {
   int SWIG_arg = 0;
   struct _LWPUCKGAMEDASH *result = 0 ;
@@ -53885,6 +53954,7 @@ static swig_lua_attribute swig_LWPUCKGAMEDASH_attributes[] = {
     { "dir_x", _wrap_LWPUCKGAMEDASH_dir_x_get, _wrap_LWPUCKGAMEDASH_dir_x_set },
     { "dir_y", _wrap_LWPUCKGAMEDASH_dir_y_get, _wrap_LWPUCKGAMEDASH_dir_y_set },
     { "shake_remain_time", _wrap_LWPUCKGAMEDASH_shake_remain_time_get, _wrap_LWPUCKGAMEDASH_shake_remain_time_set },
+    { "disabled", _wrap_LWPUCKGAMEDASH_disabled_get, _wrap_LWPUCKGAMEDASH_disabled_set },
     {0,0,0}
 };
 static swig_lua_method swig_LWPUCKGAMEDASH_methods[]= {
@@ -62361,6 +62431,35 @@ fail:
 }
 
 
+static int _wrap_puck_game_set_dash_disabled(lua_State* L) {
+  int SWIG_arg = 0;
+  LWPUCKGAME *arg1 = (LWPUCKGAME *) 0 ;
+  int arg2 ;
+  int arg3 ;
+  
+  SWIG_check_num_args("puck_game_set_dash_disabled",3,3)
+  if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("puck_game_set_dash_disabled",1,"LWPUCKGAME *");
+  if(!lua_isnumber(L,2)) SWIG_fail_arg("puck_game_set_dash_disabled",2,"int");
+  if(!lua_isnumber(L,3)) SWIG_fail_arg("puck_game_set_dash_disabled",3,"int");
+  
+  if (!SWIG_IsOK(SWIG_ConvertPtr(L,1,(void**)&arg1,SWIGTYPE_p__LWPUCKGAME,0))){
+    SWIG_fail_ptr("puck_game_set_dash_disabled",1,SWIGTYPE_p__LWPUCKGAME);
+  }
+  
+  arg2 = (int)lua_tonumber(L, 2);
+  arg3 = (int)lua_tonumber(L, 3);
+  puck_game_set_dash_disabled(arg1,arg2,arg3);
+  
+  return SWIG_arg;
+  
+  if(0) SWIG_fail;
+  
+fail:
+  lua_error(L);
+  return SWIG_arg;
+}
+
+
 static int _wrap_LWTCP_ConnectSocket_set(lua_State* L) {
   int SWIG_arg = 0;
   struct _LWTCP *arg1 = (struct _LWTCP *) 0 ;
@@ -64270,7 +64369,7 @@ static swig_lua_const_info swig_SwigModule_constants[]= {
     {SWIG_LUA_CONSTTAB_FLOAT("M_PI", (3.14159265358979323846))},
     {SWIG_LUA_CONSTTAB_FLOAT("LWEPSILON", (1e-3))},
     {SWIG_LUA_CONSTTAB_STRING("__LW_STRING_LINE__", "87")},
-    {SWIG_LUA_CONSTTAB_STRING("LWLOGPOS", "src\\lwmacro.h(88): ")},
+    {SWIG_LUA_CONSTTAB_STRING("LWLOGPOS", "src/lwmacro.h(88): ")},
     {SWIG_LUA_CONSTTAB_STRING("LW_GLSL_VERSION_STATEMENT", "#version 100\n")},
     {SWIG_LUA_CONSTTAB_STRING("GLSL_DIR_NAME", "glsl")},
     {SWIG_LUA_CONSTTAB_INT("MAX_FIELD_SPHERE", (50))},
@@ -65173,6 +65272,7 @@ static swig_lua_method swig_SwigModule_methods[]= {
     { "script_emit_ui_event", _wrap_script_emit_ui_event},
     { "script_on_near_puck_player", _wrap_script_on_near_puck_player},
     { "script_on_player_attack", _wrap_script_on_player_attack},
+    { "script_on_target_attack", _wrap_script_on_target_attack},
     { "play_sound", _wrap_play_sound},
     { "init_sys_msg", _wrap_init_sys_msg},
     { "deinit_sys_msg", _wrap_deinit_sys_msg},
@@ -65281,6 +65381,7 @@ static swig_lua_method swig_SwigModule_methods[]= {
     { "puck_game_reset_go", _wrap_puck_game_reset_go},
     { "puck_game_create_tower_geom", _wrap_puck_game_create_tower_geom},
     { "puck_game_set_tower_invincible", _wrap_puck_game_set_tower_invincible},
+    { "puck_game_set_dash_disabled", _wrap_puck_game_set_dash_disabled},
     { "new_tcp", _wrap_new_tcp},
     { "destroy_tcp", _wrap_destroy_tcp},
     { "tcp_update", _wrap_tcp_update},
