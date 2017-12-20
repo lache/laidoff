@@ -652,6 +652,9 @@ static void engine_handle_cmd(struct android_app* app, int32_t cmd) {
              */
             break;
         case APP_CMD_WINDOW_RESIZED:
+			// This callback will not be called because of Android bug.
+			// https://issuetracker.google.com/issues/37054453
+			// https://stackoverflow.com/questions/32587572/app-cmd-window-resized-is-not-called-but-native-window-is-resized
             LOGI("APP_CMD_WINDOW_RESIZED");
             break;
         case APP_CMD_CONFIG_CHANGED:
@@ -672,8 +675,10 @@ static void engine_handle_cmd(struct android_app* app, int32_t cmd) {
  * android_native_app_glue.  It runs in its own thread, with its own
  * event loop for receiving input events and doing other things.
  */
+static struct engine* shared_engine;
 void android_main(struct android_app* state) {
     struct engine engine;
+	shared_engine = &engine;
 
     LOGI("android_main");
 	LOGI("internal data path: %s", state->activity->internalDataPath);
@@ -928,4 +933,10 @@ extern "C" JNIEXPORT void JNICALL Java_com_popsongremix_laidoff_LaidoffFirebaseI
 extern "C" JNIEXPORT void JNICALL Java_com_popsongremix_laidoff_LaidoffNativeActivity_setPushTokenAndSend(JNIEnv * env, jclass cls, jstring text, jlong pLwcLong) {
     Java_com_popsongremix_laidoff_LaidoffFirebaseInstanceIDService_setPushToken(env, cls, text);
     lw_set_push_token((LWCONTEXT*)pLwcLong, 2, push_token);
+}
+
+extern "C" JNIEXPORT void JNICALL Java_com_popsongremix_laidoff_LaidoffNativeActivity_setWindowSize(JNIEnv * env, jclass cls, jint w, jint h, jlong pLwcLong) {
+	if (shared_engine && shared_engine->pLwc) {
+		lw_set_size(shared_engine->pLwc, w, h);
+	}
 }

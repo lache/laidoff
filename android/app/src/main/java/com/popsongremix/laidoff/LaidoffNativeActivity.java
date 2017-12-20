@@ -56,6 +56,7 @@ public class LaidoffNativeActivity extends NativeActivity implements RewardedVid
     public static native void registerAsset(String assetPath, int startOffset, int length);
     private static native void sendApkPath(String apkPath, String filesPath, String packageVersion);
     public static native void setPushTokenAndSend(String text, long pLwcLong);
+    public static native void setWindowSize(int width, int height, long pLwcLong);
 
     public static final String PREFS_NAME = "LaidoffPrefs";
     public static final String PREFS_KEY_HIGHSCORE = "highscore";
@@ -83,6 +84,27 @@ public class LaidoffNativeActivity extends NativeActivity implements RewardedVid
                 WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON |
                 WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON |
                 WindowManager.LayoutParams.FLAG_ALLOW_LOCK_WHILE_SCREEN_ON);
+        final View decorView = getWindow().getDecorView();
+        decorView.setOnSystemUiVisibilityChangeListener
+                (new View.OnSystemUiVisibilityChangeListener() {
+                    @Override
+                    public void onSystemUiVisibilityChange(int visibility) {
+                        Log.i(LOG_TAG, "decorView window size width: " + decorView.getWidth());
+                        Log.i(LOG_TAG, "decorView window size height: " + decorView.getHeight());
+                        setWindowSize(decorView.getWidth(), decorView.getHeight(), 0);
+                        // Note that system bars will only be "visible" if none of the
+                        // LOW_PROFILE, HIDE_NAVIGATION, or FULLSCREEN flags are set.
+                        if ((visibility & View.SYSTEM_UI_FLAG_FULLSCREEN) == 0) {
+                            // TODO: The system bars are visible. Make any desired
+                            // adjustments to your UI, such as showing the action bar or
+                            // other navigational controls.
+                        } else {
+                            // TODO: The system bars are NOT visible. Make any desired
+                            // adjustments to your UI, such as hiding the action bar or
+                            // other navigational controls.
+                        }
+                    }
+                });
 
         Log.i(LOG_TAG, "Device Android Version: " + Build.VERSION.SDK_INT);
 
@@ -298,7 +320,8 @@ public class LaidoffNativeActivity extends NativeActivity implements RewardedVid
         super.onWindowFocusChanged(hasFocus);
         if (hasFocus) {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-                getWindow().getDecorView().setSystemUiVisibility(
+                final View decorView = getWindow().getDecorView();
+                decorView.setSystemUiVisibility(
                         View.SYSTEM_UI_FLAG_LAYOUT_STABLE
                                 | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
                                 | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
@@ -307,6 +330,8 @@ public class LaidoffNativeActivity extends NativeActivity implements RewardedVid
                                 | View.SYSTEM_UI_FLAG_FULLSCREEN // hide status bar
                                 | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY
                 );
+                Log.i(LOG_TAG, "decorView window width: " + decorView.getWidth());
+                Log.i(LOG_TAG, "decorView window height: " + decorView.getHeight());
             }
         }
     }

@@ -1480,6 +1480,7 @@ void lw_set_device_model(LWCONTEXT* pLwc, const char* model) {
 }
 
 void lw_set_size(LWCONTEXT* pLwc, int w, int h) {
+	LOGI(LWLOGPOS "window size old (%d, %d) --> new (%d, %d)", pLwc->width, pLwc->height, w, h);
     pLwc->width = w;
     pLwc->height = h;
     if (pLwc->width > 0 && pLwc->height > 0) {
@@ -1489,7 +1490,7 @@ void lw_set_size(LWCONTEXT* pLwc, int w, int h) {
             LOGE("Screen width is 0 or below! (%d) Aspect ratio set to 1.0f", pLwc->width);
         }
         if (pLwc->height <= 0) {
-            LOGE("Screen heightis 0 or below! (%d) Aspect ratio set to 1.0f", pLwc->height);
+            LOGE("Screen height is 0 or below! (%d) Aspect ratio set to 1.0f", pLwc->height);
         }
         pLwc->aspect_ratio = 1.0f;
     }
