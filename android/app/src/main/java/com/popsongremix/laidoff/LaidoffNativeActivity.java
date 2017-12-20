@@ -89,8 +89,8 @@ public class LaidoffNativeActivity extends NativeActivity implements RewardedVid
                 (new View.OnSystemUiVisibilityChangeListener() {
                     @Override
                     public void onSystemUiVisibilityChange(int visibility) {
-                        Log.i(LOG_TAG, "decorView window size width: " + decorView.getWidth());
-                        Log.i(LOG_TAG, "decorView window size height: " + decorView.getHeight());
+                        Log.i(LOG_TAG, "onSystemUiVisibilityChange - decorView window size width: " + decorView.getWidth());
+                        Log.i(LOG_TAG, "onSystemUiVisibilityChange - decorView window size height: " + decorView.getHeight());
                         setWindowSize(decorView.getWidth(), decorView.getHeight(), 0);
                         // Note that system bars will only be "visible" if none of the
                         // LOW_PROFILE, HIDE_NAVIGATION, or FULLSCREEN flags are set.
@@ -330,8 +330,9 @@ public class LaidoffNativeActivity extends NativeActivity implements RewardedVid
                                 | View.SYSTEM_UI_FLAG_FULLSCREEN // hide status bar
                                 | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY
                 );
-                Log.i(LOG_TAG, "decorView window width: " + decorView.getWidth());
-                Log.i(LOG_TAG, "decorView window height: " + decorView.getHeight());
+                Log.i(LOG_TAG, "onWindowFocusChanged - decorView window width: " + decorView.getWidth());
+                Log.i(LOG_TAG, "onWindowFocusChanged - decorView window height: " + decorView.getHeight());
+                setWindowSize(decorView.getWidth(), decorView.getHeight(), 0);
             }
         }
     }

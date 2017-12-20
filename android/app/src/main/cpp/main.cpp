@@ -343,8 +343,9 @@ static int engine_init_display(struct engine* engine) {
     engine->context = context;
     engine->surface = surface;
     engine->config = config;
-    engine->width = w;
-    engine->height = h;
+	// engine->width and engine->height may be already filled with correct size
+    engine->width = engine->width < w ? w : engine->width;
+    engine->height = engine->height < h ? h : engine->height;
     engine->state.angle = 0;
 
     LOGI("Surface width: %d", engine->width);
@@ -754,7 +755,12 @@ void android_main(struct android_app* state) {
             engine.inited = true;
             lwc_start_logic_thread(engine.pLwc);
 		}
-
+		// update width & height on LWCONTEXT side if inconsistency with engine found
+		if (engine.pLwc) {
+			if (engine.width != engine.pLwc->width || engine.height != engine.pLwc->height) {
+				lw_set_size(engine.pLwc, engine.width, engine.height);
+			}
+		}
         // Read all pending events.
         int ident;
         int events;
@@ -936,7 +942,12 @@ extern "C" JNIEXPORT void JNICALL Java_com_popsongremix_laidoff_LaidoffNativeAct
 }
 
 extern "C" JNIEXPORT void JNICALL Java_com_popsongremix_laidoff_LaidoffNativeActivity_setWindowSize(JNIEnv * env, jclass cls, jint w, jint h, jlong pLwcLong) {
-	if (shared_engine && shared_engine->pLwc) {
-		lw_set_size(shared_engine->pLwc, w, h);
+	if (shared_engine) {
+		shared_engine->width = w;
+		shared_engine->height = h;
+		LWCONTEXT* pLwc = pLwcLong ? (LWCONTEXT*)pLwcLong : shared_engine->pLwc;
+		if (pLwc) {
+			lw_set_size(pLwc, w, h);
+		}
 	}
 }
