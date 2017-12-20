@@ -540,7 +540,7 @@ static void render_timer(const LWCONTEXT* pLwc, float remain_sec, float total_se
 static void render_tutorial_guide(const LWCONTEXT* pLwc, const LWPUCKGAME* puck_game, float ui_alpha) {
     if (puck_game->game_state == LPGS_TUTORIAL) {
         LWTEXTBLOCK text_block;
-        text_block.align = LTBA_CENTER_CENTER;
+        text_block.align = LTBA_CENTER_TOP;
         text_block.text_block_width = DEFAULT_TEXT_BLOCK_WIDTH;
         text_block.text_block_line_height = DEFAULT_TEXT_BLOCK_LINE_HEIGHT_E;
         text_block.size = DEFAULT_TEXT_BLOCK_SIZE_B;
@@ -554,7 +554,7 @@ static void render_tutorial_guide(const LWCONTEXT* pLwc, const LWPUCKGAME* puck_
         text_block.begin_index = 0;
         text_block.end_index = text_block.text_bytelen;
         text_block.text_block_x = 0;
-        text_block.text_block_y = 0.7f;
+        text_block.text_block_y = 0.95f;
         render_text_block(pLwc, &text_block);
     }
 }
