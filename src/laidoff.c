@@ -297,70 +297,101 @@ static void init_vbo(LWCONTEXT* pLwc) {
 void set_vertex_attrib_pointer(const LWCONTEXT* pLwc, int shader_index) {
     lw_create_lazy_shader_program(pLwc, shader_index);
     // vertex coordinates
-    glEnableVertexAttribArray(pLwc->shader[shader_index].vpos_location);
-    glVertexAttribPointer(pLwc->shader[shader_index].vpos_location, 3, GL_FLOAT, GL_FALSE,
-                          stride_in_bytes, (void *)0);
+    if (pLwc->shader[shader_index].vpos_location >= 0) {
+        glEnableVertexAttribArray(pLwc->shader[shader_index].vpos_location);
+        glVertexAttribPointer(pLwc->shader[shader_index].vpos_location, 3, GL_FLOAT, GL_FALSE,
+                              stride_in_bytes, (void *)0);
+    }
     // vertex color / normal
-    glEnableVertexAttribArray(pLwc->shader[shader_index].vcol_location);
-    glVertexAttribPointer(pLwc->shader[shader_index].vcol_location, 3, GL_FLOAT, GL_FALSE,
-                          stride_in_bytes, (void *)(sizeof(float) * 3));
+    if (pLwc->shader[shader_index].vcol_location >= 0) {
+        glEnableVertexAttribArray(pLwc->shader[shader_index].vcol_location);
+        glVertexAttribPointer(pLwc->shader[shader_index].vcol_location, 3, GL_FLOAT, GL_FALSE,
+                              stride_in_bytes, (void *)(sizeof(float) * 3));
+    }
     // uv coordinates
-    glEnableVertexAttribArray(pLwc->shader[shader_index].vuv_location);
-    glVertexAttribPointer(pLwc->shader[shader_index].vuv_location, 2, GL_FLOAT, GL_FALSE,
-                          stride_in_bytes, (void *)(sizeof(float) * (3 + 3)));
+    if (pLwc->shader[shader_index].vuv_location) {
+        glEnableVertexAttribArray(pLwc->shader[shader_index].vuv_location);
+        glVertexAttribPointer(pLwc->shader[shader_index].vuv_location, 2, GL_FLOAT, GL_FALSE,
+                              stride_in_bytes, (void *)(sizeof(float) * (3 + 3)));
+    }
     // scale-9 coordinates
-    glEnableVertexAttribArray(pLwc->shader[shader_index].vs9_location);
-    glVertexAttribPointer(pLwc->shader[shader_index].vs9_location, 2, GL_FLOAT, GL_FALSE,
-                          stride_in_bytes, (void *)(sizeof(float) * (3 + 3 + 2)));
+    if (pLwc->shader[shader_index].vs9_location) {
+        glEnableVertexAttribArray(pLwc->shader[shader_index].vs9_location);
+        glVertexAttribPointer(pLwc->shader[shader_index].vs9_location, 2, GL_FLOAT, GL_FALSE,
+                              stride_in_bytes, (void *)(sizeof(float) * (3 + 3 + 2)));
+    }
 }
 
 void set_skin_vertex_attrib_pointer(const LWCONTEXT* pLwc, int shader_index) {
     lw_create_lazy_shader_program(pLwc, shader_index);
     // vertex coordinates
-    glEnableVertexAttribArray(pLwc->shader[shader_index].vpos_location);
-    glVertexAttribPointer(pLwc->shader[shader_index].vpos_location, 3, GL_FLOAT, GL_FALSE,
-                          skin_stride_in_bytes, (void *)0);
+    if (pLwc->shader[shader_index].vpos_location >= 0) {
+        glEnableVertexAttribArray(pLwc->shader[shader_index].vpos_location);
+        glVertexAttribPointer(pLwc->shader[shader_index].vpos_location, 3, GL_FLOAT, GL_FALSE,
+                              skin_stride_in_bytes, (void *)0);
+    }
     // vertex color / normal
-    glEnableVertexAttribArray(pLwc->shader[shader_index].vcol_location);
-    glVertexAttribPointer(pLwc->shader[shader_index].vcol_location, 3, GL_FLOAT, GL_FALSE,
-                          skin_stride_in_bytes, (void *)(sizeof(float) * 3));
+    if (pLwc->shader[shader_index].vcol_location >= 0) {
+        glEnableVertexAttribArray(pLwc->shader[shader_index].vcol_location);
+        glVertexAttribPointer(pLwc->shader[shader_index].vcol_location, 3, GL_FLOAT, GL_FALSE,
+                              skin_stride_in_bytes, (void *)(sizeof(float) * 3));
+    }
     // uv coordinates
-    glEnableVertexAttribArray(pLwc->shader[shader_index].vuv_location);
-    glVertexAttribPointer(pLwc->shader[shader_index].vuv_location, 2, GL_FLOAT, GL_FALSE,
-                          skin_stride_in_bytes, (void *)(sizeof(float) * (3 + 3)));
+    if (pLwc->shader[shader_index].vuv_location >= 0) {
+        glEnableVertexAttribArray(pLwc->shader[shader_index].vuv_location);
+        glVertexAttribPointer(pLwc->shader[shader_index].vuv_location, 2, GL_FLOAT, GL_FALSE,
+                              skin_stride_in_bytes, (void *)(sizeof(float) * (3 + 3)));
+    }
     // bone weights
-    glEnableVertexAttribArray(pLwc->shader[shader_index].vbweight_location);
-    glVertexAttribPointer(pLwc->shader[shader_index].vbweight_location, 4, GL_FLOAT, GL_FALSE,
-                          skin_stride_in_bytes, (void *)(sizeof(float) * (3 + 3 + 2)));
+    if (pLwc->shader[shader_index].vbweight_location >= 0) {
+        glEnableVertexAttribArray(pLwc->shader[shader_index].vbweight_location);
+        glVertexAttribPointer(pLwc->shader[shader_index].vbweight_location, 4, GL_FLOAT, GL_FALSE,
+                              skin_stride_in_bytes, (void *)(sizeof(float) * (3 + 3 + 2)));
+    }
     // bone transformations
-    glEnableVertexAttribArray(pLwc->shader[shader_index].vbmat_location);
-    glVertexAttribPointer(pLwc->shader[shader_index].vbmat_location, 4, GL_FLOAT, GL_FALSE,
-                          skin_stride_in_bytes, (void *)(sizeof(float) * (3 + 3 + 2 + 4)));
+    if (pLwc->shader[shader_index].vbmat_location >= 0) {
+        glEnableVertexAttribArray(pLwc->shader[shader_index].vbmat_location);
+        glVertexAttribPointer(pLwc->shader[shader_index].vbmat_location, 4, GL_FLOAT, GL_FALSE,
+                              skin_stride_in_bytes, (void *)(sizeof(float) * (3 + 3 + 2 + 4)));
+    }
 }
 
 void set_fan_vertex_attrib_pointer(const LWCONTEXT* pLwc, int shader_index) {
     lw_create_lazy_shader_program(pLwc, shader_index);
     // vertex coordinates
-    glEnableVertexAttribArray(pLwc->shader[shader_index].vpos_location);
-    glVertexAttribPointer(pLwc->shader[shader_index].vpos_location, 3, GL_FLOAT, GL_FALSE,
-                          fan_stride_in_bytes, (void *)0);
+    if (pLwc->shader[shader_index].vpos_location >= 0) {
+        glEnableVertexAttribArray(pLwc->shader[shader_index].vpos_location);
+        glVertexAttribPointer(pLwc->shader[shader_index].vpos_location, 3, GL_FLOAT, GL_FALSE,
+                              fan_stride_in_bytes, (void *)0);
+    }
 }
 
 void set_ps_vertex_attrib_pointer(const LWCONTEXT* pLwc, int shader_index) {
     lw_create_lazy_shader_program(pLwc, shader_index);
-    glEnableVertexAttribArray(pLwc->shader[shader_index].a_pID);
-    glEnableVertexAttribArray(pLwc->shader[shader_index].a_pRadiusOffset);
-    glEnableVertexAttribArray(pLwc->shader[shader_index].a_pVelocityOffset);
-    glEnableVertexAttribArray(pLwc->shader[shader_index].a_pDecayOffset);
-    glEnableVertexAttribArray(pLwc->shader[shader_index].a_pSizeOffset);
-    glEnableVertexAttribArray(pLwc->shader[shader_index].a_pColorOffset);
-
-    glVertexAttribPointer(pLwc->shader[shader_index].a_pID, 1, GL_FLOAT, GL_FALSE, sizeof(LWPARTICLE2), (void*)(LWOFFSETOF(LWPARTICLE2, pId)));
-    glVertexAttribPointer(pLwc->shader[shader_index].a_pRadiusOffset, 1, GL_FLOAT, GL_FALSE, sizeof(LWPARTICLE2), (void*)(LWOFFSETOF(LWPARTICLE2, pRadiusOffset)));
-    glVertexAttribPointer(pLwc->shader[shader_index].a_pVelocityOffset, 1, GL_FLOAT, GL_FALSE, sizeof(LWPARTICLE2), (void*)(LWOFFSETOF(LWPARTICLE2, pVelocityOffset)));
-    glVertexAttribPointer(pLwc->shader[shader_index].a_pDecayOffset, 1, GL_FLOAT, GL_FALSE, sizeof(LWPARTICLE2), (void*)(LWOFFSETOF(LWPARTICLE2, pDecayOffset)));
-    glVertexAttribPointer(pLwc->shader[shader_index].a_pSizeOffset, 1, GL_FLOAT, GL_FALSE, sizeof(LWPARTICLE2), (void*)(LWOFFSETOF(LWPARTICLE2, pSizeOffset)));
-    glVertexAttribPointer(pLwc->shader[shader_index].a_pColorOffset, 3, GL_FLOAT, GL_FALSE, sizeof(LWPARTICLE2), (void*)(LWOFFSETOF(LWPARTICLE2, pColorOffset)));
+    if (pLwc->shader[shader_index].a_pID >= 0) {
+        glEnableVertexAttribArray(pLwc->shader[shader_index].a_pID);
+        glVertexAttribPointer(pLwc->shader[shader_index].a_pID, 1, GL_FLOAT, GL_FALSE, sizeof(LWPARTICLE2), (void*)(LWOFFSETOF(LWPARTICLE2, pId)));
+    }
+    if (pLwc->shader[shader_index].a_pRadiusOffset >= 0) {
+        glEnableVertexAttribArray(pLwc->shader[shader_index].a_pRadiusOffset);
+        glVertexAttribPointer(pLwc->shader[shader_index].a_pRadiusOffset, 1, GL_FLOAT, GL_FALSE, sizeof(LWPARTICLE2), (void*)(LWOFFSETOF(LWPARTICLE2, pRadiusOffset)));
+    }
+    if (pLwc->shader[shader_index].a_pVelocityOffset >= 0) {
+        glEnableVertexAttribArray(pLwc->shader[shader_index].a_pVelocityOffset);
+        glVertexAttribPointer(pLwc->shader[shader_index].a_pVelocityOffset, 1, GL_FLOAT, GL_FALSE, sizeof(LWPARTICLE2), (void*)(LWOFFSETOF(LWPARTICLE2, pVelocityOffset)));
+    }
+    if (pLwc->shader[shader_index].a_pDecayOffset >= 0) {
+        glEnableVertexAttribArray(pLwc->shader[shader_index].a_pDecayOffset);
+        glVertexAttribPointer(pLwc->shader[shader_index].a_pDecayOffset, 1, GL_FLOAT, GL_FALSE, sizeof(LWPARTICLE2), (void*)(LWOFFSETOF(LWPARTICLE2, pDecayOffset)));
+    }
+    if (pLwc->shader[shader_index].a_pSizeOffset >= 0) {
+        glEnableVertexAttribArray(pLwc->shader[shader_index].a_pSizeOffset);
+        glVertexAttribPointer(pLwc->shader[shader_index].a_pSizeOffset, 1, GL_FLOAT, GL_FALSE, sizeof(LWPARTICLE2), (void*)(LWOFFSETOF(LWPARTICLE2, pSizeOffset)));
+    }
+    if (pLwc->shader[shader_index].a_pColorOffset >= 0) {
+        glEnableVertexAttribArray(pLwc->shader[shader_index].a_pColorOffset);
+        glVertexAttribPointer(pLwc->shader[shader_index].a_pColorOffset, 3, GL_FLOAT, GL_FALSE, sizeof(LWPARTICLE2), (void*)(LWOFFSETOF(LWPARTICLE2, pColorOffset)));
+    }
 }
 
 static void gen_all_vao(LWCONTEXT* pLwc) {

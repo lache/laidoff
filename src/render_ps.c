@@ -26,10 +26,14 @@ static void s_render_rose(const LWCONTEXT* pLwc) {
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, pLwc->tex_programmed[LPT_DIR_PAD]);
 	glUniform1i(pLwc->shader[shader_index].texture_location, 0);
-	glEnableVertexAttribArray(pLwc->shader[shader_index].theta_location);
-	glVertexAttribPointer(pLwc->shader[shader_index].theta_location, 1, GL_FLOAT, GL_FALSE, sizeof(LWPARTICLE), (void*)LWOFFSETOF(LWPARTICLE, theta));
-	glEnableVertexAttribArray(pLwc->shader[shader_index].shade_location);
-	glVertexAttribPointer(pLwc->shader[shader_index].shade_location, 3, GL_FLOAT, GL_FALSE, sizeof(LWPARTICLE), (void*)LWOFFSETOF(LWPARTICLE, shade));
+    if (pLwc->shader[shader_index].theta_location >= 0) {
+        glEnableVertexAttribArray(pLwc->shader[shader_index].theta_location);
+        glVertexAttribPointer(pLwc->shader[shader_index].theta_location, 1, GL_FLOAT, GL_FALSE, sizeof(LWPARTICLE), (void*)LWOFFSETOF(LWPARTICLE, theta));
+    }
+    if (pLwc->shader[shader_index].shade_location >= 0) {
+        glEnableVertexAttribArray(pLwc->shader[shader_index].shade_location);
+        glVertexAttribPointer(pLwc->shader[shader_index].shade_location, 3, GL_FLOAT, GL_FALSE, sizeof(LWPARTICLE), (void*)LWOFFSETOF(LWPARTICLE, shade));
+    }
 	glDrawArrays(GL_POINTS, 0, NUM_PARTICLES);
 	glDisableVertexAttribArray(pLwc->shader[shader_index].theta_location);
 	glDisableVertexAttribArray(pLwc->shader[shader_index].shade_location);
@@ -64,32 +68,10 @@ void ps_render_explosion(const LWCONTEXT* pLwc, const LWEMITTER2OBJECT* emit_obj
 
 	glBindBuffer(GL_ARRAY_BUFFER, pLwc->particle_buffer2);
 
-	// Attributes
-	/*glEnableVertexAttribArray(pLwc->shader[shader_index].a_pID);
-	glEnableVertexAttribArray(pLwc->shader[shader_index].a_pRadiusOffset);
-	glEnableVertexAttribArray(pLwc->shader[shader_index].a_pVelocityOffset);
-	glEnableVertexAttribArray(pLwc->shader[shader_index].a_pDecayOffset);
-	glEnableVertexAttribArray(pLwc->shader[shader_index].a_pSizeOffset);
-	glEnableVertexAttribArray(pLwc->shader[shader_index].a_pColorOffset);
-
-	glVertexAttribPointer(pLwc->shader[shader_index].a_pID, 1, GL_FLOAT, GL_FALSE, sizeof(LWPARTICLE2), (void*)(LWOFFSETOF(LWPARTICLE2, pId)));
-	glVertexAttribPointer(pLwc->shader[shader_index].a_pRadiusOffset, 1, GL_FLOAT, GL_FALSE, sizeof(LWPARTICLE2), (void*)(LWOFFSETOF(LWPARTICLE2, pRadiusOffset)));
-	glVertexAttribPointer(pLwc->shader[shader_index].a_pVelocityOffset, 1, GL_FLOAT, GL_FALSE, sizeof(LWPARTICLE2), (void*)(LWOFFSETOF(LWPARTICLE2, pVelocityOffset)));
-	glVertexAttribPointer(pLwc->shader[shader_index].a_pDecayOffset, 1, GL_FLOAT, GL_FALSE, sizeof(LWPARTICLE2), (void*)(LWOFFSETOF(LWPARTICLE2, pDecayOffset)));
-	glVertexAttribPointer(pLwc->shader[shader_index].a_pSizeOffset, 1, GL_FLOAT, GL_FALSE, sizeof(LWPARTICLE2), (void*)(LWOFFSETOF(LWPARTICLE2, pSizeOffset)));
-	glVertexAttribPointer(pLwc->shader[shader_index].a_pColorOffset, 3, GL_FLOAT, GL_FALSE, sizeof(LWPARTICLE2), (void*)(LWOFFSETOF(LWPARTICLE2, pColorOffset)));
-*/
 	bind_all_ps_vertex_attrib(pLwc, LPVT_DEFAULT);
 
 	// Draw particles
 	glDrawArrays(GL_POINTS, 0, NUM_PARTICLES2);
-    
-	/*glDisableVertexAttribArray(pLwc->shader[shader_index].a_pID);
-	glDisableVertexAttribArray(pLwc->shader[shader_index].a_pRadiusOffset);
-	glDisableVertexAttribArray(pLwc->shader[shader_index].a_pVelocityOffset);
-	glDisableVertexAttribArray(pLwc->shader[shader_index].a_pDecayOffset);
-	glDisableVertexAttribArray(pLwc->shader[shader_index].a_pSizeOffset);
-	glDisableVertexAttribArray(pLwc->shader[shader_index].a_pColorOffset);*/
 }
 
 void lwc_render_ps(const LWCONTEXT* pLwc) {
