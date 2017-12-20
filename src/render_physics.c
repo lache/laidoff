@@ -1471,7 +1471,7 @@ void render_puck_exclamation_mark(const LWCONTEXT* pLwc, const LWPUCKGAME* puck_
         && puck_game->battle_phase != LSP_TUTORIAL) {
         return;
     }
-    if (puck_speed >= 1.0f) {
+    if (puck_game->puck_owner_player_no != 0 && puck_speed >= 1.0f) {
         float size = 0.125f;
         mat4x4 proj_view;
         mat4x4_identity(proj_view);
