@@ -15,6 +15,7 @@
 #include "lwtcp.h"
 #include "lwfvbo.h"
 #include <assert.h>
+#include "lwtimepoint.h"
 
 typedef struct _LWSPHERERENDERUNIFORM {
     float sphere_col_ratio[3];
@@ -183,9 +184,9 @@ static void render_tower_normal_2(const LWCONTEXT* pLwc, const mat4x4 view, cons
     float sx = puck_game->tower_radius / puck_game->tower_mesh_radius;
     float sy = sx;
     float sz = sx;
-    
+
     glUniform1f(shader->overlay_color_ratio_location, 0);
-    
+
     LWTOWERRENDERDATA tower_render_data[] = {
         { LVT_TOWER_BASE_2, 1.0f, 1.0f, 1.0f },
     };
@@ -205,34 +206,34 @@ static void render_tower_normal_2(const LWCONTEXT* pLwc, const mat4x4 view, cons
         } else {
             glUniform1f(shader->overlay_color_ratio_location, 0);
         }
-        
+
         mat4x4 model;
         mat4x4_identity(model);
         mat4x4_mul(model, model, rot);
         mat4x4_scale_aniso(model, model, sx, sy, sz);
         //mat4x4_scale_aniso(model, model, 5, 5, 5);
-        
+
         mat4x4 model_translate;
         mat4x4_translate(model_translate, x, y, z);
-        
+
         mat4x4_mul(model, model_translate, model);
-        
+
         mult_world_roll(model, puck_game->world_roll_axis, puck_game->world_roll_dir, puck_game->world_roll);
-        
+
         mat4x4 view_model;
         mat4x4_mul(view_model, view, model);
-        
+
         mat4x4 proj_view_model;
         mat4x4_identity(proj_view_model);
         mat4x4_mul(proj_view_model, proj, view_model);
-        
+
         const LWTOWERRENDERDATA* d = tower_render_data + i;
         float r = d->r;
         float g = d->g;
         float b = d->b;
         glUniform3f(shader->overlay_color_location, r, g, b);
         const LW_VBO_TYPE lvt = d->lvt;
-        
+
         lazy_glBindBuffer(pLwc, lvt);
         bind_all_vertex_attrib(pLwc, lvt);
         glActiveTexture(GL_TEXTURE0);
@@ -1431,6 +1432,91 @@ static void render_main_menu_ui_layer(const LWCONTEXT* pLwc, const LWPUCKGAME* p
                         1.0f);
 }
 
+static void render_tower_invincible_mark(const LWCONTEXT* pLwc,
+                                         vec4 tower_pos,
+                                         float ui_alpha,
+                                         float elapsed_from_last_damage,
+                                         float invincible_time) {
+    float ratio = elapsed_from_last_damage / invincible_time;
+    int flicker_loop_count = 5;
+    float size = 0.1f;
+    mat4x4 proj_view;
+    mat4x4_identity(proj_view);
+    mat4x4_mul(proj_view, pLwc->puck_game_proj, pLwc->puck_game_view);
+    vec2 ui_point;
+    calculate_ui_point_from_world_point(pLwc->aspect_ratio, proj_view, tower_pos, ui_point);
+    lw_load_tex(pLwc, LAE_EXCLAMATION_MARK);
+    lw_load_tex(pLwc, LAE_EXCLAMATION_MARK_ALPHA);
+    lw_load_tex(pLwc, LAE_STOP_MARK);
+    lw_load_tex(pLwc, LAE_STOP_MARK_ALPHA);
+    render_solid_vb_ui_alpha_uv(pLwc,
+                                ui_point[0],
+                                ui_point[1],
+                                size,
+                                size,
+                                pLwc->tex_atlas[LAE_STOP_MARK],
+                                pLwc->tex_atlas[LAE_STOP_MARK_ALPHA],
+                                LVT_CENTER_CENTER_ANCHORED_SQUARE,
+                                ui_alpha * fabsf(sinf((float)(M_PI * ratio * flicker_loop_count))),
+                                0,
+                                0,
+                                0,
+                                0,
+                                default_uv_offset,
+                                default_uv_scale);
+}
+
+void render_puck_exclamation_mark(const LWCONTEXT* pLwc, const LWPUCKGAME* puck_game, vec4 puck_pos, float puck_speed, float ui_alpha) {
+    if (puck_game_state_phase_battling(puck_game->battle_phase) == 0) {
+        return;
+    }
+    if (puck_speed >= 1.0f) {
+        float size = 0.125f;
+        mat4x4 proj_view;
+        mat4x4_identity(proj_view);
+        mat4x4_mul(proj_view, pLwc->puck_game_proj, pLwc->puck_game_view);
+        vec2 ui_point;
+        calculate_ui_point_from_world_point(pLwc->aspect_ratio, proj_view, puck_pos, ui_point);
+        lw_load_tex(pLwc, LAE_EXCLAMATION_MARK);
+        lw_load_tex(pLwc, LAE_EXCLAMATION_MARK_ALPHA);
+        render_solid_vb_ui_alpha_uv(pLwc,
+                                    ui_point[0],
+                                    ui_point[1],
+                                    size,
+                                    size,
+                                    pLwc->tex_atlas[LAE_EXCLAMATION_MARK],
+                                    pLwc->tex_atlas[LAE_EXCLAMATION_MARK_ALPHA],
+                                    LVT_CENTER_CENTER_ANCHORED_SQUARE,
+                                    ui_alpha * fabsf(sinf((float)(M_PI * puck_game->time * 10))),
+                                    0,
+                                    0,
+                                    0,
+                                    0,
+                                    default_uv_offset,
+                                    default_uv_scale);
+    }
+}
+
+void render_all_tower_invincible_mark(const LWCONTEXT* pLwc, const LWPUCKGAME* puck_game, float ui_alpha) {
+    if (puck_game_state_phase_battling(puck_game->battle_phase) == 0) {
+        return;
+    }
+    for (int i = 0; i < LW_PUCK_GAME_TOWER_COUNT; i++) {
+        int tower_index = i;
+        vec4 tower_pos = {
+            puck_game->tower_pos * puck_game->tower_pos_multiplier[tower_index][0],
+            puck_game->tower_pos * puck_game->tower_pos_multiplier[tower_index][1],
+            0.845f, // hard-coded
+            1,
+        };
+        float elapsed_from_last_damage = (float)(lwtimepoint_now_seconds() - puck_game->tower[tower_index].last_damaged_at);
+        float invincible_time = 1.0f;
+        if (elapsed_from_last_damage < invincible_time) {
+            render_tower_invincible_mark(pLwc, tower_pos, ui_alpha, elapsed_from_last_damage, invincible_time);
+        }
+    }
+}
+
 static void render_battle_ui_layer(const LWCONTEXT* pLwc, const LWPUCKGAME* puck_game,
                                    const mat4x4 view, const mat4x4 proj, const mat4x4 ui_proj,
                                    int remote, const float* player_controlled_pos) {
@@ -1506,6 +1592,14 @@ static void render_battle_ui_layer(const LWCONTEXT* pLwc, const LWPUCKGAME* puck
     mult_world_roll(world_roll_mat, puck_game->world_roll_axis, puck_game->world_roll_dir, puck_game->world_roll);
     mat4x4_mul_vec4(player_controlled_pos_vec4_world_roll, world_roll_mat, player_controlled_pos_vec4);
     render_dash_ring_gauge(pLwc, player_controlled_pos_vec4_world_roll, ui_alpha * control_ui_alpha);
+    vec4 puck_pos_vec4 = {
+        puck_game->go[LPGO_PUCK].pos[0],
+        puck_game->go[LPGO_PUCK].pos[1],
+        puck_game->go[LPGO_PUCK].pos[2],
+        1.0f,
+    };
+    render_puck_exclamation_mark(pLwc, puck_game, puck_pos_vec4, puck_game->go[LPGO_PUCK].speed, ui_alpha);
+    render_all_tower_invincible_mark(pLwc, puck_game, ui_alpha);
     // tutorial guide text
     render_tutorial_guide(pLwc, puck_game, ui_alpha);
     // battle result

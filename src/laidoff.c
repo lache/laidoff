@@ -877,6 +877,7 @@ static void dequeue_puck_game_state_and_apply(LWCONTEXT* pLwc) {
                 tower->collapsing = 1;
                 tower->collapsing_time = 0;
             }
+            tower->last_damaged_at = lwtimepoint_now_seconds();
         }
         const int target_damage = pLwc->puck_game_state.bf.target_current_hp - new_state.bf.target_current_hp;
         if (target_damage > 0) {
@@ -891,6 +892,7 @@ static void dequeue_puck_game_state_and_apply(LWCONTEXT* pLwc) {
                 tower->collapsing = 1;
                 tower->collapsing_time = 0;
             }
+            tower->last_damaged_at = lwtimepoint_now_seconds();
         }
         // If the battle is finished (called once)
         if (puck_game_state_phase_finished(pLwc->puck_game_state.bf.phase) == 0
@@ -907,6 +909,8 @@ static void dequeue_puck_game_state_and_apply(LWCONTEXT* pLwc) {
         pLwc->puck_game->update_tick = new_state.update_tick;
         pLwc->puck_game->wall_hit_bit = new_state.bf.wall_hit_bit;
         pLwc->puck_game->puck_owner_player_no = new_state.bf.puck_owner_player_no;
+        pLwc->puck_game->go[LPGO_PUCK].speed = new_state.puck_speed;
+        memcpy(pLwc->puck_game->go[LPGO_PUCK].pos, new_state.puck, sizeof(pLwc->puck_game->go[LPGO_PUCK].pos));
     } else {
         LOGE("State buffer dequeue failed.");
     }

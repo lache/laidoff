@@ -131,7 +131,11 @@ typedef enum _LW_ATLAS_ENUM {
     LAE_PUCK_FLOOR_COVER,
     LAE_TOWER_BASE_2_PLAYER,
     LAE_TOWER_BASE_2_TARGET,
-    LAE_COUNT,
+        LAE_EXCLAMATION_MARK,
+        LAE_EXCLAMATION_MARK_ALPHA,
+        LAE_STOP_MARK,
+        LAE_STOP_MARK_ALPHA,
+        LAE_COUNT,
     
     LAE_DONTCARE,
     LAE_ZERO_FOR_BLACK,
@@ -269,6 +273,10 @@ static const char *tex_atlas_filename[] = {
     ASSETS_BASE_PATH "ktx" PATH_SEPARATOR "puck-floor-cover.ktx",
     ASSETS_BASE_PATH "ktx" PATH_SEPARATOR "tower-base-2-player.ktx",
     ASSETS_BASE_PATH "ktx" PATH_SEPARATOR "tower-base-2-target.ktx",
+        ASSETS_BASE_PATH "ktx" PATH_SEPARATOR "exclamation-mark-a.ktx",
+        ASSETS_BASE_PATH "ktx" PATH_SEPARATOR "exclamation-mark-a_alpha.ktx",
+        ASSETS_BASE_PATH "ktx" PATH_SEPARATOR "stop-mark-a.ktx",
+        ASSETS_BASE_PATH "ktx" PATH_SEPARATOR "stop-mark-a_alpha.ktx",
 };
 
 #define MAX_TEX_ATLAS LAE_COUNT
