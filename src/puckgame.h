@@ -86,6 +86,7 @@ typedef struct _LWPUCKGAMETOWER {
     float shake_remain_time;
     int collapsing; // 0 if normal state, 1 if collapsing state
     float collapsing_time; // time elapsed from starting collapsing animation
+    int invincible;
 } LWPUCKGAMETOWER;
 
 #define LW_PUCK_GAME_TOWER_COUNT (2)
@@ -251,4 +252,4 @@ void puck_game_create_go(LWPUCKGAME* puck_game, int lpgo, float x, float y, floa
 void puck_game_create_control_joint(LWPUCKGAME* puck_game, int lpgo);
 void puck_game_reset_go(LWPUCKGAME* puck_game, LWPUCKGAMEOBJECT* go, float x, float y, float z);
 void puck_game_create_tower_geom(LWPUCKGAME* puck_game, int i);
-
+void puck_game_set_tower_invincible(LWPUCKGAME* puck_game, int tower_index, int v);

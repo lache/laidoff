@@ -397,7 +397,7 @@ void near_puck_tower(LWPUCKGAME* puck_game, dGeomID puck_geom, LWPUCKGAMETOWER* 
         return;
     }
     // Check last damaged cooltime
-    if (now - tower->last_damaged_at > 1.0f) {
+    if (now - tower->last_damaged_at > 1.0f && tower->invincible == 0) {
         int* player_hp_ptr = tower->owner_player_no == 1 ? &puck_game->player.current_hp : &puck_game->target.current_hp;
         if (tower->hp > 0 || *player_hp_ptr > 0) {
             if (tower->hp > 0) {
@@ -973,4 +973,8 @@ void puck_game_update_tick(LWPUCKGAME* puck_game, int update_frequency, float de
     // update battle stat stat (travel distance)
     puck_game->battle_stat[0].TravelDistance += puck_game->go[LPGO_PLAYER].speed / update_frequency;
     puck_game->battle_stat[1].TravelDistance += puck_game->go[LPGO_TARGET].speed / update_frequency;
+}
+
+void puck_game_set_tower_invincible(LWPUCKGAME* puck_game, int tower_index, int v) {
+    puck_game->tower[tower_index].invincible = v;
 }

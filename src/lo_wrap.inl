@@ -55299,6 +55299,56 @@ fail:
 }
 
 
+static int _wrap_LWPUCKGAMETOWER_invincible_set(lua_State* L) {
+  int SWIG_arg = 0;
+  struct _LWPUCKGAMETOWER *arg1 = (struct _LWPUCKGAMETOWER *) 0 ;
+  int arg2 ;
+  
+  SWIG_check_num_args("_LWPUCKGAMETOWER::invincible",2,2)
+  if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("_LWPUCKGAMETOWER::invincible",1,"struct _LWPUCKGAMETOWER *");
+  if(!lua_isnumber(L,2)) SWIG_fail_arg("_LWPUCKGAMETOWER::invincible",2,"int");
+  
+  if (!SWIG_IsOK(SWIG_ConvertPtr(L,1,(void**)&arg1,SWIGTYPE_p__LWPUCKGAMETOWER,0))){
+    SWIG_fail_ptr("LWPUCKGAMETOWER_invincible_set",1,SWIGTYPE_p__LWPUCKGAMETOWER);
+  }
+  
+  arg2 = (int)lua_tonumber(L, 2);
+  if (arg1) (arg1)->invincible = arg2;
+  
+  return SWIG_arg;
+  
+  if(0) SWIG_fail;
+  
+fail:
+  lua_error(L);
+  return SWIG_arg;
+}
+
+
+static int _wrap_LWPUCKGAMETOWER_invincible_get(lua_State* L) {
+  int SWIG_arg = 0;
+  struct _LWPUCKGAMETOWER *arg1 = (struct _LWPUCKGAMETOWER *) 0 ;
+  int result;
+  
+  SWIG_check_num_args("_LWPUCKGAMETOWER::invincible",1,1)
+  if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("_LWPUCKGAMETOWER::invincible",1,"struct _LWPUCKGAMETOWER *");
+  
+  if (!SWIG_IsOK(SWIG_ConvertPtr(L,1,(void**)&arg1,SWIGTYPE_p__LWPUCKGAMETOWER,0))){
+    SWIG_fail_ptr("LWPUCKGAMETOWER_invincible_get",1,SWIGTYPE_p__LWPUCKGAMETOWER);
+  }
+  
+  result = (int) ((arg1)->invincible);
+  lua_pushnumber(L, (lua_Number) result); SWIG_arg++;
+  return SWIG_arg;
+  
+  if(0) SWIG_fail;
+  
+fail:
+  lua_error(L);
+  return SWIG_arg;
+}
+
+
 static int _wrap_new_LWPUCKGAMETOWER(lua_State* L) {
   int SWIG_arg = 0;
   struct _LWPUCKGAMETOWER *result = 0 ;
@@ -55336,6 +55386,7 @@ static swig_lua_attribute swig_LWPUCKGAMETOWER_attributes[] = {
     { "shake_remain_time", _wrap_LWPUCKGAMETOWER_shake_remain_time_get, _wrap_LWPUCKGAMETOWER_shake_remain_time_set },
     { "collapsing", _wrap_LWPUCKGAMETOWER_collapsing_get, _wrap_LWPUCKGAMETOWER_collapsing_set },
     { "collapsing_time", _wrap_LWPUCKGAMETOWER_collapsing_time_get, _wrap_LWPUCKGAMETOWER_collapsing_time_set },
+    { "invincible", _wrap_LWPUCKGAMETOWER_invincible_get, _wrap_LWPUCKGAMETOWER_invincible_set },
     {0,0,0}
 };
 static swig_lua_method swig_LWPUCKGAMETOWER_methods[]= {
@@ -62281,6 +62332,35 @@ fail:
 }
 
 
+static int _wrap_puck_game_set_tower_invincible(lua_State* L) {
+  int SWIG_arg = 0;
+  LWPUCKGAME *arg1 = (LWPUCKGAME *) 0 ;
+  int arg2 ;
+  int arg3 ;
+  
+  SWIG_check_num_args("puck_game_set_tower_invincible",3,3)
+  if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("puck_game_set_tower_invincible",1,"LWPUCKGAME *");
+  if(!lua_isnumber(L,2)) SWIG_fail_arg("puck_game_set_tower_invincible",2,"int");
+  if(!lua_isnumber(L,3)) SWIG_fail_arg("puck_game_set_tower_invincible",3,"int");
+  
+  if (!SWIG_IsOK(SWIG_ConvertPtr(L,1,(void**)&arg1,SWIGTYPE_p__LWPUCKGAME,0))){
+    SWIG_fail_ptr("puck_game_set_tower_invincible",1,SWIGTYPE_p__LWPUCKGAME);
+  }
+  
+  arg2 = (int)lua_tonumber(L, 2);
+  arg3 = (int)lua_tonumber(L, 3);
+  puck_game_set_tower_invincible(arg1,arg2,arg3);
+  
+  return SWIG_arg;
+  
+  if(0) SWIG_fail;
+  
+fail:
+  lua_error(L);
+  return SWIG_arg;
+}
+
+
 static int _wrap_LWTCP_ConnectSocket_set(lua_State* L) {
   int SWIG_arg = 0;
   struct _LWTCP *arg1 = (struct _LWTCP *) 0 ;
@@ -65200,6 +65280,7 @@ static swig_lua_method swig_SwigModule_methods[]= {
     { "puck_game_create_control_joint", _wrap_puck_game_create_control_joint},
     { "puck_game_reset_go", _wrap_puck_game_reset_go},
     { "puck_game_create_tower_geom", _wrap_puck_game_create_tower_geom},
+    { "puck_game_set_tower_invincible", _wrap_puck_game_set_tower_invincible},
     { "new_tcp", _wrap_new_tcp},
     { "destroy_tcp", _wrap_destroy_tcp},
     { "tcp_update", _wrap_tcp_update},

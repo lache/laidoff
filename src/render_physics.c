@@ -1471,6 +1471,9 @@ void render_puck_exclamation_mark(const LWCONTEXT* pLwc, const LWPUCKGAME* puck_
         && puck_game->battle_phase != LSP_TUTORIAL) {
         return;
     }
+    if (puck_game->go[LPGO_PUCK].geom == 0) {
+        return;
+    }
     if (puck_game->puck_owner_player_no != 0 && puck_speed >= 1.0f) {
         float size = 0.125f;
         mat4x4 proj_view;
@@ -1507,15 +1510,19 @@ void render_all_tower_invincible_mark(const LWCONTEXT* pLwc, const LWPUCKGAME* p
     }
     for (int i = 0; i < LW_PUCK_GAME_TOWER_COUNT; i++) {
         int tower_index = i;
+        const LWPUCKGAMETOWER* tower = &puck_game->tower[tower_index];
+        if (tower->geom == 0) {
+            continue;
+        }
         vec4 tower_pos = {
             puck_game->tower_pos * puck_game->tower_pos_multiplier[tower_index][0],
             puck_game->tower_pos * puck_game->tower_pos_multiplier[tower_index][1],
             0.845f, // hard-coded
             1,
         };
-        float elapsed_from_last_damage = (float)(lwtimepoint_now_seconds() - puck_game->tower[tower_index].last_damaged_at);
+        float elapsed_from_last_damage = (float)(lwtimepoint_now_seconds() - tower->last_damaged_at);
         float invincible_time = 1.0f;
-        if (elapsed_from_last_damage < invincible_time) {
+        if (elapsed_from_last_damage < invincible_time || tower->invincible) {
             render_tower_invincible_mark(pLwc, tower_pos, ui_alpha, elapsed_from_last_damage, invincible_time);
         }
     }

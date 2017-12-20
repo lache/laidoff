@@ -205,9 +205,9 @@ void update_puck_game(LWCONTEXT* pLwc, LWPUCKGAME* puck_game, double delta_time)
     // control bogus (AI player)
     if (puck_game->game_state == LPGS_TUTORIAL) {
         LWPUCKGAMEBOGUSPARAM bogus_param = {
-            0.0050f, // target_follow_agility
-            0.15f, // dash_detect_radius
-            0.1f, // dash_frequency
+            0.0075f, // target_follow_agility
+            0.30f, // dash_detect_radius
+            0.2f, // dash_frequency
             0.8f, // dash_cooltime_lag_min
             1.2f, // dash_cooltime_lag_max
         };
@@ -398,6 +398,8 @@ void puck_game_tower_damage_test(LWCONTEXT* pLwc, LWPUCKGAME* puck_game, LWPUCKG
 
 void puck_game_player_tower_decrease_hp_test(LWPUCKGAME* puck_game) {
     puck_game_tower_damage_test(puck_game->pLwc, puck_game, &puck_game->player, &puck_game->tower[0], 1);
+    LWCONTEXT* pLwc = (LWCONTEXT*)puck_game->pLwc;
+    script_on_target_attack(pLwc->script);
 }
 
 void puck_game_target_tower_decrease_hp_test(LWPUCKGAME* puck_game) {
