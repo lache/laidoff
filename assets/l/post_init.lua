@@ -182,6 +182,8 @@ function on_ui_event(id)
 			yield_wait_ms(2000)
 			--------------------------------------
 			lo.puck_game_set_tutorial_guide_str(c.puck_game, '그럼 <타워>를 소환하겠습니다.')
+			-- make enemy tower invincible for now
+			lo.puck_game_set_tower_invincible(c.puck_game, 1, 1)
 			yield_wait_ms(2500)
 			lo.puck_game_set_tutorial_guide_str(c.puck_game, '왼쪽 하단에 생긴 것은 <아군 타워>입니다.')
 			lo.puck_game_create_tower_geom(c.puck_game, 0);
@@ -190,6 +192,7 @@ function on_ui_event(id)
 			lo.puck_game_create_tower_geom(c.puck_game, 1);
 			yield_wait_ms(3500)
 			--------------------------------------
+			lo.puck_game_set_tower_invincible(c.puck_game, 1, 0)
 			local damage_count = 2
 			local damage_msg = '공으로 <적군 타워>에 데미지를 입히세요. (%d/%d)'
 			for i=1,damage_count do
