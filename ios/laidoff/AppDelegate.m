@@ -38,7 +38,8 @@ void lw_set_push_token(LWCONTEXT* pLwc, int domain, const char* token);
                 // you have up-to-date version
             } else {
                 // open browser
-                [[UIApplication sharedApplication] openURL:[NSURL URLWithString:@"https://s3.ap-northeast-2.amazonaws.com/sky.popsongremix.com/laidoff/ipa/install.html"]];
+                NSString *installUrl = [NSString stringWithFormat:@"https://s3.ap-northeast-2.amazonaws.com/sky.popsongremix.com/laidoff/ipa/install.html?currentVersion=%@&latestVersion=%@", bundleVersion, versionName];
+                [[UIApplication sharedApplication] openURL:[NSURL URLWithString:installUrl]];
             }
         } else {
             // error while checking latest version
