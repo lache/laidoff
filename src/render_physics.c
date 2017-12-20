@@ -177,8 +177,7 @@ static void render_tower_normal_2(const LWCONTEXT* pLwc, const mat4x4 view, cons
     glUniform1i(shader->diffuse_location, 0); // 0 means GL_TEXTURE0
     glUniform1i(shader->alpha_only_location, 1); // 1 means GL_TEXTURE1
     glUniform3f(shader->overlay_color_location, 1, 1, 1);
-    glUniform1f(shader->overlay_color_ratio_location, 0);
-    
+
     mat4x4 rot;
     mat4x4_identity(rot);
     float sx = puck_game->tower_radius / puck_game->tower_mesh_radius;
@@ -188,7 +187,7 @@ static void render_tower_normal_2(const LWCONTEXT* pLwc, const mat4x4 view, cons
     glUniform1f(shader->overlay_color_ratio_location, 0);
     
     LWTOWERRENDERDATA tower_render_data[] = {
-        { LVT_TOWER_BASE_2, 0.1f, 0.1f, 0.1f },
+        { LVT_TOWER_BASE_2, 1.0f, 1.0f, 1.0f },
     };
     for (int i = 0; i < ARRAY_SIZE(tower_render_data); i++) {
         float x = pos[0];
@@ -200,6 +199,11 @@ static void render_tower_normal_2(const LWCONTEXT* pLwc, const mat4x4 view, cons
             const float shake_magnitude = 0.03f;
             x += ratio * (2 * rand() / (float)RAND_MAX - 1.0f) * shake_magnitude * pLwc->aspect_ratio;
             y += ratio * (2 * rand() / (float)RAND_MAX - 1.0f) * shake_magnitude;
+            float ratio4 = ratio * ratio;
+            ratio4 *= ratio4;
+            glUniform1f(shader->overlay_color_ratio_location, ratio4);
+        } else {
+            glUniform1f(shader->overlay_color_ratio_location, 0);
         }
         
         mat4x4 model;
