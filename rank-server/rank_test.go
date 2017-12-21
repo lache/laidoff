@@ -4,6 +4,7 @@ import (
 	"testing"
 	"runtime/debug"
 	"errors"
+	"time"
 )
 
 func assert(t *testing.T, expected, actual int) {
@@ -13,10 +14,17 @@ func assert(t *testing.T, expected, actual int) {
 	}
 }
 
+func assertBool(t *testing.T, expected, actual bool) {
+	if expected != actual {
+		debug.PrintStack()
+		t.Errorf("assert failed: expected = %v, actual = %v", expected, actual)
+	}
+}
+
 func assertErr(t *testing.T, expected, actual error) {
 	if (expected != nil && actual == nil) ||
 		(expected == nil && actual != nil) ||
-			((expected != nil && actual != nil) && (expected.Error() != actual.Error())) {
+		((expected != nil && actual != nil) && (expected.Error() != actual.Error())) {
 		debug.PrintStack()
 		t.Errorf("assert failed: expected = %v, actual = %v", expected, actual)
 	}
@@ -24,7 +32,7 @@ func assertErr(t *testing.T, expected, actual error) {
 
 type RankTieCount struct {
 	rankZeroBased int
-	tieCount int
+	tieCount      int
 }
 
 func TestGetRankZeroBasedDesc(t *testing.T) {
@@ -56,23 +64,23 @@ func assertRankTieCount(t *testing.T, expected RankTieCount, descArr *[]int, sco
 
 func TestGetRankAndTieCountZeroBasedDesc(t *testing.T) {
 	descArr := &[]int{11, 9, 7, 7, 6, 5, 4, 4, 4, 3, 3, 2, 1, 1, 1, 1, 1, 0, 0, 0, -1}
-	assertRankTieCount(t, RankTieCount{0,0}, descArr, 999)
-	assertRankTieCount(t, RankTieCount{0,0}, descArr, 12)
-	assertRankTieCount(t, RankTieCount{0,1}, descArr, 11)
-	assertRankTieCount(t, RankTieCount{1,0}, descArr, 10)
-	assertRankTieCount(t, RankTieCount{1,1}, descArr, 9)
-	assertRankTieCount(t, RankTieCount{2,0}, descArr, 8)
-	assertRankTieCount(t, RankTieCount{2,2}, descArr, 7)
-	assertRankTieCount(t, RankTieCount{4,1}, descArr, 6)
-	assertRankTieCount(t, RankTieCount{5,1}, descArr, 5)
-	assertRankTieCount(t, RankTieCount{6,3}, descArr, 4)
-	assertRankTieCount(t, RankTieCount{9,2}, descArr, 3)
-	assertRankTieCount(t, RankTieCount{11,1}, descArr, 2)
-	assertRankTieCount(t, RankTieCount{12,5}, descArr, 1)
-	assertRankTieCount(t, RankTieCount{17,3}, descArr, 0)
-	assertRankTieCount(t, RankTieCount{20,1}, descArr, -1)
-	assertRankTieCount(t, RankTieCount{21,0}, descArr, -2)
-	assertRankTieCount(t, RankTieCount{21,0}, descArr, -999)
+	assertRankTieCount(t, RankTieCount{0, 0}, descArr, 999)
+	assertRankTieCount(t, RankTieCount{0, 0}, descArr, 12)
+	assertRankTieCount(t, RankTieCount{0, 1}, descArr, 11)
+	assertRankTieCount(t, RankTieCount{1, 0}, descArr, 10)
+	assertRankTieCount(t, RankTieCount{1, 1}, descArr, 9)
+	assertRankTieCount(t, RankTieCount{2, 0}, descArr, 8)
+	assertRankTieCount(t, RankTieCount{2, 2}, descArr, 7)
+	assertRankTieCount(t, RankTieCount{4, 1}, descArr, 6)
+	assertRankTieCount(t, RankTieCount{5, 1}, descArr, 5)
+	assertRankTieCount(t, RankTieCount{6, 3}, descArr, 4)
+	assertRankTieCount(t, RankTieCount{9, 2}, descArr, 3)
+	assertRankTieCount(t, RankTieCount{11, 1}, descArr, 2)
+	assertRankTieCount(t, RankTieCount{12, 5}, descArr, 1)
+	assertRankTieCount(t, RankTieCount{17, 3}, descArr, 0)
+	assertRankTieCount(t, RankTieCount{20, 1}, descArr, -1)
+	assertRankTieCount(t, RankTieCount{21, 0}, descArr, -2)
+	assertRankTieCount(t, RankTieCount{21, 0}, descArr, -999)
 }
 
 func assertUpdateScore(t *testing.T, expected RankTieCount, descArr *[]int, oldScore, newScore int) {
@@ -86,17 +94,17 @@ func assertUpdateScore(t *testing.T, expected RankTieCount, descArr *[]int, oldS
 func TestUpdateScoreDesc(t *testing.T) {
 	descArr := &[]int{11, 9, 7, 7, 6, 5, 4, 4, 4, 3, 3, 2, 1, 1, 1, 1, 1, 0, 0, 0, -1}
 	// {11, 9, 7, 7, 6=>5, 5, 4, 4, 4, 3, 3, 2, 1, 1, 1, 1, 1, 0, 0, 0, -1}
-	assertUpdateScore(t, RankTieCount{4,2}, descArr,6, 5)
+	assertUpdateScore(t, RankTieCount{4, 2}, descArr, 6, 5)
 	// {11=>12, 9, 7, 7, 5, 5, 4, 4, 4, 3, 3, 2, 1, 1, 1, 1, 1, 0, 0, 0, -1}
-	assertUpdateScore(t, RankTieCount{0,1}, descArr,11, 12)
+	assertUpdateScore(t, RankTieCount{0, 1}, descArr, 11, 12)
 	// {12, 9, 7, 7, 5, 5, 4, 4, 4, 3, 3, 2, 1, 1, 1, 1, 1, 0, 0, 0, -1=>100}
-	assertUpdateScore(t, RankTieCount{0,1}, descArr,-1, 100)
+	assertUpdateScore(t, RankTieCount{0, 1}, descArr, -1, 100)
 	// {100, 12, 9, 7, 7, 5, 5, 4, 4, 4, 3, 3, 2, 1, 1, 1, 1, 1, 0=>1, 0, 0}
-	assertUpdateScore(t, RankTieCount{13,6}, descArr,0, 1)
+	assertUpdateScore(t, RankTieCount{13, 6}, descArr, 0, 1)
 	// {100, 12, 9, 7, 7, 5, 5, 4=>200, 4, 4, 3, 3, 2, 1, 1, 1, 1, 1, 1, 0, 0}
-	assertUpdateScore(t, RankTieCount{0,1}, descArr,4, 200)
+	assertUpdateScore(t, RankTieCount{0, 1}, descArr, 4, 200)
 	// {200=>100, 100, 12, 9, 7, 7, 5, 5, 4, 4, 3, 3, 2, 1, 1, 1, 1, 1, 1, 0, 0}
-	assertUpdateScore(t, RankTieCount{0,2}, descArr,200, 100)
+	assertUpdateScore(t, RankTieCount{0, 2}, descArr, 200, 100)
 	// {100, 100, 12, 9, 7, 7, 5, 5, 4, 4, 3, 3, 2, 1, 1, 1, 1, 1, 1, 0, 0}
 }
 
@@ -105,7 +113,7 @@ func assertInsertNewScore(t *testing.T, expected RankTieCount, descArr *[]int, n
 	actualRank, actualTieCount := insertNewScoreDesc(descArr, newScore)
 	assert(t, expected.rankZeroBased, actualRank)
 	assert(t, expected.tieCount, actualTieCount)
-	assert(t, oldLen + 1, len(*descArr))
+	assert(t, oldLen+1, len(*descArr))
 }
 
 func TestInsertNewScore(t *testing.T) {
@@ -127,20 +135,20 @@ func assertRankDataSet(t *testing.T, expected RankTieCount, rank *RankData, user
 
 func createRankTestSet(t *testing.T) *RankData {
 	rank := newRank()
-	assertRankDataSet(t, RankTieCount{0,1}, rank, 1, 100)
-	assertRankDataSet(t, RankTieCount{0,1}, rank, 1, 200)
-	assertRankDataSet(t, RankTieCount{1,1}, rank, 2, 100)
-	assertRankDataSet(t, RankTieCount{2,1}, rank, 3, 50)
-	assertRankDataSet(t, RankTieCount{2,2}, rank, 4, 50)
-	assertRankDataSet(t, RankTieCount{2,3}, rank, 5, 50)
-	assertRankDataSet(t, RankTieCount{5,1}, rank, 6, 10)
-	assertRankDataSet(t, RankTieCount{0,1}, rank, 7, 250)
-	assertRankDataSet(t, RankTieCount{1,1}, rank, 8, 225)
-	assertRankDataSet(t, RankTieCount{4,4}, rank, 9, 50)
-	assertRankDataSet(t, RankTieCount{3,1}, rank, 6, 105)
-	assertRankDataSet(t, RankTieCount{8,1}, rank, 4, 30)
-	assertRankDataSet(t, RankTieCount{0,2}, rank, 10, 250)
-	assertRankDataSet(t, RankTieCount{4,2}, rank, 7, 100)
+	assertRankDataSet(t, RankTieCount{0, 1}, rank, 1, 100)
+	assertRankDataSet(t, RankTieCount{0, 1}, rank, 1, 200)
+	assertRankDataSet(t, RankTieCount{1, 1}, rank, 2, 100)
+	assertRankDataSet(t, RankTieCount{2, 1}, rank, 3, 50)
+	assertRankDataSet(t, RankTieCount{2, 2}, rank, 4, 50)
+	assertRankDataSet(t, RankTieCount{2, 3}, rank, 5, 50)
+	assertRankDataSet(t, RankTieCount{5, 1}, rank, 6, 10)
+	assertRankDataSet(t, RankTieCount{0, 1}, rank, 7, 250)
+	assertRankDataSet(t, RankTieCount{1, 1}, rank, 8, 225)
+	assertRankDataSet(t, RankTieCount{4, 4}, rank, 9, 50)
+	assertRankDataSet(t, RankTieCount{3, 1}, rank, 6, 105)
+	assertRankDataSet(t, RankTieCount{8, 1}, rank, 4, 30)
+	assertRankDataSet(t, RankTieCount{0, 2}, rank, 10, 250)
+	assertRankDataSet(t, RankTieCount{4, 2}, rank, 7, 100)
 	return rank
 }
 
@@ -206,15 +214,17 @@ func TestRankData_Nearest2(t *testing.T) {
 
 func TestRankData_Nearest3(t *testing.T) {
 	rank := newRank()
-	assertRankDataSet(t, RankTieCount{0,1}, rank, 1, 100)
+	assertRankDataSet(t, RankTieCount{0, 1}, rank, 1, 100)
 	assertNearest(t, -1, 0, -1, errors.New("rank single entry"), rank, 10)
 }
 
 func assertNearest(t *testing.T, expectedScore int, expectedId byte, expectedNearestScore int, expectedErr error, rank *RankData, id byte) {
-	actualScore, actualNearestId, actualNearestScore, actualErr := rank.Nearest(UserId{id})
-	assert(t, expectedScore, actualScore)
-	assertUserId(t, UserId{expectedId}, actualNearestId)
-	assert(t, expectedNearestScore, actualNearestScore)
+	actualNearestResult, actualErr := rank.Nearest(UserId{id})
+	if actualErr == nil {
+		assert(t, expectedScore, actualNearestResult.Score)
+		assertUserId(t, UserId{expectedId}, actualNearestResult.NearestId)
+		assert(t, expectedNearestScore, actualNearestResult.NearestScore)
+	}
 	assertErr(t, expectedErr, actualErr)
 }
 
@@ -241,13 +251,13 @@ func TestRankData_Get(t *testing.T) {
 }
 
 func TestMoveUserIdWithinSlice(t *testing.T) {
-	userIdList := &[]UserId{{1},{2},{3},{4},{5},}
-	assertUserIdArray(t, &[]UserId{{2},{1},{3},{4},{5},}, userIdList, 0, 1)
-	assertUserIdArray(t, &[]UserId{{1},{3},{4},{5},{2},}, userIdList, 0, 4)
-	assertUserIdArray(t, &[]UserId{{2},{1},{3},{4},{5},}, userIdList, 4, 0)
-	assertUserIdArray(t, &[]UserId{{2},{1},{4},{3},{5},}, userIdList, 2, 3)
-	assertUserIdArray(t, &[]UserId{{2},{1},{3},{5},{4},}, userIdList, 2, 4)
-	assertUserIdArray(t, &[]UserId{{2},{5},{1},{3},{4},}, userIdList, 3, 1)
+	userIdList := &[]UserId{{1}, {2}, {3}, {4}, {5},}
+	assertUserIdArray(t, &[]UserId{{2}, {1}, {3}, {4}, {5},}, userIdList, 0, 1)
+	assertUserIdArray(t, &[]UserId{{1}, {3}, {4}, {5}, {2},}, userIdList, 0, 4)
+	assertUserIdArray(t, &[]UserId{{2}, {1}, {3}, {4}, {5},}, userIdList, 4, 0)
+	assertUserIdArray(t, &[]UserId{{2}, {1}, {4}, {3}, {5},}, userIdList, 2, 3)
+	assertUserIdArray(t, &[]UserId{{2}, {1}, {3}, {5}, {4},}, userIdList, 2, 4)
+	assertUserIdArray(t, &[]UserId{{2}, {5}, {1}, {3}, {4},}, userIdList, 3, 1)
 }
 
 func assertUserIdArray(t *testing.T, expected *[]UserId, userIdList *[]UserId, i int, j int) {
@@ -263,4 +273,31 @@ func assertUserId(t *testing.T, expected UserId, actual UserId) {
 		debug.PrintStack()
 		t.Errorf("assert failed: expected = %v, actual = %v", expected, actual)
 	}
+}
+
+func TestRankData_RemoveNearestOverlap(t *testing.T) {
+	rank := newRank()
+	user1 := UserId{1}
+	user2 := UserId{2}
+	rank.Set(user1, 0)
+	rank.Set(user2, 100)
+	distanceByElapsed := &DistanceByElapsed{
+		Elapsed:  []time.Duration{30 * time.Second, 20 * time.Second, 10 * time.Second, 0 * time.Second},
+		Distance: []int{100, 50, 25, 5},
+	}
+	now := time.Now()
+	result, err := rank.RemoveNearestOverlap(user1, distanceByElapsed, now)
+	assertErr(t, nil, err)
+	assertBool(t, false, result.Matched)
+	assert(t, 2, len(rank.IdArray))
+	result, err = rank.RemoveNearestOverlap(user1, distanceByElapsed, now.Add(50*time.Second))
+	assertErr(t, nil, err)
+	assertBool(t, true, result.Matched)
+	assertUserId(t, user1, result.NearestResult.Id)
+	assert(t, 0, result.NearestResult.Score)
+	assert(t, 1, result.NearestResult.IdArrayIndex)
+	assertUserId(t, user2, result.NearestResult.NearestId)
+	assert(t, 100, result.NearestResult.NearestScore)
+	assert(t, 0, result.NearestResult.NearestIdArrayIndex)
+	assert(t, 0, len(rank.IdArray))
 }

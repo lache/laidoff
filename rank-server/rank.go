@@ -9,16 +9,18 @@ import (
 	"net"
 	"fmt"
 	"math"
+	"time"
 )
 
 type UserId [16]byte
 
 // RankData is a struct containing a single leaderboard.
 type RankData struct {
-	IdScoreMap    map[UserId]int
-	ScoreArray    []int
-	IdArray       []UserId
-	NicknameArray []string
+	IdScoreMap     map[UserId]int
+	ScoreArray     []int
+	IdArray        []UserId
+	NicknameArray  []string
+	LastModifiedAt []time.Time
 }
 
 // Set adds a new ranking entry.
@@ -47,6 +49,8 @@ func (t *RankData) SetWithNickname(id UserId, newScore int, nickname string) (ra
 			moveStringWithinSlice(&t.NicknameArray, oldIdArrayIndex, newRank)
 			// Update nickname (if changed)
 			//t.NicknameArray[newRank] = nickname
+			t.LastModifiedAt[oldIdArrayIndex] = time.Now()
+			moveTimeWithinSlice(&t.LastModifiedAt, oldIdArrayIndex, newRank)
 			return newRank, newTieCount
 		}
 		return -1, -1
@@ -56,6 +60,7 @@ func (t *RankData) SetWithNickname(id UserId, newScore int, nickname string) (ra
 		rank, tieCount = insertNewScoreDesc(&t.ScoreArray, newScore)
 		insertUserIdToSlice(&t.IdArray, rank, id)
 		insertStringToSlice(&t.NicknameArray, rank, nickname)
+		insertTimeToSlice(&t.LastModifiedAt, rank, time.Now())
 		return rank, tieCount
 	}
 	// Unreachable code
@@ -74,7 +79,7 @@ func (t *RankData) Get(id UserId) (score int, rank int, tieCount int, err error)
 func (t *RankData) FindIndexOf(id UserId, begin, count int) (idArrayIndex int) {
 	idArrayIndex = -1
 	// TODO Should change to binary search from linear search
-	for i := begin; i < begin + count; i++ {
+	for i := begin; i < begin+count; i++ {
 		if t.IdArray[i] == id {
 			idArrayIndex = i
 			break
@@ -106,17 +111,26 @@ func (t *RankData) Remove(id UserId) error {
 	return nil
 }
 
-func (t *RankData) Nearest(id UserId) (score int, nearestId UserId, nearestScore int, err error) {
+type NearestResult struct {
+	Id                  UserId
+	Score               int
+	IdArrayIndex        int
+	NearestId           UserId
+	NearestScore        int
+	NearestIdArrayIndex int
+}
+
+func (t *RankData) Nearest(id UserId) (result *NearestResult, err error) {
 	idArrayLen := len(t.IdArray)
 	if idArrayLen == 0 {
-		return -1, nearestId, -1, errors.New("rank empty")
+		return result, errors.New("rank empty")
 	}
 	if idArrayLen == 1 {
-		return -1, nearestId, -1, errors.New("rank single entry")
+		return result, errors.New("rank single entry")
 	}
 	score, _, _, idArrayIndex, err := t.GetWithIndex(id)
 	if err != nil {
-		return -1, nearestId, -1, err
+		return result, err
 	}
 	nearestNeighborIndex := -1
 	nearestNeighborDiff := math.MaxInt32
@@ -136,7 +150,7 @@ func (t *RankData) Nearest(id UserId) (score int, nearestId UserId, nearestScore
 			nearestNeighborScore = higherNearestNeighborScore
 		}
 	}
-	if idArrayIndex < idArrayLen - 1 {
+	if idArrayIndex < idArrayLen-1 {
 		// In this case, queried ID is not the last element
 		// That means we can get rank - 1 as a higher closest neighbor.
 		lowerNearestNeighborIndex := idArrayIndex + 1
@@ -151,7 +165,59 @@ func (t *RankData) Nearest(id UserId) (score int, nearestId UserId, nearestScore
 			nearestNeighborScore = lowerNearestNeighborScore
 		}
 	}
-	return score, t.IdArray[nearestNeighborIndex], nearestNeighborScore,nil
+	result = &NearestResult{
+		Id:                  id,
+		Score:               score,
+		IdArrayIndex:        idArrayIndex,
+		NearestId:           t.IdArray[nearestNeighborIndex],
+		NearestScore:        nearestNeighborScore,
+		NearestIdArrayIndex: nearestNeighborIndex,
+	}
+	return result, nil
+}
+
+type DistanceByElapsed struct {
+	Elapsed  []time.Duration
+	Distance []int
+}
+
+func (t *DistanceByElapsed) FindDistance(elapsed time.Duration) int {
+	for i, e := range t.Elapsed {
+		if e <= elapsed {
+			return t.Distance[i]
+		}
+	}
+	log.Printf("FindDistance data error")
+	return 100
+}
+
+type RemoveNearestOverlapResult struct {
+	Matched       bool
+	NearestResult *NearestResult
+}
+
+func (t *RankData) RemoveNearestOverlap(id UserId, distanceByElapsed *DistanceByElapsed, now time.Time) (result *RemoveNearestOverlapResult, err error) {
+	nearestResult, err := t.Nearest(id)
+	if err != nil {
+		return nil, err
+	}
+	lastModifiedAt := t.LastModifiedAt[nearestResult.IdArrayIndex]
+	nearestLastModifiedAt := t.LastModifiedAt[nearestResult.NearestIdArrayIndex]
+	elapsed := now.Sub(lastModifiedAt)
+	nearestElapsed := now.Sub(nearestLastModifiedAt)
+	distance := distanceByElapsed.FindDistance(elapsed)
+	nearestDistance := distanceByElapsed.FindDistance(nearestElapsed)
+	diff := nearestResult.Score - nearestResult.NearestScore
+	if diff < 0 {
+		diff = -diff
+	}
+	if diff < distance+nearestDistance {
+		t.Remove(nearestResult.Id)
+		t.Remove(nearestResult.NearestId)
+		return &RemoveNearestOverlapResult{true, nearestResult}, nil
+	} else {
+		return &RemoveNearestOverlapResult{false, nearestResult}, nil
+	}
 }
 
 // PrintAll prints all rank data for debugging purpose.
@@ -216,6 +282,13 @@ func insertStringToSlice(s *[]string, i int, x string) {
 	(*s)[i] = x
 }
 
+// insertTimeToSlice inserts a time.Time x to given slice s at index i.
+func insertTimeToSlice(s *[]time.Time, i int, x time.Time) {
+	*s = append(*s, time.Time{})
+	copy((*s)[i+1:], (*s)[i:])
+	(*s)[i] = x
+}
+
 // removeUserIdFromSlice removes a user ID from given slice s.
 func removeUserIdFromSlice(s *[]UserId, i int) {
 	*s = append((*s)[0:i], (*s)[i+1:]...)
@@ -223,6 +296,11 @@ func removeUserIdFromSlice(s *[]UserId, i int) {
 
 // removeStringFromSlice removes a string from given slice s.
 func removeStringFromSlice(s *[]string, i int) {
+	*s = append((*s)[0:i], (*s)[i+1:]...)
+}
+
+// removeTimeFromSlice removes a time.Time from given slice s.
+func removeTimeFromSlice(s *[]time.Time, i int) {
 	*s = append((*s)[0:i], (*s)[i+1:]...)
 }
 
@@ -246,6 +324,17 @@ func moveStringWithinSlice(s *[]string, i, j int) {
 	m := (*s)[i]
 	removeStringFromSlice(s, i)
 	insertStringToSlice(s, j, m)
+}
+
+// moveTimeWithinSlice moves a time.Time element index i to j.
+// Note that this function does not remove any element.
+func moveTimeWithinSlice(s *[]time.Time, i, j int) {
+	if i == j {
+		return
+	}
+	m := (*s)[i]
+	removeTimeFromSlice(s, i)
+	insertTimeToSlice(s, j, m)
 }
 
 // updateScoreDesc updates an existing score entry from oldScore to newScore.
