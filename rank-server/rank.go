@@ -8,6 +8,7 @@ import (
 	"github.com/gasbank/laidoff/shared-server"
 	"net"
 	"fmt"
+	"math"
 )
 
 type UserId [16]byte
@@ -34,14 +35,7 @@ func (t *RankData) SetWithNickname(id UserId, newScore int, nickname string) (ra
 			// The same score; nothing to do
 			return oldRank, oldTieCount
 		}
-		// TODO Should change to binary search from linear search
-		oldIdArrayIndex := -1
-		for i := oldRank; i < oldRank+oldTieCount; i++ {
-			if t.IdArray[i] == id {
-				oldIdArrayIndex = i
-				break
-			}
-		}
+		oldIdArrayIndex := t.FindIndexOf(id, oldRank, oldTieCount)
 		if oldIdArrayIndex < 0 {
 			log.Fatal("CRITICAL ERROR: oldIdArrayIndex not found!")
 		} else {
@@ -75,6 +69,89 @@ func (t *RankData) Get(id UserId) (score int, rank int, tieCount int, err error)
 		return oldScore, rank, tieCount, nil
 	}
 	return -1, -1, -1, errors.New("id not exist")
+}
+
+func (t *RankData) FindIndexOf(id UserId, begin, count int) (idArrayIndex int) {
+	idArrayIndex = -1
+	// TODO Should change to binary search from linear search
+	for i := begin; i < begin + count; i++ {
+		if t.IdArray[i] == id {
+			idArrayIndex = i
+			break
+		}
+	}
+	return idArrayIndex
+}
+
+func (t *RankData) GetWithIndex(id UserId) (score int, rank int, tieCount int, idArrayIndex int, err error) {
+	idArrayIndex = -1
+	score, rank, tieCount, err = t.Get(id)
+	if err != nil {
+
+	} else {
+		idArrayIndex = t.FindIndexOf(id, rank, tieCount)
+	}
+	return score, rank, tieCount, idArrayIndex, err
+}
+
+func (t *RankData) Remove(id UserId) error {
+	_, _, _, idArrayIndex, err := t.GetWithIndex(id)
+	if err != nil {
+		return err
+	}
+	delete(t.IdScoreMap, id)
+	t.ScoreArray = append(t.ScoreArray[:idArrayIndex], t.ScoreArray[idArrayIndex+1:]...)
+	t.IdArray = append(t.IdArray[:idArrayIndex], t.IdArray[idArrayIndex+1:]...)
+	t.NicknameArray = append(t.NicknameArray[:idArrayIndex], t.NicknameArray[idArrayIndex+1:]...)
+	return nil
+}
+
+func (t *RankData) Nearest(id UserId) (score int, nearestId UserId, nearestScore int, err error) {
+	idArrayLen := len(t.IdArray)
+	if idArrayLen == 0 {
+		return -1, nearestId, -1, errors.New("rank empty")
+	}
+	if idArrayLen == 1 {
+		return -1, nearestId, -1, errors.New("rank single entry")
+	}
+	score, _, _, idArrayIndex, err := t.GetWithIndex(id)
+	if err != nil {
+		return -1, nearestId, -1, err
+	}
+	nearestNeighborIndex := -1
+	nearestNeighborDiff := math.MaxInt32
+	nearestNeighborScore := -1
+	if idArrayIndex > 0 {
+		// In this case, queried ID is not the first element.
+		// That means we can get rank - 1 as a higher closest neighbor.
+		higherNearestNeighborIndex := idArrayIndex - 1
+		higherNearestNeighborScore := t.ScoreArray[higherNearestNeighborIndex]
+		diff := score - higherNearestNeighborScore
+		if diff < 0 {
+			diff = -diff
+		}
+		if nearestNeighborDiff > diff {
+			nearestNeighborDiff = diff
+			nearestNeighborIndex = higherNearestNeighborIndex
+			nearestNeighborScore = higherNearestNeighborScore
+		}
+	}
+	if idArrayIndex < idArrayLen - 1 {
+		// In this case, queried ID is not the last element
+		// That means we can get rank - 1 as a higher closest neighbor.
+		lowerNearestNeighborIndex := idArrayIndex + 1
+		lowerNearestNeighborScore := t.ScoreArray[lowerNearestNeighborIndex]
+		diff := score - lowerNearestNeighborScore
+		if diff < 0 {
+			diff = -diff
+		}
+		if nearestNeighborDiff > diff {
+			nearestNeighborDiff = diff
+			nearestNeighborIndex = lowerNearestNeighborIndex
+			nearestNeighborScore = lowerNearestNeighborScore
+		}
+	}
+	return score, t.IdArray[nearestNeighborIndex], nearestNeighborScore,nil
 }
 
 // PrintAll prints all rank data for debugging purpose.
@@ -216,7 +293,8 @@ func newRank() *RankData {
 
 // RankService is a struct containing a whole data a rank service need to run.
 type RankService struct {
-	rank *RankData
+	rank      *RankData
+	matchPool *RankData
 }
 
 // Set is a rpc call wrapper for SetWithNickname.
@@ -287,7 +365,8 @@ func main() {
 	//selfTest()
 	server := rpc.NewServer()
 	rankService := &RankService{
-		newRank(),
+		rank:      newRank(),
+		matchPool: newRank(),
 	}
 	server.RegisterName("RankService", rankService)
 	addr := ":20172"

@@ -3,6 +3,7 @@ package main
 import (
 	"testing"
 	"runtime/debug"
+	"errors"
 )
 
 func assert(t *testing.T, expected, actual int) {
@@ -13,7 +14,9 @@ func assert(t *testing.T, expected, actual int) {
 }
 
 func assertErr(t *testing.T, expected, actual error) {
-	if expected != actual {
+	if (expected != nil && actual == nil) ||
+		(expected == nil && actual != nil) ||
+			((expected != nil && actual != nil) && (expected.Error() != actual.Error())) {
 		debug.PrintStack()
 		t.Errorf("assert failed: expected = %v, actual = %v", expected, actual)
 	}
@@ -159,6 +162,60 @@ func ExampleRankData_Set() {
 	// RankData.6: [5 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0] 50
 	// RankData.6: [3 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0] 50
 	// RankData.9: [4 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0] 30
+}
+
+func ExampleRankData_Remove() {
+	rank := createRankTestSet(nil)
+	rank.Remove(UserId{10})
+	rank.Remove(UserId{4})
+	rank.Remove(UserId{7})
+	rank.Set(UserId{7}, 45)
+	rank.Set(UserId{11}, 99)
+	rank.PrintAll()
+	// Output:
+	// RankData.0: [8 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0] 225
+	// RankData.1: [1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0] 200
+	// RankData.2: [6 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0] 105
+	// RankData.3: [2 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0] 100
+	// RankData.4: [11 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0] 99
+	// RankData.5: [9 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0] 50
+	// RankData.5: [5 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0] 50
+	// RankData.5: [3 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0] 50
+	// RankData.8: [7 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0] 45
+}
+
+func TestRankData_Nearest(t *testing.T) {
+	rank := createRankTestSet(nil)
+	assertNearest(t, 250, 8, 225, nil, rank, 10)
+	assertNearest(t, 225, 10, 250, nil, rank, 8)
+	assertNearest(t, 200, 8, 225, nil, rank, 1)
+	assertNearest(t, 105, 7, 100, nil, rank, 6)
+	assertNearest(t, 100, 2, 100, nil, rank, 7)
+	assertNearest(t, 100, 7, 100, nil, rank, 2)
+	assertNearest(t, 50, 5, 50, nil, rank, 9)
+	assertNearest(t, 50, 9, 50, nil, rank, 5)
+	assertNearest(t, 50, 5, 50, nil, rank, 3)
+	assertNearest(t, 30, 3, 50, nil, rank, 4)
+	assertNearest(t, -1, 0, -1, errors.New("id not exist"), rank, 128)
+}
+
+func TestRankData_Nearest2(t *testing.T) {
+	rank := newRank()
+	assertNearest(t, -1, 0, -1, errors.New("rank empty"), rank, 10)
+}
+
+func TestRankData_Nearest3(t *testing.T) {
+	rank := newRank()
+	assertRankDataSet(t, RankTieCount{0,1}, rank, 1, 100)
+	assertNearest(t, -1, 0, -1, errors.New("rank single entry"), rank, 10)
+}
+
+func assertNearest(t *testing.T, expectedScore int, expectedId byte, expectedNearestScore int, expectedErr error, rank *RankData, id byte) {
+	actualScore, actualNearestId, actualNearestScore, actualErr := rank.Nearest(UserId{id})
+	assert(t, expectedScore, actualScore)
+	assertUserId(t, UserId{expectedId}, actualNearestId)
+	assert(t, expectedNearestScore, actualNearestScore)
+	assertErr(t, expectedErr, actualErr)
 }
 
 func assertRankDataGet(t *testing.T, expectedScore, expectedRank, expectedTieCount int, expectedErr error, rank *RankData, userId UserId) {
