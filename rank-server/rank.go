@@ -7,10 +7,12 @@ import (
 	"net/rpc"
 	"github.com/gasbank/laidoff/shared-server"
 	"net"
+	"fmt"
 )
 
 type UserId [16]byte
 
+// RankData is a struct containing a single leaderboard.
 type RankData struct {
 	IdScoreMap    map[UserId]int
 	ScoreArray    []int
@@ -18,11 +20,13 @@ type RankData struct {
 	NicknameArray []string
 }
 
-func (t *RankData) Set(id UserId, newScore int) (int, int) {
+// Set adds a new ranking entry.
+func (t *RankData) Set(id UserId, newScore int) (rank int, tieCount int) {
 	return t.SetWithNickname(id, newScore, "")
 }
 
-func (t *RankData) SetWithNickname(id UserId, newScore int, nickname string) (int, int) {
+// SetWithNickname adds a new ranking entry with a nickname.
+func (t *RankData) SetWithNickname(id UserId, newScore int, nickname string) (rank int, tieCount int) {
 	if oldScore, ok := t.IdScoreMap[id]; ok {
 		// Existing id
 		oldRank, oldTieCount := getRankAndTieCountZeroBasedDesc(&t.ScoreArray, oldScore)
@@ -55,7 +59,7 @@ func (t *RankData) SetWithNickname(id UserId, newScore int, nickname string) (in
 	} else {
 		// New id, new score
 		t.IdScoreMap[id] = newScore
-		rank, tieCount := insertNewScoreDesc(&t.ScoreArray, newScore)
+		rank, tieCount = insertNewScoreDesc(&t.ScoreArray, newScore)
 		insertUserIdToSlice(&t.IdArray, rank, id)
 		insertStringToSlice(&t.NicknameArray, rank, nickname)
 		return rank, tieCount
@@ -64,19 +68,21 @@ func (t *RankData) SetWithNickname(id UserId, newScore int, nickname string) (in
 	return -1, -1
 }
 
-func (t *RankData) Get(id UserId) (int, int, int, error) {
+// Get a single rank entry by User ID.
+func (t *RankData) Get(id UserId) (score int, rank int, tieCount int, err error) {
 	if oldScore, ok := t.IdScoreMap[id]; ok {
-		rank, tieCount := getRankAndTieCountZeroBasedDesc(&t.ScoreArray, oldScore)
+		rank, tieCount = getRankAndTieCountZeroBasedDesc(&t.ScoreArray, oldScore)
 		return oldScore, rank, tieCount, nil
 	}
 	return -1, -1, -1, errors.New("id not exist")
 }
 
+// PrintAll prints all rank data for debugging purpose.
 func (t *RankData) PrintAll() {
 	rank := 0
 	tieCount := 1
 	for i, c := 0, len(t.IdArray); i < c; i++ {
-		log.Printf("RankData.%v: %v %v", rank, t.IdArray[i], t.ScoreArray[i])
+		fmt.Printf("RankData.%v: %v %v\n", rank, t.IdArray[i], t.ScoreArray[i])
 		if i < c-1 {
 			if t.ScoreArray[i+1] == t.ScoreArray[i] {
 				tieCount++
@@ -88,46 +94,63 @@ func (t *RankData) PrintAll() {
 	}
 }
 
-func getRankZeroBasedDesc(descArr *[]int, score int) int {
+// getRankZeroBasedDesc returns rank for given score.
+// descArr is the previous score array which should be sorted in
+// descending order.
+// It returns 0 if score is the highest score so far and
+// returns len(*descArr) - 1 if score is the lowest score so far.
+func getRankZeroBasedDesc(descArr *[]int, score int) (rankZeroBased int) {
 	return sort.Search(len(*descArr), func(i int) bool { return score >= (*descArr)[i] })
 }
 
-func getNextRankZeroBasedDesc(descArr *[]int, score int) int {
+// getNextRankZeroBasedDesc returns 'next' rank for given score.
+// descArr is the previous score array which should be sorted in
+// descending order.
+func getNextRankZeroBasedDesc(descArr *[]int, score int) (nextRankZeroBased int) {
 	return sort.Search(len(*descArr), func(i int) bool { return score > (*descArr)[i] })
 }
 
-func getRankAndTieCountZeroBasedDesc(descArr *[]int, score int) (int, int) {
-	rankZeroBased := getRankZeroBasedDesc(descArr, score)
-	tieCount := getNextRankZeroBasedDesc(descArr, score) - rankZeroBased
+// getRankAndTieCountZeroBasedDesc returns rank and tie count
+// for given score.
+func getRankAndTieCountZeroBasedDesc(descArr *[]int, score int) (rankZeroBased int, tieCount int) {
+	rankZeroBased = getRankZeroBasedDesc(descArr, score)
+	tieCount = getNextRankZeroBasedDesc(descArr, score) - rankZeroBased
 	return rankZeroBased, tieCount
 }
 
+// insertScoreToSlice inserts a score x to given slice s at index i.
 func insertScoreToSlice(s *[]int, i int, x int) {
 	*s = append(*s, 0)
 	copy((*s)[i+1:], (*s)[i:])
 	(*s)[i] = x
 }
 
+// insertUserIdToSlice inserts a user ID x to given slice s at index i.
 func insertUserIdToSlice(s *[]UserId, i int, x UserId) {
 	*s = append(*s, UserId{})
 	copy((*s)[i+1:], (*s)[i:])
 	(*s)[i] = x
 }
 
+// insertStringToSlice inserts a string x to given slice s at index i.
 func insertStringToSlice(s *[]string, i int, x string) {
 	*s = append(*s, "")
 	copy((*s)[i+1:], (*s)[i:])
 	(*s)[i] = x
 }
 
+// removeUserIdFromSlice removes a user ID from given slice s.
 func removeUserIdFromSlice(s *[]UserId, i int) {
 	*s = append((*s)[0:i], (*s)[i+1:]...)
 }
 
+// removeStringFromSlice removes a string from given slice s.
 func removeStringFromSlice(s *[]string, i int) {
 	*s = append((*s)[0:i], (*s)[i+1:]...)
 }
 
+// moveUserIdWithinSlice moves an user ID element index i to j.
+// Note that this function does not remove any element.
 func moveUserIdWithinSlice(s *[]UserId, i, j int) {
 	if i == j {
 		return
@@ -137,6 +160,8 @@ func moveUserIdWithinSlice(s *[]UserId, i, j int) {
 	insertUserIdToSlice(s, j, m)
 }
 
+// moveStringWithinSlice moves a string element index i to j.
+// Note that this function does not remove any element.
 func moveStringWithinSlice(s *[]string, i, j int) {
 	if i == j {
 		return
@@ -146,6 +171,7 @@ func moveStringWithinSlice(s *[]string, i, j int) {
 	insertStringToSlice(s, j, m)
 }
 
+// updateScoreDesc updates an existing score entry from oldScore to newScore.
 func updateScoreDesc(descArr *[]int, oldScore, newScore int) (int, int) {
 	if oldScore == newScore {
 		return -1, -1
@@ -171,12 +197,15 @@ func updateScoreDesc(descArr *[]int, oldScore, newScore int) (int, int) {
 	return -1, -1
 }
 
-func insertNewScoreDesc(descArr *[]int, newScore int) (int, int) {
-	insertRank, insertTieCount := getRankAndTieCountZeroBasedDesc(descArr, newScore)
+// insertNewScoreDesc inserts a new score entry to descArr.
+// It returns both rank and tie count for a new score entry.
+func insertNewScoreDesc(descArr *[]int, newScore int) (insertRank int, insertTieCount int) {
+	insertRank, insertTieCount = getRankAndTieCountZeroBasedDesc(descArr, newScore)
 	insertScoreToSlice(descArr, insertRank, newScore)
 	return insertRank, insertTieCount + 1
 }
 
+// newRank returns a newly allocated RankData.
 func newRank() *RankData {
 	return &RankData{
 		IdScoreMap: make(map[UserId]int),
@@ -185,16 +214,19 @@ func newRank() *RankData {
 	}
 }
 
+// RankService is a struct containing a whole data a rank service need to run.
 type RankService struct {
 	rank *RankData
 }
 
+// Set is a rpc call wrapper for SetWithNickname.
 func (t *RankService) Set(args *shared_server.ScoreItem, reply *int) error {
 	rank, _ := t.rank.SetWithNickname(args.Id, args.Score, args.Nickname)
 	*reply = rank
 	return nil
 }
 
+// Get is a rpc call wrapper for Get.
 func (t *RankService) Get(args *[16]byte, reply *shared_server.ScoreRankItem) error {
 	score, rank, _, err := t.rank.Get(*args)
 	if err != nil {
@@ -210,6 +242,7 @@ func (t *RankService) Get(args *[16]byte, reply *shared_server.ScoreRankItem) er
 	return nil
 }
 
+// GetLeaderboard is a rpc call wrapper for getting a leaderboard data.
 func (t *RankService) GetLeaderboard(args *shared_server.LeaderboardRequest, reply *shared_server.LeaderboardReply) error {
 	scoreCount := len(t.rank.ScoreArray)
 	if scoreCount == 0 {
@@ -248,6 +281,7 @@ func (t *RankService) GetLeaderboard(args *shared_server.LeaderboardRequest, rep
 	return nil
 }
 
+// main is an entry function for this package.
 func main() {
 	log.SetFlags(log.Lshortfile | log.LstdFlags)
 	//selfTest()
@@ -264,97 +298,4 @@ func main() {
 		log.Fatal("listen error:", e)
 	}
 	server.Accept(l)
-}
-
-//noinspection GoUnusedFunction
-func selfTest() {
-	descArr := &[]int{11, 9, 7, 7, 6, 5, 4, 4, 4, 3, 3, 2, 1, 1, 1, 1, 1, 0, 0, 0, -1}
-	log.Print(descArr)
-	log.Printf("arr len: %v", len(*descArr))
-	log.Printf("rank zero based: %v", getRankZeroBasedDesc(descArr, 8))
-	r, t := getRankAndTieCountZeroBasedDesc(descArr, 8)
-	log.Printf("rank zero based: %v, tie count: %v", r, t)
-	r, t = updateScoreDesc(descArr, 6, 5)
-	log.Print(descArr)
-	log.Printf("rank zero based: %v, tie count: %v", r, t)
-	r, t = updateScoreDesc(descArr, 11, 12)
-	log.Print(descArr)
-	log.Printf("rank zero based: %v, tie count: %v", r, t)
-	r, t = updateScoreDesc(descArr, -1, 100)
-	log.Print(descArr)
-	log.Printf("rank zero based: %v, tie count: %v", r, t)
-	r, t = updateScoreDesc(descArr, 0, 1)
-	log.Print(descArr)
-	log.Printf("rank zero based: %v, tie count: %v", r, t)
-	r, t = updateScoreDesc(descArr, 4, 200)
-	log.Print(descArr)
-	log.Printf("rank zero based: %v, tie count: %v", r, t)
-	r, t = updateScoreDesc(descArr, 200, 100)
-	log.Print(descArr)
-	log.Printf("rank zero based: %v, tie count: %v", r, t)
-	r, t = insertNewScoreDesc(descArr, 0)
-	log.Print(descArr)
-	log.Printf("rank zero based: %v, tie count: %v", r, t)
-	r, t = insertNewScoreDesc(descArr, 8)
-	log.Print(descArr)
-	log.Printf("rank zero based: %v, tie count: %v", r, t)
-	rank := newRank()
-	// RankData.Set test
-	r, t = rank.Set(UserId{1}, 100)
-	log.Printf("RANK: rank zero based: %v, tie count: %v", r, t)
-	r, t = rank.Set(UserId{1}, 200)
-	log.Printf("RANK: rank zero based: %v, tie count: %v", r, t)
-	r, t = rank.Set(UserId{2}, 100)
-	log.Printf("RANK: rank zero based: %v, tie count: %v", r, t)
-	r, t = rank.Set(UserId{3}, 50)
-	log.Printf("RANK: rank zero based: %v, tie count: %v", r, t)
-	r, t = rank.Set(UserId{4}, 50)
-	log.Printf("RANK: rank zero based: %v, tie count: %v", r, t)
-	r, t = rank.Set(UserId{5}, 50)
-	log.Printf("RANK: rank zero based: %v, tie count: %v", r, t)
-	r, t = rank.Set(UserId{6}, 10)
-	log.Printf("RANK: rank zero based: %v, tie count: %v", r, t)
-	r, t = rank.Set(UserId{7}, 250)
-	log.Printf("RANK: rank zero based: %v, tie count: %v", r, t)
-	r, t = rank.Set(UserId{8}, 225)
-	log.Printf("RANK: rank zero based: %v, tie count: %v", r, t)
-	r, t = rank.Set(UserId{9}, 50)
-	log.Printf("RANK: rank zero based: %v, tie count: %v", r, t)
-	r, t = rank.Set(UserId{6}, 105)
-	log.Printf("RANK: rank zero based: %v, tie count: %v", r, t)
-	r, t = rank.Set(UserId{4}, 30)
-	log.Printf("RANK: rank zero based: %v, tie count: %v", r, t)
-	r, t = rank.Set(UserId{10}, 250)
-	log.Printf("RANK: rank zero based: %v, tie count: %v", r, t)
-	r, t = rank.Set(UserId{7}, 100)
-	log.Printf("RANK: rank zero based: %v, tie count: %v", r, t)
-	// RankData.PrintAll test
-	rank.PrintAll()
-	// RankData.Get test
-	score, r, t, err := rank.Get(UserId{1})
-	if err != nil {
-		log.Printf("rank get error! %v", err.Error())
-	} else {
-		log.Printf("RANK GET: score %v, rank zero based: %v, tie count: %v", score, r, t)
-	}
-	userIdList := &[]UserId{
-		{1},
-		{2},
-		{3},
-		{4},
-		{5},
-	}
-	log.Print(userIdList)
-	moveUserIdWithinSlice(userIdList, 0, 1)
-	log.Print(userIdList)
-	moveUserIdWithinSlice(userIdList, 0, 4)
-	log.Print(userIdList)
-	moveUserIdWithinSlice(userIdList, 4, 0)
-	log.Print(userIdList)
-	moveUserIdWithinSlice(userIdList, 2, 3)
-	log.Print(userIdList)
-	moveUserIdWithinSlice(userIdList, 2, 4)
-	log.Print(userIdList)
-	moveUserIdWithinSlice(userIdList, 3, 1)
-	log.Print(userIdList)
 }
