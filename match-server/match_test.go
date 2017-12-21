@@ -7,6 +7,8 @@ import (
 	"github.com/gasbank/laidoff/db-server/user"
 	"time"
 	"github.com/stretchr/testify/assert"
+	"log"
+	"os"
 )
 
 func queueScoreMatch(id byte, score int, serviceList *service.List, distanceByElapsed *rankservice.DistanceByElapsed) (rankservice.QueueScoreMatchReply, error) {
@@ -48,6 +50,7 @@ func assertNotMatchedFirstQueue(t *testing.T, reply rankservice.QueueScoreMatchR
 func assertNotMatched(t *testing.T, reply rankservice.QueueScoreMatchReply, err error, nearestId byte) {
 	assert.Equal(t, nil, err)
 	assert.Equal(t, nil, reply.Err)
+	assert.NotNil(t, reply.RemoveNearestOverlapResult)
 	assert.Equal(t, false, reply.RemoveNearestOverlapResult.Matched, "Matched")
 	assert.Equal(t, user.Id{nearestId}, reply.RemoveNearestOverlapResult.NearestResult.NearestId)
 }
@@ -55,11 +58,14 @@ func assertNotMatched(t *testing.T, reply rankservice.QueueScoreMatchReply, err 
 func assertMatched(t *testing.T, reply rankservice.QueueScoreMatchReply, err error, matchedId byte) {
 	assert.Equal(t, nil, err)
 	assert.Equal(t, nil, reply.Err)
+	assert.NotNil(t, reply.RemoveNearestOverlapResult)
 	assert.Equal(t, true, reply.RemoveNearestOverlapResult.Matched, "Matched")
 	assert.Equal(t, user.Id{matchedId}, reply.RemoveNearestOverlapResult.NearestResult.NearestId)
 }
 
 func TestMatchRpc(t *testing.T) {
+	log.SetFlags(log.LstdFlags | log.Lshortfile)
+	log.SetOutput(os.Stdout)
 	serviceList := service.NewServiceList()
 	distanceByElapsed := rankservice.DistanceByElapsed{
 		Elapsed:  []time.Duration{30 * time.Second, 20 * time.Second, 10 * time.Second, 0 * time.Second},
@@ -67,6 +73,7 @@ func TestMatchRpc(t *testing.T) {
 	}
 	// Flush queue (for easy debugging)
 	_, err := flushQueueScoreMatch(serviceList)
+	setMatchPoolTimeBias(serviceList, 0)
 	assert.Equal(t, nil, err)
 	// Case 1 - matched immediately after second user queued
 	// First user
@@ -79,10 +86,11 @@ func TestMatchRpc(t *testing.T) {
 	// First user
 	reply3, err := queueScoreMatch(3, 100, serviceList, &distanceByElapsed)
 	assertNotMatchedFirstQueue(t, reply3, err)
-	// Second user
+	// Second user (first try)
 	reply4a, err := queueScoreMatch(4, 80, serviceList, &distanceByElapsed)
 	assertNotMatched(t, reply4a, err, 3)
 	setMatchPoolTimeBias(serviceList, 15*time.Second)
+	// Second user (second try)
 	reply4b, err := queueScoreMatch(4, 80, serviceList, &distanceByElapsed)
 	assertMatched(t, reply4b, err, 3)
 }
