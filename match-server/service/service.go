@@ -19,7 +19,7 @@ const (
 
 type List struct {
 	Push shared_server.PushService
-	Rank shared_server.RankService
+	Rank rankservice.RankService
 	Db   dbservice.Db
 }
 

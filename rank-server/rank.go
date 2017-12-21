@@ -10,27 +10,26 @@ import (
 	"fmt"
 	"math"
 	"time"
-	//"github.com/gasbank/laidoff/db-server/user"
+	"github.com/gasbank/laidoff/db-server/user"
+	"github.com/gasbank/laidoff/rank-server/rankservice"
 )
-
-type UserId [16]byte
 
 // RankData is a struct containing a single leaderboard.
 type RankData struct {
-	IdScoreMap     map[UserId]int
+	IdScoreMap     map[user.Id]int
 	ScoreArray     []int
-	IdArray        []UserId
+	IdArray        []user.Id
 	NicknameArray  []string
 	LastModifiedAt []time.Time
 }
 
 // Set adds a new ranking entry.
-func (t *RankData) Set(id UserId, newScore int) (rank int, tieCount int) {
+func (t *RankData) Set(id user.Id, newScore int) (rank int, tieCount int) {
 	return t.SetWithNickname(id, newScore, "")
 }
 
 // SetWithNickname adds a new ranking entry with a nickname.
-func (t *RankData) SetWithNickname(id UserId, newScore int, nickname string) (rank int, tieCount int) {
+func (t *RankData) SetWithNickname(id user.Id, newScore int, nickname string) (rank int, tieCount int) {
 	if oldScore, ok := t.IdScoreMap[id]; ok {
 		// Existing id
 		oldRank, oldTieCount := getRankAndTieCountZeroBasedDesc(&t.ScoreArray, oldScore)
@@ -69,7 +68,7 @@ func (t *RankData) SetWithNickname(id UserId, newScore int, nickname string) (ra
 }
 
 // Get a single rank entry by User ID.
-func (t *RankData) Get(id UserId) (score int, rank int, tieCount int, err error) {
+func (t *RankData) Get(id user.Id) (score int, rank int, tieCount int, err error) {
 	if oldScore, ok := t.IdScoreMap[id]; ok {
 		rank, tieCount = getRankAndTieCountZeroBasedDesc(&t.ScoreArray, oldScore)
 		return oldScore, rank, tieCount, nil
@@ -77,7 +76,7 @@ func (t *RankData) Get(id UserId) (score int, rank int, tieCount int, err error)
 	return -1, -1, -1, errors.New("id not exist")
 }
 
-func (t *RankData) FindIndexOf(id UserId, begin, count int) (idArrayIndex int) {
+func (t *RankData) FindIndexOf(id user.Id, begin, count int) (idArrayIndex int) {
 	idArrayIndex = -1
 	// TODO Should change to binary search from linear search
 	for i := begin; i < begin+count; i++ {
@@ -89,7 +88,7 @@ func (t *RankData) FindIndexOf(id UserId, begin, count int) (idArrayIndex int) {
 	return idArrayIndex
 }
 
-func (t *RankData) GetWithIndex(id UserId) (score int, rank int, tieCount int, idArrayIndex int, err error) {
+func (t *RankData) GetWithIndex(id user.Id) (score int, rank int, tieCount int, idArrayIndex int, err error) {
 	idArrayIndex = -1
 	score, rank, tieCount, err = t.Get(id)
 	if err != nil {
@@ -100,7 +99,7 @@ func (t *RankData) GetWithIndex(id UserId) (score int, rank int, tieCount int, i
 	return score, rank, tieCount, idArrayIndex, err
 }
 
-func (t *RankData) Remove(id UserId) error {
+func (t *RankData) Remove(id user.Id) error {
 	_, _, _, idArrayIndex, err := t.GetWithIndex(id)
 	if err != nil {
 		return err
@@ -109,19 +108,11 @@ func (t *RankData) Remove(id UserId) error {
 	t.ScoreArray = append(t.ScoreArray[:idArrayIndex], t.ScoreArray[idArrayIndex+1:]...)
 	t.IdArray = append(t.IdArray[:idArrayIndex], t.IdArray[idArrayIndex+1:]...)
 	t.NicknameArray = append(t.NicknameArray[:idArrayIndex], t.NicknameArray[idArrayIndex+1:]...)
+	t.LastModifiedAt = append(t.LastModifiedAt[:idArrayIndex], t.LastModifiedAt[idArrayIndex+1:]...)
 	return nil
 }
 
-type NearestResult struct {
-	Id                  UserId
-	Score               int
-	IdArrayIndex        int
-	NearestId           UserId
-	NearestScore        int
-	NearestIdArrayIndex int
-}
-
-func (t *RankData) Nearest(id UserId) (result *NearestResult, err error) {
+func (t *RankData) Nearest(id user.Id) (result *rankservice.NearestResult, err error) {
 	idArrayLen := len(t.IdArray)
 	if idArrayLen == 0 {
 		return result, errors.New("rank empty")
@@ -166,7 +157,7 @@ func (t *RankData) Nearest(id UserId) (result *NearestResult, err error) {
 			nearestNeighborScore = lowerNearestNeighborScore
 		}
 	}
-	result = &NearestResult{
+	result = &rankservice.NearestResult{
 		Id:                  id,
 		Score:               score,
 		IdArrayIndex:        idArrayIndex,
@@ -177,30 +168,14 @@ func (t *RankData) Nearest(id UserId) (result *NearestResult, err error) {
 	return result, nil
 }
 
-type DistanceByElapsed struct {
-	Elapsed  []time.Duration
-	Distance []int
-}
-
-func (t *DistanceByElapsed) FindDistance(elapsed time.Duration) int {
-	for i, e := range t.Elapsed {
-		if e <= elapsed {
-			return t.Distance[i]
-		}
-	}
-	log.Printf("FindDistance data error")
-	return 100
-}
-
-type RemoveNearestOverlapResult struct {
-	Matched       bool
-	NearestResult *NearestResult
-}
-
-func (t *RankData) RemoveNearestOverlap(id UserId, distanceByElapsed *DistanceByElapsed, now time.Time) (result *RemoveNearestOverlapResult, err error) {
+func (t *RankData) RemoveNearestOverlap(id user.Id, distanceByElapsed *rankservice.DistanceByElapsed, now time.Time) (result *rankservice.RemoveNearestOverlapResult, err error) {
 	nearestResult, err := t.Nearest(id)
 	if err != nil {
-		return nil, err
+		if err.Error() == "rank single entry" {
+			return nil, nil
+		} else {
+			return nil, err
+		}
 	}
 	lastModifiedAt := t.LastModifiedAt[nearestResult.IdArrayIndex]
 	nearestLastModifiedAt := t.LastModifiedAt[nearestResult.NearestIdArrayIndex]
@@ -215,9 +190,9 @@ func (t *RankData) RemoveNearestOverlap(id UserId, distanceByElapsed *DistanceBy
 	if diff < distance+nearestDistance {
 		t.Remove(nearestResult.Id)
 		t.Remove(nearestResult.NearestId)
-		return &RemoveNearestOverlapResult{true, nearestResult}, nil
+		return &rankservice.RemoveNearestOverlapResult{true, nearestResult}, nil
 	} else {
-		return &RemoveNearestOverlapResult{false, nearestResult}, nil
+		return &rankservice.RemoveNearestOverlapResult{false, nearestResult}, nil
 	}
 }
 
@@ -236,6 +211,9 @@ func (t *RankData) PrintAll() {
 			}
 		}
 	}
+}
+func (t *RankData) Flush() {
+	setNewRank(t)
 }
 
 // getRankZeroBasedDesc returns rank for given score.
@@ -270,8 +248,8 @@ func insertScoreToSlice(s *[]int, i int, x int) {
 }
 
 // insertUserIdToSlice inserts a user ID x to given slice s at index i.
-func insertUserIdToSlice(s *[]UserId, i int, x UserId) {
-	*s = append(*s, UserId{})
+func insertUserIdToSlice(s *[]user.Id, i int, x user.Id) {
+	*s = append(*s, user.Id{})
 	copy((*s)[i+1:], (*s)[i:])
 	(*s)[i] = x
 }
@@ -291,7 +269,7 @@ func insertTimeToSlice(s *[]time.Time, i int, x time.Time) {
 }
 
 // removeUserIdFromSlice removes a user ID from given slice s.
-func removeUserIdFromSlice(s *[]UserId, i int) {
+func removeUserIdFromSlice(s *[]user.Id, i int) {
 	*s = append((*s)[0:i], (*s)[i+1:]...)
 }
 
@@ -307,7 +285,7 @@ func removeTimeFromSlice(s *[]time.Time, i int) {
 
 // moveUserIdWithinSlice moves an user ID element index i to j.
 // Note that this function does not remove any element.
-func moveUserIdWithinSlice(s *[]UserId, i, j int) {
+func moveUserIdWithinSlice(s *[]user.Id, i, j int) {
 	if i == j {
 		return
 	}
@@ -372,19 +350,27 @@ func insertNewScoreDesc(descArr *[]int, newScore int) (insertRank int, insertTie
 	return insertRank, insertTieCount + 1
 }
 
+func setNewRank(t *RankData) {
+	t.IdScoreMap = make(map[user.Id]int)
+	t.ScoreArray = make([]int, 0)
+	t.IdArray = make([]user.Id, 0)
+	t.NicknameArray = make([]string, 0)
+	t.LastModifiedAt = make([]time.Time, 0)
+}
+
 // newRank returns a newly allocated RankData.
 func newRank() *RankData {
-	return &RankData{
-		IdScoreMap: make(map[UserId]int),
-		ScoreArray: make([]int, 0),
-		IdArray:    make([]UserId, 0),
-	}
+	t := new(RankData)
+	setNewRank(t)
+	return t
 }
 
 // RankService is a struct containing a whole data a rank service need to run.
 type RankService struct {
-	rank      *RankData
-	matchPool *RankData
+	rank              *RankData
+	matchPool         *RankData
+	matchPoolRequest  chan QueueScoreMatchRequestQueue
+	matchPoolTimeBias time.Duration
 }
 
 // Set is a rpc call wrapper for SetWithNickname.
@@ -449,9 +435,40 @@ func (t *RankService) GetLeaderboard(args *shared_server.LeaderboardRequest, rep
 	return nil
 }
 
-func (t *RankService) QueueScoreMatch(args *shared_server.QueueScoreMatchRequest, reply *int) error {
-	//score, rank, tieCount, err := t.rank.Get(args.Id)
-	//t.matchPool.Set(args, )
+type QueueScoreMatchRequestQueue struct {
+	request   *rankservice.QueueScoreMatchRequest
+	replyChan chan rankservice.QueueScoreMatchReply
+}
+
+func (t *RankService) QueueScoreMatch(args *rankservice.QueueScoreMatchRequest, reply *rankservice.QueueScoreMatchReply) error {
+	replyChan := make(chan rankservice.QueueScoreMatchReply)
+	t.matchPoolRequest <- QueueScoreMatchRequestQueue{args, replyChan}
+	r := <-replyChan
+	if r.Err != nil {
+		return r.Err
+	}
+	*reply = r
+	return nil
+}
+
+func (t *RankService) commitQueueScoreMatch(args *rankservice.QueueScoreMatchRequest, reply *rankservice.QueueScoreMatchReply) error {
+	if args.SetBias {
+		t.matchPoolTimeBias = args.MatchPoolTimeBias
+	} else if args.Flush {
+		t.matchPool.Flush()
+		reply.RemoveNearestOverlapResult = &rankservice.RemoveNearestOverlapResult{
+			Matched:       false,
+			NearestResult: nil,
+		}
+	} else {
+		t.matchPool.Set(args.Id, args.Score)
+		now := time.Now().Add(t.matchPoolTimeBias)
+		removeNearestOverlapResult, err := t.matchPool.RemoveNearestOverlap(args.Id, &args.DistanceByElapsed, now)
+		if err != nil {
+			return err
+		}
+		reply.RemoveNearestOverlapResult = removeNearestOverlapResult
+	}
 	return nil
 }
 
@@ -461,8 +478,9 @@ func main() {
 	//selfTest()
 	server := rpc.NewServer()
 	rankService := &RankService{
-		rank:      newRank(),
-		matchPool: newRank(),
+		rank:             newRank(),
+		matchPool:        newRank(),
+		matchPoolRequest: make(chan QueueScoreMatchRequestQueue),
 	}
 	server.RegisterName("RankService", rankService)
 	addr := ":20172"
@@ -472,5 +490,18 @@ func main() {
 	if e != nil {
 		log.Fatal("listen error:", e)
 	}
+	go processQueueScoreMatch(rankService)
 	server.Accept(l)
+}
+
+func processQueueScoreMatch(rankService *RankService) {
+	for {
+		request := <-rankService.matchPoolRequest
+		var reply rankservice.QueueScoreMatchReply
+		err := rankService.commitQueueScoreMatch(request.request, &reply)
+		if err != nil {
+			reply.Err = err
+		}
+		request.replyChan <- reply
+	}
 }

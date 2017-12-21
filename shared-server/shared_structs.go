@@ -1,7 +1,5 @@
 package shared_server
 
-import "github.com/gasbank/laidoff/db-server/user"
-
 type Args struct {
 	A, B int
 }
@@ -47,9 +45,4 @@ type LeaderboardReply struct {
 	FirstItemRank     int
 	FirstItemTieCount int
 	Items             []LeaderboardItem
-}
-
-type QueueScoreMatchRequest struct {
-	Id    user.Id
-	Score int
 }

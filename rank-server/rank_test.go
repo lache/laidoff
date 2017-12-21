@@ -5,6 +5,8 @@ import (
 	"runtime/debug"
 	"errors"
 	"time"
+	"github.com/gasbank/laidoff/db-server/user"
+	"github.com/gasbank/laidoff/rank-server/rankservice"
 )
 
 func assert(t *testing.T, expected, actual int) {
@@ -126,7 +128,7 @@ func TestInsertNewScore(t *testing.T) {
 }
 
 func assertRankDataSet(t *testing.T, expected RankTieCount, rank *RankData, userId byte, score int) {
-	actualRank, actualTieCount := rank.Set(UserId{userId}, score)
+	actualRank, actualTieCount := rank.Set(user.Id{userId}, score)
 	if t != nil {
 		assert(t, expected.rankZeroBased, actualRank)
 		assert(t, expected.tieCount, actualTieCount)
@@ -174,11 +176,11 @@ func ExampleRankData_Set() {
 
 func ExampleRankData_Remove() {
 	rank := createRankTestSet(nil)
-	rank.Remove(UserId{10})
-	rank.Remove(UserId{4})
-	rank.Remove(UserId{7})
-	rank.Set(UserId{7}, 45)
-	rank.Set(UserId{11}, 99)
+	rank.Remove(user.Id{10})
+	rank.Remove(user.Id{4})
+	rank.Remove(user.Id{7})
+	rank.Set(user.Id{7}, 45)
+	rank.Set(user.Id{11}, 99)
 	rank.PrintAll()
 	// Output:
 	// RankData.0: [8 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0] 225
@@ -219,16 +221,16 @@ func TestRankData_Nearest3(t *testing.T) {
 }
 
 func assertNearest(t *testing.T, expectedScore int, expectedId byte, expectedNearestScore int, expectedErr error, rank *RankData, id byte) {
-	actualNearestResult, actualErr := rank.Nearest(UserId{id})
+	actualNearestResult, actualErr := rank.Nearest(user.Id{id})
 	if actualErr == nil {
 		assert(t, expectedScore, actualNearestResult.Score)
-		assertUserId(t, UserId{expectedId}, actualNearestResult.NearestId)
+		assertUserId(t, user.Id{expectedId}, actualNearestResult.NearestId)
 		assert(t, expectedNearestScore, actualNearestResult.NearestScore)
 	}
 	assertErr(t, expectedErr, actualErr)
 }
 
-func assertRankDataGet(t *testing.T, expectedScore, expectedRank, expectedTieCount int, expectedErr error, rank *RankData, userId UserId) {
+func assertRankDataGet(t *testing.T, expectedScore, expectedRank, expectedTieCount int, expectedErr error, rank *RankData, userId user.Id) {
 	actualScore, actualRank, actualTieCount, actualErr := rank.Get(userId)
 	assert(t, expectedScore, actualScore)
 	assert(t, expectedRank, actualRank)
@@ -238,29 +240,29 @@ func assertRankDataGet(t *testing.T, expectedScore, expectedRank, expectedTieCou
 
 func TestRankData_Get(t *testing.T) {
 	rank := createRankTestSet(t)
-	assertRankDataGet(t, 200, 2, 1, nil, rank, UserId{1})
-	assertRankDataGet(t, 100, 4, 2, nil, rank, UserId{2})
-	assertRankDataGet(t, 50, 6, 3, nil, rank, UserId{3})
-	assertRankDataGet(t, 30, 9, 1, nil, rank, UserId{4})
-	assertRankDataGet(t, 50, 6, 3, nil, rank, UserId{5})
-	assertRankDataGet(t, 105, 3, 1, nil, rank, UserId{6})
-	assertRankDataGet(t, 100, 4, 2, nil, rank, UserId{7})
-	assertRankDataGet(t, 225, 1, 1, nil, rank, UserId{8})
-	assertRankDataGet(t, 50, 6, 3, nil, rank, UserId{9})
-	assertRankDataGet(t, 250, 0, 1, nil, rank, UserId{10})
+	assertRankDataGet(t, 200, 2, 1, nil, rank, user.Id{1})
+	assertRankDataGet(t, 100, 4, 2, nil, rank, user.Id{2})
+	assertRankDataGet(t, 50, 6, 3, nil, rank, user.Id{3})
+	assertRankDataGet(t, 30, 9, 1, nil, rank, user.Id{4})
+	assertRankDataGet(t, 50, 6, 3, nil, rank, user.Id{5})
+	assertRankDataGet(t, 105, 3, 1, nil, rank, user.Id{6})
+	assertRankDataGet(t, 100, 4, 2, nil, rank, user.Id{7})
+	assertRankDataGet(t, 225, 1, 1, nil, rank, user.Id{8})
+	assertRankDataGet(t, 50, 6, 3, nil, rank, user.Id{9})
+	assertRankDataGet(t, 250, 0, 1, nil, rank, user.Id{10})
 }
 
 func TestMoveUserIdWithinSlice(t *testing.T) {
-	userIdList := &[]UserId{{1}, {2}, {3}, {4}, {5},}
-	assertUserIdArray(t, &[]UserId{{2}, {1}, {3}, {4}, {5},}, userIdList, 0, 1)
-	assertUserIdArray(t, &[]UserId{{1}, {3}, {4}, {5}, {2},}, userIdList, 0, 4)
-	assertUserIdArray(t, &[]UserId{{2}, {1}, {3}, {4}, {5},}, userIdList, 4, 0)
-	assertUserIdArray(t, &[]UserId{{2}, {1}, {4}, {3}, {5},}, userIdList, 2, 3)
-	assertUserIdArray(t, &[]UserId{{2}, {1}, {3}, {5}, {4},}, userIdList, 2, 4)
-	assertUserIdArray(t, &[]UserId{{2}, {5}, {1}, {3}, {4},}, userIdList, 3, 1)
+	userIdList := &[]user.Id{{1}, {2}, {3}, {4}, {5},}
+	assertUserIdArray(t, &[]user.Id{{2}, {1}, {3}, {4}, {5},}, userIdList, 0, 1)
+	assertUserIdArray(t, &[]user.Id{{1}, {3}, {4}, {5}, {2},}, userIdList, 0, 4)
+	assertUserIdArray(t, &[]user.Id{{2}, {1}, {3}, {4}, {5},}, userIdList, 4, 0)
+	assertUserIdArray(t, &[]user.Id{{2}, {1}, {4}, {3}, {5},}, userIdList, 2, 3)
+	assertUserIdArray(t, &[]user.Id{{2}, {1}, {3}, {5}, {4},}, userIdList, 2, 4)
+	assertUserIdArray(t, &[]user.Id{{2}, {5}, {1}, {3}, {4},}, userIdList, 3, 1)
 }
 
-func assertUserIdArray(t *testing.T, expected *[]UserId, userIdList *[]UserId, i int, j int) {
+func assertUserIdArray(t *testing.T, expected *[]user.Id, userIdList *[]user.Id, i int, j int) {
 	moveUserIdWithinSlice(userIdList, i, j)
 	assert(t, len(*expected), len(*userIdList))
 	for i, userId := range *userIdList {
@@ -268,7 +270,7 @@ func assertUserIdArray(t *testing.T, expected *[]UserId, userIdList *[]UserId, i
 	}
 }
 
-func assertUserId(t *testing.T, expected UserId, actual UserId) {
+func assertUserId(t *testing.T, expected user.Id, actual user.Id) {
 	if expected != actual {
 		debug.PrintStack()
 		t.Errorf("assert failed: expected = %v, actual = %v", expected, actual)
@@ -277,11 +279,11 @@ func assertUserId(t *testing.T, expected UserId, actual UserId) {
 
 func TestRankData_RemoveNearestOverlap(t *testing.T) {
 	rank := newRank()
-	user1 := UserId{1}
-	user2 := UserId{2}
+	user1 := user.Id{1}
+	user2 := user.Id{2}
 	rank.Set(user1, 0)
 	rank.Set(user2, 100)
-	distanceByElapsed := &DistanceByElapsed{
+	distanceByElapsed := &rankservice.DistanceByElapsed{
 		Elapsed:  []time.Duration{30 * time.Second, 20 * time.Second, 10 * time.Second, 0 * time.Second},
 		Distance: []int{100, 50, 25, 5},
 	}

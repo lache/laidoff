@@ -16,6 +16,7 @@ import (
 	"github.com/gasbank/laidoff/match-server/config"
 	"github.com/gasbank/laidoff/match-server/battle"
 	"github.com/gasbank/laidoff/shared-server"
+	"github.com/gasbank/laidoff/rank-server/rankservice"
 )
 
 func main() {
@@ -74,7 +75,7 @@ func main() {
 	}
 }
 
-func testRankRpc(rankService shared_server.RankService, id byte, score int, nickname string) {
+func testRankRpc(rankService rankservice.RankService, id byte, score int, nickname string) {
 	scoreItem := shared_server.ScoreItem{Id: user.Id{id}, Score: score, Nickname: nickname}
 	var reply int
 	err := rankService.Set(&scoreItem, &reply)
@@ -133,7 +134,7 @@ func matchWorker(battleService battle.Service, matchQueue <-chan user.Agent, bat
 			Body:  c1.Db.Nickname + " provokes you!",
 		}
 		var broadcastReply int
-		log.Printf("Broadcast result(return error): %v", serviceList.Push.Broadcast(&broadcastPush, &broadcastReply));
+		log.Printf("Broadcast result(return error): %v", serviceList.Push.Broadcast(&broadcastPush, &broadcastReply))
 		c2 := <-matchQueue
 		log.Printf("Match queue size 2")
 		if c1.Conn == c2.Conn {
