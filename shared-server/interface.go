@@ -19,4 +19,6 @@ type RankService interface {
 	Get(args *user.Id, reply *ScoreRankItem) error
 	// List a leaderboard
 	GetLeaderboard(args *LeaderboardRequest, reply *LeaderboardReply) error
+	// Queue a user for score-based match
+	QueueScoreMatch(args *QueueScoreMatchRequest, reply *int) error
 }

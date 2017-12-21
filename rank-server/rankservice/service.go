@@ -25,6 +25,10 @@ func (c *Context) GetLeaderboard(args *shared_server.LeaderboardRequest, reply *
 	return c.rpcContext.Call("GetLeaderboard", args, reply)
 }
 
+func (c *Context) QueueScoreMatch(args *shared_server.QueueScoreMatchRequest, reply *int) error {
+	return c.rpcContext.Call("QueueScoreMatch", args, reply)
+}
+
 func New(address string) shared_server.RankService {
 	c := new(Context)
 	c.rpcContext = rpchelper.New("RankService", address)

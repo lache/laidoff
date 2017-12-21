@@ -10,6 +10,7 @@ import (
 	"fmt"
 	"math"
 	"time"
+	//"github.com/gasbank/laidoff/db-server/user"
 )
 
 type UserId [16]byte
@@ -445,6 +446,12 @@ func (t *RankService) GetLeaderboard(args *shared_server.LeaderboardRequest, rep
 		}
 		reply.Items = items
 	}
+	return nil
+}
+
+func (t *RankService) QueueScoreMatch(args *shared_server.QueueScoreMatchRequest, reply *int) error {
+	//score, rank, tieCount, err := t.rank.Get(args.Id)
+	//t.matchPool.Set(args, )
 	return nil
 }
 
