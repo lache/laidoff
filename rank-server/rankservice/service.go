@@ -13,12 +13,13 @@ type Context struct {
 }
 
 type QueueScoreMatchRequest struct {
-	Flush             bool
-	SetBias           bool
-	MatchPoolTimeBias time.Duration
-	Id                user.Id
-	Score             int
-	DistanceByElapsed DistanceByElapsed
+	Flush             bool              // flush all score match queue
+	SetBias           bool              // set match wait time bias (for debugging)
+	MatchPoolTimeBias time.Duration     // amount of match wait time bias (for debugging)
+	Id                user.Id           // queue user ID
+	Score             int               // queue score
+	DistanceByElapsed DistanceByElapsed // allowed match score range data
+	Update            bool              // true if this is a update request
 }
 
 type QueueScoreMatchReply struct {
@@ -51,8 +52,9 @@ type NearestResult struct {
 }
 
 type RemoveNearestOverlapResult struct {
-	Matched       bool
-	NearestResult *NearestResult
+	Matched        bool
+	AlreadyRemoved bool
+	NearestResult  *NearestResult
 }
 
 // Set a new score entry

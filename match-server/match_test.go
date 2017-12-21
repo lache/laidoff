@@ -12,10 +12,15 @@ import (
 )
 
 func queueScoreMatch(id byte, score int, serviceList *service.List, distanceByElapsed *rankservice.DistanceByElapsed) (rankservice.QueueScoreMatchReply, error) {
+	return queueScoreMatchUpdate(id, score, serviceList, distanceByElapsed, false)
+}
+
+func queueScoreMatchUpdate(id byte, score int, serviceList *service.List, distanceByElapsed *rankservice.DistanceByElapsed, update bool) (rankservice.QueueScoreMatchReply, error) {
 	request := rankservice.QueueScoreMatchRequest{
 		Id:                user.Id{id},
 		Score:             score,
 		DistanceByElapsed: *distanceByElapsed,
+		Update:            update,
 	}
 	var reply rankservice.QueueScoreMatchReply
 	err := serviceList.Rank.QueueScoreMatch(&request, &reply)
@@ -63,12 +68,19 @@ func assertMatched(t *testing.T, reply rankservice.QueueScoreMatchReply, err err
 	assert.Equal(t, user.Id{matchedId}, reply.RemoveNearestOverlapResult.NearestResult.NearestId)
 }
 
+func assertAlreadyRemoved(t *testing.T, reply rankservice.QueueScoreMatchReply, err error) {
+	assert.Equal(t, nil, err)
+	assert.Equal(t, nil, reply.Err)
+	assert.NotNil(t, reply.RemoveNearestOverlapResult)
+	assert.Equal(t, true, reply.RemoveNearestOverlapResult.AlreadyRemoved)
+}
+
 func createServiceListAndDistanceByElapsed(t *testing.T) (*service.List, *rankservice.DistanceByElapsed) {
 	log.SetFlags(log.LstdFlags | log.Lshortfile)
 	log.SetOutput(os.Stdout)
 	serviceList := service.NewServiceList()
 	distanceByElapsed := rankservice.DistanceByElapsed{
-		Elapsed:  []time.Duration{
+		Elapsed: []time.Duration{
 			30 * time.Second,
 			20 * time.Second,
 			10 * time.Second,
@@ -125,4 +137,20 @@ func TestMatchRpc_Case3(t *testing.T) {
 	// User 4
 	reply4, err := queueScoreMatch(4, 100, serviceList, d)
 	assertMatched(t, reply4, err, 1)
+}
+
+func TestMatchRpc_Case4(t *testing.T) {
+	serviceList, d := createServiceListAndDistanceByElapsed(t)
+	// User 1
+	reply1, err := queueScoreMatch(1, 100, serviceList, d)
+	assertNotMatchedFirstQueue(t, reply1, err)
+	// User 2
+	reply2, err := queueScoreMatch(2, 100, serviceList, d)
+	assertMatched(t, reply2, err, 1)
+	// User 1 [update]
+	reply3, err := queueScoreMatchUpdate(1, 100, serviceList, d, true)
+	assertAlreadyRemoved(t, reply3, err)
+	// User 2 [update]
+	reply4, err := queueScoreMatchUpdate(2, 100, serviceList, d, true)
+	assertAlreadyRemoved(t, reply4, err)
 }

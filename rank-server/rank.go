@@ -12,6 +12,7 @@ import (
 	"time"
 	"github.com/gasbank/laidoff/db-server/user"
 	"github.com/gasbank/laidoff/rank-server/rankservice"
+	"os"
 )
 
 // RankData is a struct containing a single leaderboard.
@@ -190,9 +191,14 @@ func (t *RankData) RemoveNearestOverlap(id user.Id, distanceByElapsed *rankservi
 	if diff < distance+nearestDistance {
 		t.Remove(nearestResult.Id)
 		t.Remove(nearestResult.NearestId)
-		return &rankservice.RemoveNearestOverlapResult{true, nearestResult}, nil
+		return &rankservice.RemoveNearestOverlapResult{
+			Matched: true,
+			NearestResult: nearestResult,
+			}, nil
 	} else {
-		return &rankservice.RemoveNearestOverlapResult{false, nearestResult}, nil
+		return &rankservice.RemoveNearestOverlapResult{
+			NearestResult: nearestResult,
+			}, nil
 	}
 }
 
@@ -461,6 +467,14 @@ func (t *RankService) commitQueueScoreMatch(args *rankservice.QueueScoreMatchReq
 			NearestResult: nil,
 		}
 	} else {
+		if args.Update {
+			if _, exist := t.matchPool.IdScoreMap[args.Id]; exist == false {
+				reply.RemoveNearestOverlapResult = &rankservice.RemoveNearestOverlapResult{
+					AlreadyRemoved: true,
+				}
+				return nil
+			}
+		}
 		t.matchPool.Set(args.Id, args.Score)
 		now := time.Now().Add(t.matchPoolTimeBias)
 		removeNearestOverlapResult, err := t.matchPool.RemoveNearestOverlap(args.Id, &args.DistanceByElapsed, now)
@@ -474,7 +488,8 @@ func (t *RankService) commitQueueScoreMatch(args *rankservice.QueueScoreMatchReq
 
 // main is an entry function for this package.
 func main() {
-	log.SetFlags(log.Lshortfile | log.LstdFlags)
+	log.SetFlags(log.LstdFlags | log.Lshortfile)
+	log.SetOutput(os.Stdout)
 	//selfTest()
 	server := rpc.NewServer()
 	rankService := &RankService{
