@@ -63,34 +63,66 @@ func assertMatched(t *testing.T, reply rankservice.QueueScoreMatchReply, err err
 	assert.Equal(t, user.Id{matchedId}, reply.RemoveNearestOverlapResult.NearestResult.NearestId)
 }
 
-func TestMatchRpc(t *testing.T) {
+func createServiceListAndDistanceByElapsed(t *testing.T) (*service.List, *rankservice.DistanceByElapsed) {
 	log.SetFlags(log.LstdFlags | log.Lshortfile)
 	log.SetOutput(os.Stdout)
 	serviceList := service.NewServiceList()
 	distanceByElapsed := rankservice.DistanceByElapsed{
-		Elapsed:  []time.Duration{30 * time.Second, 20 * time.Second, 10 * time.Second, 0 * time.Second},
-		Distance: []int{100, 50, 25, 5},
+		Elapsed:  []time.Duration{
+			30 * time.Second,
+			20 * time.Second,
+			10 * time.Second,
+			0 * time.Second},
+		Distance: []int{
+			100,
+			50,
+			25,
+			5},
 	}
 	// Flush queue (for easy debugging)
 	_, err := flushQueueScoreMatch(serviceList)
 	setMatchPoolTimeBias(serviceList, 0)
 	assert.Equal(t, nil, err)
-	// Case 1 - matched immediately after second user queued
-	// First user
-	reply1, err := queueScoreMatch(1, 100, serviceList, &distanceByElapsed)
+	return serviceList, &distanceByElapsed
+}
+
+func TestMatchRpc_Case1(t *testing.T) {
+	serviceList, d := createServiceListAndDistanceByElapsed(t)
+	// User 1
+	reply1, err := queueScoreMatch(1, 100, serviceList, d)
 	assertNotMatchedFirstQueue(t, reply1, err)
-	// Second user
-	reply2, err := queueScoreMatch(2, 99, serviceList, &distanceByElapsed)
+	// User 2
+	reply2, err := queueScoreMatch(2, 99, serviceList, d)
 	assertMatched(t, reply2, err, 1)
-	// Case 2 - matched immediately after second user queued with some time interval by first user
-	// First user
-	reply3, err := queueScoreMatch(3, 100, serviceList, &distanceByElapsed)
-	assertNotMatchedFirstQueue(t, reply3, err)
-	// Second user (first try)
-	reply4a, err := queueScoreMatch(4, 80, serviceList, &distanceByElapsed)
-	assertNotMatched(t, reply4a, err, 3)
+}
+
+func TestMatchRpc_Case2(t *testing.T) {
+	serviceList, d := createServiceListAndDistanceByElapsed(t)
+	// User 1
+	reply1, err := queueScoreMatch(1, 100, serviceList, d)
+	assertNotMatchedFirstQueue(t, reply1, err)
+	// User 2 (first try)
+	reply2a, err := queueScoreMatch(2, 80, serviceList, d)
+	assertNotMatched(t, reply2a, err, 1)
+	// Delay goes here...
 	setMatchPoolTimeBias(serviceList, 15*time.Second)
-	// Second user (second try)
-	reply4b, err := queueScoreMatch(4, 80, serviceList, &distanceByElapsed)
-	assertMatched(t, reply4b, err, 3)
+	// User 2 (second try)
+	reply2b, err := queueScoreMatch(2, 80, serviceList, d)
+	assertMatched(t, reply2b, err, 1)
+}
+
+func TestMatchRpc_Case3(t *testing.T) {
+	serviceList, d := createServiceListAndDistanceByElapsed(t)
+	// User 1
+	reply1, err := queueScoreMatch(1, 100, serviceList, d)
+	assertNotMatchedFirstQueue(t, reply1, err)
+	// User 2
+	reply2, err := queueScoreMatch(2, 80, serviceList, d)
+	assertNotMatched(t, reply2, err, 1)
+	// User 3
+	reply3, err := queueScoreMatch(3, 80, serviceList, d)
+	assertMatched(t, reply3, err, 2)
+	// User 4
+	reply4, err := queueScoreMatch(4, 100, serviceList, d)
+	assertMatched(t, reply4, err, 1)
 }
