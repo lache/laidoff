@@ -165,10 +165,7 @@ function on_ui_event(id)
 			lo.puck_game_set_tutorial_guide_str(c.puck_game, '잘했습니다!')
 			yield_wait_ms(2000)
 			--------------------------------------
-			lo.puck_game_set_tutorial_guide_str(c.puck_game, '오른쪽 <대시 버튼>으로 <대시>도 가능합니다.')
 			c.puck_game.control_flags = c.puck_game.control_flags & ~lo.LPGCF_HIDE_DASH_BUTTON
-			yield_wait_ms(2000)
-			--------------------------------------
 			local dash_near_count = 2
 			local dash_near_msg = '<대시>를 사용해 공과 부딪쳐보세요. (%d/%d)'
 			for i=1,dash_near_count do
@@ -207,8 +204,6 @@ function on_ui_event(id)
 			yield_wait_ms(1000)
 			lo.puck_game_set_tutorial_guide_str(c.puck_game, '대단히 잘했습니다!')
 			yield_wait_ms(2000)
-			lo.puck_game_set_tutorial_guide_str(c.puck_game, '파란색 공은 <아군 타워>에 피해를 주지 않습니다.')
-			yield_wait_ms(4000)
 			--------------------------------------
 			lo.puck_game_set_tutorial_guide_str(c.puck_game, '마지막으로 <적 플레이어>을 소환하겠습니다.')
 			yield_wait_ms(2000)
@@ -218,10 +213,6 @@ function on_ui_event(id)
 			
 			lo.puck_game_create_control_joint(c.puck_game, lo.LPGO_TARGET)
 			yield_wait_ms(2000)
-			lo.puck_game_set_tutorial_guide_str(c.puck_game, '적에게 닿은 공은 빨간색 공이 됩니다.')
-			yield_wait_ms(4000)
-			lo.puck_game_set_tutorial_guide_str(c.puck_game, '빨간색 공이 <아군 타워>에 맞지 않도록 주의하세요.')
-			yield_wait_ms(4000)
 			lo.puck_game_set_tutorial_guide_str(c.puck_game, '적의 방해를 피해 <적군 타워>를 파괴하십시오!')
 			lo.puck_game_set_bogus_disabled(c.puck_game, 0)
 			-- make enemy tower can be damaged
