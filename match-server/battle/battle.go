@@ -63,7 +63,7 @@ func WaitForReply(connToBattle net.Conn, replyPacketRef interface{}, expectedRep
 	return errors.New("parsed size or type error")
 }
 
-func CreateBattleInstance(battleService Service, c1 user.Agent, c2 user.Agent, battleOkQueue chan<- Ok) {
+func createBattleInstance(battleService Service, c1 user.Agent, c2 user.Agent, battleOkQueue chan<- Ok) {
 	connToBattle, err := battleService.Connection()
 	if err != nil {
 		log.Printf("battleService error! %v", err.Error())
@@ -153,6 +153,16 @@ func SendRetryQueue(conn net.Conn) {
 	}
 }
 
+func SendRetryQueue2(conn net.Conn, queueType int) {
+	retryQueueBuf := convert.Packet2Buf(convert.NewLwpRetryQueue2(queueType))
+	_, retrySendErr := conn.Write(retryQueueBuf)
+	if retrySendErr != nil {
+		log.Printf("%v: %v error!", conn.RemoteAddr(), retrySendErr.Error())
+	} else {
+		log.Printf("%v: Send retry match packet to client", conn.RemoteAddr())
+	}
+}
+
 func SendRetryQueueLater(conn net.Conn) {
 	retryQueueLaterBuf := convert.Packet2Buf(convert.NewLwpRetryQueueLater())
 	_, retrySendErr := conn.Write(retryQueueLaterBuf)
@@ -160,5 +170,44 @@ func SendRetryQueueLater(conn net.Conn) {
 		log.Printf("%v: %v error!", conn.RemoteAddr(), retrySendErr.Error())
 	} else {
 		log.Printf("%v: Send retry later match packet to client", conn.RemoteAddr())
+	}
+}
+
+func Create1vs1Match(c1 user.Agent, c2 user.Agent, battleService Service, battleOkQueue chan<- Ok, queueType int) {
+	log.Printf("%v and %v matched! (maybe)", c1.Conn.RemoteAddr(), c2.Conn.RemoteAddr())
+	maybeMatchedBuf := convert.Packet2Buf(convert.NewLwpMaybeMatched())
+	n1, err1 := c1.Conn.Write(maybeMatchedBuf)
+	n2, err2 := c2.Conn.Write(maybeMatchedBuf)
+	if n1 == 4 && n2 == 4 && err1 == nil && err2 == nil {
+		go createBattleInstance(battleService, c1, c2, battleOkQueue)
+	} else {
+		switch queueType {
+		case convert.LWPUCKGAMEQUEUETYPENEARESTSCORE:
+			// Match cannot be proceeded
+			checkMatchError2(err1, c1.Conn, convert.LWPUCKGAMEQUEUETYPENEARESTSCORE)
+			checkMatchError2(err2, c2.Conn, convert.LWPUCKGAMEQUEUETYPENEARESTSCORE)
+		case convert.LWPUCKGAMEQUEUETYPEFIFO:
+			fallthrough
+		default:
+			// Match cannot be proceeded
+			checkMatchError(err1, c1.Conn)
+			checkMatchError(err2, c2.Conn)
+		}
+	}
+}
+
+func checkMatchError(err error, conn net.Conn) {
+	if err != nil {
+		log.Printf("%v: %v error!", conn.RemoteAddr(), err.Error())
+	} else {
+		SendRetryQueue(conn)
+	}
+}
+
+func checkMatchError2(err error, conn net.Conn, queueType int) {
+	if err != nil {
+		log.Printf("%v: %v error!", conn.RemoteAddr(), err.Error())
+	} else {
+		SendRetryQueue2(conn, queueType)
 	}
 }

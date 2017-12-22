@@ -475,6 +475,13 @@ func (t *RankService) commitQueueScoreMatch(args *rankservice.QueueScoreMatchReq
 				return nil
 			}
 		}
+		if args.Delete {
+			t.matchPool.Remove(args.Id)
+			reply.RemoveNearestOverlapResult = &rankservice.RemoveNearestOverlapResult{
+				AlreadyRemoved: true,
+			}
+			return nil
+		}
 		t.matchPool.Set(args.Id, args.Score)
 		now := time.Now().Add(t.matchPoolTimeBias)
 		removeNearestOverlapResult, err := t.matchPool.RemoveNearestOverlap(args.Id, &args.DistanceByElapsed, now)

@@ -346,7 +346,8 @@ var prod bool
 
 func main() {
 	// Set default log format
-	log.SetFlags(log.Lshortfile | log.LstdFlags)
+	log.SetFlags(log.LstdFlags | log.Lshortfile)
+	log.SetOutput(os.Stdout)
 	log.Println("Greetings from push server")
 	if len(os.Args) >= 2 && os.Args[1] == "prod" {
 		log.Println("PRODUCTION MODE")

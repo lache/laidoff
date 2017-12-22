@@ -17,6 +17,7 @@ import (
 	"github.com/gasbank/laidoff/match-server/battle"
 	"github.com/gasbank/laidoff/shared-server"
 	"github.com/gasbank/laidoff/rank-server/rankservice"
+	"sync"
 )
 
 func main() {
@@ -55,7 +56,8 @@ func main() {
 	// Ongoing battle map
 	ongoingBattleMap := make(map[user.Id]battle.Ok)
 	// Nearest match map (QUEUE3)
-	nearestMatchMqp := make(map[user.Id]user.Agent)
+	nearestMatchMap := make(map[user.Id]user.Agent)
+	nearestMatchMapLock := sync.RWMutex{}
 	// Battle service
 	battleService := battle.Service{Conf: conf}
 	// Start match worker goroutine
@@ -75,15 +77,16 @@ func main() {
 			log.Println("Error accepting: ", err.Error())
 		} else {
 			req := &HandleRequestRequest{
-				Conf:             conf,
-				NickDb:           &nickDb,
-				Conn:             conn,
-				MatchQueue:       matchQueue,
-				Battle:           battleService,
-				ServiceList:      serviceList,
-				OngoingBattleMap: ongoingBattleMap,
-				BattleOkQueue:    battleOkQueue,
-				NearestMatchMap:  nearestMatchMqp,
+				Conf:                conf,
+				NickDb:              &nickDb,
+				Conn:                conn,
+				MatchQueue:          matchQueue,
+				Battle:              battleService,
+				ServiceList:         serviceList,
+				OngoingBattleMap:    ongoingBattleMap,
+				BattleOkQueue:       battleOkQueue,
+				NearestMatchMap:     nearestMatchMap,
+				NearestMatchMapLock: nearestMatchMapLock,
 			}
 			go handleRequest(req)
 		}
@@ -166,39 +169,22 @@ func matchWorker(battleService battle.Service, matchQueue <-chan user.Agent, bat
 			log.Printf("The same user ID sending QUEUE2 twice. Flushing match requests and replying with RETRYQUEUE to the later connection...")
 			battle.SendRetryQueue(c2.Conn)
 		} else {
-			log.Printf("%v and %v matched! (maybe)", c1.Conn.RemoteAddr(), c2.Conn.RemoteAddr())
-			maybeMatchedBuf := convert.Packet2Buf(convert.NewLwpMaybeMatched())
-			n1, err1 := c1.Conn.Write(maybeMatchedBuf)
-			n2, err2 := c2.Conn.Write(maybeMatchedBuf)
-			if n1 == 4 && n2 == 4 && err1 == nil && err2 == nil {
-				go battle.CreateBattleInstance(battleService, c1, c2, battleOkQueue)
-			} else {
-				// Match cannot be proceeded
-				checkMatchError(err1, c1.Conn)
-				checkMatchError(err2, c2.Conn)
-			}
+			battle.Create1vs1Match(c1, c2, battleService, battleOkQueue, convert.LWPUCKGAMEQUEUETYPEFIFO)
 		}
 	}
 }
 
-func checkMatchError(err error, conn net.Conn) {
-	if err != nil {
-		log.Printf("%v: %v error!", conn.RemoteAddr(), err.Error())
-	} else {
-		battle.SendRetryQueue(conn)
-	}
-}
-
 type HandleRequestRequest struct {
-	Conf             config.ServerConfig
-	NickDb           *nickdb.NickDb
-	Conn             net.Conn
-	MatchQueue       chan<- user.Agent
-	Battle           battle.Service
-	ServiceList      *service.List
-	OngoingBattleMap map[user.Id]battle.Ok
-	BattleOkQueue    chan<- battle.Ok
-	NearestMatchMap  map[user.Id]user.Agent
+	Conf                config.ServerConfig
+	NickDb              *nickdb.NickDb
+	Conn                net.Conn
+	MatchQueue          chan<- user.Agent
+	Battle              battle.Service
+	ServiceList         *service.List
+	OngoingBattleMap    map[user.Id]battle.Ok
+	BattleOkQueue       chan<- battle.Ok
+	NearestMatchMap     map[user.Id]user.Agent
+	NearestMatchMapLock sync.RWMutex
 }
 
 func handleRequest(req *HandleRequestRequest) {
@@ -225,20 +211,31 @@ func handleRequest(req *HandleRequestRequest) {
 			handler.HandleQueue2(req.Conf, req.MatchQueue, buf, req.Conn, req.OngoingBattleMap, req.Battle, req.BattleOkQueue, req.ServiceList.Db)
 		case convert.LPGPLWPQUEUE3:
 			req := &handler.HandleQueue3Request{
-				Conf:             req.Conf,
-				NearestMatchMap:  req.NearestMatchMap,
-				MatchQueue:       req.MatchQueue,
-				Buf:              buf,
-				Conn:             req.Conn,
-				OngoingBattleMap: req.OngoingBattleMap,
-				BattleService:    req.Battle,
-				BattleOkQueue:    req.BattleOkQueue,
-				Db:               req.ServiceList.Db,
-				Rank:             req.ServiceList.Rank,
+				Conf:                req.Conf,
+				NearestMatchMap:     req.NearestMatchMap,
+				NearestMatchMapLock: req.NearestMatchMapLock,
+				MatchQueue:          req.MatchQueue,
+				Buf:                 buf,
+				Conn:                req.Conn,
+				OngoingBattleMap:    req.OngoingBattleMap,
+				BattleService:       req.Battle,
+				BattleOkQueue:       req.BattleOkQueue,
+				Db:                  req.ServiceList.Db,
+				Rank:                req.ServiceList.Rank,
 			}
 			handler.HandleQueue3(req)
 		case convert.LPGPLWPCANCELQUEUE:
-			handler.HandleCancelQueue(req.MatchQueue, buf, req.Conn, req.OngoingBattleMap, req.ServiceList.Db)
+			req := &handler.HandleCancelQueueRequest{
+				MatchQueue:          req.MatchQueue,
+				Buf:                 buf,
+				Conn:                req.Conn,
+				OngoingBattleMap:    req.OngoingBattleMap,
+				Db:                  req.ServiceList.Db,
+				NearestMatchMap:     req.NearestMatchMap,
+				NearestMatchMapLock: req.NearestMatchMapLock,
+				Rank:                req.ServiceList.Rank,
+			}
+			handler.HandleCancelQueue(req)
 		case convert.LPGPLWPSUDDENDEATH:
 			handler.HandleSuddenDeath(req.Conf, buf) // relay 'buf' to battle service
 		case convert.LPGPLWPNEWUSER:

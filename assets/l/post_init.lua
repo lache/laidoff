@@ -244,7 +244,8 @@ function on_ui_event(id)
 		lo.puck_game_set_searching_str(c.puck_game, 'SEARCHING OPPONENT...')
 		lo.puck_game_clear_match_data(c, c.puck_game)
 		lo.puck_game_reset_battle_state(c.puck_game)
-		lo.tcp_send_queue2(c.tcp, c.tcp.user_id)
+		--lo.tcp_send_queue2(c.tcp, c.tcp.user_id)
+		lo.tcp_send_queue3(c.tcp, c.tcp.user_id, lo.LW_PUCK_GAME_QUEUE_TYPE_NEAREST_SCORE)
 	elseif id == 'leaderboard_button' then
 		lo.show_leaderboard(c)
 	else 

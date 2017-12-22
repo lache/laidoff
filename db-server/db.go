@@ -10,6 +10,7 @@ import (
 	"errors"
 	"time"
 	"encoding/gob"
+	"github.com/gasbank/laidoff/db-server/dbadmin"
 )
 
 type LeaseData struct {
@@ -62,7 +63,7 @@ func (t *DbService) Create(args int, reply *user.Db) error {
 }
 
 func (t *DbService) Get(args *user.Id, reply *user.Db) error {
-	db, err := loadUserDb(*args)
+	db, err := user.LoadUserDb(*args)
 	if err != nil {
 		return err
 	}
@@ -88,7 +89,7 @@ func CommitLease(t *DbService, leaseRequest *LeaseWriteRequest) {
 	leaseData, exist := t.leaseMap[args]
 	if exist == false {
 		// You can lease
-		db, err := loadUserDb(args)
+		db, err := user.LoadUserDb(args)
 		if err != nil {
 			leaseRequest.LeaseReplyChan <- LeaseReply{nil, err}
 			return
@@ -132,7 +133,7 @@ func CommitWrite(t *DbService, writeRequest *LeaseWriteRequest) {
 	leaseData, exist := t.leaseMap[writeRequest.LeaseDb.Db.Id]
 	if exist {
 		if leaseData.LeaseId == writeRequest.LeaseDb.LeaseId {
-			err := writeUserDb(&writeRequest.LeaseDb.Db)
+			err := user.WriteUserDb(&writeRequest.LeaseDb.Db)
 			if err != nil {
 				log.Printf("writeUserDb failed with error: %v", err.Error())
 				writeRequest.WriteReplyChan <- WriteReply{0, err}
@@ -164,6 +165,10 @@ func ProcessLeaseWriteRequest(t *DbService) {
 }
 
 func main() {
+	// Set default log format
+	log.SetFlags(log.LstdFlags | log.Lshortfile)
+	log.SetOutput(os.Stdout)
+	addr := ":20181"
 	// Create db directory to save user database
 	os.MkdirAll("db", os.ModePerm)
 	//createTestUserDb()
@@ -174,52 +179,16 @@ func main() {
 	dbService.leaseWriteRequestQueue = make(chan LeaseWriteRequest)
 	go ProcessLeaseWriteRequest(dbService)
 	server.RegisterName("DbService", dbService)
-	addr := ":20181"
 	log.Printf("Listening %v for db service...", addr)
 	// Listen for incoming tcp packets on specified port.
 	l, e := net.Listen("tcp", addr)
 	if e != nil {
 		log.Fatal("listen error:", e)
 	}
+	go dbadmin.StartService()
 	// This statement links rpc server to the socket, and allows rpc server to accept
 	// rpc request coming from that socket.
 	server.Accept(l)
-}
-func createTestUserDb() {
-	// create a new test user and write db to filesystem
-	uuid, uuidStr, err := user.NewUuid()
-	if err != nil {
-		log.Fatalf("new uuid failed: %v", err.Error())
-	}
-	log.Printf("  - New user guid: %v", uuidStr)
-	newNick := "test-user-nick"
-	// Write to disk
-	var id user.Id
-	copy(id[:], uuid)
-	_, _, err = createNewUser(id, newNick)
-	if err != nil {
-		log.Fatalf("createNewUser failed: %v", err.Error())
-	}
-}
-
-func loadUserDb(id user.Id) (*user.Db, error) {
-	uuidStr := user.IdByteArrayToString(id)
-	userDbFile, err := os.Open("db/" + uuidStr)
-	if err != nil {
-		if os.IsNotExist(err) {
-			// user db not exist
-			return nil, errors.New("user db not exist")
-		} else {
-			log.Printf("disk open failed: %v", err.Error())
-			return nil, err
-		}
-	} else {
-		defer userDbFile.Close()
-		decoder := gob.NewDecoder(userDbFile)
-		userDb := &user.Db{}
-		decoder.Decode(userDb)
-		return userDb, nil
-	}
 }
 
 func createNewUser(uuid user.Id, nickname string) (*user.Db, *os.File, error) {
@@ -239,17 +208,4 @@ func createNewUser(uuid user.Id, nickname string) (*user.Db, *os.File, error) {
 	encoder.Encode(userDb)
 	userDbFile.Close()
 	return userDb, userDbFile, nil
-}
-
-func writeUserDb(userDb *user.Db) error {
-	userDbFile, err := os.Create("db/" + user.IdByteArrayToString(userDb.Id))
-	if err != nil {
-		log.Fatalf("User db file creation failed: %v", err.Error())
-		return err
-	}
-	encoder := gob.NewEncoder(userDbFile)
-	encoder.Encode(userDb)
-	userDbFile.Close()
-	log.Printf("DB written: %+v", userDb)
-	return nil
 }

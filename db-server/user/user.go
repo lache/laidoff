@@ -6,6 +6,10 @@ import (
 	"net"
 	"io"
 	"crypto/rand"
+	"os"
+	"errors"
+	"log"
+	"encoding/gob"
 )
 
 type Id [16]byte
@@ -72,4 +76,45 @@ func NewUuid() ([]byte, string, error) {
 
 func IdByteArrayToString(id Id) string {
 	return fmt.Sprintf("%08x-%08x-%08x-%08x", id[0:4], id[4:8], id[8:12], id[12:16])
+}
+
+func (db *Db) UuidStr() string {
+	return IdByteArrayToString(db.Id)
+}
+
+func LoadUserDb(id Id) (*Db, error) {
+	uuidStr := IdByteArrayToString(id)
+	return LoadUserDbByUuidStr(uuidStr)
+}
+
+func LoadUserDbByUuidStr(uuidStr string) (*Db, error) {
+	userDbFile, err := os.Open("db/" + uuidStr)
+	if err != nil {
+		if os.IsNotExist(err) {
+			// user db not exist
+			return nil, errors.New("user db not exist")
+		} else {
+			log.Printf("disk open failed: %v", err.Error())
+			return nil, err
+		}
+	} else {
+		defer userDbFile.Close()
+		decoder := gob.NewDecoder(userDbFile)
+		userDb := &Db{}
+		decoder.Decode(userDb)
+		return userDb, nil
+	}
+}
+
+func WriteUserDb(userDb *Db) error {
+	userDbFile, err := os.Create("db/" + IdByteArrayToString(userDb.Id))
+	if err != nil {
+		log.Fatalf("User db file creation failed: %v", err.Error())
+		return err
+	}
+	encoder := gob.NewEncoder(userDbFile)
+	encoder.Encode(userDb)
+	userDbFile.Close()
+	log.Printf("DB written: %+v", userDb)
+	return nil
 }

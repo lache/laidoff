@@ -7,28 +7,53 @@ import (
 	"github.com/gasbank/laidoff/match-server/convert"
 	"github.com/gasbank/laidoff/match-server/battle"
 	"github.com/gasbank/laidoff/db-server/dbservice"
+	"sync"
+	"github.com/gasbank/laidoff/rank-server/rankservice"
 )
 
-func HandleCancelQueue(matchQueue chan<- user.Agent, buf []byte, conn net.Conn, ongoingBattleMap map[user.Id]battle.Ok, dbService dbservice.Db) {
+type HandleCancelQueueRequest struct {
+	MatchQueue          chan<- user.Agent
+	Buf                 []byte
+	Conn                net.Conn
+	OngoingBattleMap    map[user.Id]battle.Ok
+	Db                  dbservice.Db
+	NearestMatchMap     map[user.Id]user.Agent
+	NearestMatchMapLock sync.RWMutex
+	Rank                rankservice.Rank
+}
+
+func HandleCancelQueue(req *HandleCancelQueueRequest) {
 	log.Printf("CANCELQUEUE received")
-	recvPacket, err := convert.ParseCancelQueue(buf)
+	recvPacket, err := convert.ParseCancelQueue(req.Buf)
 	if err != nil {
 		log.Printf("HandleCancelQueue fail: %v", err.Error())
 		return
 	}
-	//userDb, err := user.LoadUserDb(convert.IdCuintToByteArray(recvPacket.Id))
 	var userDb user.Db
 	userId := convert.IdCuintToByteArray(recvPacket.Id)
-	err = dbService.Get(&userId, &userDb)
+	err = req.Db.Get(&userId, &userDb)
 	if err != nil {
 		log.Printf("user db load failed: %v", err.Error())
 	} else {
 		// Check ongoing battle
-		_, battleExists := ongoingBattleMap[userDb.Id]
+		_, battleExists := req.OngoingBattleMap[userDb.Id]
 		if battleExists {
 			log.Printf("Nickname '%v' has the ongoing battle session. CANCELQUEUE?!", userDb.Nickname)
 		}
-		// Queue connection
-		matchQueue <- user.Agent{conn, userDb, true }
+		req.NearestMatchMapLock.RLock()
+		_, existOnNearestMatchMap := req.NearestMatchMap[userId]
+		req.NearestMatchMapLock.RUnlock()
+		if existOnNearestMatchMap {
+			deleteFromQueueReq := &DeleteFromQueueRequest{
+				Id:                  userId,
+				Rank:                req.Rank,
+				NearestMatchMap:     req.NearestMatchMap,
+				NearestMatchMapLock: req.NearestMatchMapLock,
+			}
+			DeleteFromQueue(deleteFromQueueReq)
+		} else {
+			// Queue 'cancel queue' request
+			req.MatchQueue <- user.Agent{req.Conn, userDb, true}
+		}
 	}
 }

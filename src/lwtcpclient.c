@@ -54,6 +54,15 @@ int tcp_send_queue2(LWTCP* tcp, const LWUNIQUEID* id) {
     return tcp_send_sendbuf(tcp, sizeof(p));
 }
 
+int tcp_send_queue3(LWTCP* tcp, const LWUNIQUEID* id, int queue_type) {
+    LOGI("Sending LWPQUEUE3");
+    NEW_TCP_PACKET_CAPITAL(LWPQUEUE3, p);
+    memcpy(p.Id, id->v, sizeof(LWUNIQUEID));
+    p.QueueType = queue_type;
+    memcpy(tcp->sendbuf, &p, sizeof(p));
+    return tcp_send_sendbuf(tcp, sizeof(p));
+}
+
 int tcp_send_cancelqueue(LWTCP* tcp, const LWUNIQUEID* id) {
     LOGI("Sending LWPCANCELQUEUE");
     NEW_TCP_PACKET_CAPITAL(LWPCANCELQUEUE, p);
@@ -192,6 +201,11 @@ int parse_recv_packets(LWTCP* tcp) {
             //show_sys_msg(pLwc->def_sys_msg, "LWPRETRYQUEUE received");
             // Resend QUEUE2
             tcp_send_queue2(tcp, &pLwc->tcp->user_id);
+        } else if (CHECK_PACKET(packet_type, packet_size, LWPRETRYQUEUE2)) {
+            LOGI("LWPRETRYQUEUE2 received");
+            LWPRETRYQUEUE2* p = (LWPRETRYQUEUE2*)cursor;
+            // Resend QUEUE3
+            tcp_send_queue3(tcp, &pLwc->tcp->user_id, p->queueType);
         } else if (CHECK_PACKET(packet_type, packet_size, LWPRETRYQUEUELATER)) {
             LOGI("LWPRETRYQUEUELATER received");
             // match server internal error...

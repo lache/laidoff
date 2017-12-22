@@ -11,6 +11,7 @@ import (
 	"github.com/gasbank/laidoff/rank-server/rankservice"
 	"github.com/gasbank/laidoff/shared-server"
 	"math"
+	"os"
 )
 
 const (
@@ -21,7 +22,8 @@ const (
 
 func main() {
 	// Set default log format
-	log.SetFlags(log.Lshortfile | log.LstdFlags)
+	log.SetFlags(log.LstdFlags | log.Lshortfile)
+	log.SetOutput(os.Stdout)
 	log.Printf("Greetings from %v service", ServiceName)
 	// Connect to rank service
 	rankService := rankservice.New(RankServiceAddr)

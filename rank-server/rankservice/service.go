@@ -20,6 +20,7 @@ type QueueScoreMatchRequest struct {
 	Score             int               // queue score
 	DistanceByElapsed DistanceByElapsed // allowed match score range data
 	Update            bool              // true if this is a update request
+	Delete            bool              // true if this is a delete request
 }
 
 type QueueScoreMatchReply struct {

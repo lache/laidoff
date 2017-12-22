@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Db Service Admin</title>
+    <style>
+        .wrap {
+            white-space: pre-wrap;      /* CSS3 */
+            white-space: -moz-pre-wrap; /* Firefox */
+            white-space: -pre-wrap;     /* Opera <7 */
+            white-space: -o-pre-wrap;   /* Opera 7 */
+            word-wrap: break-word;      /* IE */
+            width: 60ch;
+        }
+    </style>
+</head>
+<body>
+<ol>
+{{range $i, $value := .DbList}}
+    <li><a href="/edit/{{$value}}">{{index $.NicknameList $i}} {{$value}}</a></li>
+{{end}}
+</ol>
+</body>
+</html>

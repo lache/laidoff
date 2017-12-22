@@ -81,6 +81,14 @@ func NewLwpRetryQueue() *C.LWPRETRYQUEUE {
 	}
 }
 
+func NewLwpRetryQueue2(queueType int) *C.LWPRETRYQUEUE2 {
+	return &C.LWPRETRYQUEUE2{
+		C.ushort(unsafe.Sizeof(C.LWPRETRYQUEUE2{})),
+		C.LPGP_LWPRETRYQUEUE2,
+		C.int(queueType),
+	}
+}
+
 func NewLwpCancelQueueOk() *C.LWPCANCELQUEUEOK {
 	return &C.LWPCANCELQUEUEOK{
 		C.ushort(unsafe.Sizeof(C.LWPCANCELQUEUEOK{})),
