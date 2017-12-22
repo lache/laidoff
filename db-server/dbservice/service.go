@@ -10,6 +10,7 @@ type Db interface {
 	Get(args *user.Id, reply *user.Db) error
 	Lease(args *user.Id, reply *user.LeaseDb) error
 	Write(args *user.LeaseDb, reply *int) error
+	GetAllUserRatings(args *GetAllUserRatingsRequest, reply *GetAllUserRatingsReply) error
 }
 
 type Context struct {
@@ -30,6 +31,18 @@ func (c *Context) Lease(args *user.Id, reply *user.LeaseDb) error {
 
 func (c *Context) Write(args *user.LeaseDb, reply *int) error {
 	return c.rpcContext.Call("Write", args, reply)
+}
+
+type GetAllUserRatingsRequest struct{}
+
+type GetAllUserRatingsReply struct {
+	Id       []user.Id
+	Nickname []string
+	Rating   []int
+}
+
+func (c *Context) GetAllUserRatings(args *GetAllUserRatingsRequest, reply *GetAllUserRatingsReply) error {
+	return c.rpcContext.Call("GetAllUserRatings", args, reply)
 }
 
 func New(address string) Db {

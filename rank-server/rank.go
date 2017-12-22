@@ -13,6 +13,7 @@ import (
 	"github.com/gasbank/laidoff/db-server/user"
 	"github.com/gasbank/laidoff/rank-server/rankservice"
 	"os"
+	"github.com/gasbank/laidoff/db-server/dbservice"
 )
 
 // RankData is a struct containing a single leaderboard.
@@ -513,7 +514,17 @@ func main() {
 		log.Fatal("listen error:", e)
 	}
 	go processQueueScoreMatch(rankService)
-	server.Accept(l)
+	db := dbservice.New(":20181")
+	var getAllUserRatingsReply dbservice.GetAllUserRatingsReply
+	err := db.GetAllUserRatings(&dbservice.GetAllUserRatingsRequest{}, &getAllUserRatingsReply)
+	if err != nil {
+		log.Fatalf("GetAllUserRatings error: %v", err.Error())
+	} else {
+		for i, id := range getAllUserRatingsReply.Id {
+			rankService.rank.SetWithNickname(id, getAllUserRatingsReply.Rating[i], getAllUserRatingsReply.Nickname[i])
+		}
+		server.Accept(l)
+	}
 }
 
 func processQueueScoreMatch(rankService *RankService) {

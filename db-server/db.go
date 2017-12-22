@@ -11,6 +11,8 @@ import (
 	"time"
 	"encoding/gob"
 	"github.com/gasbank/laidoff/db-server/dbadmin"
+	"github.com/gasbank/laidoff/db-server/dbservice"
+	"io/ioutil"
 )
 
 type LeaseData struct {
@@ -125,6 +127,26 @@ func (t *DbService) Write(args *user.LeaseDb, reply *int) error {
 		return r.err
 	} else {
 		*reply = r.Reply
+	}
+	return nil
+}
+
+func (t *DbService) GetAllUserRatings(args *dbservice.GetAllUserRatingsRequest, reply *dbservice.GetAllUserRatingsReply) error {
+	files, err := ioutil.ReadDir("db")
+	if err != nil {
+		return err
+	} else {
+		*reply = dbservice.GetAllUserRatingsReply{}
+		for _, f := range files {
+			userDb, err := user.LoadUserDbByUuidStr(f.Name())
+			if err != nil {
+				return err
+			} else {
+				(*reply).Id = append((*reply).Id, userDb.Id)
+				(*reply).Nickname = append((*reply).Nickname, userDb.Nickname)
+				(*reply).Rating = append((*reply).Rating, userDb.Rating)
+			}
+		}
 	}
 	return nil
 }
