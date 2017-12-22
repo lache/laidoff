@@ -11,6 +11,7 @@ import (
 	"reflect"
 	"errors"
 	"unsafe"
+	"github.com/gasbank/laidoff/db-server/dbservice"
 )
 
 type Ok struct {
@@ -63,7 +64,7 @@ func WaitForReply(connToBattle net.Conn, replyPacketRef interface{}, expectedRep
 	return errors.New("parsed size or type error")
 }
 
-func createBattleInstance(battleService Service, c1 user.Agent, c2 user.Agent, battleOkQueue chan<- Ok) {
+func createBattleInstance(battleService Service, c1 user.Agent, c2 user.Agent, battleOkQueue chan<- Ok, bot bool) {
 	connToBattle, err := battleService.Connection()
 	if err != nil {
 		log.Printf("battleService error! %v", err.Error())
@@ -76,6 +77,7 @@ func createBattleInstance(battleService Service, c1 user.Agent, c2 user.Agent, b
 			c2.Db.Id,
 			c1.Db.Nickname,
 			c2.Db.Nickname,
+			bot,
 		))
 		_, err = connToBattle.Write(createBattleBuf)
 		if err != nil {
@@ -88,7 +90,11 @@ func createBattleInstance(battleService Service, c1 user.Agent, c2 user.Agent, b
 			log.Printf("WaitForReply failed - %v", err.Error())
 		} else {
 			// No error! so far ... proceed battle
-			log.Printf("MATCH %v and %v matched successfully!", c1.Conn.RemoteAddr(), c2.Conn.RemoteAddr())
+			if c2.Conn != nil {
+				log.Printf("MATCH %v and %v matched successfully!", c1.Conn.RemoteAddr(), c2.Conn.RemoteAddr())
+			} else {
+				log.Printf("MATCH %v and *bot* matched successfully!", c1.Conn.RemoteAddr())
+			}
 			createBattleOkWrap := convert.CreateBattleOk{S: *createBattleOk}
 			battleOkQueue <- Ok {
 				false,
@@ -119,6 +125,10 @@ func OkWorker(conf config.ServerConfig, battleOkQueue <-chan Ok, ongoingBattleMa
 }
 
 func WriteMatched2(conf config.ServerConfig, conn net.Conn, battleOk Ok, id user.Id) {
+	if conn == nil {
+		log.Printf("WriteMatched2 will be skipped since conn is nil. (maybe bot user?)")
+		return
+	}
 	if battleOk.c1.Db.Id == id {
 		conn.Write(createMatched2Buf(conf, battleOk.createBattleOk, uint32(battleOk.createBattleOk.S.C1_token), 1, battleOk.c2.Db.Nickname))
 	} else if battleOk.c2.Db.Id == id {
@@ -179,7 +189,7 @@ func Create1vs1Match(c1 user.Agent, c2 user.Agent, battleService Service, battle
 	n1, err1 := c1.Conn.Write(maybeMatchedBuf)
 	n2, err2 := c2.Conn.Write(maybeMatchedBuf)
 	if n1 == 4 && n2 == 4 && err1 == nil && err2 == nil {
-		go createBattleInstance(battleService, c1, c2, battleOkQueue)
+		go createBattleInstance(battleService, c1, c2, battleOkQueue, false)
 	} else {
 		switch queueType {
 		case convert.LWPUCKGAMEQUEUETYPENEARESTSCORE:
@@ -192,6 +202,37 @@ func Create1vs1Match(c1 user.Agent, c2 user.Agent, battleService Service, battle
 			// Match cannot be proceeded
 			checkMatchError(err1, c1.Conn)
 			checkMatchError(err2, c2.Conn)
+		}
+	}
+}
+
+func CreateBotMatch(c1 user.Agent, battleService Service, battleOkQueue chan<- Ok, queueType int, db dbservice.Db) {
+	log.Printf("%v and *bot* matched! (maybe)", c1.Conn.RemoteAddr())
+	maybeMatchedBuf := convert.Packet2Buf(convert.NewLwpMaybeMatched())
+	n1, err1 := c1.Conn.Write(maybeMatchedBuf)
+	var botUserDb user.Db
+	err := db.Create(1, &botUserDb)
+	if err != nil {
+		log.Printf("Create error: %v", err.Error())
+		return
+	}
+	c2Bot := user.Agent{
+		Conn:        nil,
+		Db:          botUserDb,
+		CancelQueue: false,
+	}
+	if n1 == 4 && err1 == nil {
+		go createBattleInstance(battleService, c1, c2Bot, battleOkQueue, true)
+	} else {
+		switch queueType {
+		case convert.LWPUCKGAMEQUEUETYPENEARESTSCORE:
+			// Match cannot be proceeded
+			checkMatchError2(err1, c1.Conn, convert.LWPUCKGAMEQUEUETYPENEARESTSCORE)
+		case convert.LWPUCKGAMEQUEUETYPEFIFO:
+			fallthrough
+		default:
+			// Match cannot be proceeded
+			checkMatchError(err1, c1.Conn)
 		}
 	}
 }

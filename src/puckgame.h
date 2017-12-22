@@ -211,6 +211,7 @@ typedef struct _LWPUCKGAME {
     int control_flags;
     char tutorial_guide_str[512];
     int bogus_disabled;
+    int bogus_opponent;
 } LWPUCKGAME;
 
 LWPUCKGAME* new_puck_game(int update_frequency);

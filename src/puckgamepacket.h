@@ -323,6 +323,7 @@ typedef struct _LWPBASE {
 typedef struct _LWPCREATEBATTLE {
 	unsigned short Size;
 	unsigned short Type;
+    int BotBattle;
 	unsigned int Id1[4];
 	unsigned int Id2[4];
     char Nickname1[LW_NICKNAME_MAX_LEN];

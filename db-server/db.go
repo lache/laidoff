@@ -39,6 +39,7 @@ type WriteReply struct {
 
 type DbService struct {
 	nickDb                 nickdb.NickDb
+	botNickDb              nickdb.NickDb
 	leaseMap               map[user.Id]LeaseData
 	leaseWriteRequestQueue chan LeaseWriteRequest
 }
@@ -50,11 +51,16 @@ func (t *DbService) Create(args int, reply *user.Db) error {
 		log.Printf("[Service] new uuid failed: %v", err.Error())
 		return err
 	}
-	newNick := nickdb.PickRandomNick(&t.nickDb)
+	var newNick string
+	if args == 0 {
+		newNick = nickdb.PickRandomNick(&t.nickDb)
+	} else {
+		newNick = nickdb.PickRandomNick(&t.botNickDb)
+	}
 	// Write to disk
 	var id user.Id
 	copy(id[:], uuid)
-	userDb, _, err := createNewUser(id, newNick)
+	userDb, _, err := createNewUser(id, newNick, args != 0)
 	if err != nil {
 		log.Printf("[Service] createNewUser failed: %v", err.Error())
 		return err
@@ -196,7 +202,8 @@ func main() {
 	//createTestUserDb()
 	server := rpc.NewServer()
 	dbService := new(DbService)
-	dbService.nickDb = nickdb.LoadNickDb()
+	dbService.nickDb = nickdb.LoadNickDbByFilename("adj.txt", "noun.txt")
+	dbService.botNickDb = nickdb.LoadNickDbByFilename("adj.txt", "bot-noun.txt")
 	dbService.leaseMap = make(map[user.Id]LeaseData)
 	dbService.leaseWriteRequestQueue = make(chan LeaseWriteRequest)
 	go ProcessLeaseWriteRequest(dbService)
@@ -213,12 +220,13 @@ func main() {
 	server.Accept(l)
 }
 
-func createNewUser(uuid user.Id, nickname string) (*user.Db, *os.File, error) {
+func createNewUser(uuid user.Id, nickname string, bot bool) (*user.Db, *os.File, error) {
 	userDb := &user.Db{
 		Id:       uuid,
 		Created:  time.Now(),
 		Nickname: nickname,
 		Rating:   1500,
+		Bot:      bot,
 	}
 	uuidStr := user.IdByteArrayToString(uuid)
 	userDbFile, err := os.Create("db/" + uuidStr)

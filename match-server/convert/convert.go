@@ -241,14 +241,21 @@ func NicknameToCArray(nickname string) [C.LW_NICKNAME_MAX_LEN]C.char {
 	return nicknameCchar
 }
 
-func NewCreateBattle(id1, id2 user.Id, nickname1, nickname2 string) *C.LWPCREATEBATTLE {
+func NewCreateBattle(id1, id2 user.Id, nickname1, nickname2 string, bot bool) *C.LWPCREATEBATTLE {
 	var c1Nickname [C.LW_NICKNAME_MAX_LEN]C.char
 	var c2Nickname [C.LW_NICKNAME_MAX_LEN]C.char
 	GoStringToCCharArray(&nickname1, &c1Nickname)
 	GoStringToCCharArray(&nickname2, &c2Nickname)
+	var isBot C.int
+	if bot {
+		isBot = 1
+	} else {
+		isBot = 0
+	}
 	return &C.LWPCREATEBATTLE{
 		C.ushort(unsafe.Sizeof(C.LWPCREATEBATTLE{})),
 		C.LPGP_LWPCREATEBATTLE,
+		isBot,
 		UserIdToCuint(id1),
 		UserIdToCuint(id2),
 		c1Nickname,

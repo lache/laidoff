@@ -37,13 +37,17 @@ type NickDb struct {
 }
 
 func LoadNickDb() NickDb {
-	adjDb, adjMaxLen, err := loadFileLines("adj.txt")
+	return LoadNickDbByFilename("adj.txt", "noun.txt")
+}
+
+func LoadNickDbByFilename(adjFilename, nounFilename string) NickDb {
+	adjDb, adjMaxLen, err := loadFileLines(adjFilename)
 	if err != nil {
 		log.Fatalf("adj load error: %v", err)
 	}
 	log.Printf("%v adjs loaded. (max length element: %v)", len(adjDb), adjMaxLen)
 
-	nounDb, nounMaxLen, err := loadFileLines("noun.txt")
+	nounDb, nounMaxLen, err := loadFileLines(nounFilename)
 	if err != nil {
 		log.Fatalf("noun load error: %v", err)
 	}

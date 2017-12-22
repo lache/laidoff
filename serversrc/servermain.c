@@ -120,9 +120,24 @@ static int lw_get_normalized_dir_pad_input(const LWREMOTEPLAYERCONTROL *control,
 static int update_puck_game(LWSERVER* server, LWPUCKGAME* puck_game, double delta_time) {
     // update tick (server-client shared portion)
     puck_game_update_tick(puck_game, server->update_frequency, (float)delta_time);
+    // update puck game time
+    puck_game->time = puck_game_elapsed_time(puck_game->update_tick, (int)(1.0 / delta_time));
     // check for termination condition
     if (puck_game_state_phase_finished(puck_game->battle_phase)) {
         return -1;
+    }
+    if (puck_game->bogus_opponent) {
+        // easy version first
+        LWPUCKGAMEBOGUSPARAM bogus_param = {
+            0.0075f, // target_follow_agility
+            0.30f, // dash_detect_radius
+            0.2f, // dash_frequency
+            0.8f, // dash_cooltime_lag_min
+            1.2f, // dash_cooltime_lag_max
+        };
+        if (puck_game_state_phase_battling(puck_game->battle_phase)) {
+            puck_game_control_bogus(puck_game, &bogus_param);
+        }
     }
     for (int i = 0; i < 2; i++) {
         puck_game_update_remote_player(puck_game, (float)delta_time, i);
@@ -563,8 +578,9 @@ int tcp_server_entry(void *context) {
             memcpy(puck_game->nickname, p->Nickname1, sizeof(puck_game->nickname));
             memcpy(puck_game->target_nickname, p->Nickname2, sizeof(puck_game->target_nickname));
             const int battle_id = server->battle_counter + 1; // battle id is 1-based index
-            LOGI("LWPCREATEBATTLE: Create a new puck game instance '%s' vs '%s' (battle id = %d)",
-                 p->Nickname1, p->Nickname2, battle_id);
+            LOGI("LWPCREATEBATTLE: Create a new puck game instance '%s' vs '%s' (battle id = %d) (bot = %d)",
+                 p->Nickname1, p->Nickname2, battle_id, p->BotBattle);
+            puck_game->bogus_opponent = p->BotBattle;
             puck_game->server = server;
             puck_game->battle_id = battle_id;
             puck_game->c1_token = pcg32_random();

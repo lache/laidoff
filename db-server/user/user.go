@@ -47,6 +47,7 @@ type Db struct {
 	LastLogin   time.Time  // last login date time
 	WeeklyScore int        // weekly score
 	Rating      int        // Elo rating
+	Bot         bool       // bot
 }
 
 type LeaseDb struct {
