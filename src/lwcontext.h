@@ -364,6 +364,8 @@ typedef struct _LWCONTEXT {
 	void* android_native_activity;
     char device_model[64];
     int lowend_device;
+    int argc;
+    char** argv;
 } LWCONTEXT;
 
 #ifdef __cplusplus

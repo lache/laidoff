@@ -261,6 +261,14 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
     if (key == GLFW_KEY_KP_2 && action == GLFW_PRESS) {
         puck_game_roll_world(pLwc->puck_game, 1, 0, (float)LWDEG2RAD(180));
     }
+    // Start second client
+#if LW_PLATFORM_OSX
+    if (key == GLFW_KEY_1 && action == GLFW_PRESS) {
+        char run_this[512];
+        sprintf(run_this, "%s 1 &", pLwc->argv[0]);
+        system(run_this);
+    }
+#endif
 }
 
 void char_callback(GLFWwindow* window, unsigned int c) {

@@ -227,6 +227,8 @@ int main(int argc, char* argv[]) {
     }
 #endif
     LWCONTEXT* pLwc = lw_init_initial_size(width, height);
+    pLwc->argc = argc;
+    pLwc->argv = (char**)argv;
     // multiple clients with different user data path enable
     // multiplayer testing environment on a single desktop.
     switch (client_instance_id) {
