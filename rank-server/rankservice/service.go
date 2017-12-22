@@ -76,13 +76,13 @@ func (c *Context) QueueScoreMatch(args *QueueScoreMatchRequest, reply *QueueScor
 	return c.rpcContext.Call("QueueScoreMatch", args, reply)
 }
 
-func New(address string) RankService {
+func New(address string) Rank {
 	c := new(Context)
-	c.rpcContext = rpchelper.New("RankService", address)
+	c.rpcContext = rpchelper.New("Rank", address)
 	return c
 }
 
-type RankService interface {
+type Rank interface {
 	// Set a new score entry
 	Set(args *shared_server.ScoreItem, reply *int) error
 	// Get score and rank

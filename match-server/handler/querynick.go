@@ -10,7 +10,7 @@ import (
 	"github.com/gasbank/laidoff/rank-server/rankservice"
 )
 
-func HandleQueryNick(buf []byte, conn net.Conn, rankService rankservice.RankService, dbService dbservice.Db) {
+func HandleQueryNick(buf []byte, conn net.Conn, rankService rankservice.Rank, dbService dbservice.Db) {
 	log.Printf("QUERYNICK received")
 	recvPacket, err := convert.ParseQueryNick(buf)
 	if err != nil {

@@ -371,7 +371,7 @@ func newRank() *RankData {
 	return t
 }
 
-// RankService is a struct containing a whole data a rank service need to run.
+// Rank is a struct containing a whole data a rank service need to run.
 type RankService struct {
 	rank              *RankData
 	matchPool         *RankData
@@ -497,7 +497,7 @@ func main() {
 		matchPool:        newRank(),
 		matchPoolRequest: make(chan QueueScoreMatchRequestQueue),
 	}
-	server.RegisterName("RankService", rankService)
+	server.RegisterName("Rank", rankService)
 	addr := ":20172"
 	log.Printf("Listening %v for rank service...", addr)
 	// Listen for incoming tcp packets on specified port.

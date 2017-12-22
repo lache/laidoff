@@ -54,7 +54,10 @@ func main() {
 	battleOkQueue := make(chan battle.Ok)
 	// Ongoing battle map
 	ongoingBattleMap := make(map[user.Id]battle.Ok)
-	battleService := battle.Service{ Conf: conf }
+	// Nearest match map (QUEUE3)
+	nearestMatchMqp := make(map[user.Id]user.Agent)
+	// Battle service
+	battleService := battle.Service{Conf: conf}
 	// Start match worker goroutine
 	go matchWorker(battleService, matchQueue, battleOkQueue, serviceList)
 	// Start battle ok worker goroutine
@@ -71,12 +74,23 @@ func main() {
 		if err != nil {
 			log.Println("Error accepting: ", err.Error())
 		} else {
-			go handleRequest(conf, &nickDb, conn, matchQueue, serviceList, ongoingBattleMap, battleService, battleOkQueue)
+			req := &HandleRequestRequest{
+				Conf:             conf,
+				NickDb:           &nickDb,
+				Conn:             conn,
+				MatchQueue:       matchQueue,
+				Battle:           battleService,
+				ServiceList:      serviceList,
+				OngoingBattleMap: ongoingBattleMap,
+				BattleOkQueue:    battleOkQueue,
+				NearestMatchMap:  nearestMatchMqp,
+			}
+			go handleRequest(req)
 		}
 	}
 }
 
-func testRankRpc(rankService rankservice.RankService, id byte, score int, nickname string) {
+func testRankRpc(rankService rankservice.Rank, id byte, score int, nickname string) {
 	scoreItem := shared_server.ScoreItem{Id: user.Id{id}, Score: score, Nickname: nickname}
 	var reply int
 	err := rankService.Set(&scoreItem, &reply)
@@ -175,20 +189,32 @@ func checkMatchError(err error, conn net.Conn) {
 	}
 }
 
-func handleRequest(conf config.ServerConfig, nickDb *nickdb.NickDb, conn net.Conn, matchQueue chan<- user.Agent, serviceList *service.List, ongoingBattleMap map[user.Id]battle.Ok, battleService battle.Service, battleOkQueue chan<- battle.Ok) {
-	log.Printf("Accepting from %v", conn.RemoteAddr())
+type HandleRequestRequest struct {
+	Conf             config.ServerConfig
+	NickDb           *nickdb.NickDb
+	Conn             net.Conn
+	MatchQueue       chan<- user.Agent
+	Battle           battle.Service
+	ServiceList      *service.List
+	OngoingBattleMap map[user.Id]battle.Ok
+	BattleOkQueue    chan<- battle.Ok
+	NearestMatchMap  map[user.Id]user.Agent
+}
+
+func handleRequest(req *HandleRequestRequest) {
+	log.Printf("Accepting from %v", req.Conn.RemoteAddr())
 	for {
 		buf := make([]byte, 1024)
 		//conn.SetReadDeadline(time.Now().Add(10000 * time.Millisecond))
-		readLen, err := conn.Read(buf)
+		readLen, err := req.Conn.Read(buf)
 		if readLen == 0 {
-			log.Printf("%v: readLen is zero.", conn.RemoteAddr())
+			log.Printf("%v: readLen is zero.", req.Conn.RemoteAddr())
 			break
 		}
 		if err != nil {
-			log.Printf("%v: Error reading: %v", conn.RemoteAddr(), err.Error())
+			log.Printf("%v: Error reading: %v", req.Conn.RemoteAddr(), err.Error())
 		}
-		log.Printf("%v: Packet received (readLen=%v)", conn.RemoteAddr(), readLen)
+		log.Printf("%v: Packet received (readLen=%v)", req.Conn.RemoteAddr(), readLen)
 		packetSize := binary.LittleEndian.Uint16(buf)
 		packetType := binary.LittleEndian.Uint16(buf[2:])
 		log.Printf("  Size %v", packetSize)
@@ -196,25 +222,37 @@ func handleRequest(conf config.ServerConfig, nickDb *nickdb.NickDb, conn net.Con
 
 		switch packetType {
 		case convert.LPGPLWPQUEUE2:
-			handler.HandleQueue2(conf, matchQueue, buf, conn, ongoingBattleMap, battleService, battleOkQueue, serviceList.Db)
+			handler.HandleQueue2(req.Conf, req.MatchQueue, buf, req.Conn, req.OngoingBattleMap, req.Battle, req.BattleOkQueue, req.ServiceList.Db)
 		case convert.LPGPLWPQUEUE3:
-			handler.HandleQueue3(conf, matchQueue, buf, conn, ongoingBattleMap, battleService, battleOkQueue, serviceList.Db)
+			req := &handler.HandleQueue3Request{
+				Conf:             req.Conf,
+				NearestMatchMap:  req.NearestMatchMap,
+				MatchQueue:       req.MatchQueue,
+				Buf:              buf,
+				Conn:             req.Conn,
+				OngoingBattleMap: req.OngoingBattleMap,
+				BattleService:    req.Battle,
+				BattleOkQueue:    req.BattleOkQueue,
+				Db:               req.ServiceList.Db,
+				Rank:             req.ServiceList.Rank,
+			}
+			handler.HandleQueue3(req)
 		case convert.LPGPLWPCANCELQUEUE:
-			handler.HandleCancelQueue(matchQueue, buf, conn, ongoingBattleMap, serviceList.Db)
+			handler.HandleCancelQueue(req.MatchQueue, buf, req.Conn, req.OngoingBattleMap, req.ServiceList.Db)
 		case convert.LPGPLWPSUDDENDEATH:
-			handler.HandleSuddenDeath(conf, buf) // relay 'buf' to battle service
+			handler.HandleSuddenDeath(req.Conf, buf) // relay 'buf' to battle service
 		case convert.LPGPLWPNEWUSER:
-			handler.HandleNewUser(nickDb, conn, serviceList.Db)
+			handler.HandleNewUser(req.NickDb, req.Conn, req.ServiceList.Db)
 		case convert.LPGPLWPQUERYNICK:
-			handler.HandleQueryNick(buf, conn, serviceList.Rank, serviceList.Db)
+			handler.HandleQueryNick(buf, req.Conn, req.ServiceList.Rank, req.ServiceList.Db)
 		case convert.LPGPLWPPUSHTOKEN:
-			handler.HandlePushToken(buf, conn, serviceList)
+			handler.HandlePushToken(buf, req.Conn, req.ServiceList)
 		case convert.LPGPLWPGETLEADERBOARD:
-			handler.HandleGetLeaderboard(buf, conn, serviceList)
+			handler.HandleGetLeaderboard(buf, req.Conn, req.ServiceList)
 		case convert.LPGPLWPSETNICKNAME:
-			handler.HandleSetNickname(buf, conn, serviceList.Db)
+			handler.HandleSetNickname(buf, req.Conn, req.ServiceList.Db)
 		}
 	}
-	conn.Close()
-	log.Printf("Conn closed %v", conn.RemoteAddr())
+	req.Conn.Close()
+	log.Printf("Conn closed %v", req.Conn.RemoteAddr())
 }

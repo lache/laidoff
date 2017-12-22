@@ -284,8 +284,16 @@ func TestRankData_RemoveNearestOverlap(t *testing.T) {
 	rank.Set(user1, 0)
 	rank.Set(user2, 100)
 	distanceByElapsed := &rankservice.DistanceByElapsed{
-		Elapsed:  []time.Duration{30 * time.Second, 20 * time.Second, 10 * time.Second, 0 * time.Second},
-		Distance: []int{100, 50, 25, 5},
+		Elapsed: []time.Duration{
+			30 * time.Second,
+			20 * time.Second,
+			10 * time.Second,
+			0 * time.Second},
+		Distance: []int{
+			100,
+			50,
+			25,
+			5},
 	}
 	now := time.Now()
 	result, err := rank.RemoveNearestOverlap(user1, distanceByElapsed, now)

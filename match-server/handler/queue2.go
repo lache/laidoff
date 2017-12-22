@@ -15,7 +15,7 @@ func HandleQueue2(conf config.ServerConfig, matchQueue chan<- user.Agent, buf []
 	log.Printf("QUEUE2 received")
 	recvPacket, err := convert.ParseQueue2(buf)
 	if err != nil {
-		log.Printf("ParseQueue2 fail: %v", err.Error())
+		log.Printf("ParseQueue2 error: %v", err.Error())
 		return
 	}
 	userId := convert.IdCuintToByteArray(recvPacket.Id)

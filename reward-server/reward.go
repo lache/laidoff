@@ -42,7 +42,7 @@ func main() {
 		}
 	}
 }
-func handleRequest(conn net.Conn, rankService rankservice.RankService, dbService dbservice.Db) {
+func handleRequest(conn net.Conn, rankService rankservice.Rank, dbService dbservice.Db) {
 	log.Printf("Accepting from %v", conn.RemoteAddr())
 	for {
 		buf := make([]byte, 1024)
@@ -69,7 +69,7 @@ func handleRequest(conn net.Conn, rankService rankservice.RankService, dbService
 	log.Printf("Conn closed %v", conn.RemoteAddr())
 }
 
-func handleBattleResult(buf []byte, rankService rankservice.RankService, dbService dbservice.Db) {
+func handleBattleResult(buf []byte, rankService rankservice.Rank, dbService dbservice.Db) {
 	log.Printf("BATTLERESULT received")
 	// Parse
 	bufReader := bytes.NewReader(buf)

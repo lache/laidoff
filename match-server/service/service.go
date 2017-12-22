@@ -19,7 +19,7 @@ const (
 
 type List struct {
 	Push shared_server.PushService
-	Rank rankservice.RankService
+	Rank rankservice.Rank
 	Db   dbservice.Db
 }
 
@@ -94,7 +94,7 @@ func (t *Arith) Broadcast(backoff time.Duration, title, body string) int {
 func (t *RankClient) Set(backoff time.Duration, id [16]byte, score int, nickname string) int {
 	args := &shared_server.ScoreItem{Id: id, Score: score, Nickname: nickname}
 	var reply int
-	err := t.client.Call("RankService.Set", args, &reply)
+	err := t.client.Call("Rank.Set", args, &reply)
 	if err != nil {
 		log.Printf("error: %v", err)
 		if backoff > 10*time.Second {
@@ -112,7 +112,7 @@ func (t *RankClient) Set(backoff time.Duration, id [16]byte, score int, nickname
 func (t *RankClient) Get(backoff time.Duration, id user.Id) *shared_server.ScoreRankItem {
 	args := id
 	var reply shared_server.ScoreRankItem
-	err := t.client.Call("RankService.Get", args, &reply)
+	err := t.client.Call("Rank.Get", args, &reply)
 	if err != nil {
 		log.Printf("error: %v", err)
 		if backoff > 10*time.Second {
@@ -130,7 +130,7 @@ func (t *RankClient) Get(backoff time.Duration, id user.Id) *shared_server.Score
 func (t *RankClient) GetLeaderboard(backoff time.Duration, startIndex int, count int) *shared_server.LeaderboardReply {
 	args := &shared_server.LeaderboardRequest{StartIndex: startIndex, Count: count}
 	var reply shared_server.LeaderboardReply
-	err := t.client.Call("RankService.GetLeaderboard", args, &reply)
+	err := t.client.Call("Rank.GetLeaderboard", args, &reply)
 	if err != nil {
 		log.Printf("error: %v", err)
 		if backoff > 10*time.Second {
@@ -173,7 +173,7 @@ func CreateNewUserDb() {
 		if err != nil {
 			log.Printf("rpc call error: %v", err.Error())
 		} else {
-			log.Printf("DbService.Create reply: %v", reply.Nickname)
+			log.Printf("Db.Create reply: %v", reply.Nickname)
 		}
 		userId = reply.Id
 	}
@@ -184,7 +184,7 @@ func CreateNewUserDb() {
 		if err != nil {
 			log.Printf("rpc call error: %v", err.Error())
 		} else {
-			log.Printf("DbService.Get reply: %v", reply.Nickname)
+			log.Printf("Db.Get reply: %v", reply.Nickname)
 		}
 	}
 	// Lease & Write test
@@ -195,7 +195,7 @@ func CreateNewUserDb() {
 		if err != nil {
 			log.Printf("rpc call error: %v", err.Error())
 		} else {
-			log.Printf("DbService.Lease reply: Nickname %v, Lease ID %v",
+			log.Printf("Db.Lease reply: Nickname %v, Lease ID %v",
 				reply.Db.Nickname, reply.LeaseId)
 		}
 		// Write
@@ -205,7 +205,7 @@ func CreateNewUserDb() {
 		if err != nil {
 			log.Printf("rpc call error: %v", err.Error())
 		} else {
-			log.Printf("DbService.Write reply: %v", writeReply)
+			log.Printf("Db.Write reply: %v", writeReply)
 		}
 	}
 }
