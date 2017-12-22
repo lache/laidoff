@@ -15,30 +15,49 @@ func HandleQueue2(conf config.ServerConfig, matchQueue chan<- user.Agent, buf []
 	log.Printf("QUEUE2 received")
 	recvPacket, err := convert.ParseQueue2(buf)
 	if err != nil {
-		log.Printf("HandleQueue2 fail: %v", err.Error())
+		log.Printf("ParseQueue2 fail: %v", err.Error())
 		return
 	}
-	var userDb user.Db
 	userId := convert.IdCuintToByteArray(recvPacket.Id)
+	userDb, resumed, err := CheckOngoingBattle(userId, dbService, ongoingBattleMap, battleService, battleOkQueue, conn, conf)
+	if err != nil {
+		log.Printf("CheckOngoingBattle error: %v", err.Error())
+	} else if resumed == false {
+		// Queue connection
+		matchQueue <- user.Agent{conn, userDb, false}
+		// Send reply
+		queueOkBuf := convert.Packet2Buf(convert.NewLwpQueueOk())
+		conn.Write(queueOkBuf)
+		log.Printf("Nickname '%v' queued", userDb.Nickname)
+	}
+}
+
+func CheckOngoingBattle(userId user.Id, dbService dbservice.Db, ongoingBattleMap map[user.Id]battle.Ok, battleService battle.Service, battleOkQueue chan<- battle.Ok, conn net.Conn, conf config.ServerConfig) (userDb user.Db, resumed bool, err error) {
+	resumed = false
+	err = nil
 	err = dbService.Get(&userId, &userDb)
 	if err != nil {
-		log.Printf("user db load failed: %v", err.Error())
+		// error set
 	} else {
 		// Check ongoing battle
 		battleOk, battleExists := ongoingBattleMap[userDb.Id]
 		if battleExists {
+			// There is the ongoing battle for this user
 			log.Printf("Nickname '%v' has the ongoing battle session. Check this battle still valid...", userDb.Nickname)
 			connToBattle, err := battleService.Connection()
 			if err != nil {
+				// However, we could not check whether this session is valid or not
+				// since battle service is not available
 				log.Printf("Connection to battle service failed - %v", err.Error())
 				log.Printf("Assume ongoing battle session is invalid")
-				// Battle is not valid. Remove from cache
+				// Remove from ongoing battle map(cache)
 				battleOkQueue <- battle.Ok{
-					RemoveCache:    true,
-					RemoveUserId:   userDb.Id,
+					RemoveCache:  true,
+					RemoveUserId: userDb.Id,
 				}
 				// And then fallback to queuing this user
 			} else {
+				// Successfully connected to battle service.
 				checkBattleValidBuf := convert.Packet2Buf(convert.NewCheckBattleValid(battleOk.BattleId))
 				connToBattle.Write(checkBattleValidBuf)
 				battleValid, battleValidEnum := convert.NewLwpBattleValid()
@@ -47,6 +66,7 @@ func HandleQueue2(conf config.ServerConfig, matchQueue chan<- user.Agent, buf []
 					log.Printf("WaitForReply failed - %v", err.Error())
 				} else {
 					if battleValid.Valid == 1 {
+						// There is an ongoing battle session here.
 						// [1] QUEUEOK
 						queueOkBuf := convert.Packet2Buf(convert.NewLwpQueueOk())
 						conn.Write(queueOkBuf)
@@ -56,23 +76,18 @@ func HandleQueue2(conf config.ServerConfig, matchQueue chan<- user.Agent, buf []
 						// [3] MATCHED2
 						battle.WriteMatched2(conf, conn, battleOk, userDb.Id)
 						// Should exit this function here
-						return
+						resumed = true
 					} else {
 						// Battle is not valid. Remove from cache
 						battleOkQueue <- battle.Ok{
-							RemoveCache:    true,
-							RemoveUserId:   userDb.Id,
+							RemoveCache:  true,
+							RemoveUserId: userDb.Id,
 						}
 						// And then fallback to queuing this user
 					}
 				}
 			}
 		}
-		// Queue connection
-		matchQueue <- user.Agent{conn, userDb, false }
-		// Send reply
-		queueOkBuf := convert.Packet2Buf(convert.NewLwpQueueOk())
-		conn.Write(queueOkBuf)
-		log.Printf("Nickname '%v' queued", userDb.Nickname)
 	}
+	return userDb, resumed, err
 }

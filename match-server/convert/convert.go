@@ -18,6 +18,7 @@ import "C"
 //noinspection ALL
 const (
 	LPGPLWPQUEUE2         = C.LPGP_LWPQUEUE2
+	LPGPLWPQUEUE3         = C.LPGP_LWPQUEUE3
 	LPGPLWPCANCELQUEUE    = C.LPGP_LWPCANCELQUEUE
 	LPGPLWPSUDDENDEATH    = C.LPGP_LWPSUDDENDEATH
 	LPGPLWPNEWUSER        = C.LPGP_LWPNEWUSER
@@ -26,6 +27,9 @@ const (
 	LPGPLWPGETLEADERBOARD = C.LPGP_LWPGETLEADERBOARD
 	LPGPLWPSETNICKNAME    = C.LPGP_LWPSETNICKNAME
 	LPGPLWPBATTLERESULT   = C.LPGP_LWPBATTLERESULT
+
+	LWPUCKGAMEQUEUETYPEFIFO         = C.LW_PUCK_GAME_QUEUE_TYPE_FIFO
+	LWPUCKGAMEQUEUETYPENEARESTSCORE = C.LW_PUCK_GAME_QUEUE_TYPE_NEAREST_SCORE
 )
 
 /////////////////////////////////////////////////////////////////////////////////////
@@ -290,6 +294,17 @@ func ParseQueryNick(buf []byte) (*C.LWPQUERYNICK, error) {
 func ParseQueue2(buf []byte) (*C.LWPQUEUE2, error) {
 	bufReader := bytes.NewReader(buf)
 	recvPacket := &C.LWPQUEUE2{}
+	err := binary.Read(bufReader, binary.LittleEndian, recvPacket)
+	if err != nil {
+		log.Printf("binary.Read fail: %v", err.Error())
+		return nil, err
+	}
+	return recvPacket, nil
+}
+
+func ParseQueue3(buf []byte) (*C.LWPQUEUE3, error) {
+	bufReader := bytes.NewReader(buf)
+	recvPacket := &C.LWPQUEUE3{}
 	err := binary.Read(bufReader, binary.LittleEndian, recvPacket)
 	if err != nil {
 		log.Printf("binary.Read fail: %v", err.Error())

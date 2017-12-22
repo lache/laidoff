@@ -21,7 +21,8 @@ import (
 
 func main() {
 	// Set default log format
-	log.SetFlags(log.Lshortfile | log.LstdFlags)
+	log.SetFlags(log.LstdFlags | log.Lshortfile)
+	log.SetOutput(os.Stdout)
 	log.Println("Greetings from match server")
 	// Test Db service
 	if len(os.Args) > 1 && os.Args[1] == "test" {
@@ -196,6 +197,8 @@ func handleRequest(conf config.ServerConfig, nickDb *nickdb.NickDb, conn net.Con
 		switch packetType {
 		case convert.LPGPLWPQUEUE2:
 			handler.HandleQueue2(conf, matchQueue, buf, conn, ongoingBattleMap, battleService, battleOkQueue, serviceList.Db)
+		case convert.LPGPLWPQUEUE3:
+			handler.HandleQueue3(conf, matchQueue, buf, conn, ongoingBattleMap, battleService, battleOkQueue, serviceList.Db)
 		case convert.LPGPLWPCANCELQUEUE:
 			handler.HandleCancelQueue(matchQueue, buf, conn, ongoingBattleMap, serviceList.Db)
 		case convert.LPGPLWPSUDDENDEATH:
