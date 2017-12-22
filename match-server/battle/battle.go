@@ -88,6 +88,8 @@ func createBattleInstance(battleService Service, c1 user.Agent, c2 user.Agent, b
 		err = WaitForReply(connToBattle, createBattleOk, unsafe.Sizeof(*createBattleOk), createBattleOkEnum)
 		if err != nil {
 			log.Printf("WaitForReply failed - %v", err.Error())
+			SendRetryQueueLater(c1.Conn)
+			SendRetryQueueLater(c2.Conn)
 		} else {
 			// No error! so far ... proceed battle
 			if c2.Conn != nil {
@@ -174,6 +176,9 @@ func SendRetryQueue2(conn net.Conn, queueType int) {
 }
 
 func SendRetryQueueLater(conn net.Conn) {
+	if conn == nil {
+		return
+	}
 	retryQueueLaterBuf := convert.Packet2Buf(convert.NewLwpRetryQueueLater())
 	_, retrySendErr := conn.Write(retryQueueLaterBuf)
 	if retrySendErr != nil {
