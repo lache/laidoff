@@ -4,12 +4,11 @@ import (
 	"net"
 	"log"
 	"github.com/gasbank/laidoff/db-server/user"
-	"github.com/gasbank/laidoff/match-server/nickdb"
 	"github.com/gasbank/laidoff/match-server/convert"
 	"github.com/gasbank/laidoff/db-server/dbservice"
 )
 
-func HandleNewUser(nickDb *nickdb.NickDb, conn net.Conn, dbService dbservice.Db) {
+func HandleNewUser(conn net.Conn, dbService dbservice.Db) {
 	log.Printf("NEWUSER received")
 	var userDb user.Db
 	err := dbService.Create(0, &userDb)

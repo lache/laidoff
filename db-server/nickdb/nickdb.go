@@ -36,10 +36,6 @@ type NickDb struct {
 	nounMaxLen int
 }
 
-func LoadNickDb() NickDb {
-	return LoadNickDbByFilename("adj.txt", "noun.txt")
-}
-
 func LoadNickDbByFilename(adjFilename, nounFilename string) NickDb {
 	adjDb, adjMaxLen, err := loadFileLines(adjFilename)
 	if err != nil {

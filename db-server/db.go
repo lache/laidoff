@@ -6,7 +6,7 @@ import (
 	"os"
 	"net/rpc"
 	"net"
-	"github.com/gasbank/laidoff/match-server/nickdb"
+	"github.com/gasbank/laidoff/db-server/nickdb"
 	"errors"
 	"time"
 	"encoding/gob"

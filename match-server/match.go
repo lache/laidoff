@@ -8,7 +8,6 @@ import (
 	"encoding/json"
 	"time"
 	"math/rand"
-	"github.com/gasbank/laidoff/match-server/nickdb"
 	"github.com/gasbank/laidoff/match-server/convert"
 	"github.com/gasbank/laidoff/db-server/user"
 	"github.com/gasbank/laidoff/match-server/service"
@@ -31,11 +30,8 @@ func main() {
 	}
 	// Seed a new random number
 	rand.Seed(time.Now().Unix())
-	// Load nick name database
-	nickDb := nickdb.LoadNickDb()
 	// Service List
 	serviceList := service.NewServiceList()
-	log.Printf("Sample nick: %v", nickdb.PickRandomNick(&nickDb))
 	// Load conf.json
 	confFile, err := os.Open("conf.json")
 	if err != nil {
@@ -78,7 +74,6 @@ func main() {
 		} else {
 			req := &HandleRequestRequest{
 				Conf:                conf,
-				NickDb:              &nickDb,
 				Conn:                conn,
 				MatchQueue:          matchQueue,
 				Battle:              battleService,
@@ -176,7 +171,6 @@ func matchWorker(battleService battle.Service, matchQueue <-chan user.Agent, bat
 
 type HandleRequestRequest struct {
 	Conf                config.ServerConfig
-	NickDb              *nickdb.NickDb
 	Conn                net.Conn
 	MatchQueue          chan<- user.Agent
 	Battle              battle.Service
@@ -239,7 +233,7 @@ func handleRequest(req *HandleRequestRequest) {
 		case convert.LPGPLWPSUDDENDEATH:
 			handler.HandleSuddenDeath(req.Conf, buf) // relay 'buf' to battle service
 		case convert.LPGPLWPNEWUSER:
-			handler.HandleNewUser(req.NickDb, req.Conn, req.ServiceList.Db)
+			handler.HandleNewUser(req.Conn, req.ServiceList.Db)
 		case convert.LPGPLWPQUERYNICK:
 			handler.HandleQueryNick(buf, req.Conn, req.ServiceList.Rank, req.ServiceList.Db)
 		case convert.LPGPLWPPUSHTOKEN:
