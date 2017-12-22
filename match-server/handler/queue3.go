@@ -11,6 +11,7 @@ import (
 	"github.com/gasbank/laidoff/rank-server/rankservice"
 	"time"
 	"sync"
+	"math/rand"
 )
 
 type HandleQueue3Request struct {
@@ -60,7 +61,7 @@ func handleNearestScoreQueue3(userId user.Id, req *HandleQueue3Request) {
 			// moment of truth
 			// match with bot if user defeated at previous battle
 			if userDb.BattleStat.ConsecutiveDefeat > 0 {
-				log.Printf("Here comes a bot...!")
+				log.Printf("Here comes a defeat type bot...!")
 				agent1 := user.Agent{Conn: req.Conn, Db: userDb}
 				battle.CreateBotMatch(agent1, req.BattleService, req.BattleOkQueue, convert.LWPUCKGAMEQUEUETYPENEARESTSCORE, req.Db)
 			} else {
@@ -73,22 +74,23 @@ func handleNearestScoreQueue3(userId user.Id, req *HandleQueue3Request) {
 }
 
 func queueToScoreMatch(userDb user.Db, req *HandleQueue3Request) {
+	timeDilationFactor := 0.5 + 0.5*rand.Float64()
 	distanceByElapsed := rankservice.DistanceByElapsed{
 		Elapsed: []time.Duration{
-			35 * time.Second,
-			29 * time.Second,
-			19 * time.Second,
-			9 * time.Second,
-			3 * time.Second,
-			0 * time.Second,
+			//35 * time.Second,
+			//29 * time.Second,
+			//19 * time.Second,
+			time.Duration(timeDilationFactor*9000) * time.Millisecond,
+			time.Duration(timeDilationFactor*3000) * time.Millisecond,
+			time.Duration(timeDilationFactor*0) * time.Millisecond,
 		},
-		Distance: []int{ // aware that this is a 'half-'distance...
-			130, // after 35 sec
-			100, // ~35 sec
-			60,  // ~29 sec
-			45,  // ~19 sec
-			25,  // ~9 sec
-			5,   // ~3 sec
+		Distance: []int{// aware that this is a 'half-'distance...
+			//130, // after 35 sec
+			//100, // ~35 sec
+			//60,  // ~29 sec
+			45, // ~19 sec
+			25, // ~9 sec
+			5,  // ~3 sec
 		},
 	}
 	queueScoreMatchReq := rankservice.QueueScoreMatchRequest{
@@ -100,11 +102,13 @@ func queueToScoreMatch(userDb user.Db, req *HandleQueue3Request) {
 		DistanceByElapsed: distanceByElapsed,
 		Update:            false, // user requested queueing
 	}
-	var queueScoreMatchReply rankservice.QueueScoreMatchReply
-	log.Printf("ScoreMatch queue %v (score:%v)", userDb.Nickname, userDb.Rating)
-	reqMaxCount := 40
+	lastElapsedMargin := time.Duration(timeDilationFactor*3000) * time.Millisecond
 	reqInterval := 500 * time.Millisecond
+	reqTotalTime := distanceByElapsed.Elapsed[0] + lastElapsedMargin
+	reqMaxCount := int(reqTotalTime / reqInterval)
+	log.Printf("ScoreMatch queue %v (score:%v) [reqTotalTime=%v,reqMaxCount=%v,reqInterval=%v]", userDb.Nickname, userDb.Rating, reqTotalTime, reqMaxCount, reqInterval)
 	for reqCount := 0; reqCount < reqMaxCount; reqCount++ {
+		var queueScoreMatchReply rankservice.QueueScoreMatchReply
 		err := req.Rank.QueueScoreMatch(&queueScoreMatchReq, &queueScoreMatchReply)
 		if err != nil {
 			log.Printf("QueueScoreMatch error: %v", err.Error())
@@ -159,7 +163,12 @@ func queueToScoreMatch(userDb user.Db, req *HandleQueue3Request) {
 	req.NearestMatchMapLock.Lock()
 	delete(req.NearestMatchMap, userDb.Id)
 	req.NearestMatchMapLock.Unlock()
-	battle.SendRetryQueue2(req.Conn, convert.LWPUCKGAMEQUEUETYPENEARESTSCORE)
+
+	log.Printf("Here comes a long-wait type bot...!")
+	agent1 := user.Agent{Conn: req.Conn, Db: userDb}
+	battle.CreateBotMatch(agent1, req.BattleService, req.BattleOkQueue, convert.LWPUCKGAMEQUEUETYPENEARESTSCORE, req.Db)
+	// or wait again
+	//battle.SendRetryQueue2(req.Conn, convert.LWPUCKGAMEQUEUETYPENEARESTSCORE)
 }
 
 type DeleteFromQueueRequest struct {
