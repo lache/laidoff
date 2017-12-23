@@ -5,8 +5,6 @@ import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.pm.PackageInfo;
-import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.util.Log;
@@ -21,7 +19,6 @@ import java.util.concurrent.atomic.AtomicLong;
 class UpdateResTask extends AsyncTask<UpdateResTaskParam, Void, File> {
 
     private final ProgressDialog asyncDialog;
-    private final Activity activity;
     private String fileAbsolutePath;
     private ArrayList<String> assetFile = new ArrayList<>();
     private GetFileResult listGfr;
@@ -30,13 +27,14 @@ class UpdateResTask extends AsyncTask<UpdateResTaskParam, Void, File> {
 
     UpdateResTask(Activity activity) {
         asyncDialog = new ProgressDialog(activity);
-        this.activity = activity;
+        asyncDialog.setCancelable(false);
+        asyncDialog.setCanceledOnTouchOutside(false);
     }
 
     @Override
     protected void onPreExecute() {
         asyncDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
-        asyncDialog.setMessage("로딩중");
+        asyncDialog.setMessage("First install loading");
         asyncDialog.setMax(1);
 
         // show dialog
@@ -45,7 +43,7 @@ class UpdateResTask extends AsyncTask<UpdateResTaskParam, Void, File> {
     }
 
     @Override
-    protected File doInBackground(UpdateResTaskParam... params) {
+    protected File doInBackground(final UpdateResTaskParam... params) {
 
         try {
             checkNewVersion(params[0]);
@@ -58,16 +56,16 @@ class UpdateResTask extends AsyncTask<UpdateResTaskParam, Void, File> {
 
             return listGfr.file;
         } catch (UnknownHostException e) {
-            activity.runOnUiThread(new Runnable() {
+            params[0].activity.runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
-                    AlertDialog.Builder dlgAlert  = new AlertDialog.Builder(activity);
+                    AlertDialog.Builder dlgAlert  = new AlertDialog.Builder(params[0].activity);
                     dlgAlert.setMessage(R.string.no_conn);
                     dlgAlert.setTitle(R.string.error);
                     dlgAlert.setPositiveButton(R.string.exit, new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialogInterface, int i) {
-                            activity.finish();
+                            params[0].activity.finish();
                         }
                     });
                     //dlgAlert.setCancelable(true);
@@ -82,7 +80,7 @@ class UpdateResTask extends AsyncTask<UpdateResTaskParam, Void, File> {
         return null;
     }
 
-    private void checkNewVersion(UpdateResTaskParam param) throws Exception {
+    private void checkNewVersion(final UpdateResTaskParam param) throws Exception {
         String packageVersionName = LaidoffNativeActivity.getPackageVersion();
 
         if (packageVersionName.compareTo("0.1.0") == 0) {
@@ -97,16 +95,16 @@ class UpdateResTask extends AsyncTask<UpdateResTaskParam, Void, File> {
 
             String versionNameFromServer = DownloadTask.getStringFromFile(versionNameFileResult.file).trim();
             if (packageVersionName.compareTo(versionNameFromServer) != 0) {
-                activity.runOnUiThread(new Runnable() {
+                param.activity.runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        Toast.makeText(activity.getApplicationContext(), "최신 버전이 있습니다.", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(param.activity.getApplicationContext(), "최신 버전이 있습니다.", Toast.LENGTH_SHORT).show();
                     }
                 });
                 String installUrl = String.format("%s/%s?currentVersion=%s&latestVersion=%s",
                         param.remoteApkBasePath, "install.html", packageVersionName, versionNameFromServer);
                 Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(installUrl));
-                activity.startActivity(browserIntent);
+                param.activity.startActivity(browserIntent);
             }
         }
     }
