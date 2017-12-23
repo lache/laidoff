@@ -15,10 +15,25 @@
     </style>
 </head>
 <body>
-<ol>
-{{range $i, $value := .DbList}}
-    <li><a href="/edit/{{$value}}">{{index $.NicknameList $i}} {{$value}}</a></li>
+<table>
+    <tr>
+        <th>ModTime</th>
+        <th>Nickname</th>
+        <th>Score</th>
+        <th>Battle</th>
+        <th>Victory</th>
+        <th>Defeat</th>
+    </tr>
+{{range $i, $value := .ListItem}}
+    <tr>
+        <td>{{$value.ModTime.Format "2006-01-02T15:04:05Z07:00"}}</td>
+        <td><a href="/edit/{{$value.UuidStr}}">{{$value.Db.Nickname}}</a></td>
+        <td>{{$value.Db.Rating}}</td>
+        <td>{{$value.Db.BattleStat.Battle}}</td>
+        <td>{{$value.Db.BattleStat.Victory}}</td>
+        <td>{{$value.Db.BattleStat.Defeat}}</td>
+    </tr>
 {{end}}
-</ol>
+</table>
 </body>
 </html>

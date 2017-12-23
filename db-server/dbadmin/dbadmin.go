@@ -9,6 +9,8 @@ import (
 	"html/template"
 	"github.com/gasbank/laidoff/db-server/user"
 	"strconv"
+	"time"
+	"sort"
 )
 
 type Page struct {
@@ -133,10 +135,26 @@ func makeHandler(fn func(http.ResponseWriter, *http.Request, string)) http.Handl
 	}
 }
 
+type ListItem struct {
+	UuidStr string
+	ModTime time.Time
+	Db      *user.Db
+}
+
+type byModTimeDesc []ListItem
+
+func (a byModTimeDesc) Len() int      { return len(a) }
+func (a byModTimeDesc) Swap(i, j int) { a[i], a[j] = a[j], a[i] }
+func (a byModTimeDesc) Less(i, j int) bool {
+	if a[i].ModTime.Sub(a[j].ModTime) > 0 {
+		return true
+	}
+	return false
+}
+
 type ListData struct {
-	Title        string
-	DbList       []string
-	NicknameList []string
+	Title    string
+	ListItem []ListItem
 }
 
 func listHandler(w http.ResponseWriter, _ *http.Request) {
@@ -150,10 +168,14 @@ func listHandler(w http.ResponseWriter, _ *http.Request) {
 			if err != nil {
 				http.Error(w, err.Error(), http.StatusInternalServerError)
 			} else {
-				listData.DbList = append(listData.DbList, f.Name())
-				listData.NicknameList = append(listData.NicknameList, userDb.Nickname)
+				listData.ListItem = append(listData.ListItem, ListItem{
+					f.Name(),
+					f.ModTime(),
+					userDb,
+				})
 			}
 		}
+		sort.Sort(byModTimeDesc(listData.ListItem))
 		err := templates.ExecuteTemplate(w, "list.html", listData)
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
