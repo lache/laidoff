@@ -69,14 +69,14 @@ void* init_mq(const char* addr, void* sm) {
 	mq->subtree = SUBTREE;
 	mq->port = 5556;
 	mq->verbose = 0;
-	// Prepare our context and subscriber
-	mq->snapshot = zsock_new(ZMQ_DEALER);
-	zsock_connect(mq->snapshot, "tcp://%s:%d", addr, mq->port);
-	mq->subscriber = zsock_new(ZMQ_SUB);
-	zsock_set_subscribe(mq->subscriber, mq->subtree);
-	zsock_connect(mq->subscriber, "tcp://%s:%d", addr, mq->port + 1);
-	mq->publisher = zsock_new(ZMQ_PUSH);
-	zsock_connect(mq->publisher, "tcp://%s:%d", addr, mq->port + 2);
+	// Prepare our context and subscriber - not used in puck game
+//    mq->snapshot = zsock_new(ZMQ_DEALER);
+//    zsock_connect(mq->snapshot, "tcp://%s:%d", addr, mq->port);
+//    mq->subscriber = zsock_new(ZMQ_SUB);
+//    zsock_set_subscribe(mq->subscriber, mq->subtree);
+//    zsock_connect(mq->subscriber, "tcp://%s:%d", addr, mq->port + 1);
+//    mq->publisher = zsock_new(ZMQ_PUSH);
+//    zsock_connect(mq->publisher, "tcp://%s:%d", addr, mq->port + 2);
 
 	mq->kvmap = zhash_new();
 	mq->posmap = zhash_new();
@@ -93,9 +93,9 @@ void* init_mq(const char* addr, void* sm) {
 	sprintf(sys_msg, LWU("Connecting %s"), addr);
 	//show_sys_msg(sm, sys_msg);
 
-	// First we request a time sync:
-	mq->start_req_time_mono = zclock_mono();
-	s_req_time(mq);
+	// First we request a time sync: - not used in puck game
+	//mq->start_req_time_mono = zclock_mono();
+	//s_req_time(mq);
 
 	ZMUTEX_INIT(mq->mutex);
 
@@ -346,6 +346,9 @@ void mq_send_fire(LWMESSAGEQUEUE* mq, const float* pos, const float* vel) {
 }
 
 void mq_send_action(LWMESSAGEQUEUE* mq, int action) {
+    if (mq->publisher == 0) {
+        return;
+    }
 	kvmsg_t* kvmsg = kvmsg_new(0);
 	kvmsg_fmt_key(kvmsg, "%s%s/%s/tznt", mq->subtree, zuuid_str(mq->uuid), "action");
 	LWACTIONMSG msg;
