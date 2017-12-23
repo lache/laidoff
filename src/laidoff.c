@@ -585,6 +585,9 @@ int get_tex_index_by_hash_key(const LWCONTEXT* pLwc, const char *hash_key) {
 }
 
 void render_stat(const LWCONTEXT* pLwc) {
+    if (pLwc->show_stat == 0) {
+        return;
+    }
     LWTEXTBLOCK text_block;
     text_block.align = LTBA_RIGHT_BOTTOM;
     text_block.text_block_width = DEFAULT_TEXT_BLOCK_WIDTH / 2;
@@ -614,6 +617,9 @@ void render_stat(const LWCONTEXT* pLwc) {
 }
 
 void render_addr(const LWCONTEXT* pLwc) {
+    if (pLwc->show_stat == 0) {
+        return;
+    }
     LWTEXTBLOCK text_block;
     text_block.align = LTBA_LEFT_BOTTOM;
     text_block.text_block_width = DEFAULT_TEXT_BLOCK_WIDTH;

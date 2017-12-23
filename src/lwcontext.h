@@ -366,6 +366,7 @@ typedef struct _LWCONTEXT {
     int lowend_device;
     int argc;
     char** argv;
+    int show_stat;
 } LWCONTEXT;
 
 #ifdef __cplusplus

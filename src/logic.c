@@ -561,6 +561,10 @@ void toggle_network_poll(LWCONTEXT* pLwc) {
 	field_set_network(pLwc->field, !field_network(pLwc->field));
 }
 
+void toggle_stat(LWCONTEXT* pLwc) {
+    pLwc->show_stat = !pLwc->show_stat;
+}
+
 void start_nickname_text_input_activity(LWCONTEXT* pLwc) {
 	lw_start_text_input_activity(pLwc, LITI_NICKNAME);
 }
@@ -628,6 +632,7 @@ void reset_runtime_context(LWCONTEXT* pLwc) {
         { LWU("Push Token"), start_request_push_token },
 		{ LWU("TCP Address"), start_tcp_addr_text_input_activity },
         { LWU("Leaderboard"), show_leaderboard },
+        { LWU("Stat Toggle"), toggle_stat },
 	};
 	for (int i = 0; i < ARRAY_SIZE(handler_array); i++) {
 		pLwc->admin_button_command[i].name = handler_array[i].name;
