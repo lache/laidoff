@@ -670,7 +670,8 @@ static void render_match_state(const LWCONTEXT* pLwc, float ui_alpha) {
 static void render_hp_gauge(const LWCONTEXT* pLwc,
                             float w, float h,
                             float x, float y, int current_hp, int total_hp,
-                            float hp_shake_remain_time, int left, const char* str,
+                            float hp_shake_remain_time, int left,
+                            const char* str1, const char* str2,
                             float ui_alpha) {
     const float gauge_width = w;
     const float gauge_height = h;
@@ -736,7 +737,8 @@ static void render_hp_gauge(const LWCONTEXT* pLwc,
     SET_COLOR_RGBA_FLOAT(text_block.color_normal_outline, 0, 0, 0, ui_alpha);
     SET_COLOR_RGBA_FLOAT(text_block.color_emp_glyph, 1, 1, 0, ui_alpha);
     SET_COLOR_RGBA_FLOAT(text_block.color_emp_outline, 0, 0, 0, ui_alpha);
-    text_block.text = str;
+    // nickname
+    text_block.text = str1;
     text_block.text_bytelen = (int)strlen(text_block.text);
     text_block.begin_index = 0;
     text_block.end_index = text_block.text_bytelen;
@@ -744,6 +746,16 @@ static void render_hp_gauge(const LWCONTEXT* pLwc,
     text_block.text_block_x = left ? (-pLwc->aspect_ratio + 0.4f) : (pLwc->aspect_ratio - 0.4f);
     //text_block.text_block_y = y;
     text_block.text_block_y = y - 0.6f;
+    render_text_block(pLwc, &text_block);
+    // score
+    text_block.text = str2;
+    text_block.text_bytelen = (int)strlen(text_block.text);
+    text_block.begin_index = 0;
+    text_block.end_index = text_block.text_bytelen;
+    //text_block.text_block_x = left ? -pLwc->aspect_ratio : +pLwc->aspect_ratio;
+    text_block.text_block_x = left ? (-pLwc->aspect_ratio + 0.4f) : (pLwc->aspect_ratio - 0.4f);
+    //text_block.text_block_y = y;
+    text_block.text_block_y = y - 0.7f;
     render_text_block(pLwc, &text_block);
 }
 
@@ -1549,10 +1561,36 @@ static void render_battle_ui_layer(const LWCONTEXT* pLwc, const LWPUCKGAME* puck
     const int player_total_hp = remote ? state->bf.player_total_hp : puck_game->player.total_hp;
     const int target_total_hp = remote ? state->bf.target_total_hp : puck_game->target.total_hp;
     if (puck_game->tower[0].geom) {
-        render_hp_gauge(pLwc, gauge_width, gauge_height, gauge1_x, gauge1_y, player_current_hp, player_total_hp, player->hp_shake_remain_time, 1, puck_game->nickname, ui_alpha);
+        char player_score[32];
+        sprintf(player_score, "%d", puck_game->score);
+        render_hp_gauge(pLwc,
+                        gauge_width,
+                        gauge_height,
+                        gauge1_x,
+                        gauge1_y,
+                        player_current_hp,
+                        player_total_hp,
+                        player->hp_shake_remain_time,
+                        1,
+                        puck_game->nickname,
+                        player_score,
+                        ui_alpha);
     }
     if (puck_game->tower[1].geom) {
-        render_hp_gauge(pLwc, gauge_width, gauge_height, gauge2_x, gauge2_y, target_current_hp, target_total_hp, target->hp_shake_remain_time, 0, target_nickname, ui_alpha);
+        char target_score[32];
+        sprintf(target_score, "%d", puck_game->target_score);
+        render_hp_gauge(pLwc,
+                        gauge_width,
+                        gauge_height,
+                        gauge2_x,
+                        gauge2_y,
+                        target_current_hp,
+                        target_total_hp,
+                        target->hp_shake_remain_time,
+                        0,
+                        target_nickname,
+                        target_score,
+                        ui_alpha);
     }
     // Battle timer (center top of the screen)
     const float remain_time = puck_game_remain_time(puck_game->total_time,

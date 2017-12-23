@@ -126,7 +126,7 @@ func NewLwpSetNicknameResult(request *C.LWPSETNICKNAME) *C.LWPSETNICKNAMERESULT 
 	}
 }
 
-func NewLwpMatched2(port int, ipv4 net.IP, battleId int, token uint, playerNo int, targetNickname string) *C.LWPMATCHED2 {
+func NewLwpMatched2(port int, ipv4 net.IP, battleId int, token uint, playerNo int, targetScore int, targetNickname string) *C.LWPMATCHED2 {
 	return &C.LWPMATCHED2{
 		C.ushort(unsafe.Sizeof(C.LWPMATCHED2{})),
 		C.LPGP_LWPMATCHED2,
@@ -136,6 +136,7 @@ func NewLwpMatched2(port int, ipv4 net.IP, battleId int, token uint, playerNo in
 		C.int(battleId),
 		C.uint(token),
 		C.int(playerNo),
+		C.int(targetScore),
 		NicknameToCArray(targetNickname),
 	}
 }

@@ -177,6 +177,7 @@ int parse_recv_packets(LWTCP* tcp) {
             pLwc->udp = new_udp();
             // make a copy of target nickname
             memcpy(pLwc->puck_game->target_nickname, p->target_nickname, sizeof(p->target_nickname));
+            pLwc->puck_game->target_score = p->target_score;
             pLwc->udp_host_addr.host_resolved = *(unsigned long*)p->ipaddr;
             sprintf(pLwc->udp_host_addr.host, "%d.%d.%d.%d",
                     ((int)pLwc->udp_host_addr.host_resolved >> 0) & 0xff,

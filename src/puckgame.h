@@ -208,6 +208,7 @@ typedef struct _LWPUCKGAME {
     LWPBATTLERESULT_STAT battle_stat[2];
     int score;
     int rank;
+    int target_score;
     int control_flags;
     char tutorial_guide_str[512];
     int bogus_disabled;

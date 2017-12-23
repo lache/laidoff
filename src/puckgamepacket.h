@@ -312,6 +312,7 @@ typedef struct _LWPMATCHED2 {
 	int battle_id;
 	unsigned int token;
 	int player_no;
+    int target_score;
 	char target_nickname[LW_NICKNAME_MAX_LEN];
 } LWPMATCHED2;
 
