@@ -9,7 +9,6 @@ import android.content.res.AssetManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.media.AudioManager;
-import android.media.MediaPlayer;
 import android.media.SoundPool;
 import android.os.Build;
 import android.os.Bundle;
@@ -19,7 +18,6 @@ import android.view.WindowManager;
 import android.widget.Toast;
 
 import com.google.android.gms.ads.AdRequest;
-import com.google.android.gms.ads.AdView;
 import com.google.android.gms.ads.MobileAds;
 import com.google.android.gms.ads.reward.RewardItem;
 import com.google.android.gms.ads.reward.RewardedVideoAd;
@@ -34,35 +32,25 @@ import java.util.Locale;
 
 public class LaidoffNativeActivity extends NativeActivity implements RewardedVideoAdListener
 {
-    private static boolean mBgmOn;
-
     static {
         System.loadLibrary("zmq");
         System.loadLibrary("czmq");
         System.loadLibrary("native-activity");
     }
 
-    private static MediaPlayer mBgmPlayer;
     private int mSound_MetalHit;
     private SoundPool mSoundPool;
-    private int mSound_Tapping01;
-    private int mSound_Completed03;
-    private int mSound_GameOver01;
-    private int mSound_GameStart01;
-    private int mSound_Point;
 
     public static native String signalResourceReady(Class<LaidoffNativeActivity> and9NativeActivityClass);
     public static native int pushTextureData(int width, int height, int[] data, int texAtlasIndex);
     public static native void registerAsset(String assetPath, int startOffset, int length);
     private static native void sendApkPath(String apkPath, String filesPath, String packageVersion);
     public static native void setPushTokenAndSend(String text, long pLwcLong);
+    @SuppressWarnings("SameParameterValue")
     public static native void setWindowSize(int width, int height, long pLwcLong);
 
-    public static final String PREFS_NAME = "LaidoffPrefs";
-    public static final String PREFS_KEY_HIGHSCORE = "highscore";
-
     private static LaidoffNativeActivity INSTANCE;
-    
+
     public static final String LOG_TAG = "and9";
     private RewardedVideoAd mRewardedVideoAd;
     /** Called when the activity is first created. */
@@ -94,15 +82,15 @@ public class LaidoffNativeActivity extends NativeActivity implements RewardedVid
                         setWindowSize(decorView.getWidth(), decorView.getHeight(), 0);
                         // Note that system bars will only be "visible" if none of the
                         // LOW_PROFILE, HIDE_NAVIGATION, or FULLSCREEN flags are set.
-                        if ((visibility & View.SYSTEM_UI_FLAG_FULLSCREEN) == 0) {
-                            // TODO: The system bars are visible. Make any desired
-                            // adjustments to your UI, such as showing the action bar or
-                            // other navigational controls.
-                        } else {
-                            // TODO: The system bars are NOT visible. Make any desired
-                            // adjustments to your UI, such as hiding the action bar or
-                            // other navigational controls.
-                        }
+//                        if ((visibility & View.SYSTEM_UI_FLAG_FULLSCREEN) == 0) {
+//                            // TODO: The system bars are visible. Make any desired
+//                            // adjustments to your UI, such as showing the action bar or
+//                            // other navigational controls.
+//                        } else {
+//                            // TODO: The system bars are NOT visible. Make any desired
+//                            // adjustments to your UI, such as hiding the action bar or
+//                            // other navigational controls.
+//                        }
                     }
                 });
 
@@ -119,7 +107,7 @@ public class LaidoffNativeActivity extends NativeActivity implements RewardedVid
         assetsLoader.registerAllAssetsOfType("action");
         assetsLoader.registerAllAssetsOfType("fnt");
         assetsLoader.registerAllAssetsOfType("d");
-        assetsLoader.registerAllAssetsOfType("glsles");
+        assetsLoader.registerAllAssetsOfType("glsl");
         assetsLoader.registerAllAssetsOfType("l");
         assetsLoader.registerAllAssetsOfType("field");
         assetsLoader.registerAllAssetsOfType("nav");
@@ -138,29 +126,7 @@ public class LaidoffNativeActivity extends NativeActivity implements RewardedVid
                 //mSoundPool.play(sampleId, 1, 1, 0, 0, 1);
             }
         });
-
-        mSound_Tapping01 = mSoundPool.load(getApplicationContext(), R.raw.jump, 1);
-        mSound_Completed03 = mSoundPool.load(getApplicationContext(), R.raw.completed, 1);
-        mSound_GameOver01 = mSoundPool.load(getApplicationContext(), R.raw.over, 1);
-        mSound_GameStart01 = mSoundPool.load(getApplicationContext(), R.raw.start, 1);
-        mSound_Point = mSoundPool.load(getApplicationContext(), R.raw.point, 1);
         mSound_MetalHit = mSoundPool.load(getApplicationContext(), R.raw.sfx_metal_hit, 1);
-
-        mBgmPlayer = MediaPlayer.create(getApplicationContext(), R.raw.opening); // in 2nd param u have to pass your desire ringtone
-        mBgmPlayer.setLooping(true);
-        //mBgmPlayer.prepare();
-        //mBgmPlayer.start();
-
-        /*
-        final int atlasCount = 3;
-        for (int i = 0; i < atlasCount; i++) {
-            String assetName = String.format(Locale.US, "tex/kiwi-atlas-set-%02d.png", i + 1);
-            loadBitmap(assetName);
-        }
-        */
-
-        //Intent intent = new Intent(this, TextInputActivity.class);
-        //startActivity(intent);
     }
 
     private void loadRewardedVideoAd() {
@@ -194,15 +160,17 @@ public class LaidoffNativeActivity extends NativeActivity implements RewardedVid
         //urtp.remoteAssetsBasePath = "http://222.110.4.119:18080";
         urtp.remoteListFilePath = "list.txt";
         urtp.localListFilename = "list.txt";
+        urtp.activity = this;
 
-         new UpdateResTask(this).execute(urtp);
+        new UpdateResTask(this).execute(urtp);
     }
 
+    @SuppressWarnings("unused")
     static public int loadBitmap(String assetName) {
         return loadBitmapWithIndex(0, assetName);
     }
 
-    static public int loadBitmapWithIndex(int i, String assetName) {
+    static public int loadBitmapWithIndex(@SuppressWarnings("SameParameterValue") int i, String assetName) {
         Bitmap bitmap = getBitmapFromAsset(INSTANCE.getApplicationContext(), assetName);
 
         Log.i(LOG_TAG, String.format(Locale.US, "Tex(asset name) %s Bitmap width: %d", assetName, bitmap.getWidth()));
@@ -210,7 +178,7 @@ public class LaidoffNativeActivity extends NativeActivity implements RewardedVid
 
         int[] pixels = new int[bitmap.getWidth()*bitmap.getHeight()];
         bitmap.getPixels(pixels, 0, bitmap.getWidth(), 0, 0, bitmap.getWidth(), bitmap.getHeight());
-        int bytes_allocated_on_native = INSTANCE.pushTextureData(bitmap.getWidth(), bitmap.getHeight(), pixels, i);
+        int bytes_allocated_on_native = pushTextureData(bitmap.getWidth(), bitmap.getHeight(), pixels, i);
 
         Log.i(LOG_TAG, String.format(Locale.US, "Tex(asset name) %s Bitmap copied to native side %d bytes", assetName, bytes_allocated_on_native));
 
@@ -224,6 +192,7 @@ public class LaidoffNativeActivity extends NativeActivity implements RewardedVid
         Bitmap bitmap = null;
         try {
             boolean fromDownloaded = true;
+            //noinspection ConstantConditions
             if (fromDownloaded) {
 
                 String filenameOnly = filePath.substring(filePath.lastIndexOf("/")+1);
@@ -255,12 +224,6 @@ public class LaidoffNativeActivity extends NativeActivity implements RewardedVid
     public void onPause() {
         mRewardedVideoAd.pause(this);
         super.onPause();
-
-        if (mBgmOn)
-        {
-            mBgmPlayer.pause();
-        }
-
         Log.d(LOG_TAG, "onPause()");
     }
 
@@ -268,16 +231,11 @@ public class LaidoffNativeActivity extends NativeActivity implements RewardedVid
     public void onResume() {
         mRewardedVideoAd.resume(this);
         super.onResume();
-
-        if (mBgmOn)
-        {
-            mBgmPlayer.start();
-        }
-
         Log.d(LOG_TAG, "onResume()");
     }
 
 
+    @SuppressWarnings("unused")
     public static void startTextInputActivity(String dummy) {
         Intent intent = new Intent(INSTANCE, TextInputActivity.class);
 //        EditText editText = (EditText) findViewById(R.id.editText);
@@ -296,10 +254,12 @@ public class LaidoffNativeActivity extends NativeActivity implements RewardedVid
 
     }
 
+    @SuppressWarnings("unused")
     public static void requestPushToken(long pLwc) {
         setPushTokenAndSend(FirebaseInstanceId.getInstance().getToken(), pLwc);
     }
 
+    @SuppressWarnings("unused")
     public static void startPlayMetalHitSound(String dummy) {
         INSTANCE.playMetalHitSound();
     }
