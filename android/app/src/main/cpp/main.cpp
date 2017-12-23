@@ -874,7 +874,7 @@ void android_main(struct android_app* state) {
                 sec_diff--;
             }
 
-            long frame_interval_nanoseconds = sec_diff * 1000000000LL + nsec_diff;
+            uint64_t frame_interval_nanoseconds = sec_diff * 1000000000ULL + nsec_diff;
             delta_time = (double)frame_interval_nanoseconds / 1e9;
             //LOGI("frame interval: %ld nsec / %.4f fps", frame_interval_nanoseconds, 1.0 / delta_time);
 
