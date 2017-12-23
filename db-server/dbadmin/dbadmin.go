@@ -116,6 +116,11 @@ func saveHandler(w http.ResponseWriter, r *http.Request, uuidStr string) {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
+	userDb.BattleStat.ConsecutiveDefeat, err = strconv.Atoi(r.FormValue("ConsecutiveDefeat"))
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
 	err = user.WriteUserDb(userDb)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
