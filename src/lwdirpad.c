@@ -128,7 +128,7 @@ void get_right_dir_pad_original_center(const float aspect_ratio, float *x, float
     }
 }
 
-void get_left_dir_pad_original_center(const float aspect_ratio, float *x, float *y) {
+void get_left_dir_pad_original_center(const float aspect_ratio, float* x, float* y) {
     const float sr = get_dir_pad_size_radius();
     if (aspect_ratio > 1) {
         *x = -1 * aspect_ratio + sr;

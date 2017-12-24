@@ -1,9 +1,9 @@
 #include <math.h>
 #include <string.h>
 #include "numcomp.h"
-#include "pcg_basic.h"
 #include "lwlog.h"
 #include "lwmacro.h"
+#include "pcg_basic.h"
 
 void numcomp_init_float_preset(LWNUMCOMPFLOATPRESET* preset, int c, float m, float M) {
     preset->c = c;
@@ -83,12 +83,21 @@ void numcomp_test_vec3_print(const float* v, const LWNUMCOMPVEC3PRESET* preset) 
 }
 
 float numcomp_float_random_01() {
-    const int random_mask = 0x00ffffff;
+    const int random_mask = 0x7fffffff;
     return (float)(pcg32_random() & random_mask) / random_mask;
 }
 
 float numcomp_float_random_range(float m, float M) {
     return m + numcomp_float_random_01() * (M - m);
+}
+
+float numcomp_float_random_01_local(pcg32_random_t* rng) {
+    const int random_mask = 0x7fffffff;
+    return (float)(pcg32_random_r(rng) & random_mask) / random_mask;
+}
+
+float numcomp_float_random_range_local(pcg32_random_t* rng, float m, float M) {
+    return m + numcomp_float_random_01_local(rng) * (M - m);
 }
 
 void numcomp_test_all() {

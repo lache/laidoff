@@ -119,9 +119,7 @@ static int lw_get_normalized_dir_pad_input(const LWREMOTEPLAYERCONTROL *control,
 
 static int update_puck_game(LWSERVER* server, LWPUCKGAME* puck_game, double delta_time) {
     // update tick (server-client shared portion)
-    puck_game_update_tick(puck_game, server->update_frequency, (float)delta_time);
-    // update puck game time
-    puck_game->time = puck_game_elapsed_time(puck_game->update_tick, (int)(1.0 / delta_time));
+    puck_game_update_tick(puck_game, server->update_frequency);
     // check for termination condition
     if (puck_game_state_phase_finished(puck_game->battle_phase)) {
         return -1;

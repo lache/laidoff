@@ -449,8 +449,23 @@ static void render_radial_wave(const LWCONTEXT* pLwc,
     glDepthMask(GL_TRUE);
 }
 
-static void render_hp_star(const LWCONTEXT* pLwc, float ui_alpha, int hp, int left, float hp_shake_remain_time) {
-    float x = left ? -pLwc->aspect_ratio + 0.4f : pLwc->aspect_ratio - 0.4f;
+static void calculate_world_right_top_end_ui_point(const LWCONTEXT* pLwc, const LWPUCKGAME* puck_game, vec2 world_right_top_end_ui_point) {
+    // calculate world right top point in ui coordinate
+    vec4 world_right_top_end_vec4 = {
+        2.11f, // half world model dimension including bezel hardcoded
+        2.11f, // half world model dimension including bezel hardcoded
+        0.76f, // half world model dimension including bezel hardcoded
+        1.00f,
+    };
+    mat4x4 proj_view;
+    mat4x4_identity(proj_view);
+    mat4x4_mul(proj_view, pLwc->puck_game_proj, pLwc->puck_game_view);
+    calculate_ui_point_from_world_point(pLwc->aspect_ratio, proj_view, world_right_top_end_vec4, world_right_top_end_ui_point);
+}
+
+static void render_hp_star(const LWCONTEXT* pLwc, const LWPUCKGAME* puck_game, float ui_alpha, int hp, int left, float hp_shake_remain_time, const vec2 world_right_top_end_ui_point) {
+    // render at the center of margins
+    float x = (world_right_top_end_ui_point[0] + pLwc->aspect_ratio) / 2 * (left ? -1 : +1);
     float y = 0.575f;
     float size = 0.5f;
     if (hp_shake_remain_time > 0) {
@@ -667,11 +682,55 @@ static void render_match_state(const LWCONTEXT* pLwc, float ui_alpha) {
     render_text_block(pLwc, &text_block);
 }
 
+static void render_nickname_score(const LWCONTEXT* pLwc,
+                                  int left,
+                                  float ui_alpha,
+                                  const char* nickname,
+                                  const char* score,
+                                  const vec2 world_right_top_end_ui_point) {
+    // render at the center of margins
+    float x = (world_right_top_end_ui_point[0] + pLwc->aspect_ratio) / 2 * (left ? -1 : +1);
+    // Render text
+    LWTEXTBLOCK text_block;
+    //text_block.align = left ? LTBA_LEFT_TOP : LTBA_RIGHT_TOP;
+    text_block.align = left ? LTBA_CENTER_TOP : LTBA_CENTER_TOP;
+    text_block.text_block_width = DEFAULT_TEXT_BLOCK_WIDTH;
+    text_block.text_block_line_height = DEFAULT_TEXT_BLOCK_LINE_HEIGHT_E;
+    text_block.size = DEFAULT_TEXT_BLOCK_SIZE_E;
+    text_block.multiline = 1;
+    SET_COLOR_RGBA_FLOAT(text_block.color_normal_glyph, 1, 1, 1, ui_alpha);
+    SET_COLOR_RGBA_FLOAT(text_block.color_normal_outline, 0, 0, 0, ui_alpha);
+    SET_COLOR_RGBA_FLOAT(text_block.color_emp_glyph, 1, 1, 0, ui_alpha);
+    SET_COLOR_RGBA_FLOAT(text_block.color_emp_outline, 0, 0, 0, ui_alpha);
+    // nickname
+    text_block.text = nickname;
+    text_block.text_bytelen = (int)strlen(text_block.text);
+    text_block.begin_index = 0;
+    text_block.end_index = text_block.text_bytelen;
+    text_block.text_block_x = x;
+    text_block.text_block_y = 0.325f;
+    render_text_block(pLwc, &text_block);
+    // score
+    text_block.text = score;
+    text_block.text_bytelen = (int)strlen(text_block.text);
+    text_block.begin_index = 0;
+    text_block.end_index = text_block.text_bytelen;
+    text_block.text_block_x = x;
+    text_block.text_block_y = 0.225f;
+    render_text_block(pLwc, &text_block);
+}
+
 static void render_hp_gauge(const LWCONTEXT* pLwc,
-                            float w, float h,
-                            float x, float y, int current_hp, int total_hp,
-                            float hp_shake_remain_time, int left,
-                            const char* str1, const char* str2,
+                            float w,
+                            float h,
+                            float x,
+                            float y,
+                            int current_hp,
+                            int total_hp,
+                            float hp_shake_remain_time,
+                            int left,
+                            const char* str1,
+                            const char* str2,
                             float ui_alpha) {
     const float gauge_width = w;
     const float gauge_height = h;
@@ -685,14 +744,14 @@ static void render_hp_gauge(const LWCONTEXT* pLwc,
         y += ratio * (2 * rand() / (float)RAND_MAX - 1.0f) * shake_magnitude;
     }
     // Render background (gray)
-    /*render_solid_vb_ui(pLwc,
+    render_solid_vb_ui(pLwc,
                        x,
                        y,
                        gauge_width,
                        gauge_height,
                        0,
                        LVT_CENTER_BOTTOM_ANCHORED_SQUARE,
-                       1, base_color, base_color, base_color, 1);*/
+                       1, base_color, base_color, base_color, 1);
     const float cell_border = 0.015f;
     if (total_hp > 0) {
         const float cell_width = (gauge_width - cell_border * (total_hp + 1)) / total_hp;
@@ -715,48 +774,16 @@ static void render_hp_gauge(const LWCONTEXT* pLwc,
             }
 
             // Render foreground (green or red)
-            /*render_solid_vb_ui(pLwc,
+            render_solid_vb_ui(pLwc,
                                cell_x_0 + cell_x_stride * i,
                                y + gauge_height / 2,
                                cell_width,
                                gauge_height - cell_border * 2,
                                0,
                                LVT_LEFT_CENTER_ANCHORED_SQUARE,
-                               ui_alpha, r, g, b, 1);*/
+                               ui_alpha, r, g, b, 1);
         }
     }
-    // Render text
-    LWTEXTBLOCK text_block;
-    //text_block.align = left ? LTBA_LEFT_TOP : LTBA_RIGHT_TOP;
-    text_block.align = left ? LTBA_CENTER_TOP : LTBA_CENTER_TOP;
-    text_block.text_block_width = DEFAULT_TEXT_BLOCK_WIDTH;
-    text_block.text_block_line_height = DEFAULT_TEXT_BLOCK_LINE_HEIGHT_E;
-    text_block.size = DEFAULT_TEXT_BLOCK_SIZE_E;
-    text_block.multiline = 1;
-    SET_COLOR_RGBA_FLOAT(text_block.color_normal_glyph, 1, 1, 1, ui_alpha);
-    SET_COLOR_RGBA_FLOAT(text_block.color_normal_outline, 0, 0, 0, ui_alpha);
-    SET_COLOR_RGBA_FLOAT(text_block.color_emp_glyph, 1, 1, 0, ui_alpha);
-    SET_COLOR_RGBA_FLOAT(text_block.color_emp_outline, 0, 0, 0, ui_alpha);
-    // nickname
-    text_block.text = str1;
-    text_block.text_bytelen = (int)strlen(text_block.text);
-    text_block.begin_index = 0;
-    text_block.end_index = text_block.text_bytelen;
-    //text_block.text_block_x = left ? -pLwc->aspect_ratio : +pLwc->aspect_ratio;
-    text_block.text_block_x = left ? (-pLwc->aspect_ratio + 0.4f) : (pLwc->aspect_ratio - 0.4f);
-    //text_block.text_block_y = y;
-    text_block.text_block_y = y - 0.6f;
-    render_text_block(pLwc, &text_block);
-    // score
-    text_block.text = str2;
-    text_block.text_bytelen = (int)strlen(text_block.text);
-    text_block.begin_index = 0;
-    text_block.end_index = text_block.text_bytelen;
-    //text_block.text_block_x = left ? -pLwc->aspect_ratio : +pLwc->aspect_ratio;
-    text_block.text_block_x = left ? (-pLwc->aspect_ratio + 0.4f) : (pLwc->aspect_ratio - 0.4f);
-    //text_block.text_block_y = y;
-    text_block.text_block_y = y - 0.7f;
-    render_text_block(pLwc, &text_block);
 }
 
 static void render_dash_gauge(const LWCONTEXT* pLwc) {
@@ -1445,10 +1472,16 @@ static void render_main_menu_ui_layer(const LWCONTEXT* pLwc, const LWPUCKGAME* p
 }
 
 static void render_tower_invincible_mark(const LWCONTEXT* pLwc,
-                                         vec4 tower_pos,
+                                         const vec3 tower_pos,
                                          float ui_alpha,
                                          float elapsed_from_last_damage,
                                          float invincible_time) {
+    vec4 tower_pos_vec4 = {
+        tower_pos[0],
+        tower_pos[1],
+        tower_pos[2],
+        1,
+    };
     float ratio = elapsed_from_last_damage / invincible_time;
     int flicker_loop_count = 5;
     float size = 0.1f;
@@ -1456,7 +1489,7 @@ static void render_tower_invincible_mark(const LWCONTEXT* pLwc,
     mat4x4_identity(proj_view);
     mat4x4_mul(proj_view, pLwc->puck_game_proj, pLwc->puck_game_view);
     vec2 ui_point;
-    calculate_ui_point_from_world_point(pLwc->aspect_ratio, proj_view, tower_pos, ui_point);
+    calculate_ui_point_from_world_point(pLwc->aspect_ratio, proj_view, tower_pos_vec4, ui_point);
     int lae = LAE_STOP_MARK;
     int lae_alpha = LAE_STOP_MARK_ALPHA;
     lw_load_tex(pLwc, lae);
@@ -1478,7 +1511,13 @@ static void render_tower_invincible_mark(const LWCONTEXT* pLwc,
                                 default_uv_scale);
 }
 
-void render_puck_exclamation_mark(const LWCONTEXT* pLwc, const LWPUCKGAME* puck_game, vec4 puck_pos, float puck_speed, float ui_alpha) {
+void render_puck_exclamation_mark(const LWCONTEXT* pLwc, const LWPUCKGAME* puck_game, const vec3 puck_pos, float puck_speed, float ui_alpha) {
+    vec4 puck_pos_vec4 = {
+        puck_pos[0],
+        puck_pos[1],
+        puck_pos[2],
+        1.0f,
+    };
     if (puck_game_state_phase_battling(puck_game->battle_phase) == 0
         && puck_game->battle_phase != LSP_TUTORIAL) {
         return;
@@ -1492,7 +1531,7 @@ void render_puck_exclamation_mark(const LWCONTEXT* pLwc, const LWPUCKGAME* puck_
         mat4x4_identity(proj_view);
         mat4x4_mul(proj_view, pLwc->puck_game_proj, pLwc->puck_game_view);
         vec2 ui_point;
-        calculate_ui_point_from_world_point(pLwc->aspect_ratio, proj_view, puck_pos, ui_point);
+        calculate_ui_point_from_world_point(pLwc->aspect_ratio, proj_view, puck_pos_vec4, ui_point);
         int lae = LAE_EXCLAMATION_MARK;
         int lae_alpha = LAE_EXCLAMATION_MARK_ALPHA;
         lw_load_tex(pLwc, lae);
@@ -1526,11 +1565,10 @@ void render_all_tower_invincible_mark(const LWCONTEXT* pLwc, const LWPUCKGAME* p
         if (tower->geom == 0) {
             continue;
         }
-        vec4 tower_pos = {
+        vec3 tower_pos = {
             puck_game->tower_pos * puck_game->tower_pos_multiplier[tower_index][0],
             puck_game->tower_pos * puck_game->tower_pos_multiplier[tower_index][1],
             0.845f, // hard-coded
-            1,
         };
         float elapsed_from_last_damage = (float)(lwtimepoint_now_seconds() - tower->last_damaged_at);
         float invincible_time = 1.0f;
@@ -1538,6 +1576,21 @@ void render_all_tower_invincible_mark(const LWCONTEXT* pLwc, const LWPUCKGAME* p
             render_tower_invincible_mark(pLwc, tower_pos, ui_alpha, elapsed_from_last_damage, invincible_time);
         }
     }
+}
+
+static void render_dash_ring_gauge_player_pos(const LWCONTEXT* pLwc, const LWPUCKGAME* puck_game, const vec3 player_controlled_pos, float ui_alpha) {
+    vec4 player_controlled_pos_vec4 = {
+        player_controlled_pos[0],
+        player_controlled_pos[1],
+        player_controlled_pos[2],
+        1.0f,
+    };
+    vec4 player_controlled_pos_vec4_world_roll;
+    mat4x4 world_roll_mat;
+    mat4x4_identity(world_roll_mat);
+    mult_world_roll(world_roll_mat, puck_game->world_roll_axis, puck_game->world_roll_dir, puck_game->world_roll);
+    mat4x4_mul_vec4(player_controlled_pos_vec4_world_roll, world_roll_mat, player_controlled_pos_vec4);
+    render_dash_ring_gauge(pLwc, player_controlled_pos_vec4_world_roll, ui_alpha);
 }
 
 static void render_battle_ui_layer(const LWCONTEXT* pLwc, const LWPUCKGAME* puck_game,
@@ -1548,49 +1601,56 @@ static void render_battle_ui_layer(const LWCONTEXT* pLwc, const LWPUCKGAME* puck
     const LWPUCKGAMEPLAYER* target = &puck_game->target;
     float ui_alpha = puck_game->battle_ui_alpha;
     float control_ui_alpha = puck_game->battle_control_ui_alpha;
+    vec2 world_right_top_end_ui_point;
+    calculate_world_right_top_end_ui_point(pLwc, puck_game, world_right_top_end_ui_point);
+    //render_solid_vb_ui(pLwc, world_right_top_end_ui_point[0], world_right_top_end_ui_point[1], 0.1f, 0.1f, 0, LVT_CENTER_CENTER_ANCHORED_SQUARE, 0.5f, 1.0f, 1.0f, 1.0f, 1.0f);
     // HP gauges (player & target)
     const char* target_nickname = puck_game->battle_id ? puck_game->target_nickname : "Bogus Opponent";
-    const float gauge_width = pLwc->aspect_ratio * 0.9f;
-    const float gauge_height = 0.075f;
-    const float gauge1_x = -pLwc->aspect_ratio + gauge_width / 2;
-    const float gauge1_y = 1.0f - gauge_height;
-    const float gauge2_x = pLwc->aspect_ratio - gauge_width / 2;
-    const float gauge2_y = 1.0f - gauge_height;
     const int player_current_hp = remote ? state->bf.player_current_hp : puck_game->player.current_hp;
-    const int target_current_hp = remote ? state->bf.target_current_hp : puck_game->target.current_hp;
-    const int player_total_hp = remote ? state->bf.player_total_hp : puck_game->player.total_hp;
-    const int target_total_hp = remote ? state->bf.target_total_hp : puck_game->target.total_hp;
     if (puck_game->tower[0].geom) {
         char player_score[32];
         sprintf(player_score, "%d", puck_game->score);
-        render_hp_gauge(pLwc,
-                        gauge_width,
-                        gauge_height,
-                        gauge1_x,
-                        gauge1_y,
-                        player_current_hp,
-                        player_total_hp,
-                        player->hp_shake_remain_time,
-                        1,
-                        puck_game->nickname,
-                        player_score,
-                        ui_alpha);
+//        const float gauge_width = pLwc->aspect_ratio * 0.9f;
+//        const float gauge_height = 0.075f;
+//        const float gauge1_x = (-world_right_top_end_ui_point[0] - pLwc->aspect_ratio) / 2 + gauge_width / 2;
+//        const float gauge1_y = 1.0f - gauge_height;
+//        const int player_total_hp = remote ? state->bf.player_total_hp : puck_game->player.total_hp;
+//        render_hp_gauge(pLwc,
+//                        gauge_width,
+//                        gauge_height,
+//                        gauge1_x,
+//                        gauge1_y,
+//                        player_current_hp,
+//                        player_total_hp,
+//                        player->hp_shake_remain_time,
+//                        1,
+//                        puck_game->nickname,
+//                        player_score,
+//                        ui_alpha);
+        render_nickname_score(pLwc, 1, ui_alpha, puck_game->nickname, player_score, world_right_top_end_ui_point);
     }
+    const int target_current_hp = remote ? state->bf.target_current_hp : puck_game->target.current_hp;
     if (puck_game->tower[1].geom) {
         char target_score[32];
         sprintf(target_score, "%d", puck_game->target_score);
-        render_hp_gauge(pLwc,
-                        gauge_width,
-                        gauge_height,
-                        gauge2_x,
-                        gauge2_y,
-                        target_current_hp,
-                        target_total_hp,
-                        target->hp_shake_remain_time,
-                        0,
-                        target_nickname,
-                        target_score,
-                        ui_alpha);
+//        const float gauge_width = pLwc->aspect_ratio * 0.9f;
+//        const float gauge_height = 0.075f;
+//        const float gauge2_x = pLwc->aspect_ratio - gauge_width / 2;
+//        const float gauge2_y = 1.0f - gauge_height;
+//        const int target_total_hp = remote ? state->bf.target_total_hp : puck_game->target.total_hp;
+//        render_hp_gauge(pLwc,
+//                        gauge_width,
+//                        gauge_height,
+//                        gauge2_x,
+//                        gauge2_y,
+//                        target_current_hp,
+//                        target_total_hp,
+//                        target->hp_shake_remain_time,
+//                        0,
+//                        target_nickname,
+//                        target_score,
+//                        ui_alpha);
+        render_nickname_score(pLwc, 0, ui_alpha, target_nickname, target_score, world_right_top_end_ui_point);
     }
     // Battle timer (center top of the screen)
     const float remain_time = puck_game_remain_time(puck_game->total_time,
@@ -1605,33 +1665,18 @@ static void render_battle_ui_layer(const LWCONTEXT* pLwc, const LWPUCKGAME* puck
     }
     // HP star (test)
     if (puck_game->tower[0].geom) {
-        render_hp_star(pLwc, ui_alpha, player_current_hp, 1, player->hp_shake_remain_time);
+        render_hp_star(pLwc, puck_game, ui_alpha, player_current_hp, 1, player->hp_shake_remain_time, world_right_top_end_ui_point);
     }
     if (puck_game->tower[1].geom) {
-        render_hp_star(pLwc, ui_alpha, target_current_hp, 0, target->hp_shake_remain_time);
+        render_hp_star(pLwc, puck_game, ui_alpha, target_current_hp, 0, target->hp_shake_remain_time, world_right_top_end_ui_point);
     }
     // Match state text (bottom of the screen)
     //render_match_state(pLwc, ui_alpha);
     // Dash ring gauge
-    vec4 player_controlled_pos_vec4 = {
-        player_controlled_pos[0],
-        player_controlled_pos[1],
-        player_controlled_pos[2],
-        1.0f,
-    };
-    vec4 player_controlled_pos_vec4_world_roll;
-    mat4x4 world_roll_mat;
-    mat4x4_identity(world_roll_mat);
-    mult_world_roll(world_roll_mat, puck_game->world_roll_axis, puck_game->world_roll_dir, puck_game->world_roll);
-    mat4x4_mul_vec4(player_controlled_pos_vec4_world_roll, world_roll_mat, player_controlled_pos_vec4);
-    render_dash_ring_gauge(pLwc, player_controlled_pos_vec4_world_roll, ui_alpha * control_ui_alpha);
-    vec4 puck_pos_vec4 = {
-        puck_game->go[LPGO_PUCK].pos[0],
-        puck_game->go[LPGO_PUCK].pos[1],
-        puck_game->go[LPGO_PUCK].pos[2],
-        1.0f,
-    };
-    render_puck_exclamation_mark(pLwc, puck_game, puck_pos_vec4, puck_game->go[LPGO_PUCK].speed, ui_alpha);
+    render_dash_ring_gauge_player_pos(pLwc, puck_game, player_controlled_pos, ui_alpha * control_ui_alpha);
+    // render puck exclamation mark
+    render_puck_exclamation_mark(pLwc, puck_game, puck_game->go[LPGO_PUCK].pos, puck_game->go[LPGO_PUCK].speed, ui_alpha);
+    // render tower invincible mark
     render_all_tower_invincible_mark(pLwc, puck_game, ui_alpha);
     // tutorial guide text
     render_tutorial_guide(pLwc, puck_game, ui_alpha);
@@ -1682,12 +1727,17 @@ static void render_battle_ui_layer(const LWCONTEXT* pLwc, const LWPUCKGAME* puck
     }
     if (pLwc->control_flags & LCF_PUCK_GAME_DASH
         && ((puck_game->control_flags & LPGCF_HIDE_DASH_BUTTON) == 0)) {
+        float cx, cy;
+        float sx, sy;
+        get_left_dir_pad_original_center(pLwc->aspect_ratio, &cx, &cy);
+        sx = button_size * 1.5f;
+        sy = sx;
         lwbutton_lae_append(&(((LWCONTEXT*)pLwc)->button_list),
                             "dash_button",
-                            +1.00f,
-                            -0.225f,
-                            button_size * 1.75f,
-                            button_size * 1.75f,
+                            -cx - sx / 2,
+                            cy + sy / 2,
+                            sx,
+                            sy,
                             LAE_BUTTON_DASH,
                             LAE_BUTTON_DASH_ALPHA,
                             ui_alpha * control_ui_alpha,
@@ -1851,7 +1901,6 @@ void lwc_render_physics(const LWCONTEXT* pLwc, const mat4x4 view, const mat4x4 p
         sphere_render_uniform.sphere_col[1][1] = 1.0f;
         sphere_render_uniform.sphere_col[1][2] = 0.8f;
     }
-    const float wall_height = 0.8f;
 
     render_physics_menu(pLwc, proj, view, puck_game);
 
@@ -1872,7 +1921,7 @@ void lwc_render_physics(const LWCONTEXT* pLwc, const mat4x4 view, const mat4x4 p
                 0,
                 LVT_CENTER_BOTTOM_ANCHORED_SQUARE,
                 puck_game->world_size_half,
-                wall_height / 2,
+                puck_game->wall_height / 2,
                 puck_game->world_size_half,
                 &sphere_render_uniform,
                 LPGB_N);
@@ -1889,7 +1938,7 @@ void lwc_render_physics(const LWCONTEXT* pLwc, const mat4x4 view, const mat4x4 p
                 0,
                 LVT_CENTER_TOP_ANCHORED_SQUARE,
                 puck_game->world_size_half,
-                wall_height / 2,
+                puck_game->wall_height / 2,
                 puck_game->world_size_half,
                 &sphere_render_uniform,
                 LPGB_S);
@@ -1905,7 +1954,7 @@ void lwc_render_physics(const LWCONTEXT* pLwc, const mat4x4 view, const mat4x4 p
                 0,
                 (float)LWDEG2RAD(90),
                 LVT_LEFT_CENTER_ANCHORED_SQUARE,
-                wall_height / 2,
+                puck_game->wall_height / 2,
                 puck_game->world_size_half,
                 puck_game->world_size_half,
                 &sphere_render_uniform,
@@ -1922,7 +1971,7 @@ void lwc_render_physics(const LWCONTEXT* pLwc, const mat4x4 view, const mat4x4 p
                 0,
                 (float)LWDEG2RAD(-90),
                 LVT_RIGHT_CENTER_ANCHORED_SQUARE,
-                wall_height / 2,
+                puck_game->wall_height / 2,
                 puck_game->world_size_half,
                 puck_game->world_size_half,
                 &sphere_render_uniform,

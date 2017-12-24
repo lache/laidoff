@@ -207,6 +207,7 @@ LWPUCKGAME* new_puck_game(int update_frequency) {
     memset(puck_game, 0, sizeof(LWPUCKGAME));
     // datasheet begin
     puck_game->world_size = 4.0f;
+    puck_game->wall_height = 0.8f;
     puck_game->dash_interval = 1.2f;
     puck_game->dash_duration = 0.1f;
     puck_game->dash_shake_time = 0.3f;
@@ -656,6 +657,8 @@ void puck_game_reset_go(LWPUCKGAME* puck_game, LWPUCKGAMEOBJECT* go, float x, fl
 }
 
 void puck_game_reset_battle_state(LWPUCKGAME* puck_game) {
+    // reset physics engine random seed again
+    dRandSetSeed(0);
     puck_game->update_tick = 0;
     puck_game->prepare_step_waited_tick = 0;
     puck_game->battle_phase = LSP_READY;
@@ -676,6 +679,14 @@ void puck_game_reset_battle_state(LWPUCKGAME* puck_game) {
     puck_game->control_flags &= ~LPGCF_HIDE_TIMER;
     puck_game->control_flags &= ~LPGCF_HIDE_PULL_BUTTON;
     puck_game->control_flags &= ~LPGCF_HIDE_DASH_BUTTON;
+    // reset bogus control variables
+    puck_game->target_dx = 0;
+    puck_game->target_dy = 0;
+    puck_game->target_dlen_ratio = 0;
+    // re-seed bogus rng
+    pcg32_srandom_r(&puck_game->bogus_rng, 0x01041685967ULL, 0x027855157ULL);
+    // reset dash state
+    memset(puck_game->remote_dash, 0, sizeof(puck_game->remote_dash));
 }
 
 void puck_game_reset_tutorial_state(LWPUCKGAME* puck_game) {
@@ -765,8 +776,8 @@ void puck_game_control_bogus(LWPUCKGAME* puck_game, const LWPUCKGAMEBOGUSPARAM* 
     int bogus_player_no = puck_game->player_no == 2 ? 1 : 2;
     LWPUCKGAMEDASH* dash = &puck_game->remote_dash[bogus_player_no - 1];
     if (dash->disabled == 0 && ideal_target_dlen < bogus_param->dash_detect_radius) {
-        if (numcomp_float_random_01() < bogus_param->dash_frequency) {
-            const float dash_cooltime_aware_lag = numcomp_float_random_range(bogus_param->dash_cooltime_lag_min, bogus_param->dash_cooltime_lag_max);
+        if (numcomp_float_random_01_local(&puck_game->bogus_rng) < bogus_param->dash_frequency) {
+            const float dash_cooltime_aware_lag = numcomp_float_random_range_local(&puck_game->bogus_rng, bogus_param->dash_cooltime_lag_min, bogus_param->dash_cooltime_lag_max);
             if (puck_game_dash_elapsed_since_last(puck_game, dash) >= puck_game->dash_interval + dash_cooltime_aware_lag) {
                 puck_game_dash(puck_game, dash, bogus_player_no);
             }
@@ -931,7 +942,9 @@ void puck_game_set_tutorial_guide_str(LWPUCKGAME* puck_game, const char* str) {
     strcpy(puck_game->tutorial_guide_str, str);
 }
 
-void puck_game_update_tick(LWPUCKGAME* puck_game, int update_frequency, float delta_time) {
+void puck_game_update_tick(LWPUCKGAME* puck_game, int update_frequency) {
+    // update puck game time
+    puck_game->time = puck_game_elapsed_time(puck_game->update_tick, update_frequency);
     // reset per-frame caches
     puck_game->player.puck_contacted = 0;
     puck_game->target.puck_contacted = 0;

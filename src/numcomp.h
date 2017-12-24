@@ -2,6 +2,8 @@
 
 #include "linmath.h"
 
+typedef struct pcg_state_setseq_64 pcg32_random_t;
+
 // compress 32-bit floating point value into
 // c-bit fixed-point compressed value between [m, M].
 typedef struct _LWNUMCOMPFLOATPRESET {
@@ -55,3 +57,5 @@ void numcomp_batch_test_mat4x4();
 void numcomp_batch_test_conversion();
 float numcomp_float_random_01();
 float numcomp_float_random_range(float m, float M);
+float numcomp_float_random_01_local(pcg32_random_t* rng);
+float numcomp_float_random_range_local(pcg32_random_t* rng, float m, float M);

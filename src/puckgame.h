@@ -2,6 +2,7 @@
 #include "linmath.h"
 #include "puckgamepacket.h"
 #include <ode/ode.h>
+#include "pcg_basic.h"
 
 typedef struct _LWPUCKGAME LWPUCKGAME;
 
@@ -110,6 +111,7 @@ typedef struct _LWPUCKGAMEBOGUSPARAM {
 typedef struct _LWPUCKGAME {
 	// ---- Static game data begin
 	float world_size;
+    float wall_height;
 	float dash_interval;
 	float dash_duration;
 	float dash_shake_time;
@@ -213,6 +215,7 @@ typedef struct _LWPUCKGAME {
     char tutorial_guide_str[512];
     int bogus_disabled;
     int bogus_opponent;
+    pcg32_random_t bogus_rng;
 } LWPUCKGAME;
 
 LWPUCKGAME* new_puck_game(int update_frequency);
@@ -251,7 +254,7 @@ void puck_game_reset_battle_state(LWPUCKGAME* puck_game);
 void puck_game_reset_tutorial_state(LWPUCKGAME* puck_game);
 void puck_game_set_searching_str(LWPUCKGAME* puck_game, const char* str);
 void puck_game_set_tutorial_guide_str(LWPUCKGAME* puck_game, const char* str);
-void puck_game_update_tick(LWPUCKGAME* puck_game, int update_frequency, float delta_time);
+void puck_game_update_tick(LWPUCKGAME* puck_game, int update_frequency);
 void puck_game_create_go(LWPUCKGAME* puck_game, int lpgo, float x, float y, float z);
 void puck_game_create_control_joint(LWPUCKGAME* puck_game, int lpgo);
 void puck_game_reset_go(LWPUCKGAME* puck_game, LWPUCKGAMEOBJECT* go, float x, float y, float z);
