@@ -21,6 +21,16 @@
 
 static void render_field_object_rot(const LWCONTEXT* pLwc, int vbo_index, GLuint tex_id, const mat4x4 view, const mat4x4 proj, float x, float y, float z, float sx, float sy, float sz, float alpha_multiplier, int mipmap, const mat4x4 rot) {
     int shader_index = LWST_DEFAULT;
+    const LWSHADER* shader = &pLwc->shader[shader_index];
+    lazy_glUseProgram(pLwc, shader_index);
+    glUniform2fv(shader->vuvoffset_location, 1, default_uv_offset);
+    glUniform2fv(shader->vuvscale_location, 1, default_uv_scale);
+    glUniform2fv(shader->vs9offset_location, 1, default_uv_offset);
+    glUniform1f(shader->alpha_multiplier_location, 1.0f);
+    glUniform1i(shader->diffuse_location, 0); // 0 means GL_TEXTURE0
+    glUniform1i(shader->alpha_only_location, 1); // 1 means GL_TEXTURE1
+    glUniform3f(shader->overlay_color_location, 1, 1, 1);
+    glUniform1f(shader->overlay_color_ratio_location, 0);
     
     mat4x4 model;
     mat4x4_identity(model);
