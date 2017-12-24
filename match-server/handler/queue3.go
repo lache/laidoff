@@ -88,9 +88,9 @@ func queueToScoreMatch(userDb user.Db, req *HandleQueue3Request) {
 			//130, // after 35 sec
 			//100, // ~35 sec
 			//60,  // ~29 sec
-			45, // ~19 sec
-			25, // ~9 sec
-			5,  // ~3 sec
+			75, // ~19 sec
+			45, // ~9 sec
+			15,  // ~3 sec
 		},
 	}
 	queueScoreMatchReq := rankservice.QueueScoreMatchRequest{
