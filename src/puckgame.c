@@ -705,6 +705,8 @@ void puck_game_reset_tutorial_state(LWPUCKGAME* puck_game) {
     puck_game->target.current_hp = puck_game->hp;
     memset(puck_game->remote_control, 0, sizeof(puck_game->remote_control));
     puck_game->control_flags |= LPGCF_HIDE_TIMER;
+    // reset dash state
+    memset(puck_game->remote_dash, 0, sizeof(puck_game->remote_dash));
 }
 
 void puck_game_reset(LWPUCKGAME* puck_game) {
