@@ -8,6 +8,7 @@ import (
 	"net"
 	"github.com/gasbank/laidoff/shared-server"
 	"log"
+	"github.com/gasbank/laidoff/reward-server/rating"
 )
 // #include "../../src/puckgamepacket.h"
 import "C"
@@ -126,7 +127,10 @@ func NewLwpSetNicknameResult(request *C.LWPSETNICKNAME) *C.LWPSETNICKNAMERESULT 
 	}
 }
 
-func NewLwpMatched2(port int, ipv4 net.IP, battleId int, token uint, playerNo int, targetScore int, targetNickname string) *C.LWPMATCHED2 {
+func NewLwpMatched2(port int, ipv4 net.IP, battleId int, token uint, playerNo, playerScore, targetScore int, targetNickname string) *C.LWPMATCHED2 {
+	drawScore, _ := rating.CalculateNewRating(playerScore, targetScore, 0)
+	victoryScore, _ := rating.CalculateNewRating(playerScore, targetScore, 1)
+	defeatScore, _ := rating.CalculateNewRating(playerScore, targetScore, 2)
 	return &C.LWPMATCHED2{
 		C.ushort(unsafe.Sizeof(C.LWPMATCHED2{})),
 		C.LPGP_LWPMATCHED2,
@@ -138,6 +142,9 @@ func NewLwpMatched2(port int, ipv4 net.IP, battleId int, token uint, playerNo in
 		C.int(playerNo),
 		C.int(targetScore),
 		NicknameToCArray(targetNickname),
+		C.int(victoryScore),
+		C.int(defeatScore),
+		C.int(drawScore),
 	}
 }
 

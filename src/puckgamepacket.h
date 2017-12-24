@@ -314,6 +314,9 @@ typedef struct _LWPMATCHED2 {
 	int player_no;
     int target_score;
 	char target_nickname[LW_NICKNAME_MAX_LEN];
+    int victory_score;
+    int defeat_score;
+    int draw_score;
 } LWPMATCHED2;
 
 typedef struct _LWPBASE {

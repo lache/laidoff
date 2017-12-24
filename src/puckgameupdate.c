@@ -121,7 +121,11 @@ void update_puck_game(LWCONTEXT* pLwc, LWPUCKGAME* puck_game, double delta_time)
     puck_game->on_puck_player_collision = puck_game_on_puck_player_collision;
     // tick physics engine only if practice mode (single play mode)
     if (puck_game->game_state == LPGS_PRACTICE || puck_game->game_state == LPGS_TUTORIAL) {
+        // update puck game time is done in the function below
         puck_game_update_tick(puck_game, pLwc->update_frequency);
+    } else {
+        // update puck game time according to update tick which is synced with server
+        puck_game->time = puck_game_elapsed_time(puck_game->update_tick, pLwc->update_frequency);
     }
     // set boundary impact according to wall hit bits
     for (int i = 0; i < 4; i++) {

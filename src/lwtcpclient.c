@@ -188,6 +188,7 @@ int parse_recv_packets(LWTCP* tcp) {
             udp_update_addr(pLwc->udp,
                             pLwc->udp_host_addr.host_resolved,
                             pLwc->udp_host_addr.port);
+            memcpy(&pLwc->puck_game->matched2, p, sizeof(pLwc->puck_game->matched2));
             // Since player_no updated
             puck_game_reset_view_proj(pLwc, pLwc->puck_game);
             //show_sys_msg(pLwc->def_sys_msg, "LWPMATCHED2 received");

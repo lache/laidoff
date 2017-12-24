@@ -10,8 +10,8 @@ import (
 	"github.com/gasbank/laidoff/db-server/user"
 	"github.com/gasbank/laidoff/rank-server/rankservice"
 	"github.com/gasbank/laidoff/shared-server"
-	"math"
 	"os"
+	"github.com/gasbank/laidoff/reward-server/rating"
 )
 
 const (
@@ -101,7 +101,7 @@ func handleBattleResult(buf []byte, rankService rankservice.Rank, dbService dbse
 	if err != nil {
 		log.Printf("rpc rank get failed: %v", err.Error())
 	}
-	newRating1, newRating2 := calculateNewRating(oldRating1, oldRating2, winner)
+	newRating1, newRating2 := rating.CalculateNewRating(oldRating1.Score, oldRating2.Score, winner)
 	var reply1, reply2 int
 	err = rankService.Set(&shared_server.ScoreItem{Id: id1, Score: newRating1, Nickname: nickname1}, &reply1)
 	if err != nil {
@@ -114,25 +114,6 @@ func handleBattleResult(buf []byte, rankService rankservice.Rank, dbService dbse
 	// update user db battle stat
 	updateUserDbBattleStat(recvPacket, int(recvPacket.S.BattleTimeSec), int(recvPacket.S.Winner), dbService, 1, newRating1)
 	updateUserDbBattleStat(recvPacket, int(recvPacket.S.BattleTimeSec), int(recvPacket.S.Winner), dbService, 2, newRating2)
-}
-
-func calculateNewRating(old1 shared_server.ScoreRankItem, old2 shared_server.ScoreRankItem, winner int) (int, int) {
-	e1 := 1.0 / (1.0 + math.Pow(10.0, (float64)(old2.Score - old1.Score)/400))
-	e2 := 1.0 / (1.0 + math.Pow(10.0, (float64)(old1.Score - old2.Score)/400))
-	K := 32
-	var s1, s2 float64
-	if winner == 0 {
-		s1, s2 = 0.5, 0.5
-	} else if winner == 1 {
-		s1, s2 = 1.0, 0.0
-	} else if winner == 2 {
-		s1, s2 = 0.0, 1.0
-	} else {
-		log.Printf("invalid winner %v", winner)
-	}
-	new1 := float64(old1.Score) + float64(K) * (s1 - e1)
-	new2 := float64(old2.Score) + float64(K) * (s2 - e2)
-	return int(new1), int(new2)
 }
 
 func updateUserDbBattleStat(recvPacket *convert.BattleResult, battleTimeSec, winner int, dbService dbservice.Db, playerNo int, rating int) {

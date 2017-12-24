@@ -132,13 +132,13 @@ func WriteMatched2(conf config.ServerConfig, conn net.Conn, battleOk Ok, id user
 		return
 	}
 	if battleOk.c1.Db.Id == id {
-		conn.Write(createMatched2Buf(conf, battleOk.createBattleOk, uint32(battleOk.createBattleOk.S.C1_token), 1, battleOk.c2.Db.Rating, battleOk.c2.Db.Nickname))
+		conn.Write(createMatched2Buf(conf, battleOk.createBattleOk, uint(battleOk.createBattleOk.S.C1_token), 1, battleOk.c1.Db.Rating, battleOk.c2.Db.Rating, battleOk.c2.Db.Nickname))
 	} else if battleOk.c2.Db.Id == id {
-		conn.Write(createMatched2Buf(conf, battleOk.createBattleOk, uint32(battleOk.createBattleOk.S.C2_token), 2, battleOk.c1.Db.Rating, battleOk.c1.Db.Nickname))
+		conn.Write(createMatched2Buf(conf, battleOk.createBattleOk, uint(battleOk.createBattleOk.S.C2_token), 2, battleOk.c2.Db.Rating, battleOk.c1.Db.Rating, battleOk.c1.Db.Nickname))
 	}
 }
 
-func createMatched2Buf(conf config.ServerConfig, createBattleOk convert.CreateBattleOk, token uint32, playerNo int, targetScore int, targetNickname string) []byte {
+func createMatched2Buf(conf config.ServerConfig, createBattleOk convert.CreateBattleOk, token uint, playerNo, playerScore, targetScore int, targetNickname string) []byte {
 	publicAddr, err := net.ResolveTCPAddr(conf.BattlePublicServiceConnType, conf.BattlePublicServiceHost+":"+conf.BattlePublicServicePort)
 	if err != nil {
 		log.Panicf("BattlePublicService conf parse error: %v", err.Error())
@@ -149,8 +149,9 @@ func createMatched2Buf(conf config.ServerConfig, createBattleOk convert.CreateBa
 		publicAddr.Port,
 		publicAddrIpv4,
 		int(createBattleOk.S.Battle_id),
-		uint(token),
-		int(playerNo),
+		token,
+		playerNo,
+		playerScore,
 		targetScore,
 		targetNickname,
 	))
