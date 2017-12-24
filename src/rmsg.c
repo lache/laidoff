@@ -93,3 +93,12 @@ void rmsg_quitapp(LWCONTEXT* pLwc, void* native_context) {
     cmd->native_context = native_context;
     s_send_and_close_rmsg(pLwc, &rmsg);
 }
+
+void rmsg_loadtex(LWCONTEXT* pLwc, int lae) {
+    zmq_msg_t rmsg;
+    zmq_msg_init_size(&rmsg, sizeof(LWFIELDRENDERCOMMAND));
+    LWFIELDRENDERCOMMAND* cmd = zmq_msg_data(&rmsg);
+    cmd->cmdtype = LRCT_LOADTEX;
+    cmd->atlas = lae;
+    s_send_and_close_rmsg(pLwc, &rmsg);
+}

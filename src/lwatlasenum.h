@@ -285,3 +285,4 @@ LwStaticAssert(ARRAY_SIZE(tex_atlas_filename) == LAE_COUNT, "LAE_COUNT error");
 
 void lw_load_tex(const LWCONTEXT* _pLwc, int lae);
 void lazy_tex_atlas_glBindTexture(const LWCONTEXT* _pLwc, int lae);
+void lw_load_tex_async(const LWCONTEXT* _pLwc, int lae);

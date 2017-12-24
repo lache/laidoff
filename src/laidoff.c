@@ -747,6 +747,10 @@ void handle_rmsg_quitapp(LWCONTEXT* pLwc, const LWFIELDRENDERCOMMAND* cmd) {
     lw_app_quit(pLwc, cmd->native_context);
 }
 
+void handle_rmsg_loadtex(LWCONTEXT* pLwc, const LWFIELDRENDERCOMMAND* cmd) {
+    lw_load_tex(pLwc, cmd->atlas);
+}
+
 void delete_all_rmsgs(LWCONTEXT* pLwc) {
     zmq_msg_t rmsg;
     while (1) {
@@ -797,6 +801,9 @@ static void read_all_rmsgs(LWCONTEXT* pLwc) {
                 break;
             case LRCT_QUITAPP:
                 handle_rmsg_quitapp(pLwc, cmd);
+                break;
+            case LRCT_LOADTEX:
+                handle_rmsg_loadtex(pLwc, cmd);
                 break;
         }
         zmq_msg_close(&rmsg);

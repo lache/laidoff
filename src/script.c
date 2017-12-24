@@ -342,7 +342,7 @@ int l_spawn_oil_truck(lua_State* L) {
 		float x = (float)lua_tonumber(L, 2);
 		float y = (float)lua_tonumber(L, 3);
 		int field_event_id = (int)lua_tonumber(L, 4);
-        lw_load_tex(pLwc, LAE_3D_OIL_TRUCK_TEX_KTX); // TODO safe?
+        lw_load_tex_async(pLwc, LAE_3D_OIL_TRUCK_TEX_KTX); // TODO safe?
 		int r = spawn_field_object(pLwc->field,
                                    x,
                                    y,
@@ -366,7 +366,7 @@ int l_spawn_devil(lua_State* L) {
 		float x = (float)lua_tonumber(L, 2);
 		float y = (float)lua_tonumber(L, 3);
 		int field_event_id = (int)lua_tonumber(L, 4);
-        lw_load_tex(pLwc, LAE_DEVIL_KTX);
+        lw_load_tex_async(pLwc, LAE_DEVIL_KTX);
 		int r = spawn_field_object(pLwc->field,
                                    x,
                                    y,

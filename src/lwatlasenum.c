@@ -5,6 +5,12 @@
 #include "lwlog.h"
 #include "laidoff.h"
 #include <memory.h>
+#include "rmsg.h"
+
+void lw_load_tex_async(const LWCONTEXT* _pLwc, int lae) {
+    LWCONTEXT* pLwc = (LWCONTEXT*)_pLwc;
+    rmsg_loadtex(pLwc, lae);
+}
 
 void lw_load_tex(const LWCONTEXT* _pLwc, int lae) {
     LWCONTEXT* pLwc = (LWCONTEXT*)_pLwc;

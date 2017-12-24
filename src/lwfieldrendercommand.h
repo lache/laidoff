@@ -14,6 +14,7 @@ typedef enum _LW_RENDER_COMMAND_TYPE {
 	LRCT_RPARAMS,
 	LRCT_BULLETSPAWNHEIGHT,
     LRCT_QUITAPP, // render thread == main thread
+    LRCT_LOADTEX,
 } LW_RENDER_COMMAND_TYPE;
 
 typedef struct _LWFIELDRENDERCOMMAND {
