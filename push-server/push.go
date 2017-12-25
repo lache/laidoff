@@ -16,6 +16,7 @@ import (
 	"html/template"
 	"regexp"
 	"fmt"
+	"github.com/gasbank/laidoff/db-server/user"
 )
 
 type UserId [16]byte
@@ -56,7 +57,7 @@ type PushServiceData struct {
 	UserIdMap    map[UserId]string // User ID --> Push Token
 }
 
-func (t *PushServiceData) Add(id UserId, pushToken string, domain int) {
+func (t *PushServiceData) Add(id user.Id, pushToken string, domain int) {
 	var idFixed [16]byte
 	copy(idFixed[:], id[:])
 	t.PushTokenMap[pushToken] = PushUserData{idFixed, domain, "", pushToken}
@@ -285,7 +286,7 @@ func sendPushHandler(w http.ResponseWriter, r *http.Request, pushService *PushSe
 	http.Redirect(w, r, "/push/", http.StatusFound)
 }
 
-func editPushTokenHandler(w http.ResponseWriter, r *http.Request, pushService *PushService, pushToken string) {
+func editPushTokenHandler(w http.ResponseWriter, _ *http.Request, pushService *PushService, pushToken string) {
 	pushUserData := pushService.data.PushTokenMap[pushToken]
 	err := templates.ExecuteTemplate(w, "editPushToken.html", pushUserData)
 	if err != nil {
@@ -293,7 +294,7 @@ func editPushTokenHandler(w http.ResponseWriter, r *http.Request, pushService *P
 	}
 }
 
-func writePushHandler(w http.ResponseWriter, r *http.Request, pushService *PushService, pushToken string) {
+func writePushHandler(w http.ResponseWriter, _ *http.Request, _ *PushService, pushToken string) {
 	type WritePushData struct {
 		PushToken string
 	}
@@ -337,9 +338,9 @@ func startAdminService(pushService *PushService) {
 }
 
 const (
-	ANDROID_KEY_PATH = "cert/dev/fcmserverkey"
-	APPLE_KEY_PATH = "cert/dev/cert.p12"
-	APPLE_PROD_KEY_PATH = "cert/prod/cert.p12"
+	ANDROIDKEYPATH   = "cert/dev/fcmserverkey"
+	APPLEKEYPATH     = "cert/dev/cert.p12"
+	APPLEPRODKEYPATH = "cert/prod/cert.p12"
 )
 
 var prod bool
@@ -359,7 +360,7 @@ func main() {
 	os.MkdirAll("db", os.ModePerm)
 	os.MkdirAll("pages", os.ModePerm)
 	// Load Firebase Cloud Messaging (FCM) server key
-	fcmServerKeyBuf, err := ioutil.ReadFile(ANDROID_KEY_PATH)
+	fcmServerKeyBuf, err := ioutil.ReadFile(ANDROIDKEYPATH)
 	if err != nil {
 		log.Fatalf("fcm server key load failed: %v", err.Error())
 	}
@@ -416,9 +417,9 @@ func main() {
 func PostIosMessage(pushToken string, body string) {
 	var appleKeyPath string
 	if prod {
-		appleKeyPath = APPLE_PROD_KEY_PATH
+		appleKeyPath = APPLEPRODKEYPATH
 	} else {
-		appleKeyPath = APPLE_KEY_PATH
+		appleKeyPath = APPLEKEYPATH
 	}
 	cert, err := certificate.FromP12File(appleKeyPath, "")
 	if err != nil {
