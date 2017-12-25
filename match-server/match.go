@@ -195,54 +195,59 @@ func handleRequest(req *HandleRequestRequest) {
 			log.Printf("%v: Error reading: %v", req.Conn.RemoteAddr(), err.Error())
 		}
 		log.Printf("%v: Packet received (readLen=%v)", req.Conn.RemoteAddr(), readLen)
-		packetSize := binary.LittleEndian.Uint16(buf)
-		packetType := binary.LittleEndian.Uint16(buf[2:])
-		log.Printf("  Size %v", packetSize)
-		log.Printf("  Type %v", packetType)
+		for readLen > 0 {
+			packetSize := binary.LittleEndian.Uint16(buf)
+			packetType := binary.LittleEndian.Uint16(buf[2:])
+			log.Printf("  Size %v", packetSize)
+			log.Printf("  Type %v", packetType)
 
-		switch packetType {
-		case convert.LPGPLWPQUEUE2:
-			handler.HandleQueue2(req.Conf, req.MatchQueue, buf, req.Conn, req.OngoingBattleMap, req.Battle, req.BattleOkQueue, req.ServiceList.Db)
-		case convert.LPGPLWPQUEUE3:
-			req := &handler.HandleQueue3Request{
-				Conf:                req.Conf,
-				NearestMatchMap:     req.NearestMatchMap,
-				NearestMatchMapLock: req.NearestMatchMapLock,
-				MatchQueue:          req.MatchQueue,
-				Buf:                 buf,
-				Conn:                req.Conn,
-				OngoingBattleMap:    req.OngoingBattleMap,
-				BattleService:       req.Battle,
-				BattleOkQueue:       req.BattleOkQueue,
-				Db:                  req.ServiceList.Db,
-				Rank:                req.ServiceList.Rank,
+			switch packetType {
+			case convert.LPGPLWPQUEUE2:
+				handler.HandleQueue2(req.Conf, req.MatchQueue, buf, req.Conn, req.OngoingBattleMap, req.Battle, req.BattleOkQueue, req.ServiceList.Db)
+			case convert.LPGPLWPQUEUE3:
+				req := &handler.HandleQueue3Request{
+					Conf:                req.Conf,
+					NearestMatchMap:     req.NearestMatchMap,
+					NearestMatchMapLock: req.NearestMatchMapLock,
+					MatchQueue:          req.MatchQueue,
+					Buf:                 buf,
+					Conn:                req.Conn,
+					OngoingBattleMap:    req.OngoingBattleMap,
+					BattleService:       req.Battle,
+					BattleOkQueue:       req.BattleOkQueue,
+					Db:                  req.ServiceList.Db,
+					Rank:                req.ServiceList.Rank,
+				}
+				handler.HandleQueue3(req)
+			case convert.LPGPLWPCANCELQUEUE:
+				req := &handler.HandleCancelQueueRequest{
+					MatchQueue:          req.MatchQueue,
+					Buf:                 buf,
+					Conn:                req.Conn,
+					OngoingBattleMap:    req.OngoingBattleMap,
+					Db:                  req.ServiceList.Db,
+					NearestMatchMap:     req.NearestMatchMap,
+					NearestMatchMapLock: req.NearestMatchMapLock,
+					Rank:                req.ServiceList.Rank,
+				}
+				handler.HandleCancelQueue(req)
+			case convert.LPGPLWPSUDDENDEATH:
+				handler.HandleSuddenDeath(req.Conf, buf) // relay 'buf' to battle service
+			case convert.LPGPLWPNEWUSER:
+				handler.HandleNewUser(req.Conn, req.ServiceList.Db)
+			case convert.LPGPLWPQUERYNICK:
+				handler.HandleQueryNick(buf, req.Conn, req.ServiceList.Rank, req.ServiceList.Db)
+			case convert.LPGPLWPPUSHTOKEN:
+				handler.HandlePushToken(buf, req.Conn, req.ServiceList)
+			case convert.LPGPLWPGETLEADERBOARD:
+				handler.HandleGetLeaderboard(buf, req.Conn, req.ServiceList)
+			case convert.LPGPLWPSETNICKNAME:
+				handler.HandleSetNickname(buf, req.Conn, req.ServiceList.Db)
 			}
-			handler.HandleQueue3(req)
-		case convert.LPGPLWPCANCELQUEUE:
-			req := &handler.HandleCancelQueueRequest{
-				MatchQueue:          req.MatchQueue,
-				Buf:                 buf,
-				Conn:                req.Conn,
-				OngoingBattleMap:    req.OngoingBattleMap,
-				Db:                  req.ServiceList.Db,
-				NearestMatchMap:     req.NearestMatchMap,
-				NearestMatchMapLock: req.NearestMatchMapLock,
-				Rank:                req.ServiceList.Rank,
-			}
-			handler.HandleCancelQueue(req)
-		case convert.LPGPLWPSUDDENDEATH:
-			handler.HandleSuddenDeath(req.Conf, buf) // relay 'buf' to battle service
-		case convert.LPGPLWPNEWUSER:
-			handler.HandleNewUser(req.Conn, req.ServiceList.Db)
-		case convert.LPGPLWPQUERYNICK:
-			handler.HandleQueryNick(buf, req.Conn, req.ServiceList.Rank, req.ServiceList.Db)
-		case convert.LPGPLWPPUSHTOKEN:
-			handler.HandlePushToken(buf, req.Conn, req.ServiceList)
-		case convert.LPGPLWPGETLEADERBOARD:
-			handler.HandleGetLeaderboard(buf, req.Conn, req.ServiceList)
-		case convert.LPGPLWPSETNICKNAME:
-			handler.HandleSetNickname(buf, req.Conn, req.ServiceList.Db)
+			readLen = readLen - int(packetSize)
+			buf = buf[packetSize:]
 		}
+
 	}
 	req.Conn.Close()
 	log.Printf("Conn closed %v", req.Conn.RemoteAddr())
