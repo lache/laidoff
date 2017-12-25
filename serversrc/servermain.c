@@ -792,7 +792,6 @@ int main(int argc, char* argv[]) {
     LWCONN conn[LW_CONN_CAPACITY];
     double logic_elapsed_ms = 0;
     double sync_elapsed_ms = 0;
-    lwtimepoint_now_seconds();
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wfor-loop-analysis"
 #pragma clang diagnostic ignored "-Wmissing-noreturn"
