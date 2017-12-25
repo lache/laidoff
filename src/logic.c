@@ -577,8 +577,8 @@ void show_leaderboard(LWCONTEXT* pLwc) {
     tcp_send_get_leaderboard(pLwc->tcp, 300, 0, LW_LEADERBOARD_ITEMS_IN_PAGE, change_to_leaderboard);
 }
 
-void request_top_leaderboard(LWTCP* tcp) {
-    tcp_send_get_leaderboard(tcp, 300, 0, LW_LEADERBOARD_ITEMS_IN_PAGE, 0);
+void request_player_reveal_leaderboard(LWTCP* tcp) {
+    tcp_send_get_leaderboard_reveal_player(tcp, 300, &tcp->user_id, LW_LEADERBOARD_ITEMS_IN_PAGE);
 }
 
 void start_request_push_token(LWCONTEXT* pLwc) {

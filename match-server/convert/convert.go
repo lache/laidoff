@@ -18,16 +18,17 @@ import "C"
 /////////////////////////////////////////////////////////////////////////////////////
 //noinspection ALL
 const (
-	LPGPLWPQUEUE2         = C.LPGP_LWPQUEUE2
-	LPGPLWPQUEUE3         = C.LPGP_LWPQUEUE3
-	LPGPLWPCANCELQUEUE    = C.LPGP_LWPCANCELQUEUE
-	LPGPLWPSUDDENDEATH    = C.LPGP_LWPSUDDENDEATH
-	LPGPLWPNEWUSER        = C.LPGP_LWPNEWUSER
-	LPGPLWPQUERYNICK      = C.LPGP_LWPQUERYNICK
-	LPGPLWPPUSHTOKEN      = C.LPGP_LWPPUSHTOKEN
-	LPGPLWPGETLEADERBOARD = C.LPGP_LWPGETLEADERBOARD
-	LPGPLWPSETNICKNAME    = C.LPGP_LWPSETNICKNAME
-	LPGPLWPBATTLERESULT   = C.LPGP_LWPBATTLERESULT
+	LPGPLWPQUEUE2                     = C.LPGP_LWPQUEUE2
+	LPGPLWPQUEUE3                     = C.LPGP_LWPQUEUE3
+	LPGPLWPCANCELQUEUE                = C.LPGP_LWPCANCELQUEUE
+	LPGPLWPSUDDENDEATH                = C.LPGP_LWPSUDDENDEATH
+	LPGPLWPNEWUSER                    = C.LPGP_LWPNEWUSER
+	LPGPLWPQUERYNICK                  = C.LPGP_LWPQUERYNICK
+	LPGPLWPPUSHTOKEN                  = C.LPGP_LWPPUSHTOKEN
+	LPGPLWPGETLEADERBOARD             = C.LPGP_LWPGETLEADERBOARD
+	LPGPLWPGETLEADERBOARDREVEALPLAYER = C.LPGP_LWPGETLEADERBOARDREVEALPLAYER
+	LPGPLWPSETNICKNAME                = C.LPGP_LWPSETNICKNAME
+	LPGPLWPBATTLERESULT               = C.LPGP_LWPBATTLERESULT
 
 	LWPUCKGAMEQUEUETYPEFIFO         = C.LW_PUCK_GAME_QUEUE_TYPE_FIFO
 	LWPUCKGAMEQUEUETYPENEARESTSCORE = C.LW_PUCK_GAME_QUEUE_TYPE_NEAREST_SCORE
@@ -163,6 +164,7 @@ func NewLwpLeaderboard(leaderboardReply *shared_server.LeaderboardReply) *C.LWPL
 		C.int(leaderboardReply.FirstItemTieCount),
 		nicknameList,
 		scoreList,
+		C.int(leaderboardReply.RevealIndex),
 	}
 }
 func NewLwpNewUserData(uuid user.Id, newNick string, score, rank int) *C.LWPNEWUSERDATA {
@@ -361,6 +363,17 @@ func ParseSetNickname(buf []byte) (*C.LWPSETNICKNAME, error) {
 func ParseGetLeaderboard(buf []byte) (*C.LWPGETLEADERBOARD, error) {
 	bufReader := bytes.NewReader(buf)
 	recvPacket := &C.LWPGETLEADERBOARD{}
+	err := binary.Read(bufReader, binary.LittleEndian, recvPacket)
+	if err != nil {
+		log.Printf("binary.Read fail: %v", err.Error())
+		return nil, err
+	}
+	return recvPacket, nil
+}
+
+func ParseGetLeaderboardRevealPlayer(buf []byte) (*C.LWPGETLEADERBOARDREVEALPLAYER, error) {
+	bufReader := bytes.NewReader(buf)
+	recvPacket := &C.LWPGETLEADERBOARDREVEALPLAYER{}
 	err := binary.Read(bufReader, binary.LittleEndian, recvPacket)
 	if err != nil {
 		log.Printf("binary.Read fail: %v", err.Error())

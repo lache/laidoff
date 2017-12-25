@@ -21,7 +21,7 @@ void tcp_on_connect(LWTCP* tcp, const char* path_prefix) {
         // Request a new user to be created
         tcp_send_newuser(tcp);
     }
-    request_top_leaderboard(tcp);
+    request_player_reveal_leaderboard(tcp);
 }
 
 int tcp_send_sendbuf(LWTCP* tcp, int s) {
@@ -79,6 +79,35 @@ int tcp_send_suddendeath(LWTCP* tcp, int battle_id, unsigned int token) {
     p.Token = token;
     memcpy(tcp->sendbuf, &p, sizeof(p));
     return tcp_send_sendbuf(tcp, sizeof(p));
+}
+
+int tcp_send_get_leaderboard_reveal_player(LWTCP* tcp, int backoffMs, const LWUNIQUEID* user_id, int count) {
+    LOGI("Sending LWPGETLEADERBOARDREVEALPLAYER");
+    if (tcp == 0) {
+        LOGE("tcp null");
+        return -1;
+    }
+    NEW_TCP_PACKET_CAPITAL(LWPGETLEADERBOARDREVEALPLAYER, p);
+    memcpy(p.Id, user_id, sizeof(p.Id));
+    p.Count = count;
+    memcpy(tcp->sendbuf, &p, sizeof(p));
+    int send_result = (int)send(tcp->ConnectSocket, tcp->sendbuf, sizeof(p), 0);
+    if (send_result < 0) {
+        LOGI("Send result error: %d", send_result);
+        if (backoffMs > 10 * 1000 /* 10 seconds */) {
+            LOGE(LWLOGPOS "failed");
+            return -1;
+        } else if (backoffMs > 0) {
+#if LW_PLATFORM_WIN32
+            Sleep(backoffMs);
+#else
+            usleep(backoffMs * 1000);
+#endif
+        }
+        tcp_connect(tcp);
+        return tcp_send_get_leaderboard_reveal_player(tcp, backoffMs * 2, user_id, count);
+    }
+    return send_result;
 }
 
 int tcp_send_get_leaderboard(LWTCP* tcp, int backoffMs, int start_index, int count, void (*on_leaderboard_packet)(LWCONTEXT* pLwc)) {

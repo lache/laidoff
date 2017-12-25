@@ -28,6 +28,7 @@ int get_cached_user_id(const char* path_prefix, LWUNIQUEID* id) {
 	FILE* f;
 	char path[1024] = { 0, };
 	concat_path(path, path_prefix, LW_USER_ID_CACHE_FILE);
+    LOGI("Open cached user id file: %s", path);
 	f = fopen(path, "rb");
 	if (f == 0) {
 		// no cached user id exists

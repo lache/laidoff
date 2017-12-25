@@ -241,6 +241,8 @@ func handleRequest(req *HandleRequestRequest) {
 				handler.HandlePushToken(buf, req.Conn, req.ServiceList)
 			case convert.LPGPLWPGETLEADERBOARD:
 				handler.HandleGetLeaderboard(buf, req.Conn, req.ServiceList)
+			case convert.LPGPLWPGETLEADERBOARDREVEALPLAYER:
+				handler.HandleGetLeaderboardRevealPlayer(buf, req.Conn, req.ServiceList)
 			case convert.LPGPLWPSETNICKNAME:
 				handler.HandleSetNickname(buf, req.Conn, req.ServiceList.Db)
 			}

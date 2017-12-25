@@ -41,6 +41,7 @@ typedef enum _LW_PUCK_GAME_PACKET {
     LPGP_LWPRETRYQUEUELATER = 220,
     LPGP_LWPQUEUE3 = 221,
     LPGP_LWPRETRYQUEUE2 = 222,
+    LPGP_LWPGETLEADERBOARDREVEALPLAYER = 223,
     // should be less than 256 (packet type field: unsigned char type)
     LPGP_SENTIAL_UNSIGNED_CHAR = 255,
 	// internal admin tcp
@@ -379,7 +380,15 @@ typedef struct _LWPLEADERBOARD {
     int First_item_tie_count;
     char Nickname[LW_LEADERBOARD_ITEMS_IN_PAGE][LW_NICKNAME_MAX_LEN];
     int Score[LW_LEADERBOARD_ITEMS_IN_PAGE];
+    int Reveal_index;
 } LWPLEADERBOARD;
+
+typedef struct _LWPGETLEADERBOARDREVEALPLAYER {
+    unsigned short Size;
+    unsigned short Type;
+    unsigned int Id[4];
+    int Count;
+} LWPGETLEADERBOARDREVEALPLAYER;
 
 enum {
     LW_PUSH_TOKEN_LENGTH = 256,

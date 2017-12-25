@@ -30,7 +30,7 @@ void load_field_5_init_runtime_data(LWCONTEXT* pLwc);
 void show_leaderboard(LWCONTEXT* pLwc);
 void change_to_leaderboard(LWCONTEXT* pLwc);
 void change_to_physics(LWCONTEXT* pLwc);
-void request_top_leaderboard(LWTCP* tcp);
+void request_player_reveal_leaderboard(LWTCP* tcp);
 #ifdef __cplusplus
 };
 #endif

@@ -1,5 +1,7 @@
 package shared_server
 
+import "github.com/gasbank/laidoff/db-server/user"
+
 type Args struct {
 	A, B int
 }
@@ -11,7 +13,7 @@ type Quotient struct {
 type PushToken struct {
 	Domain    int
 	PushToken string
-	UserId    [16]byte
+	UserId    user.Id
 }
 
 type BroadcastPush struct {
@@ -20,20 +22,32 @@ type BroadcastPush struct {
 }
 
 type ScoreItem struct {
-	Id       [16]byte
+	Id       user.Id
 	Score    int
 	Nickname string
 }
 
 type ScoreRankItem struct {
-	Id    [16]byte
+	Id    user.Id
 	Score int
 	Rank  int
+}
+
+type ScoreRankIndexItem struct {
+	Id    user.Id
+	Score int
+	Rank  int
+	Index int
 }
 
 type LeaderboardRequest struct {
 	StartIndex int
 	Count      int
+}
+
+type LeaderboardRevealPlayerRequest struct {
+	Id    user.Id
+	Count int
 }
 
 type LeaderboardItem struct {
@@ -44,5 +58,6 @@ type LeaderboardItem struct {
 type LeaderboardReply struct {
 	FirstItemRank     int
 	FirstItemTieCount int
+	RevealIndex       int
 	Items             []LeaderboardItem
 }

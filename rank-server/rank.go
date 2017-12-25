@@ -193,13 +193,13 @@ func (t *RankData) RemoveNearestOverlap(id user.Id, distanceByElapsed *rankservi
 		t.Remove(nearestResult.Id)
 		t.Remove(nearestResult.NearestId)
 		return &rankservice.RemoveNearestOverlapResult{
-			Matched: true,
+			Matched:       true,
 			NearestResult: nearestResult,
-			}, nil
+		}, nil
 	} else {
 		return &rankservice.RemoveNearestOverlapResult{
 			NearestResult: nearestResult,
-			}, nil
+		}, nil
 	}
 }
 
@@ -388,7 +388,7 @@ func (t *RankService) Set(args *shared_server.ScoreItem, reply *int) error {
 }
 
 // Get is a rpc call wrapper for Get.
-func (t *RankService) Get(args *[16]byte, reply *shared_server.ScoreRankItem) error {
+func (t *RankService) Get(args *user.Id, reply *shared_server.ScoreRankItem) error {
 	score, rank, _, err := t.rank.Get(*args)
 	if err != nil {
 		log.Printf("Get failed: %v", err)
@@ -399,6 +399,24 @@ func (t *RankService) Get(args *[16]byte, reply *shared_server.ScoreRankItem) er
 		reply.Id = *args
 		reply.Score = score
 		reply.Rank = rank
+	}
+	return nil
+}
+
+// GetWithIndex is a rpc call wrapper for GetWithIndex.
+func (t *RankService) GetWithIndex(args *user.Id, reply *shared_server.ScoreRankIndexItem) error {
+	score, rank, _, index, err := t.rank.GetWithIndex(*args)
+	if err != nil {
+		log.Printf("Get failed: %v", err)
+		reply.Id = *args
+		reply.Score = 1500
+		reply.Rank = -1
+		reply.Index = -1
+	} else {
+		reply.Id = *args
+		reply.Score = score
+		reply.Rank = rank
+		reply.Index = index
 	}
 	return nil
 }
@@ -439,6 +457,30 @@ func (t *RankService) GetLeaderboard(args *shared_server.LeaderboardRequest, rep
 		}
 		reply.Items = items
 	}
+	return nil
+}
+
+// GetLeaderboardRevealPlayer is a rpc call wrapper for getting a leaderboard page revealing specific player.
+func (t *RankService) GetLeaderboardRevealPlayer(args *shared_server.LeaderboardRevealPlayerRequest, reply *shared_server.LeaderboardReply) error {
+	_, _, _, idArrayIndex, err := t.rank.GetWithIndex(args.Id)
+	var page, revealIndex int
+	if err != nil {
+		page = 0
+		revealIndex = -1
+	} else {
+		page = int(idArrayIndex / args.Count)
+		revealIndex = idArrayIndex - page*args.Count
+	}
+	req := shared_server.LeaderboardRequest{
+		StartIndex: page * args.Count,
+		Count:      args.Count,
+	}
+	err = t.GetLeaderboard(&req, reply)
+	if err != nil {
+		return err
+	}
+	// additionally, write RevealIndex field
+	reply.RevealIndex = revealIndex
 	return nil
 }
 
@@ -494,6 +536,10 @@ func (t *RankService) commitQueueScoreMatch(args *rankservice.QueueScoreMatchReq
 	return nil
 }
 
+func registerRankService(rpcServer *rpc.Server, rankInterface rankservice.Rank) {
+	rpcServer.RegisterName("Rank", rankInterface)
+}
+
 // main is an entry function for this package.
 func main() {
 	log.SetFlags(log.LstdFlags | log.Lshortfile)
@@ -505,7 +551,7 @@ func main() {
 		matchPool:        newRank(),
 		matchPoolRequest: make(chan QueueScoreMatchRequestQueue),
 	}
-	server.RegisterName("Rank", rankService)
+	registerRankService(server, rankService)
 	addr := ":20172"
 	log.Printf("Listening %v for rank service...", addr)
 	// Listen for incoming tcp packets on specified port.

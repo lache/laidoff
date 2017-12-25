@@ -268,6 +268,16 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
         sprintf(run_this, "%s 1 &", pLwc->argv[0]);
         system(run_this);
     }
+    if (key == GLFW_KEY_2 && action == GLFW_PRESS) {
+        char run_this[512];
+        sprintf(run_this, "%s 2 &", pLwc->argv[0]);
+        system(run_this);
+    }
+    if (key == GLFW_KEY_3 && action == GLFW_PRESS) {
+        char run_this[512];
+        sprintf(run_this, "%s 3 &", pLwc->argv[0]);
+        system(run_this);
+    }
 #endif
 }
 

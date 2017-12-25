@@ -96,8 +96,6 @@ function on_ui_event(id)
 	elseif id == 'jump_button' then
 		print('[script]button_jump')
 		lo.puck_game_jump(c, c.puck_game)
-		-- temporarily for rematch
-		lo.puck_game_rematch(c, c.puck_game)
 		return 0
 	elseif id == 'practice_button' then
 		print('[script]practice_button')
@@ -118,7 +116,10 @@ function on_ui_event(id)
 			lo.change_to_physics(c)
 		elseif c.puck_game.game_state == lo.LPGS_TUTORIAL then
 			lo.script_cleanup_all_coros(c)
-			--c.puck_game.game_state = lo.LPGS_MAIN_MENU
+			lo.lw_go_back(c, c.android_native_activity)
+		elseif c.puck_game.game_state == lo.LPGS_BATTLE then
+			-- refresh leaderboard
+			lo.request_player_reveal_leaderboard(c.tcp)
 			lo.lw_go_back(c, c.android_native_activity)
 		else
 			lo.lw_go_back(c, c.android_native_activity)

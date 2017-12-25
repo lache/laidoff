@@ -12,6 +12,7 @@ int tcp_send_newuser(LWTCP* tcp);
 int tcp_send_querynick(LWTCP* tcp, const LWUNIQUEID* id);
 int tcp_send_push_token(LWTCP* tcp, int backoffMs, int domain, const char* push_token);
 int tcp_send_get_leaderboard(LWTCP* tcp, int backoffMs, int start_index, int count, void (*on_leaderboard_packet)(LWCONTEXT* pLwc));
+int tcp_send_get_leaderboard_reveal_player(LWTCP* tcp, int backoffMs, const LWUNIQUEID* user_id, int count);
 int tcp_send_setnickname(LWTCP* tcp, const LWUNIQUEID* id, const char* nickname);
 int tcp_send_cancelqueue(LWTCP* tcp, const LWUNIQUEID* id);
 int parse_recv_packets(LWTCP* tcp);

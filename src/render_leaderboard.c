@@ -4,14 +4,25 @@
 #include "render_text_block.h"
 #include <string.h>
 
-static void render_item(const LWCONTEXT* pLwc, int index, const char* rank, const char* nickname, const char* score, int header, float x0, float y0, float ui_alpha) {
+static void render_item(const LWCONTEXT* pLwc,
+                        int index,
+                        const char* rank,
+                        const char* nickname,
+                        const char* score,
+                        int header,
+                        float x0,
+                        float y0,
+                        float ui_alpha,
+                        float r,
+                        float g,
+                        float b) {
     LWTEXTBLOCK text_block;
     text_block.align = LTBA_LEFT_BOTTOM;
     text_block.text_block_width = DEFAULT_TEXT_BLOCK_WIDTH;
     text_block.text_block_line_height = DEFAULT_TEXT_BLOCK_LINE_HEIGHT_F;
     text_block.size = DEFAULT_TEXT_BLOCK_SIZE_E;
     text_block.multiline = 1;
-    SET_COLOR_RGBA_FLOAT(text_block.color_normal_glyph, 1, 1, (float)(1 - header), ui_alpha);
+    SET_COLOR_RGBA_FLOAT(text_block.color_normal_glyph, r, g, b, ui_alpha);
     SET_COLOR_RGBA_FLOAT(text_block.color_normal_outline, 0, 0, 0, ui_alpha);
     SET_COLOR_RGBA_FLOAT(text_block.color_emp_glyph, 1, 1, 0, ui_alpha);
     SET_COLOR_RGBA_FLOAT(text_block.color_emp_outline, 0, 0, 0, ui_alpha);
@@ -62,7 +73,7 @@ static void render_title(const LWCONTEXT* pLwc) {
 
 void render_leaderboard_table(const LWCONTEXT* pLwc, float x0, float y0, float ui_alpha) {
     // Render leaderboard table header
-    render_item(pLwc, 0, "#", "Nickname", "Score", 1, x0, y0, ui_alpha);
+    render_item(pLwc, 0, "#", "Nickname", "Score", 1, x0, y0, ui_alpha, 1, 1, 0);
     // Render leaderboard table
     const LWPLEADERBOARD* p = &pLwc->last_leaderboard;
     int rank = p->First_item_rank;
@@ -72,7 +83,11 @@ void render_leaderboard_table(const LWCONTEXT* pLwc, float x0, float y0, float u
         sprintf(rank_str, "%d", rank + 1);
         char score_str[64];
         sprintf(score_str, "%d", p->Score[i]);
-        render_item(pLwc, i + 1, rank_str, p->Nickname[i], score_str, 0, x0, y0, ui_alpha);
+        float r = 1, g = 1, b = 1;
+        if (p->Reveal_index == i) {
+            r = 0.0f, g = 1.0f, b = 0.3f;
+        }
+        render_item(pLwc, i + 1, rank_str, p->Nickname[i], score_str, 0, x0, y0, ui_alpha, r, g, b);
         if (i < p->Count - 1) {
             if (p->Score[i] == p->Score[i+1]) {
                 tieCount++;
