@@ -54,3 +54,16 @@ SetConsoleTextAttribute(hConsole, saved_attributes); \
 #define LOGF(...) ((void)__android_log_print(ANDROID_LOG_ERROR, "native-activity", __VA_ARGS__));abort()
 #define LOGA(...) ((void)__android_log_print(ANDROID_LOG_ASSERT, "native-activity", __VA_ARGS__))
 #endif
+
+#define LW_STRINGIFY_(x) #x
+#define LW_STRINGIFY(x) LW_STRINGIFY_(x)
+#define __LW_STRING_LINE__ LW_STRINGIFY(__LINE__)
+#define LWLOGPOS __FILE__ "(" __LW_STRING_LINE__ "): "
+
+#define LOGVP(...) LOGV(LWLOGPOS __VA_ARGS__)
+#define LOGDP(...) LOGD(LWLOGPOS __VA_ARGS__)
+#define LOGIP(...) LOGI(LWLOGPOS __VA_ARGS__)
+#define LOGWP(...) LOGW(LWLOGPOS __VA_ARGS__)
+#define LOGEP(...) LOGE(LWLOGPOS __VA_ARGS__)
+#define LOGFP(...) LOGF(LWLOGPOS __VA_ARGS__)
+#define LOGAP(...) LOGA(LWLOGPOS __VA_ARGS__)
