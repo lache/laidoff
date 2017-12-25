@@ -305,178 +305,202 @@ int control_index_from_player_no(int player_no) {
     return player_no - 1;
 }
 
-void select_server(LWSERVER* server, LWCONN* conn) {
+void select_server(LWSERVER* server, LWCONN* conn, LWTCP* reward_service) {
     //clear the buffer by filling null, it might have previously received data
     memset(server->buf, '\0', BUFLEN);
     fd_set readfds;
     FD_ZERO(&readfds);
     FD_SET(server->s, &readfds);
+    if (reward_service && reward_service->ConnectSocket != INVALID_SOCKET) {
+        FD_SET(reward_service->ConnectSocket, &readfds);
+    }
     struct timeval tv;
     tv.tv_sec = 0;
-    tv.tv_usec = 2500;
-    int rv = select(server->s + 1, &readfds, NULL, NULL, &tv);
-    //printf("rv");
+    tv.tv_usec = 2500; // 400 Hz
+    int maxfds = LWMAX(reward_service->ConnectSocket, server->s) + 1;
+    int rv = select(maxfds, &readfds, NULL, NULL, &tv);
+    LOGIx("select() return value: %d", rv);
     //try to receive some data, this is a blocking call
-    if (rv == 1) {
-        server->recv_len = (int)recvfrom(server->s,
-                                         server->buf,
-                                         BUFLEN,
-                                         0,
-                                         (struct sockaddr*)&server->si_other,
-                                         &server->slen);
-        if (server->recv_len == SOCKET_ERROR) {
-
-        } else {
-            add_conn(conn, LW_CONN_CAPACITY, &server->si_other);
-
-            const int packet_type = *(int*)server->buf;
-            switch (packet_type) {
-                case LPGP_LWPGETTOKEN: {
-                    LWPTOKEN p;
-                    p.type = LPGP_LWPTOKEN;
-                    ++server->token_counter;
-                    p.token = server->token_counter;
-                    SERVER_SEND(server, p);
-                    break;
-                }
-                case LPGP_LWPQUEUE: {
-                    LWPMATCHED p;
-                    p.type = LPGP_LWPMATCHED;
-                    p.master = 0;
-                    SERVER_SEND(server, p);
-                    break;
-                }
-                case LPGP_LWPMOVE: {
-                    LWPMOVE* p = (LWPMOVE*)server->buf;
-                    LWPUCKGAME* pg = 0;
-                    int player_no = check_token(server, (LWPUDPHEADER*)p, &pg);
-                    if (check_player_no(player_no)) {
-                        //LOGI("MOVE dx=%.2f dy=%.2f", p->dx, p->dy);
-                        LWREMOTEPLAYERCONTROL* control = &pg->remote_control[control_index_from_player_no(player_no)];
-                        control->dir_pad_dragging = 1;
-                        control->dx = p->dx;
-                        control->dy = p->dy;
-                        control->dlen = p->dlen;
-                        add_conn_with_token(conn,
-                                            LW_CONN_CAPACITY,
-                                            &server->si_other,
-                                            p->battle_id,
-                                            (unsigned int)p->token,
-                                            player_no);
-                    }
-                    break;
-                }
-                case LPGP_LWPSTOP: {
-                    LWPSTOP* p = (LWPSTOP*)server->buf;
-                    LWPUCKGAME* pg = 0;
-                    int player_no = check_token(server, (LWPUDPHEADER*)p, &pg);
-                    if (check_player_no(player_no)) {
-                        //LOGI("STOP");
-                        LWREMOTEPLAYERCONTROL* control = &pg->remote_control[control_index_from_player_no(player_no)];
-                        control->dir_pad_dragging = 0;
-                        add_conn_with_token(conn,
-                                            LW_CONN_CAPACITY,
-                                            &server->si_other,
-                                            p->battle_id,
-                                            (unsigned int)p->token,
-                                            player_no);
-                    }
-                    break;
-                }
-                case LPGP_LWPDASH: {
-                    LWPDASH* p = (LWPDASH*)server->buf;
-                    LWPUCKGAME* pg = 0;
-                    int player_no = check_token(server, (LWPUDPHEADER*)p, &pg);
-                    if (check_player_no(player_no)) {
-                        //LOGI("DASH");
-                        LWPUCKGAMEDASH* dash = &pg->remote_dash[control_index_from_player_no(player_no)];
-                        puck_game_commit_dash_to_puck(pg, dash, player_no);
-                        add_conn_with_token(conn,
-                                            LW_CONN_CAPACITY,
-                                            &server->si_other,
-                                            p->battle_id,
-                                            (unsigned int)p->token,
-                                            player_no);
-                    }
-                    break;
-                }
-                case LPGP_LWPJUMP: {
-                    LWPJUMP* p = (LWPJUMP*)server->buf;
-                    LWPUCKGAME* pg = 0;
-                    int player_no = check_token(server, (LWPUDPHEADER*)p, &pg);
-                    if (check_player_no(player_no)) {
-                        //LOGI("JUMP");
-                        LWPUCKGAMEJUMP* jump = &pg->remote_jump[control_index_from_player_no(player_no)];
-                        puck_game_commit_jump(pg, jump, player_no);
-                        add_conn_with_token(conn,
-                                            LW_CONN_CAPACITY,
-                                            &server->si_other,
-                                            p->battle_id,
-                                            (unsigned int)p->token,
-                                            player_no);
-                    }
-                    break;
-                }
-                case LPGP_LWPFIRE: {
-                    LWPFIRE* p = (LWPFIRE*)server->buf;
-                    LWPUCKGAME* pg = 0;
-                    int player_no = check_token(server, (LWPUDPHEADER*)p, &pg);
-                    if (check_player_no(player_no)) {
-                        //LOGI("FIRE");
-                        LWPUCKGAMEFIRE* fire = &pg->remote_fire[control_index_from_player_no(player_no)];
-                        puck_game_commit_fire(pg, fire, player_no, p->dx, p->dy, p->dlen);
-                        add_conn_with_token(conn,
-                                            LW_CONN_CAPACITY,
-                                            &server->si_other,
-                                            p->battle_id,
-                                            (unsigned int)p->token,
-                                            player_no);
-                    }
-                    break;
-                }
-                case LPGP_LWPPULLSTART: {
-                    LWPPULLSTART* p = (LWPPULLSTART*)server->buf;
-                    LWPUCKGAME* pg = 0;
-                    int player_no = check_token(server, (LWPUDPHEADER*)p, &pg);
-                    if (check_player_no(player_no)) {
-                        //LOGI("PULL START");
-                        LWREMOTEPLAYERCONTROL* control = &pg->remote_control[control_index_from_player_no(player_no)];
-                        control->pull_puck = 1;
-                        add_conn_with_token(conn,
-                                            LW_CONN_CAPACITY,
-                                            &server->si_other,
-                                            p->battle_id,
-                                            (unsigned int)p->token,
-                                            player_no);
-                    }
-                    break;
-                }
-                case LPGP_LWPPULLSTOP: {
-                    LWPPULLSTOP* p = (LWPPULLSTOP*)server->buf;
-                    LWPUCKGAME* pg = 0;
-                    int player_no = check_token(server, (LWPUDPHEADER*)p, &pg);
-                    if (check_player_no(player_no)) {
-                        //LOGI("PULL STOP");
-                        LWREMOTEPLAYERCONTROL* control = &pg->remote_control[control_index_from_player_no(player_no)];
-                        control->pull_puck = 0;
-                        add_conn_with_token(conn,
-                                            LW_CONN_CAPACITY,
-                                            &server->si_other,
-                                            p->battle_id,
-                                            (unsigned int)p->token,
-                                            player_no);
-                    }
-                    break;
-                }
-                default: {
-                    break;
+    switch (rv) {
+        case -1:
+            LOGEP("select() returns -1");
+            exit(-2);
+//        case 0:
+//            // timeout
+//            break;
+        default:
+            if (reward_service
+                && reward_service->ConnectSocket != INVALID_SOCKET
+                && FD_ISSET(reward_service->ConnectSocket, &readfds)) {
+                int recv_count = (int)recv(reward_service->ConnectSocket,
+                                           reward_service->recvbuf,
+                                           (size_t)reward_service->recvbuflen,
+                                           MSG_DONTWAIT);
+                if (recv_count == 0) {
+                    LOGEP("Recv size 0 from reward server. Disconnected.");
+                    closesocket(reward_service->ConnectSocket);
+                    reward_service->ConnectSocket = INVALID_SOCKET;
                 }
             }
-        }
+            if (FD_ISSET(server->s, &readfds)) {
+                server->recv_len = (int)recvfrom(server->s,
+                                                 server->buf,
+                                                 BUFLEN,
+                                                 0,
+                                                 (struct sockaddr*)&server->si_other,
+                                                 &server->slen);
+                if (server->recv_len == SOCKET_ERROR) {
 
+                } else {
+                    add_conn(conn, LW_CONN_CAPACITY, &server->si_other);
 
-    } else {
-        //LOGI("EMPTY");
+                    const int packet_type = *(int*)server->buf;
+                    switch (packet_type) {
+                        case LPGP_LWPGETTOKEN: {
+                            LWPTOKEN p;
+                            p.type = LPGP_LWPTOKEN;
+                            ++server->token_counter;
+                            p.token = server->token_counter;
+                            SERVER_SEND(server, p);
+                            break;
+                        }
+                        case LPGP_LWPQUEUE: {
+                            LWPMATCHED p;
+                            p.type = LPGP_LWPMATCHED;
+                            p.master = 0;
+                            SERVER_SEND(server, p);
+                            break;
+                        }
+                        case LPGP_LWPMOVE: {
+                            LWPMOVE* p = (LWPMOVE*)server->buf;
+                            LWPUCKGAME* pg = 0;
+                            int player_no = check_token(server, (LWPUDPHEADER*)p, &pg);
+                            if (check_player_no(player_no)) {
+                                //LOGI("MOVE dx=%.2f dy=%.2f", p->dx, p->dy);
+                                LWREMOTEPLAYERCONTROL* control = &pg->remote_control[control_index_from_player_no(player_no)];
+                                control->dir_pad_dragging = 1;
+                                control->dx = p->dx;
+                                control->dy = p->dy;
+                                control->dlen = p->dlen;
+                                add_conn_with_token(conn,
+                                                    LW_CONN_CAPACITY,
+                                                    &server->si_other,
+                                                    p->battle_id,
+                                                    (unsigned int)p->token,
+                                                    player_no);
+                            }
+                            break;
+                        }
+                        case LPGP_LWPSTOP: {
+                            LWPSTOP* p = (LWPSTOP*)server->buf;
+                            LWPUCKGAME* pg = 0;
+                            int player_no = check_token(server, (LWPUDPHEADER*)p, &pg);
+                            if (check_player_no(player_no)) {
+                                //LOGI("STOP");
+                                LWREMOTEPLAYERCONTROL* control = &pg->remote_control[control_index_from_player_no(player_no)];
+                                control->dir_pad_dragging = 0;
+                                add_conn_with_token(conn,
+                                                    LW_CONN_CAPACITY,
+                                                    &server->si_other,
+                                                    p->battle_id,
+                                                    (unsigned int)p->token,
+                                                    player_no);
+                            }
+                            break;
+                        }
+                        case LPGP_LWPDASH: {
+                            LWPDASH* p = (LWPDASH*)server->buf;
+                            LWPUCKGAME* pg = 0;
+                            int player_no = check_token(server, (LWPUDPHEADER*)p, &pg);
+                            if (check_player_no(player_no)) {
+                                //LOGI("DASH");
+                                LWPUCKGAMEDASH* dash = &pg->remote_dash[control_index_from_player_no(player_no)];
+                                puck_game_commit_dash_to_puck(pg, dash, player_no);
+                                add_conn_with_token(conn,
+                                                    LW_CONN_CAPACITY,
+                                                    &server->si_other,
+                                                    p->battle_id,
+                                                    (unsigned int)p->token,
+                                                    player_no);
+                            }
+                            break;
+                        }
+                        case LPGP_LWPJUMP: {
+                            LWPJUMP* p = (LWPJUMP*)server->buf;
+                            LWPUCKGAME* pg = 0;
+                            int player_no = check_token(server, (LWPUDPHEADER*)p, &pg);
+                            if (check_player_no(player_no)) {
+                                //LOGI("JUMP");
+                                LWPUCKGAMEJUMP* jump = &pg->remote_jump[control_index_from_player_no(player_no)];
+                                puck_game_commit_jump(pg, jump, player_no);
+                                add_conn_with_token(conn,
+                                                    LW_CONN_CAPACITY,
+                                                    &server->si_other,
+                                                    p->battle_id,
+                                                    (unsigned int)p->token,
+                                                    player_no);
+                            }
+                            break;
+                        }
+                        case LPGP_LWPFIRE: {
+                            LWPFIRE* p = (LWPFIRE*)server->buf;
+                            LWPUCKGAME* pg = 0;
+                            int player_no = check_token(server, (LWPUDPHEADER*)p, &pg);
+                            if (check_player_no(player_no)) {
+                                //LOGI("FIRE");
+                                LWPUCKGAMEFIRE* fire = &pg->remote_fire[control_index_from_player_no(player_no)];
+                                puck_game_commit_fire(pg, fire, player_no, p->dx, p->dy, p->dlen);
+                                add_conn_with_token(conn,
+                                                    LW_CONN_CAPACITY,
+                                                    &server->si_other,
+                                                    p->battle_id,
+                                                    (unsigned int)p->token,
+                                                    player_no);
+                            }
+                            break;
+                        }
+                        case LPGP_LWPPULLSTART: {
+                            LWPPULLSTART* p = (LWPPULLSTART*)server->buf;
+                            LWPUCKGAME* pg = 0;
+                            int player_no = check_token(server, (LWPUDPHEADER*)p, &pg);
+                            if (check_player_no(player_no)) {
+                                //LOGI("PULL START");
+                                LWREMOTEPLAYERCONTROL* control = &pg->remote_control[control_index_from_player_no(player_no)];
+                                control->pull_puck = 1;
+                                add_conn_with_token(conn,
+                                                    LW_CONN_CAPACITY,
+                                                    &server->si_other,
+                                                    p->battle_id,
+                                                    (unsigned int)p->token,
+                                                    player_no);
+                            }
+                            break;
+                        }
+                        case LPGP_LWPPULLSTOP: {
+                            LWPPULLSTOP* p = (LWPPULLSTOP*)server->buf;
+                            LWPUCKGAME* pg = 0;
+                            int player_no = check_token(server, (LWPUDPHEADER*)p, &pg);
+                            if (check_player_no(player_no)) {
+                                //LOGI("PULL STOP");
+                                LWREMOTEPLAYERCONTROL* control = &pg->remote_control[control_index_from_player_no(player_no)];
+                                control->pull_puck = 0;
+                                add_conn_with_token(conn,
+                                                    LW_CONN_CAPACITY,
+                                                    &server->si_other,
+                                                    p->battle_id,
+                                                    (unsigned int)p->token,
+                                                    player_no);
+                            }
+                            break;
+                        }
+                        default: {
+                            break;
+                        }
+                    }
+                }
+            }
+
+            break;
     }
 }
 
@@ -708,13 +732,11 @@ int tcp_send_battle_result(LWTCP* tcp,
     memcpy(tcp->sendbuf, &p, sizeof(p));
     int send_result = (int)send(tcp->ConnectSocket, tcp->sendbuf, sizeof(p), 0);
     if (send_result < 0) {
-        LOGI(LWLOGPOS
-                     "Send result error: %d", send_result);
         if (backoffMs > 10 * 1000 /* 10 seconds */) {
-            LOGE(LWLOGPOS
-                         "tcp_send_battle_result all retries failed");
+            LOGEP("tcp_send_battle_result: all retries failed!!!");
             return -1;
         } else if (backoffMs > 0) {
+            LOGEP("tcp_send_battle_result: retrying in %d ms...", backoffMs);
             struct timespec ts;
             ts.tv_sec = 0;
             ts.tv_nsec = backoffMs * 1000 * 1000;
@@ -788,7 +810,7 @@ int main(int argc, char* argv[]) {
                                     reward_service_on_recv_packets);
     // Create a test puck game instance (not used for battle)
     const double logic_timestep = 1.0 / logic_hz;
-    const double sync_timestep = 1.0 / 70;
+    const double sync_timestep = 1.0 / 60;
     LWCONN conn[LW_CONN_CAPACITY];
     double logic_elapsed_ms = 0;
     double sync_elapsed_ms = 0;
@@ -799,6 +821,9 @@ int main(int argc, char* argv[]) {
         const double loop_start = lwtimepoint_now_seconds();
         if (logic_elapsed_ms > 0) {
             int iter = (int)(logic_elapsed_ms / (logic_timestep * 1000));
+            if (iter > 0) {
+                LOGIx("iter: %d", iter);
+            }
             for (int i = 0; i < iter; i++) {
                 for (int j = 0; j < LW_PUCK_GAME_POOL_CAPACITY; j++) {
                     LWPUCKGAME* puck_game = server->puck_game_pool[j];
@@ -828,7 +853,7 @@ int main(int argc, char* argv[]) {
         LOGIx("Waiting for data...");
         fflush(stdout);
 
-        select_server(server, conn);
+        select_server(server, conn, reward_service);
 
         double loop_time = lwtimepoint_now_seconds() - loop_start;
         logic_elapsed_ms += loop_time * 1000;
