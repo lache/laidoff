@@ -168,7 +168,7 @@ static void render_tower_normal(const LWCONTEXT* pLwc, const mat4x4 view, const 
 }
 
 static void render_tower_normal_2(const LWCONTEXT* pLwc, const mat4x4 view, const mat4x4 proj, const LWPUCKGAME* puck_game, const float* pos, const LWPUCKGAMETOWER* tower, int remote) {
-    int shader_index = LWST_DEFAULT_NORMAL;
+    int shader_index = LWST_DEFAULT;
     const LWSHADER* shader = &pLwc->shader[shader_index];
     lazy_glUseProgram(pLwc, shader_index);
     glUniform2fv(shader->vuvoffset_location, 1, default_uv_offset);
