@@ -338,22 +338,6 @@ void puck_game_clear_match_data(LWCONTEXT* pLwc, LWPUCKGAME* puck_game) {
     memset(&pLwc->puck_game_state, 0, sizeof(pLwc->puck_game_state));
 }
 
-void puck_game_rematch(LWCONTEXT* pLwc, LWPUCKGAME* puck_game) {
-    // queue again after game ended
-    if (puck_game->battle_id
-        && puck_game->token
-        && puck_game_state_phase_finished(pLwc->puck_game_state.bf.phase)) {
-        puck_game_clear_match_data(pLwc, puck_game);
-        puck_game_reset_view_proj(pLwc, puck_game);
-        puck_game_reset(puck_game);
-        puck_game_remote_state_reset(puck_game, &pLwc->puck_game_state);
-        int send_result = tcp_send_queue2(pLwc->tcp, &pLwc->tcp->user_id);
-        if (send_result < 0) {
-            LOGE(LWLOGPOS "Send result failed: %d", send_result);
-        }
-    }
-}
-
 void puck_game_reset_view_proj(LWCONTEXT* pLwc, LWPUCKGAME* puck_game) {
     // Setup puck game view, proj matrices
     

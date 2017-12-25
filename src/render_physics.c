@@ -2060,31 +2060,46 @@ void lwc_render_physics(const LWCONTEXT* pLwc, const mat4x4 view, const mat4x4 p
                      puck_game->tower_collapsing_z_rot_angle[i]);
     }
 
-    if (puck_game->game_state != LPGS_SEARCHING) {
-        // battle UI layer
-        if (puck_game->battle_ui_alpha) {
-            render_battle_ui_layer(pLwc, puck_game, view, proj, pLwc->proj, remote, player_controlled_pos);
+    switch (puck_game->game_state) {
+        case LPGS_SEARCHING:
+        {
+            render_searching_state(pLwc, puck_game);
+            const float button_size = 0.35f;
+            // search cancel button
+            lwbutton_lae_append(&(((LWCONTEXT*)pLwc)->button_list),
+                                "back_button",
+                                +0.0f - button_size * 1.5f / 2,
+                                -0.5f + button_size * 1.5f / 2,
+                                button_size * 1.5f,
+                                button_size * 1.5f,
+                                LAE_UI_BACK_BUTTON,
+                                LAE_UI_BACK_BUTTON,
+                                1.0f,
+                                1.0f,
+                                1.0f,
+                                1.0f);
+            break;
         }
-        // main menu UI layer
-        if (puck_game->main_menu_ui_alpha) {
-            render_main_menu_ui_layer(pLwc, puck_game, view, proj, pLwc->proj, remote, player_controlled_pos);
+        case LPGS_MAIN_MENU:
+        {
+            if (puck_game->main_menu_ui_alpha) {
+                render_main_menu_ui_layer(pLwc, puck_game, view, proj, pLwc->proj, remote, player_controlled_pos);
+            }
+            break;
         }
-    } else {
-        render_searching_state(pLwc, puck_game);
-        const float button_size = 0.35f;
-        // search cancel button
-        lwbutton_lae_append(&(((LWCONTEXT*)pLwc)->button_list),
-                            "back_button",
-                            +0.0f - button_size * 1.5f / 2,
-                            -0.5f + button_size * 1.5f / 2,
-                            button_size * 1.5f,
-                            button_size * 1.5f,
-                            LAE_UI_BACK_BUTTON,
-                            LAE_UI_BACK_BUTTON,
-                            1.0f,
-                            1.0f,
-                            1.0f,
-                            1.0f);
+        case LPGS_TUTORIAL:
+        case LPGS_PRACTICE:
+        case LPGS_BATTLE:
+        {
+            if (puck_game->battle_ui_alpha) {
+                render_battle_ui_layer(pLwc, puck_game, view, proj, pLwc->proj, remote, player_controlled_pos);
+            }
+            break;
+        }
+        case LPGS_BATTLE_PREPARE:
+        {
+            break;
+        }
     }
     // render buttons (shared)
     render_lwbutton(pLwc, &pLwc->button_list);

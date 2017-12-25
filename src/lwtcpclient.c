@@ -234,7 +234,6 @@ int parse_recv_packets(LWTCP* tcp) {
             memcpy(pLwc->puck_game->nickname, p->nickname, sizeof(char) * LW_NICKNAME_MAX_LEN);
             pLwc->puck_game->rank = p->rank;
             pLwc->puck_game->score = p->score;
-            //tcp_send_queue2(tcp, &pLwc->tcp->user_id);
         } else if (CHECK_PACKET(packet_type, packet_size, LWPNICK)) {
             LOGI("LWPNICK received");
             LWPNICK* p = (LWPNICK*)cursor;
@@ -242,7 +241,6 @@ int parse_recv_packets(LWTCP* tcp) {
             memcpy(pLwc->puck_game->nickname, p->nickname, sizeof(char) * LW_NICKNAME_MAX_LEN);
             pLwc->puck_game->score = p->score;
             pLwc->puck_game->rank = p->rank;
-            //tcp_send_queue2(tcp, &pLwc->tcp->user_id);
         } else if (CHECK_PACKET(packet_type, packet_size, LWPSYSMSG)) {
             LOGI("LWPSYSMSG received");
             LWPSYSMSG* p = (LWPSYSMSG*)cursor;
