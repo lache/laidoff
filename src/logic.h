@@ -3,6 +3,7 @@
 #include "lwvbotype.h"
 
 typedef struct _LWCONTEXT LWCONTEXT;
+typedef struct _LWTCP LWTCP;
 
 typedef struct _LWFIELDMESH {
 	LW_VBO_TYPE vbo;
@@ -29,6 +30,7 @@ void load_field_5_init_runtime_data(LWCONTEXT* pLwc);
 void show_leaderboard(LWCONTEXT* pLwc);
 void change_to_leaderboard(LWCONTEXT* pLwc);
 void change_to_physics(LWCONTEXT* pLwc);
+void request_top_leaderboard(LWTCP* tcp);
 #ifdef __cplusplus
 };
 #endif

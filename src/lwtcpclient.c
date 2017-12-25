@@ -21,6 +21,7 @@ void tcp_on_connect(LWTCP* tcp, const char* path_prefix) {
         // Request a new user to be created
         tcp_send_newuser(tcp);
     }
+    request_top_leaderboard(tcp);
 }
 
 int tcp_send_sendbuf(LWTCP* tcp, int s) {
@@ -80,7 +81,7 @@ int tcp_send_suddendeath(LWTCP* tcp, int battle_id, unsigned int token) {
     return tcp_send_sendbuf(tcp, sizeof(p));
 }
 
-int tcp_send_get_leaderboard(LWTCP* tcp, int backoffMs, int start_index, int count) {
+int tcp_send_get_leaderboard(LWTCP* tcp, int backoffMs, int start_index, int count, void (*on_leaderboard_packet)(LWCONTEXT* pLwc)) {
     LOGI("Sending LWPGETLEADERBOARD");
     if (tcp == 0) {
         LOGE("tcp null");
@@ -90,6 +91,7 @@ int tcp_send_get_leaderboard(LWTCP* tcp, int backoffMs, int start_index, int cou
     p.Start_index = start_index;
     p.Count = count;
     memcpy(tcp->sendbuf, &p, sizeof(p));
+    tcp->on_leaderboard_packet = on_leaderboard_packet;
     int send_result = (int)send(tcp->ConnectSocket, tcp->sendbuf, sizeof(p), 0);
     if (send_result < 0) {
         LOGI("Send result error: %d", send_result);
@@ -104,7 +106,7 @@ int tcp_send_get_leaderboard(LWTCP* tcp, int backoffMs, int start_index, int cou
 #endif
         }
         tcp_connect(tcp);
-        return tcp_send_get_leaderboard(tcp, backoffMs * 2, start_index, count);
+        return tcp_send_get_leaderboard(tcp, backoffMs * 2, start_index, count, on_leaderboard_packet);
     }
     return send_result;
 }
@@ -270,7 +272,9 @@ int parse_recv_packets(LWTCP* tcp) {
                     }
                 }
             }
-            change_to_leaderboard(pLwc);
+            if (tcp->on_leaderboard_packet) {
+                tcp->on_leaderboard_packet(pLwc);
+            }
         } else {
             LOGE("Unknown TCP packet");
         }

@@ -4,19 +4,17 @@
 #include "render_text_block.h"
 #include <string.h>
 
-static void render_item(const LWCONTEXT* pLwc, int index, const char* rank, const char* nickname, const char* score, int header, float back_button_size) {
-    const float x0 = -pLwc->aspect_ratio + back_button_size + 0.1f;
-    const float y0 = +0.75f;
+static void render_item(const LWCONTEXT* pLwc, int index, const char* rank, const char* nickname, const char* score, int header, float x0, float y0, float ui_alpha) {
     LWTEXTBLOCK text_block;
     text_block.align = LTBA_LEFT_BOTTOM;
     text_block.text_block_width = DEFAULT_TEXT_BLOCK_WIDTH;
     text_block.text_block_line_height = DEFAULT_TEXT_BLOCK_LINE_HEIGHT_F;
     text_block.size = DEFAULT_TEXT_BLOCK_SIZE_E;
     text_block.multiline = 1;
-    SET_COLOR_RGBA_FLOAT(text_block.color_normal_glyph, 1, 1, (float)(1 - header), 1);
-    SET_COLOR_RGBA_FLOAT(text_block.color_normal_outline, 0, 0, 0, 1);
-    SET_COLOR_RGBA_FLOAT(text_block.color_emp_glyph, 1, 1, 0, 1);
-    SET_COLOR_RGBA_FLOAT(text_block.color_emp_outline, 0, 0, 0, 1);
+    SET_COLOR_RGBA_FLOAT(text_block.color_normal_glyph, 1, 1, (float)(1 - header), ui_alpha);
+    SET_COLOR_RGBA_FLOAT(text_block.color_normal_outline, 0, 0, 0, ui_alpha);
+    SET_COLOR_RGBA_FLOAT(text_block.color_emp_glyph, 1, 1, 0, ui_alpha);
+    SET_COLOR_RGBA_FLOAT(text_block.color_emp_outline, 0, 0, 0, ui_alpha);
     text_block.text_block_y = y0 - 0.1f * index;
     
     text_block.text = rank;
@@ -62,16 +60,9 @@ static void render_title(const LWCONTEXT* pLwc) {
     render_text_block(pLwc, &text_block);
 }
 
-void lwc_render_leaderboard(const LWCONTEXT* pLwc) {
-    // Clear all
-    LW_GL_VIEWPORT();
-    glClearColor(0.2f, 0.4f, 0.1f, 1.0f);
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    // Render title
-    render_title(pLwc);
-    const float back_button_size = 0.35f * 1.5f;
+void render_leaderboard_table(const LWCONTEXT* pLwc, float x0, float y0, float ui_alpha) {
     // Render leaderboard table header
-    render_item(pLwc, 0, "#", "Nickname", "Score", 1, back_button_size);
+    render_item(pLwc, 0, "#", "Nickname", "Score", 1, x0, y0, ui_alpha);
     // Render leaderboard table
     const LWPLEADERBOARD* p = &pLwc->last_leaderboard;
     int rank = p->First_item_rank;
@@ -81,7 +72,7 @@ void lwc_render_leaderboard(const LWCONTEXT* pLwc) {
         sprintf(rank_str, "%d", rank + 1);
         char score_str[64];
         sprintf(score_str, "%d", p->Score[i]);
-        render_item(pLwc, i + 1, rank_str, p->Nickname[i], score_str, 0, back_button_size);
+        render_item(pLwc, i + 1, rank_str, p->Nickname[i], score_str, 0, x0, y0, ui_alpha);
         if (i < p->Count - 1) {
             if (p->Score[i] == p->Score[i+1]) {
                 tieCount++;
@@ -95,6 +86,19 @@ void lwc_render_leaderboard(const LWCONTEXT* pLwc) {
             }
         }
     }
+}
+
+void lwc_render_leaderboard(const LWCONTEXT* pLwc) {
+    // Clear all
+    LW_GL_VIEWPORT();
+    glClearColor(0.2f, 0.4f, 0.1f, 1.0f);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    // Render title
+    render_title(pLwc);
+    const float back_button_size = 0.35f * 1.5f;
+    const float x0 = -pLwc->aspect_ratio + back_button_size + 0.1f;
+    const float y0 = +0.75f;
+    render_leaderboard_table(pLwc, x0, y0, 1.0f);
     lwbutton_lae_append(&(((LWCONTEXT*)pLwc)->button_list),
                         "back_button",
                         -pLwc->aspect_ratio,

@@ -367,6 +367,8 @@ typedef struct _LWCONTEXT {
     int argc;
     char** argv;
     int show_stat;
+    int viewport_x;
+    int viewport_y;
 } LWCONTEXT;
 
 #ifdef __cplusplus

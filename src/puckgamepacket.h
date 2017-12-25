@@ -231,7 +231,7 @@ typedef struct _LWPQUERYNICK {
 } LWPQUERYNICK;
 
 #define LW_NICKNAME_MAX_LEN (32)
-#define LW_LEADERBOARD_ITEMS_IN_PAGE (20)
+#define LW_LEADERBOARD_ITEMS_IN_PAGE (15)
 
 typedef struct _LWPNICK {
 	unsigned short size;

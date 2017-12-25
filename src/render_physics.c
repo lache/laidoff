@@ -16,6 +16,7 @@
 #include "lwfvbo.h"
 #include <assert.h>
 #include "lwtimepoint.h"
+#include "render_leaderboard.h"
 
 typedef struct _LWSPHERERENDERUNIFORM {
     float sphere_col_ratio[3];
@@ -449,7 +450,7 @@ static void render_radial_wave(const LWCONTEXT* pLwc,
     glDepthMask(GL_TRUE);
 }
 
-static void calculate_world_right_top_end_ui_point(const LWCONTEXT* pLwc, const LWPUCKGAME* puck_game, vec2 world_right_top_end_ui_point) {
+void calculate_world_right_top_end_ui_point(const LWCONTEXT* pLwc, const LWPUCKGAME* puck_game, vec2 world_right_top_end_ui_point) {
     // calculate world right top point in ui coordinate
     vec4 world_right_top_end_vec4 = {
         2.11f, // half world model dimension including bezel hardcoded
@@ -463,7 +464,13 @@ static void calculate_world_right_top_end_ui_point(const LWCONTEXT* pLwc, const 
     calculate_ui_point_from_world_point(pLwc->aspect_ratio, proj_view, world_right_top_end_vec4, world_right_top_end_ui_point);
 }
 
-static void render_hp_star(const LWCONTEXT* pLwc, const LWPUCKGAME* puck_game, float ui_alpha, int hp, int left, float hp_shake_remain_time, const vec2 world_right_top_end_ui_point) {
+static void render_hp_star(const LWCONTEXT* pLwc,
+                           const LWPUCKGAME* puck_game,
+                           float ui_alpha,
+                           int hp,
+                           int left,
+                           float hp_shake_remain_time,
+                           const vec2 world_right_top_end_ui_point) {
     // render at the center of margins
     float x = (world_right_top_end_ui_point[0] + pLwc->aspect_ratio) / 2 * (left ? -1 : +1);
     float y = 0.575f;
@@ -1405,10 +1412,21 @@ static void render_icon_amount(const LWCONTEXT* pLwc,
 static void render_main_menu_ui_layer(const LWCONTEXT* pLwc, const LWPUCKGAME* puck_game,
                                       const mat4x4 view, const mat4x4 proj, const mat4x4 ui_proj,
                                       int remote, const float* player_controlled_pos) {
+    // reset viewport temporarily
+    LW_GL_VIEWPORT();
+    // leaderboard
+    float leaderboard_x = -pLwc->aspect_ratio + 0.1f;
+    float leaderboard_y = 0.8f;
+    render_leaderboard_table(pLwc, leaderboard_x, leaderboard_y, puck_game->main_menu_ui_alpha);
+    // revert to default viewport
+    glViewport(pLwc->viewport_x,
+               pLwc->viewport_y,
+               pLwc->width,
+               pLwc->height);
     // render buttons as a single sprite
     render_main_menu(pLwc, puck_game, view, proj, puck_game->main_menu_ui_alpha);
     // nickname (background, icon, text)
-    float top_bar_x_cursor = -pLwc->aspect_ratio;
+    float top_bar_x_cursor = -pLwc->aspect_ratio / 2;
     const float top_bar_x_cursor_margin = 0.05f;
     {
         const float width = 1.2f;
@@ -1819,7 +1837,11 @@ static void render_battle_ui_layer(const LWCONTEXT* pLwc, const LWPUCKGAME* puck
 void lwc_render_physics(const LWCONTEXT* pLwc, const mat4x4 view, const mat4x4 proj) {
     const LWPUCKGAME* puck_game = pLwc->puck_game;
     const LWPSTATE* state = &pLwc->puck_game_state;
-    LW_GL_VIEWPORT();
+    //LW_GL_VIEWPORT();
+    glViewport(pLwc->viewport_x,
+               pLwc->viewport_y,
+               pLwc->width,
+               pLwc->height);
     lw_clear_color();
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 

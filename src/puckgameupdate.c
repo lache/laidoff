@@ -15,6 +15,7 @@
 #include "lwmath.h"
 #include "sound.h"
 #include "script.h"
+#include "render_physics.h"
 
 void puck_game_update_world_roll(LWPUCKGAME* puck_game) {
     if (puck_game->world_roll_dirty) {
@@ -36,6 +37,17 @@ void puck_game_update_world_roll(LWPUCKGAME* puck_game) {
     }
     puck_game->battle_ui_alpha = LWMAX(0.0f, 1.0f - puck_game->world_roll);
     puck_game->main_menu_ui_alpha = LWMAX(0.0f, 1.0f - fabsf((float)LWDEG2RAD(180) - puck_game->world_roll));
+    LWCONTEXT* pLwc = (LWCONTEXT*)puck_game->pLwc;
+    if (pLwc->game_scene == LGS_PHYSICS) {
+        vec2 world_right_top_end_ui_point;
+        calculate_world_right_top_end_ui_point(pLwc, puck_game, world_right_top_end_ui_point);
+        const float width_ratio_of_world = fabsf(world_right_top_end_ui_point[0]) / pLwc->aspect_ratio;
+        pLwc->viewport_x = (int)(puck_game->main_menu_ui_alpha * pLwc->width * width_ratio_of_world / 2);
+        pLwc->viewport_y = 0;
+    } else {
+        pLwc->viewport_x = 0;
+        pLwc->viewport_y = 0;
+    }
 }
 
 void update_boundary_impact(LWPUCKGAME* puck_game, float delta_time) {

@@ -75,6 +75,7 @@ typedef struct _LWTCP {
     // State
     LW_UDP_STATE state;
     int send_fail;
+    void (*on_leaderboard_packet)(LWCONTEXT*);
 } LWTCP;
 
 LWTCP* new_tcp(LWCONTEXT* pLwc,

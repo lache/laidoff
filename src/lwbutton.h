@@ -28,6 +28,6 @@ LWBUTTON* lwbutton_append(LWBUTTONLIST* button_list, const char* id, float x, fl
 LWBUTTON* lwbutton_lae_append(LWBUTTONLIST* button_list, const char* id, float x, float y, float w, float h,
                               LW_ATLAS_ENUM lae, LW_ATLAS_ENUM lae_alpha, float ui_alpha,
                               float over_r, float over_g, float over_b);
-int lwbutton_press(const LWBUTTONLIST* button_list, float x, float y);
+int lwbutton_press(const LWCONTEXT* pLwc, const LWBUTTONLIST* button_list, float x, float y);
 const char* lwbutton_id(const LWBUTTONLIST* button_list, int idx);
 void render_lwbutton(const LWCONTEXT* pLwc, const LWBUTTONLIST* button_list);

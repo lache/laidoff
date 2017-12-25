@@ -40,7 +40,9 @@ LWBUTTON* lwbutton_append(LWBUTTONLIST* button_list, const char* id, float x, fl
     return b;
 }
 
-int lwbutton_press(const LWBUTTONLIST* button_list, float x, float y) {
+int lwbutton_press(const LWCONTEXT* pLwc, const LWBUTTONLIST* button_list, float x, float y) {
+    x -= (float)pLwc->viewport_x / pLwc->width * 2 * pLwc->aspect_ratio;
+    y -= (float)pLwc->viewport_y / pLwc->height * 2;
     if (button_list->button_count >= ARRAY_SIZE(button_list->button)) {
         LOGE(LWLOGPOS "ARRAY_SIZE(button_list->button) exceeded");
         return -1;

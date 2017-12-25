@@ -574,7 +574,11 @@ void start_tcp_addr_text_input_activity(LWCONTEXT* pLwc) {
 }
 
 void show_leaderboard(LWCONTEXT* pLwc) {
-    tcp_send_get_leaderboard(pLwc->tcp, 300, 0, LW_LEADERBOARD_ITEMS_IN_PAGE);
+    tcp_send_get_leaderboard(pLwc->tcp, 300, 0, LW_LEADERBOARD_ITEMS_IN_PAGE, change_to_leaderboard);
+}
+
+void request_top_leaderboard(LWTCP* tcp) {
+    tcp_send_get_leaderboard(tcp, 300, 0, LW_LEADERBOARD_ITEMS_IN_PAGE, 0);
 }
 
 void start_request_push_token(LWCONTEXT* pLwc) {
