@@ -444,6 +444,7 @@ func (t *RankService) GetLeaderboard(args *shared_server.LeaderboardRequest, rep
 	} else {
 		reply.FirstItemRank = rank
 		reply.FirstItemTieCount = tieCount
+		reply.RevealIndex = -1
 		items := make([]shared_server.LeaderboardItem, 0)
 		c := args.Count
 		if args.StartIndex+c > scoreCount {

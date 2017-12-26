@@ -113,6 +113,7 @@ function on_ui_event(id)
 			lo.tcp_send_cancelqueue(c.tcp, c.tcp.user_id)
 			c.puck_game.game_state = lo.LPGS_MAIN_MENU
 		elseif c.game_scene == lo.LGS_LEADERBOARD then
+			lo.request_player_reveal_leaderboard(c.tcp)
 			lo.change_to_physics(c)
 		elseif c.puck_game.game_state == lo.LPGS_TUTORIAL then
 			lo.script_cleanup_all_coros(c)

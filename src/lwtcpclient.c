@@ -91,6 +91,7 @@ int tcp_send_get_leaderboard_reveal_player(LWTCP* tcp, int backoffMs, const LWUN
     memcpy(p.Id, user_id, sizeof(p.Id));
     p.Count = count;
     memcpy(tcp->sendbuf, &p, sizeof(p));
+    tcp->on_leaderboard_packet = 0; // do nothing when reply packet received
     int send_result = (int)send(tcp->ConnectSocket, tcp->sendbuf, sizeof(p), 0);
     if (send_result < 0) {
         LOGI("Send result error: %d", send_result);
