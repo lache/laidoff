@@ -675,7 +675,7 @@ static void update_battle_wall(LWCONTEXT* pLwc) {
 	pLwc->battle_wall_tex_v = fmodf(pLwc->battle_wall_tex_v, 1.0f);
 }
 
-void logic_udate_default_projection(LWCONTEXT* pLwc) {
+void logic_update_default_projection(LWCONTEXT* pLwc) {
 	float ratio = pLwc->width / (float)pLwc->height;
 
 	//LOGV("Update(): width: %d height: %d ratio: %f", pLwc->width, pLwc->height, ratio);

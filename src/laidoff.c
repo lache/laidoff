@@ -1516,7 +1516,7 @@ void lw_set_size(LWCONTEXT* pLwc, int w, int h) {
                                       &pLwc->right_dir_pad.origin_y);
     
     // Update default projection matrix (pLwc->proj)
-    logic_udate_default_projection(pLwc);
+    logic_update_default_projection(pLwc);
     // Initialize test font FBO
     init_font_fbo(pLwc);
     // Render font FBO using render-to-texture

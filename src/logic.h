@@ -14,7 +14,7 @@ typedef struct _LWFIELDMESH {
 extern "C" {;
 #endif
 const char* logic_server_addr(int idx);
-void logic_udate_default_projection(LWCONTEXT* pLwc);
+void logic_update_default_projection(LWCONTEXT* pLwc);
 void reset_runtime_context(LWCONTEXT* pLwc);
 void reset_runtime_context_async(LWCONTEXT* pLwc);
 void logic_start_logic_update_job(LWCONTEXT* pLwc);

@@ -10181,18 +10181,18 @@ fail:
 }
 
 
-static int _wrap_logic_udate_default_projection(lua_State* L) {
+static int _wrap_logic_update_default_projection(lua_State* L) {
   int SWIG_arg = 0;
   LWCONTEXT *arg1 = (LWCONTEXT *) 0 ;
   
-  SWIG_check_num_args("logic_udate_default_projection",1,1)
-  if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("logic_udate_default_projection",1,"LWCONTEXT *");
+  SWIG_check_num_args("logic_update_default_projection",1,1)
+  if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("logic_update_default_projection",1,"LWCONTEXT *");
   
   if (!SWIG_IsOK(SWIG_ConvertPtr(L,1,(void**)&arg1,SWIGTYPE_p__LWCONTEXT,0))){
-    SWIG_fail_ptr("logic_udate_default_projection",1,SWIGTYPE_p__LWCONTEXT);
+    SWIG_fail_ptr("logic_update_default_projection",1,SWIGTYPE_p__LWCONTEXT);
   }
   
-  logic_udate_default_projection(arg1);
+  logic_update_default_projection(arg1);
   
   return SWIG_arg;
   
@@ -81298,7 +81298,7 @@ static swig_lua_method swig_SwigModule_methods[]= {
     { "load_png_pkm_sw_decoding", _wrap_load_png_pkm_sw_decoding},
     { "set_package_version", _wrap_set_package_version},
     { "logic_server_addr", _wrap_logic_server_addr},
-    { "logic_udate_default_projection", _wrap_logic_udate_default_projection},
+    { "logic_update_default_projection", _wrap_logic_update_default_projection},
     { "reset_runtime_context_async", _wrap_reset_runtime_context_async},
     { "logic_start_logic_update_job", _wrap_logic_start_logic_update_job},
     { "logic_stop_logic_update_job", _wrap_logic_stop_logic_update_job},
