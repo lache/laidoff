@@ -5,7 +5,6 @@
 #include "lwtimepoint.h"
 #include <tinycthread.h>
 #include "lwmacro.h"
-
 #if LW_PLATFORM_WIN32
 #   include <winsock2.h>
 #elif !LW_PLATFORM_OSX
@@ -16,10 +15,6 @@
 #   define LwChangeDirectory(x) SetCurrentDirectory(x)
 #else
 #   define LwChangeDirectory(x) chdir(x)
-#endif
-
-#ifndef SOCKET
-#   define SOCKET int
 #endif
 
 #ifndef BOOL
@@ -287,14 +282,9 @@ int check_token(LWSERVER* server,
     } else if (pg->c2_token == p->token) {
         *puck_game = pg;
         return 2;
-    } else {
-        LOGE("Battle id %d token not match.", p->battle_id);
-        return -3;
     }
-#pragma clang diagnostic push
-#pragma ide diagnostic ignored "OCDFAInspection"
-    return -4;
-#pragma clang diagnostic pop
+    LOGE("Battle id %d token not match.", p->battle_id);
+    return -3;
 }
 
 int check_player_no(int player_no) {
@@ -317,7 +307,7 @@ void select_server(LWSERVER* server, LWCONN* conn, LWTCP* reward_service) {
     struct timeval tv;
     tv.tv_sec = 0;
     tv.tv_usec = 2500; // 400 Hz
-    int maxfds = LWMAX(reward_service->ConnectSocket, server->s) + 1;
+    int maxfds = (int)(LWMAX(reward_service->ConnectSocket, server->s)) + 1;
     int rv = select(maxfds, &readfds, NULL, NULL, &tv);
     LOGIx("select() return value: %d", rv);
     //try to receive some data, this is a blocking call
@@ -591,11 +581,13 @@ int tcp_admin_server_entry(void* context) {
     }
 #if !LW_PLATFORM_WIN32
 #pragma clang diagnostic pop
-#endif
 #pragma clang diagnostic push
 #pragma ide diagnostic ignored "OCDFAInspection"
+#endif
     return 0;
+#if !LW_PLATFORM_WIN32
 #pragma clang diagnostic pop
+#endif
 }
 
 void fill_state2_gameobject(LWPSTATE2GAMEOBJECT* packet_field,
@@ -767,24 +759,29 @@ void process_battle_reward(LWPUCKGAME* puck_game, LWTCP* reward_service, int log
                            puck_game_winner(puck_game),
                            logic_hz);
 }
-
+#if !LW_PLATFORM_WIN32
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wunused-parameter"
-
+#endif
 void reward_service_on_connect(LWTCP* tcp, const char* path_prefix) {
-    LOGI("Reward service connected.");
+    LOGI("Reward service connected. %s:%d (path_prefix:%s)",
+         tcp->host_addr.host,
+         tcp->host_addr.port,
+         path_prefix);
 }
-
+#if !LW_PLATFORM_WIN32
 #pragma clang diagnostic pop
+#endif
 
 int reward_service_on_recv_packets(LWTCP* tcp) {
     LOGI("Packet received (%d bytes) from reward service.", tcp->recvbufnotparsed);
     return tcp->recvbufnotparsed;
 }
 
+#if !LW_PLATFORM_WIN32
 #pragma clang diagnostic push
 #pragma ide diagnostic ignored "OCDFAInspection"
-
+#endif
 int main(int argc, char* argv[]) {
     LOGI("LAIDOFF-SERVER: Greetings.");
     LOGI("sizeof(LWPSTATE) == %zu bytes", sizeof(LWPSTATE));
@@ -814,9 +811,11 @@ int main(int argc, char* argv[]) {
     LWCONN conn[LW_CONN_CAPACITY];
     double logic_elapsed_ms = 0;
     double sync_elapsed_ms = 0;
+#if !LW_PLATFORM_WIN32
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wfor-loop-analysis"
 #pragma clang diagnostic ignored "-Wmissing-noreturn"
+#endif
     while (1) {
         const double loop_start = lwtimepoint_now_seconds();
         if (logic_elapsed_ms > 0) {
@@ -860,9 +859,13 @@ int main(int argc, char* argv[]) {
         sync_elapsed_ms += loop_time * 1000;
         LOGIx("Loop time: %.3f ms", loop_time * 1000);
     }
+#if !LW_PLATFORM_WIN32
 #pragma clang diagnostic pop
+#endif
     destroy_tcp(&reward_service);
     return 0;
 }
 
+#if !LW_PLATFORM_WIN32
 #pragma clang diagnostic pop
+#endif

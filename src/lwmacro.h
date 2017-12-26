@@ -98,3 +98,7 @@ typedef int socklen_t;
 #define GLSL_DIR_NAME "glsl"
 
 #define LW_SUPPORT_VAO (LW_PLATFORM_WIN32 || LW_PLATFORM_OSX || LW_PLATFORM_LINUX)
+
+#ifndef MSG_DONTWAIT
+#define MSG_DONTWAIT 0
+#endif
