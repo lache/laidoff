@@ -552,7 +552,7 @@ static int32_t engine_handle_input(struct android_app* app, AInputEvent* event) 
 					} else {
 						if(AKeyEvent_getAction(event) == AKEY_EVENT_ACTION_DOWN) {
 							engine->pLwc->android_native_activity = engine->app;// engine->app->activity;
-							logic_emit_ui_event_async(engine->pLwc, "back_button");
+							logic_emit_ui_event_async(engine->pLwc, "back_button", 0, 0);
 						}
 						return 1;
 					}
