@@ -914,6 +914,14 @@ extern "C" void lw_start_text_input_activity(LWCONTEXT* pLwc, int tag) {
     request_void_string_command("startTextInputActivity", "dummy");
 }
 
+extern "C" void lw_start_reward_video(LWCONTEXT* pLwc, int tag) {
+    request_void_string_command("startRewardVideo", "dummy");
+}
+
+extern "C" void lw_start_sign_in(LWCONTEXT* pLwc, int tag) {
+    request_void_string_command("startSignIn", "dummy");
+}
+
 static char push_token[1024];
 
 extern "C" void lw_request_remote_notification_device_token(LWCONTEXT* pLwc) {

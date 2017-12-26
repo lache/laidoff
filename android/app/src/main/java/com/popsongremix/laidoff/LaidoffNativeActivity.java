@@ -22,12 +22,6 @@ import com.google.android.gms.ads.MobileAds;
 import com.google.android.gms.ads.reward.RewardItem;
 import com.google.android.gms.ads.reward.RewardedVideoAd;
 import com.google.android.gms.ads.reward.RewardedVideoAdListener;
-import com.google.android.gms.auth.api.signin.GoogleSignIn;
-import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
-import com.google.android.gms.auth.api.signin.GoogleSignInClient;
-import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
-import com.google.android.gms.common.api.ApiException;
-import com.google.android.gms.tasks.Task;
 import com.google.firebase.iid.FirebaseInstanceId;
 
 import java.io.File;
@@ -43,27 +37,19 @@ public class LaidoffNativeActivity extends NativeActivity implements RewardedVid
         System.loadLibrary("native-activity");
     }
 
-    private int mSound_MetalHit;
-    private SoundPool mSoundPool;
-    private GoogleSignInClient mGoogleSignInClient;
-
     public static native String signalResourceReady(Class<LaidoffNativeActivity> and9NativeActivityClass);
-
     public static native int pushTextureData(int width, int height, int[] data, int texAtlasIndex);
-
     public static native void registerAsset(String assetPath, int startOffset, int length);
-
     private static native void sendApkPath(String apkPath, String filesPath, String packageVersion);
-
     public static native void setPushTokenAndSend(String text, long pLwcLong);
-
     @SuppressWarnings("SameParameterValue")
     public static native void setWindowSize(int width, int height, long pLwcLong);
 
     private static LaidoffNativeActivity INSTANCE;
-
     public static final String LOG_TAG = "and9";
     private RewardedVideoAd mRewardedVideoAd;
+    private int mSound_MetalHit;
+    private SoundPool mSoundPool;
 
     /**
      * Called when the activity is first created.
@@ -78,14 +64,6 @@ public class LaidoffNativeActivity extends NativeActivity implements RewardedVid
         // Interstitial
         mRewardedVideoAd = MobileAds.getRewardedVideoAdInstance(this);
         mRewardedVideoAd.setRewardedVideoAdListener(this);
-
-        // Configure sign-in to request the user's ID, email address, and basic
-        // profile. ID and basic profile are included in DEFAULT_SIGN_IN.
-        GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_GAMES_SIGN_IN)
-                .requestEmail()
-                .build();
-        // Build a GoogleSignInClient with the options specified by gso.
-        mGoogleSignInClient = GoogleSignIn.getClient(this, gso);
 
         //getWindow().getDecorView().setKeepScreenOn(true);
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED |
@@ -148,19 +126,6 @@ public class LaidoffNativeActivity extends NativeActivity implements RewardedVid
             }
         });
         mSound_MetalHit = mSoundPool.load(getApplicationContext(), R.raw.sfx_metal_hit, 1);
-    }
-
-    @Override
-    public void onStart() {
-        super.onStart();
-        // Check for existing Google Sign In account, if the user is already signed in
-        // the GoogleSignInAccount will be non-null.
-        GoogleSignInAccount account = GoogleSignIn.getLastSignedInAccount(this);
-        if (account != null) {
-            printGoogleAccountDebugInfo(account);
-        } else {
-            Log.i(LOG_TAG, "onStart(): Google account not available.");
-        }
     }
 
     @SuppressWarnings("unused")
@@ -272,20 +237,37 @@ public class LaidoffNativeActivity extends NativeActivity implements RewardedVid
 
     @SuppressWarnings("unused")
     public static void startTextInputActivity(String dummy) {
-        Intent intent = new Intent(INSTANCE, TextInputActivity.class);
-//        EditText editText = (EditText) findViewById(R.id.editText);
-//        String message = editText.getText().toString();
-//        intent.putExtra(EXTRA_MESSAGE, message);
-        INSTANCE.startActivity(intent);
+        INSTANCE.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                Intent intent = new Intent(INSTANCE, TextInputActivity.class);
+                //        EditText editText = (EditText) findViewById(R.id.editText);
+                //        String message = editText.getText().toString();
+                //        intent.putExtra(EXTRA_MESSAGE, message);
+                INSTANCE.startActivity(intent);
+            }
+        });
+    }
 
-        // test interstitial
-//        INSTANCE.runOnUiThread(new Runnable() {
-//            @Override
-//            public void run() {
-//                INSTANCE.loadRewardedVideoAd();
-//            }
-//        });
-        INSTANCE.SignIn();
+    @SuppressWarnings("unused")
+    public static void startRewardVideo(String dummy) {
+        INSTANCE.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                INSTANCE.loadRewardedVideoAd();
+            }
+        });
+    }
+
+    @SuppressWarnings("unused")
+    public static void startSignIn(String dummy) {
+        INSTANCE.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                Intent intent = new Intent(INSTANCE, SignInActivity.class);
+                INSTANCE.startActivity(intent);
+            }
+        });
     }
 
     @SuppressWarnings("unused")
@@ -329,45 +311,6 @@ public class LaidoffNativeActivity extends NativeActivity implements RewardedVid
                 setWindowSize(decorView.getWidth(), decorView.getHeight(), 0);
             }
         }
-    }
-
-    int RC_SIGN_IN = 10000;
-
-    public void SignIn() {
-        Intent signInIntent = mGoogleSignInClient.getSignInIntent();
-        startActivityForResult(signInIntent, RC_SIGN_IN);
-    }
-
-    @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-
-        // Result returned from launching the Intent from GoogleSignInClient.getSignInIntent(...);
-        if (requestCode == RC_SIGN_IN) {
-            // The Task returned from this call is always completed, no need to attach
-            // a listener.
-            Task<GoogleSignInAccount> task = GoogleSignIn.getSignedInAccountFromIntent(data);
-            handleSignInResult(task);
-        }
-    }
-
-    private void handleSignInResult(Task<GoogleSignInAccount> completedTask) {
-        try {
-            GoogleSignInAccount account = completedTask.getResult(ApiException.class);
-            printGoogleAccountDebugInfo(account);
-            // Signed in successfully, show authenticated UI.
-            //updateUI(account);
-        } catch (ApiException e) {
-            // The ApiException status code indicates the detailed failure reason.
-            // Please refer to the GoogleSignInStatusCodes class reference for more information.
-            Log.w(LOG_TAG, "handleSignInResult - signInResult:failed code=" + e.getStatusCode());
-            //updateUI(null);
-        }
-    }
-
-    private void printGoogleAccountDebugInfo(GoogleSignInAccount account) {
-        Log.i(LOG_TAG, "handleSignInResult - Google account name: " + account.getDisplayName());
-        Log.i(LOG_TAG, "handleSignInResult - Google Photo URL: " + account.getPhotoUrl());
     }
 
     // AdMob reward video callbacks

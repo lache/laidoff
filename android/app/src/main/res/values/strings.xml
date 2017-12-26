@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <string name="app_id">933754889415</string>
     <string name="app_name">Rumble</string>
     <string name="no_conn">인터넷 연결 확인 오네가이</string>
     <string name="error">에러</string>
