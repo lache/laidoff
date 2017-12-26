@@ -16,6 +16,7 @@ func HandleGetLeaderboard(buf []byte, conn net.Conn, serviceList *service.List) 
 		log.Printf("HandleGetLeaderboard fail: %v", err.Error())
 	}
 	leaderboardRequest := shared_server.LeaderboardRequest{
+		Id:         convert.IdCuintToByteArray(recvPacket.Id),
 		StartIndex: int(recvPacket.Start_index),
 		Count:      int(recvPacket.Count),
 	}

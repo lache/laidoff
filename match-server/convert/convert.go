@@ -165,6 +165,8 @@ func NewLwpLeaderboard(leaderboardReply *shared_server.LeaderboardReply) *C.LWPL
 		nicknameList,
 		scoreList,
 		C.int(leaderboardReply.RevealIndex),
+		C.int(leaderboardReply.CurrentPage),
+		C.int(leaderboardReply.TotalPage),
 	}
 }
 func NewLwpNewUserData(uuid user.Id, newNick string, score, rank int) *C.LWPNEWUSERDATA {

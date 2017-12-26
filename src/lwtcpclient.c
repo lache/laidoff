@@ -118,6 +118,7 @@ int tcp_send_get_leaderboard(LWTCP* tcp, int backoffMs, int start_index, int cou
         return -1;
     }
     NEW_TCP_PACKET_CAPITAL(LWPGETLEADERBOARD, p);
+    memcpy(p.Id, &tcp->user_id, sizeof(p.Id));
     p.Start_index = start_index;
     p.Count = count;
     memcpy(tcp->sendbuf, &p, sizeof(p));

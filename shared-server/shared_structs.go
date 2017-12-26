@@ -41,6 +41,7 @@ type ScoreRankIndexItem struct {
 }
 
 type LeaderboardRequest struct {
+	Id         user.Id
 	StartIndex int
 	Count      int
 }
@@ -60,4 +61,6 @@ type LeaderboardReply struct {
 	FirstItemTieCount int
 	RevealIndex       int
 	Items             []LeaderboardItem
+	CurrentPage       int // one-based, 0 on empty leaderboard
+	TotalPage         int // one-based, 0 on empty leaderboard
 }

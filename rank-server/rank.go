@@ -445,12 +445,17 @@ func (t *RankService) GetLeaderboard(args *shared_server.LeaderboardRequest, rep
 		reply.FirstItemRank = rank
 		reply.FirstItemTieCount = tieCount
 		reply.RevealIndex = -1
+		reply.CurrentPage = int(math.Ceil(float64(args.StartIndex+1) / float64(args.Count)))
+		reply.TotalPage = int(math.Ceil(float64(scoreCount) / float64(args.Count)))
 		items := make([]shared_server.LeaderboardItem, 0)
 		c := args.Count
 		if args.StartIndex+c > scoreCount {
 			c = scoreCount - args.StartIndex
 		}
 		for i := 0; i < c; i++ {
+			if t.rank.IdArray[args.StartIndex+i] == args.Id {
+				reply.RevealIndex = i
+			}
 			items = append(items, shared_server.LeaderboardItem{
 				Nickname: t.rank.NicknameArray[args.StartIndex+i],
 				Score:    t.rank.ScoreArray[args.StartIndex+i],

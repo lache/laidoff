@@ -8,6 +8,7 @@ import (
 	"github.com/gasbank/laidoff/db-server/user"
 	"github.com/gasbank/laidoff/rank-server/rankservice"
 	"github.com/gasbank/laidoff/shared-server"
+	assert2 "github.com/stretchr/testify/assert"
 )
 
 func assert(t *testing.T, expected, actual int) {
@@ -175,7 +176,7 @@ func ExampleRankData_Set() {
 	// RankData.9: [4 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0] 30
 }
 
-func testGetLeaderboardRevealPlayer(t *testing.T, rankService rankservice.Rank, id byte, count int, expectedRevealIndex int, expectedScores []int) {
+func testGetLeaderboardRevealPlayer(t *testing.T, rankService rankservice.Rank, id byte, count int, expectedRevealIndex int, expectedScores []int, expectedCurrentPage, expectedTotalPage int) {
 	var leaderboardReply shared_server.LeaderboardReply
 	err := rankService.GetLeaderboardRevealPlayer(&shared_server.LeaderboardRevealPlayerRequest{
 		Id:    user.Id{id},
@@ -187,6 +188,21 @@ func testGetLeaderboardRevealPlayer(t *testing.T, rankService rankservice.Rank, 
 	for i := 0; i < len(expectedScores); i++ {
 		assert(t, expectedScores[i], leaderboardReply.Items[i].Score)
 	}
+	assert2.Equal(t, expectedCurrentPage, leaderboardReply.CurrentPage)
+	assert2.Equal(t, expectedTotalPage, leaderboardReply.TotalPage)
+}
+
+func TestRankService_GetLeaderboardRevealPlayer_Empty(t *testing.T) {
+	rankService := &RankService{
+		rank:             newRank(),
+		matchPool:        newRank(),
+		matchPoolRequest: make(chan QueueScoreMatchRequestQueue),
+	}
+	count := 3
+	//noinspection GoPreferNilSlice
+	page1 := []int{}
+	totalPage := 0
+	testGetLeaderboardRevealPlayer(t, rankService, 1, count, -1, page1, totalPage, totalPage)
 }
 
 func TestRankService_GetLeaderboardRevealPlayer(t *testing.T) {
@@ -200,31 +216,33 @@ func TestRankService_GetLeaderboardRevealPlayer(t *testing.T) {
 	page2 := []int{105, 100, 100}
 	page3 := []int{50, 50, 50}
 	page4 := []int{30}
-	testGetLeaderboardRevealPlayer(t, rankService, 10, count, 0, page1)
-	testGetLeaderboardRevealPlayer(t, rankService, 8, count, 1, page1)
-	testGetLeaderboardRevealPlayer(t, rankService, 1, count, 2, page1)
-	testGetLeaderboardRevealPlayer(t, rankService, 6, count, 0, page2)
-	testGetLeaderboardRevealPlayer(t, rankService, 7, count, 1, page2)
-	testGetLeaderboardRevealPlayer(t, rankService, 2, count, 2, page2)
-	testGetLeaderboardRevealPlayer(t, rankService, 9, count, 0, page3)
-	testGetLeaderboardRevealPlayer(t, rankService, 5, count, 1, page3)
-	testGetLeaderboardRevealPlayer(t, rankService, 3, count, 2, page3)
-	testGetLeaderboardRevealPlayer(t, rankService, 4, count, 0, page4)
+	totalPage := 4
+	testGetLeaderboardRevealPlayer(t, rankService, 10, count, 0, page1, 1, totalPage)
+	testGetLeaderboardRevealPlayer(t, rankService, 8, count, 1, page1, 1, totalPage)
+	testGetLeaderboardRevealPlayer(t, rankService, 1, count, 2, page1, 1, totalPage)
+	testGetLeaderboardRevealPlayer(t, rankService, 6, count, 0, page2, 2, totalPage)
+	testGetLeaderboardRevealPlayer(t, rankService, 7, count, 1, page2, 2, totalPage)
+	testGetLeaderboardRevealPlayer(t, rankService, 2, count, 2, page2, 2, totalPage)
+	testGetLeaderboardRevealPlayer(t, rankService, 9, count, 0, page3, 3, totalPage)
+	testGetLeaderboardRevealPlayer(t, rankService, 5, count, 1, page3, 3, totalPage)
+	testGetLeaderboardRevealPlayer(t, rankService, 3, count, 2, page3, 3, totalPage)
+	testGetLeaderboardRevealPlayer(t, rankService, 4, count, 0, page4, totalPage, totalPage)
 	count = 8
 	page1 = []int{250, 225, 200, 105, 100, 100, 50, 50}
 	page2 = []int{50, 30}
-	testGetLeaderboardRevealPlayer(t, rankService, 10, count, 0, page1)
-	testGetLeaderboardRevealPlayer(t, rankService, 8, count, 1, page1)
-	testGetLeaderboardRevealPlayer(t, rankService, 1, count, 2, page1)
-	testGetLeaderboardRevealPlayer(t, rankService, 6, count, 3, page1)
-	testGetLeaderboardRevealPlayer(t, rankService, 7, count, 4, page1)
-	testGetLeaderboardRevealPlayer(t, rankService, 2, count, 5, page1)
-	testGetLeaderboardRevealPlayer(t, rankService, 9, count, 6, page1)
-	testGetLeaderboardRevealPlayer(t, rankService, 5, count, 7, page1)
-	testGetLeaderboardRevealPlayer(t, rankService, 3, count, 0, page2)
-	testGetLeaderboardRevealPlayer(t, rankService, 4, count, 1, page2)
-	// non-existent id returns first page of rank with reveal index -1.
-	testGetLeaderboardRevealPlayer(t, rankService, 120, count, -1, page1)
+	totalPage = 2
+	testGetLeaderboardRevealPlayer(t, rankService, 10, count, 0, page1, 1, totalPage)
+	testGetLeaderboardRevealPlayer(t, rankService, 8, count, 1, page1, 1, totalPage)
+	testGetLeaderboardRevealPlayer(t, rankService, 1, count, 2, page1, 1, totalPage)
+	testGetLeaderboardRevealPlayer(t, rankService, 6, count, 3, page1, 1, totalPage)
+	testGetLeaderboardRevealPlayer(t, rankService, 7, count, 4, page1, 1, totalPage)
+	testGetLeaderboardRevealPlayer(t, rankService, 2, count, 5, page1, 1, totalPage)
+	testGetLeaderboardRevealPlayer(t, rankService, 9, count, 6, page1, 1, totalPage)
+	testGetLeaderboardRevealPlayer(t, rankService, 5, count, 7, page1, 1, totalPage)
+	testGetLeaderboardRevealPlayer(t, rankService, 3, count, 0, page2, totalPage, totalPage)
+	testGetLeaderboardRevealPlayer(t, rankService, 4, count, 1, page2, totalPage, totalPage)
+	// non-existent id returns first page of rank with reveal index -1 and returns a first(top) page.
+	testGetLeaderboardRevealPlayer(t, rankService, 120, count, -1, page1, 1, totalPage)
 }
 
 func ExampleRankData_Remove() {

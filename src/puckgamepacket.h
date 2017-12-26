@@ -368,6 +368,7 @@ typedef struct _LWPSUDDENDEATH {
 typedef struct _LWPGETLEADERBOARD {
     unsigned short Size;
     unsigned short Type;
+    unsigned int Id[4];
     int Start_index;
     int Count;
 } LWPGETLEADERBOARD;
@@ -381,6 +382,8 @@ typedef struct _LWPLEADERBOARD {
     char Nickname[LW_LEADERBOARD_ITEMS_IN_PAGE][LW_NICKNAME_MAX_LEN];
     int Score[LW_LEADERBOARD_ITEMS_IN_PAGE];
     int Reveal_index;
+    int Current_page; // one-based, 0 on empty leaderboard
+    int Total_page; // one-based, 0 on empty leaderboard
 } LWPLEADERBOARD;
 
 typedef struct _LWPGETLEADERBOARDREVEALPLAYER {
