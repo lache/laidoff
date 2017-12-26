@@ -1,12 +1,10 @@
 package com.popsongremix.laidoff;
 
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Intent;
-import android.content.IntentSender;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.util.Log;
 
 import com.google.android.gms.auth.api.Auth;
@@ -15,11 +13,8 @@ import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.auth.api.signin.GoogleSignInResult;
-import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.ApiException;
 import com.google.android.gms.common.api.CommonStatusCodes;
-import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.android.gms.common.api.ResultCallback;
 import com.google.android.gms.games.Games;
 import com.google.android.gms.games.Player;
 import com.google.android.gms.games.PlayersClient;
@@ -30,12 +25,8 @@ import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.GoogleAuthProvider;
 
-public class SignInActivity extends FragmentActivity implements GoogleApiClient.OnConnectionFailedListener, GoogleApiClient.ConnectionCallbacks {
-    private GoogleSignInClient mGoogleSignInClient;
-    private GoogleApiClient mGoogleApiClient;
-    int RC_SIGN_IN = 10000;
+public class SignInActivity extends Activity {
     int RC_SIGN_IN_2 = 20000;
-    int RC_RESOLVE_ERR = 30000;
     private FirebaseAuth mAuth;
     private GoogleSignInOptions gso;
 
@@ -43,40 +34,17 @@ public class SignInActivity extends FragmentActivity implements GoogleApiClient.
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        mAuth = FirebaseAuth.getInstance();
+
         if (isSignedIn()) {
             signOut();
-        }
-
-        signinxxxxxxx();
-
-    }
-
-    private void signinxxxxxxx() {
-        if (isSignedIn() == false) {
-            // Configure sign-in to request the user's ID, email address, and basic
-            // profile. ID and basic profile are included in DEFAULT_SIGN_IN.
+        } else {
             gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_GAMES_SIGN_IN)
                     // requestIdToken 인자는 "웹 애플리케이션 유형"의 클라이언트 ID임
-                    //.requestIdToken("933754889415-fr8buam0m8dh9hv71r2fb4au548lij0f.apps.googleusercontent.com")
+                    .requestIdToken("933754889415-fr8buam0m8dh9hv71r2fb4au548lij0f.apps.googleusercontent.com")
+                    .requestEmail()
                     .requestProfile()
                     .build();
-        mGoogleApiClient = new GoogleApiClient.Builder(this)
-                .enableAutoManage(this, this)
-                .addConnectionCallbacks(this)
-                //.addApi(Games.API)
-                //.addScope(Games.SCOPE_GAMES)
-                .addApi(Auth.GOOGLE_SIGN_IN_API, gso)
-                .build();
-            // Build a GoogleSignInClient with the options specified by gso.
-
-            mAuth = FirebaseAuth.getInstance();
-
-            //Intent signInIntent = Auth.GoogleSignInApi.getSignInIntent(mGoogleApiClient);
-            //startActivityForResult(signInIntent, RC_SIGN_IN);
-
-            //mGoogleSignInClient = GoogleSignIn.getClient(this, gso);
-            //signIn();
-
             signInSilently(gso);
         }
     }
@@ -89,21 +57,19 @@ public class SignInActivity extends FragmentActivity implements GoogleApiClient.
                     public void onComplete(@NonNull Task<GoogleSignInAccount> task) {
                         if (task.isSuccessful()) {
                             // The signed in account is stored in the task's result.
-                            try {
-                                GoogleSignInAccount signedInAccount = task.getResult(ApiException.class);
-                                Log.i(LaidoffNativeActivity.LOG_TAG, signedInAccount.getDisplayName());
-                            } catch (ApiException e) {
-                                if (e.getStatusCode() == CommonStatusCodes.SIGN_IN_REQUIRED) {
-                                    startSignInIntent2();
-                                }
-                            }
-
+                            GoogleSignInAccount signedInAccount = task.getResult();
+                            //Log.i(LaidoffNativeActivity.LOG_TAG, signedInAccount.getDisplayName());
+                            onSignedInAccountAcquired(signedInAccount);
                         } else {
                             // Player will need to sign-in explicitly using via UI
                             Log.i(LaidoffNativeActivity.LOG_TAG, "Failed!");
                             ApiException e = (ApiException)task.getException();
-                            if (e.getStatusCode() == CommonStatusCodes.SIGN_IN_REQUIRED) {
-                                startSignInIntent2();
+                            if (e != null) {
+                                if (e.getStatusCode() == CommonStatusCodes.SIGN_IN_REQUIRED) {
+                                    startSignInIntent2();
+                                }
+                            } else {
+                                Log.e(LaidoffNativeActivity.LOG_TAG, "ApiException error");
                             }
                         }
                     }
@@ -118,6 +84,7 @@ public class SignInActivity extends FragmentActivity implements GoogleApiClient.
                     @Override
                     public void onComplete(@NonNull Task<Void> task) {
                         // at this point, the user is signed out.
+                        Log.i(LaidoffNativeActivity.LOG_TAG, "Signed out successfully");
                     }
                 });
     }
@@ -132,17 +99,10 @@ public class SignInActivity extends FragmentActivity implements GoogleApiClient.
         return GoogleSignIn.getLastSignedInAccount(this) != null;
     }
 
-    private void startSignInIntent() {
-        GoogleSignInClient signInClient = GoogleSignIn.getClient(this,
-                GoogleSignInOptions.DEFAULT_GAMES_SIGN_IN);
-        Intent intent = signInClient.getSignInIntent();
-        startActivityForResult(intent, RC_SIGN_IN);
-    }
-
     @Override
     protected void onResume() {
         super.onResume();
-        //signInSilently();
+        //signInSilently(gso);
     }
 
     @Override
@@ -159,88 +119,15 @@ public class SignInActivity extends FragmentActivity implements GoogleApiClient.
     }
 
     @Override
-    public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
-        if (connectionResult.hasResolution()) {
-            try {
-                connectionResult.startResolutionForResult(this, RC_RESOLVE_ERR);
-            } catch (IntentSender.SendIntentException e) {
-
-            }
-        }
-
-    }
-
-    @Override
-    public void onConnected(@Nullable Bundle bundle) {
-
-            Auth.GoogleSignInApi.silentSignIn(mGoogleApiClient).setResultCallback(
-                    new ResultCallback<GoogleSignInResult>() {
-                        @Override
-                        public void onResult(GoogleSignInResult googleSignInResult) {
-                            GoogleSignInAccount acct = googleSignInResult.getSignInAccount();
-                            if (acct == null) {
-                                Log.e(LaidoffNativeActivity.LOG_TAG, "account was null: " + googleSignInResult.getStatus().getStatusMessage());
-                                return;
-                            }
-
-                            AuthCredential credential = GoogleAuthProvider.getCredential(acct.getIdToken(),null);
-
-                            mAuth.signInWithCredential(credential)
-                                    .addOnCompleteListener(
-                                            new OnCompleteListener<AuthResult>() {
-                                                @Override
-                                                public void onComplete(@NonNull Task<AuthResult> task) {
-                                                    // check task.isSuccessful()
-                                                }
-                                            });
-                        }
-                    }
-            );
-
-    }
-
-    @Override
-    public void onConnectionSuspended(int i) {
-
-    }
-
-    public void signIn() {
-        Intent signInIntent = mGoogleSignInClient.getSignInIntent();
-        startActivityForResult(signInIntent, RC_SIGN_IN);
-    }
-
-    @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-
-        // Result returned from launching the Intent from GoogleSignInClient.getSignInIntent(...);
-        if (requestCode == RC_SIGN_IN) {
-            // The Task returned from this call is always completed, no need to attach
-            // a listener.
-            Task<GoogleSignInAccount> task = GoogleSignIn.getSignedInAccountFromIntent(data);
-            handleSignInResult(task);
-        }
 
         if (requestCode == RC_SIGN_IN_2) {
             GoogleSignInResult result = Auth.GoogleSignInApi.getSignInResultFromIntent(data);
             if (result.isSuccess()) {
                 // The signed in account is stored in the result.
                 GoogleSignInAccount signedInAccount = result.getSignInAccount();
-                Log.i(LaidoffNativeActivity.LOG_TAG, signedInAccount.getDisplayName());
-
-                PlayersClient pc = Games.getPlayersClient(this, signedInAccount);
-                pc.getCurrentPlayer().addOnCompleteListener(this,
-                        new OnCompleteListener<Player>() {
-                            @Override
-                            public void onComplete(@NonNull Task<Player> task) {
-                                if (task.isSuccessful()) {
-                                    Player player = task.getResult();
-                                    Log.i(LaidoffNativeActivity.LOG_TAG, player.getName());
-                                } else {
-                                    Log.e(LaidoffNativeActivity.LOG_TAG, "ERROR~");
-                                }
-                            }
-                        });
+                onSignedInAccountAcquired(signedInAccount);
             } else {
 
                 String message = result.getStatus().getStatusMessage();
@@ -253,18 +140,41 @@ public class SignInActivity extends FragmentActivity implements GoogleApiClient.
         }
     }
 
-    private void handleSignInResult(Task<GoogleSignInAccount> completedTask) {
-        try {
-            GoogleSignInAccount account = completedTask.getResult(ApiException.class);
-            printGoogleAccountDebugInfo(account);
-            // Signed in successfully, show authenticated UI.
-            //updateUI(account);
-        } catch (ApiException e) {
-            // The ApiException status code indicates the detailed failure reason.
-            // Please refer to the GoogleSignInStatusCodes class reference for more information.
-            Log.w(LaidoffNativeActivity.LOG_TAG, "handleSignInResult - signInResult:failed code=" + e.getStatusCode());
-            //updateUI(null);
-        }
+    private void onSignedInAccountAcquired(GoogleSignInAccount signedInAccount) {
+        Log.i(LaidoffNativeActivity.LOG_TAG, signedInAccount.getDisplayName());
+
+        AuthCredential credential = GoogleAuthProvider.getCredential(signedInAccount.getIdToken(),null);
+
+        mAuth.signInWithCredential(credential)
+                .addOnCompleteListener(
+                        new OnCompleteListener<AuthResult>() {
+                            @Override
+                            public void onComplete(@NonNull Task<AuthResult> task) {
+                                // check task.isSuccessful()
+                                if (task.isSuccessful()) {
+                                    Log.i(LaidoffNativeActivity.LOG_TAG, "Registered to firebase successfully.");
+                                } else {
+                                    Log.e(LaidoffNativeActivity.LOG_TAG, "Registered to firebase failed!!!");
+                                }
+                            }
+                        });
+
+        PlayersClient pc = Games.getPlayersClient(this, signedInAccount);
+        pc.getCurrentPlayer().addOnCompleteListener(this,
+                new OnCompleteListener<Player>() {
+                    @Override
+                    public void onComplete(@NonNull Task<Player> task) {
+                        if (task.isSuccessful()) {
+                            Player player = task.getResult();
+                            Log.i(LaidoffNativeActivity.LOG_TAG, player.getName());
+
+
+
+                        } else {
+                            Log.e(LaidoffNativeActivity.LOG_TAG, "ERROR~");
+                        }
+                    }
+                });
     }
 
     private void printGoogleAccountDebugInfo(GoogleSignInAccount account) {
