@@ -72,8 +72,6 @@ LWBUTTON* lwbutton_append(const LWCONTEXT* pLwc,
         LOGE(LWLOGPOS "ARRAY_SIZE(b->id) exceeded");
         return 0;
     }
-    x += (float)pLwc->viewport_x / pLwc->width * 2 * pLwc->aspect_ratio;
-    y += (float)pLwc->viewport_y / pLwc->height * 2;
     strcpy(b->id, id);
     b->x = x;
     b->y = y;
@@ -82,20 +80,30 @@ LWBUTTON* lwbutton_append(const LWCONTEXT* pLwc,
     b->over_r = 1.0f;
     b->over_g = 1.0f;
     b->over_b = 1.0f;
+    b->viewport_x = pLwc->viewport_x;
+    b->viewport_y = pLwc->viewport_y;
     button_list->button_count++;
     return b;
 }
 
-int lwbutton_press(const LWCONTEXT* pLwc, const LWBUTTONLIST* button_list, float x, float y) {
-    //x -= (float)pLwc->viewport_x / pLwc->width * 2 * pLwc->aspect_ratio;
-    //y -= (float)pLwc->viewport_y / pLwc->height * 2;
+int lwbutton_press(const LWCONTEXT* pLwc,
+                   const LWBUTTONLIST* button_list,
+                   float x,
+                   float y,
+                   float* w_ratio,
+                   float* h_ratio) {
     if (button_list->button_count >= ARRAY_SIZE(button_list->button)) {
         LOGE(LWLOGPOS "ARRAY_SIZE(button_list->button) exceeded");
         return -1;
     }
     for (int i = 0; i < button_list->button_count; i++) {
         const LWBUTTON* b = &button_list->button[i];
-        if (b->x <= x && x <= b->x + b->w && b->y - b->h <= y && y <= b->y) {
+        // adjust x, y position according to viewport offset
+        float x_v = x - (float)b->viewport_x / pLwc->width * 2 * pLwc->aspect_ratio;
+        float y_v = y - (float)b->viewport_y / pLwc->height * 2;
+        if (b->x <= x_v && x_v <= b->x + b->w && b->y - b->h <= y_v && y_v <= b->y) {
+            *w_ratio = (x_v - b->x) / b->w;
+            *h_ratio = 1.0f - (y_v - (b->y - b->h)) / b->h;
             return i;
         }
     }

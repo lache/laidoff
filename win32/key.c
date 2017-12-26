@@ -107,7 +107,7 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
         //lw_go_back(pLwc, 0);
         // thread-safety.. do not use 'script_emit_ui_event' directly
         //script_emit_ui_event(pLwc->L, "back_button");
-        logic_emit_ui_event_async(pLwc, "back_button");
+        logic_emit_ui_event_async(pLwc, "back_button", 0, 0);
 		return;
 	}
 

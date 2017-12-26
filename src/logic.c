@@ -134,6 +134,8 @@ typedef struct _LWMSGINITSCENE {
 typedef struct _LWMSGUIEVENT {
 	LW_MSG type;
 	char id[LW_UI_IDENTIFIER_LENGTH];
+    float w_ratio;
+    float h_ratio;
 } LWMSGUIEVENT;
 
 void logic_start_logic_update_job_async(LWCONTEXT* pLwc) {
@@ -345,7 +347,7 @@ void load_scene_async(LWCONTEXT* pLwc, zactor_t* actor, LW_GAME_SCENE next_game_
 	}
 }
 
-void logic_emit_ui_event_async(LWCONTEXT* pLwc, const char* id) {
+void logic_emit_ui_event_async(LWCONTEXT* pLwc, const char* id, float w_ratio, float h_ratio) {
 	if (strlen(id) > LW_UI_IDENTIFIER_LENGTH - 1) {
 		LOGE(LWLOGPOS "id('%s') length exceeds (max %d)", id, LW_UI_IDENTIFIER_LENGTH - 1);
 		return;
@@ -354,6 +356,8 @@ void logic_emit_ui_event_async(LWCONTEXT* pLwc, const char* id) {
 	LWMSGUIEVENT m;
 	m.type = LM_LWMSGUIEVENT;
 	strcpy(m.id, id);
+    m.w_ratio = w_ratio;
+    m.h_ratio = h_ratio;
 	zmsg_addmem(msg, &m, sizeof(LWMSGUIEVENT));
 	zactor_t* actor = pLwc->logic_actor;
 	if (zactor_send(actor, &msg) < 0) {
@@ -574,7 +578,19 @@ void start_tcp_addr_text_input_activity(LWCONTEXT* pLwc) {
 }
 
 void show_leaderboard(LWCONTEXT* pLwc) {
-    tcp_send_get_leaderboard(pLwc->tcp, 300, 0, LW_LEADERBOARD_ITEMS_IN_PAGE, change_to_leaderboard);
+    tcp_send_get_leaderboard(pLwc->tcp,
+                             300,
+                             0,
+                             LW_LEADERBOARD_ITEMS_IN_PAGE,
+                             change_to_leaderboard);
+}
+
+void request_leaderboard(LWTCP* tcp, int one_based_page) {
+    tcp_send_get_leaderboard(tcp,
+                             300,
+                             (one_based_page - 1) * LW_LEADERBOARD_ITEMS_IN_PAGE,
+                             LW_LEADERBOARD_ITEMS_IN_PAGE,
+                             0);
 }
 
 void request_player_reveal_leaderboard(LWTCP* tcp) {
@@ -896,8 +912,8 @@ static int loop_pipe_reader(zloop_t* loop, zsock_t* pipe, void* args) {
 		} else if (d && s == sizeof(LWMSGUIEVENT) && *(int*)d == LM_LWMSGUIEVENT) {
             LWMSGUIEVENT* m = (LWMSGUIEVENT*)d;
             if (pLwc->puck_game->world_roll_dirty == 0) {
-                LOGI("UI Event: %s", m->id);
-                script_emit_ui_event(pLwc->L, m->id);
+                LOGI("UI Event: %s (w_ratio=%.2f, h_ratio=%.2f)", m->id, m->w_ratio, m->h_ratio);
+                script_emit_ui_event(pLwc->L, m->id, m->w_ratio, m->h_ratio);
             } else {
                 LOGI("UI Event '%s' suppressed since state is dirty", m->id);
             }

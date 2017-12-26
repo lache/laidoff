@@ -78,8 +78,8 @@ function copy(obj, seen)
 end
 
 -- Lua handler for logc frame finish events emitted from C
-function on_ui_event(id)
-	print('ui event emitted from C:' .. id)
+function on_ui_event(id, w_ratio, h_ratio)
+	print(string.format('ui event emitted from C:%s (w_ratio:%.2f, h_ratio:%.2f)', id, w_ratio, h_ratio))
 	local gtid = 'catapult'
 	if id == 'seltower0' then gtid = 'catapult'
 	elseif id == 'seltower1' then gtid = 'crossbow'
@@ -249,6 +249,16 @@ function on_ui_event(id)
 		lo.tcp_send_queue3(c.tcp, c.tcp.user_id, lo.LW_PUCK_GAME_QUEUE_TYPE_NEAREST_SCORE)
 	elseif id == 'leaderboard_button' then
 		lo.show_leaderboard(c)
+	elseif id == 'leaderboard_page_button' then
+		--print(c.last_leaderboard.Current_page)
+		if c.last_leaderboard.Current_page ~= 0 then
+			if w_ratio < 1.0/3 and c.last_leaderboard.Current_page > 1 then
+				lo.request_leaderboard(c.tcp, c.last_leaderboard.Current_page - 1)
+			elseif w_ratio < 2.0/3 then
+			elseif c.last_leaderboard.Current_page < c.last_leaderboard.Total_page then
+				lo.request_leaderboard(c.tcp, c.last_leaderboard.Current_page + 1)
+			end
+		end
 	else 
 		lo.construct_set_preview_enable(c.construct, 0)
 		return 0

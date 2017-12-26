@@ -10323,17 +10323,23 @@ static int _wrap_logic_emit_ui_event_async(lua_State* L) {
   int SWIG_arg = 0;
   LWCONTEXT *arg1 = (LWCONTEXT *) 0 ;
   char *arg2 = (char *) 0 ;
+  float arg3 ;
+  float arg4 ;
   
-  SWIG_check_num_args("logic_emit_ui_event_async",2,2)
+  SWIG_check_num_args("logic_emit_ui_event_async",4,4)
   if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("logic_emit_ui_event_async",1,"LWCONTEXT *");
   if(!SWIG_lua_isnilstring(L,2)) SWIG_fail_arg("logic_emit_ui_event_async",2,"char const *");
+  if(!lua_isnumber(L,3)) SWIG_fail_arg("logic_emit_ui_event_async",3,"float");
+  if(!lua_isnumber(L,4)) SWIG_fail_arg("logic_emit_ui_event_async",4,"float");
   
   if (!SWIG_IsOK(SWIG_ConvertPtr(L,1,(void**)&arg1,SWIGTYPE_p__LWCONTEXT,0))){
     SWIG_fail_ptr("logic_emit_ui_event_async",1,SWIGTYPE_p__LWCONTEXT);
   }
   
   arg2 = (char *)lua_tostring(L, 2);
-  logic_emit_ui_event_async(arg1,(char const *)arg2);
+  arg3 = (float)lua_tonumber(L, 3);
+  arg4 = (float)lua_tonumber(L, 4);
+  logic_emit_ui_event_async(arg1,(char const *)arg2,arg3,arg4);
   
   return SWIG_arg;
   
@@ -10518,6 +10524,32 @@ static int _wrap_request_player_reveal_leaderboard(lua_State* L) {
   }
   
   request_player_reveal_leaderboard(arg1);
+  
+  return SWIG_arg;
+  
+  if(0) SWIG_fail;
+  
+fail:
+  lua_error(L);
+  return SWIG_arg;
+}
+
+
+static int _wrap_request_leaderboard(lua_State* L) {
+  int SWIG_arg = 0;
+  LWTCP *arg1 = (LWTCP *) 0 ;
+  int arg2 ;
+  
+  SWIG_check_num_args("request_leaderboard",2,2)
+  if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("request_leaderboard",1,"LWTCP *");
+  if(!lua_isnumber(L,2)) SWIG_fail_arg("request_leaderboard",2,"int");
+  
+  if (!SWIG_IsOK(SWIG_ConvertPtr(L,1,(void**)&arg1,SWIGTYPE_p__LWTCP,0))){
+    SWIG_fail_ptr("request_leaderboard",1,SWIGTYPE_p__LWTCP);
+  }
+  
+  arg2 = (int)lua_tonumber(L, 2);
+  request_leaderboard(arg1,arg2);
   
   return SWIG_arg;
   
@@ -45354,6 +45386,126 @@ fail:
 }
 
 
+static int _wrap_render_solid_vb_ui_alpha_uv_shader(lua_State* L) {
+  int SWIG_arg = 0;
+  LWCONTEXT *arg1 = (LWCONTEXT *) 0 ;
+  float arg2 ;
+  float arg3 ;
+  float arg4 ;
+  float arg5 ;
+  GLuint arg6 ;
+  GLuint arg7 ;
+  enum _LW_VBO_TYPE arg8 ;
+  float arg9 ;
+  float arg10 ;
+  float arg11 ;
+  float arg12 ;
+  float arg13 ;
+  float *arg14 = (float *) 0 ;
+  float *arg15 = (float *) 0 ;
+  int arg16 ;
+  GLuint *argp6 ;
+  GLuint *argp7 ;
+  
+  SWIG_check_num_args("render_solid_vb_ui_alpha_uv_shader",16,16)
+  if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("render_solid_vb_ui_alpha_uv_shader",1,"LWCONTEXT const *");
+  if(!lua_isnumber(L,2)) SWIG_fail_arg("render_solid_vb_ui_alpha_uv_shader",2,"float");
+  if(!lua_isnumber(L,3)) SWIG_fail_arg("render_solid_vb_ui_alpha_uv_shader",3,"float");
+  if(!lua_isnumber(L,4)) SWIG_fail_arg("render_solid_vb_ui_alpha_uv_shader",4,"float");
+  if(!lua_isnumber(L,5)) SWIG_fail_arg("render_solid_vb_ui_alpha_uv_shader",5,"float");
+  if(!lua_isuserdata(L,6)) SWIG_fail_arg("render_solid_vb_ui_alpha_uv_shader",6,"GLuint");
+  if(!lua_isuserdata(L,7)) SWIG_fail_arg("render_solid_vb_ui_alpha_uv_shader",7,"GLuint");
+  if(!lua_isnumber(L,8)) SWIG_fail_arg("render_solid_vb_ui_alpha_uv_shader",8,"enum _LW_VBO_TYPE");
+  if(!lua_isnumber(L,9)) SWIG_fail_arg("render_solid_vb_ui_alpha_uv_shader",9,"float");
+  if(!lua_isnumber(L,10)) SWIG_fail_arg("render_solid_vb_ui_alpha_uv_shader",10,"float");
+  if(!lua_isnumber(L,11)) SWIG_fail_arg("render_solid_vb_ui_alpha_uv_shader",11,"float");
+  if(!lua_isnumber(L,12)) SWIG_fail_arg("render_solid_vb_ui_alpha_uv_shader",12,"float");
+  if(!lua_isnumber(L,13)) SWIG_fail_arg("render_solid_vb_ui_alpha_uv_shader",13,"float");
+  if(!SWIG_isptrtype(L,14)) SWIG_fail_arg("render_solid_vb_ui_alpha_uv_shader",14,"float const *");
+  if(!SWIG_isptrtype(L,15)) SWIG_fail_arg("render_solid_vb_ui_alpha_uv_shader",15,"float const *");
+  if(!lua_isnumber(L,16)) SWIG_fail_arg("render_solid_vb_ui_alpha_uv_shader",16,"int");
+  
+  if (!SWIG_IsOK(SWIG_ConvertPtr(L,1,(void**)&arg1,SWIGTYPE_p__LWCONTEXT,0))){
+    SWIG_fail_ptr("render_solid_vb_ui_alpha_uv_shader",1,SWIGTYPE_p__LWCONTEXT);
+  }
+  
+  arg2 = (float)lua_tonumber(L, 2);
+  arg3 = (float)lua_tonumber(L, 3);
+  arg4 = (float)lua_tonumber(L, 4);
+  arg5 = (float)lua_tonumber(L, 5);
+  
+  if (!SWIG_IsOK(SWIG_ConvertPtr(L,6,(void**)&argp6,SWIGTYPE_p_GLuint,0))){
+    SWIG_fail_ptr("render_solid_vb_ui_alpha_uv_shader",6,SWIGTYPE_p_GLuint);
+  }
+  arg6 = *argp6;
+  
+  
+  if (!SWIG_IsOK(SWIG_ConvertPtr(L,7,(void**)&argp7,SWIGTYPE_p_GLuint,0))){
+    SWIG_fail_ptr("render_solid_vb_ui_alpha_uv_shader",7,SWIGTYPE_p_GLuint);
+  }
+  arg7 = *argp7;
+  
+  arg8 = (enum _LW_VBO_TYPE)(int)lua_tonumber(L, 8);
+  arg9 = (float)lua_tonumber(L, 9);
+  arg10 = (float)lua_tonumber(L, 10);
+  arg11 = (float)lua_tonumber(L, 11);
+  arg12 = (float)lua_tonumber(L, 12);
+  arg13 = (float)lua_tonumber(L, 13);
+  
+  if (!SWIG_IsOK(SWIG_ConvertPtr(L,14,(void**)&arg14,SWIGTYPE_p_float,0))){
+    SWIG_fail_ptr("render_solid_vb_ui_alpha_uv_shader",14,SWIGTYPE_p_float);
+  }
+  
+  
+  if (!SWIG_IsOK(SWIG_ConvertPtr(L,15,(void**)&arg15,SWIGTYPE_p_float,0))){
+    SWIG_fail_ptr("render_solid_vb_ui_alpha_uv_shader",15,SWIGTYPE_p_float);
+  }
+  
+  arg16 = (int)lua_tonumber(L, 16);
+  render_solid_vb_ui_alpha_uv_shader((struct _LWCONTEXT const *)arg1,arg2,arg3,arg4,arg5,arg6,arg7,arg8,arg9,arg10,arg11,arg12,arg13,(float const *)arg14,(float const *)arg15,arg16);
+  
+  return SWIG_arg;
+  
+  if(0) SWIG_fail;
+  
+fail:
+  lua_error(L);
+  return SWIG_arg;
+}
+
+
+static int _wrap_lwc_enable_additive_blending(lua_State* L) {
+  int SWIG_arg = 0;
+  
+  SWIG_check_num_args("lwc_enable_additive_blending",0,0)
+  lwc_enable_additive_blending();
+  
+  return SWIG_arg;
+  
+  if(0) SWIG_fail;
+  
+fail:
+  lua_error(L);
+  return SWIG_arg;
+}
+
+
+static int _wrap_lwc_disable_additive_blending(lua_State* L) {
+  int SWIG_arg = 0;
+  
+  SWIG_check_num_args("lwc_disable_additive_blending",0,0)
+  lwc_disable_additive_blending();
+  
+  return SWIG_arg;
+  
+  if(0) SWIG_fail;
+  
+fail:
+  lua_error(L);
+  return SWIG_arg;
+}
+
+
 static int _wrap_render_text_block(lua_State* L) {
   int SWIG_arg = 0;
   LWCONTEXT *arg1 = (LWCONTEXT *) 0 ;
@@ -45724,14 +45876,20 @@ static int _wrap_script_emit_ui_event(lua_State* L) {
   int SWIG_arg = 0;
   void *arg1 = (void *) 0 ;
   char *arg2 = (char *) 0 ;
+  float arg3 ;
+  float arg4 ;
   int result;
   
-  SWIG_check_num_args("script_emit_ui_event",2,2)
+  SWIG_check_num_args("script_emit_ui_event",4,4)
   if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("script_emit_ui_event",1,"void *");
   if(!SWIG_lua_isnilstring(L,2)) SWIG_fail_arg("script_emit_ui_event",2,"char const *");
+  if(!lua_isnumber(L,3)) SWIG_fail_arg("script_emit_ui_event",3,"float");
+  if(!lua_isnumber(L,4)) SWIG_fail_arg("script_emit_ui_event",4,"float");
   arg1=(void *)SWIG_MustGetPtr(L,1,0,0,1,"script_emit_ui_event");
   arg2 = (char *)lua_tostring(L, 2);
-  result = (int)script_emit_ui_event(arg1,(char const *)arg2);
+  arg3 = (float)lua_tonumber(L, 3);
+  arg4 = (float)lua_tonumber(L, 4);
+  result = (int)script_emit_ui_event(arg1,(char const *)arg2,arg3,arg4);
   lua_pushnumber(L, (lua_Number) result); SWIG_arg++;
   return SWIG_arg;
   
@@ -64561,6 +64719,43 @@ fail:
 }
 
 
+static int _wrap_tcp_send_get_leaderboard_reveal_player(lua_State* L) {
+  int SWIG_arg = 0;
+  LWTCP *arg1 = (LWTCP *) 0 ;
+  int arg2 ;
+  LWUNIQUEID *arg3 = (LWUNIQUEID *) 0 ;
+  int arg4 ;
+  int result;
+  
+  SWIG_check_num_args("tcp_send_get_leaderboard_reveal_player",4,4)
+  if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("tcp_send_get_leaderboard_reveal_player",1,"LWTCP *");
+  if(!lua_isnumber(L,2)) SWIG_fail_arg("tcp_send_get_leaderboard_reveal_player",2,"int");
+  if(!SWIG_isptrtype(L,3)) SWIG_fail_arg("tcp_send_get_leaderboard_reveal_player",3,"LWUNIQUEID const *");
+  if(!lua_isnumber(L,4)) SWIG_fail_arg("tcp_send_get_leaderboard_reveal_player",4,"int");
+  
+  if (!SWIG_IsOK(SWIG_ConvertPtr(L,1,(void**)&arg1,SWIGTYPE_p__LWTCP,0))){
+    SWIG_fail_ptr("tcp_send_get_leaderboard_reveal_player",1,SWIGTYPE_p__LWTCP);
+  }
+  
+  arg2 = (int)lua_tonumber(L, 2);
+  
+  if (!SWIG_IsOK(SWIG_ConvertPtr(L,3,(void**)&arg3,SWIGTYPE_p__LWUNIQUEID,0))){
+    SWIG_fail_ptr("tcp_send_get_leaderboard_reveal_player",3,SWIGTYPE_p__LWUNIQUEID);
+  }
+  
+  arg4 = (int)lua_tonumber(L, 4);
+  result = (int)tcp_send_get_leaderboard_reveal_player(arg1,arg2,(struct _LWUNIQUEID const *)arg3,arg4);
+  lua_pushnumber(L, (lua_Number) result); SWIG_arg++;
+  return SWIG_arg;
+  
+  if(0) SWIG_fail;
+  
+fail:
+  lua_error(L);
+  return SWIG_arg;
+}
+
+
 static int _wrap_tcp_send_setnickname(lua_State* L) {
   int SWIG_arg = 0;
   LWTCP *arg1 = (LWTCP *) 0 ;
@@ -75261,6 +75456,64 @@ fail:
 }
 
 
+static int _wrap_LWPGETLEADERBOARD_Id_set(lua_State* L) {
+  int SWIG_arg = 0;
+  struct _LWPGETLEADERBOARD *arg1 = (struct _LWPGETLEADERBOARD *) 0 ;
+  unsigned int *arg2 ;
+  
+  SWIG_check_num_args("_LWPGETLEADERBOARD::Id",2,2)
+  if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("_LWPGETLEADERBOARD::Id",1,"struct _LWPGETLEADERBOARD *");
+  if(!SWIG_isptrtype(L,2)) SWIG_fail_arg("_LWPGETLEADERBOARD::Id",2,"unsigned int [4]");
+  
+  if (!SWIG_IsOK(SWIG_ConvertPtr(L,1,(void**)&arg1,SWIGTYPE_p__LWPGETLEADERBOARD,0))){
+    SWIG_fail_ptr("LWPGETLEADERBOARD_Id_set",1,SWIGTYPE_p__LWPGETLEADERBOARD);
+  }
+  
+  
+  if (!SWIG_IsOK(SWIG_ConvertPtr(L,2,(void**)&arg2,SWIGTYPE_p_unsigned_int,0))){
+    SWIG_fail_ptr("LWPGETLEADERBOARD_Id_set",2,SWIGTYPE_p_unsigned_int);
+  }
+  
+  {
+    size_t ii;
+    unsigned int *b = (unsigned int *) arg1->Id;
+    for (ii = 0; ii < (size_t)4; ii++) b[ii] = *((unsigned int *) arg2 + ii);
+  }
+  
+  return SWIG_arg;
+  
+  if(0) SWIG_fail;
+  
+fail:
+  lua_error(L);
+  return SWIG_arg;
+}
+
+
+static int _wrap_LWPGETLEADERBOARD_Id_get(lua_State* L) {
+  int SWIG_arg = 0;
+  struct _LWPGETLEADERBOARD *arg1 = (struct _LWPGETLEADERBOARD *) 0 ;
+  unsigned int *result = 0 ;
+  
+  SWIG_check_num_args("_LWPGETLEADERBOARD::Id",1,1)
+  if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("_LWPGETLEADERBOARD::Id",1,"struct _LWPGETLEADERBOARD *");
+  
+  if (!SWIG_IsOK(SWIG_ConvertPtr(L,1,(void**)&arg1,SWIGTYPE_p__LWPGETLEADERBOARD,0))){
+    SWIG_fail_ptr("LWPGETLEADERBOARD_Id_get",1,SWIGTYPE_p__LWPGETLEADERBOARD);
+  }
+  
+  result = (unsigned int *)(unsigned int *) ((arg1)->Id);
+  SWIG_NewPointerObj(L,result,SWIGTYPE_p_unsigned_int,0); SWIG_arg++; 
+  return SWIG_arg;
+  
+  if(0) SWIG_fail;
+  
+fail:
+  lua_error(L);
+  return SWIG_arg;
+}
+
+
 static int _wrap_LWPGETLEADERBOARD_Start_index_set(lua_State* L) {
   int SWIG_arg = 0;
   struct _LWPGETLEADERBOARD *arg1 = (struct _LWPGETLEADERBOARD *) 0 ;
@@ -75393,6 +75646,7 @@ static int _proxy__wrap_new_LWPGETLEADERBOARD(lua_State *L) {
 static swig_lua_attribute swig_LWPGETLEADERBOARD_attributes[] = {
     { "Size", _wrap_LWPGETLEADERBOARD_Size_get, _wrap_LWPGETLEADERBOARD_Size_set },
     { "Type", _wrap_LWPGETLEADERBOARD_Type_get, _wrap_LWPGETLEADERBOARD_Type_set },
+    { "Id", _wrap_LWPGETLEADERBOARD_Id_get, _wrap_LWPGETLEADERBOARD_Id_set },
     { "Start_index", _wrap_LWPGETLEADERBOARD_Start_index_get, _wrap_LWPGETLEADERBOARD_Start_index_set },
     { "Count", _wrap_LWPGETLEADERBOARD_Count_get, _wrap_LWPGETLEADERBOARD_Count_set },
     {0,0,0}
@@ -75853,6 +76107,106 @@ fail:
 }
 
 
+static int _wrap_LWPLEADERBOARD_Current_page_set(lua_State* L) {
+  int SWIG_arg = 0;
+  struct _LWPLEADERBOARD *arg1 = (struct _LWPLEADERBOARD *) 0 ;
+  int arg2 ;
+  
+  SWIG_check_num_args("_LWPLEADERBOARD::Current_page",2,2)
+  if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("_LWPLEADERBOARD::Current_page",1,"struct _LWPLEADERBOARD *");
+  if(!lua_isnumber(L,2)) SWIG_fail_arg("_LWPLEADERBOARD::Current_page",2,"int");
+  
+  if (!SWIG_IsOK(SWIG_ConvertPtr(L,1,(void**)&arg1,SWIGTYPE_p__LWPLEADERBOARD,0))){
+    SWIG_fail_ptr("LWPLEADERBOARD_Current_page_set",1,SWIGTYPE_p__LWPLEADERBOARD);
+  }
+  
+  arg2 = (int)lua_tonumber(L, 2);
+  if (arg1) (arg1)->Current_page = arg2;
+  
+  return SWIG_arg;
+  
+  if(0) SWIG_fail;
+  
+fail:
+  lua_error(L);
+  return SWIG_arg;
+}
+
+
+static int _wrap_LWPLEADERBOARD_Current_page_get(lua_State* L) {
+  int SWIG_arg = 0;
+  struct _LWPLEADERBOARD *arg1 = (struct _LWPLEADERBOARD *) 0 ;
+  int result;
+  
+  SWIG_check_num_args("_LWPLEADERBOARD::Current_page",1,1)
+  if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("_LWPLEADERBOARD::Current_page",1,"struct _LWPLEADERBOARD *");
+  
+  if (!SWIG_IsOK(SWIG_ConvertPtr(L,1,(void**)&arg1,SWIGTYPE_p__LWPLEADERBOARD,0))){
+    SWIG_fail_ptr("LWPLEADERBOARD_Current_page_get",1,SWIGTYPE_p__LWPLEADERBOARD);
+  }
+  
+  result = (int) ((arg1)->Current_page);
+  lua_pushnumber(L, (lua_Number) result); SWIG_arg++;
+  return SWIG_arg;
+  
+  if(0) SWIG_fail;
+  
+fail:
+  lua_error(L);
+  return SWIG_arg;
+}
+
+
+static int _wrap_LWPLEADERBOARD_Total_page_set(lua_State* L) {
+  int SWIG_arg = 0;
+  struct _LWPLEADERBOARD *arg1 = (struct _LWPLEADERBOARD *) 0 ;
+  int arg2 ;
+  
+  SWIG_check_num_args("_LWPLEADERBOARD::Total_page",2,2)
+  if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("_LWPLEADERBOARD::Total_page",1,"struct _LWPLEADERBOARD *");
+  if(!lua_isnumber(L,2)) SWIG_fail_arg("_LWPLEADERBOARD::Total_page",2,"int");
+  
+  if (!SWIG_IsOK(SWIG_ConvertPtr(L,1,(void**)&arg1,SWIGTYPE_p__LWPLEADERBOARD,0))){
+    SWIG_fail_ptr("LWPLEADERBOARD_Total_page_set",1,SWIGTYPE_p__LWPLEADERBOARD);
+  }
+  
+  arg2 = (int)lua_tonumber(L, 2);
+  if (arg1) (arg1)->Total_page = arg2;
+  
+  return SWIG_arg;
+  
+  if(0) SWIG_fail;
+  
+fail:
+  lua_error(L);
+  return SWIG_arg;
+}
+
+
+static int _wrap_LWPLEADERBOARD_Total_page_get(lua_State* L) {
+  int SWIG_arg = 0;
+  struct _LWPLEADERBOARD *arg1 = (struct _LWPLEADERBOARD *) 0 ;
+  int result;
+  
+  SWIG_check_num_args("_LWPLEADERBOARD::Total_page",1,1)
+  if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("_LWPLEADERBOARD::Total_page",1,"struct _LWPLEADERBOARD *");
+  
+  if (!SWIG_IsOK(SWIG_ConvertPtr(L,1,(void**)&arg1,SWIGTYPE_p__LWPLEADERBOARD,0))){
+    SWIG_fail_ptr("LWPLEADERBOARD_Total_page_get",1,SWIGTYPE_p__LWPLEADERBOARD);
+  }
+  
+  result = (int) ((arg1)->Total_page);
+  lua_pushnumber(L, (lua_Number) result); SWIG_arg++;
+  return SWIG_arg;
+  
+  if(0) SWIG_fail;
+  
+fail:
+  lua_error(L);
+  return SWIG_arg;
+}
+
+
 static int _wrap_new_LWPLEADERBOARD(lua_State* L) {
   int SWIG_arg = 0;
   struct _LWPLEADERBOARD *result = 0 ;
@@ -75891,6 +76245,8 @@ static swig_lua_attribute swig_LWPLEADERBOARD_attributes[] = {
     { "Nickname", _wrap_LWPLEADERBOARD_Nickname_get, _wrap_LWPLEADERBOARD_Nickname_set },
     { "Score", _wrap_LWPLEADERBOARD_Score_get, _wrap_LWPLEADERBOARD_Score_set },
     { "Reveal_index", _wrap_LWPLEADERBOARD_Reveal_index_get, _wrap_LWPLEADERBOARD_Reveal_index_set },
+    { "Current_page", _wrap_LWPLEADERBOARD_Current_page_get, _wrap_LWPLEADERBOARD_Current_page_set },
+    { "Total_page", _wrap_LWPLEADERBOARD_Total_page_get, _wrap_LWPLEADERBOARD_Total_page_set },
     {0,0,0}
 };
 static swig_lua_method swig_LWPLEADERBOARD_methods[]= {
@@ -80160,6 +80516,7 @@ static swig_lua_const_info swig_SwigModule_constants[]= {
     {SWIG_LUA_CONSTTAB_FLOAT("LWEPSILON", (1e-3))},
     {SWIG_LUA_CONSTTAB_STRING("LW_GLSL_VERSION_STATEMENT", "#version 100\n")},
     {SWIG_LUA_CONSTTAB_STRING("GLSL_DIR_NAME", "glsl")},
+    {SWIG_LUA_CONSTTAB_INT("MSG_DONTWAIT", 0)},
     {SWIG_LUA_CONSTTAB_INT("MAX_FIELD_SPHERE", (50))},
     {SWIG_LUA_CONSTTAB_INT("MAX_FIELD_REMOTE_SPHERE", (50))},
     {SWIG_LUA_CONSTTAB_INT("MAX_USER_GEOM", (16))},
@@ -80320,6 +80677,7 @@ static swig_lua_const_info swig_SwigModule_constants[]= {
     {SWIG_LUA_CONSTTAB_INT("LAE_EXCLAMATION_MARK_ALPHA", LAE_EXCLAMATION_MARK_ALPHA)},
     {SWIG_LUA_CONSTTAB_INT("LAE_STOP_MARK", LAE_STOP_MARK)},
     {SWIG_LUA_CONSTTAB_INT("LAE_STOP_MARK_ALPHA", LAE_STOP_MARK_ALPHA)},
+    {SWIG_LUA_CONSTTAB_INT("LAE_UI_BUTTON_ATLAS", LAE_UI_BUTTON_ATLAS)},
     {SWIG_LUA_CONSTTAB_INT("LAE_COUNT", LAE_COUNT)},
     {SWIG_LUA_CONSTTAB_INT("LAE_DONTCARE", LAE_DONTCARE)},
     {SWIG_LUA_CONSTTAB_INT("LAE_ZERO_FOR_BLACK", LAE_ZERO_FOR_BLACK)},
@@ -80335,6 +80693,7 @@ static swig_lua_const_info swig_SwigModule_constants[]= {
     {SWIG_LUA_CONSTTAB_INT("LAS_DONTCARE", LAS_DONTCARE)},
     {SWIG_LUA_CONSTTAB_INT("LAC_RESULT_TITLE", LAC_RESULT_TITLE)},
     {SWIG_LUA_CONSTTAB_INT("LAC_PREPARE_TITLE", LAC_PREPARE_TITLE)},
+    {SWIG_LUA_CONSTTAB_INT("LAC_UI_BUTTON", LAC_UI_BUTTON)},
     {SWIG_LUA_CONSTTAB_INT("LAC_COUNT", LAC_COUNT)},
     {SWIG_LUA_CONSTTAB_INT("LW_ATTRIB_DEFENCE_NONE", (0))},
     {SWIG_LUA_CONSTTAB_INT("LW_ATTRIB_DEFENCE_WEAK", (1))},
@@ -80420,7 +80779,7 @@ static swig_lua_const_info swig_SwigModule_constants[]= {
     {SWIG_LUA_CONSTTAB_INT("LGS_SPLASH", LGS_SPLASH)},
     {SWIG_LUA_CONSTTAB_INT("LGS_LEADERBOARD", LGS_LEADERBOARD)},
     {SWIG_LUA_CONSTTAB_STRING("__LW_STRING_LINE__", "60")},
-    {SWIG_LUA_CONSTTAB_STRING("LWLOGPOS", "src/lwlog.h(61): ")},
+    {SWIG_LUA_CONSTTAB_STRING("LWLOGPOS", "src\\lwlog.h(61): ")},
     {SWIG_LUA_CONSTTAB_INT("LPT_GRID", LPT_GRID)},
     {SWIG_LUA_CONSTTAB_INT("LPT_SOLID_RED", LPT_SOLID_RED)},
     {SWIG_LUA_CONSTTAB_INT("LPT_SOLID_GREEN", LPT_SOLID_GREEN)},
@@ -80954,6 +81313,7 @@ static swig_lua_method swig_SwigModule_methods[]= {
     { "show_leaderboard", _wrap_show_leaderboard},
     { "change_to_leaderboard", _wrap_change_to_leaderboard},
     { "request_player_reveal_leaderboard", _wrap_request_player_reveal_leaderboard},
+    { "request_leaderboard", _wrap_request_leaderboard},
     { "load_action", _wrap_load_action},
     { "unload_action", _wrap_unload_action},
     { "get_curve_value", _wrap_get_curve_value},
@@ -81108,6 +81468,9 @@ static swig_lua_method swig_SwigModule_methods[]= {
     { "render_solid_vb_ui_flip_y_uv_shader", _wrap_render_solid_vb_ui_flip_y_uv_shader},
     { "render_solid_vb_ui_flip_y_uv_shader_rot", _wrap_render_solid_vb_ui_flip_y_uv_shader_rot},
     { "render_solid_vb_ui_alpha_uv", _wrap_render_solid_vb_ui_alpha_uv},
+    { "render_solid_vb_ui_alpha_uv_shader", _wrap_render_solid_vb_ui_alpha_uv_shader},
+    { "lwc_enable_additive_blending", _wrap_lwc_enable_additive_blending},
+    { "lwc_disable_additive_blending", _wrap_lwc_disable_additive_blending},
     { "render_text_block", _wrap_render_text_block},
     { "render_text_block_alpha", _wrap_render_text_block_alpha},
     { "toggle_font_texture_test_mode", _wrap_toggle_font_texture_test_mode},
@@ -81250,6 +81613,7 @@ static swig_lua_method swig_SwigModule_methods[]= {
     { "tcp_send_querynick", _wrap_tcp_send_querynick},
     { "tcp_send_push_token", _wrap_tcp_send_push_token},
     { "tcp_send_get_leaderboard", _wrap_tcp_send_get_leaderboard},
+    { "tcp_send_get_leaderboard_reveal_player", _wrap_tcp_send_get_leaderboard_reveal_player},
     { "tcp_send_setnickname", _wrap_tcp_send_setnickname},
     { "tcp_send_cancelqueue", _wrap_tcp_send_cancelqueue},
     { "parse_recv_packets", _wrap_parse_recv_packets},

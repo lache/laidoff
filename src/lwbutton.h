@@ -23,6 +23,8 @@ typedef struct _LWBUTTON {
     LW_ATLAS_CONF lac;
     char atlas_sprite_name[64];
     int rendered;
+    int viewport_x;
+    int viewport_y;
 } LWBUTTON;
 
 typedef struct _LWBUTTONLIST {
@@ -64,6 +66,11 @@ LWBUTTON* lwbutton_lae_append(const LWCONTEXT* pLwc,
                               float over_r,
                               float over_g,
                               float over_b);
-int lwbutton_press(const LWCONTEXT* pLwc, const LWBUTTONLIST* button_list, float x, float y);
+int lwbutton_press(const LWCONTEXT* pLwc,
+                   const LWBUTTONLIST* button_list,
+                   float x,
+                   float y,
+                   float* w_ratio,
+                   float* h_ratio);
 const char* lwbutton_id(const LWBUTTONLIST* button_list, int idx);
 void render_lwbutton(const LWCONTEXT* pLwc, const LWBUTTONLIST* button_list);

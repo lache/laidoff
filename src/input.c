@@ -39,10 +39,11 @@ void lw_trigger_mouse_press(LWCONTEXT* pLwc, float x, float y, int pointer_id) {
     pLwc->last_mouse_press_x = x;
     pLwc->last_mouse_press_y = y;
 
-    int pressed_idx = lwbutton_press(pLwc, &pLwc->button_list, x, y);
+    float w_ratio, h_ratio;
+    int pressed_idx = lwbutton_press(pLwc, &pLwc->button_list, x, y, &w_ratio, &h_ratio);
     if (pressed_idx >= 0) {
         const char* id = lwbutton_id(&pLwc->button_list, pressed_idx);
-        logic_emit_ui_event_async(pLwc, id);
+        logic_emit_ui_event_async(pLwc, id, w_ratio, h_ratio);
         // Should return here to prevent calling overlapped UI element behind buttons.
         return;
     }

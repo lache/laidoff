@@ -711,13 +711,15 @@ int script_emit_logic_frame_finish(void* L, float delta_time) {
 	return ret;
 }
 
-int script_emit_ui_event(void* L, const char* id) {
+int script_emit_ui_event(void* L, const char* id, float w_ratio, float h_ratio) {
 	int ret;
 	// push functions and arguments
 	lua_getglobal(L, "on_ui_event"); // function to be called
 	lua_pushstring(L, id); // push 2nd argument
+    lua_pushnumber(L, w_ratio); // push 3rd argument
+    lua_pushnumber(L, h_ratio); // push 4th argument
 	// do the call (1 arguments, 1 result)
-	if (lua_pcall(L, 1, 1, 0) != 0) {
+	if (lua_pcall(L, 3, 1, 0) != 0) {
 		LOGE(LWLOGPOS "error: %s", lua_tostring(L, -1));
 	}
 	/* retrieve result */
