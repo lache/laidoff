@@ -41,27 +41,27 @@ type RankTieCount struct {
 
 func TestGetRankZeroBasedDesc(t *testing.T) {
 	descArr := &[]int{11, 9, 7, 7, 6, 5, 4, 4, 4, 3, 3, 2, 1, 1, 1, 1, 1, 0, 0, 0, -1}
-	assert(t, 0, getRankZeroBasedDesc(descArr, 999))
-	assert(t, 0, getRankZeroBasedDesc(descArr, 12))
-	assert(t, 0, getRankZeroBasedDesc(descArr, 11))
-	assert(t, 1, getRankZeroBasedDesc(descArr, 10))
-	assert(t, 1, getRankZeroBasedDesc(descArr, 9))
-	assert(t, 2, getRankZeroBasedDesc(descArr, 8))
-	assert(t, 2, getRankZeroBasedDesc(descArr, 7))
-	assert(t, 4, getRankZeroBasedDesc(descArr, 6))
-	assert(t, 5, getRankZeroBasedDesc(descArr, 5))
-	assert(t, 6, getRankZeroBasedDesc(descArr, 4))
-	assert(t, 9, getRankZeroBasedDesc(descArr, 3))
-	assert(t, 11, getRankZeroBasedDesc(descArr, 2))
-	assert(t, 12, getRankZeroBasedDesc(descArr, 1))
-	assert(t, 17, getRankZeroBasedDesc(descArr, 0))
-	assert(t, 20, getRankZeroBasedDesc(descArr, -1))
-	assert(t, 21, getRankZeroBasedDesc(descArr, -2))
-	assert(t, 21, getRankZeroBasedDesc(descArr, -999))
+	assert(t, 0, rankservice.GetRankZeroBasedDesc(descArr, 999))
+	assert(t, 0, rankservice.GetRankZeroBasedDesc(descArr, 12))
+	assert(t, 0, rankservice.GetRankZeroBasedDesc(descArr, 11))
+	assert(t, 1, rankservice.GetRankZeroBasedDesc(descArr, 10))
+	assert(t, 1, rankservice.GetRankZeroBasedDesc(descArr, 9))
+	assert(t, 2, rankservice.GetRankZeroBasedDesc(descArr, 8))
+	assert(t, 2, rankservice.GetRankZeroBasedDesc(descArr, 7))
+	assert(t, 4, rankservice.GetRankZeroBasedDesc(descArr, 6))
+	assert(t, 5, rankservice.GetRankZeroBasedDesc(descArr, 5))
+	assert(t, 6, rankservice.GetRankZeroBasedDesc(descArr, 4))
+	assert(t, 9, rankservice.GetRankZeroBasedDesc(descArr, 3))
+	assert(t, 11, rankservice.GetRankZeroBasedDesc(descArr, 2))
+	assert(t, 12, rankservice.GetRankZeroBasedDesc(descArr, 1))
+	assert(t, 17, rankservice.GetRankZeroBasedDesc(descArr, 0))
+	assert(t, 20, rankservice.GetRankZeroBasedDesc(descArr, -1))
+	assert(t, 21, rankservice.GetRankZeroBasedDesc(descArr, -2))
+	assert(t, 21, rankservice.GetRankZeroBasedDesc(descArr, -999))
 }
 
 func assertRankTieCount(t *testing.T, expected RankTieCount, descArr *[]int, score int) {
-	actualRank, actualTieCount := getRankAndTieCountZeroBasedDesc(descArr, score)
+	actualRank, actualTieCount := rankservice.GetRankAndTieCountZeroBasedDesc(descArr, score)
 	assert(t, expected.rankZeroBased, actualRank)
 	assert(t, expected.tieCount, actualTieCount)
 }
@@ -89,7 +89,7 @@ func TestGetRankAndTieCountZeroBasedDesc(t *testing.T) {
 
 func assertUpdateScore(t *testing.T, expected RankTieCount, descArr *[]int, oldScore, newScore int) {
 	oldLen := len(*descArr)
-	actualRank, actualTieCount := updateScoreDesc(descArr, oldScore, newScore)
+	actualRank, actualTieCount := rankservice.UpdateScoreDesc(descArr, oldScore, newScore)
 	assert(t, expected.rankZeroBased, actualRank)
 	assert(t, expected.tieCount, actualTieCount)
 	assert(t, oldLen, len(*descArr))
@@ -114,7 +114,7 @@ func TestUpdateScoreDesc(t *testing.T) {
 
 func assertInsertNewScore(t *testing.T, expected RankTieCount, descArr *[]int, newScore int) {
 	oldLen := len(*descArr)
-	actualRank, actualTieCount := insertNewScoreDesc(descArr, newScore)
+	actualRank, actualTieCount := rankservice.InsertNewScoreDesc(descArr, newScore)
 	assert(t, expected.rankZeroBased, actualRank)
 	assert(t, expected.tieCount, actualTieCount)
 	assert(t, oldLen+1, len(*descArr))
@@ -129,7 +129,7 @@ func TestInsertNewScore(t *testing.T) {
 	// {11, 9, 8, 7, 7, 6, 5, 4, 4, 4, 3, 3, 2, 1, 1, 1, 1, 1, 0, 0, 0, 0, -1}
 }
 
-func assertRankDataSet(t *testing.T, expected RankTieCount, rank *RankData, userId byte, score int) {
+func assertRankDataSet(t *testing.T, expected RankTieCount, rank *rankservice.RankData, userId byte, score int) {
 	actualRank, actualTieCount := rank.Set(user.Id{userId}, score)
 	if t != nil {
 		assert(t, expected.rankZeroBased, actualRank)
@@ -137,8 +137,8 @@ func assertRankDataSet(t *testing.T, expected RankTieCount, rank *RankData, user
 	}
 }
 
-func createRankTestSet(t *testing.T) *RankData {
-	rank := newRank()
+func createRankTestSet(t *testing.T) *rankservice.RankData {
+	rank := rankservice.NewRank()
 	assertRankDataSet(t, RankTieCount{0, 1}, rank, 1, 100)
 	assertRankDataSet(t, RankTieCount{0, 1}, rank, 1, 200)
 	assertRankDataSet(t, RankTieCount{1, 1}, rank, 2, 100)
@@ -193,11 +193,7 @@ func testGetLeaderboardRevealPlayer(t *testing.T, rankService rankservice.Rank, 
 }
 
 func TestRankService_GetLeaderboardRevealPlayer_Empty(t *testing.T) {
-	rankService := &RankService{
-		rank:             newRank(),
-		matchPool:        newRank(),
-		matchPoolRequest: make(chan QueueScoreMatchRequestQueue),
-	}
+	rankService := rankservice.NewLocalRankService()
 	count := 3
 	//noinspection GoPreferNilSlice
 	page1 := []int{}
@@ -206,11 +202,7 @@ func TestRankService_GetLeaderboardRevealPlayer_Empty(t *testing.T) {
 }
 
 func TestRankService_GetLeaderboardRevealPlayer(t *testing.T) {
-	rankService := &RankService{
-		rank:             createRankTestSet(nil),
-		matchPool:        newRank(),
-		matchPoolRequest: make(chan QueueScoreMatchRequestQueue),
-	}
+	rankService := rankservice.NewLocalRankServiceWithTestSet(createRankTestSet(nil))
 	count := 3
 	page1 := []int{250, 225, 200}
 	page2 := []int{105, 100, 100}
@@ -281,17 +273,17 @@ func TestRankData_Nearest(t *testing.T) {
 }
 
 func TestRankData_Nearest2(t *testing.T) {
-	rank := newRank()
+	rank := rankservice.NewRank()
 	assertNearest(t, -1, 0, -1, errors.New("rank empty"), rank, 10)
 }
 
 func TestRankData_Nearest3(t *testing.T) {
-	rank := newRank()
+	rank := rankservice.NewRank()
 	assertRankDataSet(t, RankTieCount{0, 1}, rank, 1, 100)
 	assertNearest(t, -1, 0, -1, errors.New("rank single entry"), rank, 10)
 }
 
-func assertNearest(t *testing.T, expectedScore int, expectedId byte, expectedNearestScore int, expectedErr error, rank *RankData, id byte) {
+func assertNearest(t *testing.T, expectedScore int, expectedId byte, expectedNearestScore int, expectedErr error, rank *rankservice.RankData, id byte) {
 	actualNearestResult, actualErr := rank.Nearest(user.Id{id})
 	if actualErr == nil {
 		assert(t, expectedScore, actualNearestResult.Score)
@@ -301,7 +293,7 @@ func assertNearest(t *testing.T, expectedScore int, expectedId byte, expectedNea
 	assertErr(t, expectedErr, actualErr)
 }
 
-func assertRankDataGet(t *testing.T, expectedScore, expectedRank, expectedTieCount int, expectedErr error, rank *RankData, userId user.Id) {
+func assertRankDataGet(t *testing.T, expectedScore, expectedRank, expectedTieCount int, expectedErr error, rank *rankservice.RankData, userId user.Id) {
 	actualScore, actualRank, actualTieCount, actualErr := rank.Get(userId)
 	assert(t, expectedScore, actualScore)
 	assert(t, expectedRank, actualRank)
@@ -334,7 +326,7 @@ func TestMoveUserIdWithinSlice(t *testing.T) {
 }
 
 func assertUserIdArray(t *testing.T, expected *[]user.Id, userIdList *[]user.Id, i int, j int) {
-	moveUserIdWithinSlice(userIdList, i, j)
+	rankservice.MoveUserIdWithinSlice(userIdList, i, j)
 	assert(t, len(*expected), len(*userIdList))
 	for i, userId := range *userIdList {
 		assertUserId(t, (*expected)[i], userId)
@@ -349,7 +341,7 @@ func assertUserId(t *testing.T, expected user.Id, actual user.Id) {
 }
 
 func TestRankData_RemoveNearestOverlap(t *testing.T) {
-	rank := newRank()
+	rank := rankservice.NewRank()
 	user1 := user.Id{1}
 	user2 := user.Id{2}
 	rank.Set(user1, 0)

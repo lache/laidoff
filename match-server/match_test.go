@@ -78,7 +78,8 @@ func assertAlreadyRemoved(t *testing.T, reply rankservice.QueueScoreMatchReply, 
 func createServiceListAndDistanceByElapsed(t *testing.T) (*service.List, *rankservice.DistanceByElapsed) {
 	log.SetFlags(log.LstdFlags | log.Lshortfile)
 	log.SetOutput(os.Stdout)
-	serviceList := service.NewServiceList()
+	serviceList := service.NewServiceListLocalTest()
+	//serviceList := service.NewServiceList()
 	distanceByElapsed := rankservice.DistanceByElapsed{
 		Elapsed: []time.Duration{
 			30 * time.Second,

@@ -163,6 +163,14 @@ func NewServiceList() *List {
 	}
 }
 
+func NewServiceListLocalTest() *List {
+	return &List{
+		nil,
+		rankservice.NewLocalRankService(),
+		nil,
+	}
+}
+
 func CreateNewUserDb() {
 	dbService := dbservice.New(":20181")
 	var userId user.Id

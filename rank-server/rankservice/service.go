@@ -63,7 +63,7 @@ func (c *Context) Set(args *shared_server.ScoreItem, reply *int) error {
 	return c.rpcContext.Call("Set", args, reply)
 }
 
-// Get score and rank
+// Get score and Rank
 func (c *Context) Get(args *user.Id, reply *shared_server.ScoreRankItem) error {
 	return c.rpcContext.Call("Get", args, reply)
 }
@@ -82,7 +82,7 @@ func (c *Context) QueueScoreMatch(args *QueueScoreMatchRequest, reply *QueueScor
 	return c.rpcContext.Call("QueueScoreMatch", args, reply)
 }
 
-// Get score, rank and index
+// Get score, Rank and index
 func (c *Context) GetWithIndex(args *user.Id, reply *shared_server.ScoreRankIndexItem) error {
 	return c.rpcContext.Call("GetWithIndex", args, reply)
 }
@@ -96,7 +96,7 @@ func New(address string) Rank {
 type Rank interface {
 	// Set a new score entry
 	Set(args *shared_server.ScoreItem, reply *int) error
-	// Get score and rank
+	// Get score and Rank
 	Get(args *user.Id, reply *shared_server.ScoreRankItem) error
 	// List a leaderboard
 	GetLeaderboard(args *shared_server.LeaderboardRequest, reply *shared_server.LeaderboardReply) error
@@ -104,6 +104,6 @@ type Rank interface {
 	GetLeaderboardRevealPlayer(args *shared_server.LeaderboardRevealPlayerRequest, reply *shared_server.LeaderboardReply) error
 	// Queue a user for score-based match
 	QueueScoreMatch(args *QueueScoreMatchRequest, reply *QueueScoreMatchReply) error
-	// Get score, rank and index
+	// Get score, Rank and index
 	GetWithIndex(args *user.Id, reply *shared_server.ScoreRankIndexItem) error
 }
