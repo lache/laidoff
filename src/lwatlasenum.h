@@ -135,6 +135,7 @@ typedef enum _LW_ATLAS_ENUM {
         LAE_EXCLAMATION_MARK_ALPHA,
         LAE_STOP_MARK,
         LAE_STOP_MARK_ALPHA,
+        LAE_UI_BUTTON_ATLAS,
         LAE_COUNT,
     
     LAE_DONTCARE,
@@ -277,6 +278,7 @@ static const char *tex_atlas_filename[] = {
         ASSETS_BASE_PATH "ktx" PATH_SEPARATOR "exclamation-mark-a_alpha.ktx",
         ASSETS_BASE_PATH "ktx" PATH_SEPARATOR "stop-mark-a.ktx",
         ASSETS_BASE_PATH "ktx" PATH_SEPARATOR "stop-mark-a_alpha.ktx",
+        ASSETS_BASE_PATH "ktx" PATH_SEPARATOR "ui-button-atlas.ktx",
 };
 
 #define MAX_TEX_ATLAS LAE_COUNT

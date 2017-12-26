@@ -604,17 +604,7 @@ static void s_render_test_particle(const LWCONTEXT* pLwc, const mat4x4 view, con
     LWEMITTER2OBJECT* emit_object = ps_emit_object_begin(field_ps(pLwc->field));
     mat4x4 proj_view;
     mat4x4_mul(proj_view, proj, view);
-    //glEnable(GL_BLEND);
-    //glBlendFunc(GL_DST_COLOR, GL_ONE_MINUS_SRC_ALPHA);
-    //glBlendFunc(GL_DST_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-    //glBlendFunc(GL_ONE, GL_ONE);
-    //glDepthFunc()
-    //glBlendEquation(GL_MAX);
-    //glDisable(GL_DEPTH_TEST);
-    glEnable(GL_BLEND);
-    glBlendFunc(GL_SRC_ALPHA, GL_ONE);
-    glDepthMask(GL_FALSE);
-    //glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    lwc_enable_additive_blending();
     while (emit_object) {
         mat4x4 model;
         mat4x4_identity(model);
@@ -623,10 +613,7 @@ static void s_render_test_particle(const LWCONTEXT* pLwc, const mat4x4 view, con
         ps_render_explosion(pLwc, emit_object, proj_view, model);
         emit_object = ps_emit_object_next(field_ps(pLwc->field), emit_object);
     }
-    //glBlendEquation(GL_FUNC_ADD);
-    //glEnable(GL_DEPTH_TEST);
-    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-    glDepthMask(GL_TRUE);
+    lwc_disable_additive_blending();
 }
 
 void lwc_render_field(const LWCONTEXT* pLwc) {

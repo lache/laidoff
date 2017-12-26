@@ -40,20 +40,38 @@ void render_atlas_sprite(const LWCONTEXT* pLwc,
                     uv_scale);
     const float sprite_aspect_ratio = uv_scale[0] / uv_scale[1];
     lw_load_tex(pLwc, lae);
-    lw_load_tex(pLwc, lae_alpha);
-    render_solid_vb_ui_alpha_uv(pLwc,
-                                x,
-                                y,
-                                sprite_width,
-                                sprite_width / sprite_aspect_ratio,
-                                pLwc->tex_atlas[lae],
-                                pLwc->tex_atlas[lae_alpha],
-                                lvt,
-                                ui_alpha,
-                                0.0f,
-                                0.0f,
-                                0.0f,
-                                0.0f,
-                                uv_offset,
-                                uv_scale);
+    if (lae_alpha != LAE_DONTCARE) {
+        lw_load_tex(pLwc, lae_alpha);
+        render_solid_vb_ui_alpha_uv(pLwc,
+                                    x,
+                                    y,
+                                    sprite_width,
+                                    sprite_width / sprite_aspect_ratio,
+                                    pLwc->tex_atlas[lae],
+                                    pLwc->tex_atlas[lae_alpha],
+                                    lvt,
+                                    ui_alpha,
+                                    0.0f,
+                                    0.0f,
+                                    0.0f,
+                                    0.0f,
+                                    uv_offset,
+                                    uv_scale);
+    } else {
+        /*render_solid_vb_ui_uv(pLwc,
+                              x,
+                              y,
+                              sprite_width,
+                              sprite_width / sprite_aspect_ratio,
+                              pLwc->tex_atlas[lae],
+                              lvt,
+                              ui_alpha,
+                              0.0f,
+                              0.0f,
+                              0.0f,
+                              0.0f,
+                              uv_offset,
+                              uv_scale);*/
+    }
+
 }

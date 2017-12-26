@@ -1413,16 +1413,19 @@ static void render_main_menu_ui_layer(const LWCONTEXT* pLwc, const LWPUCKGAME* p
                                       const mat4x4 view, const mat4x4 proj, const mat4x4 ui_proj,
                                       int remote, const float* player_controlled_pos) {
     // reset viewport temporarily
+    const int viewport_x = pLwc->viewport_x;
+    const int viewport_y = pLwc->viewport_y;
+    ((LWCONTEXT*)pLwc)->viewport_x = 0;
+    ((LWCONTEXT*)pLwc)->viewport_y = 0;
     LW_GL_VIEWPORT();
     // leaderboard
     float leaderboard_x = -pLwc->aspect_ratio + 0.1f;
     float leaderboard_y = 0.8f;
     render_leaderboard_table(pLwc, leaderboard_x, leaderboard_y, puck_game->main_menu_ui_alpha);
     // revert to default viewport
-    glViewport(pLwc->viewport_x,
-               pLwc->viewport_y,
-               pLwc->width,
-               pLwc->height);
+    ((LWCONTEXT*)pLwc)->viewport_x = viewport_x;
+    ((LWCONTEXT*)pLwc)->viewport_y = viewport_y;
+    LW_GL_VIEWPORT();
     // render buttons as a single sprite
     render_main_menu(pLwc, puck_game, view, proj, puck_game->main_menu_ui_alpha);
     // nickname (background, icon, text)
@@ -1476,7 +1479,8 @@ static void render_main_menu_ui_layer(const LWCONTEXT* pLwc, const LWPUCKGAME* p
     }
     // buttons
     float button_alpha = 0.0f; // alpha zeroed intentionally (nonzero only when debugging)
-    lwbutton_lae_append(&(((LWCONTEXT*)pLwc)->button_list),
+    lwbutton_lae_append(pLwc,
+                        &(((LWCONTEXT*)pLwc)->button_list),
                         "practice_button",
                         -0.75f,
                         +0.70f,
@@ -1488,7 +1492,8 @@ static void render_main_menu_ui_layer(const LWCONTEXT* pLwc, const LWPUCKGAME* p
                         1.0f,
                         1.0f,
                         1.0f);
-    lwbutton_lae_append(&(((LWCONTEXT*)pLwc)->button_list),
+    lwbutton_lae_append(pLwc,
+                        &(((LWCONTEXT*)pLwc)->button_list),
                         "tutorial_button",
                         +0.75f - 0.70f,
                         +0.70f,
@@ -1500,7 +1505,8 @@ static void render_main_menu_ui_layer(const LWCONTEXT* pLwc, const LWPUCKGAME* p
                         1.0f,
                         1.0f,
                         1.0f);
-    lwbutton_lae_append(&(((LWCONTEXT*)pLwc)->button_list),
+    lwbutton_lae_append(pLwc,
+                        &(((LWCONTEXT*)pLwc)->button_list),
                         "online_button",
                         -0.75f,
                         +0.25f,
@@ -1512,7 +1518,8 @@ static void render_main_menu_ui_layer(const LWCONTEXT* pLwc, const LWPUCKGAME* p
                         1.0f,
                         1.0f,
                         1.0f);
-    lwbutton_lae_append(&(((LWCONTEXT*)pLwc)->button_list),
+    lwbutton_lae_append(pLwc,
+                        &(((LWCONTEXT*)pLwc)->button_list),
                         "leaderboard_button",
                         -0.75f,
                         +0.25f - 0.50f - 0.05f,
@@ -1768,7 +1775,8 @@ static void render_battle_ui_layer(const LWCONTEXT* pLwc, const LWPUCKGAME* puck
     if ((pLwc->control_flags & LCF_PUCK_GAME_PULL)
         && ((puck_game->control_flags & LPGCF_HIDE_PULL_BUTTON) == 0)) {
         int pull_puck = puck_game->remote_control[0].pull_puck;
-        lwbutton_lae_append(&(((LWCONTEXT*)pLwc)->button_list),
+        lwbutton_lae_append(pLwc,
+                            &(((LWCONTEXT*)pLwc)->button_list),
                             "pull_button",
                             +1.000f + button_size * 1.75f / 2 - button_size / 2,
                             +0.175f,
@@ -1788,7 +1796,8 @@ static void render_battle_ui_layer(const LWCONTEXT* pLwc, const LWPUCKGAME* puck
         get_left_dir_pad_original_center(pLwc->aspect_ratio, &cx, &cy);
         sx = button_size * 1.5f;
         sy = sx;
-        lwbutton_lae_append(&(((LWCONTEXT*)pLwc)->button_list),
+        lwbutton_lae_append(pLwc,
+                            &(((LWCONTEXT*)pLwc)->button_list),
                             "dash_button",
                             -cx - sx / 2,
                             cy + sy / 2,
@@ -1802,7 +1811,8 @@ static void render_battle_ui_layer(const LWCONTEXT* pLwc, const LWPUCKGAME* puck
                             1.0f);
     }
     if (pLwc->control_flags & LCF_PUCK_GAME_JUMP) {
-        lwbutton_lae_append(&(((LWCONTEXT*)pLwc)->button_list),
+        lwbutton_lae_append(pLwc,
+                            &(((LWCONTEXT*)pLwc)->button_list),
                             "jump_button",
                             button_x_0 + button_x_interval * 3,
                             button_y_0 + button_y_interval * 2,
@@ -1819,7 +1829,8 @@ static void render_battle_ui_layer(const LWCONTEXT* pLwc, const LWPUCKGAME* puck
         || puck_game->game_state == LPGS_TUTORIAL
         || puck_game_state_phase_finished(puck_game->battle_phase)) {
         // return to main menu button
-        lwbutton_lae_append(&(((LWCONTEXT*)pLwc)->button_list),
+        lwbutton_lae_append(pLwc,
+                            &(((LWCONTEXT*)pLwc)->button_list),
                             "back_button",
                             -pLwc->aspect_ratio,
                             1.0f,//0.8f,
@@ -1837,11 +1848,7 @@ static void render_battle_ui_layer(const LWCONTEXT* pLwc, const LWPUCKGAME* puck
 void lwc_render_physics(const LWCONTEXT* pLwc, const mat4x4 view, const mat4x4 proj) {
     const LWPUCKGAME* puck_game = pLwc->puck_game;
     const LWPSTATE* state = &pLwc->puck_game_state;
-    //LW_GL_VIEWPORT();
-    glViewport(pLwc->viewport_x,
-               pLwc->viewport_y,
-               pLwc->width,
-               pLwc->height);
+    LW_GL_VIEWPORT();
     lw_clear_color();
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -2088,7 +2095,8 @@ void lwc_render_physics(const LWCONTEXT* pLwc, const mat4x4 view, const mat4x4 p
             render_searching_state(pLwc, puck_game);
             const float button_size = 0.35f;
             // search cancel button
-            lwbutton_lae_append(&(((LWCONTEXT*)pLwc)->button_list),
+            lwbutton_lae_append(pLwc,
+                                &(((LWCONTEXT*)pLwc)->button_list),
                                 "back_button",
                                 +0.0f - button_size * 1.5f / 2,
                                 -0.5f + button_size * 1.5f / 2,

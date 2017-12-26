@@ -319,7 +319,7 @@ static void s_render_tower_button(const LWCONTEXT* pLwc, LWBUTTONLIST* button_li
         // Register as a button
         char btn_id[32];
         sprintf(btn_id, "seltower%d", i);
-        lwbutton_append(button_list, btn_id, btn_bg_x_nor, btn_bg_y_nor, wf, hf);
+        lwbutton_append(pLwc, button_list, btn_id, btn_bg_x_nor, btn_bg_y_nor, wf, hf);
     }
 }
 
@@ -337,13 +337,13 @@ static void s_render_tower_page_button(const LWCONTEXT* pLwc, LWBUTTONLIST* butt
                                             0, LVT_UI_LEFT_BUTTON_BG,
                                             1, 0, 0, 0, 0, 0, LWST_COLOR, 0);
     // Register as a button
-    lwbutton_append(button_list, "seltower_left", btn_bg_x_nor - (left_button_width*btn_bg_size_nor), btn_bg_y_nor + hf/2, wf - (left_button_right_edge_width*btn_bg_size_nor / 2), hf);
+    lwbutton_append(pLwc, button_list, "seltower_left", btn_bg_x_nor - (left_button_width*btn_bg_size_nor), btn_bg_y_nor + hf/2, wf - (left_button_right_edge_width*btn_bg_size_nor / 2), hf);
     // Right arrow button (180-deg rotation)
     render_solid_vb_ui_flip_y_uv_shader_rot(pLwc, btn_bg_x_nor + (left_button_total_width + left_button_width_margin) * btn_bg_size_nor, btn_bg_y_nor, 2 * btn_bg_size_nor, 2 * btn_bg_size_nor,
                                             0, LVT_UI_LEFT_BUTTON_BG,
                                             1, 0, 0, 0, 0, 0, LWST_COLOR, (float)M_PI);
     // Register as a button
-    lwbutton_append(button_list, "seltower_right", btn_bg_x_nor + (left_button_width + left_button_right_edge_width/2 + left_button_width_margin) * btn_bg_size_nor, btn_bg_y_nor + hf / 2, wf - (left_button_right_edge_width*btn_bg_size_nor / 2), hf);
+    lwbutton_append(pLwc, button_list, "seltower_right", btn_bg_x_nor + (left_button_width + left_button_right_edge_width/2 + left_button_width_margin) * btn_bg_size_nor, btn_bg_y_nor + hf / 2, wf - (left_button_right_edge_width*btn_bg_size_nor / 2), hf);
 }
 
 static void s_render_full_panel(const LWCONTEXT* pLwc, LWBUTTONLIST* button_list) {
@@ -443,7 +443,7 @@ static void s_render_full_panel(const LWCONTEXT* pLwc, LWBUTTONLIST* button_list
         // Register as a button
         char btn_id[32];
         sprintf(btn_id, "upgrade%d", i);
-        lwbutton_append(button_list, btn_id, button_x - wf/2, button_y + hf/2, wf, hf);
+        lwbutton_append(pLwc, button_list, btn_id, button_x - wf/2, button_y + hf/2, wf, hf);
     }
 }
 

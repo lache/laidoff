@@ -27,14 +27,14 @@ static void render_item(const LWCONTEXT* pLwc,
     SET_COLOR_RGBA_FLOAT(text_block.color_emp_glyph, 1, 1, 0, ui_alpha);
     SET_COLOR_RGBA_FLOAT(text_block.color_emp_outline, 0, 0, 0, ui_alpha);
     text_block.text_block_y = y0 - 0.1f * index;
-    
+
     text_block.text = rank;
     text_block.text_bytelen = (int)strlen(text_block.text);
     text_block.begin_index = 0;
     text_block.end_index = text_block.text_bytelen;
     text_block.text_block_x = x0;
     render_text_block(pLwc, &text_block);
-    
+
     text_block.text = nickname;
     text_block.text_bytelen = (int)strlen(text_block.text);
     text_block.begin_index = 0;
@@ -89,7 +89,7 @@ void render_leaderboard_table(const LWCONTEXT* pLwc, float x0, float y0, float u
         }
         render_item(pLwc, i + 1, rank_str, p->Nickname[i], score_str, 0, x0, y0, ui_alpha, r, g, b);
         if (i < p->Count - 1) {
-            if (p->Score[i] == p->Score[i+1]) {
+            if (p->Score[i] == p->Score[i + 1]) {
                 tieCount++;
             } else {
                 if (rank == p->First_item_rank) {
@@ -101,6 +101,22 @@ void render_leaderboard_table(const LWCONTEXT* pLwc, float x0, float y0, float u
             }
         }
     }
+    const float page_button_w = 1.0f;
+    const float page_button_h = 0.0f; // don't care
+    lwbutton_lae_append_atlas_additive(pLwc,
+                                       &(((LWCONTEXT*)pLwc)->button_list),
+                                       "leaderboard_prev_page_button",
+                                       0,
+                                       0,
+                                       page_button_w,
+                                       page_button_h,
+                                       LAE_UI_BUTTON_ATLAS,
+                                       LAC_UI_BUTTON,
+                                       "leaderboard-page.png",
+                                       ui_alpha,
+                                       1.0f,
+                                       1.0f,
+                                       1.0f);
 }
 
 void lwc_render_leaderboard(const LWCONTEXT* pLwc) {
@@ -114,7 +130,8 @@ void lwc_render_leaderboard(const LWCONTEXT* pLwc) {
     const float x0 = -pLwc->aspect_ratio + back_button_size + 0.1f;
     const float y0 = +0.75f;
     render_leaderboard_table(pLwc, x0, y0, 1.0f);
-    lwbutton_lae_append(&(((LWCONTEXT*)pLwc)->button_list),
+    lwbutton_lae_append(pLwc,
+                        &(((LWCONTEXT*)pLwc)->button_list),
                         "back_button",
                         -pLwc->aspect_ratio,
                         0.8f,

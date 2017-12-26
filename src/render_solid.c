@@ -5,43 +5,146 @@
 #include "lwlog.h"
 #include <assert.h>
 
-void render_solid_box_ui_lvt_flip_y_uv(const LWCONTEXT* pLwc, float x, float y, float w, float h, GLuint tex_index, enum _LW_VBO_TYPE lvt, int flip_y_uv) {
-    render_solid_vb_ui_flip_y_uv(pLwc, x, y, w, h, tex_index, lvt, 1, 1, 1, 1, 0, flip_y_uv);
+void render_solid_box_ui_lvt_flip_y_uv(const LWCONTEXT* pLwc,
+                                       float x,
+                                       float y,
+                                       float w,
+                                       float h,
+                                       GLuint tex_index,
+                                       enum _LW_VBO_TYPE lvt,
+                                       int flip_y_uv) {
+    render_solid_vb_ui_flip_y_uv(pLwc,
+                                 x,
+                                 y,
+                                 w,
+                                 h,
+                                 tex_index,
+                                 lvt,
+                                 1,
+                                 1,
+                                 1,
+                                 1,
+                                 0,
+                                 flip_y_uv);
 }
 
-void render_solid_box_ui(const LWCONTEXT* pLwc, float x, float y, float w, float h, GLuint tex_index) {
-    render_solid_vb_ui(pLwc, x, y, w, h, tex_index, LVT_LEFT_BOTTOM_ANCHORED_SQUARE, 1, 1, 1, 1, 0);
+void render_solid_box_ui(const LWCONTEXT* pLwc,
+                         float x,
+                         float y,
+                         float w,
+                         float h,
+                         GLuint tex_index) {
+    render_solid_vb_ui(pLwc,
+                       x,
+                       y,
+                       w,
+                       h,
+                       tex_index,
+                       LVT_LEFT_BOTTOM_ANCHORED_SQUARE,
+                       1,
+                       1,
+                       1,
+                       1,
+                       0);
 }
 
-void render_solid_box_ui_alpha(const LWCONTEXT* pLwc, float x, float y, float w, float h, GLuint tex_index, float alpha_multiplier) {
-    render_solid_vb_ui(pLwc, x, y, w, h, tex_index, LVT_LEFT_BOTTOM_ANCHORED_SQUARE, alpha_multiplier, 1, 1, 1, 0);
+void render_solid_box_ui_alpha(const LWCONTEXT* pLwc,
+                               float x,
+                               float y,
+                               float w,
+                               float h,
+                               GLuint tex_index,
+                               float alpha_multiplier) {
+    render_solid_vb_ui(pLwc,
+                       x,
+                       y,
+                       w,
+                       h,
+                       tex_index,
+                       LVT_LEFT_BOTTOM_ANCHORED_SQUARE,
+                       alpha_multiplier,
+                       1,
+                       1,
+                       1,
+                       0);
 }
 
 void render_solid_vb_ui_flip_y_uv(const LWCONTEXT* pLwc,
-                                  float x, float y, float w, float h,
+                                  float x,
+                                  float y,
+                                  float w,
+                                  float h,
                                   GLuint tex_index,
                                   enum _LW_VBO_TYPE lvt,
-                                  float alpha_multiplier, float over_r, float over_g, float over_b, float oratio, int flip_y_uv) {
-    
+                                  float alpha_multiplier,
+                                  float over_r,
+                                  float over_g,
+                                  float over_b,
+                                  float oratio,
+                                  int flip_y_uv) {
     int shader_index = LWST_DEFAULT;
-    render_solid_vb_ui_flip_y_uv_shader(pLwc, x, y, w, h, tex_index, lvt, alpha_multiplier, over_r, over_g, over_b, oratio, flip_y_uv, shader_index);
+    render_solid_vb_ui_flip_y_uv_shader(pLwc,
+                                        x,
+                                        y,
+                                        w,
+                                        h,
+                                        tex_index,
+                                        lvt,
+                                        alpha_multiplier,
+                                        over_r,
+                                        over_g,
+                                        over_b,
+                                        oratio,
+                                        flip_y_uv,
+                                        shader_index);
 }
 
 void render_solid_vb_ui_flip_y_uv_shader(const LWCONTEXT* pLwc,
-                                         float x, float y, float w, float h,
+                                         float x,
+                                         float y,
+                                         float w,
+                                         float h,
                                          GLuint tex_index,
                                          enum _LW_VBO_TYPE lvt,
-                                         float alpha_multiplier, float over_r, float over_g, float over_b, float oratio, int flip_y_uv, int shader_index) {
-    
-    render_solid_vb_ui_flip_y_uv_shader_rot(pLwc, x, y, w, h, tex_index, lvt, alpha_multiplier, over_r, over_g, over_b, oratio, flip_y_uv, shader_index, 0);
+                                         float alpha_multiplier,
+                                         float over_r,
+                                         float over_g,
+                                         float over_b,
+                                         float oratio,
+                                         int flip_y_uv,
+                                         int shader_index) {    
+    render_solid_vb_ui_flip_y_uv_shader_rot(pLwc,
+                                            x,
+                                            y,
+                                            w,
+                                            h,
+                                            tex_index,
+                                            lvt,
+                                            alpha_multiplier,
+                                            over_r,
+                                            over_g,
+                                            over_b,
+                                            oratio,
+                                            flip_y_uv,
+                                            shader_index,
+                                            0);
 }
 
 void render_solid_vb_ui_flip_y_uv_shader_rot(const LWCONTEXT* pLwc,
-                                             float x, float y, float w, float h,
+                                             float x,
+                                             float y,
+                                             float w,
+                                             float h,
                                              GLuint tex_index,
                                              enum _LW_VBO_TYPE lvt,
-                                             float alpha_multiplier, float over_r, float over_g, float over_b, float oratio, int flip_y_uv, int shader_index, float rot) {
-    
+                                             float alpha_multiplier,
+                                             float over_r,
+                                             float over_g,
+                                             float over_b,
+                                             float oratio,
+                                             int flip_y_uv,
+                                             int shader_index,
+                                             float rot) {
     lazy_glUseProgram(pLwc, shader_index);
     glUniform2fv(pLwc->shader[shader_index].vuvoffset_location, 1, default_uv_offset);
     glUniform2fv(pLwc->shader[shader_index].vuvscale_location, 1, flip_y_uv ? default_flip_y_uv_scale : default_uv_scale);
@@ -85,22 +188,50 @@ void render_solid_vb_ui_flip_y_uv_shader_rot(const LWCONTEXT* pLwc,
 }
 
 void render_solid_vb_ui_alpha(const LWCONTEXT* pLwc,
-                              float x, float y, float w, float h,
-                              GLuint tex_index, GLuint tex_alpha_index,
+                              float x,
+                              float y,
+                              float w,
+                              float h,
+                              GLuint tex_index,
+                              GLuint tex_alpha_index,
                               enum _LW_VBO_TYPE lvt,
-                              float alpha_multiplier, float over_r, float over_g, float over_b, float oratio) {
-    render_solid_vb_ui_alpha_uv(pLwc, x, y, w, h, tex_index, tex_alpha_index, lvt,
-                                alpha_multiplier, over_r, over_g, over_b, oratio,
-                                default_uv_offset, default_uv_scale);
+                              float alpha_multiplier,
+                              float over_r,
+                              float over_g,
+                              float over_b,
+                              float oratio) {
+    render_solid_vb_ui_alpha_uv(pLwc,
+                                x,
+                                y,
+                                w,
+                                h,
+                                tex_index,
+                                tex_alpha_index,
+                                lvt,
+                                alpha_multiplier,
+                                over_r,
+                                over_g,
+                                over_b,
+                                oratio,
+                                default_uv_offset,
+                                default_uv_scale);
 }
 
 void render_solid_vb_ui_alpha_uv(const LWCONTEXT* pLwc,
-                                 float x, float y, float w, float h,
-                                 GLuint tex_index, GLuint tex_alpha_index,
+                                 float x,
+                                 float y,
+                                 float w,
+                                 float h,
+                                 GLuint tex_index,
+                                 GLuint tex_alpha_index,
                                  enum _LW_VBO_TYPE lvt,
                                  float alpha_multiplier,
-                                 float over_r, float over_g, float over_b, float oratio,
-                                 const float* uv_offset, const float* uv_scale) {
+                                 float over_r,
+                                 float over_g,
+                                 float over_b,
+                                 float oratio,
+                                 const float* uv_offset,
+                                 const float* uv_scale) {
     int shader_index = LWST_ETC1;
     
     const LWSHADER* shader = &pLwc->shader[shader_index];
@@ -152,12 +283,39 @@ void render_solid_vb_ui_alpha_uv(const LWCONTEXT* pLwc,
 }
 
 void render_solid_vb_ui(const LWCONTEXT* pLwc,
-                        float x, float y, float w, float h,
+                        float x,
+                        float y,
+                        float w,
+                        float h,
                         GLuint tex_index,
                         enum _LW_VBO_TYPE lvt,
-                        float alpha_multiplier, float over_r, float over_g, float over_b, float oratio) {
-    
-    render_solid_vb_ui_flip_y_uv(pLwc, x, y, w, h, tex_index, lvt, alpha_multiplier, over_r, over_g, over_b, oratio, 0);
-    
+                        float alpha_multiplier,
+                        float over_r,
+                        float over_g,
+                        float over_b,
+                        float oratio) {
+    render_solid_vb_ui_flip_y_uv(pLwc,
+                                 x,
+                                 y,
+                                 w,
+                                 h,
+                                 tex_index,
+                                 lvt,
+                                 alpha_multiplier,
+                                 over_r,
+                                 over_g,
+                                 over_b,
+                                 oratio,
+                                 0);
 }
 
+void lwc_enable_additive_blending() {
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE);
+    glDepthMask(GL_FALSE);
+}
+
+void lwc_disable_additive_blending() {
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    glDepthMask(GL_TRUE);
+}
