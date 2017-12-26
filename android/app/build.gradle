@@ -119,18 +119,10 @@ repositories {
 }
 
 dependencies {
-    //compile fileTree(include: ['*.jar'], dir: 'libs')
-    //compile project(path: ':native-activity' , configuration: 'debug')
-    //compile(name: 'game_api_v0.0.1', ext: 'aar')
-    //compile 'com.squareup.retrofit2:retrofit:2.2.0'
-    //compile 'com.squareup.retrofit2:converter-gson:2.1.0'
-    //compile 'com.google.code.gson:gson:2.8.0'
-    //compile 'com.jakewharton.timber:timber:4.5.1'
-    //compile 'com.squareup.okhttp3:okhttp:3.6.0'
-    //compile 'com.squareup.okhttp3:logging-interceptor:3.6.0'
-    implementation 'com.google.firebase:firebase-messaging:11.6.2'
-    implementation 'com.google.firebase:firebase-ads:11.6.2'
+    implementation 'com.google.firebase:firebase-messaging:11.8.0'
+    implementation 'com.google.firebase:firebase-ads:11.8.0'
+    implementation 'com.google.firebase:firebase-auth:11.8.0'
+    implementation 'com.google.android.gms:play-services-auth:11.8.0'
 }
-
 
 apply plugin: 'com.google.gms.google-services'

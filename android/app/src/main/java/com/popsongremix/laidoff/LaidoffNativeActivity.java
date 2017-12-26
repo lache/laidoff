@@ -22,6 +22,12 @@ import com.google.android.gms.ads.MobileAds;
 import com.google.android.gms.ads.reward.RewardItem;
 import com.google.android.gms.ads.reward.RewardedVideoAd;
 import com.google.android.gms.ads.reward.RewardedVideoAdListener;
+import com.google.android.gms.auth.api.signin.GoogleSignIn;
+import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
+import com.google.android.gms.auth.api.signin.GoogleSignInClient;
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
+import com.google.android.gms.common.api.ApiException;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.iid.FirebaseInstanceId;
 
 import java.io.File;
@@ -30,8 +36,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Locale;
 
-public class LaidoffNativeActivity extends NativeActivity implements RewardedVideoAdListener
-{
+public class LaidoffNativeActivity extends NativeActivity implements RewardedVideoAdListener {
     static {
         System.loadLibrary("zmq");
         System.loadLibrary("czmq");
@@ -40,12 +45,18 @@ public class LaidoffNativeActivity extends NativeActivity implements RewardedVid
 
     private int mSound_MetalHit;
     private SoundPool mSoundPool;
+    private GoogleSignInClient mGoogleSignInClient;
 
     public static native String signalResourceReady(Class<LaidoffNativeActivity> and9NativeActivityClass);
+
     public static native int pushTextureData(int width, int height, int[] data, int texAtlasIndex);
+
     public static native void registerAsset(String assetPath, int startOffset, int length);
+
     private static native void sendApkPath(String apkPath, String filesPath, String packageVersion);
+
     public static native void setPushTokenAndSend(String text, long pLwcLong);
+
     @SuppressWarnings("SameParameterValue")
     public static native void setWindowSize(int width, int height, long pLwcLong);
 
@@ -53,10 +64,12 @@ public class LaidoffNativeActivity extends NativeActivity implements RewardedVid
 
     public static final String LOG_TAG = "and9";
     private RewardedVideoAd mRewardedVideoAd;
-    /** Called when the activity is first created. */
+
+    /**
+     * Called when the activity is first created.
+     */
     @Override
-    public void onCreate(Bundle savedInstanceState)
-    {
+    public void onCreate(Bundle savedInstanceState) {
         INSTANCE = this;
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main);
@@ -65,6 +78,14 @@ public class LaidoffNativeActivity extends NativeActivity implements RewardedVid
         // Interstitial
         mRewardedVideoAd = MobileAds.getRewardedVideoAdInstance(this);
         mRewardedVideoAd.setRewardedVideoAdListener(this);
+
+        // Configure sign-in to request the user's ID, email address, and basic
+        // profile. ID and basic profile are included in DEFAULT_SIGN_IN.
+        GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_GAMES_SIGN_IN)
+                .requestEmail()
+                .build();
+        // Build a GoogleSignInClient with the options specified by gso.
+        mGoogleSignInClient = GoogleSignIn.getClient(this, gso);
 
         //getWindow().getDecorView().setKeepScreenOn(true);
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED |
@@ -129,6 +150,20 @@ public class LaidoffNativeActivity extends NativeActivity implements RewardedVid
         mSound_MetalHit = mSoundPool.load(getApplicationContext(), R.raw.sfx_metal_hit, 1);
     }
 
+    @Override
+    public void onStart() {
+        super.onStart();
+        // Check for existing Google Sign In account, if the user is already signed in
+        // the GoogleSignInAccount will be non-null.
+        GoogleSignInAccount account = GoogleSignIn.getLastSignedInAccount(this);
+        if (account != null) {
+            printGoogleAccountDebugInfo(account);
+        } else {
+            Log.i(LOG_TAG, "onStart(): Google account not available.");
+        }
+    }
+
+    @SuppressWarnings("unused")
     private void loadRewardedVideoAd() {
         // production: ca-app-pub-5072035175916776/9587253247
         mRewardedVideoAd.loadAd("ca-app-pub-3940256099942544/5224354917",
@@ -152,17 +187,17 @@ public class LaidoffNativeActivity extends NativeActivity implements RewardedVid
             Log.i(LOG_TAG, String.format(" - file: %s", aFileList.getAbsolutePath()));
         }
 
-        UpdateResTaskParam urtp = new UpdateResTaskParam();
-        urtp.fileAbsolutePath = files.getAbsolutePath();
-        urtp.remoteAssetsBasePath = "http://sky.popsongremix.com/laidoff/assets";
-        //urtp.remoteAssetsBasePath = "http://192.168.0.28:19876/assets";
-        urtp.remoteApkBasePath = "http://sky.popsongremix.com/laidoff/apk";
-        //urtp.remoteAssetsBasePath = "http://222.110.4.119:18080";
-        urtp.remoteListFilePath = "list.txt";
-        urtp.localListFilename = "list.txt";
-        urtp.activity = this;
+        UpdateResTaskParam updateResTaskParam = new UpdateResTaskParam();
+        updateResTaskParam.fileAbsolutePath = files.getAbsolutePath();
+        updateResTaskParam.remoteAssetsBasePath = "http://sky.popsongremix.com/laidoff/assets";
+        //updateResTaskParam.remoteAssetsBasePath = "http://192.168.0.28:19876/assets";
+        updateResTaskParam.remoteApkBasePath = "http://sky.popsongremix.com/laidoff/apk";
+        //updateResTaskParam.remoteAssetsBasePath = "http://222.110.4.119:18080";
+        updateResTaskParam.remoteListFilePath = "list.txt";
+        updateResTaskParam.localListFilename = "list.txt";
+        updateResTaskParam.activity = this;
 
-        new UpdateResTask(this).execute(urtp);
+        new UpdateResTask(this).execute(updateResTaskParam);
     }
 
     @SuppressWarnings("unused")
@@ -176,7 +211,7 @@ public class LaidoffNativeActivity extends NativeActivity implements RewardedVid
         Log.i(LOG_TAG, String.format(Locale.US, "Tex(asset name) %s Bitmap width: %d", assetName, bitmap.getWidth()));
         Log.i(LOG_TAG, String.format(Locale.US, "Tex(asset name) %s Bitmap height: %d", assetName, bitmap.getHeight()));
 
-        int[] pixels = new int[bitmap.getWidth()*bitmap.getHeight()];
+        int[] pixels = new int[bitmap.getWidth() * bitmap.getHeight()];
         bitmap.getPixels(pixels, 0, bitmap.getWidth(), 0, 0, bitmap.getWidth(), bitmap.getHeight());
         int bytes_allocated_on_native = pushTextureData(bitmap.getWidth(), bitmap.getHeight(), pixels, i);
 
@@ -195,7 +230,7 @@ public class LaidoffNativeActivity extends NativeActivity implements RewardedVid
             //noinspection ConstantConditions
             if (fromDownloaded) {
 
-                String filenameOnly = filePath.substring(filePath.lastIndexOf("/")+1);
+                String filenameOnly = filePath.substring(filePath.lastIndexOf("/") + 1);
 
                 File f = new File(context.getFilesDir().getAbsoluteFile(), filenameOnly);
 
@@ -244,14 +279,13 @@ public class LaidoffNativeActivity extends NativeActivity implements RewardedVid
         INSTANCE.startActivity(intent);
 
         // test interstitial
-        INSTANCE.runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                INSTANCE.loadRewardedVideoAd();
-            }
-        });
-
-
+//        INSTANCE.runOnUiThread(new Runnable() {
+//            @Override
+//            public void run() {
+//                INSTANCE.loadRewardedVideoAd();
+//            }
+//        });
+        INSTANCE.SignIn();
     }
 
     @SuppressWarnings("unused")
@@ -295,6 +329,45 @@ public class LaidoffNativeActivity extends NativeActivity implements RewardedVid
                 setWindowSize(decorView.getWidth(), decorView.getHeight(), 0);
             }
         }
+    }
+
+    int RC_SIGN_IN = 10000;
+
+    public void SignIn() {
+        Intent signInIntent = mGoogleSignInClient.getSignInIntent();
+        startActivityForResult(signInIntent, RC_SIGN_IN);
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        // Result returned from launching the Intent from GoogleSignInClient.getSignInIntent(...);
+        if (requestCode == RC_SIGN_IN) {
+            // The Task returned from this call is always completed, no need to attach
+            // a listener.
+            Task<GoogleSignInAccount> task = GoogleSignIn.getSignedInAccountFromIntent(data);
+            handleSignInResult(task);
+        }
+    }
+
+    private void handleSignInResult(Task<GoogleSignInAccount> completedTask) {
+        try {
+            GoogleSignInAccount account = completedTask.getResult(ApiException.class);
+            printGoogleAccountDebugInfo(account);
+            // Signed in successfully, show authenticated UI.
+            //updateUI(account);
+        } catch (ApiException e) {
+            // The ApiException status code indicates the detailed failure reason.
+            // Please refer to the GoogleSignInStatusCodes class reference for more information.
+            Log.w(LOG_TAG, "handleSignInResult - signInResult:failed code=" + e.getStatusCode());
+            //updateUI(null);
+        }
+    }
+
+    private void printGoogleAccountDebugInfo(GoogleSignInAccount account) {
+        Log.i(LOG_TAG, "handleSignInResult - Google account name: " + account.getDisplayName());
+        Log.i(LOG_TAG, "handleSignInResult - Google Photo URL: " + account.getPhotoUrl());
     }
 
     // AdMob reward video callbacks
