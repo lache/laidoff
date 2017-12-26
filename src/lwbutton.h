@@ -22,6 +22,7 @@ typedef struct _LWBUTTON {
     int enable_additive;
     LW_ATLAS_CONF lac;
     char atlas_sprite_name[64];
+    int rendered;
 } LWBUTTON;
 
 typedef struct _LWBUTTONLIST {

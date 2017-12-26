@@ -71,6 +71,55 @@ static void render_title(const LWCONTEXT* pLwc) {
     render_text_block(pLwc, &text_block);
 }
 
+static void render_leaderboard_page(const LWCONTEXT* pLwc, float x_center, float y_top, float ui_alpha) {
+    if (pLwc->last_leaderboard.Current_page == 0 || pLwc->last_leaderboard.Total_page == 0) {
+        return;
+    }
+    LWTEXTBLOCK text_block;
+    text_block.align = LTBA_CENTER_TOP;
+    text_block.text_block_width = DEFAULT_TEXT_BLOCK_WIDTH;
+    text_block.text_block_line_height = DEFAULT_TEXT_BLOCK_LINE_HEIGHT_F;
+    text_block.size = DEFAULT_TEXT_BLOCK_SIZE_E;
+    text_block.multiline = 1;
+    SET_COLOR_RGBA_FLOAT(text_block.color_normal_glyph, 1, 1, 1, ui_alpha);
+    SET_COLOR_RGBA_FLOAT(text_block.color_normal_outline, 0, 0, 0, ui_alpha);
+    SET_COLOR_RGBA_FLOAT(text_block.color_emp_glyph, 1, 1, 0, ui_alpha);
+    SET_COLOR_RGBA_FLOAT(text_block.color_emp_outline, 0, 0, 0, ui_alpha);
+    char page_str[32];
+    sprintf(page_str, "%d / %d", pLwc->last_leaderboard.Current_page, pLwc->last_leaderboard.Total_page);
+    text_block.text = page_str;
+    text_block.text_bytelen = (int)strlen(text_block.text);
+    text_block.begin_index = 0;
+    text_block.end_index = text_block.text_bytelen;
+    text_block.text_block_x = x_center;
+    text_block.text_block_y = y_top;
+    render_text_block(pLwc, &text_block);
+}
+
+static void render_leaderboard_page_button(const LWCONTEXT* pLwc, float x_center, float y_bottom, float ui_alpha) {
+    const int sprite_lae = LAE_UI_BUTTON_ATLAS;
+    const int sprite_lac = LAC_UI_BUTTON;
+    const char* sprite_name = "leaderboard-page.png";
+    const LWATLASSPRITE* sprite = atlas_sprite_name(pLwc, sprite_lac, sprite_name);
+    const float sprite_aspect_ratio = (float)sprite->width / sprite->height;
+    const float page_button_w = pLwc->aspect_ratio * 0.7f;
+    const float page_button_h = page_button_w / sprite_aspect_ratio;
+    lwbutton_lae_append_atlas_additive(pLwc,
+                                       &(((LWCONTEXT*)pLwc)->button_list),
+                                       "leaderboard_page_button",
+                                       x_center - page_button_w / 2,
+                                       y_bottom + page_button_h * 1.25f,
+                                       page_button_w,
+                                       page_button_h,
+                                       sprite_lae,
+                                       sprite_lac,
+                                       sprite_name,
+                                       ui_alpha,
+                                       1.0f,
+                                       1.0f,
+                                       1.0f);
+}
+
 void render_leaderboard_table(const LWCONTEXT* pLwc, float x0, float y0, float ui_alpha) {
     // Render leaderboard table header
     render_item(pLwc, 0, "#", "Nickname", "Score", 1, x0, y0, ui_alpha, 1, 1, 0);
@@ -101,22 +150,10 @@ void render_leaderboard_table(const LWCONTEXT* pLwc, float x0, float y0, float u
             }
         }
     }
-    const float page_button_w = 1.0f;
-    const float page_button_h = 0.0f; // don't care
-    lwbutton_lae_append_atlas_additive(pLwc,
-                                       &(((LWCONTEXT*)pLwc)->button_list),
-                                       "leaderboard_prev_page_button",
-                                       0,
-                                       0,
-                                       page_button_w,
-                                       page_button_h,
-                                       LAE_UI_BUTTON_ATLAS,
-                                       LAC_UI_BUTTON,
-                                       "leaderboard-page.png",
-                                       ui_alpha,
-                                       1.0f,
-                                       1.0f,
-                                       1.0f);
+    // render page texts (i.e. '23 / 1023')
+    render_leaderboard_page(pLwc, -pLwc->aspect_ratio / 2, -0.7f, ui_alpha);
+    // render page buttons
+    render_leaderboard_page_button(pLwc, -pLwc->aspect_ratio / 2, -1.0f, ui_alpha);
 }
 
 void lwc_render_leaderboard(const LWCONTEXT* pLwc) {

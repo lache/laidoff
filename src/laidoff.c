@@ -1038,7 +1038,7 @@ void lwc_render(const LWCONTEXT* pLwc) {
     // Set rendering flag to 1 (ignoring const-ness.......)
     lwcontext_set_rendering((LWCONTEXT*)pLwc, 1);
     // Button count to zero (ignoring const-ness......)
-    ((LWCONTEXT*)pLwc)->button_list.button_count = 0;
+    memset((void*)&pLwc->button_list, 0, sizeof(pLwc->button_list));
     // Tick rendering thread
     deltatime_tick(pLwc->render_dt);
     // Process all render messages (ignoring const-ness.......)

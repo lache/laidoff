@@ -112,7 +112,7 @@ void render_solid_vb_ui_flip_y_uv_shader(const LWCONTEXT* pLwc,
                                          float over_b,
                                          float oratio,
                                          int flip_y_uv,
-                                         int shader_index) {    
+                                         int shader_index) {
     render_solid_vb_ui_flip_y_uv_shader_rot(pLwc,
                                             x,
                                             y,
@@ -154,10 +154,10 @@ void render_solid_vb_ui_flip_y_uv_shader_rot(const LWCONTEXT* pLwc,
     glUniform3f(pLwc->shader[shader_index].overlay_color_location, over_r, over_g, over_b);
     glUniform1f(pLwc->shader[shader_index].overlay_color_ratio_location, oratio);
     glUniformMatrix4fv(pLwc->shader[shader_index].mvp_location, 1, GL_FALSE, (const GLfloat*)pLwc->proj);
-    
+
     float ui_scale_x = w / 2;
     float ui_scale_y = h / 2;
-    
+
     mat4x4 model_translate;
     mat4x4 model;
     mat4x4 identity_view; mat4x4_identity(identity_view);
@@ -165,7 +165,7 @@ void render_solid_vb_ui_flip_y_uv_shader_rot(const LWCONTEXT* pLwc,
     mat4x4 proj_view_model;
     mat4x4 model_scale;
     mat4x4 model_scale_rotate;
-    
+
     mat4x4_identity(model_scale);
     mat4x4_scale_aniso(model_scale, model_scale, ui_scale_x, ui_scale_y, 1.0f);
     mat4x4_rotate_Z(model_scale_rotate, model_scale, rot);
@@ -175,7 +175,7 @@ void render_solid_vb_ui_flip_y_uv_shader_rot(const LWCONTEXT* pLwc,
     mat4x4_mul(view_model, identity_view, model);
     mat4x4_identity(proj_view_model);
     mat4x4_mul(proj_view_model, pLwc->proj, view_model);
-    
+
     lazy_glBindBuffer(pLwc, lvt);
     bind_all_vertex_attrib(pLwc, lvt);
     glActiveTexture(GL_TEXTURE0);
@@ -233,9 +233,42 @@ void render_solid_vb_ui_alpha_uv(const LWCONTEXT* pLwc,
                                  const float* uv_offset,
                                  const float* uv_scale) {
     int shader_index = LWST_ETC1;
-    
+    render_solid_vb_ui_alpha_uv_shader(pLwc,
+                                       x,
+                                       y,
+                                       w,
+                                       h,
+                                       tex_index,
+                                       tex_alpha_index,
+                                       lvt,
+                                       alpha_multiplier,
+                                       over_r,
+                                       over_g,
+                                       over_b,
+                                       oratio,
+                                       uv_offset,
+                                       uv_scale,
+                                       shader_index);
+}
+
+void render_solid_vb_ui_alpha_uv_shader(const LWCONTEXT* pLwc,
+                                        float x,
+                                        float y,
+                                        float w,
+                                        float h,
+                                        GLuint tex_index,
+                                        GLuint tex_alpha_index,
+                                        enum _LW_VBO_TYPE lvt,
+                                        float alpha_multiplier,
+                                        float over_r,
+                                        float over_g,
+                                        float over_b,
+                                        float oratio,
+                                        const float* uv_offset,
+                                        const float* uv_scale,
+                                        int shader_index) {
     const LWSHADER* shader = &pLwc->shader[shader_index];
-    
+
     lazy_glUseProgram(pLwc, shader_index);
     glUniform2fv(shader->vuvoffset_location, 1, uv_offset);
     glUniform2fv(shader->vuvscale_location, 1, uv_scale);
@@ -246,17 +279,17 @@ void render_solid_vb_ui_alpha_uv(const LWCONTEXT* pLwc,
     glUniform3f(shader->overlay_color_location, over_r, over_g, over_b);
     glUniform1f(shader->overlay_color_ratio_location, oratio);
     glUniformMatrix4fv(shader->mvp_location, 1, GL_FALSE, (const GLfloat*)pLwc->proj);
-    
+
     float ui_scale_x = w / 2;
     float ui_scale_y = h / 2;
-    
+
     mat4x4 model_translate;
     mat4x4 model;
     mat4x4 identity_view; mat4x4_identity(identity_view);
     mat4x4 view_model;
     mat4x4 proj_view_model;
     mat4x4 model_scale;
-    
+
     mat4x4_identity(model_scale);
     mat4x4_scale_aniso(model_scale, model_scale, ui_scale_x, ui_scale_y, 1.0f);
     mat4x4_translate(model_translate, x, y, 0);
@@ -265,21 +298,23 @@ void render_solid_vb_ui_alpha_uv(const LWCONTEXT* pLwc,
     mat4x4_mul(view_model, identity_view, model);
     mat4x4_identity(proj_view_model);
     mat4x4_mul(proj_view_model, pLwc->proj, view_model);
-    
+
     lazy_glBindBuffer(pLwc, lvt);
     bind_all_vertex_attrib_etc1_with_alpha(pLwc, lvt);
     glActiveTexture(GL_TEXTURE0);
     assert(tex_index);
     glBindTexture(GL_TEXTURE_2D, tex_index);
     set_tex_filter(GL_LINEAR, GL_LINEAR);
-    glActiveTexture(GL_TEXTURE1);
-    assert(tex_index);
-    glBindTexture(GL_TEXTURE_2D, tex_alpha_index);
-    set_tex_filter(GL_LINEAR, GL_LINEAR);
+    if (shader_index == LWST_ETC1) {
+        glActiveTexture(GL_TEXTURE1);
+        assert(tex_alpha_index);
+        glBindTexture(GL_TEXTURE_2D, tex_alpha_index);
+        set_tex_filter(GL_LINEAR, GL_LINEAR);
+    } else {
+        assert(tex_alpha_index == 0);
+    }
     glUniformMatrix4fv(shader->mvp_location, 1, GL_FALSE, (const GLfloat*)proj_view_model);
     glDrawArrays(GL_TRIANGLES, 0, pLwc->vertex_buffer[lvt].vertex_count);
-    
-    //glActiveTexture(GL_TEXTURE0);
 }
 
 void render_solid_vb_ui(const LWCONTEXT* pLwc,

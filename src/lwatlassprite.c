@@ -58,20 +58,21 @@ void render_atlas_sprite(const LWCONTEXT* pLwc,
                                     uv_offset,
                                     uv_scale);
     } else {
-        /*render_solid_vb_ui_uv(pLwc,
-                              x,
-                              y,
-                              sprite_width,
-                              sprite_width / sprite_aspect_ratio,
-                              pLwc->tex_atlas[lae],
-                              lvt,
-                              ui_alpha,
-                              0.0f,
-                              0.0f,
-                              0.0f,
-                              0.0f,
-                              uv_offset,
-                              uv_scale);*/
+        render_solid_vb_ui_alpha_uv_shader(pLwc,
+                                           x,
+                                           y,
+                                           sprite_width,
+                                           sprite_width / sprite_aspect_ratio,
+                                           pLwc->tex_atlas[lae],
+                                           0,
+                                           lvt,
+                                           ui_alpha,
+                                           0.0f,
+                                           0.0f,
+                                           0.0f,
+                                           0.0f,
+                                           uv_offset,
+                                           uv_scale,
+                                           LWST_DEFAULT);
     }
-
 }

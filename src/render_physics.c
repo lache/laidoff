@@ -1420,8 +1420,10 @@ static void render_main_menu_ui_layer(const LWCONTEXT* pLwc, const LWPUCKGAME* p
     LW_GL_VIEWPORT();
     // leaderboard
     float leaderboard_x = -pLwc->aspect_ratio + 0.1f;
-    float leaderboard_y = 0.8f;
+    float leaderboard_y = 0.85f;
     render_leaderboard_table(pLwc, leaderboard_x, leaderboard_y, puck_game->main_menu_ui_alpha);
+    // render buttons appended so far while temporary viewport configuration valid
+    render_lwbutton(pLwc, &pLwc->button_list);
     // revert to default viewport
     ((LWCONTEXT*)pLwc)->viewport_x = viewport_x;
     ((LWCONTEXT*)pLwc)->viewport_y = viewport_y;

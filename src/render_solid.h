@@ -103,5 +103,21 @@ void render_solid_vb_ui_alpha_uv(const LWCONTEXT* pLwc,
                                  float oratio,
                                  const float* uv_offset,
                                  const float* uv_scale);
+void render_solid_vb_ui_alpha_uv_shader(const LWCONTEXT* pLwc,
+                                        float x,
+                                        float y,
+                                        float w,
+                                        float h,
+                                        GLuint tex_index,
+                                        GLuint tex_alpha_index,
+                                        enum _LW_VBO_TYPE lvt,
+                                        float alpha_multiplier,
+                                        float over_r,
+                                        float over_g,
+                                        float over_b,
+                                        float oratio,
+                                        const float* uv_offset,
+                                        const float* uv_scale,
+                                        int shader_index);
 void lwc_enable_additive_blending();
 void lwc_disable_additive_blending();

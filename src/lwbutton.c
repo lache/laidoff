@@ -112,7 +112,11 @@ const char* lwbutton_id(const LWBUTTONLIST* button_list, int idx) {
 
 void render_lwbutton(const LWCONTEXT* pLwc, const LWBUTTONLIST* button_list) {
     for (int i = 0; i < button_list->button_count; i++) {
-        const LWBUTTON* b = &button_list->button[i];
+        LWBUTTON* b = (LWBUTTON*)&button_list->button[i];
+        if (b->rendered) {
+            continue;
+        }
+        b->rendered = 1;
         if (b->ui_alpha) {
             if (b->enable_additive) {
                 lwc_enable_additive_blending();
