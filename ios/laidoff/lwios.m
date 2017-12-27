@@ -56,11 +56,12 @@ void lw_start_text_input_activity(LWCONTEXT* pLwc, int tag) {
 }
 
 void lw_start_reward_video(LWCONTEXT* pLwc, int tag) {
-    LOGE("Not supported");
 }
 
 void lw_start_sign_in(LWCONTEXT* pLwc, int tag) {
-    LOGE("Not supported");
+}
+
+void lw_start_sign_out(LWCONTEXT* pLwc, int tag) {
 }
 
 char * create_string_from_file(const char * filename) {

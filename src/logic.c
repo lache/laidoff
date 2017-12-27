@@ -29,6 +29,7 @@ void toggle_font_texture_test_mode(LWCONTEXT* pLwc);
 void lw_request_remote_notification_device_token(LWCONTEXT* pLwc);
 void lw_start_reward_video(LWCONTEXT* pLwc, int tag);
 void lw_start_sign_in(LWCONTEXT* pLwc, int tag);
+void lw_start_sign_out(LWCONTEXT* pLwc, int tag);
 
 static const char* server_addr[] = {
         "s.popsongremix.com", // AWS Tokyo
@@ -582,6 +583,10 @@ void start_sign_in(LWCONTEXT* pLwc) {
     lw_start_sign_in(pLwc, 0);
 }
 
+void start_sign_out(LWCONTEXT* pLwc) {
+    lw_start_sign_out(pLwc, 0);
+}
+
 void start_tcp_addr_text_input_activity(LWCONTEXT* pLwc) {
     lw_start_text_input_activity(pLwc, LITI_SERVER_ADDR);
 }
@@ -664,6 +669,7 @@ void reset_runtime_context(LWCONTEXT* pLwc) {
             { LWU("Stat Toggle"), toggle_stat },
             { LWU("Reward Video"), start_reward_video },
             { LWU("Sign In"), start_sign_in },
+            { LWU("Sign Out"), start_sign_out },
     };
     for (int i = 0; i < ARRAY_SIZE(handler_array); i++) {
         pLwc->admin_button_command[i].name = handler_array[i].name;

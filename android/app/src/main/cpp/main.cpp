@@ -928,6 +928,10 @@ extern "C" void lw_start_sign_in(LWCONTEXT *pLwc, int tag) {
     request_void_string_command("startSignIn", "dummy");
 }
 
+extern "C" void lw_start_sign_out(LWCONTEXT *pLwc, int tag) {
+    request_void_string_command("startSignOut", "dummy");
+}
+
 static char push_token[1024];
 
 extern "C" void lw_request_remote_notification_device_token(LWCONTEXT *pLwc) {

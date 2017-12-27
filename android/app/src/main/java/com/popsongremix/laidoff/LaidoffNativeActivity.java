@@ -1,5 +1,6 @@
 package com.popsongremix.laidoff;
 
+import android.app.Activity;
 import android.app.NativeActivity;
 import android.content.Context;
 import android.content.Intent;
@@ -12,6 +13,7 @@ import android.media.AudioManager;
 import android.media.SoundPool;
 import android.os.Build;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.util.Log;
 import android.view.View;
 import android.view.WindowManager;
@@ -22,6 +24,11 @@ import com.google.android.gms.ads.MobileAds;
 import com.google.android.gms.ads.reward.RewardItem;
 import com.google.android.gms.ads.reward.RewardedVideoAd;
 import com.google.android.gms.ads.reward.RewardedVideoAdListener;
+import com.google.android.gms.auth.api.signin.GoogleSignIn;
+import com.google.android.gms.auth.api.signin.GoogleSignInClient;
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.iid.FirebaseInstanceId;
 
 import java.io.File;
@@ -274,6 +281,16 @@ public class LaidoffNativeActivity extends NativeActivity implements RewardedVid
     }
 
     @SuppressWarnings("unused")
+    public static void startSignOut(String dummy) {
+        INSTANCE.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                INSTANCE.signOut();
+            }
+        });
+    }
+
+    @SuppressWarnings("unused")
     public static void requestPushToken(long pLwc) {
         setPushTokenAndSend(FirebaseInstanceId.getInstance().getToken(), pLwc);
     }
@@ -354,5 +371,20 @@ public class LaidoffNativeActivity extends NativeActivity implements RewardedVid
 
     public void onRewardedVideoStarted() {
         Toast.makeText(this, "onRewardedVideoStarted", Toast.LENGTH_SHORT).show();
+    }
+
+    private void signOut() {
+        GoogleSignInClient signInClient = GoogleSignIn.getClient(this,
+                GoogleSignInOptions.DEFAULT_GAMES_SIGN_IN);
+        final Activity activity = this;
+        signInClient.signOut().addOnCompleteListener(this,
+                new OnCompleteListener<Void>() {
+                    @Override
+                    public void onComplete(@NonNull Task<Void> task) {
+                        // at this point, the user is signed out.
+                        Log.i(LOG_TAG, "Signed out successfully");
+                        Toast.makeText(activity, "Signed out successfully", Toast.LENGTH_LONG).show();
+                    }
+                });
     }
 }

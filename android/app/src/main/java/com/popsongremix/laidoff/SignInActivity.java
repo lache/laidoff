@@ -34,9 +34,7 @@ public class SignInActivity extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (isSignedIn()) {
-            signOut();
-        } else {
+        if (isSignedIn() == false) {
             googleSignInOptions = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_GAMES_SIGN_IN)
                     .requestIdToken(getString(R.string.web_client_id))
                     .requestEmail()
@@ -71,22 +69,6 @@ public class SignInActivity extends Activity {
                                 Log.e(LOG_TAG, "Silent sign-in failed. ApiException null error.");
                             }
                         }
-                    }
-                });
-    }
-
-    private void signOut() {
-        GoogleSignInClient signInClient = GoogleSignIn.getClient(this,
-                GoogleSignInOptions.DEFAULT_GAMES_SIGN_IN);
-        final Activity activity = this;
-        signInClient.signOut().addOnCompleteListener(this,
-                new OnCompleteListener<Void>() {
-                    @Override
-                    public void onComplete(@NonNull Task<Void> task) {
-                        // at this point, the user is signed out.
-                        Log.i(LOG_TAG, "Signed out successfully");
-                        Toast.makeText(activity, "Signed out successfully", Toast.LENGTH_LONG).show();
-                        activity.finish();
                     }
                 });
     }
