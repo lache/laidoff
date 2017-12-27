@@ -252,14 +252,16 @@ function on_ui_event(id, w_ratio, h_ratio)
 	elseif id == 'leaderboard_page_button' then
 		--print(c.last_leaderboard.Current_page)
 		if c.last_leaderboard.Current_page ~= 0 then
-			if w_ratio < 1.0/3 and c.last_leaderboard.Current_page > 1 then
-				-- go to the previous page
-				lo.request_leaderboard(c.tcp, c.last_leaderboard.Current_page - 1)
+			if w_ratio < 1.0/3 then
+				-- go to the previous page if possible
+				if c.last_leaderboard.Current_page > 1 then
+					lo.request_leaderboard(c.tcp, c.last_leaderboard.Current_page - 1)
+				end
 			elseif w_ratio < 2.0/3 then
 				-- go to the page which reveals the player
 				lo.request_player_reveal_leaderboard(c.tcp)
 			elseif c.last_leaderboard.Current_page < c.last_leaderboard.Total_page then
-				-- go to the next page
+				-- go to the next page if possible
 				lo.request_leaderboard(c.tcp, c.last_leaderboard.Current_page + 1)
 			end
 		end
