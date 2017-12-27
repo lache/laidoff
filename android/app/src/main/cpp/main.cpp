@@ -12,6 +12,8 @@
 #include <lwtimepoint.h>
 #include <input.h>
 #include <puckgame.h>
+#include <lwtcp.h>
+#include <lwime.h>
 #include "laidoff.h"
 #include "lwlog.h"
 #include "czmq.h"
@@ -31,11 +33,11 @@ struct saved_state {
  * Shared state for our app.
  */
 struct engine {
-    struct android_app *app;
+    struct android_app* app;
 
-    ASensorManager *sensorManager;
-    const ASensor *accelerometerSensor;
-    ASensorEventQueue *sensorEventQueue;
+    ASensorManager* sensorManager;
+    const ASensor* accelerometerSensor;
+    ASensorEventQueue* sensorEventQueue;
 
     EGLDisplay display;
     EGLSurface surface;
@@ -49,7 +51,7 @@ struct engine {
     bool app_cmd_init_window_triggered;
     bool inited;
 
-    struct _LWCONTEXT *pLwc;
+    struct _LWCONTEXT* pLwc;
 
     // 라이프사이클 플래그
     int resumed;
@@ -57,24 +59,24 @@ struct engine {
     int surface_ready;
 };
 
-static void recreate_surface(engine *pEngine);
+static void recreate_surface(engine* pEngine);
 
-static JavaVM *s_vm_from_java;
-static JavaVM *s_vm_from_cpp;
-static JNIEnv *s_env_from_java;
+static JavaVM* s_vm_from_java;
+static JavaVM* s_vm_from_cpp;
+static JNIEnv* s_env_from_java;
 static jobject s_obj_from_java;
 static jobject s_obj_from_cpp;
-static ALooper *s_looper_from_cpp;
+static ALooper* s_looper_from_cpp;
 static bool s_java_activity_created;
 
 #define JAVA_NATIVE_ACTIVITY_NAME "com.popsongremix.laidoff.LaidoffNativeActivity"
 #define TEXT_INPUT_ACTIVITY_NAME "com.popsongremix.laidoff.TextInputActivity"
 
 extern "C" int lw_get_text_input_seq();
-extern "C" const char *lw_get_text_input();
-extern "C" void lw_set_push_token(LWCONTEXT *pLwc, int domain, const char *token);
+extern "C" const char* lw_get_text_input();
+extern "C" void lw_set_push_token(LWCONTEXT* pLwc, int domain, const char* token);
 
-const char *egl_get_error_string(EGLint error) {
+const char* egl_get_error_string(EGLint error) {
     switch (error) {
         case EGL_SUCCESS:
             return "EGL_SUCCESS";
@@ -112,7 +114,7 @@ const char *egl_get_error_string(EGLint error) {
     return unknown_error_str;
 }
 
-jclass get_java_native_activity_class(JNIEnv *env) {
+jclass get_java_native_activity_class(JNIEnv* env) {
     jclass ClassNativeActivity = env->FindClass("android/app/NativeActivity");
     jmethodID getClassLoader = env->GetMethodID(ClassNativeActivity, "getClassLoader",
                                                 "()Ljava/lang/ClassLoader;");
@@ -126,8 +128,8 @@ jclass get_java_native_activity_class(JNIEnv *env) {
     return (jclass) env->CallObjectMethod(cls, findClass, actionString);
 }
 
-void request_void_string_command(const char *command_name, const char *param1) {
-    JNIEnv *env;
+void request_void_string_command(const char* command_name, const char* param1) {
+    JNIEnv* env;
     s_vm_from_cpp->AttachCurrentThread(&env, NULL);
     {
         jclass s_java_native_activity_class = get_java_native_activity_class(env);
@@ -143,8 +145,24 @@ void request_void_string_command(const char *command_name, const char *param1) {
     s_vm_from_cpp->DetachCurrentThread();
 }
 
-void request_void_long_command(const char *command_name, jlong param1) {
-    JNIEnv *env;
+void request_void_int4_command(const char* command_name, int v1, int v2, int v3, int v4) {
+    JNIEnv* env;
+    s_vm_from_cpp->AttachCurrentThread(&env, NULL);
+    {
+        jclass s_java_native_activity_class = get_java_native_activity_class(env);
+
+        jmethodID callMeStaticMethod = env->GetStaticMethodID(s_java_native_activity_class,
+                                                              command_name,
+                                                              "(IIII)V");
+        env->CallStaticVoidMethod(s_java_native_activity_class, callMeStaticMethod,
+                                  v1, v2, v3, v4);
+    }
+    s_vm_from_cpp->DetachCurrentThread();
+}
+
+
+void request_void_long_command(const char* command_name, jlong param1) {
+    JNIEnv* env;
     s_vm_from_cpp->AttachCurrentThread(&env, NULL);
     {
         jclass s_java_native_activity_class = get_java_native_activity_class(env);
@@ -156,9 +174,9 @@ void request_void_long_command(const char *command_name, jlong param1) {
     s_vm_from_cpp->DetachCurrentThread();
 }
 
-int request_int_string_command(const char *command_name, const char *param1) {
+int request_int_string_command(const char* command_name, const char* param1) {
     int ret = 0;
-    JNIEnv *env;
+    JNIEnv* env;
     s_vm_from_cpp->AttachCurrentThread(&env, NULL);
     {
         jclass s_java_native_activity_class = get_java_native_activity_class(env);
@@ -175,13 +193,13 @@ int request_int_string_command(const char *command_name, const char *param1) {
     return ret;
 }
 
-void request_sound_command(const char *command_name, const char *sound_type) {
+void request_sound_command(const char* command_name, const char* sound_type) {
     request_void_string_command(command_name, sound_type);
 }
 
-int request_get_int_command(const char *command_name) {
+int request_get_int_command(const char* command_name) {
     int ret = 0;
-    JNIEnv *env;
+    JNIEnv* env;
     s_vm_from_cpp->AttachCurrentThread(&env, NULL);
     {
         jclass s_java_native_activity_class = get_java_native_activity_class(env);
@@ -195,9 +213,9 @@ int request_get_int_command(const char *command_name) {
     return ret;
 }
 
-int request_get_boolean_command(const char *command_name) {
+int request_get_boolean_command(const char* command_name) {
     int ret = 0;
-    JNIEnv *env;
+    JNIEnv* env;
     s_vm_from_cpp->AttachCurrentThread(&env, NULL);
     {
         jclass s_java_native_activity_class = get_java_native_activity_class(env);
@@ -211,9 +229,9 @@ int request_get_boolean_command(const char *command_name) {
     return ret;
 }
 
-void request_void_command(const char *command_name) {
+void request_void_command(const char* command_name) {
     int ret = 0;
-    JNIEnv *env;
+    JNIEnv* env;
     s_vm_from_cpp->AttachCurrentThread(&env, NULL);
     {
         jclass s_java_native_activity_class = get_java_native_activity_class(env);
@@ -225,9 +243,9 @@ void request_void_command(const char *command_name) {
     s_vm_from_cpp->DetachCurrentThread();
 }
 
-void request_void_int_command(const char *command_name, int param1) {
+void request_void_int_command(const char* command_name, int param1) {
     int ret = 0;
-    JNIEnv *env;
+    JNIEnv* env;
     s_vm_from_cpp->AttachCurrentThread(&env, NULL);
     {
         jclass s_java_native_activity_class = get_java_native_activity_class(env);
@@ -275,18 +293,18 @@ extern "C" void request_set_highscore(int highscore) {
     //return request_void_int_command("setHighscore", highscore);
 }
 
-void request_play_sound(const char *sound_type) {
+void request_play_sound(const char* sound_type) {
     //request_sound_command("playSound", sound_type);
 }
 
-void request_stop_sound(const char *sound_type) {
+void request_stop_sound(const char* sound_type) {
     //request_sound_command("stopSound", sound_type);
 }
 
 /**
  * Initialize an EGL context for the current display.
  */
-static int engine_init_display(struct engine *engine) {
+static int engine_init_display(struct engine* engine) {
     // initialize OpenGL ES and EGL
 
     /*
@@ -371,7 +389,7 @@ static int engine_init_display(struct engine *engine) {
 /**
  * Just the current frame in the display.
  */
-static void engine_draw_frame(struct engine *engine) {
+static void engine_draw_frame(struct engine* engine) {
     if (engine->display == NULL) {
         // No display.
         return;
@@ -404,7 +422,7 @@ static void engine_draw_frame(struct engine *engine) {
     }
 }
 
-static void recreate_surface(engine *engine) {
+static void recreate_surface(engine* engine) {
     engine->surface_ready = 0;
 
     if (engine->display && engine->config && engine->app && engine->app->window) {
@@ -439,7 +457,7 @@ static void recreate_surface(engine *engine) {
 /**
  * Tear down the EGL context currently associated with the display.
  */
-static void engine_term_display(struct engine *engine) {
+static void engine_term_display(struct engine* engine) {
     if (engine->display != EGL_NO_DISPLAY) {
         eglMakeCurrent(engine->display, EGL_NO_SURFACE, EGL_NO_SURFACE, EGL_NO_CONTEXT);
         if (engine->context != EGL_NO_CONTEXT) {
@@ -459,8 +477,8 @@ static void engine_term_display(struct engine *engine) {
 /**
  * Process the next input event.
  */
-static int32_t engine_handle_input(struct android_app *app, AInputEvent *event) {
-    struct engine *engine = (struct engine *) app->userData;
+static int32_t engine_handle_input(struct android_app* app, AInputEvent* event) {
+    struct engine* engine = (struct engine*) app->userData;
     switch (AInputEvent_getType(event)) {
         case AINPUT_EVENT_TYPE_MOTION:
             switch (AInputEvent_getSource(event)) {
@@ -585,8 +603,8 @@ static int32_t engine_handle_input(struct android_app *app, AInputEvent *event) 
 /**
  * Process the next main command.
  */
-static void engine_handle_cmd(struct android_app *app, int32_t cmd) {
-    struct engine *engine = (struct engine *) app->userData;
+static void engine_handle_cmd(struct android_app* app, int32_t cmd) {
+    struct engine* engine = (struct engine*) app->userData;
     switch (cmd) {
         case APP_CMD_START:
             LOGI("APP_CMD_START");
@@ -612,7 +630,7 @@ static void engine_handle_cmd(struct android_app *app, int32_t cmd) {
             LOGI("APP_CMD_SAVE_STATE");
             // The system has asked us to save our current state.  Do so.
             engine->app->savedState = malloc(sizeof(struct saved_state));
-            *((struct saved_state *) engine->app->savedState) = engine->state;
+            *((struct saved_state*) engine->app->savedState) = engine->state;
             engine->app->savedStateSize = sizeof(struct saved_state);
             break;
         case APP_CMD_INIT_WINDOW:
@@ -685,9 +703,9 @@ static void engine_handle_cmd(struct android_app *app, int32_t cmd) {
  * android_native_app_glue.  It runs in its own thread, with its own
  * event loop for receiving input events and doing other things.
  */
-static struct engine *shared_engine;
+static struct engine* shared_engine;
 
-void android_main(struct android_app *state) {
+void android_main(struct android_app* state) {
     struct engine engine;
     shared_engine = &engine;
 
@@ -719,13 +737,13 @@ void android_main(struct android_app *state) {
 
     if (state->savedState != NULL) {
         // We are starting with a previous saved state; restore from it.
-        engine.state = *(struct saved_state *) state->savedState;
+        engine.state = *(struct saved_state*) state->savedState;
     }
 
     // Setup static variables for calling Java functions from C++ side
     {
-        JNIEnv *env;
-        JavaVM *lJavaVM = state->activity->vm;
+        JNIEnv* env;
+        JavaVM* lJavaVM = state->activity->vm;
 
         s_vm_from_cpp = lJavaVM;
         s_obj_from_cpp = state->activity->clazz;
@@ -771,7 +789,7 @@ void android_main(struct android_app *state) {
         // Read all pending events.
         int ident;
         int events;
-        struct android_poll_source *source;
+        struct android_poll_source* source;
 
         int poll_without_timeout = engine.focused && engine.resumed;
 
@@ -784,7 +802,7 @@ void android_main(struct android_app *state) {
         */
 
         while ((ident = ALooper_pollAll(poll_without_timeout ? 0 : -1, NULL, &events,
-                                        (void **) &source)) >= 0) {
+                                        (void**) &source)) >= 0) {
             // Process this event.
             if (source != NULL) {
                 source->process(state, source);
@@ -891,7 +909,15 @@ void android_main(struct android_app *state) {
 }
 
 extern "C" JNIEXPORT jstring JNICALL
-Java_com_popsongremix_laidoff_LaidoffNativeActivity_signalResourceReady(JNIEnv *env, jobject obj,
+Java_com_popsongremix_laidoff_LaidoffNativeActivity_getUserId(JNIEnv* env, jobject obj) {
+    s_env_from_java = env;
+    s_obj_from_java = obj;
+    std::string hello = "Hello from C++";
+    return env->NewStringUTF(hello.c_str());
+}
+
+extern "C" JNIEXPORT jstring JNICALL
+Java_com_popsongremix_laidoff_LaidoffNativeActivity_signalResourceReady(JNIEnv* env, jobject obj,
                                                                         jclass and9NativeActivityClass) {
     s_env_from_java = env;
     s_obj_from_java = obj;
@@ -907,43 +933,50 @@ Java_com_popsongremix_laidoff_LaidoffNativeActivity_signalResourceReady(JNIEnv *
     return env->NewStringUTF(hello.c_str());
 }
 
-extern "C" void lw_app_quit(LWCONTEXT *pLwc, void *native_context) {
+extern "C" void lw_app_quit(LWCONTEXT* pLwc, void* native_context) {
     // 'native_context' is 'android_app'
-    struct android_app *android_app = (struct android_app *) native_context;
+    struct android_app* android_app = (struct android_app*) native_context;
     ANativeActivity_finish(android_app->activity);
     android_app->destroyRequested = 1;
 }
 
-extern "C" void lw_start_text_input_activity(LWCONTEXT *pLwc, int tag) {
+extern "C" void lw_start_text_input_activity(LWCONTEXT* pLwc, int tag) {
     pLwc->last_text_input_seq = lw_get_text_input_seq();
-    pLwc->text_input_tag = tag;
+    lw_set_text_input_tag(tag);
     request_void_string_command("startTextInputActivity", "dummy");
 }
 
-extern "C" void lw_start_reward_video(LWCONTEXT *pLwc, int tag) {
+extern "C" void lw_start_reward_video(LWCONTEXT* pLwc, int tag) {
     request_void_string_command("startRewardVideo", "dummy");
 }
 
-extern "C" void lw_start_sign_in(LWCONTEXT *pLwc, int tag) {
-    request_void_string_command("startSignIn", "dummy");
+extern "C" void lw_start_sign_in(LWCONTEXT* pLwc, int tag) {
+    int v1 = 0, v2 = 0, v3 = 0, v4 = 0;
+    if (pLwc->tcp) {
+        v1 = pLwc->tcp->user_id.v[0];
+        v2 = pLwc->tcp->user_id.v[1];
+        v3 = pLwc->tcp->user_id.v[2];
+        v4 = pLwc->tcp->user_id.v[3];
+    }
+    request_void_int4_command("startSignIn", v1, v2, v3, v4);
 }
 
-extern "C" void lw_start_sign_out(LWCONTEXT *pLwc, int tag) {
+extern "C" void lw_start_sign_out(LWCONTEXT* pLwc, int tag) {
     request_void_string_command("startSignOut", "dummy");
 }
 
 static char push_token[1024];
 
-extern "C" void lw_request_remote_notification_device_token(LWCONTEXT *pLwc) {
+extern "C" void lw_request_remote_notification_device_token(LWCONTEXT* pLwc) {
     request_void_long_command("requestPushToken", (jlong) pLwc);
 
     //lw_set_push_token(pLwc, 2, push_token);
 }
 
 extern "C" JNIEXPORT void JNICALL
-Java_com_popsongremix_laidoff_LaidoffFirebaseInstanceIDService_setPushToken(JNIEnv *env, jclass cls,
+Java_com_popsongremix_laidoff_LaidoffFirebaseInstanceIDService_setPushToken(JNIEnv* env, jclass cls,
                                                                             jstring text) {
-    const char *buffer = env->GetStringUTFChars(text, JNI_FALSE);
+    const char* buffer = env->GetStringUTFChars(text, JNI_FALSE);
 
     size_t buffer_len = strlen(buffer);
     if (buffer_len > 0) {
@@ -957,20 +990,20 @@ Java_com_popsongremix_laidoff_LaidoffFirebaseInstanceIDService_setPushToken(JNIE
 }
 
 extern "C" JNIEXPORT void JNICALL
-Java_com_popsongremix_laidoff_LaidoffNativeActivity_setPushTokenAndSend(JNIEnv *env, jclass cls,
+Java_com_popsongremix_laidoff_LaidoffNativeActivity_setPushTokenAndSend(JNIEnv* env, jclass cls,
                                                                         jstring text,
                                                                         jlong pLwcLong) {
     Java_com_popsongremix_laidoff_LaidoffFirebaseInstanceIDService_setPushToken(env, cls, text);
-    lw_set_push_token((LWCONTEXT *) pLwcLong, 2, push_token);
+    lw_set_push_token((LWCONTEXT*) pLwcLong, 2, push_token);
 }
 
 extern "C" JNIEXPORT void JNICALL
-Java_com_popsongremix_laidoff_LaidoffNativeActivity_setWindowSize(JNIEnv *env, jclass cls, jint w,
+Java_com_popsongremix_laidoff_LaidoffNativeActivity_setWindowSize(JNIEnv* env, jclass cls, jint w,
                                                                   jint h, jlong pLwcLong) {
     if (shared_engine) {
         shared_engine->width = w;
         shared_engine->height = h;
-        LWCONTEXT *pLwc = pLwcLong ? (LWCONTEXT *) pLwcLong : shared_engine->pLwc;
+        LWCONTEXT* pLwc = pLwcLong ? (LWCONTEXT*) pLwcLong : shared_engine->pLwc;
         if (pLwc) {
             lw_set_size(pLwc, w, h);
         }

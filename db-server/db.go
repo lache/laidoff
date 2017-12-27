@@ -192,11 +192,16 @@ func ProcessLeaseWriteRequest(t *DbService) {
 	}
 }
 
+const (
+	ServiceName = "db"
+	ServiceAddr = ":20181"
+)
+
 func main() {
 	// Set default log format
 	log.SetFlags(log.LstdFlags | log.Lshortfile)
 	log.SetOutput(os.Stdout)
-	addr := ":20181"
+	log.Printf("Greetings from %v service", ServiceName)
 	// Create db directory to save user database
 	os.MkdirAll("db", os.ModePerm)
 	//createTestUserDb()
@@ -208,9 +213,9 @@ func main() {
 	dbService.leaseWriteRequestQueue = make(chan LeaseWriteRequest)
 	go ProcessLeaseWriteRequest(dbService)
 	server.RegisterName("DbService", dbService)
-	log.Printf("Listening %v for db service...", addr)
+	log.Printf("Listening %v for db service...", ServiceAddr)
 	// Listen for incoming tcp packets on specified port.
-	l, e := net.Listen("tcp", addr)
+	l, e := net.Listen("tcp", ServiceAddr)
 	if e != nil {
 		log.Fatal("listen error:", e)
 	}

@@ -241,6 +241,15 @@ func IdCuintToByteArray(id [4]C.uint) user.Id {
 	return b
 }
 
+func IdIntToByteArray(id [4]int) user.Id {
+	var b user.Id
+	binary.BigEndian.PutUint32(b[0:], uint32(id[0]))
+	binary.BigEndian.PutUint32(b[4:], uint32(id[1]))
+	binary.BigEndian.PutUint32(b[8:], uint32(id[2]))
+	binary.BigEndian.PutUint32(b[12:], uint32(id[3]))
+	return b
+}
+
 func NicknameToCArray(nickname string) [C.LW_NICKNAME_MAX_LEN]C.char {
 	var nicknameCchar [C.LW_NICKNAME_MAX_LEN]C.char
 	for i, v := range []byte(nickname) {

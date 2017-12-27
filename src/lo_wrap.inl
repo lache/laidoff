@@ -24644,56 +24644,6 @@ fail:
 }
 
 
-static int _wrap_LWCONTEXT_text_input_tag_set(lua_State* L) {
-  int SWIG_arg = 0;
-  struct _LWCONTEXT *arg1 = (struct _LWCONTEXT *) 0 ;
-  int arg2 ;
-  
-  SWIG_check_num_args("_LWCONTEXT::text_input_tag",2,2)
-  if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("_LWCONTEXT::text_input_tag",1,"struct _LWCONTEXT *");
-  if(!lua_isnumber(L,2)) SWIG_fail_arg("_LWCONTEXT::text_input_tag",2,"int");
-  
-  if (!SWIG_IsOK(SWIG_ConvertPtr(L,1,(void**)&arg1,SWIGTYPE_p__LWCONTEXT,0))){
-    SWIG_fail_ptr("LWCONTEXT_text_input_tag_set",1,SWIGTYPE_p__LWCONTEXT);
-  }
-  
-  arg2 = (int)lua_tonumber(L, 2);
-  if (arg1) (arg1)->text_input_tag = arg2;
-  
-  return SWIG_arg;
-  
-  if(0) SWIG_fail;
-  
-fail:
-  lua_error(L);
-  return SWIG_arg;
-}
-
-
-static int _wrap_LWCONTEXT_text_input_tag_get(lua_State* L) {
-  int SWIG_arg = 0;
-  struct _LWCONTEXT *arg1 = (struct _LWCONTEXT *) 0 ;
-  int result;
-  
-  SWIG_check_num_args("_LWCONTEXT::text_input_tag",1,1)
-  if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("_LWCONTEXT::text_input_tag",1,"struct _LWCONTEXT *");
-  
-  if (!SWIG_IsOK(SWIG_ConvertPtr(L,1,(void**)&arg1,SWIGTYPE_p__LWCONTEXT,0))){
-    SWIG_fail_ptr("LWCONTEXT_text_input_tag_get",1,SWIGTYPE_p__LWCONTEXT);
-  }
-  
-  result = (int) ((arg1)->text_input_tag);
-  lua_pushnumber(L, (lua_Number) result); SWIG_arg++;
-  return SWIG_arg;
-  
-  if(0) SWIG_fail;
-  
-fail:
-  lua_error(L);
-  return SWIG_arg;
-}
-
-
 static int _wrap_LWCONTEXT_left_dir_pad_set(lua_State* L) {
   int SWIG_arg = 0;
   struct _LWCONTEXT *arg1 = (struct _LWCONTEXT *) 0 ;
@@ -25553,7 +25503,6 @@ static swig_lua_attribute swig_LWCONTEXT_attributes[] = {
     { "tcp_host_addr", _wrap_LWCONTEXT_tcp_host_addr_get, _wrap_LWCONTEXT_tcp_host_addr_set },
     { "udp_host_addr", _wrap_LWCONTEXT_udp_host_addr_get, _wrap_LWCONTEXT_udp_host_addr_set },
     { "last_text_input_seq", _wrap_LWCONTEXT_last_text_input_seq_get, _wrap_LWCONTEXT_last_text_input_seq_set },
-    { "text_input_tag", _wrap_LWCONTEXT_text_input_tag_get, _wrap_LWCONTEXT_text_input_tag_set },
     { "left_dir_pad", _wrap_LWCONTEXT_left_dir_pad_get, _wrap_LWCONTEXT_left_dir_pad_set },
     { "right_dir_pad", _wrap_LWCONTEXT_right_dir_pad_get, _wrap_LWCONTEXT_right_dir_pad_set },
     { "last_leaderboard", _wrap_LWCONTEXT_last_leaderboard_get, _wrap_LWCONTEXT_last_leaderboard_set },

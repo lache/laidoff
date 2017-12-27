@@ -829,7 +829,7 @@ void lwc_update(LWCONTEXT* pLwc, double delta_time) {
 
     // Check for a new native user text input
     if (pLwc->last_text_input_seq != lw_get_text_input_seq()) {
-        switch (pLwc->text_input_tag) {
+        switch (lw_text_input_tag()) {
             case LITI_NICKNAME:
             {
                 char nicknameMsg[256];

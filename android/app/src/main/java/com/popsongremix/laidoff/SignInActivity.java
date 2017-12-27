@@ -45,28 +45,33 @@ import javax.net.ssl.X509TrustManager;
 import okhttp3.OkHttpClient;
 
 public class SignInActivity extends Activity {
-    int RC_SIGN_IN = 20000;
-    private GoogleSignInOptions googleSignInOptions;
+    static int RC_SIGN_IN = 20000;
     public static final String LOG_TAG = "SignIn";
-    
+    public static native void setNickname(String text);
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (!isSignedIn()) {
-            googleSignInOptions = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_GAMES_SIGN_IN)
-                    .requestIdToken(getString(R.string.web_client_id))
-                    .requestEmail()
-                    .requestProfile()
-                    .build();
-            signInSilently(googleSignInOptions);
-        } else {
-            onSignedInAccountAcquired(GoogleSignIn.getLastSignedInAccount(this));
-        }
+        startSignIn(this);
     }
 
-    private void signInSilently(GoogleSignInOptions gso) {
-        GoogleSignInClient signInClient = GoogleSignIn.getClient(this, gso);
-        signInClient.silentSignIn().addOnCompleteListener(this,
+    public static void startSignIn(Activity activity) {
+        GoogleSignInOptions googleSignInOptions = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_GAMES_SIGN_IN)
+                //.requestIdToken(getString(R.string.web_client_id)) // require additional consent step
+                //.requestEmail() // require additional consent step
+                //.requestProfile() // require additional consent step
+                //.requestServerAuthCode(getString(R.string.web_client_id)) // require additional consent step
+                .build();
+        signInSilently(activity, googleSignInOptions);
+//        if (!isSignedIn()) {
+//
+//        } else {
+//            onSignedInAccountAcquired(GoogleSignIn.getLastSignedInAccount(this));
+//        }
+    }
+
+    private static void signInSilently(final Activity activity, final GoogleSignInOptions googleSignInOptions) {
+        GoogleSignInClient signInClient = GoogleSignIn.getClient(activity, googleSignInOptions);
+        signInClient.silentSignIn().addOnCompleteListener(activity,
                 new OnCompleteListener<GoogleSignInAccount>() {
                     @Override
                     public void onComplete(@NonNull Task<GoogleSignInAccount> task) {
@@ -74,14 +79,14 @@ public class SignInActivity extends Activity {
                             // The signed in account is stored in the task's result.
                             GoogleSignInAccount signedInAccount = task.getResult();
                             //Log.i(LOG_TAG, signedInAccount.getDisplayName());
-                            onSignedInAccountAcquired(signedInAccount);
+                            onSignedInAccountAcquired(activity, signedInAccount);
                         } else {
                             // Player will need to sign-in explicitly using via UI
                             ApiException e = (ApiException)task.getException();
                             if (e != null) {
                                 if (e.getStatusCode() == CommonStatusCodes.SIGN_IN_REQUIRED) {
                                     Log.i(LOG_TAG, "Silent sign-in failed. Try to start user interaction sign-in activity...");
-                                    startSignInIntent();
+                                    startSignInIntent(activity, googleSignInOptions);
                                 } else {
                                     Log.e(LOG_TAG, String.format("Silent sign-in failed with unknown status code %d", e.getStatusCode()));
                                 }
@@ -93,15 +98,15 @@ public class SignInActivity extends Activity {
                 });
     }
 
-    private void startSignInIntent() {
-        GoogleSignInClient signInClient = GoogleSignIn.getClient(this, googleSignInOptions);
+    private static void startSignInIntent(Activity activity, GoogleSignInOptions googleSignInOptions) {
+        GoogleSignInClient signInClient = GoogleSignIn.getClient(activity, googleSignInOptions);
         Intent intent = signInClient.getSignInIntent();
-        startActivityForResult(intent, RC_SIGN_IN);
+        activity.startActivityForResult(intent, RC_SIGN_IN);
     }
 
-    private boolean isSignedIn() {
-        return GoogleSignIn.getLastSignedInAccount(this) != null;
-    }
+//    private boolean isSignedIn() {
+//        return GoogleSignIn.getLastSignedInAccount(this) != null;
+//    }
 
     @Override
     protected void onResume() {
@@ -126,24 +131,28 @@ public class SignInActivity extends Activity {
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
+        onSignInActivityResult(this, requestCode, data);
+    }
+
+    public static void onSignInActivityResult(Activity activity, int requestCode, Intent data) {
         if (requestCode == RC_SIGN_IN) {
             GoogleSignInResult result = Auth.GoogleSignInApi.getSignInResultFromIntent(data);
             if (result.isSuccess()) {
                 // The signed in account is stored in the result.
                 GoogleSignInAccount signedInAccount = result.getSignInAccount();
-                onSignedInAccountAcquired(signedInAccount);
+                onSignedInAccountAcquired(activity, signedInAccount);
             } else {
                 String message = result.getStatus().getStatusMessage();
                 if (message == null || message.isEmpty()) {
                     message = "Unknown sign-in error!";
                 }
-                new AlertDialog.Builder(this).setMessage(message)
+                new AlertDialog.Builder(activity).setMessage(message)
                         .setNeutralButton(android.R.string.ok, null).show();
             }
         }
     }
 
-    private void onSignedInAccountAcquired(final GoogleSignInAccount signedInAccount) {
+    private static void onSignedInAccountAcquired(final Activity activity, final GoogleSignInAccount signedInAccount) {
         Log.i(LOG_TAG, "Account Display Name: " + signedInAccount.getDisplayName());
         Log.i(LOG_TAG, "Account Photo URL: " + signedInAccount.getPhotoUrl());
         Log.i(LOG_TAG, "Account Email: " + signedInAccount.getEmail());
@@ -151,47 +160,56 @@ public class SignInActivity extends Activity {
         Log.i(LOG_TAG, "Account Given Name: " + signedInAccount.getGivenName());
         Log.i(LOG_TAG, "Account ID Token: " + signedInAccount.getIdToken());
         Log.i(LOG_TAG, "Account ID: " + signedInAccount.getId());
-        sendIdTokenSecurely(signedInAccount.getIdToken());
-        AuthCredential credential = GoogleAuthProvider.getCredential(signedInAccount.getIdToken(),null);
-        final Activity activity = this;
-        // Signed-in successfully. Register this account to firebase.
-        FirebaseAuth.getInstance().signInWithCredential(credential)
-                .addOnCompleteListener(
-                        new OnCompleteListener<AuthResult>() {
-                            @Override
-                            public void onComplete(@NonNull Task<AuthResult> task) {
-                                // check task.isSuccessful()
-                                if (task.isSuccessful()) {
-                                    Log.i(LOG_TAG, "Registered to firebase successfully.");
-                                    Toast.makeText(activity, "Registered to firebase successfully.", Toast.LENGTH_LONG).show();
-                                } else {
-                                    Log.e(LOG_TAG, "Registered to firebase failed with error: " + task.toString());
+        Log.i(LOG_TAG, "Account Server Auth Code: " + signedInAccount.getServerAuthCode());
+        if (signedInAccount.getIdToken() != null) {
+            sendIdTokenSecurely(activity, signedInAccount.getIdToken());
+            AuthCredential credential = GoogleAuthProvider.getCredential(signedInAccount.getIdToken(),null);
+            // Signed-in successfully. Register this account to firebase.
+            FirebaseAuth.getInstance().signInWithCredential(credential)
+                    .addOnCompleteListener(
+                            new OnCompleteListener<AuthResult>() {
+                                @Override
+                                public void onComplete(@NonNull Task<AuthResult> task) {
+                                    // check task.isSuccessful()
+                                    if (task.isSuccessful()) {
+                                        Log.i(LOG_TAG, "Registered to firebase successfully.");
+                                        Toast.makeText(activity, "Registered to firebase successfully.", Toast.LENGTH_LONG).show();
+                                    } else if (task.getException() != null) {
+                                        Log.e(LOG_TAG, "Registered to firebase failed with error: " + task.getException().getMessage());
+                                    }
+                                    getGamePlayer(activity, signedInAccount);
                                 }
-                                // Get Google Play Games profile info
-                                PlayersClient pc = Games.getPlayersClient(activity, signedInAccount);
-                                pc.getCurrentPlayer().addOnCompleteListener(activity,
-                                        new OnCompleteListener<Player>() {
-                                            @Override
-                                            public void onComplete(@NonNull Task<Player> task) {
-                                                if (task.isSuccessful()) {
-                                                    Player player = task.getResult();
-                                                    Log.i(LOG_TAG, "Player Name: " + player.getName());
-                                                    Log.i(LOG_TAG, "Player Display Name: " + player.getDisplayName());
-                                                    Log.i(LOG_TAG, "Player ID: " + player.getPlayerId());
-                                                    Log.i(LOG_TAG, "Player Title: " + player.getTitle());
-                                                    Log.i(LOG_TAG, "Player Hi Res Image URI: " + player.getHiResImageUri());
-                                                    Log.i(LOG_TAG, "Player Icon Image URI: " + player.getIconImageUri());
-                                                    Log.i(LOG_TAG, "Player Banner Image Landscape URI: " + player.getBannerImageLandscapeUri());
-                                                    Log.i(LOG_TAG, "Player Banner Image Portrait URI: " + player.getBannerImagePortraitUri());
-                                                    Log.i(LOG_TAG, "Player Has Icon Image: " + player.hasIconImage());
-                                                } else {
-                                                    Log.e(LOG_TAG, "getCurrentPlayer() error: " + task.toString());
-                                                }
-                                                activity.finish();
-                                            }
-                                        });
-                            }
-                        });
+                            });
+        } else {
+            getGamePlayer(activity, signedInAccount);
+        }
+    }
+
+    private static void getGamePlayer(final Activity activity, GoogleSignInAccount signedInAccount) {
+        // Get Google Play Games profile info
+        PlayersClient pc = Games.getPlayersClient(activity, signedInAccount);
+        pc.getCurrentPlayer().addOnCompleteListener(activity,
+                new OnCompleteListener<Player>() {
+                    @Override
+                    public void onComplete(@NonNull Task<Player> task) {
+                        if (task.isSuccessful()) {
+                            Player player = task.getResult();
+                            Log.i(LOG_TAG, "Player Name: " + player.getName());
+                            Log.i(LOG_TAG, "Player Display Name: " + player.getDisplayName());
+                            Log.i(LOG_TAG, "Player ID: " + player.getPlayerId());
+                            Log.i(LOG_TAG, "Player Title: " + player.getTitle());
+                            Log.i(LOG_TAG, "Player Hi Res Image URI: " + player.getHiResImageUri());
+                            Log.i(LOG_TAG, "Player Icon Image URI: " + player.getIconImageUri());
+                            Log.i(LOG_TAG, "Player Banner Image Landscape URI: " + player.getBannerImageLandscapeUri());
+                            Log.i(LOG_TAG, "Player Banner Image Portrait URI: " + player.getBannerImagePortraitUri());
+                            Log.i(LOG_TAG, "Player Has Icon Image: " + player.hasIconImage());
+
+                            setNickname(player.getDisplayName());
+                        } else {
+                            Log.e(LOG_TAG, "getCurrentPlayer() error: " + task.toString());
+                        }
+                    }
+                });
     }
 
     private void printGoogleAccountDebugInfo(GoogleSignInAccount account) {
@@ -199,8 +217,8 @@ public class SignInActivity extends Activity {
         Log.i(LOG_TAG, "handleSignInResult - Google Photo URL: " + account.getPhotoUrl());
     }
 
-    private void sendIdTokenSecurely(String idToken) {
-        KeyStore keyStore = readKeyStore(); //your method to obtain KeyStore
+    private static void sendIdTokenSecurely(Activity activity, String idToken) {
+        KeyStore keyStore = readKeyStore(activity); //your method to obtain KeyStore
         SSLContext sslContext = null;
         try {
             sslContext = SSLContext.getInstance("SSL");
@@ -228,7 +246,7 @@ public class SignInActivity extends Activity {
         }
         try {
             if (keyManagerFactory != null) {
-                keyManagerFactory.init(keyStore, getString(R.string.keystore_password).toCharArray());
+                keyManagerFactory.init(keyStore, activity.getString(R.string.keystore_password).toCharArray());
             }
         } catch (KeyStoreException e) {
             e.printStackTrace();
@@ -256,18 +274,27 @@ public class SignInActivity extends Activity {
                     .sslSocketFactory(sslContext.getSocketFactory(), x509TrustManager)
                     .build();
         }
-        postAsync(client, getString(R.string.google_auth_service_addr), idToken);
+        Bundle b = activity.getIntent().getExtras();
+        AuthTask.AuthRequestBody authRequestBody = new AuthTask.AuthRequestBody();
+        if(b != null) {
+            authRequestBody.v1 = b.getInt("userId[0]");
+            authRequestBody.v2 = b.getInt("userId[1]");
+            authRequestBody.v3 = b.getInt("userId[2]");
+            authRequestBody.v4 = b.getInt("userId[3]");
+        }
+        authRequestBody.idToken = idToken;
+        postAsync(client, activity.getString(R.string.google_auth_service_addr), authRequestBody);
     }
 
-    private static void postAsync(OkHttpClient client, String url, String text) {
+    private static void postAsync(OkHttpClient client, String url, AuthTask.AuthRequestBody authRequestBody) {
         AuthTask.AuthTaskParam authTaskParam = new AuthTask.AuthTaskParam();
         authTaskParam.client = client;
         authTaskParam.url = url;
-        authTaskParam.text = text;
+        authTaskParam.body = authRequestBody;
         new AuthTask().execute(authTaskParam);
     }
 
-    KeyStore readKeyStore() {
+    static KeyStore readKeyStore(Activity activity) {
         KeyStore ks = null;
         try {
             ks = KeyStore.getInstance(KeyStore.getDefaultType());
@@ -277,10 +304,10 @@ public class SignInActivity extends Activity {
 
         InputStream fis = null;
         try {
-            fis = getResources().openRawResource(R.raw.popsongremix_com);
+            fis = activity.getResources().openRawResource(R.raw.popsongremix_com);
             try {
                 assert ks != null;
-                ks.load(fis, getString(R.string.keystore_password).toCharArray());
+                ks.load(fis, activity.getString(R.string.keystore_password).toCharArray());
             } catch (IOException e) {
                 e.printStackTrace();
             } catch (NoSuchAlgorithmException e) {

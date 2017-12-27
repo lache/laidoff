@@ -355,7 +355,6 @@ typedef struct _LWCONTEXT {
 	LWHOSTADDR tcp_host_addr;
 	LWHOSTADDR udp_host_addr;
 	int last_text_input_seq;
-	int text_input_tag;
     LWDIRPAD left_dir_pad;
     LWDIRPAD right_dir_pad;
     LWPLEADERBOARD last_leaderboard;

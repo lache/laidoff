@@ -92,6 +92,16 @@ extern "C" JNIEXPORT void JNICALL Java_com_popsongremix_laidoff_TextInputActivit
     env->ReleaseStringUTFChars(text, buffer);
 }
 
+extern "C" JNIEXPORT void JNICALL Java_com_popsongremix_laidoff_SignInActivity_setNickname(JNIEnv * env, jclass cls, jstring text) {
+    const char *buffer = env->GetStringUTFChars(text, JNI_FALSE);
+
+    lw_set_text_input_tag(LITI_NICKNAME);
+    strcpy(lw_get_text_input_for_writing(), buffer);
+    lw_increase_text_input_seq();
+
+    env->ReleaseStringUTFChars(text, buffer);
+}
+
 extern "C" JNIEXPORT void JNICALL Java_com_popsongremix_laidoff_LaidoffNativeActivity_sendApkPath(JNIEnv * env,
                                                                                                   jclass cls,
                                                                                                   jstring apkPath,

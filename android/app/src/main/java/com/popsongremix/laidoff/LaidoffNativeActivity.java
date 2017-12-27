@@ -75,6 +75,8 @@ public class LaidoffNativeActivity extends NativeActivity implements RewardedVid
         mRewardedVideoAd.setRewardedVideoAdListener(this);
         enableImmersiveMode();
 
+        SignInActivity.startSignIn(this);
+
         Log.i(LOG_TAG, "Device Android Version: " + Build.VERSION.SDK_INT);
 
         AssetsLoader assetsLoader = new AssetsLoader(this);
@@ -270,11 +272,17 @@ public class LaidoffNativeActivity extends NativeActivity implements RewardedVid
     }
 
     @SuppressWarnings("unused")
-    public static void startSignIn(String dummy) {
+    public static void startSignIn(final int v1, final int v2, final int v3, final int v4) {
         INSTANCE.runOnUiThread(new Runnable() {
             @Override
             public void run() {
                 Intent intent = new Intent(INSTANCE, SignInActivity.class);
+                Bundle b = new Bundle();
+                b.putInt("userId[0]", v1);
+                b.putInt("userId[1]", v2);
+                b.putInt("userId[2]", v3);
+                b.putInt("userId[3]", v4);
+                intent.putExtras(b); //Put your id to your next Intent
                 INSTANCE.startActivity(intent);
             }
         });
@@ -386,5 +394,12 @@ public class LaidoffNativeActivity extends NativeActivity implements RewardedVid
                         Toast.makeText(activity, "Signed out successfully", Toast.LENGTH_LONG).show();
                     }
                 });
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        SignInActivity.onSignInActivityResult(this, requestCode, data);
     }
 }

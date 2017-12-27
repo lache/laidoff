@@ -19,11 +19,15 @@ import (
 	"sync"
 )
 
+const (
+	ServiceName = "match"
+)
+
 func main() {
 	// Set default log format
 	log.SetFlags(log.LstdFlags | log.Lshortfile)
 	log.SetOutput(os.Stdout)
-	log.Println("Greetings from match server")
+	log.Printf("Greetings from %v service", ServiceName)
 	// Test Db service
 	if len(os.Args) > 1 && os.Args[1] == "test" {
 		service.CreateNewUserDb()

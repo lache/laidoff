@@ -231,7 +231,7 @@ typedef struct _LWPQUERYNICK {
 	unsigned int Id[4];
 } LWPQUERYNICK;
 
-#define LW_NICKNAME_MAX_LEN (32)
+#define LW_NICKNAME_MAX_LEN (128) // google nickname max 20-char, one char 4-byte * 20 = 80
 #define LW_LEADERBOARD_ITEMS_IN_PAGE (15)
 
 typedef struct _LWPNICK {
@@ -246,7 +246,7 @@ typedef struct _LWPNEWUSERDATA {
 	unsigned short size;
 	unsigned short type;
 	unsigned int id[4];
-	char nickname[32];
+	char nickname[LW_NICKNAME_MAX_LEN];
     int score;
     int rank;
 } LWPNEWUSERDATA;

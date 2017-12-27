@@ -42,7 +42,7 @@ void lw_request_remote_notification_device_token(LWCONTEXT* pLwc)
 
 void lw_start_text_input_activity(LWCONTEXT* pLwc, int tag) {
     pLwc->last_text_input_seq = lw_get_text_input_seq();
-    pLwc->text_input_tag = tag;
+    lw_set_text_input_tag(tag);
     
     UIAlertView * alert = [[UIAlertView alloc] initWithTitle:@"입력!! 입력을 해라!!!"
                                                      message:[NSString stringWithFormat:@"입력!! (태그:%d)", tag]

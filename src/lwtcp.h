@@ -22,7 +22,7 @@
 #include "lwuniqueid.h"
 #include "lwhostaddr.h"
 
-#define LW_TCP_BUFLEN 1024
+#define LW_TCP_BUFLEN 2048
 
 typedef struct _LWCONTEXT LWCONTEXT;
 typedef struct _LWTCP LWTCP;
