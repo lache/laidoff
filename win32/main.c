@@ -410,3 +410,11 @@ void lw_start_text_input_activity(LWCONTEXT* pLwc, int tag) {
 void lw_request_remote_notification_device_token(LWCONTEXT* pLwc) {
     LOGE("Not supported in win32");
 }
+
+void lw_start_reward_video(LWCONTEXT* pLwc, int tag) {
+    LOGE("Not supported");
+}
+
+void lw_start_sign_in(LWCONTEXT* pLwc, int tag) {
+    LOGE("Not supported");
+}
