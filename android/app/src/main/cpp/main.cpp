@@ -17,6 +17,7 @@
 #include "czmq.h"
 #include "logic.h"
 #include "sysmsg.h"
+
 /**
  * Our saved state data.
  */
@@ -30,11 +31,11 @@ struct saved_state {
  * Shared state for our app.
  */
 struct engine {
-    struct android_app* app;
+    struct android_app *app;
 
-    ASensorManager* sensorManager;
-    const ASensor* accelerometerSensor;
-    ASensorEventQueue* sensorEventQueue;
+    ASensorManager *sensorManager;
+    const ASensor *accelerometerSensor;
+    ASensorEventQueue *sensorEventQueue;
 
     EGLDisplay display;
     EGLSurface surface;
@@ -48,7 +49,7 @@ struct engine {
     bool app_cmd_init_window_triggered;
     bool inited;
 
-    struct _LWCONTEXT* pLwc;
+    struct _LWCONTEXT *pLwc;
 
     // 라이프사이클 플래그
     int resumed;
@@ -58,118 +59,135 @@ struct engine {
 
 static void recreate_surface(engine *pEngine);
 
-static JavaVM* s_vm_from_java;
-static JavaVM* s_vm_from_cpp;
-static JNIEnv* s_env_from_java;
+static JavaVM *s_vm_from_java;
+static JavaVM *s_vm_from_cpp;
+static JNIEnv *s_env_from_java;
 static jobject s_obj_from_java;
 static jobject s_obj_from_cpp;
-static ALooper* s_looper_from_cpp;
+static ALooper *s_looper_from_cpp;
 static bool s_java_activity_created;
 
 #define JAVA_NATIVE_ACTIVITY_NAME "com.popsongremix.laidoff.LaidoffNativeActivity"
 #define TEXT_INPUT_ACTIVITY_NAME "com.popsongremix.laidoff.TextInputActivity"
 
 extern "C" int lw_get_text_input_seq();
-extern "C" const char* lw_get_text_input();
-extern "C" void lw_set_push_token(LWCONTEXT* pLwc, int domain, const char* token);
+extern "C" const char *lw_get_text_input();
+extern "C" void lw_set_push_token(LWCONTEXT *pLwc, int domain, const char *token);
 
-const char* egl_get_error_string(EGLint error)
-{
-    switch(error)
-    {
-        case EGL_SUCCESS: return "EGL_SUCCESS";
-        case EGL_NOT_INITIALIZED: return "EGL_NOT_INITIALIZED";
-        case EGL_BAD_ACCESS: return "EGL_BAD_ACCESS";
-        case EGL_BAD_ALLOC: return "EGL_BAD_ALLOC";
-        case EGL_BAD_ATTRIBUTE: return "EGL_BAD_ATTRIBUTE";
-        case EGL_BAD_CONTEXT: return "EGL_BAD_CONTEXT";
-        case EGL_BAD_CONFIG: return "EGL_BAD_CONFIG";
-        case EGL_BAD_CURRENT_SURFACE: return "EGL_BAD_CURRENT_SURFACE";
-        case EGL_BAD_DISPLAY: return "EGL_BAD_DISPLAY";
-        case EGL_BAD_SURFACE: return "EGL_BAD_SURFACE";
-        case EGL_BAD_MATCH: return "EGL_BAD_MATCH";
-        case EGL_BAD_PARAMETER: return "EGL_BAD_PARAMETER";
-        case EGL_BAD_NATIVE_PIXMAP: return "EGL_BAD_NATIVE_PIXMAP";
-        case EGL_BAD_NATIVE_WINDOW: return "EGL_BAD_NATIVE_WINDOW";
-        case EGL_CONTEXT_LOST: return "EGL_CONTEXT_LOST";
+const char *egl_get_error_string(EGLint error) {
+    switch (error) {
+        case EGL_SUCCESS:
+            return "EGL_SUCCESS";
+        case EGL_NOT_INITIALIZED:
+            return "EGL_NOT_INITIALIZED";
+        case EGL_BAD_ACCESS:
+            return "EGL_BAD_ACCESS";
+        case EGL_BAD_ALLOC:
+            return "EGL_BAD_ALLOC";
+        case EGL_BAD_ATTRIBUTE:
+            return "EGL_BAD_ATTRIBUTE";
+        case EGL_BAD_CONTEXT:
+            return "EGL_BAD_CONTEXT";
+        case EGL_BAD_CONFIG:
+            return "EGL_BAD_CONFIG";
+        case EGL_BAD_CURRENT_SURFACE:
+            return "EGL_BAD_CURRENT_SURFACE";
+        case EGL_BAD_DISPLAY:
+            return "EGL_BAD_DISPLAY";
+        case EGL_BAD_SURFACE:
+            return "EGL_BAD_SURFACE";
+        case EGL_BAD_MATCH:
+            return "EGL_BAD_MATCH";
+        case EGL_BAD_PARAMETER:
+            return "EGL_BAD_PARAMETER";
+        case EGL_BAD_NATIVE_PIXMAP:
+            return "EGL_BAD_NATIVE_PIXMAP";
+        case EGL_BAD_NATIVE_WINDOW:
+            return "EGL_BAD_NATIVE_WINDOW";
+        case EGL_CONTEXT_LOST:
+            return "EGL_CONTEXT_LOST";
     }
     static char unknown_error_str[1024];
     sprintf(unknown_error_str, "Unknown error: %02x", error);
     return unknown_error_str;
 }
 
-jclass get_java_native_activity_class(JNIEnv* env)
-{
+jclass get_java_native_activity_class(JNIEnv *env) {
     jclass ClassNativeActivity = env->FindClass("android/app/NativeActivity");
-    jmethodID getClassLoader = env->GetMethodID(ClassNativeActivity,"getClassLoader", "()Ljava/lang/ClassLoader;");
+    jmethodID getClassLoader = env->GetMethodID(ClassNativeActivity, "getClassLoader",
+                                                "()Ljava/lang/ClassLoader;");
 
     jclass classLoader = env->FindClass("java/lang/ClassLoader");
-    jmethodID findClass = env->GetMethodID(classLoader, "loadClass", "(Ljava/lang/String;)Ljava/lang/Class;");
+    jmethodID findClass = env->GetMethodID(classLoader, "loadClass",
+                                           "(Ljava/lang/String;)Ljava/lang/Class;");
     jobject cls = env->CallObjectMethod(s_obj_from_cpp, getClassLoader);
 
     jstring actionString = env->NewStringUTF(JAVA_NATIVE_ACTIVITY_NAME);
-    return (jclass)env->CallObjectMethod(cls, findClass, actionString);
+    return (jclass) env->CallObjectMethod(cls, findClass, actionString);
 }
 
-void request_void_string_command(const char* command_name, const char* param1)
-{
-    JNIEnv* env;
+void request_void_string_command(const char *command_name, const char *param1) {
+    JNIEnv *env;
     s_vm_from_cpp->AttachCurrentThread(&env, NULL);
     {
         jclass s_java_native_activity_class = get_java_native_activity_class(env);
 
         jstring soundTypeString = env->NewStringUTF(param1);
 
-        jmethodID callMeStaticMethod = env->GetStaticMethodID(s_java_native_activity_class, command_name, "(Ljava/lang/String;)V");
-        env->CallStaticVoidMethod(s_java_native_activity_class, callMeStaticMethod, soundTypeString);
+        jmethodID callMeStaticMethod = env->GetStaticMethodID(s_java_native_activity_class,
+                                                              command_name,
+                                                              "(Ljava/lang/String;)V");
+        env->CallStaticVoidMethod(s_java_native_activity_class, callMeStaticMethod,
+                                  soundTypeString);
     }
     s_vm_from_cpp->DetachCurrentThread();
 }
 
-void request_void_long_command(const char* command_name, jlong param1)
-{
-    JNIEnv* env;
+void request_void_long_command(const char *command_name, jlong param1) {
+    JNIEnv *env;
     s_vm_from_cpp->AttachCurrentThread(&env, NULL);
     {
         jclass s_java_native_activity_class = get_java_native_activity_class(env);
 
-        jmethodID callMeStaticMethod = env->GetStaticMethodID(s_java_native_activity_class, command_name, "(J)V");
+        jmethodID callMeStaticMethod = env->GetStaticMethodID(s_java_native_activity_class,
+                                                              command_name, "(J)V");
         env->CallStaticVoidMethod(s_java_native_activity_class, callMeStaticMethod, param1);
     }
     s_vm_from_cpp->DetachCurrentThread();
 }
 
-int request_int_string_command(const char* command_name, const char* param1)
-{
+int request_int_string_command(const char *command_name, const char *param1) {
     int ret = 0;
-    JNIEnv* env;
+    JNIEnv *env;
     s_vm_from_cpp->AttachCurrentThread(&env, NULL);
     {
         jclass s_java_native_activity_class = get_java_native_activity_class(env);
 
         jstring soundTypeString = env->NewStringUTF(param1);
 
-        jmethodID callMeStaticMethod = env->GetStaticMethodID(s_java_native_activity_class, command_name, "(Ljava/lang/String;)I");
-        ret = env->CallStaticIntMethod(s_java_native_activity_class, callMeStaticMethod, soundTypeString);
+        jmethodID callMeStaticMethod = env->GetStaticMethodID(s_java_native_activity_class,
+                                                              command_name,
+                                                              "(Ljava/lang/String;)I");
+        ret = env->CallStaticIntMethod(s_java_native_activity_class, callMeStaticMethod,
+                                       soundTypeString);
     }
     s_vm_from_cpp->DetachCurrentThread();
     return ret;
 }
 
-void request_sound_command(const char* command_name, const char* sound_type)
-{
+void request_sound_command(const char *command_name, const char *sound_type) {
     request_void_string_command(command_name, sound_type);
 }
 
-int request_get_int_command(const char* command_name)
-{
+int request_get_int_command(const char *command_name) {
     int ret = 0;
-    JNIEnv* env;
+    JNIEnv *env;
     s_vm_from_cpp->AttachCurrentThread(&env, NULL);
     {
         jclass s_java_native_activity_class = get_java_native_activity_class(env);
 
-        jmethodID callMeStaticMethod = env->GetStaticMethodID(s_java_native_activity_class, command_name, "()I");
+        jmethodID callMeStaticMethod = env->GetStaticMethodID(s_java_native_activity_class,
+                                                              command_name, "()I");
         ret = env->CallStaticIntMethod(s_java_native_activity_class, callMeStaticMethod);
     }
     s_vm_from_cpp->DetachCurrentThread();
@@ -177,15 +195,15 @@ int request_get_int_command(const char* command_name)
     return ret;
 }
 
-int request_get_boolean_command(const char* command_name)
-{
+int request_get_boolean_command(const char *command_name) {
     int ret = 0;
-    JNIEnv* env;
+    JNIEnv *env;
     s_vm_from_cpp->AttachCurrentThread(&env, NULL);
     {
         jclass s_java_native_activity_class = get_java_native_activity_class(env);
 
-        jmethodID callMeStaticMethod = env->GetStaticMethodID(s_java_native_activity_class, command_name, "()Z");
+        jmethodID callMeStaticMethod = env->GetStaticMethodID(s_java_native_activity_class,
+                                                              command_name, "()Z");
         ret = env->CallStaticBooleanMethod(s_java_native_activity_class, callMeStaticMethod);
     }
     s_vm_from_cpp->DetachCurrentThread();
@@ -193,93 +211,82 @@ int request_get_boolean_command(const char* command_name)
     return ret;
 }
 
-void request_void_command(const char* command_name)
-{
+void request_void_command(const char *command_name) {
     int ret = 0;
-    JNIEnv* env;
+    JNIEnv *env;
     s_vm_from_cpp->AttachCurrentThread(&env, NULL);
     {
         jclass s_java_native_activity_class = get_java_native_activity_class(env);
 
-        jmethodID callMeStaticMethod = env->GetStaticMethodID(s_java_native_activity_class, command_name, "()V");
+        jmethodID callMeStaticMethod = env->GetStaticMethodID(s_java_native_activity_class,
+                                                              command_name, "()V");
         env->CallStaticVoidMethod(s_java_native_activity_class, callMeStaticMethod);
     }
     s_vm_from_cpp->DetachCurrentThread();
 }
 
-void request_void_int_command(const char* command_name, int param1)
-{
+void request_void_int_command(const char *command_name, int param1) {
     int ret = 0;
-    JNIEnv* env;
+    JNIEnv *env;
     s_vm_from_cpp->AttachCurrentThread(&env, NULL);
     {
         jclass s_java_native_activity_class = get_java_native_activity_class(env);
 
-        jmethodID callMeStaticMethod = env->GetStaticMethodID(s_java_native_activity_class, command_name, "(I)V");
+        jmethodID callMeStaticMethod = env->GetStaticMethodID(s_java_native_activity_class,
+                                                              command_name, "(I)V");
         env->CallStaticVoidMethod(s_java_native_activity_class, callMeStaticMethod, param1);
     }
     s_vm_from_cpp->DetachCurrentThread();
 }
 
-extern "C" int request_is_retryable()
-{
+extern "C" int request_is_retryable() {
     return request_get_boolean_command("isRetryable");
 }
 
-extern "C" int request_is_boasted()
-{
+extern "C" int request_is_boasted() {
     return request_get_boolean_command("isBoasted");
 }
 
-extern "C" void request_boast(int point)
-{
+extern "C" void request_boast(int point) {
     request_void_int_command("boast", point);
 }
 
-extern "C" void request_on_game_over(int point)
-{
+extern "C" void request_on_game_over(int point) {
     request_void_int_command("onGameOver", point);
 }
 
-extern "C" void request_on_game_start()
-{
+extern "C" void request_on_game_start() {
     request_void_command("onGameStart");
 }
 
-extern "C" int request_get_today_played_count()
-{
+extern "C" int request_get_today_played_count() {
     return 0;//request_get_int_command("getTodayPlayedCount");
 }
 
-extern "C" int request_get_today_playing_limit_count()
-{
+extern "C" int request_get_today_playing_limit_count() {
     return 0;//request_get_int_command("getTodayPlayingLimitCount");
 }
 
-extern "C" int request_get_highscore()
-{
+extern "C" int request_get_highscore() {
     return 0;//request_get_int_command("getHighscore");
 }
 
-extern "C" void request_set_highscore(int highscore)
-{
+extern "C" void request_set_highscore(int highscore) {
     //return request_void_int_command("setHighscore", highscore);
 }
 
-void request_play_sound(const char* sound_type)
-{
+void request_play_sound(const char *sound_type) {
     //request_sound_command("playSound", sound_type);
 }
 
-void request_stop_sound(const char* sound_type)
-{
+void request_stop_sound(const char *sound_type) {
     //request_sound_command("stopSound", sound_type);
 }
 
 /**
  * Initialize an EGL context for the current display.
  */
-static int engine_init_display(struct engine* engine) {
+static int engine_init_display(struct engine *engine) {
     // initialize OpenGL ES and EGL
 
     /*
@@ -310,7 +317,7 @@ static int engine_init_display(struct engine* engine) {
 
     eglInitialize(display, 0, 0);
 
-    eglChooseConfig(display, attribs, &config,1, &numConfigs);
+    eglChooseConfig(display, attribs, &config, 1, &numConfigs);
 
     eglGetConfigAttrib(display, config, EGL_NATIVE_VISUAL_ID, &format);
     surface = eglCreateWindowSurface(display, config, engine->app->window, NULL);
@@ -331,19 +338,19 @@ static int engine_init_display(struct engine* engine) {
     eglQuerySurface(display, surface, EGL_WIDTH, &w);
     eglQuerySurface(display, surface, EGL_HEIGHT, &h);
 
-	int min_swap_interval, max_swap_interval;
-	eglGetConfigAttrib(display, config, EGL_MIN_SWAP_INTERVAL, &min_swap_interval);
-	eglGetConfigAttrib(display, config, EGL_MAX_SWAP_INTERVAL, &max_swap_interval);
+    int min_swap_interval, max_swap_interval;
+    eglGetConfigAttrib(display, config, EGL_MIN_SWAP_INTERVAL, &min_swap_interval);
+    eglGetConfigAttrib(display, config, EGL_MAX_SWAP_INTERVAL, &max_swap_interval);
 
-	// Calling eglSwapInterval has no meaning on Android?
-	// (https://groups.google.com/forum/#!topic/android-developers/HvMZRcp3pt0)
+    // Calling eglSwapInterval has no meaning on Android?
+    // (https://groups.google.com/forum/#!topic/android-developers/HvMZRcp3pt0)
     //eglSwapInterval(display, 1);
 
     engine->display = display;
     engine->context = context;
     engine->surface = surface;
     engine->config = config;
-	// engine->width and engine->height may be already filled with correct size
+    // engine->width and engine->height may be already filled with correct size
     engine->width = engine->width < w ? w : engine->width;
     engine->height = engine->height < h ? h : engine->height;
     engine->state.angle = 0;
@@ -364,20 +371,17 @@ static int engine_init_display(struct engine* engine) {
 /**
  * Just the current frame in the display.
  */
-static void engine_draw_frame(struct engine* engine) {
-    if (engine->display == NULL)
-    {
+static void engine_draw_frame(struct engine *engine) {
+    if (engine->display == NULL) {
         // No display.
         return;
     }
 
-    if (!engine->surface_ready || !engine->focused || !engine->resumed)
-    {
+    if (!engine->surface_ready || !engine->focused || !engine->resumed) {
         return;
     }
 
-    if (engine->pLwc)
-    {
+    if (engine->pLwc) {
         lwc_prerender_mutable_context(engine->pLwc);
         lwc_render(engine->pLwc);
     }
@@ -385,54 +389,49 @@ static void engine_draw_frame(struct engine* engine) {
     GLboolean swap_result = eglSwapBuffers(engine->display, engine->surface);
     GLint swap_error = eglGetError();
 
-    if (swap_result != EGL_TRUE)
-    {
+    if (swap_result != EGL_TRUE) {
         LOGI("Swap Failed!");
         LOGI("eglGetError() = %d", swap_error);
         LOGI("eglGetError description = %s", egl_get_error_string(swap_error));
 
-        if (swap_error == EGL_BAD_SURFACE)
-        {
+        if (swap_error == EGL_BAD_SURFACE) {
             // EGL 서피스 문제면 서피스만 새로 만들어보자...
             recreate_surface(engine);
-        }
-        else if (swap_error == EGL_BAD_NATIVE_WINDOW)
-        {
+        } else if (swap_error == EGL_BAD_NATIVE_WINDOW) {
             // 재초기화 위해서 `inited` 플래그 내림
             engine->inited = false;
         }
     }
 }
 
-static void recreate_surface(engine *engine)
-{
+static void recreate_surface(engine *engine) {
     engine->surface_ready = 0;
 
-    if (engine->display && engine->config && engine->app && engine->app->window)
-    {
+    if (engine->display && engine->config && engine->app && engine->app->window) {
         if (engine->surface != EGL_NO_SURFACE) {
-            eglDestroySurface(engine->display, engine->surface);
+            // TODO: eglDestroySurface() call below makes infinite 'Emulator: Draw context is NULL' errors on emulators... comment it for now
+            //eglDestroySurface(engine->display, engine->surface);
         }
 
-        engine->surface = eglCreateWindowSurface(engine->display, engine->config, engine->app->window, NULL);
+        engine->surface = eglCreateWindowSurface(engine->display, engine->config,
+                                                 engine->app->window, NULL);
 
-        if (eglMakeCurrent(engine->display, engine->surface, engine->surface, engine->context) == EGL_FALSE) {
+        if (eglMakeCurrent(engine->display, engine->surface, engine->surface, engine->context) ==
+            EGL_FALSE) {
             LOGW("Unable to eglMakeCurrent!!");
         } else {
-			EGLint w, h;
-			eglQuerySurface(engine->display, engine->surface, EGL_WIDTH, &w);
-			eglQuerySurface(engine->display, engine->surface, EGL_HEIGHT, &h);
-			engine->width = w;
-			engine->height = h;
-			lw_set_size(engine->pLwc, w, h);
+            EGLint w, h;
+            eglQuerySurface(engine->display, engine->surface, EGL_WIDTH, &w);
+            eglQuerySurface(engine->display, engine->surface, EGL_HEIGHT, &h);
+            engine->width = w;
+            engine->height = h;
+            lw_set_size(engine->pLwc, w, h);
 
-			LOGI("Change surface (width x height) to (%d x %d)", w, h);
+            LOGI("Change surface (width x height) to (%d x %d)", w, h);
 
-			engine->surface_ready = 1;
-		}
-    }
-    else
-    {
+            engine->surface_ready = 1;
+        }
+    } else {
         LOGE("APP_CMD_CONFIG_CHANGED but surface cannot be recreated.");
     }
 }
@@ -440,7 +439,7 @@ static void recreate_surface(engine *engine)
 /**
  * Tear down the EGL context currently associated with the display.
  */
-static void engine_term_display(struct engine* engine) {
+static void engine_term_display(struct engine *engine) {
     if (engine->display != EGL_NO_DISPLAY) {
         eglMakeCurrent(engine->display, EGL_NO_SURFACE, EGL_NO_SURFACE, EGL_NO_CONTEXT);
         if (engine->context != EGL_NO_CONTEXT) {
@@ -460,104 +459,114 @@ static void engine_term_display(struct engine* engine) {
 /**
  * Process the next input event.
  */
-static int32_t engine_handle_input(struct android_app* app, AInputEvent* event) {
-    struct engine* engine = (struct engine*)app->userData;
-    switch(AInputEvent_getType(event)){
+static int32_t engine_handle_input(struct android_app *app, AInputEvent *event) {
+    struct engine *engine = (struct engine *) app->userData;
+    switch (AInputEvent_getType(event)) {
         case AINPUT_EVENT_TYPE_MOTION:
-			switch(AInputEvent_getSource(event)){
+            switch (AInputEvent_getSource(event)) {
                 case AINPUT_SOURCE_TOUCHSCREEN:
-					int pointer_count = AMotionEvent_getPointerCount(event);
-					//LOGI("Pointer count *** %d", pointer_count);
-					int action = AKeyEvent_getAction(event);
+                    int pointer_count = AMotionEvent_getPointerCount(event);
+                    //LOGI("Pointer count *** %d", pointer_count);
+                    int action = AKeyEvent_getAction(event);
                     int motion_event_action = action & AMOTION_EVENT_ACTION_MASK;
-					int pointer_index = (action & AMOTION_EVENT_ACTION_POINTER_INDEX_MASK) >> AMOTION_EVENT_ACTION_POINTER_INDEX_SHIFT;
+                    int pointer_index = (action & AMOTION_EVENT_ACTION_POINTER_INDEX_MASK)
+                            >> AMOTION_EVENT_ACTION_POINTER_INDEX_SHIFT;
 
-					const float xpos = AMotionEvent_getX(event, pointer_index);
-					const float ypos = AMotionEvent_getY(event, pointer_index);
-					//LOGI("Pointer #%d", pointer_index);
-					const int pointer_id = AMotionEvent_getPointerId(event, pointer_index);
+                    const float xpos = AMotionEvent_getX(event, pointer_index);
+                    const float ypos = AMotionEvent_getY(event, pointer_index);
+                    //LOGI("Pointer #%d", pointer_index);
+                    const int pointer_id = AMotionEvent_getPointerId(event, pointer_index);
 
-					int width = engine->width;
-					int height = engine->height;
+                    int width = engine->width;
+                    int height = engine->height;
 
-					float normalized_xpos = (float)(2 * (xpos / width - 0.5));
-					float normalized_ypos = (float)(1.0 - 2 * (ypos / height));
+                    float normalized_xpos = (float) (2 * (xpos / width - 0.5));
+                    float normalized_ypos = (float) (1.0 - 2 * (ypos / height));
 
-					const int verbose_log = 0;
-					const int verbose_move_log = 0;
+                    const int verbose_log = 0;
+                    const int verbose_move_log = 0;
 
-					switch(motion_event_action){
-						case AMOTION_EVENT_ACTION_DOWN:
-							if (verbose_log) {
-								LOGI("[%d] AMOTION_EVENT_ACTION_DOWN [%d] %.2f %.2f", pointer_count, pointer_id, xpos, ypos);
-							}
-							lw_trigger_touch(engine->pLwc, normalized_xpos, normalized_ypos, pointer_id);
-							lw_trigger_mouse_press(engine->pLwc, normalized_xpos, normalized_ypos, pointer_id);
-							break;
-						case AMOTION_EVENT_ACTION_UP:
-							if (verbose_log) {
-								LOGI("[%d] AMOTION_EVENT_ACTION_UP [%d] %.2f %.2f", pointer_count, pointer_id, xpos, ypos);
-							}
-							lw_trigger_mouse_release(engine->pLwc, normalized_xpos, normalized_ypos, pointer_id);
-							break;
-						case AMOTION_EVENT_ACTION_MOVE:
-						{
-							for (size_t i = 0; i < pointer_count; i++) {
-								const int move_pointer_id = AMotionEvent_getPointerId(event, i);
-								const float move_xpos = AMotionEvent_getX(event, i);
-								const float move_ypos = AMotionEvent_getY(event, i);
-								float move_normalized_xpos = (float)(2 * (move_xpos / width - 0.5));
-								float move_normalized_ypos = (float)(1.0 - 2 * (move_ypos / height));
-								if (verbose_move_log) {
-									LOGI("[%d] AMOTION_EVENT_ACTION_MOVE [%d] %.2f %.2f", pointer_count, move_pointer_id, move_xpos, move_ypos);
-								}
-								lw_trigger_mouse_move(engine->pLwc, move_normalized_xpos, move_normalized_ypos, move_pointer_id);
-							}
-							break;
-						}
-						case AMOTION_EVENT_ACTION_POINTER_DOWN:
-						{
-							if (verbose_log) {
-								LOGI("[%d] AMOTION_EVENT_ACTION_POINTER_DOWN [%d] %.2f %.2f",
-									 pointer_count, pointer_id, xpos, ypos);
-							}
-							lw_trigger_mouse_press(engine->pLwc, normalized_xpos, normalized_ypos, pointer_id);
-							break;
-						}
-						case AMOTION_EVENT_ACTION_POINTER_UP:
-						{
-							if (verbose_log) {
-								LOGI("[%d] AMOTION_EVENT_ACTION_POINTER_UP [%d] %.2f %.2f",
-									 pointer_count, pointer_id, xpos, ypos);
-							}
-							lw_trigger_mouse_release(engine->pLwc, normalized_xpos, normalized_ypos, pointer_id);
-							break;
-						}
-						case AMOTION_EVENT_ACTION_CANCEL:
-							break;
-						default:
-							LOGI("[%d] ????????? DEFAULT: [%d] %.2f %.2f", pointer_count, pointer_id, xpos, ypos);
-							return 0;
-					}
+                    switch (motion_event_action) {
+                        case AMOTION_EVENT_ACTION_DOWN:
+                            if (verbose_log) {
+                                LOGI("[%d] AMOTION_EVENT_ACTION_DOWN [%d] %.2f %.2f", pointer_count,
+                                     pointer_id, xpos, ypos);
+                            }
+                            lw_trigger_touch(engine->pLwc, normalized_xpos, normalized_ypos,
+                                             pointer_id);
+                            lw_trigger_mouse_press(engine->pLwc, normalized_xpos, normalized_ypos,
+                                                   pointer_id);
+                            break;
+                        case AMOTION_EVENT_ACTION_UP:
+                            if (verbose_log) {
+                                LOGI("[%d] AMOTION_EVENT_ACTION_UP [%d] %.2f %.2f", pointer_count,
+                                     pointer_id, xpos, ypos);
+                            }
+                            lw_trigger_mouse_release(engine->pLwc, normalized_xpos, normalized_ypos,
+                                                     pointer_id);
+                            break;
+                        case AMOTION_EVENT_ACTION_MOVE: {
+                            for (size_t i = 0; i < pointer_count; i++) {
+                                const int move_pointer_id = AMotionEvent_getPointerId(event, i);
+                                const float move_xpos = AMotionEvent_getX(event, i);
+                                const float move_ypos = AMotionEvent_getY(event, i);
+                                float move_normalized_xpos = (float) (2 *
+                                                                      (move_xpos / width - 0.5));
+                                float move_normalized_ypos = (float) (1.0 -
+                                                                      2 * (move_ypos / height));
+                                if (verbose_move_log) {
+                                    LOGI("[%d] AMOTION_EVENT_ACTION_MOVE [%d] %.2f %.2f",
+                                         pointer_count, move_pointer_id, move_xpos, move_ypos);
+                                }
+                                lw_trigger_mouse_move(engine->pLwc, move_normalized_xpos,
+                                                      move_normalized_ypos, move_pointer_id);
+                            }
+                            break;
+                        }
+                        case AMOTION_EVENT_ACTION_POINTER_DOWN: {
+                            if (verbose_log) {
+                                LOGI("[%d] AMOTION_EVENT_ACTION_POINTER_DOWN [%d] %.2f %.2f",
+                                     pointer_count, pointer_id, xpos, ypos);
+                            }
+                            lw_trigger_mouse_press(engine->pLwc, normalized_xpos, normalized_ypos,
+                                                   pointer_id);
+                            break;
+                        }
+                        case AMOTION_EVENT_ACTION_POINTER_UP: {
+                            if (verbose_log) {
+                                LOGI("[%d] AMOTION_EVENT_ACTION_POINTER_UP [%d] %.2f %.2f",
+                                     pointer_count, pointer_id, xpos, ypos);
+                            }
+                            lw_trigger_mouse_release(engine->pLwc, normalized_xpos, normalized_ypos,
+                                                     pointer_id);
+                            break;
+                        }
+                        case AMOTION_EVENT_ACTION_CANCEL:
+                            break;
+                        default:
+                            LOGI("[%d] ????????? DEFAULT: [%d] %.2f %.2f", pointer_count,
+                                 pointer_id, xpos, ypos);
+                            return 0;
+                    }
                     break;
             } // end switch
-			// AINPUT_EVENT_TYPE_MOTION always handled
-			return 1;
+            // AINPUT_EVENT_TYPE_MOTION always handled
+            return 1;
         case AINPUT_EVENT_TYPE_KEY:
-			if (AKeyEvent_getKeyCode(event) == AKEYCODE_BACK) {
-				if (engine->pLwc && engine->pLwc->puck_game) {
-					if (engine->pLwc->puck_game->game_state == LPGS_MAIN_MENU
-						&& engine->pLwc->game_scene != LGS_LEADERBOARD) {
-						// just android handle this case --> destroy and stop this app "gracefully"
-					} else {
-						if(AKeyEvent_getAction(event) == AKEY_EVENT_ACTION_DOWN) {
-							engine->pLwc->android_native_activity = engine->app;// engine->app->activity;
-							logic_emit_ui_event_async(engine->pLwc, "back_button", 0, 0);
-						}
-						return 1;
-					}
-				}
-			}
+            if (AKeyEvent_getKeyCode(event) == AKEYCODE_BACK) {
+                if (engine->pLwc && engine->pLwc->puck_game) {
+                    if (engine->pLwc->puck_game->game_state == LPGS_MAIN_MENU
+                        && engine->pLwc->game_scene != LGS_LEADERBOARD) {
+                        // just android handle this case --> destroy and stop this app "gracefully"
+                    } else {
+                        if (AKeyEvent_getAction(event) == AKEY_EVENT_ACTION_DOWN) {
+                            engine->pLwc->android_native_activity = engine->app;// engine->app->activity;
+                            logic_emit_ui_event_async(engine->pLwc, "back_button", 0, 0);
+                        }
+                        return 1;
+                    }
+                }
+            }
             // handle key input...
             break;
     } // end switch
@@ -576,8 +585,8 @@ static int32_t engine_handle_input(struct android_app* app, AInputEvent* event) 
 /**
  * Process the next main command.
  */
-static void engine_handle_cmd(struct android_app* app, int32_t cmd) {
-    struct engine* engine = (struct engine*)app->userData;
+static void engine_handle_cmd(struct android_app *app, int32_t cmd) {
+    struct engine *engine = (struct engine *) app->userData;
     switch (cmd) {
         case APP_CMD_START:
             LOGI("APP_CMD_START");
@@ -586,12 +595,12 @@ static void engine_handle_cmd(struct android_app* app, int32_t cmd) {
             LOGI("APP_CMD_RESUME");
             engine->resumed = 1;
             ALooper_wake(engine->app->looper);
-			logic_start_logic_update_job_async(engine->pLwc);
+            logic_start_logic_update_job_async(engine->pLwc);
             break;
         case APP_CMD_PAUSE:
             LOGI("APP_CMD_PAUSE");
             engine->resumed = 0;
-			logic_stop_logic_update_job_async(engine->pLwc);
+            logic_stop_logic_update_job_async(engine->pLwc);
             break;
         case APP_CMD_STOP:
             LOGI("APP_CMD_STOP");
@@ -603,7 +612,7 @@ static void engine_handle_cmd(struct android_app* app, int32_t cmd) {
             LOGI("APP_CMD_SAVE_STATE");
             // The system has asked us to save our current state.  Do so.
             engine->app->savedState = malloc(sizeof(struct saved_state));
-            *((struct saved_state*)engine->app->savedState) = engine->state;
+            *((struct saved_state *) engine->app->savedState) = engine->state;
             engine->app->savedStateSize = sizeof(struct saved_state);
             break;
         case APP_CMD_INIT_WINDOW:
@@ -653,9 +662,9 @@ static void engine_handle_cmd(struct android_app* app, int32_t cmd) {
              */
             break;
         case APP_CMD_WINDOW_RESIZED:
-			// This callback will not be called because of Android bug.
-			// https://issuetracker.google.com/issues/37054453
-			// https://stackoverflow.com/questions/32587572/app-cmd-window-resized-is-not-called-but-native-window-is-resized
+            // This callback will not be called because of Android bug.
+            // https://issuetracker.google.com/issues/37054453
+            // https://stackoverflow.com/questions/32587572/app-cmd-window-resized-is-not-called-but-native-window-is-resized
             LOGI("APP_CMD_WINDOW_RESIZED");
             break;
         case APP_CMD_CONFIG_CHANGED:
@@ -676,15 +685,16 @@ static void engine_handle_cmd(struct android_app* app, int32_t cmd) {
  * android_native_app_glue.  It runs in its own thread, with its own
  * event loop for receiving input events and doing other things.
  */
-static struct engine* shared_engine;
-void android_main(struct android_app* state) {
+static struct engine *shared_engine;
+
+void android_main(struct android_app *state) {
     struct engine engine;
-	shared_engine = &engine;
+    shared_engine = &engine;
 
     LOGI("android_main");
-	LOGI("internal data path: %s", state->activity->internalDataPath);
+    LOGI("internal data path: %s", state->activity->internalDataPath);
 
-	// Make sure glue isn't stripped.
+    // Make sure glue isn't stripped.
     app_dummy();
 
     memset(&engine, 0, sizeof(engine));
@@ -703,26 +713,25 @@ void android_main(struct android_app* state) {
                                         */
 
     engine.sensorEventQueue = ASensorManager_createEventQueue(
-                                    engine.sensorManager,
-                                    state->looper, LOOPER_ID_USER,
-                                    NULL, NULL);
+            engine.sensorManager,
+            state->looper, LOOPER_ID_USER,
+            NULL, NULL);
 
-    if (state->savedState != NULL)
-    {
+    if (state->savedState != NULL) {
         // We are starting with a previous saved state; restore from it.
-        engine.state = *(struct saved_state*)state->savedState;
+        engine.state = *(struct saved_state *) state->savedState;
     }
 
-	// Setup static variables for calling Java functions from C++ side
-	{
-		JNIEnv *env;
-		JavaVM* lJavaVM = state->activity->vm;
+    // Setup static variables for calling Java functions from C++ side
+    {
+        JNIEnv *env;
+        JavaVM *lJavaVM = state->activity->vm;
 
-		s_vm_from_cpp = lJavaVM;
-		s_obj_from_cpp = state->activity->clazz;
+        s_vm_from_cpp = lJavaVM;
+        s_obj_from_cpp = state->activity->clazz;
 
-		s_looper_from_cpp = engine.app->looper;
-	}
+        s_looper_from_cpp = engine.app->looper;
+    }
 
     struct timespec last_time;
     clock_gettime(CLOCK_MONOTONIC, &last_time);
@@ -730,7 +739,7 @@ void android_main(struct android_app* state) {
     // loop waiting for stuff to do.
     long loop_tick = 0;
 
-	while (1) {
+    while (1) {
         struct timespec loop_begin;
         clock_gettime(CLOCK_MONOTONIC, &loop_begin);
 
@@ -740,31 +749,29 @@ void android_main(struct android_app* state) {
             && s_java_activity_created
             && engine.app->window != NULL
             && engine.resumed
-            && engine.focused)
-        {
+            && engine.focused) {
             LOGI("Init engine...");
             engine_init_display(&engine);
-            if (engine.pLwc)
-            {
+            if (engine.pLwc) {
                 lw_deinit(engine.pLwc);
             }
             engine.pLwc = lw_init_initial_size(engine.width, engine.height);
-			engine.pLwc->internal_data_path = state->activity->internalDataPath;
-			engine.pLwc->user_data_path = state->activity->internalDataPath;
+            engine.pLwc->internal_data_path = state->activity->internalDataPath;
+            engine.pLwc->user_data_path = state->activity->internalDataPath;
             lw_set_size(engine.pLwc, engine.width, engine.height);
             engine.inited = true;
             lwc_start_logic_thread(engine.pLwc);
-		}
-		// update width & height on LWCONTEXT side if inconsistency with engine found
-		if (engine.pLwc) {
-			if (engine.width != engine.pLwc->width || engine.height != engine.pLwc->height) {
-				lw_set_size(engine.pLwc, engine.width, engine.height);
-			}
-		}
+        }
+        // update width & height on LWCONTEXT side if inconsistency with engine found
+        if (engine.pLwc) {
+            if (engine.width != engine.pLwc->width || engine.height != engine.pLwc->height) {
+                lw_set_size(engine.pLwc, engine.width, engine.height);
+            }
+        }
         // Read all pending events.
         int ident;
         int events;
-        struct android_poll_source* source;
+        struct android_poll_source *source;
 
         int poll_without_timeout = engine.focused && engine.resumed;
 
@@ -776,7 +783,8 @@ void android_main(struct android_app* state) {
              engine.resumed);
         */
 
-        while ((ident=ALooper_pollAll(poll_without_timeout ? 0 : -1, NULL, &events, (void**)&source)) >= 0) {
+        while ((ident = ALooper_pollAll(poll_without_timeout ? 0 : -1, NULL, &events,
+                                        (void **) &source)) >= 0) {
             // Process this event.
             if (source != NULL) {
                 source->process(state, source);
@@ -813,8 +821,7 @@ void android_main(struct android_app* state) {
             engine.state.angle = 0;
         }
 
-        if (engine.pLwc)
-        {
+        if (engine.pLwc) {
             //lwc_update(engine.pLwc, 1.0/60);
 
             const int uc = lw_get_update_count(engine.pLwc);
@@ -822,7 +829,7 @@ void android_main(struct android_app* state) {
             const long lt_sec = deltatime_last_time_sec(engine.pLwc->update_dt);
             const long lt_nsec = deltatime_last_time_nsec(engine.pLwc->update_dt);
             const double dt = lwcontext_delta_time(engine.pLwc);
-            const double throttle_time = 1/60.0 - dt;
+            const double throttle_time = 1 / 60.0 - dt;
 
             //LOGI("U# %6d / R# %6d / Last time sec: %ld, nsec: %ld / Delta time: %.4f / FPS: %.4f fps", uc, rc, lt_sec, lt_nsec, dt, 1.0/dt);
 
@@ -868,14 +875,13 @@ void android_main(struct android_app* state) {
             long nsec_diff = current_time.tv_nsec - last_time.tv_nsec;
             long sec_diff = current_time.tv_sec - last_time.tv_sec;
 
-            if (nsec_diff < 0)
-            {
+            if (nsec_diff < 0) {
                 nsec_diff += 1000000000LL;
                 sec_diff--;
             }
 
             uint64_t frame_interval_nanoseconds = sec_diff * 1000000000ULL + nsec_diff;
-            delta_time = (double)frame_interval_nanoseconds / 1e9;
+            delta_time = (double) frame_interval_nanoseconds / 1e9;
             //LOGI("frame interval: %ld nsec / %.4f fps", frame_interval_nanoseconds, 1.0 / delta_time);
 
             last_time = current_time;
@@ -884,8 +890,9 @@ void android_main(struct android_app* state) {
     }
 }
 
-extern "C" JNIEXPORT jstring JNICALL Java_com_popsongremix_laidoff_LaidoffNativeActivity_signalResourceReady(JNIEnv *env, jobject obj, jclass and9NativeActivityClass)
-{
+extern "C" JNIEXPORT jstring JNICALL
+Java_com_popsongremix_laidoff_LaidoffNativeActivity_signalResourceReady(JNIEnv *env, jobject obj,
+                                                                        jclass and9NativeActivityClass) {
     s_env_from_java = env;
     s_obj_from_java = obj;
 
@@ -895,42 +902,43 @@ extern "C" JNIEXPORT jstring JNICALL Java_com_popsongremix_laidoff_LaidoffNative
 
     s_java_activity_created = true;
 
-	ALooper_wake(s_looper_from_cpp);
+    ALooper_wake(s_looper_from_cpp);
 
     return env->NewStringUTF(hello.c_str());
 }
 
-extern "C" void lw_app_quit(LWCONTEXT* pLwc, void* native_context)
-{
-	// 'native_context' is 'android_app'
-	struct android_app* android_app = (struct android_app*)native_context;
-	ANativeActivity_finish(android_app->activity);
-	android_app->destroyRequested = 1;
+extern "C" void lw_app_quit(LWCONTEXT *pLwc, void *native_context) {
+    // 'native_context' is 'android_app'
+    struct android_app *android_app = (struct android_app *) native_context;
+    ANativeActivity_finish(android_app->activity);
+    android_app->destroyRequested = 1;
 }
 
-extern "C" void lw_start_text_input_activity(LWCONTEXT* pLwc, int tag) {
+extern "C" void lw_start_text_input_activity(LWCONTEXT *pLwc, int tag) {
     pLwc->last_text_input_seq = lw_get_text_input_seq();
     pLwc->text_input_tag = tag;
     request_void_string_command("startTextInputActivity", "dummy");
 }
 
-extern "C" void lw_start_reward_video(LWCONTEXT* pLwc, int tag) {
+extern "C" void lw_start_reward_video(LWCONTEXT *pLwc, int tag) {
     request_void_string_command("startRewardVideo", "dummy");
 }
 
-extern "C" void lw_start_sign_in(LWCONTEXT* pLwc, int tag) {
+extern "C" void lw_start_sign_in(LWCONTEXT *pLwc, int tag) {
     request_void_string_command("startSignIn", "dummy");
 }
 
 static char push_token[1024];
 
-extern "C" void lw_request_remote_notification_device_token(LWCONTEXT* pLwc) {
-    request_void_long_command("requestPushToken", (jlong)pLwc);
+extern "C" void lw_request_remote_notification_device_token(LWCONTEXT *pLwc) {
+    request_void_long_command("requestPushToken", (jlong) pLwc);
 
     //lw_set_push_token(pLwc, 2, push_token);
 }
 
-extern "C" JNIEXPORT void JNICALL Java_com_popsongremix_laidoff_LaidoffFirebaseInstanceIDService_setPushToken(JNIEnv * env, jclass cls, jstring text) {
+extern "C" JNIEXPORT void JNICALL
+Java_com_popsongremix_laidoff_LaidoffFirebaseInstanceIDService_setPushToken(JNIEnv *env, jclass cls,
+                                                                            jstring text) {
     const char *buffer = env->GetStringUTFChars(text, JNI_FALSE);
 
     size_t buffer_len = strlen(buffer);
@@ -944,18 +952,23 @@ extern "C" JNIEXPORT void JNICALL Java_com_popsongremix_laidoff_LaidoffFirebaseI
     env->ReleaseStringUTFChars(text, buffer);
 }
 
-extern "C" JNIEXPORT void JNICALL Java_com_popsongremix_laidoff_LaidoffNativeActivity_setPushTokenAndSend(JNIEnv * env, jclass cls, jstring text, jlong pLwcLong) {
+extern "C" JNIEXPORT void JNICALL
+Java_com_popsongremix_laidoff_LaidoffNativeActivity_setPushTokenAndSend(JNIEnv *env, jclass cls,
+                                                                        jstring text,
+                                                                        jlong pLwcLong) {
     Java_com_popsongremix_laidoff_LaidoffFirebaseInstanceIDService_setPushToken(env, cls, text);
-    lw_set_push_token((LWCONTEXT*)pLwcLong, 2, push_token);
+    lw_set_push_token((LWCONTEXT *) pLwcLong, 2, push_token);
 }
 
-extern "C" JNIEXPORT void JNICALL Java_com_popsongremix_laidoff_LaidoffNativeActivity_setWindowSize(JNIEnv * env, jclass cls, jint w, jint h, jlong pLwcLong) {
-	if (shared_engine) {
-		shared_engine->width = w;
-		shared_engine->height = h;
-		LWCONTEXT* pLwc = pLwcLong ? (LWCONTEXT*)pLwcLong : shared_engine->pLwc;
-		if (pLwc) {
-			lw_set_size(pLwc, w, h);
-		}
-	}
+extern "C" JNIEXPORT void JNICALL
+Java_com_popsongremix_laidoff_LaidoffNativeActivity_setWindowSize(JNIEnv *env, jclass cls, jint w,
+                                                                  jint h, jlong pLwcLong) {
+    if (shared_engine) {
+        shared_engine->width = w;
+        shared_engine->height = h;
+        LWCONTEXT *pLwc = pLwcLong ? (LWCONTEXT *) pLwcLong : shared_engine->pLwc;
+        if (pLwc) {
+            lw_set_size(pLwc, w, h);
+        }
+    }
 }

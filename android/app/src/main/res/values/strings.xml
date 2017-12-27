@@ -1,12 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_id">933754889415</string>
+    <string name="web_client_id">933754889415-fr8buam0m8dh9hv71r2fb4au548lij0f.apps.googleusercontent.com</string>
+    <string name="admob_id">ca-app-pub-5072035175916776~3533761034</string>
+    <string name="banner_ad_unit_id">ca-app-pub-3940256099942544/6300978111</string>
+    <string name="reward_video_ad_test">ca-app-pub-3940256099942544/5224354917</string>
+    <string name="reward_video_ad_prod">ca-app-pub-5072035175916776/9587253247</string>
+    <string name="remote_assets_base_path">http://sky.popsongremix.com/laidoff/assets</string>
+    <string name="remote_apk_base_path">http://sky.popsongremix.com/laidoff/apk</string>
+    <string name="list_file_name">list.txt</string>
     <string name="app_name">Rumble</string>
     <string name="no_conn">인터넷 연결 확인 오네가이</string>
     <string name="error">에러</string>
     <string name="exit">종료</string>
     <string name="title_activity_text">Text</string>
-
     <!-- Strings related to login -->
     <string name="prompt_email">Email</string>
     <string name="prompt_password">Password (optional)</string>
@@ -23,6 +30,5 @@
     <string name="title_activity_login">Input Text</string>
     <string name="text_input_button">확인</string>
     <string name="text_input_header">벼..별로 입력을 받을 생각이 있는 건 아니니까..</string>
-    <string name="banner_ad_unit_id">ca-app-pub-3940256099942544/6300978111</string>
     <string name="hello_world_main">Hello World, main</string>
 </resources>

@@ -50,7 +50,9 @@
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>
-
+        <activity
+            android:name=".SignInActivity"
+            android:theme="@style/Theme.Transparent" />
         <service android:name=".LaidoffFirebaseInstanceIDService">
             <intent-filter>
                 <action android:name="com.google.firebase.INSTANCE_ID_EVENT" />
@@ -61,8 +63,6 @@
                 <action android:name="com.google.firebase.MESSAGING_EVENT" />
             </intent-filter>
         </service>
-
-        <activity android:name=".SignInActivity"></activity>
     </application>
 
 </manifest>

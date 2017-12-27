@@ -38,10 +38,15 @@ public class LaidoffNativeActivity extends NativeActivity implements RewardedVid
     }
 
     public static native String signalResourceReady(Class<LaidoffNativeActivity> and9NativeActivityClass);
+
     public static native int pushTextureData(int width, int height, int[] data, int texAtlasIndex);
+
     public static native void registerAsset(String assetPath, int startOffset, int length);
+
     private static native void sendApkPath(String apkPath, String filesPath, String packageVersion);
+
     public static native void setPushTokenAndSend(String text, long pLwcLong);
+
     @SuppressWarnings("SameParameterValue")
     public static native void setWindowSize(int width, int height, long pLwcLong);
 
@@ -51,47 +56,17 @@ public class LaidoffNativeActivity extends NativeActivity implements RewardedVid
     private int mSound_MetalHit;
     private SoundPool mSoundPool;
 
-    /**
-     * Called when the activity is first created.
-     */
     @Override
     public void onCreate(Bundle savedInstanceState) {
         INSTANCE = this;
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main);
         // AdMob
-        MobileAds.initialize(this, "ca-app-pub-5072035175916776~3533761034");
+        MobileAds.initialize(this, getString(R.string.admob_id));
         // Interstitial
         mRewardedVideoAd = MobileAds.getRewardedVideoAdInstance(this);
         mRewardedVideoAd.setRewardedVideoAdListener(this);
-
-        //getWindow().getDecorView().setKeepScreenOn(true);
-        getWindow().addFlags(WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED |
-                WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD |
-                WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON |
-                WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON |
-                WindowManager.LayoutParams.FLAG_ALLOW_LOCK_WHILE_SCREEN_ON);
-        final View decorView = getWindow().getDecorView();
-        decorView.setOnSystemUiVisibilityChangeListener
-                (new View.OnSystemUiVisibilityChangeListener() {
-                    @Override
-                    public void onSystemUiVisibilityChange(int visibility) {
-                        Log.i(LOG_TAG, "onSystemUiVisibilityChange - decorView window size width: " + decorView.getWidth());
-                        Log.i(LOG_TAG, "onSystemUiVisibilityChange - decorView window size height: " + decorView.getHeight());
-                        setWindowSize(decorView.getWidth(), decorView.getHeight(), 0);
-                        // Note that system bars will only be "visible" if none of the
-                        // LOW_PROFILE, HIDE_NAVIGATION, or FULLSCREEN flags are set.
-//                        if ((visibility & View.SYSTEM_UI_FLAG_FULLSCREEN) == 0) {
-//                            // TODO: The system bars are visible. Make any desired
-//                            // adjustments to your UI, such as showing the action bar or
-//                            // other navigational controls.
-//                        } else {
-//                            // TODO: The system bars are NOT visible. Make any desired
-//                            // adjustments to your UI, such as hiding the action bar or
-//                            // other navigational controls.
-//                        }
-                    }
-                });
+        enableImmersiveMode();
 
         Log.i(LOG_TAG, "Device Android Version: " + Build.VERSION.SDK_INT);
 
@@ -128,11 +103,39 @@ public class LaidoffNativeActivity extends NativeActivity implements RewardedVid
         mSound_MetalHit = mSoundPool.load(getApplicationContext(), R.raw.sfx_metal_hit, 1);
     }
 
-    @SuppressWarnings("unused")
+    private void enableImmersiveMode() {
+        //getWindow().getDecorView().setKeepScreenOn(true);
+        getWindow().addFlags(WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED |
+                WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD |
+                WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON |
+                WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON |
+                WindowManager.LayoutParams.FLAG_ALLOW_LOCK_WHILE_SCREEN_ON);
+        final View decorView = getWindow().getDecorView();
+        decorView.setOnSystemUiVisibilityChangeListener
+                (new View.OnSystemUiVisibilityChangeListener() {
+                    @Override
+                    public void onSystemUiVisibilityChange(int visibility) {
+                        Log.i(LOG_TAG, "onSystemUiVisibilityChange - decorView window size width: " + decorView.getWidth());
+                        Log.i(LOG_TAG, "onSystemUiVisibilityChange - decorView window size height: " + decorView.getHeight());
+                        setWindowSize(decorView.getWidth(), decorView.getHeight(), 0);
+                        // Note that system bars will only be "visible" if none of the
+                        // LOW_PROFILE, HIDE_NAVIGATION, or FULLSCREEN flags are set.
+//                        if ((visibility & View.SYSTEM_UI_FLAG_FULLSCREEN) == 0) {
+//                            // TODO: The system bars are visible. Make any desired
+//                            // adjustments to your UI, such as showing the action bar or
+//                            // other navigational controls.
+//                        } else {
+//                            // TODO: The system bars are NOT visible. Make any desired
+//                            // adjustments to your UI, such as hiding the action bar or
+//                            // other navigational controls.
+//                        }
+                    }
+                });
+    }
+
     private void loadRewardedVideoAd() {
         // production: ca-app-pub-5072035175916776/9587253247
-        mRewardedVideoAd.loadAd("ca-app-pub-3940256099942544/5224354917",
-                new AdRequest.Builder().build());
+        mRewardedVideoAd.loadAd(getString(R.string.reward_video_ad_test), new AdRequest.Builder().build());
     }
 
     public void playMetalHitSound() {
@@ -154,12 +157,12 @@ public class LaidoffNativeActivity extends NativeActivity implements RewardedVid
 
         UpdateResTaskParam updateResTaskParam = new UpdateResTaskParam();
         updateResTaskParam.fileAbsolutePath = files.getAbsolutePath();
-        updateResTaskParam.remoteAssetsBasePath = "http://sky.popsongremix.com/laidoff/assets";
+        updateResTaskParam.remoteAssetsBasePath = getString(R.string.remote_assets_base_path);
         //updateResTaskParam.remoteAssetsBasePath = "http://192.168.0.28:19876/assets";
-        updateResTaskParam.remoteApkBasePath = "http://sky.popsongremix.com/laidoff/apk";
+        updateResTaskParam.remoteApkBasePath = getString(R.string.remote_apk_base_path);
         //updateResTaskParam.remoteAssetsBasePath = "http://222.110.4.119:18080";
-        updateResTaskParam.remoteListFilePath = "list.txt";
-        updateResTaskParam.localListFilename = "list.txt";
+        updateResTaskParam.remoteListFilePath = getString(R.string.list_file_name);
+        updateResTaskParam.localListFilename = getString(R.string.list_file_name);
         updateResTaskParam.activity = this;
 
         new UpdateResTask(this).execute(updateResTaskParam);
@@ -294,6 +297,10 @@ public class LaidoffNativeActivity extends NativeActivity implements RewardedVid
     @Override
     public void onWindowFocusChanged(boolean hasFocus) {
         super.onWindowFocusChanged(hasFocus);
+        enableImmersiveModeOnWindowFocusChanged(hasFocus);
+    }
+
+    private void enableImmersiveModeOnWindowFocusChanged(boolean hasFocus) {
         if (hasFocus) {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
                 final View decorView = getWindow().getDecorView();
