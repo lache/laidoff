@@ -9,6 +9,8 @@
     <string name="remote_assets_base_path">http://sky.popsongremix.com/laidoff/assets</string>
     <string name="remote_apk_base_path">http://sky.popsongremix.com/laidoff/apk</string>
     <string name="list_file_name">list.txt</string>
+    <string name="google_auth_service_addr">https://office.popsongremix.com:10622/auth-google</string>
+    <string name="keystore_password">debugPassword</string>
     <string name="app_name">Rumble</string>
     <string name="no_conn">인터넷 연결 확인 오네가이</string>
     <string name="error">에러</string>

@@ -26,6 +26,24 @@ import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.GoogleAuthProvider;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.security.KeyManagementException;
+import java.security.KeyStore;
+import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
+import java.security.SecureRandom;
+import java.security.UnrecoverableKeyException;
+import java.security.cert.CertificateException;
+
+import javax.net.ssl.KeyManagerFactory;
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.TrustManager;
+import javax.net.ssl.TrustManagerFactory;
+import javax.net.ssl.X509TrustManager;
+
+import okhttp3.OkHttpClient;
+
 public class SignInActivity extends Activity {
     int RC_SIGN_IN = 20000;
     private GoogleSignInOptions googleSignInOptions;
@@ -34,13 +52,15 @@ public class SignInActivity extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (isSignedIn() == false) {
+        if (!isSignedIn()) {
             googleSignInOptions = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_GAMES_SIGN_IN)
                     .requestIdToken(getString(R.string.web_client_id))
                     .requestEmail()
                     .requestProfile()
                     .build();
             signInSilently(googleSignInOptions);
+        } else {
+            onSignedInAccountAcquired(GoogleSignIn.getLastSignedInAccount(this));
         }
     }
 
@@ -131,6 +151,7 @@ public class SignInActivity extends Activity {
         Log.i(LOG_TAG, "Account Given Name: " + signedInAccount.getGivenName());
         Log.i(LOG_TAG, "Account ID Token: " + signedInAccount.getIdToken());
         Log.i(LOG_TAG, "Account ID: " + signedInAccount.getId());
+        sendIdTokenSecurely(signedInAccount.getIdToken());
         AuthCredential credential = GoogleAuthProvider.getCredential(signedInAccount.getIdToken(),null);
         final Activity activity = this;
         // Signed-in successfully. Register this account to firebase.
@@ -176,5 +197,106 @@ public class SignInActivity extends Activity {
     private void printGoogleAccountDebugInfo(GoogleSignInAccount account) {
         Log.i(LOG_TAG, "handleSignInResult - Google account name: " + account.getDisplayName());
         Log.i(LOG_TAG, "handleSignInResult - Google Photo URL: " + account.getPhotoUrl());
+    }
+
+    private void sendIdTokenSecurely(String idToken) {
+        KeyStore keyStore = readKeyStore(); //your method to obtain KeyStore
+        SSLContext sslContext = null;
+        try {
+            sslContext = SSLContext.getInstance("SSL");
+        } catch (NoSuchAlgorithmException e) {
+            e.printStackTrace();
+        }
+        TrustManagerFactory trustManagerFactory = null;
+        try {
+            trustManagerFactory = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
+        } catch (NoSuchAlgorithmException e) {
+            e.printStackTrace();
+        }
+        try {
+            if (trustManagerFactory != null) {
+                trustManagerFactory.init(keyStore);
+            }
+        } catch (KeyStoreException e) {
+            e.printStackTrace();
+        }
+        KeyManagerFactory keyManagerFactory = null;
+        try {
+            keyManagerFactory = KeyManagerFactory.getInstance(KeyManagerFactory.getDefaultAlgorithm());
+        } catch (NoSuchAlgorithmException e) {
+            e.printStackTrace();
+        }
+        try {
+            if (keyManagerFactory != null) {
+                keyManagerFactory.init(keyStore, getString(R.string.keystore_password).toCharArray());
+            }
+        } catch (KeyStoreException e) {
+            e.printStackTrace();
+        } catch (NoSuchAlgorithmException e) {
+            e.printStackTrace();
+        } catch (UnrecoverableKeyException e) {
+            e.printStackTrace();
+        }
+        try {
+            if (sslContext != null && keyManagerFactory != null && trustManagerFactory != null) {
+                sslContext.init(keyManagerFactory.getKeyManagers(),trustManagerFactory.getTrustManagers(), new SecureRandom());
+            }
+        } catch (KeyManagementException e) {
+            e.printStackTrace();
+        }
+
+        TrustManager[] tms = new TrustManager[0];
+        if (trustManagerFactory != null) {
+            tms = trustManagerFactory.getTrustManagers();
+        }
+        X509TrustManager x509TrustManager = (X509TrustManager)tms[0];
+        OkHttpClient client = null;
+        if (sslContext != null) {
+            client = new OkHttpClient.Builder()
+                    .sslSocketFactory(sslContext.getSocketFactory(), x509TrustManager)
+                    .build();
+        }
+        postAsync(client, getString(R.string.google_auth_service_addr), idToken);
+    }
+
+    private static void postAsync(OkHttpClient client, String url, String text) {
+        AuthTask.AuthTaskParam authTaskParam = new AuthTask.AuthTaskParam();
+        authTaskParam.client = client;
+        authTaskParam.url = url;
+        authTaskParam.text = text;
+        new AuthTask().execute(authTaskParam);
+    }
+
+    KeyStore readKeyStore() {
+        KeyStore ks = null;
+        try {
+            ks = KeyStore.getInstance(KeyStore.getDefaultType());
+        } catch (KeyStoreException e) {
+            e.printStackTrace();
+        }
+
+        InputStream fis = null;
+        try {
+            fis = getResources().openRawResource(R.raw.popsongremix_com);
+            try {
+                assert ks != null;
+                ks.load(fis, getString(R.string.keystore_password).toCharArray());
+            } catch (IOException e) {
+                e.printStackTrace();
+            } catch (NoSuchAlgorithmException e) {
+                e.printStackTrace();
+            } catch (CertificateException e) {
+                e.printStackTrace();
+            }
+        } finally {
+            if (fis != null) {
+                try {
+                    fis.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+        return ks;
     }
 }

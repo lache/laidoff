@@ -65,7 +65,7 @@ android {
             } else {
                 cmake {
                     arguments '-DANDROID_PLATFORM=android-19',
-                            '-DANDROID_TOOLCHAIN=clang'//, '-DANDROID_STL=gnustl_static'
+                            '-DANDROID_TOOLCHAIN=clang'
                 }
             }
 
@@ -124,6 +124,7 @@ dependencies {
     implementation 'com.google.firebase:firebase-auth:11.8.0'
     implementation 'com.google.android.gms:play-services-auth:11.8.0'
     implementation 'com.google.android.gms:play-services-games:11.8.0'
+    implementation 'com.squareup.okhttp3:okhttp:3.9.1'
 }
 
 apply plugin: 'com.google.gms.google-services'

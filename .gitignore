@@ -33,3 +33,4 @@ laidoff.ipa
 /match-server/*.exe
 /db-server/db
 match-server/match-server
+/auth-google-server/key
