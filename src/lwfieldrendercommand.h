@@ -15,6 +15,7 @@ typedef enum _LW_RENDER_COMMAND_TYPE {
 	LRCT_BULLETSPAWNHEIGHT,
     LRCT_QUITAPP, // render thread == main thread
     LRCT_LOADTEX,
+    LRCT_STARTTEXTINPUTACTIVITY
 } LW_RENDER_COMMAND_TYPE;
 
 typedef struct _LWFIELDRENDERCOMMAND {
@@ -50,6 +51,7 @@ typedef struct _LWFIELDRENDERCOMMAND {
 	int anim_marker_search_begin;
     // native context
     void* native_context;
+    int tag;
 } LWFIELDRENDERCOMMAND;
 
 double rendercommand_animtime(const LWFIELDRENDERCOMMAND* rcmd, double now);

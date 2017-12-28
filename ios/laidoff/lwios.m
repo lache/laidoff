@@ -17,6 +17,7 @@
 #include "lwcontext.h"
 #include <czmq.h>
 #include "lwime.h"
+#include "rmsg.h"
 
 static id app_delegate;
 
@@ -41,14 +42,20 @@ void lw_request_remote_notification_device_token(LWCONTEXT* pLwc)
 }
 
 void lw_start_text_input_activity(LWCONTEXT* pLwc, int tag) {
+    // post to main(render) thread to call iOS specific API
+    // (iOS API call should be called in main thread)
+    rmsg_start_text_input_activity(pLwc, tag);
+}
+
+void lw_start_text_input_activity_ios(LWCONTEXT* pLwc, int tag) {
     pLwc->last_text_input_seq = lw_get_text_input_seq();
     lw_set_text_input_tag(tag);
     
-    UIAlertView * alert = [[UIAlertView alloc] initWithTitle:@"입력!! 입력을 해라!!!"
-                                                     message:[NSString stringWithFormat:@"입력!! (태그:%d)", tag]
+    UIAlertView * alert = [[UIAlertView alloc] initWithTitle:@"Change Nickname"
+                                                     message:[NSString stringWithFormat:@"Enter new nickname"]
                                                     delegate:app_delegate
-                                           cancelButtonTitle:@"취소"
-                                           otherButtonTitles:@"확인",
+                                           cancelButtonTitle:@"Cancel"
+                                           otherButtonTitles:@"Change",
                            nil];
     alert.tag = tag;
     alert.alertViewStyle = UIAlertViewStylePlainTextInput;

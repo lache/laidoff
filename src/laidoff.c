@@ -738,6 +738,18 @@ void handle_rmsg_loadtex(LWCONTEXT* pLwc, const LWFIELDRENDERCOMMAND* cmd) {
     lw_load_tex(pLwc, cmd->atlas);
 }
 
+#if LW_PLATFORM_IOS
+void lw_start_text_input_activity_ios(LWCONTEXT* pLwc, int tag);
+#endif
+
+void handle_rmsg_starttextinputactivity(LWCONTEXT* pLwc, const LWFIELDRENDERCOMMAND* cmd) {
+#if LW_PLATFORM_IOS
+    lw_start_text_input_activity_ios(pLwc, cmd->tag);
+#else
+    LOGEP("Not supported");
+#endif
+}
+
 void delete_all_rmsgs(LWCONTEXT* pLwc) {
     zmq_msg_t rmsg;
     while (1) {
@@ -791,6 +803,9 @@ static void read_all_rmsgs(LWCONTEXT* pLwc) {
                 break;
             case LRCT_LOADTEX:
                 handle_rmsg_loadtex(pLwc, cmd);
+                break;
+            case LRCT_STARTTEXTINPUTACTIVITY:
+                handle_rmsg_starttextinputactivity(pLwc, cmd);
                 break;
         }
         zmq_msg_close(&rmsg);

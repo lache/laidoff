@@ -125,7 +125,7 @@ didRegisterUserNotificationSettings:(UIUserNotificationSettings *)notificationSe
         }
     } else {
         NSString* textInput = [[alertView textFieldAtIndex:0] text];
-        if (textInput) {
+        if (textInput && buttonIndex == 1) {
             NSLog(@"Entered: %@", textInput);
             strcpy(lw_get_text_input_for_writing(), (char*)[textInput UTF8String]);
             lw_increase_text_input_seq();

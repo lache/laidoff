@@ -102,3 +102,12 @@ void rmsg_loadtex(LWCONTEXT* pLwc, int lae) {
     cmd->atlas = lae;
     s_send_and_close_rmsg(pLwc, &rmsg);
 }
+
+void rmsg_start_text_input_activity(LWCONTEXT* pLwc, int tag) {
+    zmq_msg_t rmsg;
+    zmq_msg_init_size(&rmsg, sizeof(LWFIELDRENDERCOMMAND));
+    LWFIELDRENDERCOMMAND* cmd = zmq_msg_data(&rmsg);
+    cmd->cmdtype = LRCT_STARTTEXTINPUTACTIVITY;
+    cmd->tag = tag;
+    s_send_and_close_rmsg(pLwc, &rmsg);
+}
