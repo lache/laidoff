@@ -306,6 +306,11 @@ int parse_recv_packets(LWTCP* tcp) {
             if (tcp->on_leaderboard_packet) {
                 tcp->on_leaderboard_packet(pLwc);
             }
+        } else if (CHECK_PACKET(packet_type, packet_size, LWPSETNICKNAMERESULT)) {
+            LOGI("LWPSETNICKNAME received");
+            LWPSETNICKNAMERESULT* p = (LWPSETNICKNAMERESULT*)cursor;
+            LOGI("Nickname successfully changed to '%s'", p->Nickname);
+            strcpy(pLwc->puck_game->nickname, p->Nickname);
         } else {
             LOGE("Unknown TCP packet");
         }
