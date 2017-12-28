@@ -189,6 +189,7 @@ func listHandler(w http.ResponseWriter, _ *http.Request) {
 }
 
 func StartService() {
+	http.HandleFunc("/", listHandler)
 	http.HandleFunc("/list/", listHandler)
 	http.HandleFunc("/view/", makeHandler(viewHandler))
 	http.HandleFunc("/edit/", makeHandler(editHandler))
