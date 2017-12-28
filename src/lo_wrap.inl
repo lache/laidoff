@@ -7297,6 +7297,51 @@ fail:
 }
 
 
+static int _wrap_is_file_exist(lua_State* L) {
+  int SWIG_arg = 0;
+  char *arg1 = (char *) 0 ;
+  char *arg2 = (char *) 0 ;
+  int result;
+  
+  SWIG_check_num_args("is_file_exist",2,2)
+  if(!SWIG_lua_isnilstring(L,1)) SWIG_fail_arg("is_file_exist",1,"char const *");
+  if(!SWIG_lua_isnilstring(L,2)) SWIG_fail_arg("is_file_exist",2,"char const *");
+  arg1 = (char *)lua_tostring(L, 1);
+  arg2 = (char *)lua_tostring(L, 2);
+  result = (int)is_file_exist((char const *)arg1,(char const *)arg2);
+  lua_pushnumber(L, (lua_Number) result); SWIG_arg++;
+  return SWIG_arg;
+  
+  if(0) SWIG_fail;
+  
+fail:
+  lua_error(L);
+  return SWIG_arg;
+}
+
+
+static int _wrap_touch_file(lua_State* L) {
+  int SWIG_arg = 0;
+  char *arg1 = (char *) 0 ;
+  char *arg2 = (char *) 0 ;
+  
+  SWIG_check_num_args("touch_file",2,2)
+  if(!SWIG_lua_isnilstring(L,1)) SWIG_fail_arg("touch_file",1,"char const *");
+  if(!SWIG_lua_isnilstring(L,2)) SWIG_fail_arg("touch_file",2,"char const *");
+  arg1 = (char *)lua_tostring(L, 1);
+  arg2 = (char *)lua_tostring(L, 2);
+  touch_file((char const *)arg1,(char const *)arg2);
+  
+  return SWIG_arg;
+  
+  if(0) SWIG_fail;
+  
+fail:
+  lua_error(L);
+  return SWIG_arg;
+}
+
+
 static int _wrap_load_fnt(lua_State* L) {
   int SWIG_arg = 0;
   char *arg1 = (char *) 0 ;
@@ -9871,6 +9916,48 @@ static int _wrap_set_package_version(lua_State* L) {
   if(!SWIG_lua_isnilstring(L,1)) SWIG_fail_arg("set_package_version",1,"char const *");
   arg1 = (char *)lua_tostring(L, 1);
   set_package_version((char const *)arg1);
+  
+  return SWIG_arg;
+  
+  if(0) SWIG_fail;
+  
+fail:
+  lua_error(L);
+  return SWIG_arg;
+}
+
+
+static int _wrap_init_font_fbo(lua_State* L) {
+  int SWIG_arg = 0;
+  LWCONTEXT *arg1 = (LWCONTEXT *) 0 ;
+  
+  SWIG_check_num_args("init_font_fbo",1,1)
+  if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("init_font_fbo",1,"LWCONTEXT *");
+  
+  if (!SWIG_IsOK(SWIG_ConvertPtr(L,1,(void**)&arg1,SWIGTYPE_p__LWCONTEXT,0))){
+    SWIG_fail_ptr("init_font_fbo",1,SWIGTYPE_p__LWCONTEXT);
+  }
+  
+  init_font_fbo(arg1);
+  
+  return SWIG_arg;
+  
+  if(0) SWIG_fail;
+  
+fail:
+  lua_error(L);
+  return SWIG_arg;
+}
+
+
+static int _wrap_load_pkm_hw_decoding(lua_State* L) {
+  int SWIG_arg = 0;
+  char *arg1 = (char *) 0 ;
+  
+  SWIG_check_num_args("load_pkm_hw_decoding",1,1)
+  if(!SWIG_lua_isnilstring(L,1)) SWIG_fail_arg("load_pkm_hw_decoding",1,"char const *");
+  arg1 = (char *)lua_tostring(L, 1);
+  load_pkm_hw_decoding((char const *)arg1);
   
   return SWIG_arg;
   
@@ -13262,6 +13349,29 @@ static int _wrap_lw_load_tex_async(lua_State* L) {
   
   arg2 = (int)lua_tonumber(L, 2);
   lw_load_tex_async((struct _LWCONTEXT const *)arg1,arg2);
+  
+  return SWIG_arg;
+  
+  if(0) SWIG_fail;
+  
+fail:
+  lua_error(L);
+  return SWIG_arg;
+}
+
+
+static int _wrap_lw_calculate_all_tex_atlas_hash(lua_State* L) {
+  int SWIG_arg = 0;
+  LWCONTEXT *arg1 = (LWCONTEXT *) 0 ;
+  
+  SWIG_check_num_args("lw_calculate_all_tex_atlas_hash",1,1)
+  if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("lw_calculate_all_tex_atlas_hash",1,"LWCONTEXT *");
+  
+  if (!SWIG_IsOK(SWIG_ConvertPtr(L,1,(void**)&arg1,SWIGTYPE_p__LWCONTEXT,0))){
+    SWIG_fail_ptr("lw_calculate_all_tex_atlas_hash",1,SWIGTYPE_p__LWCONTEXT);
+  }
+  
+  lw_calculate_all_tex_atlas_hash(arg1);
   
   return SWIG_arg;
   
@@ -53287,6 +53397,54 @@ fail:
 }
 
 
+static int _wrap_puck_game_is_tutorial_completed(lua_State* L) {
+  int SWIG_arg = 0;
+  LWPUCKGAME *arg1 = (LWPUCKGAME *) 0 ;
+  int result;
+  
+  SWIG_check_num_args("puck_game_is_tutorial_completed",1,1)
+  if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("puck_game_is_tutorial_completed",1,"LWPUCKGAME *");
+  
+  if (!SWIG_IsOK(SWIG_ConvertPtr(L,1,(void**)&arg1,SWIGTYPE_p__LWPUCKGAME,0))){
+    SWIG_fail_ptr("puck_game_is_tutorial_completed",1,SWIGTYPE_p__LWPUCKGAME);
+  }
+  
+  result = (int)puck_game_is_tutorial_completed(arg1);
+  lua_pushnumber(L, (lua_Number) result); SWIG_arg++;
+  return SWIG_arg;
+  
+  if(0) SWIG_fail;
+  
+fail:
+  lua_error(L);
+  return SWIG_arg;
+}
+
+
+static int _wrap_puck_game_is_tutorial_stoppable(lua_State* L) {
+  int SWIG_arg = 0;
+  LWPUCKGAME *arg1 = (LWPUCKGAME *) 0 ;
+  int result;
+  
+  SWIG_check_num_args("puck_game_is_tutorial_stoppable",1,1)
+  if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("puck_game_is_tutorial_stoppable",1,"LWPUCKGAME *");
+  
+  if (!SWIG_IsOK(SWIG_ConvertPtr(L,1,(void**)&arg1,SWIGTYPE_p__LWPUCKGAME,0))){
+    SWIG_fail_ptr("puck_game_is_tutorial_stoppable",1,SWIGTYPE_p__LWPUCKGAME);
+  }
+  
+  result = (int)puck_game_is_tutorial_stoppable(arg1);
+  lua_pushnumber(L, (lua_Number) result); SWIG_arg++;
+  return SWIG_arg;
+  
+  if(0) SWIG_fail;
+  
+fail:
+  lua_error(L);
+  return SWIG_arg;
+}
+
+
 static int _wrap_LWPUCKGAMEOBJECT_geom_set(lua_State* L) {
   int SWIG_arg = 0;
   struct _LWPUCKGAMEOBJECT *arg1 = (struct _LWPUCKGAMEOBJECT *) 0 ;
@@ -81221,6 +81379,8 @@ static swig_lua_method swig_SwigModule_methods[]= {
     { "save_cached_user_id", _wrap_save_cached_user_id},
     { "concat_path", _wrap_concat_path},
     { "package_version", _wrap_package_version},
+    { "is_file_exist", _wrap_is_file_exist},
+    { "touch_file", _wrap_touch_file},
     { "load_fnt", _wrap_load_fnt},
     { "font_binary_search_char", _wrap_font_binary_search_char},
     { "font_get_base", _wrap_font_get_base},
@@ -81326,6 +81486,8 @@ static swig_lua_method swig_SwigModule_methods[]= {
     { "set_vertex_attrib_pointer", _wrap_set_vertex_attrib_pointer},
     { "load_png_pkm_sw_decoding", _wrap_load_png_pkm_sw_decoding},
     { "set_package_version", _wrap_set_package_version},
+    { "init_font_fbo", _wrap_init_font_fbo},
+    { "load_pkm_hw_decoding", _wrap_load_pkm_hw_decoding},
     { "logic_server_addr", _wrap_logic_server_addr},
     { "logic_update_default_projection", _wrap_logic_update_default_projection},
     { "reset_runtime_context_async", _wrap_reset_runtime_context_async},
@@ -81351,6 +81513,7 @@ static swig_lua_method swig_SwigModule_methods[]= {
     { "lw_load_tex", _wrap_lw_load_tex},
     { "lazy_tex_atlas_glBindTexture", _wrap_lazy_tex_atlas_glBindTexture},
     { "lw_load_tex_async", _wrap_lw_load_tex_async},
+    { "lw_calculate_all_tex_atlas_hash", _wrap_lw_calculate_all_tex_atlas_hash},
     { "atlas_sprite_name", _wrap_atlas_sprite_name},
     { "atlas_sprite_uv", _wrap_atlas_sprite_uv},
     { "render_atlas_sprite", _wrap_render_atlas_sprite},
@@ -81586,6 +81749,8 @@ static swig_lua_method swig_SwigModule_methods[]= {
     { "puck_game_dash_and_send", _wrap_puck_game_dash_and_send},
     { "puck_game_clear_match_data", _wrap_puck_game_clear_match_data},
     { "puck_game_update_world_roll", _wrap_puck_game_update_world_roll},
+    { "puck_game_is_tutorial_completed", _wrap_puck_game_is_tutorial_completed},
+    { "puck_game_is_tutorial_stoppable", _wrap_puck_game_is_tutorial_stoppable},
     { "new_puck_game", _wrap_new_puck_game},
     { "delete_puck_game", _wrap_delete_puck_game},
     { "puck_game_push", _wrap_puck_game_push},

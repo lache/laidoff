@@ -4,6 +4,7 @@
 #include "lwtimepoint.h"
 #include "numcomp.h"
 #include <assert.h>
+#include "file.h"
 
 static void call_collision_callback(LWPUCKGAME* puck_game,
                                     const dContact* contact,

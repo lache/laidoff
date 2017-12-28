@@ -465,8 +465,12 @@ void lw_release_key_q(LWCONTEXT* pLwc) {
 
 void lw_go_back(LWCONTEXT* pLwc, void* native_context) {
     if (pLwc->puck_game) {
-        if (pLwc->puck_game->game_state == LPGS_PRACTICE || pLwc->puck_game->game_state == LPGS_TUTORIAL) {
+        if (pLwc->puck_game->game_state == LPGS_PRACTICE) {
             puck_game_roll_to_main_menu(pLwc->puck_game);
+        } else if (pLwc->puck_game->game_state == LPGS_TUTORIAL) {
+            if (puck_game_is_tutorial_stoppable(pLwc->puck_game)) {
+                puck_game_roll_to_main_menu(pLwc->puck_game);
+            }
         } else if (pLwc->puck_game->game_state == LPGS_MAIN_MENU) {
             // if lw_go_back called in logic thread, call to 'lw_app_quit()' will block app forever.
             // not good.

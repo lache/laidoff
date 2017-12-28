@@ -16,6 +16,7 @@
 #include "sound.h"
 #include "script.h"
 #include "render_physics.h"
+#include "file.h"
 
 void puck_game_update_world_roll(LWPUCKGAME* puck_game) {
     if (puck_game->world_roll_dirty) {
@@ -412,4 +413,13 @@ void puck_game_target_tower_decrease_hp_test(LWPUCKGAME* puck_game) {
 
 int puck_game_remote(const LWCONTEXT* pLwc, const LWPUCKGAME* puck_game) {
     return puck_game->battle_id != 0;
+}
+
+int puck_game_is_tutorial_completed(const LWPUCKGAME* puck_game) {
+    LWCONTEXT* pLwc = (LWCONTEXT*)puck_game->pLwc;
+    return is_file_exist(pLwc->user_data_path, "tutorial-finished");
+}
+
+int puck_game_is_tutorial_stoppable(const LWPUCKGAME* puck_game) {
+    return puck_game_is_tutorial_completed(puck_game);
 }

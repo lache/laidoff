@@ -1850,8 +1850,8 @@ static void render_battle_ui_layer(const LWCONTEXT* pLwc, const LWPUCKGAME* puck
                             1.0f);
     }
     if (puck_game->game_state == LPGS_PRACTICE
-        || puck_game->game_state == LPGS_TUTORIAL
-        || puck_game_state_phase_finished(puck_game->battle_phase)) {
+        || (puck_game->game_state == LPGS_TUTORIAL && puck_game_is_tutorial_stoppable(puck_game))
+        || (puck_game->game_state == LPGS_BATTLE && puck_game_state_phase_finished(puck_game->battle_phase))) {
         // return to main menu button
         lwbutton_lae_append(pLwc,
                             &(((LWCONTEXT*)pLwc)->button_list),

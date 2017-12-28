@@ -239,6 +239,7 @@ function on_ui_event(id, w_ratio, h_ratio)
 			yield_wait_player_attack(3)
 			victory = 1
 			lo.puck_game_set_tutorial_guide_str(c.puck_game, '축하합니다! 실전에서도 건투를 빕니다.')
+			lo.touch_file('', 'tutorial-finished')
 		end)
 		
 	elseif id == 'online_button' then
@@ -310,4 +311,10 @@ if field_filename then
 	local field_module = FieldModule:new(field_filename_name, field)
 	print('field_module:test()', field_module:test())
 end
+
+if lo.puck_game_is_tutorial_completed(c.puck_game) == 1 then
+else
+	on_ui_event('tutorial_button', 0, 0)
+end
+
 return 1

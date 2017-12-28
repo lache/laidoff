@@ -10,6 +10,9 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <unistd.h>
+#else
+#include <io.h>
+#define F_OK (0)
 #endif
 
 void concat_path(char* path, const char* path1, const char* path2) {
@@ -62,16 +65,35 @@ int save_cached_user_id(const char* path_prefix, const LWUNIQUEID* id) {
 	f = fopen(path, "wb");
 	if (f == 0) {
 		// no cached user id exists
-        LOGE("CRITICAL ERROR: Cannot open user id file cache for writing...");
+        LOGEP("CRITICAL ERROR: Cannot open user id file cache for writing...");
         exit(-99);
 	}
 	const int expected_size = sizeof(unsigned int) * 4;
 	size_t elements_written = fwrite((const void*)id, expected_size, 1, f);
 	if (elements_written != 1) {
 		// no cached user id exists
-		LOGE("fwrite bytes written failed!");
+		LOGEP("fwrite bytes written failed!");
 		return -2;
 	}
 	fclose(f);
 	return 0;
+}
+
+int is_file_exist(const char* path_prefix, const char* filename) {
+    char path[1024] = { 0, };
+    concat_path(path, path_prefix, filename);
+    return access(path, F_OK) != -1;
+}
+
+void touch_file(const char* path_prefix, const char* filename) {
+    char path[1024] = { 0, };
+    concat_path(path, path_prefix, filename);
+    FILE* f = fopen(path, "wb");
+    if (f == 0) {
+        // no cached user id exists
+        LOGEP("CRITICAL ERROR: Cannot open file '%s' for writing...", path);
+        exit(-99);
+    }
+    fclose(f);
+    LOGIP("File '%s' touched.", path);
 }
