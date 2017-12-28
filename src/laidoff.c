@@ -56,8 +56,6 @@
 // SWIG output file
 #include "lo_wrap.inl"
 
-#define LW_SUPPORT_ETC1_HARDWARE_DECODING LW_PLATFORM_ANDROID
-
 const float default_uv_offset[2] = { 0, 0 };
 const float default_uv_scale[2] = { 1, 1 };
 const float default_flip_y_uv_scale[2] = { 1, -1 };
@@ -110,7 +108,6 @@ void init_load_textures(LWCONTEXT* pLwc);
 void load_test_font(LWCONTEXT* pLwc);
 int spawn_attack_trail(LWCONTEXT* pLwc, float x, float y, float z);
 float get_battle_enemy_x_center(int enemy_slot_index);
-void init_font_fbo(LWCONTEXT* pLwc);
 
 void set_tex_filter(int min_filter, int mag_filter) {
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, min_filter);
@@ -570,6 +567,7 @@ int get_tex_index_by_hash_key(const LWCONTEXT* pLwc, const char *hash_key) {
             return i;
         }
     }
+    LOGEP("hash_key '%s' not found on tex_atlas_hash array. returning 0", hash_key);
     return 0;
 }
 
@@ -1137,7 +1135,7 @@ void bind_all_ps_vertex_attrib(const LWCONTEXT* pLwc, int vbo_index) {
     bind_all_ps_vertex_attrib_shader(pLwc, LWST_EMITTER2, vbo_index);
 }
 
-static void load_pkm_hw_decoding(const char *tex_atlas_filename) {
+void load_pkm_hw_decoding(const char *tex_atlas_filename) {
     size_t file_size = 0;
     char *b = create_binary_from_file(tex_atlas_filename, &file_size);
     if (!b) {
@@ -1421,6 +1419,8 @@ LWCONTEXT* lw_init_initial_size(int width, int height) {
     pLwc->height = height;
     
     setlocale(LC_ALL, "");
+
+    lw_calculate_all_tex_atlas_hash(pLwc);
     
     init_gl_context(pLwc);
     
@@ -1506,11 +1506,7 @@ void lw_set_size(LWCONTEXT* pLwc, int w, int h) {
     
     // Update default projection matrix (pLwc->proj)
     logic_update_default_projection(pLwc);
-    // Initialize test font FBO
-    init_font_fbo(pLwc);
-    // Render font FBO using render-to-texture
-    lwc_render_font_test_fbo(pLwc);
-    
+
     // Reset dir pad input state
     reset_dir_pad_position(&pLwc->left_dir_pad);
     reset_dir_pad_position(&pLwc->right_dir_pad);

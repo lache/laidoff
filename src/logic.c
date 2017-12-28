@@ -58,6 +58,10 @@ void change_to_battle(LWCONTEXT* pLwc) {
 
 void change_to_font_test(LWCONTEXT* pLwc) {
     pLwc->next_game_scene = LGS_FONT_TEST;
+    // Initialize test font FBO
+    init_font_fbo(pLwc);
+    // Render font FBO using render-to-texture
+    lwc_render_font_test_fbo(pLwc);
 }
 
 void change_to_admin(LWCONTEXT* pLwc) {

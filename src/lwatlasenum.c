@@ -12,6 +12,18 @@ void lw_load_tex_async(const LWCONTEXT* _pLwc, int lae) {
     rmsg_loadtex(pLwc, lae);
 }
 
+void lw_calculate_all_tex_atlas_hash(LWCONTEXT* pLwc) {
+    for (int lae = 0; lae < LAE_COUNT; lae++) {
+        size_t tex_atlas_filename_len = (int)strlen(tex_atlas_filename[lae]);
+        size_t filename_index = tex_atlas_filename_len;
+        // take only filename
+        while (tex_atlas_filename[lae][filename_index - 1] != PATH_SEPARATOR[0]) {
+            filename_index--;
+        }
+        pLwc->tex_atlas_hash[lae] = hash((const unsigned char*)&tex_atlas_filename[lae][filename_index]);
+    }
+}
+
 void lw_load_tex(const LWCONTEXT* _pLwc, int lae) {
     LWCONTEXT* pLwc = (LWCONTEXT*)_pLwc;
     if (pLwc->tex_atlas_ready[lae]) {
@@ -38,14 +50,13 @@ void lw_load_tex(const LWCONTEXT* _pLwc, int lae) {
         load_png_pkm_sw_decoding(pLwc, lae);
     } else if (strcmp(tex_atlas_filename[lae] + tex_atlas_filename_len - 4, ".pkm") == 0) {
 #if LW_SUPPORT_ETC1_HARDWARE_DECODING
-        load_pkm_hw_decoding(tex_atlas_filename[i]);
+        load_pkm_hw_decoding(tex_atlas_filename[lae]);
 #else
         load_png_pkm_sw_decoding(pLwc, lae);
 #endif
     } else {
         LOGE("load_tex_files: unknown tex file extension - %s", tex_atlas_filename[lae]);
     }
-    pLwc->tex_atlas_hash[lae] = hash((const unsigned char*)&tex_atlas_filename[lae][filename_index]);
     pLwc->tex_atlas_ready[lae] = 1;
 }
 

@@ -91,7 +91,9 @@ void lw_flag_logic_actor_to_quit_and_wait(LWCONTEXT* pLwc);
 void set_vertex_attrib_pointer(const LWCONTEXT* pLwc, int shader_index);
 void load_png_pkm_sw_decoding(LWCONTEXT* pLwc, int i);
 void set_package_version(const char* package_version);
-    
+void init_font_fbo(LWCONTEXT* pLwc);
+void load_pkm_hw_decoding(const char *tex_atlas_filename);
+
 extern const float default_uv_offset[2];
 extern const float default_uv_scale[2];
 extern const float default_flip_y_uv_scale[2];

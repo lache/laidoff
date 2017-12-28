@@ -73,7 +73,7 @@ void lwc_render_font_test_fbo(const struct _LWCONTEXT* pLwc) {
 	test_text_block.align = LTBA_CENTER_TOP;
 	render_text_block(pLwc, &test_text_block);
 
-	test_text_block.text = LWU("한글이 됩니다~~~");
+	test_text_block.text = LWU("FBO pre-rendered 한글이 됩니다~~~");
 	//test_text_block.size = DEFAULT_TEXT_BLOCK_SIZE_A;
 	test_text_block.text_bytelen = (int)strlen(test_text_block.text);
 	test_text_block.begin_index = 0;
