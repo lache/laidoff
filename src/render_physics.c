@@ -453,15 +453,18 @@ static void render_radial_wave(const LWCONTEXT* pLwc,
 void calculate_world_right_top_end_ui_point(const LWCONTEXT* pLwc, const LWPUCKGAME* puck_game, vec2 world_right_top_end_ui_point) {
     // calculate world right top point in ui coordinate
     vec4 world_right_top_end_vec4 = {
-        2.11f, // half world model dimension including bezel hardcoded
-        2.11f, // half world model dimension including bezel hardcoded
-        0.76f, // half world model dimension including bezel hardcoded
+        2.11f, // half world model dimension including bezel hard-coded
+        2.11f, // half world model dimension including bezel hard-coded
+        0.76f, // half world model dimension including bezel hard-coded
         1.00f,
     };
     mat4x4 proj_view;
     mat4x4_identity(proj_view);
     mat4x4_mul(proj_view, pLwc->puck_game_proj, pLwc->puck_game_view);
     calculate_ui_point_from_world_point(pLwc->aspect_ratio, proj_view, world_right_top_end_vec4, world_right_top_end_ui_point);
+    // ignore world rotation for player 2
+    world_right_top_end_ui_point[0] = fabsf(world_right_top_end_ui_point[0]);
+    world_right_top_end_ui_point[1] = fabsf(world_right_top_end_ui_point[1]);
 }
 
 static void render_hp_star(const LWCONTEXT* pLwc,
