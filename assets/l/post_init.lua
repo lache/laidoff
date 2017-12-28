@@ -239,7 +239,7 @@ function on_ui_event(id, w_ratio, h_ratio)
 			yield_wait_player_attack(3)
 			victory = 1
 			lo.puck_game_set_tutorial_guide_str(c.puck_game, '축하합니다! 실전에서도 건투를 빕니다.')
-			lo.touch_file('', 'tutorial-finished')
+			lo.touch_file(c.user_data_path, 'tutorial-finished')
 		end)
 		
 	elseif id == 'online_button' then
