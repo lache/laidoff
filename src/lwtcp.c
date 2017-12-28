@@ -137,7 +137,7 @@ LWTCP* new_tcp(LWCONTEXT* pLwc,
         free(tcp);
         return 0;
     }
-    
+
     if (tcp_connect(tcp) < 0) {
         free(tcp);
         return 0;
