@@ -1,9 +1,12 @@
 package com.popsongremix.laidoff;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.app.NativeActivity;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.res.AssetManager;
@@ -14,13 +17,18 @@ import android.media.SoundPool;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.text.InputType;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.View;
 import android.view.WindowManager;
+import android.view.inputmethod.EditorInfo;
+import android.view.inputmethod.InputMethodManager;
+import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.ads.AdRequest;
-import com.google.android.gms.ads.MobileAds;
 import com.google.android.gms.ads.reward.RewardItem;
 import com.google.android.gms.ads.reward.RewardedVideoAd;
 import com.google.android.gms.ads.reward.RewardedVideoAdListener;
@@ -259,11 +267,9 @@ public class LaidoffNativeActivity extends NativeActivity implements RewardedVid
         INSTANCE.runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                Intent intent = new Intent(INSTANCE, TextInputActivity.class);
-                //        EditText editText = (EditText) findViewById(R.id.editText);
-                //        String message = editText.getText().toString();
-                //        intent.putExtra(EXTRA_MESSAGE, message);
-                INSTANCE.startActivity(intent);
+                //Intent intent = new Intent(INSTANCE, TextInputActivity.class);
+                //INSTANCE.startActivity(intent);
+                INSTANCE.showNicknameInputDialog();
             }
         });
     }
@@ -408,5 +414,25 @@ public class LaidoffNativeActivity extends NativeActivity implements RewardedVid
         super.onActivityResult(requestCode, resultCode, data);
 
         SignInActivity.onSignInActivityResult(this, requestCode, data);
+    }
+
+    public void showNicknameInputDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle(getString(R.string.enter_new_nickname));
+        // Set up the input
+        final EditText input = new EditText(this);
+        input.setImeOptions(input.getImeOptions() | EditorInfo.IME_FLAG_NO_EXTRACT_UI | EditorInfo.IME_ACTION_DONE);
+        // Specify the type of input expected; this, for example, sets the input as a password, and will mask the text
+        input.setInputType(InputType.TYPE_CLASS_TEXT);
+        input.requestFocus();
+        builder.setView(input);
+        // Set up the buttons
+        builder.setPositiveButton(getString(R.string.change_nickname), new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                TextInputActivity.sendInputText(input.getText().toString());
+            }
+        });
+        builder.show();
     }
 }

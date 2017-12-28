@@ -33,4 +33,6 @@
     <string name="text_input_button">확인</string>
     <string name="text_input_header">텍스트 입력</string>
     <string name="hello_world_main">Hello World, main</string>
+    <string name="change_nickname">Change nickname</string>
+    <string name="enter_new_nickname">Enter new nickname</string>
 </resources>
