@@ -800,6 +800,7 @@ int main(int argc, char* argv[]) {
     LWHOSTADDR reward_host_addr;
     strcpy(reward_host_addr.host, "127.0.0.1");
     strcpy(reward_host_addr.port_str, "10290");
+    reward_host_addr.port = atoi(reward_host_addr.port_str);
     LWTCP* reward_service = new_tcp(0,
                                     0,
                                     &reward_host_addr,
