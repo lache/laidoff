@@ -1273,7 +1273,7 @@ void render_caution_popup(const LWCONTEXT* pLwc, const char* str) {
 static void render_popup_ui_layer(const LWCONTEXT* pLwc) {
     if (pLwc->tcp == 0) {
         char str[256];
-        sprintf(str, "Could not conect to server.\n(is server ready?)");
+        sprintf(str, "Could not connect to server.\n(is server ready?)");
         render_caution_popup(pLwc, str);
     } else if (pLwc->tcp->send_fail || (pLwc->udp && pLwc->udp->ready == 0)) {
         char str[256];
@@ -1322,7 +1322,7 @@ static void render_main_menu(const LWCONTEXT* pLwc, const LWPUCKGAME* puck_game,
     glUniformMatrix4fv(shader->mvp_location, 1, GL_FALSE, (const GLfloat*)proj_view_model);
     glActiveTexture(GL_TEXTURE0);
     glUniform1i(shader->diffuse_location, 0); // 0 means GL_TEXTURE0
-    lazy_tex_atlas_glBindTexture(pLwc, LAE_UI_MAIN_MENU);
+    lazy_tex_atlas_glBindTexture(pLwc, LAE_UI_MAIN_MENU_EN);
     set_tex_filter(GL_LINEAR, GL_LINEAR);
 
     glEnable(GL_BLEND);
@@ -1412,6 +1412,52 @@ static void render_icon_amount(const LWCONTEXT* pLwc,
     render_text_block(pLwc, &text_block);
 }
 
+static void render_top_bar_rank(const LWCONTEXT* pLwc, const LWPUCKGAME* puck_game, float* top_bar_x_cursor, float top_bar_x_cursor_margin, int no_record) {
+    const float width = 0.4f;
+    const float height = 0.15f;
+    const float x = *top_bar_x_cursor + width / 2;
+    const float y = 1.0f - height / 2;
+    const LW_ATLAS_ENUM lae = LAE_RANK_ICON;
+    const LW_ATLAS_ENUM lae_alpha = LAE_RANK_ICON_ALPHA;
+    char str[32];
+    if (no_record == 0) {
+        sprintf(str, "%d", puck_game->rank + 1); // rank is zero-based
+    } else {
+        sprintf(str, "--");
+    }
+    render_icon_amount(pLwc, puck_game, x, y, width, height, str, lae, lae_alpha, 0.9f, 1.0f, 0.9f);
+    *top_bar_x_cursor += width + top_bar_x_cursor_margin;
+}
+
+static void render_top_bar_energy(const LWCONTEXT* pLwc, const LWPUCKGAME* puck_game, float* top_bar_x_cursor, float top_bar_x_cursor_margin, int no_record) {
+    const float width = 0.4f;
+    const float height = 0.15f;
+    const float x = *top_bar_x_cursor + width / 2;
+    const float y = 1.0f - height / 2;
+    const LW_ATLAS_ENUM lae = LAE_ENERGY_ICON;
+    const LW_ATLAS_ENUM lae_alpha = LAE_ENERGY_ICON_ALPHA;
+    char str[32];
+    if (no_record == 0) {
+        sprintf(str, "%d", puck_game->score);
+    } else {
+        sprintf(str, "--");
+    }
+    render_icon_amount(pLwc, puck_game, x, y, width, height, str, lae, lae_alpha, 0.4f, 0.9f, 1.0f);
+    *top_bar_x_cursor += width + top_bar_x_cursor_margin;
+}
+
+static void render_top_bar_nickname(const LWCONTEXT* pLwc, const LWPUCKGAME* puck_game, float* top_bar_x_cursor, float top_bar_x_cursor_margin) {
+    const float width = 1.4f;
+    const float height = 0.175f;
+    const float x = *top_bar_x_cursor;
+    const float y = 1.0f - height / 2;
+    const LW_ATLAS_ENUM lae = LAE_PROFILE_ICON;
+    const char* str = pLwc->puck_game->nickname;
+    lw_load_tex(pLwc, lae);
+    render_icon_amount(pLwc, puck_game, x, y, width, height, str, lae, LAE_DONTCARE, 1.0f, 1.0f, 1.0f);
+    *top_bar_x_cursor += width + top_bar_x_cursor_margin;
+}
+
 static void render_main_menu_ui_layer(const LWCONTEXT* pLwc, const LWPUCKGAME* puck_game,
                                       const mat4x4 view, const mat4x4 proj, const mat4x4 ui_proj,
                                       int remote, const float* player_controlled_pos) {
@@ -1433,55 +1479,15 @@ static void render_main_menu_ui_layer(const LWCONTEXT* pLwc, const LWPUCKGAME* p
     LW_GL_VIEWPORT();
     // render buttons as a single sprite
     render_main_menu(pLwc, puck_game, view, proj, puck_game->main_menu_ui_alpha);
-    // nickname (background, icon, text)
-    float top_bar_x_cursor = -pLwc->aspect_ratio / 2;
+    float top_bar_x_cursor = 0;
     const float top_bar_x_cursor_margin = 0.05f;
-    {
-        const float width = 1.2f;
-        const float height = 0.15f;
-        const float x = top_bar_x_cursor + width / 2;
-        const float y = 1.0f - height / 2;
-        const LW_ATLAS_ENUM lae = LAE_PROFILE_ICON;
-        const char* str = pLwc->puck_game->nickname;
-        lw_load_tex(pLwc, lae);
-        render_icon_amount(pLwc, puck_game, x, y, width, height, str, lae, LAE_DONTCARE, 1.0f, 1.0f, 1.0f);
-        top_bar_x_cursor += width + top_bar_x_cursor_margin;
-    }
+    // nickname (background, icon, text)
+    render_top_bar_nickname(pLwc, puck_game, &top_bar_x_cursor, top_bar_x_cursor_margin);
     const int no_record = puck_game->rank < 0;
     // energy (background, icon, text)
-    {
-        const float width = 0.4f;
-        const float height = 0.15f;
-        const float x = top_bar_x_cursor + width / 2;
-        const float y = 1.0f - height / 2;
-        const LW_ATLAS_ENUM lae = LAE_ENERGY_ICON;
-        const LW_ATLAS_ENUM lae_alpha = LAE_ENERGY_ICON_ALPHA;
-        char str[32];
-        if (no_record == 0) {
-            sprintf(str, "%d", puck_game->score);
-        } else {
-            sprintf(str, "--");
-        }
-        render_icon_amount(pLwc, puck_game, x, y, width, height, str, lae, lae_alpha, 0.4f, 0.9f, 1.0f);
-        top_bar_x_cursor += width + top_bar_x_cursor_margin;
-    }
+    //render_top_bar_energy(pLwc, puck_game, &top_bar_x_cursor, top_bar_x_cursor_margin, no_record);
     // rank (background, icon, text)
-    {
-        const float width = 0.4f;
-        const float height = 0.15f;
-        const float x = top_bar_x_cursor + width / 2;
-        const float y = 1.0f - height / 2;
-        const LW_ATLAS_ENUM lae = LAE_RANK_ICON;
-        const LW_ATLAS_ENUM lae_alpha = LAE_RANK_ICON_ALPHA;
-        char str[32];
-        if (no_record == 0) {
-            sprintf(str, "%d", puck_game->rank + 1); // rank is zero-based
-        } else {
-            sprintf(str, "--");
-        }
-        render_icon_amount(pLwc, puck_game, x, y, width, height, str, lae, lae_alpha, 0.9f, 1.0f, 0.9f);
-        top_bar_x_cursor += width + top_bar_x_cursor_margin;
-    }
+    //render_top_bar_rank(pLwc, puck_game, &top_bar_x_cursor, top_bar_x_cursor_margin, no_record);
     // buttons
     float button_alpha = 0.0f; // alpha zeroed intentionally (nonzero only when debugging)
     lwbutton_lae_append(pLwc,
@@ -1525,10 +1531,23 @@ static void render_main_menu_ui_layer(const LWCONTEXT* pLwc, const LWPUCKGAME* p
                         1.0f);
     lwbutton_lae_append(pLwc,
                         &(((LWCONTEXT*)pLwc)->button_list),
-                        "leaderboard_button",
+                        "change_nickname_button",
                         -0.75f,
                         +0.25f - 0.50f - 0.05f,
-                        +0.75f * 2,
+                        +0.70f,
+                        +0.40f,
+                        0,
+                        0,
+                        puck_game->main_menu_ui_alpha * button_alpha,
+                        1.0f,
+                        1.0f,
+                        1.0f);
+    lwbutton_lae_append(pLwc,
+                        &(((LWCONTEXT*)pLwc)->button_list),
+                        "settings",
+                        +0.75f - 0.70f,
+                        +0.25f - 0.50f - 0.05f,
+                        +0.70f,
                         +0.40f,
                         0,
                         0,
@@ -1799,7 +1818,7 @@ static void render_battle_ui_layer(const LWCONTEXT* pLwc, const LWPUCKGAME* puck
         float cx, cy;
         float sx, sy;
         get_left_dir_pad_original_center(pLwc->aspect_ratio, &cx, &cy);
-        sx = button_size * 1.5f;
+        sx = button_size * 1.75f;
         sy = sx;
         lwbutton_lae_append(pLwc,
                             &(((LWCONTEXT*)pLwc)->button_list),

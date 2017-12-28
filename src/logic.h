@@ -32,6 +32,7 @@ void change_to_leaderboard(LWCONTEXT* pLwc);
 void change_to_physics(LWCONTEXT* pLwc);
 void request_player_reveal_leaderboard(LWTCP* tcp);
 void request_leaderboard(LWTCP* tcp, int one_based_page);
+void start_nickname_text_input_activity(LWCONTEXT* pLwc);
 #ifdef __cplusplus
 };
 #endif

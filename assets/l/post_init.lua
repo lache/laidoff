@@ -265,7 +265,10 @@ function on_ui_event(id, w_ratio, h_ratio)
 				lo.request_leaderboard(c.tcp, c.last_leaderboard.Current_page + 1)
 			end
 		end
-	else 
+	elseif id == 'change_nickname_button' then
+		lo.start_nickname_text_input_activity(c)
+	elseif id == 'settings' then
+	else
 		lo.construct_set_preview_enable(c.construct, 0)
 		return 0
 	end

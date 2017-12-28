@@ -69,13 +69,14 @@ public class LaidoffNativeActivity extends NativeActivity implements RewardedVid
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main);
         // AdMob
-        MobileAds.initialize(this, getString(R.string.admob_id));
+        //MobileAds.initialize(this, getString(R.string.admob_id));
         // Interstitial
-        mRewardedVideoAd = MobileAds.getRewardedVideoAdInstance(this);
-        mRewardedVideoAd.setRewardedVideoAdListener(this);
+        //mRewardedVideoAd = MobileAds.getRewardedVideoAdInstance(this);
+        //mRewardedVideoAd.setRewardedVideoAdListener(this);
+        // enable immersive mode
         enableImmersiveMode();
 
-        SignInActivity.startSignIn(this);
+        //SignInActivity.startSignIn(this);
 
         Log.i(LOG_TAG, "Device Android Version: " + Build.VERSION.SDK_INT);
 
@@ -226,7 +227,9 @@ public class LaidoffNativeActivity extends NativeActivity implements RewardedVid
 
     @Override
     public void onDestroy() {
-        mRewardedVideoAd.destroy(this);
+        if (mRewardedVideoAd != null) {
+            mRewardedVideoAd.destroy(this);
+        }
         super.onDestroy();
 
         Log.d(LOG_TAG, "onDestroy()");
@@ -234,14 +237,18 @@ public class LaidoffNativeActivity extends NativeActivity implements RewardedVid
 
     @Override
     public void onPause() {
-        mRewardedVideoAd.pause(this);
+        if (mRewardedVideoAd != null) {
+            mRewardedVideoAd.pause(this);
+        }
         super.onPause();
         Log.d(LOG_TAG, "onPause()");
     }
 
     @Override
     public void onResume() {
-        mRewardedVideoAd.resume(this);
+        if (mRewardedVideoAd != null) {
+            mRewardedVideoAd.resume(this);
+        }
         super.onResume();
         Log.d(LOG_TAG, "onResume()");
     }

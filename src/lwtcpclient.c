@@ -178,6 +178,7 @@ int tcp_send_setnickname(LWTCP* tcp, const LWUNIQUEID* id, const char* nickname)
     NEW_TCP_PACKET_CAPITAL(LWPSETNICKNAME, p);
     memcpy(p.Id, id->v, sizeof(p.Id));
     memcpy(p.Nickname, nickname, sizeof(p.Nickname));
+    p.Nickname[sizeof(p.Nickname) - 1] = 0;
     memcpy(tcp->sendbuf, &p, sizeof(p));
     return tcp_send_sendbuf(tcp, sizeof(p));
 }
@@ -308,9 +309,30 @@ int parse_recv_packets(LWTCP* tcp) {
             }
         } else if (CHECK_PACKET(packet_type, packet_size, LWPSETNICKNAMERESULT)) {
             LOGI("LWPSETNICKNAME received");
+            char nicknameMsg[256];
             LWPSETNICKNAMERESULT* p = (LWPSETNICKNAMERESULT*)cursor;
-            LOGI("Nickname successfully changed to '%s'", p->Nickname);
-            strcpy(pLwc->puck_game->nickname, p->Nickname);
+            switch (p->Result) {
+            case LW_SET_NICKNAME_RESULT_OK:
+                strcpy(pLwc->puck_game->nickname, p->Nickname);
+                sprintf(nicknameMsg, "Nickname changed to [%s].", p->Nickname);
+                break;
+            case LW_SET_NICKNAME_RESULT_TOO_SHORT:
+                sprintf(nicknameMsg, "Nickname too short.");
+                break;
+            case LW_SET_NICKNAME_RESULT_TOO_LONG:
+                sprintf(nicknameMsg, "Nickname too long.");
+                break;
+            case LW_SET_NICKNAME_RESULT_TOO_NOT_ALLOWED:
+                sprintf(nicknameMsg, "Nickname contains not allowed characters.");
+                break;
+            case LW_SET_NICKNAME_RESULT_INTERNAL_ERROR:
+                sprintf(nicknameMsg, "Nickname changing failed.");
+                break;
+            default:
+                sprintf(nicknameMsg, "Nickname changing failed (unknown result).");
+                break;
+            }
+            show_sys_msg(pLwc->def_sys_msg, nicknameMsg);
         } else {
             LOGE("Unknown TCP packet");
         }

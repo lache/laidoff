@@ -832,9 +832,9 @@ void lwc_update(LWCONTEXT* pLwc, double delta_time) {
         switch (lw_text_input_tag()) {
             case LITI_NICKNAME:
             {
-                char nicknameMsg[256];
-                sprintf(nicknameMsg, "Changing nickname to %s...", lw_get_text_input());
-                show_sys_msg(pLwc->def_sys_msg, nicknameMsg);
+                //char nicknameMsg[256];
+                //sprintf(nicknameMsg, "Changing nickname to %s...", lw_get_text_input());
+                //show_sys_msg(pLwc->def_sys_msg, nicknameMsg);
                 tcp_send_setnickname(pLwc->tcp, &pLwc->tcp->user_id, lw_get_text_input());
                 break;
             }

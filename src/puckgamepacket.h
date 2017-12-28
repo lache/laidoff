@@ -51,6 +51,44 @@ typedef enum _LW_PUCK_GAME_PACKET {
     LPGP_LWPBATTLEVALID = 1003,
 } LW_PUCK_GAME_PACKET;
 
+#define puck_game_state_phase_finished(v) ((v) >= LSP_FINISHED_DRAW)
+#define puck_game_state_phase_started(v) ((v) >= LSP_GO)
+#define puck_game_state_phase_battling(v) (puck_game_state_phase_started((v)) && !puck_game_state_phase_finished((v)))
+
+#define LW_NICKNAME_MAX_LEN (32)
+#define LW_SET_NICKNAME_RESULT_OK (0)
+#define LW_SET_NICKNAME_RESULT_TOO_SHORT (1)
+#define LW_SET_NICKNAME_RESULT_TOO_LONG (2)
+#define LW_SET_NICKNAME_RESULT_TOO_NOT_ALLOWED (3)
+#define LW_SET_NICKNAME_RESULT_INTERNAL_ERROR (4)
+
+#define LW_LEADERBOARD_ITEMS_IN_PAGE (15)
+
+#define LW_PUCK_GAME_QUEUE_TYPE_FIFO (0)
+#define LW_PUCK_GAME_QUEUE_TYPE_NEAREST_SCORE (1)
+
+typedef enum _LWP_STATE_PHASE {
+    LSP_READY = 0,
+    LSP_STEADY = 1,
+    LSP_GO = 2,
+    LSP_FINISHED_DRAW = 3,
+    LSP_FINISHED_VICTORY_P1 = 4,
+    LSP_FINISHED_VICTORY_P2 = 5,
+    LSP_TUTORIAL = 6,
+} LWP_STATE_PHASE;
+
+typedef enum _LWP_STATE_WALL_HIT_BIT {
+    LSWHB_EAST = 1 << 0,
+    LSWHB_WEST = 1 << 1,
+    LSWHB_SOUTH = 1 << 2,
+    LSWHB_NORTH = 1 << 3,
+} LWP_STATE_WALL_HIT_BIT;
+
+enum {
+    LW_PUSH_TOKEN_LENGTH = 256,
+    LW_SYS_MSG_LENGTH = 256,
+};
+
 // Client -> Server
 typedef struct _LWPGETTOKEN {
 	int type;
@@ -143,27 +181,6 @@ typedef struct _LWPPULLSTOP {
 	int token;
 } LWPPULLSTOP;
 
-typedef enum _LWP_STATE_PHASE {
-    LSP_READY = 0,
-    LSP_STEADY = 1,
-    LSP_GO = 2,
-    LSP_FINISHED_DRAW = 3,
-    LSP_FINISHED_VICTORY_P1 = 4,
-    LSP_FINISHED_VICTORY_P2 = 5,
-    LSP_TUTORIAL = 6,
-} LWP_STATE_PHASE;
-
-typedef enum _LWP_STATE_WALL_HIT_BIT {
-    LSWHB_EAST = 1 << 0,
-    LSWHB_WEST = 1 << 1,
-    LSWHB_SOUTH = 1 << 2,
-    LSWHB_NORTH = 1 << 3,
-} LWP_STATE_WALL_HIT_BIT;
-
-#define puck_game_state_phase_finished(v) ((v) >= LSP_FINISHED_DRAW)
-#define puck_game_state_phase_started(v) ((v) >= LSP_GO)
-#define puck_game_state_phase_battling(v) (puck_game_state_phase_started((v)) && !puck_game_state_phase_finished((v)))
-
 typedef struct _LWPSTATEBITFIELD {
     unsigned int player_current_hp : 4;
     unsigned int player_total_hp : 4;
@@ -231,9 +248,6 @@ typedef struct _LWPQUERYNICK {
 	unsigned int Id[4];
 } LWPQUERYNICK;
 
-#define LW_NICKNAME_MAX_LEN (128) // google nickname max 20-char, one char 4-byte * 20 = 80
-#define LW_LEADERBOARD_ITEMS_IN_PAGE (15)
-
 typedef struct _LWPNICK {
 	unsigned short size;
 	unsigned short type;
@@ -256,9 +270,6 @@ typedef struct _LWPQUEUE2 {
 	unsigned short Type;
 	unsigned int Id[4];
 } LWPQUEUE2;
-
-#define LW_PUCK_GAME_QUEUE_TYPE_FIFO (0)
-#define LW_PUCK_GAME_QUEUE_TYPE_NEAREST_SCORE (1)
 
 typedef struct _LWPQUEUE3 {
     unsigned short Size;
@@ -393,11 +404,6 @@ typedef struct _LWPGETLEADERBOARDREVEALPLAYER {
     int Count;
 } LWPGETLEADERBOARDREVEALPLAYER;
 
-enum {
-    LW_PUSH_TOKEN_LENGTH = 256,
-    LW_SYS_MSG_LENGTH = 256,
-};
-
 typedef struct _LWPPUSHTOKEN {
     unsigned short Size;
     unsigned short Type;
@@ -447,6 +453,7 @@ typedef struct _LWPSETNICKNAMERESULT {
     unsigned short Type;
     unsigned int Id[4];
     char Nickname[LW_NICKNAME_MAX_LEN];
+    int Result;
 } LWPSETNICKNAMERESULT;
 
 typedef struct _LWPSETBATTLEPRESET {

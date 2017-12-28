@@ -10561,6 +10561,29 @@ fail:
 }
 
 
+static int _wrap_start_nickname_text_input_activity(lua_State* L) {
+  int SWIG_arg = 0;
+  LWCONTEXT *arg1 = (LWCONTEXT *) 0 ;
+  
+  SWIG_check_num_args("start_nickname_text_input_activity",1,1)
+  if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("start_nickname_text_input_activity",1,"LWCONTEXT *");
+  
+  if (!SWIG_IsOK(SWIG_ConvertPtr(L,1,(void**)&arg1,SWIGTYPE_p__LWCONTEXT,0))){
+    SWIG_fail_ptr("start_nickname_text_input_activity",1,SWIGTYPE_p__LWCONTEXT);
+  }
+  
+  start_nickname_text_input_activity(arg1);
+  
+  return SWIG_arg;
+  
+  if(0) SWIG_fail;
+  
+fail:
+  lua_error(L);
+  return SWIG_arg;
+}
+
+
 static int _wrap_LWANIM_valid_set(lua_State* L) {
   int SWIG_arg = 0;
   struct _LWANIM *arg1 = (struct _LWANIM *) 0 ;
@@ -63507,7 +63530,7 @@ static int _wrap_LWTCP_sendbuf_set(lua_State* L) {
   
   SWIG_check_num_args("_LWTCP::sendbuf",2,2)
   if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("_LWTCP::sendbuf",1,"struct _LWTCP *");
-  if(!SWIG_lua_isnilstring(L,2)) SWIG_fail_arg("_LWTCP::sendbuf",2,"char [1024]");
+  if(!SWIG_lua_isnilstring(L,2)) SWIG_fail_arg("_LWTCP::sendbuf",2,"char [2048]");
   
   if (!SWIG_IsOK(SWIG_ConvertPtr(L,1,(void**)&arg1,SWIGTYPE_p__LWTCP,0))){
     SWIG_fail_ptr("LWTCP_sendbuf_set",1,SWIGTYPE_p__LWTCP);
@@ -63516,8 +63539,8 @@ static int _wrap_LWTCP_sendbuf_set(lua_State* L) {
   arg2 = (char *)lua_tostring(L, 2);
   {
     if(arg2) {
-      strncpy((char*)arg1->sendbuf, (const char *)arg2, 1024-1);
-      arg1->sendbuf[1024-1] = 0;
+      strncpy((char*)arg1->sendbuf, (const char *)arg2, 2048-1);
+      arg1->sendbuf[2048-1] = 0;
     } else {
       arg1->sendbuf[0] = 0;
     }
@@ -63564,7 +63587,7 @@ static int _wrap_LWTCP_recvbuf_set(lua_State* L) {
   
   SWIG_check_num_args("_LWTCP::recvbuf",2,2)
   if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("_LWTCP::recvbuf",1,"struct _LWTCP *");
-  if(!SWIG_lua_isnilstring(L,2)) SWIG_fail_arg("_LWTCP::recvbuf",2,"char [1024]");
+  if(!SWIG_lua_isnilstring(L,2)) SWIG_fail_arg("_LWTCP::recvbuf",2,"char [2048]");
   
   if (!SWIG_IsOK(SWIG_ConvertPtr(L,1,(void**)&arg1,SWIGTYPE_p__LWTCP,0))){
     SWIG_fail_ptr("LWTCP_recvbuf_set",1,SWIGTYPE_p__LWTCP);
@@ -63573,8 +63596,8 @@ static int _wrap_LWTCP_recvbuf_set(lua_State* L) {
   arg2 = (char *)lua_tostring(L, 2);
   {
     if(arg2) {
-      strncpy((char*)arg1->recvbuf, (const char *)arg2, 1024-1);
-      arg1->recvbuf[1024-1] = 0;
+      strncpy((char*)arg1->recvbuf, (const char *)arg2, 2048-1);
+      arg1->recvbuf[2048-1] = 0;
     } else {
       arg1->recvbuf[0] = 0;
     }
@@ -70729,7 +70752,7 @@ static int _wrap_LWPNEWUSERDATA_nickname_set(lua_State* L) {
   
   SWIG_check_num_args("_LWPNEWUSERDATA::nickname",2,2)
   if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("_LWPNEWUSERDATA::nickname",1,"struct _LWPNEWUSERDATA *");
-  if(!SWIG_lua_isnilstring(L,2)) SWIG_fail_arg("_LWPNEWUSERDATA::nickname",2,"char [32]");
+  if(!SWIG_lua_isnilstring(L,2)) SWIG_fail_arg("_LWPNEWUSERDATA::nickname",2,"char [(32)]");
   
   if (!SWIG_IsOK(SWIG_ConvertPtr(L,1,(void**)&arg1,SWIGTYPE_p__LWPNEWUSERDATA,0))){
     SWIG_fail_ptr("LWPNEWUSERDATA_nickname_set",1,SWIGTYPE_p__LWPNEWUSERDATA);
@@ -70738,8 +70761,8 @@ static int _wrap_LWPNEWUSERDATA_nickname_set(lua_State* L) {
   arg2 = (char *)lua_tostring(L, 2);
   {
     if(arg2) {
-      strncpy((char*)arg1->nickname, (const char *)arg2, 32-1);
-      arg1->nickname[32-1] = 0;
+      strncpy((char*)arg1->nickname, (const char *)arg2, (32)-1);
+      arg1->nickname[(32)-1] = 0;
     } else {
       arg1->nickname[0] = 0;
     }
@@ -78507,6 +78530,56 @@ fail:
 }
 
 
+static int _wrap_LWPSETNICKNAMERESULT_Result_set(lua_State* L) {
+  int SWIG_arg = 0;
+  struct _LWPSETNICKNAMERESULT *arg1 = (struct _LWPSETNICKNAMERESULT *) 0 ;
+  int arg2 ;
+  
+  SWIG_check_num_args("_LWPSETNICKNAMERESULT::Result",2,2)
+  if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("_LWPSETNICKNAMERESULT::Result",1,"struct _LWPSETNICKNAMERESULT *");
+  if(!lua_isnumber(L,2)) SWIG_fail_arg("_LWPSETNICKNAMERESULT::Result",2,"int");
+  
+  if (!SWIG_IsOK(SWIG_ConvertPtr(L,1,(void**)&arg1,SWIGTYPE_p__LWPSETNICKNAMERESULT,0))){
+    SWIG_fail_ptr("LWPSETNICKNAMERESULT_Result_set",1,SWIGTYPE_p__LWPSETNICKNAMERESULT);
+  }
+  
+  arg2 = (int)lua_tonumber(L, 2);
+  if (arg1) (arg1)->Result = arg2;
+  
+  return SWIG_arg;
+  
+  if(0) SWIG_fail;
+  
+fail:
+  lua_error(L);
+  return SWIG_arg;
+}
+
+
+static int _wrap_LWPSETNICKNAMERESULT_Result_get(lua_State* L) {
+  int SWIG_arg = 0;
+  struct _LWPSETNICKNAMERESULT *arg1 = (struct _LWPSETNICKNAMERESULT *) 0 ;
+  int result;
+  
+  SWIG_check_num_args("_LWPSETNICKNAMERESULT::Result",1,1)
+  if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("_LWPSETNICKNAMERESULT::Result",1,"struct _LWPSETNICKNAMERESULT *");
+  
+  if (!SWIG_IsOK(SWIG_ConvertPtr(L,1,(void**)&arg1,SWIGTYPE_p__LWPSETNICKNAMERESULT,0))){
+    SWIG_fail_ptr("LWPSETNICKNAMERESULT_Result_get",1,SWIGTYPE_p__LWPSETNICKNAMERESULT);
+  }
+  
+  result = (int) ((arg1)->Result);
+  lua_pushnumber(L, (lua_Number) result); SWIG_arg++;
+  return SWIG_arg;
+  
+  if(0) SWIG_fail;
+  
+fail:
+  lua_error(L);
+  return SWIG_arg;
+}
+
+
 static int _wrap_new_LWPSETNICKNAMERESULT(lua_State* L) {
   int SWIG_arg = 0;
   struct _LWPSETNICKNAMERESULT *result = 0 ;
@@ -78541,6 +78614,7 @@ static swig_lua_attribute swig_LWPSETNICKNAMERESULT_attributes[] = {
     { "Type", _wrap_LWPSETNICKNAMERESULT_Type_get, _wrap_LWPSETNICKNAMERESULT_Type_set },
     { "Id", _wrap_LWPSETNICKNAMERESULT_Id_get, _wrap_LWPSETNICKNAMERESULT_Id_set },
     { "Nickname", _wrap_LWPSETNICKNAMERESULT_Nickname_get, _wrap_LWPSETNICKNAMERESULT_Nickname_set },
+    { "Result", _wrap_LWPSETNICKNAMERESULT_Result_get, _wrap_LWPSETNICKNAMERESULT_Result_set },
     {0,0,0}
 };
 static swig_lua_method swig_LWPSETNICKNAMERESULT_methods[]= {
@@ -80596,7 +80670,8 @@ static swig_lua_const_info swig_SwigModule_constants[]= {
     {SWIG_LUA_CONSTTAB_INT("LAE_PHYSICS_MENU", LAE_PHYSICS_MENU)},
     {SWIG_LUA_CONSTTAB_INT("LAE_UI_CAUTION_POPUP", LAE_UI_CAUTION_POPUP)},
     {SWIG_LUA_CONSTTAB_INT("LAE_UI_CAUTION_POPUP_ALPHA", LAE_UI_CAUTION_POPUP_ALPHA)},
-    {SWIG_LUA_CONSTTAB_INT("LAE_UI_MAIN_MENU", LAE_UI_MAIN_MENU)},
+    {SWIG_LUA_CONSTTAB_INT("LAE_UI_MAIN_MENU_KO", LAE_UI_MAIN_MENU_KO)},
+    {SWIG_LUA_CONSTTAB_INT("LAE_UI_MAIN_MENU_EN", LAE_UI_MAIN_MENU_EN)},
     {SWIG_LUA_CONSTTAB_INT("LAE_UI_BACK_BUTTON", LAE_UI_BACK_BUTTON)},
     {SWIG_LUA_CONSTTAB_INT("LAE_RESULT_TITLE_ATLAS", LAE_RESULT_TITLE_ATLAS)},
     {SWIG_LUA_CONSTTAB_INT("LAE_RESULT_TITLE_ATLAS_ALPHA", LAE_RESULT_TITLE_ATLAS_ALPHA)},
@@ -80936,7 +81011,7 @@ static swig_lua_const_info swig_SwigModule_constants[]= {
     {SWIG_LUA_CONSTTAB_INT("LPGCF_HIDE_LEFT_DIR_PAD", LPGCF_HIDE_LEFT_DIR_PAD)},
     {SWIG_LUA_CONSTTAB_INT("LPGCF_HIDE_DASH_BUTTON", LPGCF_HIDE_DASH_BUTTON)},
     {SWIG_LUA_CONSTTAB_INT("LPGCF_HIDE_PULL_BUTTON", LPGCF_HIDE_PULL_BUTTON)},
-    {SWIG_LUA_CONSTTAB_INT("LW_TCP_BUFLEN", 1024)},
+    {SWIG_LUA_CONSTTAB_INT("LW_TCP_BUFLEN", 2048)},
     {SWIG_LUA_CONSTTAB_INT("LUS_INIT", LUS_INIT)},
     {SWIG_LUA_CONSTTAB_INT("LUS_GETTOKEN", LUS_GETTOKEN)},
     {SWIG_LUA_CONSTTAB_INT("LUS_QUEUE", LUS_QUEUE)},
@@ -80985,6 +81060,15 @@ static swig_lua_const_info swig_SwigModule_constants[]= {
     {SWIG_LUA_CONSTTAB_INT("LPGP_LWPCREATEBATTLEOK", LPGP_LWPCREATEBATTLEOK)},
     {SWIG_LUA_CONSTTAB_INT("LPGP_LWPCHECKBATTLEVALID", LPGP_LWPCHECKBATTLEVALID)},
     {SWIG_LUA_CONSTTAB_INT("LPGP_LWPBATTLEVALID", LPGP_LWPBATTLEVALID)},
+    {SWIG_LUA_CONSTTAB_INT("LW_NICKNAME_MAX_LEN", (32))},
+    {SWIG_LUA_CONSTTAB_INT("LW_SET_NICKNAME_RESULT_OK", (0))},
+    {SWIG_LUA_CONSTTAB_INT("LW_SET_NICKNAME_RESULT_TOO_SHORT", (1))},
+    {SWIG_LUA_CONSTTAB_INT("LW_SET_NICKNAME_RESULT_TOO_LONG", (2))},
+    {SWIG_LUA_CONSTTAB_INT("LW_SET_NICKNAME_RESULT_TOO_NOT_ALLOWED", (3))},
+    {SWIG_LUA_CONSTTAB_INT("LW_SET_NICKNAME_RESULT_INTERNAL_ERROR", (4))},
+    {SWIG_LUA_CONSTTAB_INT("LW_LEADERBOARD_ITEMS_IN_PAGE", (15))},
+    {SWIG_LUA_CONSTTAB_INT("LW_PUCK_GAME_QUEUE_TYPE_FIFO", (0))},
+    {SWIG_LUA_CONSTTAB_INT("LW_PUCK_GAME_QUEUE_TYPE_NEAREST_SCORE", (1))},
     {SWIG_LUA_CONSTTAB_INT("LSP_READY", LSP_READY)},
     {SWIG_LUA_CONSTTAB_INT("LSP_STEADY", LSP_STEADY)},
     {SWIG_LUA_CONSTTAB_INT("LSP_GO", LSP_GO)},
@@ -80996,10 +81080,6 @@ static swig_lua_const_info swig_SwigModule_constants[]= {
     {SWIG_LUA_CONSTTAB_INT("LSWHB_WEST", LSWHB_WEST)},
     {SWIG_LUA_CONSTTAB_INT("LSWHB_SOUTH", LSWHB_SOUTH)},
     {SWIG_LUA_CONSTTAB_INT("LSWHB_NORTH", LSWHB_NORTH)},
-    {SWIG_LUA_CONSTTAB_INT("LW_NICKNAME_MAX_LEN", (32))},
-    {SWIG_LUA_CONSTTAB_INT("LW_LEADERBOARD_ITEMS_IN_PAGE", (15))},
-    {SWIG_LUA_CONSTTAB_INT("LW_PUCK_GAME_QUEUE_TYPE_FIFO", (0))},
-    {SWIG_LUA_CONSTTAB_INT("LW_PUCK_GAME_QUEUE_TYPE_NEAREST_SCORE", (1))},
     {SWIG_LUA_CONSTTAB_INT("LW_PUSH_TOKEN_LENGTH", LW_PUSH_TOKEN_LENGTH)},
     {SWIG_LUA_CONSTTAB_INT("LW_SYS_MSG_LENGTH", LW_SYS_MSG_LENGTH)},
     {0,0,0,0,0,0}
@@ -81263,6 +81343,7 @@ static swig_lua_method swig_SwigModule_methods[]= {
     { "change_to_leaderboard", _wrap_change_to_leaderboard},
     { "request_player_reveal_leaderboard", _wrap_request_player_reveal_leaderboard},
     { "request_leaderboard", _wrap_request_leaderboard},
+    { "start_nickname_text_input_activity", _wrap_start_nickname_text_input_activity},
     { "load_action", _wrap_load_action},
     { "unload_action", _wrap_unload_action},
     { "get_curve_value", _wrap_get_curve_value},

@@ -35,9 +35,9 @@ public class TextInputActivity extends Activity {
         //this.requestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.activity_text_input);
         // AdMob
-        mAdView = (AdView) findViewById(R.id.adView);
-        AdRequest adRequest = new AdRequest.Builder().build();
-        mAdView.loadAd(adRequest);
+//        mAdView = (AdView) findViewById(R.id.adView);
+//        AdRequest adRequest = new AdRequest.Builder().build();
+//        mAdView.loadAd(adRequest);
 
         mInputText = (EditText) findViewById(R.id.input_text);
         mInputText.setOnEditorActionListener(new TextView.OnEditorActionListener() {
