@@ -94,6 +94,20 @@ static void handle_move_key_press_release(LWCONTEXT* pLwc, int key, int action) 
 
 }
 
+static void run_additional_client(const char* name, int idx) {
+#if LW_PLATFORM_OSX
+    char run_this[512];
+    sprintf(run_this, "%s %d &", name, idx);
+    system(run_this);
+#elif LW_PLATFORM_WIN32
+    char run_this[512];
+    sprintf(run_this, "start %s %d", name, idx);
+    system(run_this);
+#else
+    LOGEP("Not supported");
+#endif
+}
+
 void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods) {
 #if LW_PLATFORM_WIN32
 	lwimgui_key_callback(window, key, scancode, action, mods);
@@ -262,23 +276,15 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
         puck_game_roll_world(pLwc->puck_game, 1, 0, (float)LWDEG2RAD(180));
     }
     // Start second client
-#if LW_PLATFORM_OSX
     if (key == GLFW_KEY_1 && action == GLFW_PRESS) {
-        char run_this[512];
-        sprintf(run_this, "%s 1 &", pLwc->argv[0]);
-        system(run_this);
+        run_additional_client(pLwc->argv[0], 1);
     }
     if (key == GLFW_KEY_2 && action == GLFW_PRESS) {
-        char run_this[512];
-        sprintf(run_this, "%s 2 &", pLwc->argv[0]);
-        system(run_this);
+        run_additional_client(pLwc->argv[0], 2);
     }
     if (key == GLFW_KEY_3 && action == GLFW_PRESS) {
-        char run_this[512];
-        sprintf(run_this, "%s 3 &", pLwc->argv[0]);
-        system(run_this);
+        run_additional_client(pLwc->argv[0], 3);
     }
-#endif
 }
 
 void char_callback(GLFWwindow* window, unsigned int c) {
