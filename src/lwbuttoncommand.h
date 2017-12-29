@@ -2,7 +2,7 @@
 
 struct _LWCONTEXT;
 
-typedef void (*LW_BUTTON_COMMAND_HANDLER)(struct _LWCONTEXT* pLwc);
+typedef void (*LW_BUTTON_COMMAND_HANDLER)(LWCONTEXT* pLwc);
 
 typedef struct _LWBUTTONCOMMAND {
 	const char* name;

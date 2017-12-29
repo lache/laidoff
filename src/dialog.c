@@ -33,7 +33,7 @@ static int parse_dialog_command(const char* dialog_instruction, const char* dial
 	return -1;
 }
 
-void update_dialog(struct _LWCONTEXT* pLwc)
+void update_dialog(LWCONTEXT* pLwc)
 {
 	// dialog commands
 	if (pLwc->dialog && pLwc->dialog[pLwc->dialog_start_index] == '/')

@@ -15,8 +15,8 @@ int calculate_and_apply_attack_1_on_1(LWCONTEXT* pLwc, LWBATTLECREATURE* ca, con
 	LWBATTLECOMMANDRESULT* cmd_result_a, LWBATTLECOMMANDRESULT* cmd_result_b);
 void play_enemy_hp_desc_anim(LWCONTEXT* pLwc, LWENEMY* enemy, int enemy_slot,
 	const LWBATTLECOMMANDRESULT* cmd_result_a, const LWBATTLECOMMANDRESULT* cmd_result_b);
-int get_alive_enemy_count(struct _LWCONTEXT* pLwc);
-void exec_player_win(struct _LWCONTEXT* pLwc);
+int get_alive_enemy_count(LWCONTEXT* pLwc);
+void exec_player_win(LWCONTEXT* pLwc);
 
 int spawn_attack_trail(LWCONTEXT* pLwc, float x, float y, float z) {
 	for (int i = 0; i < MAX_TRAIL; i++) {
@@ -121,7 +121,7 @@ void update_attack_trail(LWCONTEXT* pLwc) {
 	}
 }
 
-int reset_enemy_turn(struct _LWCONTEXT* pLwc) {
+int reset_enemy_turn(LWCONTEXT* pLwc) {
 	int turn_token_counter = 0;
 	ARRAY_ITERATE_VALID(LWENEMY, pLwc->enemy) {
 		if (e->c.hp > 0) {
@@ -139,13 +139,13 @@ int reset_enemy_turn(struct _LWCONTEXT* pLwc) {
 	return turn_token_counter;
 }
 
-int setup_enemy_turn(struct _LWCONTEXT* pLwc) {
+int setup_enemy_turn(LWCONTEXT* pLwc) {
 	const int turn_token_counter = reset_enemy_turn(pLwc);
 
 	return turn_token_counter;
 }
 
-int pick_target_player(struct _LWCONTEXT* pLwc) {
+int pick_target_player(LWCONTEXT* pLwc) {
 	ARRAY_ITERATE_VALID(LWBATTLECREATURE, pLwc->player) {
 		if (e->hp > 0) {
 			return i;
@@ -162,7 +162,7 @@ const LWSKILL* pick_skill(LWBATTLECREATURE* ca) {
 	return 0;
 }
 
-void play_player_hp_desc_anim(struct _LWCONTEXT* pLwc, const int player_slot,
+void play_player_hp_desc_anim(LWCONTEXT* pLwc, const int player_slot,
 	LWBATTLECOMMANDRESULT* cmd_result_a, LWBATTLECOMMANDRESULT* cmd_result_b) {
 
 	float left_top_x = 0;
@@ -197,7 +197,7 @@ void play_player_hp_desc_anim(struct _LWCONTEXT* pLwc, const int player_slot,
 	spawn_damage_text(pLwc, left_top_x + area_width / 2, left_top_y - area_height / 2, 0, damage_str, LDTC_UI);
 }
 
-int exec_attack_e2p(struct _LWCONTEXT* pLwc) {
+int exec_attack_e2p(LWCONTEXT* pLwc) {
 	if (pLwc->battle_state == LBS_ENEMY_TURN_WAIT && pLwc->enemy_turn_creature_index >= 0) {
 
 		const int player_slot = pick_target_player(pLwc);
@@ -224,7 +224,7 @@ int exec_attack_e2p(struct _LWCONTEXT* pLwc) {
 	return -1;
 }
 
-void reset_player_turn(struct _LWCONTEXT* pLwc) {
+void reset_player_turn(LWCONTEXT* pLwc) {
 	int turn_token_counter = 0;
 	ARRAY_ITERATE_VALID(LWBATTLECREATURE, pLwc->player) {
 		if (e->hp > 0) {
@@ -240,11 +240,11 @@ void reset_player_turn(struct _LWCONTEXT* pLwc) {
 	} ARRAY_ITERATE_VALID_END();
 }
 
-void setup_player_turn(struct _LWCONTEXT* pLwc) {
+void setup_player_turn(LWCONTEXT* pLwc) {
 	reset_player_turn(pLwc);
 }
 
-int get_alive_enemy_count(struct _LWCONTEXT* pLwc) {
+int get_alive_enemy_count(LWCONTEXT* pLwc) {
 	int count = 0;
 	ARRAY_ITERATE_VALID(const LWENEMY, pLwc->enemy) {
 		if (e->c.hp > 0) {
@@ -254,7 +254,7 @@ int get_alive_enemy_count(struct _LWCONTEXT* pLwc) {
 	return count;
 }
 
-void exec_player_win(struct _LWCONTEXT* pLwc) {
+void exec_player_win(LWCONTEXT* pLwc) {
 
 	pLwc->battle_state = LBS_START_PLAYER_WIN;
 
@@ -271,7 +271,7 @@ void exec_player_win(struct _LWCONTEXT* pLwc) {
 	change_to_battle_result(pLwc);
 }
 
-void update_enemy_turn(struct _LWCONTEXT* pLwc) {
+void update_enemy_turn(LWCONTEXT* pLwc) {
 	if (pLwc->battle_state == LBS_START_ENEMY_TURN) {
 
 		const int turn_token_counter = setup_enemy_turn(pLwc);
@@ -323,7 +323,7 @@ void update_enemy_turn(struct _LWCONTEXT* pLwc) {
 	}
 }
 
-int exec_attack_p2e(struct _LWCONTEXT* pLwc, int enemy_slot) {
+int exec_attack_p2e(LWCONTEXT* pLwc, int enemy_slot) {
 	if (pLwc->battle_state == LBS_SELECT_TARGET && pLwc->player_turn_creature_index >= 0) {
 
 		LWBATTLECREATURE* ca = &pLwc->player[pLwc->player_turn_creature_index];
@@ -418,7 +418,7 @@ int calculate_and_apply_attack_1_on_1(LWCONTEXT* pLwc, LWBATTLECREATURE* ca, con
 	return 0;
 }
 
-void exec_attack_p2e_with_screen_point(struct _LWCONTEXT* pLwc, float x, float y) {
+void exec_attack_p2e_with_screen_point(LWCONTEXT* pLwc, float x, float y) {
 
 	for (int i = 0; i < MAX_ENEMY_SLOT; i++) {
 		if (pLwc->enemy[i].valid && pLwc->enemy[i].c.hp > 0) {
@@ -435,7 +435,7 @@ void exec_attack_p2e_with_screen_point(struct _LWCONTEXT* pLwc, float x, float y
 	}
 }
 
-void update_battle(struct _LWCONTEXT* pLwc) {
+void update_battle(LWCONTEXT* pLwc) {
 
 	
 

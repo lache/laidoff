@@ -18,7 +18,7 @@ float clamped_interp(float a, float b, float r) {
 	return (1.0f - r) * a + r * b;
 }
 
-void update_battle_result(struct _LWCONTEXT* pLwc) {
+void update_battle_result(LWCONTEXT* pLwc) {
 
 	
 
@@ -51,7 +51,7 @@ void update_battle_result(struct _LWCONTEXT* pLwc) {
 	} ARRAY_ITERATE_VALID_END();
 }
 
-void process_touch_battle_result(struct _LWCONTEXT* pLwc, float x, float y) {
+void process_touch_battle_result(LWCONTEXT* pLwc, float x, float y) {
 	LWUIDIM next_button_d;
 	get_battle_result_next_button_dim(&next_button_d);
 	if (lwuidim_contains(&next_button_d, x, y)) {

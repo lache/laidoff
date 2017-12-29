@@ -5,7 +5,7 @@
 #include "render_solid.h"
 #include "laidoff.h"
 
-void lwc_render_font_test_fbo(const struct _LWCONTEXT* pLwc) {
+void lwc_render_font_test_fbo(const LWCONTEXT* pLwc) {
 	glBindFramebuffer(GL_FRAMEBUFFER, pLwc->font_fbo.fbo);
 	glDisable(GL_DEPTH_TEST);
 
@@ -128,7 +128,7 @@ void lwc_render_font_test_fbo(const struct _LWCONTEXT* pLwc) {
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
-void lwc_render_font_test(const struct _LWCONTEXT* pLwc) {
+void lwc_render_font_test(const LWCONTEXT* pLwc) {
 	LW_GL_VIEWPORT();
 	lw_clear_color();
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);

@@ -2,7 +2,7 @@
 
 struct _LWCONTEXT;
 
-void lwc_render_skin(const struct _LWCONTEXT* pLwc);
+void lwc_render_skin(const LWCONTEXT* pLwc);
 
 void render_skin_ui(const LWCONTEXT* pLwc,
 	float x, float y, float scale,

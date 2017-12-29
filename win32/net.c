@@ -40,7 +40,7 @@ void DieWithError(char *errorMessage) {
 	LOGE("NET ERROR: %s", errorMessage);
 }
 
-void init_net(struct _LWCONTEXT* pLwc) {
+void init_net(LWCONTEXT* pLwc) {
 	servIP = "222.110.4.119";
 	echoString = "desktop!!";
 	echoServPort = 10001;
@@ -65,14 +65,14 @@ void init_net(struct _LWCONTEXT* pLwc) {
 	echoServAddr.sin_port = htons(echoServPort);     /* Server port */
 }
 
-void deinit_net(struct _LWCONTEXT* pLwc) {
+void deinit_net(LWCONTEXT* pLwc) {
 	closesocket(sock);
 #if LW_PLATFORM_WIN32
 	WSACleanup();  /* Cleanup Winsock */
 #endif
 }
 
-void net_rtt_test(struct _LWCONTEXT* pLwc) {
+void net_rtt_test(LWCONTEXT* pLwc) {
 	if (sendto(sock, echoString, echoStringLen, 0, (struct sockaddr *)&echoServAddr, sizeof(echoServAddr)) != echoStringLen)
 		DieWithError("sendto() sent a different number of bytes than expected");
 

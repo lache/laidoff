@@ -149,7 +149,7 @@ void render_player_creature_battle_result_ui(const LWCONTEXT* pLwc, const LWBATT
                         );
 }
 
-void render_header(const struct _LWCONTEXT* pLwc) {
+void render_header(const LWCONTEXT* pLwc) {
     
     render_solid_vb_ui_flip_y_uv(pLwc, 0, header_y_center, 2 * pLwc->aspect_ratio, header_height,
                                  pLwc->tex_programmed[LPT_BOTH_END_GRADIENT_HORIZONTAL], LVT_CENTER_CENTER_ANCHORED_SQUARE,
@@ -174,7 +174,7 @@ void render_header(const struct _LWCONTEXT* pLwc) {
     render_text_block(pLwc, &text_block);
 }
 
-void get_battle_result_next_button_dim(struct _LWUIDIM* d) {
+void get_battle_result_next_button_dim(LWUIDIM* d) {
     d->align = LTBA_CENTER_CENTER;
     d->x = 0;
     d->y = footer_y_center;
@@ -182,7 +182,7 @@ void get_battle_result_next_button_dim(struct _LWUIDIM* d) {
     d->h = footer_height;
 }
 
-void render_next_button(const struct _LWCONTEXT* pLwc) {
+void render_next_button(const LWCONTEXT* pLwc) {
     LWUIDIM next_button_d;
     get_battle_result_next_button_dim(&next_button_d);
     render_solid_vb_ui_flip_y_uv(pLwc,
@@ -210,11 +210,11 @@ void render_next_button(const struct _LWCONTEXT* pLwc) {
     render_text_block(pLwc, &text_block);
 }
 
-void render_footer_button(const struct _LWCONTEXT* pLwc) {
+void render_footer_button(const LWCONTEXT* pLwc) {
     render_next_button(pLwc);
 }
 
-void lwc_render_battle_result(const struct _LWCONTEXT* pLwc) {
+void lwc_render_battle_result(const LWCONTEXT* pLwc) {
     LW_GL_VIEWPORT();
     lw_clear_color();
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);

@@ -115,4 +115,4 @@ typedef struct _LWBATTLECREATURE {
 #define BATTLECREATURE_SHOE { 1, LWU("신발"), 1, 1, 1, 10, 10, 0, 30, LAE_C_TREE_KTX, CREATURESTAT_GRADE_1_NON_WEAK }
 #define BATTLECREATURE_TOFU { 1, LWU("두부"), 1, 1, 1, 10, 10, 0, 30, LAE_C_TOFU_KTX, CREATURESTAT_GRADE_1_NON_WEAK }
 
-void update_player(const struct _LWCONTEXT* pLwc, int slot_index, LWBATTLECREATURE* player);
+void update_player(const LWCONTEXT* pLwc, int slot_index, LWBATTLECREATURE* player);

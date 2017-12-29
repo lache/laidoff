@@ -1,7 +1,7 @@
 #pragma once
 
-struct _LWCONTEXT;
+typedef struct _LWCONTEXT LWCONTEXT;
 
-void init_net(struct _LWCONTEXT* pLwc);
-void net_rtt_test(struct _LWCONTEXT* pLwc);
-void deinit_net(struct _LWCONTEXT* pLwc);
+void init_net(LWCONTEXT* pLwc);
+void net_rtt_test(LWCONTEXT* pLwc);
+void deinit_net(LWCONTEXT* pLwc);

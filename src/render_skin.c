@@ -42,7 +42,7 @@ static void render_ground(const LWCONTEXT* pLwc, const mat4x4 view, const mat4x4
     glDrawArrays(GL_TRIANGLES, 0, pLwc->vertex_buffer[vbo_index].vertex_count);
 }
 
-void lwc_render_skin(const struct _LWCONTEXT* pLwc) {
+void lwc_render_skin(const LWCONTEXT* pLwc) {
     LW_GL_VIEWPORT();
     lw_clear_color();
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);

@@ -54,6 +54,6 @@ LwStaticAssert(ARRAY_SIZE(ENEMY_DATA_LIST) == LET_COUNT, "LET_COUNT error");
 
 struct _LWCONTEXT;
 
-void update_enemy(const struct _LWCONTEXT* pLwc, int enemy_slot_index, LWENEMY* enemy);
+void update_enemy(const LWCONTEXT* pLwc, int enemy_slot_index, LWENEMY* enemy);
 float get_battle_enemy_x_center(int enemy_slot_index);
-void update_render_enemy_position(const struct _LWCONTEXT* pLwc, int enemy_slot_index, const LWENEMY* enemy, vec3 pos);
+void update_render_enemy_position(const LWCONTEXT* pLwc, int enemy_slot_index, const LWENEMY* enemy, vec3 pos);

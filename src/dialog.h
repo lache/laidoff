@@ -1,5 +1,5 @@
 #pragma once
 
-struct _LWCONTEXT;
+typedef struct _LWCONTEXT LWCONTEXT;
 
-void update_dialog(struct _LWCONTEXT* pLwc);
+void update_dialog(LWCONTEXT* pLwc);

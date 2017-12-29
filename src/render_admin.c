@@ -37,7 +37,7 @@ void get_but_pos(const ADMIN_BUTTON_LAYOUT* abl, int r, int c, vec2 but_pos) {
 	but_pos[1] = +(abl->aspect_ratio_y) - (abl->margin_y + r * (abl->but_h + abl->spacing_y) + abl->but_h / 2);
 }
 
-void lwc_render_admin(const struct _LWCONTEXT* pLwc) {
+void lwc_render_admin(const LWCONTEXT* pLwc) {
 	LW_GL_VIEWPORT();
 	glClearColor(189 / 255.f, 82 / 255.f, 232 / 255.f, 1);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -109,7 +109,7 @@ int calculate_admin_button_index(float x, float y, const ADMIN_BUTTON_LAYOUT* ab
 	}
 }
 
-void touch_admin(struct _LWCONTEXT* pLwc, float x0, float y0, float x1, float y1) {
+void touch_admin(LWCONTEXT* pLwc, float x0, float y0, float x1, float y1) {
 
 	ADMIN_BUTTON_LAYOUT _abl, *abl = &_abl;
 	calculate_admin_button_layout(pLwc, abl);

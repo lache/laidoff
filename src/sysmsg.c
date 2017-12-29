@@ -40,7 +40,7 @@ void update_sys_msg(void* _sm, float delta_time) {
 static const float header_y_center = 0.9f;
 static const float header_height = 0.1f;
 
-static void s_render(const struct _LWCONTEXT* pLwc, const char* msg) {
+static void s_render(const LWCONTEXT* pLwc, const char* msg) {
 	render_solid_vb_ui_flip_y_uv(pLwc, 0, -header_y_center, 2 * pLwc->aspect_ratio, header_height,
 		pLwc->tex_programmed[LPT_BOTH_END_GRADIENT_HORIZONTAL], LVT_CENTER_CENTER_ANCHORED_SQUARE,
 		1, 39 / 255.0f, 74 / 255.0f, 110 / 255.0f, 1.0f, 0);
@@ -64,7 +64,7 @@ static void s_render(const struct _LWCONTEXT* pLwc, const char* msg) {
 	render_text_block(pLwc, &text_block);
 }
 
-void render_sys_msg(const struct _LWCONTEXT* pLwc, void* _sm) {
+void render_sys_msg(const LWCONTEXT* pLwc, void* _sm) {
 	LWSYSMSG* sm = (LWSYSMSG*)_sm;
 	if (sm->remain_time <= 0) {
 		return;

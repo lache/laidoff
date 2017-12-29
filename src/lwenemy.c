@@ -21,7 +21,7 @@ float get_battle_enemy_x_center(int enemy_slot_index) {
 	return -1.6f + 0.8f * enemy_slot_index;
 }
 
-void update_render_enemy_position(const struct _LWCONTEXT* pLwc, int enemy_slot_index, const LWENEMY* enemy, vec3 pos) {
+void update_render_enemy_position(const LWCONTEXT* pLwc, int enemy_slot_index, const LWENEMY* enemy, vec3 pos) {
 
 	// base position
 	pos[0] = get_battle_enemy_x_center(enemy_slot_index);
@@ -90,7 +90,7 @@ void update_enemy_scope_ui_point(const LWCONTEXT* pLwc, LWENEMY* enemy) {
 	}
 }
 
-void update_enemy(const struct _LWCONTEXT* pLwc, int enemy_slot_index, LWENEMY* enemy) {
+void update_enemy(const LWCONTEXT* pLwc, int enemy_slot_index, LWENEMY* enemy) {
 	enemy->c.shake_duration = (float)LWMAX(0, enemy->c.shake_duration - (float)lwcontext_delta_time(pLwc));
 	enemy->evasion_anim.t = (float)LWMAX(0, enemy->evasion_anim.t - (float)lwcontext_delta_time(pLwc));
 	enemy->death_anim.anim_1d.t = (float)LWMAX(0, enemy->death_anim.anim_1d.t - (float)lwcontext_delta_time(pLwc));
