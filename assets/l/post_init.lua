@@ -158,7 +158,7 @@ function on_ui_event(id, w_ratio, h_ratio)
 			for i=1,near_count do
 				lo.puck_game_set_tutorial_guide_str(c.puck_game, string.format(near_msg, i-1, near_count))
 				if i ~= 1 then
-					yield_wait_ms(500)
+					yield_wait_ms(1000)
 				end
 				yield_wait_near_puck_player(1)
 			end
@@ -173,7 +173,7 @@ function on_ui_event(id, w_ratio, h_ratio)
 			for i=1,dash_near_count do
 				lo.puck_game_set_tutorial_guide_str(c.puck_game, string.format(dash_near_msg, i-1, dash_near_count))
 				if i ~= 1 then
-					yield_wait_ms(500)
+					yield_wait_ms(1000)
 				end
 				yield_wait_near_puck_player_with_dash(1)
 			end

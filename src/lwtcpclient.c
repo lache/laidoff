@@ -24,14 +24,6 @@ void tcp_on_connect(LWTCP* tcp, const char* path_prefix) {
     request_player_reveal_leaderboard(tcp);
 }
 
-int tcp_send_sendbuf(LWTCP* tcp, int s) {
-    int send_result = (int)send(tcp->connect_socket, tcp->send_buf, s, 0);
-    if (send_result < 0) {
-        tcp->send_fail = 1;
-    }
-    return send_result;
-}
-
 int tcp_send_newuser(LWTCP* tcp) {
     LOGI("Sending LWPNEWUSER");
     NEW_TCP_PACKET(LWPNEWUSER, p);

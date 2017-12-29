@@ -1,7 +1,7 @@
 #include "lwtcp.h"
 #include <string.h>
 #include "lwlog.h"
-
+#include "lwtimepoint.h"
 
 #if !LW_PLATFORM_WIN32
 int WSAGetLastError() {
@@ -49,7 +49,7 @@ int tcp_connect(LWTCP* tcp) {
             if (tcp_connect_errno == 0) {
                 LOGI("[INFO] TCP connect() returned value indicates it finished synchronously (connecting to localhost?)");
             } else {
-                if (tcp_connect_errno != EAGAIN && tcp_connect_errno != EINPROGRESS && tcp_connect_errno != 0) {
+                if (tcp_connect_errno != EAGAIN && tcp_connect_errno != EINPROGRESS && tcp_connect_errno != ETIMEDOUT && tcp_connect_errno != 0) {
                     LOGE("TCP connect failed! (refused?)");
                     closesocket(tcp->connect_socket);
                     tcp->connect_socket = INVALID_SOCKET;
@@ -109,6 +109,7 @@ int tcp_connect(LWTCP* tcp) {
     int set = 1;
     setsockopt (tcp->connect_socket, SOL_SOCKET, SO_NOSIGPIPE, &set, sizeof (int));
 #endif
+    tcp->send_fail = 0;
     return 0;
 }
 
@@ -179,4 +180,40 @@ void tcp_update(LWTCP* tcp) {
             }
         }
 	}
+    // try to reconnect & resend if send_fail flag set
+    double now = lwtimepoint_now_seconds();
+    const double retry_interval = 1;
+    if (tcp->send_fail && now - tcp->send_fail_time > retry_interval) {
+        LOGI("send_fail flag detected. (%d bytes) trying to reconnect & resend packet...", tcp->send_buf_len);
+        if (tcp_connect(tcp) == 0) {
+            tcp_send_sendbuf(tcp, tcp->send_buf_len);
+        } else {
+            LOGE("reconnect failed");
+            // refresh fail time to now
+            tcp->send_fail_time = lwtimepoint_now_seconds();
+        }
+    }
+}
+
+int tcp_send_sendbuf(LWTCP* tcp, int s) {
+    tcp->send_buf_len = s;
+    int send_result = (int)send(tcp->connect_socket, tcp->send_buf, s, 0);
+    if (send_result < 0) {
+        LOGE("sending %d bytes failed. send_fail flag set.", s);
+        tcp->send_fail = 1;
+        tcp->send_fail_time = lwtimepoint_now_seconds();
+        /*if (tcp_connect(tcp) == 0) {
+            send_result = tcp_send_sendbuf(tcp, s);
+            if (send_result >= 0) {
+                tcp->send_fail = 0;
+                tcp->send_fail_time = 0;
+                tcp->send_buf_len = 0;
+            }
+        }*/
+    } else {
+        tcp->send_fail = 0;
+        tcp->send_fail_time = 0;
+        tcp->send_buf_len = 0;
+    }
+    return send_result;
 }

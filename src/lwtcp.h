@@ -64,6 +64,7 @@ typedef struct _LWTCP {
 	struct addrinfo hints;
 	char send_buf[LW_TCP_BUFLEN];
 	char recv_buf[LW_TCP_BUFLEN];
+    int send_buf_len;
 	int recv_buf_len;
 	int recv_buf_not_parsed;
 	LWUNIQUEID user_id;
@@ -74,6 +75,7 @@ typedef struct _LWTCP {
     // State
     LW_UDP_STATE state;
     int send_fail;
+    double send_fail_time;
     void (*on_leaderboard_packet)(LWCONTEXT*);
 } LWTCP;
 
@@ -85,6 +87,7 @@ LWTCP* new_tcp(LWCONTEXT* pLwc,
 void destroy_tcp(LWTCP** tcp);
 void tcp_update(LWTCP* tcp);
 int tcp_connect(LWTCP* tcp);
+int tcp_send_sendbuf(LWTCP* tcp, int s);
 #if !LW_PLATFORM_WIN32
 int WSAGetLastError();
 #endif
