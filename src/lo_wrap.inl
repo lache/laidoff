@@ -63707,26 +63707,26 @@ fail:
 }
 
 
-static int _wrap_LWTCP_sendbuf_set(lua_State* L) {
+static int _wrap_LWTCP_send_buf_set(lua_State* L) {
   int SWIG_arg = 0;
   struct _LWTCP *arg1 = (struct _LWTCP *) 0 ;
   char *arg2 ;
   
-  SWIG_check_num_args("_LWTCP::sendbuf",2,2)
-  if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("_LWTCP::sendbuf",1,"struct _LWTCP *");
-  if(!SWIG_lua_isnilstring(L,2)) SWIG_fail_arg("_LWTCP::sendbuf",2,"char [2048]");
+  SWIG_check_num_args("_LWTCP::send_buf",2,2)
+  if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("_LWTCP::send_buf",1,"struct _LWTCP *");
+  if(!SWIG_lua_isnilstring(L,2)) SWIG_fail_arg("_LWTCP::send_buf",2,"char [2048]");
   
   if (!SWIG_IsOK(SWIG_ConvertPtr(L,1,(void**)&arg1,SWIGTYPE_p__LWTCP,0))){
-    SWIG_fail_ptr("LWTCP_sendbuf_set",1,SWIGTYPE_p__LWTCP);
+    SWIG_fail_ptr("LWTCP_send_buf_set",1,SWIGTYPE_p__LWTCP);
   }
   
   arg2 = (char *)lua_tostring(L, 2);
   {
     if(arg2) {
-      strncpy((char*)arg1->sendbuf, (const char *)arg2, 2048-1);
-      arg1->sendbuf[2048-1] = 0;
+      strncpy((char*)arg1->send_buf, (const char *)arg2, 2048-1);
+      arg1->send_buf[2048-1] = 0;
     } else {
-      arg1->sendbuf[0] = 0;
+      arg1->send_buf[0] = 0;
     }
   }
   
@@ -63740,19 +63740,19 @@ fail:
 }
 
 
-static int _wrap_LWTCP_sendbuf_get(lua_State* L) {
+static int _wrap_LWTCP_send_buf_get(lua_State* L) {
   int SWIG_arg = 0;
   struct _LWTCP *arg1 = (struct _LWTCP *) 0 ;
   char *result = 0 ;
   
-  SWIG_check_num_args("_LWTCP::sendbuf",1,1)
-  if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("_LWTCP::sendbuf",1,"struct _LWTCP *");
+  SWIG_check_num_args("_LWTCP::send_buf",1,1)
+  if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("_LWTCP::send_buf",1,"struct _LWTCP *");
   
   if (!SWIG_IsOK(SWIG_ConvertPtr(L,1,(void**)&arg1,SWIGTYPE_p__LWTCP,0))){
-    SWIG_fail_ptr("LWTCP_sendbuf_get",1,SWIGTYPE_p__LWTCP);
+    SWIG_fail_ptr("LWTCP_send_buf_get",1,SWIGTYPE_p__LWTCP);
   }
   
-  result = (char *)(char *) ((arg1)->sendbuf);
+  result = (char *)(char *) ((arg1)->send_buf);
   lua_pushstring(L,(const char *)result); SWIG_arg++;
   return SWIG_arg;
   
@@ -63764,26 +63764,26 @@ fail:
 }
 
 
-static int _wrap_LWTCP_recvbuf_set(lua_State* L) {
+static int _wrap_LWTCP_recv_buf_set(lua_State* L) {
   int SWIG_arg = 0;
   struct _LWTCP *arg1 = (struct _LWTCP *) 0 ;
   char *arg2 ;
   
-  SWIG_check_num_args("_LWTCP::recvbuf",2,2)
-  if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("_LWTCP::recvbuf",1,"struct _LWTCP *");
-  if(!SWIG_lua_isnilstring(L,2)) SWIG_fail_arg("_LWTCP::recvbuf",2,"char [2048]");
+  SWIG_check_num_args("_LWTCP::recv_buf",2,2)
+  if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("_LWTCP::recv_buf",1,"struct _LWTCP *");
+  if(!SWIG_lua_isnilstring(L,2)) SWIG_fail_arg("_LWTCP::recv_buf",2,"char [2048]");
   
   if (!SWIG_IsOK(SWIG_ConvertPtr(L,1,(void**)&arg1,SWIGTYPE_p__LWTCP,0))){
-    SWIG_fail_ptr("LWTCP_recvbuf_set",1,SWIGTYPE_p__LWTCP);
+    SWIG_fail_ptr("LWTCP_recv_buf_set",1,SWIGTYPE_p__LWTCP);
   }
   
   arg2 = (char *)lua_tostring(L, 2);
   {
     if(arg2) {
-      strncpy((char*)arg1->recvbuf, (const char *)arg2, 2048-1);
-      arg1->recvbuf[2048-1] = 0;
+      strncpy((char*)arg1->recv_buf, (const char *)arg2, 2048-1);
+      arg1->recv_buf[2048-1] = 0;
     } else {
-      arg1->recvbuf[0] = 0;
+      arg1->recv_buf[0] = 0;
     }
   }
   
@@ -63797,19 +63797,19 @@ fail:
 }
 
 
-static int _wrap_LWTCP_recvbuf_get(lua_State* L) {
+static int _wrap_LWTCP_recv_buf_get(lua_State* L) {
   int SWIG_arg = 0;
   struct _LWTCP *arg1 = (struct _LWTCP *) 0 ;
   char *result = 0 ;
   
-  SWIG_check_num_args("_LWTCP::recvbuf",1,1)
-  if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("_LWTCP::recvbuf",1,"struct _LWTCP *");
+  SWIG_check_num_args("_LWTCP::recv_buf",1,1)
+  if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("_LWTCP::recv_buf",1,"struct _LWTCP *");
   
   if (!SWIG_IsOK(SWIG_ConvertPtr(L,1,(void**)&arg1,SWIGTYPE_p__LWTCP,0))){
-    SWIG_fail_ptr("LWTCP_recvbuf_get",1,SWIGTYPE_p__LWTCP);
+    SWIG_fail_ptr("LWTCP_recv_buf_get",1,SWIGTYPE_p__LWTCP);
   }
   
-  result = (char *)(char *) ((arg1)->recvbuf);
+  result = (char *)(char *) ((arg1)->recv_buf);
   lua_pushstring(L,(const char *)result); SWIG_arg++;
   return SWIG_arg;
   
@@ -63821,21 +63821,21 @@ fail:
 }
 
 
-static int _wrap_LWTCP_iResult_set(lua_State* L) {
+static int _wrap_LWTCP_recv_buf_len_set(lua_State* L) {
   int SWIG_arg = 0;
   struct _LWTCP *arg1 = (struct _LWTCP *) 0 ;
   int arg2 ;
   
-  SWIG_check_num_args("_LWTCP::iResult",2,2)
-  if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("_LWTCP::iResult",1,"struct _LWTCP *");
-  if(!lua_isnumber(L,2)) SWIG_fail_arg("_LWTCP::iResult",2,"int");
+  SWIG_check_num_args("_LWTCP::recv_buf_len",2,2)
+  if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("_LWTCP::recv_buf_len",1,"struct _LWTCP *");
+  if(!lua_isnumber(L,2)) SWIG_fail_arg("_LWTCP::recv_buf_len",2,"int");
   
   if (!SWIG_IsOK(SWIG_ConvertPtr(L,1,(void**)&arg1,SWIGTYPE_p__LWTCP,0))){
-    SWIG_fail_ptr("LWTCP_iResult_set",1,SWIGTYPE_p__LWTCP);
+    SWIG_fail_ptr("LWTCP_recv_buf_len_set",1,SWIGTYPE_p__LWTCP);
   }
   
   arg2 = (int)lua_tonumber(L, 2);
-  if (arg1) (arg1)->iResult = arg2;
+  if (arg1) (arg1)->recv_buf_len = arg2;
   
   return SWIG_arg;
   
@@ -63847,19 +63847,19 @@ fail:
 }
 
 
-static int _wrap_LWTCP_iResult_get(lua_State* L) {
+static int _wrap_LWTCP_recv_buf_len_get(lua_State* L) {
   int SWIG_arg = 0;
   struct _LWTCP *arg1 = (struct _LWTCP *) 0 ;
   int result;
   
-  SWIG_check_num_args("_LWTCP::iResult",1,1)
-  if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("_LWTCP::iResult",1,"struct _LWTCP *");
+  SWIG_check_num_args("_LWTCP::recv_buf_len",1,1)
+  if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("_LWTCP::recv_buf_len",1,"struct _LWTCP *");
   
   if (!SWIG_IsOK(SWIG_ConvertPtr(L,1,(void**)&arg1,SWIGTYPE_p__LWTCP,0))){
-    SWIG_fail_ptr("LWTCP_iResult_get",1,SWIGTYPE_p__LWTCP);
+    SWIG_fail_ptr("LWTCP_recv_buf_len_get",1,SWIGTYPE_p__LWTCP);
   }
   
-  result = (int) ((arg1)->iResult);
+  result = (int) ((arg1)->recv_buf_len);
   lua_pushnumber(L, (lua_Number) result); SWIG_arg++;
   return SWIG_arg;
   
@@ -63871,21 +63871,21 @@ fail:
 }
 
 
-static int _wrap_LWTCP_recvbuflen_set(lua_State* L) {
+static int _wrap_LWTCP_recv_buf_not_parsed_set(lua_State* L) {
   int SWIG_arg = 0;
   struct _LWTCP *arg1 = (struct _LWTCP *) 0 ;
   int arg2 ;
   
-  SWIG_check_num_args("_LWTCP::recvbuflen",2,2)
-  if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("_LWTCP::recvbuflen",1,"struct _LWTCP *");
-  if(!lua_isnumber(L,2)) SWIG_fail_arg("_LWTCP::recvbuflen",2,"int");
+  SWIG_check_num_args("_LWTCP::recv_buf_not_parsed",2,2)
+  if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("_LWTCP::recv_buf_not_parsed",1,"struct _LWTCP *");
+  if(!lua_isnumber(L,2)) SWIG_fail_arg("_LWTCP::recv_buf_not_parsed",2,"int");
   
   if (!SWIG_IsOK(SWIG_ConvertPtr(L,1,(void**)&arg1,SWIGTYPE_p__LWTCP,0))){
-    SWIG_fail_ptr("LWTCP_recvbuflen_set",1,SWIGTYPE_p__LWTCP);
+    SWIG_fail_ptr("LWTCP_recv_buf_not_parsed_set",1,SWIGTYPE_p__LWTCP);
   }
   
   arg2 = (int)lua_tonumber(L, 2);
-  if (arg1) (arg1)->recvbuflen = arg2;
+  if (arg1) (arg1)->recv_buf_not_parsed = arg2;
   
   return SWIG_arg;
   
@@ -63897,69 +63897,19 @@ fail:
 }
 
 
-static int _wrap_LWTCP_recvbuflen_get(lua_State* L) {
+static int _wrap_LWTCP_recv_buf_not_parsed_get(lua_State* L) {
   int SWIG_arg = 0;
   struct _LWTCP *arg1 = (struct _LWTCP *) 0 ;
   int result;
   
-  SWIG_check_num_args("_LWTCP::recvbuflen",1,1)
-  if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("_LWTCP::recvbuflen",1,"struct _LWTCP *");
+  SWIG_check_num_args("_LWTCP::recv_buf_not_parsed",1,1)
+  if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("_LWTCP::recv_buf_not_parsed",1,"struct _LWTCP *");
   
   if (!SWIG_IsOK(SWIG_ConvertPtr(L,1,(void**)&arg1,SWIGTYPE_p__LWTCP,0))){
-    SWIG_fail_ptr("LWTCP_recvbuflen_get",1,SWIGTYPE_p__LWTCP);
+    SWIG_fail_ptr("LWTCP_recv_buf_not_parsed_get",1,SWIGTYPE_p__LWTCP);
   }
   
-  result = (int) ((arg1)->recvbuflen);
-  lua_pushnumber(L, (lua_Number) result); SWIG_arg++;
-  return SWIG_arg;
-  
-  if(0) SWIG_fail;
-  
-fail:
-  lua_error(L);
-  return SWIG_arg;
-}
-
-
-static int _wrap_LWTCP_recvbufnotparsed_set(lua_State* L) {
-  int SWIG_arg = 0;
-  struct _LWTCP *arg1 = (struct _LWTCP *) 0 ;
-  int arg2 ;
-  
-  SWIG_check_num_args("_LWTCP::recvbufnotparsed",2,2)
-  if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("_LWTCP::recvbufnotparsed",1,"struct _LWTCP *");
-  if(!lua_isnumber(L,2)) SWIG_fail_arg("_LWTCP::recvbufnotparsed",2,"int");
-  
-  if (!SWIG_IsOK(SWIG_ConvertPtr(L,1,(void**)&arg1,SWIGTYPE_p__LWTCP,0))){
-    SWIG_fail_ptr("LWTCP_recvbufnotparsed_set",1,SWIGTYPE_p__LWTCP);
-  }
-  
-  arg2 = (int)lua_tonumber(L, 2);
-  if (arg1) (arg1)->recvbufnotparsed = arg2;
-  
-  return SWIG_arg;
-  
-  if(0) SWIG_fail;
-  
-fail:
-  lua_error(L);
-  return SWIG_arg;
-}
-
-
-static int _wrap_LWTCP_recvbufnotparsed_get(lua_State* L) {
-  int SWIG_arg = 0;
-  struct _LWTCP *arg1 = (struct _LWTCP *) 0 ;
-  int result;
-  
-  SWIG_check_num_args("_LWTCP::recvbufnotparsed",1,1)
-  if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("_LWTCP::recvbufnotparsed",1,"struct _LWTCP *");
-  
-  if (!SWIG_IsOK(SWIG_ConvertPtr(L,1,(void**)&arg1,SWIGTYPE_p__LWTCP,0))){
-    SWIG_fail_ptr("LWTCP_recvbufnotparsed_get",1,SWIGTYPE_p__LWTCP);
-  }
-  
-  result = (int) ((arg1)->recvbufnotparsed);
+  result = (int) ((arg1)->recv_buf_not_parsed);
   lua_pushnumber(L, (lua_Number) result); SWIG_arg++;
   return SWIG_arg;
   
@@ -64443,11 +64393,10 @@ static swig_lua_attribute swig_LWTCP_attributes[] = {
     { "result", _wrap_LWTCP_result_get, _wrap_LWTCP_result_set },
     { "ptr", _wrap_LWTCP_ptr_get, _wrap_LWTCP_ptr_set },
     { "hints", _wrap_LWTCP_hints_get, _wrap_LWTCP_hints_set },
-    { "sendbuf", _wrap_LWTCP_sendbuf_get, _wrap_LWTCP_sendbuf_set },
-    { "recvbuf", _wrap_LWTCP_recvbuf_get, _wrap_LWTCP_recvbuf_set },
-    { "iResult", _wrap_LWTCP_iResult_get, _wrap_LWTCP_iResult_set },
-    { "recvbuflen", _wrap_LWTCP_recvbuflen_get, _wrap_LWTCP_recvbuflen_set },
-    { "recvbufnotparsed", _wrap_LWTCP_recvbufnotparsed_get, _wrap_LWTCP_recvbufnotparsed_set },
+    { "send_buf", _wrap_LWTCP_send_buf_get, _wrap_LWTCP_send_buf_set },
+    { "recv_buf", _wrap_LWTCP_recv_buf_get, _wrap_LWTCP_recv_buf_set },
+    { "recv_buf_len", _wrap_LWTCP_recv_buf_len_get, _wrap_LWTCP_recv_buf_len_set },
+    { "recv_buf_not_parsed", _wrap_LWTCP_recv_buf_not_parsed_get, _wrap_LWTCP_recv_buf_not_parsed_set },
     { "user_id", _wrap_LWTCP_user_id_get, _wrap_LWTCP_user_id_set },
     { "pLwc", _wrap_LWTCP_pLwc_get, _wrap_LWTCP_pLwc_set },
     { "on_connect", _wrap_LWTCP_on_connect_get, _wrap_LWTCP_on_connect_set },

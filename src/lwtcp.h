@@ -56,17 +56,16 @@ typedef enum _LW_UDP_STATE {
 
 typedef struct _LWTCP {
 #if LW_PLATFORM_WIN32
-	WSADATA wsaData;
+	WSADATA wsa_data;
 #endif
 	SOCKET connect_socket;
 	struct addrinfo* result;
 	struct addrinfo* ptr;
 	struct addrinfo hints;
-	char sendbuf[LW_TCP_BUFLEN];
-	char recvbuf[LW_TCP_BUFLEN];
-	int iResult;
-	int recvbuflen;
-	int recvbufnotparsed;
+	char send_buf[LW_TCP_BUFLEN];
+	char recv_buf[LW_TCP_BUFLEN];
+	int recv_buf_len;
+	int recv_buf_not_parsed;
 	LWUNIQUEID user_id;
     LWCONTEXT* pLwc;
     LWTCP_ON_CONNECT on_connect;

@@ -33,7 +33,7 @@ char echoBuffer[ECHOMAX];        /* Buffer for echo string */
 int echoStringLen;               /* Length of string to echo */
 int respStringLen;               /* Length of response string */
 #if LW_PLATFORM_WIN32
-WSADATA wsaData;                 /* Structure for WinSock setup communication */
+WSADATA wsa_data;                 /* Structure for WinSock setup communication */
 #endif
 
 void DieWithError(char *errorMessage) {
@@ -47,7 +47,7 @@ void init_net(struct _LWCONTEXT* pLwc) {
 	echoStringLen = (int)strlen(echoString);
 #if LW_PLATFORM_WIN32
 	/* Load Winsock 2.0 DLL */
-	if (WSAStartup(MAKEWORD(2, 0), &wsaData) != 0) {
+	if (WSAStartup(MAKEWORD(2, 0), &wsa_data) != 0) {
 		fprintf(stderr, "WSAStartup() failed");
 		exit(1);
 	}

@@ -323,8 +323,8 @@ void select_server(LWSERVER* server, LWCONN* conn, LWTCP* reward_service) {
                 && reward_service->connect_socket != INVALID_SOCKET
                 && FD_ISSET(reward_service->connect_socket, &readfds)) {
                 int recv_count = (int)recv(reward_service->connect_socket,
-                                           reward_service->recvbuf,
-                                           (size_t)reward_service->recvbuflen,
+                                           reward_service->recv_buf,
+                                           (size_t)reward_service->recv_buf_len,
                                            MSG_DONTWAIT);
                 if (recv_count == 0) {
                     LOGEP("Recv size 0 from reward server. Disconnected.");
@@ -721,8 +721,8 @@ int tcp_send_battle_result(LWTCP* tcp,
     p.Player[1].Stat = puck_game->battle_stat[1];
     p.BattleTimeSec = (int)roundf(puck_game_elapsed_time(puck_game->update_tick, logic_hz));
     p.TotalHp = puck_game->player.total_hp;
-    memcpy(tcp->sendbuf, &p, sizeof(p));
-    int send_result = (int)send(tcp->connect_socket, tcp->sendbuf, sizeof(p), 0);
+    memcpy(tcp->send_buf, &p, sizeof(p));
+    int send_result = (int)send(tcp->connect_socket, tcp->send_buf, sizeof(p), 0);
     if (send_result < 0) {
         if (backoffMs > 10 * 1000 /* 10 seconds */) {
             LOGEP("tcp_send_battle_result: all retries failed!!!");
@@ -774,8 +774,8 @@ void reward_service_on_connect(LWTCP* tcp, const char* path_prefix) {
 #endif
 
 int reward_service_on_recv_packets(LWTCP* tcp) {
-    LOGI("Packet received (%d bytes) from reward service.", tcp->recvbufnotparsed);
-    return tcp->recvbufnotparsed;
+    LOGI("Packet received (%d bytes) from reward service.", tcp->recv_buf_not_parsed);
+    return tcp->recv_buf_not_parsed;
 }
 
 #if !LW_PLATFORM_WIN32

@@ -27,7 +27,7 @@ int tcp_connect(LWTCP* tcp) {
         closesocket(tcp->connect_socket);
     }
     tcp->connect_socket = INVALID_SOCKET;
-    tcp->recvbuflen = LW_TCP_BUFLEN;
+    tcp->recv_buf_len = LW_TCP_BUFLEN;
 
     
     // Attempt to connect to an address until one succeeds
@@ -131,9 +131,9 @@ LWTCP* new_tcp(LWCONTEXT* pLwc,
     signal(SIGPIPE, SIG_IGN);
 #endif
     
-    tcp->iResult = getaddrinfo(host_addr->host, host_addr->port_str, &tcp->hints, &tcp->result);
-    if (tcp->iResult != 0) {
-        LOGE("getaddrinfo failed with error: %d", tcp->iResult);
+    int result = getaddrinfo(host_addr->host, host_addr->port_str, &tcp->hints, &tcp->result);
+    if (result != 0) {
+        LOGE("getaddrinfo failed with error: %d", result);
         free(tcp);
         return 0;
     }
@@ -162,20 +162,20 @@ void tcp_update(LWTCP* tcp) {
 	if (!tcp) {
 		return;
 	}
-	if (LW_TCP_BUFLEN - tcp->recvbufnotparsed <= 0) {
+	if (LW_TCP_BUFLEN - tcp->recv_buf_not_parsed <= 0) {
 		LOGE("TCP receive buffer overrun!!!");
 	}
-	int n = (int)recv(tcp->connect_socket, tcp->recvbuf + tcp->recvbufnotparsed, LW_TCP_BUFLEN - tcp->recvbufnotparsed, 0);
+	int n = (int)recv(tcp->connect_socket, tcp->recv_buf + tcp->recv_buf_not_parsed, LW_TCP_BUFLEN - tcp->recv_buf_not_parsed, 0);
 	if (n > 0) {
         if (tcp->on_recv_packets) {
             LOGI("TCP received: %d bytes", n);
-            tcp->recvbufnotparsed += n;
+            tcp->recv_buf_not_parsed += n;
             int parsed_bytes = tcp->on_recv_packets(tcp);
             if (parsed_bytes > 0) {
                 for (int i = 0; i < LW_TCP_BUFLEN - parsed_bytes; i++) {
-                    tcp->recvbuf[i] = tcp->recvbuf[i + parsed_bytes];
+                    tcp->recv_buf[i] = tcp->recv_buf[i + parsed_bytes];
                 }
-                tcp->recvbufnotparsed -= parsed_bytes;
+                tcp->recv_buf_not_parsed -= parsed_bytes;
             }
         }
 	}

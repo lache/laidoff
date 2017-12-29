@@ -25,7 +25,7 @@ void tcp_on_connect(LWTCP* tcp, const char* path_prefix) {
 }
 
 int tcp_send_sendbuf(LWTCP* tcp, int s) {
-    int send_result = (int)send(tcp->connect_socket, tcp->sendbuf, s, 0);
+    int send_result = (int)send(tcp->connect_socket, tcp->send_buf, s, 0);
     if (send_result < 0) {
         tcp->send_fail = 1;
     }
@@ -35,7 +35,7 @@ int tcp_send_sendbuf(LWTCP* tcp, int s) {
 int tcp_send_newuser(LWTCP* tcp) {
     LOGI("Sending LWPNEWUSER");
     NEW_TCP_PACKET(LWPNEWUSER, p);
-    memcpy(tcp->sendbuf, &p, sizeof(p));
+    memcpy(tcp->send_buf, &p, sizeof(p));
     return tcp_send_sendbuf(tcp, sizeof(p));
 }
 
@@ -43,7 +43,7 @@ int tcp_send_querynick(LWTCP* tcp, const LWUNIQUEID* id) {
     LOGI("Sending LWPQUERYNICK");
     NEW_TCP_PACKET_CAPITAL(LWPQUERYNICK, p);
     memcpy(p.Id, id->v, sizeof(LWUNIQUEID));
-    memcpy(tcp->sendbuf, &p, sizeof(p));
+    memcpy(tcp->send_buf, &p, sizeof(p));
     return tcp_send_sendbuf(tcp, sizeof(p));
 }
 
@@ -51,7 +51,7 @@ int tcp_send_queue2(LWTCP* tcp, const LWUNIQUEID* id) {
     LOGI("Sending LWPQUEUE2");
     NEW_TCP_PACKET_CAPITAL(LWPQUEUE2, p);
     memcpy(p.Id, id->v, sizeof(LWUNIQUEID));
-    memcpy(tcp->sendbuf, &p, sizeof(p));
+    memcpy(tcp->send_buf, &p, sizeof(p));
     return tcp_send_sendbuf(tcp, sizeof(p));
 }
 
@@ -60,7 +60,7 @@ int tcp_send_queue3(LWTCP* tcp, const LWUNIQUEID* id, int queue_type) {
     NEW_TCP_PACKET_CAPITAL(LWPQUEUE3, p);
     memcpy(p.Id, id->v, sizeof(LWUNIQUEID));
     p.QueueType = queue_type;
-    memcpy(tcp->sendbuf, &p, sizeof(p));
+    memcpy(tcp->send_buf, &p, sizeof(p));
     return tcp_send_sendbuf(tcp, sizeof(p));
 }
 
@@ -68,7 +68,7 @@ int tcp_send_cancelqueue(LWTCP* tcp, const LWUNIQUEID* id) {
     LOGI("Sending LWPCANCELQUEUE");
     NEW_TCP_PACKET_CAPITAL(LWPCANCELQUEUE, p);
     memcpy(p.Id, id->v, sizeof(LWUNIQUEID));
-    memcpy(tcp->sendbuf, &p, sizeof(p));
+    memcpy(tcp->send_buf, &p, sizeof(p));
     return tcp_send_sendbuf(tcp, sizeof(p));
 }
 
@@ -77,7 +77,7 @@ int tcp_send_suddendeath(LWTCP* tcp, int battle_id, unsigned int token) {
     NEW_TCP_PACKET_CAPITAL(LWPSUDDENDEATH, p);
     p.Battle_id = battle_id;
     p.Token = token;
-    memcpy(tcp->sendbuf, &p, sizeof(p));
+    memcpy(tcp->send_buf, &p, sizeof(p));
     return tcp_send_sendbuf(tcp, sizeof(p));
 }
 
@@ -90,9 +90,9 @@ int tcp_send_get_leaderboard_reveal_player(LWTCP* tcp, int backoffMs, const LWUN
     NEW_TCP_PACKET_CAPITAL(LWPGETLEADERBOARDREVEALPLAYER, p);
     memcpy(p.Id, user_id, sizeof(p.Id));
     p.Count = count;
-    memcpy(tcp->sendbuf, &p, sizeof(p));
+    memcpy(tcp->send_buf, &p, sizeof(p));
     tcp->on_leaderboard_packet = 0; // do nothing when reply packet received
-    int send_result = (int)send(tcp->connect_socket, tcp->sendbuf, sizeof(p), 0);
+    int send_result = (int)send(tcp->connect_socket, tcp->send_buf, sizeof(p), 0);
     if (send_result < 0) {
         LOGI("Send result error: %d", send_result);
         if (backoffMs > 10 * 1000 /* 10 seconds */) {
@@ -121,9 +121,9 @@ int tcp_send_get_leaderboard(LWTCP* tcp, int backoffMs, int start_index, int cou
     memcpy(p.Id, &tcp->user_id, sizeof(p.Id));
     p.Start_index = start_index;
     p.Count = count;
-    memcpy(tcp->sendbuf, &p, sizeof(p));
+    memcpy(tcp->send_buf, &p, sizeof(p));
     tcp->on_leaderboard_packet = on_leaderboard_packet;
-    int send_result = (int)send(tcp->connect_socket, tcp->sendbuf, sizeof(p), 0);
+    int send_result = (int)send(tcp->connect_socket, tcp->send_buf, sizeof(p), 0);
     if (send_result < 0) {
         LOGI("Send result error: %d", send_result);
         if (backoffMs > 10 * 1000 /* 10 seconds */) {
@@ -153,8 +153,8 @@ int tcp_send_push_token(LWTCP* tcp, int backoffMs, int domain, const char* push_
     strncpy(p.Push_token, push_token, sizeof(p.Push_token) - 1);
     memcpy(p.Id, tcp->user_id.v, sizeof(p.Id));
     p.Push_token[sizeof(p.Push_token) - 1] = '\0';
-    memcpy(tcp->sendbuf, &p, sizeof(p));
-    int send_result = (int)send(tcp->connect_socket, tcp->sendbuf, sizeof(p), 0);
+    memcpy(tcp->send_buf, &p, sizeof(p));
+    int send_result = (int)send(tcp->connect_socket, tcp->send_buf, sizeof(p), 0);
     if (send_result < 0) {
         LOGI("Send result error: %d", send_result);
         if (backoffMs > 10 * 1000 /* 10 seconds */) {
@@ -179,7 +179,7 @@ int tcp_send_setnickname(LWTCP* tcp, const LWUNIQUEID* id, const char* nickname)
     memcpy(p.Id, id->v, sizeof(p.Id));
     memcpy(p.Nickname, nickname, sizeof(p.Nickname));
     p.Nickname[sizeof(p.Nickname) - 1] = 0;
-    memcpy(tcp->sendbuf, &p, sizeof(p));
+    memcpy(tcp->send_buf, &p, sizeof(p));
     return tcp_send_sendbuf(tcp, sizeof(p));
 }
 
@@ -209,15 +209,15 @@ static void debug_print_leaderboard(const LWPLEADERBOARD* p) {
 int parse_recv_packets(LWTCP* tcp) {
     LWCONTEXT* pLwc = tcp->pLwc;
     // too small for parsing
-    if (tcp->recvbufnotparsed < 2) {
+    if (tcp->recv_buf_not_parsed < 2) {
         return -1;
     }
     int parsed_bytes = 0;
-    char* cursor = tcp->recvbuf;
+    char* cursor = tcp->recv_buf;
     while (1) {
         unsigned short packet_size = *(unsigned short*)(cursor + 0);
         // still incomplete packet
-        if (packet_size == 0 || packet_size > tcp->recvbufnotparsed - parsed_bytes) {
+        if (packet_size == 0 || packet_size > tcp->recv_buf_not_parsed - parsed_bytes) {
             return parsed_bytes;
         }
         unsigned short packet_type = *(unsigned short*)(cursor + 2);
