@@ -30,7 +30,7 @@ void lw_trigger_mouse_press(LWCONTEXT* pLwc, float x, float y, int pointer_id) {
 
     convert_touch_coord_to_ui_coord(pLwc, &x, &y);
 
-    LOGI("mouse press ui coord x=%f, y=%f", x, y);
+    LOGIx("mouse press ui coord x=%f, y=%f", x, y);
 
     if (field_network(pLwc->field)) {
         mq_publish_now(pLwc, pLwc->mq, 0);
@@ -166,7 +166,7 @@ void lw_trigger_mouse_release(LWCONTEXT* pLwc, float x, float y, int pointer_id)
 
     convert_touch_coord_to_ui_coord(pLwc, &x, &y);
 
-    LOGI("mouse release ui coord x=%f, y=%f (last press ui coord x=%f, y=%f) (width %f) (height %f)\n",
+    LOGIx("mouse release ui coord x=%f, y=%f (last press ui coord x=%f, y=%f) (width %f) (height %f)\n",
          x, y,
          pLwc->last_mouse_press_x, pLwc->last_mouse_press_y,
          fabsf(x - pLwc->last_mouse_press_x),

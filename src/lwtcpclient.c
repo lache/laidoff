@@ -183,6 +183,29 @@ int tcp_send_setnickname(LWTCP* tcp, const LWUNIQUEID* id, const char* nickname)
     return tcp_send_sendbuf(tcp, sizeof(p));
 }
 
+static void debug_print_leaderboard(const LWPLEADERBOARD* p) {
+    LOGI("Count: %d", p->Count);
+    LOGI("First Item Rank: %d", p->First_item_rank);
+    LOGI("First Item Tie Count: %d", p->First_item_tie_count);
+    int rank = p->First_item_rank;
+    int tieCount = 1;
+    for (int i = 0; i < p->Count; i++) {
+        LOGI("  rank.%d %s %d", rank, p->Nickname[i], p->Score[i]);
+        if (i < p->Count - 1) {
+            if (p->Score[i] == p->Score[i + 1]) {
+                tieCount++;
+            } else {
+                if (rank == p->First_item_rank) {
+                    rank += p->First_item_tie_count;
+                } else {
+                    rank += tieCount;
+                }
+                tieCount = 1;
+            }
+        }
+    }
+}
+
 int parse_recv_packets(LWTCP* tcp) {
     LWCONTEXT* pLwc = tcp->pLwc;
     // too small for parsing
@@ -284,26 +307,7 @@ int parse_recv_packets(LWTCP* tcp) {
             LWPLEADERBOARD* p = (LWPLEADERBOARD*)cursor;
             // Cache it first
             memcpy(&pLwc->last_leaderboard, p, sizeof(LWPLEADERBOARD));
-            LOGI("Count: %d", p->Count);
-            LOGI("First Item Rank: %d", p->First_item_rank);
-            LOGI("First Item Tie Count: %d", p->First_item_tie_count);
-            int rank = p->First_item_rank;
-            int tieCount = 1;
-            for (int i = 0; i < p->Count; i++) {
-                LOGI("  rank.%d %s %d", rank, p->Nickname[i], p->Score[i]);
-                if (i < p->Count - 1) {
-                    if (p->Score[i] == p->Score[i + 1]) {
-                        tieCount++;
-                    } else {
-                        if (rank == p->First_item_rank) {
-                            rank += p->First_item_tie_count;
-                        } else {
-                            rank += tieCount;
-                        }
-                        tieCount = 1;
-                    }
-                }
-            }
+            //debug_print_leaderboard(p);
             if (tcp->on_leaderboard_packet) {
                 tcp->on_leaderboard_packet(pLwc);
             }

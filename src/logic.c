@@ -886,7 +886,7 @@ static int loop_logic_update(zloop_t* loop, int timer_id, void* args) {
 static int loop_pipe_reader(zloop_t* loop, zsock_t* pipe, void* args) {
     LWCONTEXT* pLwc = args;
     zmsg_t* msg = zmsg_recv(pipe);
-    LOGI(LWLOGPOS "Message received through pipe");
+    LOGIx(LWLOGPOS "Message received through pipe");
     zframe_t* f = zmsg_first(msg);
     while (f) {
         byte* d = zframe_data(f);
@@ -930,7 +930,7 @@ static int loop_pipe_reader(zloop_t* loop, zsock_t* pipe, void* args) {
         } else if (d && s == sizeof(LWMSGUIEVENT) && *(int*)d == LM_LWMSGUIEVENT) {
             LWMSGUIEVENT* m = (LWMSGUIEVENT*)d;
             if (pLwc->puck_game->world_roll_dirty == 0) {
-                LOGI("UI Event: %s (w_ratio=%.2f, h_ratio=%.2f)", m->id, m->w_ratio, m->h_ratio);
+                LOGIx("UI Event: %s (w_ratio=%.2f, h_ratio=%.2f)", m->id, m->w_ratio, m->h_ratio);
                 script_emit_ui_event(pLwc->L, m->id, m->w_ratio, m->h_ratio);
             } else {
                 LOGI("UI Event '%s' suppressed since state is dirty", m->id);

@@ -79,7 +79,7 @@ end
 
 -- Lua handler for logc frame finish events emitted from C
 function on_ui_event(id, w_ratio, h_ratio)
-	print(string.format('ui event emitted from C:%s (w_ratio:%.2f, h_ratio:%.2f)', id, w_ratio, h_ratio))
+	--print(string.format('ui event emitted from C:%s (w_ratio:%.2f, h_ratio:%.2f)', id, w_ratio, h_ratio))
 	local gtid = 'catapult'
 	if id == 'seltower0' then gtid = 'catapult'
 	elseif id == 'seltower1' then gtid = 'crossbow'
@@ -273,6 +273,7 @@ function on_ui_event(id, w_ratio, h_ratio)
 		lo.construct_set_preview_enable(c.construct, 0)
 		return 0
 	end
+	--[[
 	local gt = data.guntower[gtid]
 	if last_construct_gtid ~= gtid then
 		lo.construct_set_preview_enable(c.construct, 1)
@@ -291,6 +292,7 @@ function on_ui_event(id, w_ratio, h_ratio)
 		gtinst:start_thinking()
 	end
 	last_construct_gtid = gtid
+	]]--
 	return 0
 end
 
