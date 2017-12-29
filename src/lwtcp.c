@@ -23,27 +23,27 @@ static int make_socket_nonblocking(int sock) {
 }
 
 int tcp_connect(LWTCP* tcp) {
-    if (tcp->ConnectSocket) {
-        closesocket(tcp->ConnectSocket);
+    if (tcp->connect_socket) {
+        closesocket(tcp->connect_socket);
     }
-    tcp->ConnectSocket = INVALID_SOCKET;
+    tcp->connect_socket = INVALID_SOCKET;
     tcp->recvbuflen = LW_TCP_BUFLEN;
 
     
     // Attempt to connect to an address until one succeeds
     for (tcp->ptr = tcp->result; tcp->ptr != NULL; tcp->ptr = tcp->ptr->ai_next) {
         // Create a socket for connecting to server
-        tcp->ConnectSocket = socket(tcp->ptr->ai_family, tcp->ptr->ai_socktype,
+        tcp->connect_socket = socket(tcp->ptr->ai_family, tcp->ptr->ai_socktype,
                                     tcp->ptr->ai_protocol);
-        if (tcp->ConnectSocket == INVALID_SOCKET) {
+        if (tcp->connect_socket == INVALID_SOCKET) {
             LOGE("socket failed with error: %ld", (long)WSAGetLastError());
             return -2;
         }
         
-        make_socket_nonblocking(tcp->ConnectSocket);
+        make_socket_nonblocking(tcp->connect_socket);
 
         // Connect to server
-        int connect_ret = connect(tcp->ConnectSocket, tcp->ptr->ai_addr, (int)tcp->ptr->ai_addrlen);
+        int connect_ret = connect(tcp->connect_socket, tcp->ptr->ai_addr, (int)tcp->ptr->ai_addrlen);
         if (connect_ret == -1) {
             int tcp_connect_errno = errno;
             if (tcp_connect_errno == 0) {
@@ -51,33 +51,33 @@ int tcp_connect(LWTCP* tcp) {
             } else {
                 if (tcp_connect_errno != EAGAIN && tcp_connect_errno != EINPROGRESS && tcp_connect_errno != 0) {
                     LOGE("TCP connect failed! (refused?)");
-                    closesocket(tcp->ConnectSocket);
-                    tcp->ConnectSocket = INVALID_SOCKET;
+                    closesocket(tcp->connect_socket);
+                    tcp->connect_socket = INVALID_SOCKET;
                     continue;
                 }
                 fd_set fdset;
                 FD_ZERO(&fdset);
-                FD_SET(tcp->ConnectSocket, &fdset);
+                FD_SET(tcp->connect_socket, &fdset);
                 struct timeval connect_timeout;
                 connect_timeout.tv_sec = 3;
                 connect_timeout.tv_usec = 0;
-                int select_ret = select(tcp->ConnectSocket + 1, NULL, &fdset, NULL, &connect_timeout);
+                int select_ret = select(tcp->connect_socket + 1, NULL, &fdset, NULL, &connect_timeout);
                 if (select_ret == 0) {
                     LOGE("TCP connect timeout");
-                    closesocket(tcp->ConnectSocket);
-                    tcp->ConnectSocket = INVALID_SOCKET;
+                    closesocket(tcp->connect_socket);
+                    tcp->connect_socket = INVALID_SOCKET;
                     continue;
                 }
                 if (select_ret != 1) {
                     LOGE("TCP connect select failed");
-                    closesocket(tcp->ConnectSocket);
-                    tcp->ConnectSocket = INVALID_SOCKET;
+                    closesocket(tcp->connect_socket);
+                    tcp->connect_socket = INVALID_SOCKET;
                     continue;
                 }
-                if (!FD_ISSET(tcp->ConnectSocket, &fdset)) {
+                if (!FD_ISSET(tcp->connect_socket, &fdset)) {
                     LOGE("TCP connect failed!");
-                    closesocket(tcp->ConnectSocket);
-                    tcp->ConnectSocket = INVALID_SOCKET;
+                    closesocket(tcp->connect_socket);
+                    tcp->connect_socket = INVALID_SOCKET;
                     continue;
                 }
             }
@@ -85,7 +85,7 @@ int tcp_connect(LWTCP* tcp) {
             socklen_t optlen;
             optval = -1;
             optlen = sizeof(optval);
-            if (getsockopt(tcp->ConnectSocket, SOL_SOCKET, SO_ERROR, (char*)&optval, &optlen) == -1) {
+            if (getsockopt(tcp->connect_socket, SOL_SOCKET, SO_ERROR, (char*)&optval, &optlen) == -1) {
                 LOGE("getsockopt error");
                 continue;
             }
@@ -93,21 +93,21 @@ int tcp_connect(LWTCP* tcp) {
                 // Connection ok.
             } else {
                 LOGE("Connection error, optval=%d (%s)", optval, strerror(optval));
-                closesocket(tcp->ConnectSocket);
-                tcp->ConnectSocket = INVALID_SOCKET;
+                closesocket(tcp->connect_socket);
+                tcp->connect_socket = INVALID_SOCKET;
                 continue;
             }
         }
         break;
     }
     //freeaddrinfo(tcp->result);
-    if (tcp->ConnectSocket == INVALID_SOCKET) {
+    if (tcp->connect_socket == INVALID_SOCKET) {
         LOGE("Unable to connect to server!");
         return -3;
     }
 #if LW_PLATFORM_IOS
     int set = 1;
-    setsockopt (tcp->ConnectSocket, SOL_SOCKET, SO_NOSIGPIPE, &set, sizeof (int));
+    setsockopt (tcp->connect_socket, SOL_SOCKET, SO_NOSIGPIPE, &set, sizeof (int));
 #endif
     return 0;
 }
@@ -165,7 +165,7 @@ void tcp_update(LWTCP* tcp) {
 	if (LW_TCP_BUFLEN - tcp->recvbufnotparsed <= 0) {
 		LOGE("TCP receive buffer overrun!!!");
 	}
-	int n = (int)recv(tcp->ConnectSocket, tcp->recvbuf + tcp->recvbufnotparsed, LW_TCP_BUFLEN - tcp->recvbufnotparsed, 0);
+	int n = (int)recv(tcp->connect_socket, tcp->recvbuf + tcp->recvbufnotparsed, LW_TCP_BUFLEN - tcp->recvbufnotparsed, 0);
 	if (n > 0) {
         if (tcp->on_recv_packets) {
             LOGI("TCP received: %d bytes", n);

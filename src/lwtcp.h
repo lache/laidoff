@@ -58,7 +58,7 @@ typedef struct _LWTCP {
 #if LW_PLATFORM_WIN32
 	WSADATA wsaData;
 #endif
-	SOCKET ConnectSocket;
+	SOCKET connect_socket;
 	struct addrinfo* result;
 	struct addrinfo* ptr;
 	struct addrinfo hints;

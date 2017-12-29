@@ -51740,6 +51740,32 @@ fail:
 }
 
 
+static int _wrap_rmsg_start_text_input_activity(lua_State* L) {
+  int SWIG_arg = 0;
+  LWCONTEXT *arg1 = (LWCONTEXT *) 0 ;
+  int arg2 ;
+  
+  SWIG_check_num_args("rmsg_start_text_input_activity",2,2)
+  if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("rmsg_start_text_input_activity",1,"LWCONTEXT *");
+  if(!lua_isnumber(L,2)) SWIG_fail_arg("rmsg_start_text_input_activity",2,"int");
+  
+  if (!SWIG_IsOK(SWIG_ConvertPtr(L,1,(void**)&arg1,SWIGTYPE_p__LWCONTEXT,0))){
+    SWIG_fail_ptr("rmsg_start_text_input_activity",1,SWIGTYPE_p__LWCONTEXT);
+  }
+  
+  arg2 = (int)lua_tonumber(L, 2);
+  rmsg_start_text_input_activity(arg1,arg2);
+  
+  return SWIG_arg;
+  
+  if(0) SWIG_fail;
+  
+fail:
+  lua_error(L);
+  return SWIG_arg;
+}
+
+
 static int _wrap_LWPARABOLA3D_abc_set(lua_State* L) {
   int SWIG_arg = 0;
   struct _LWPARABOLA3D *arg1 = (struct _LWPARABOLA3D *) 0 ;
@@ -53403,13 +53429,13 @@ static int _wrap_puck_game_is_tutorial_completed(lua_State* L) {
   int result;
   
   SWIG_check_num_args("puck_game_is_tutorial_completed",1,1)
-  if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("puck_game_is_tutorial_completed",1,"LWPUCKGAME *");
+  if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("puck_game_is_tutorial_completed",1,"LWPUCKGAME const *");
   
   if (!SWIG_IsOK(SWIG_ConvertPtr(L,1,(void**)&arg1,SWIGTYPE_p__LWPUCKGAME,0))){
     SWIG_fail_ptr("puck_game_is_tutorial_completed",1,SWIGTYPE_p__LWPUCKGAME);
   }
   
-  result = (int)puck_game_is_tutorial_completed(arg1);
+  result = (int)puck_game_is_tutorial_completed((struct _LWPUCKGAME const *)arg1);
   lua_pushnumber(L, (lua_Number) result); SWIG_arg++;
   return SWIG_arg;
   
@@ -53427,13 +53453,13 @@ static int _wrap_puck_game_is_tutorial_stoppable(lua_State* L) {
   int result;
   
   SWIG_check_num_args("puck_game_is_tutorial_stoppable",1,1)
-  if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("puck_game_is_tutorial_stoppable",1,"LWPUCKGAME *");
+  if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("puck_game_is_tutorial_stoppable",1,"LWPUCKGAME const *");
   
   if (!SWIG_IsOK(SWIG_ConvertPtr(L,1,(void**)&arg1,SWIGTYPE_p__LWPUCKGAME,0))){
     SWIG_fail_ptr("puck_game_is_tutorial_stoppable",1,SWIGTYPE_p__LWPUCKGAME);
   }
   
-  result = (int)puck_game_is_tutorial_stoppable(arg1);
+  result = (int)puck_game_is_tutorial_stoppable((struct _LWPUCKGAME const *)arg1);
   lua_pushnumber(L, (lua_Number) result); SWIG_arg++;
   return SWIG_arg;
   
@@ -63451,27 +63477,27 @@ fail:
 }
 
 
-static int _wrap_LWTCP_ConnectSocket_set(lua_State* L) {
+static int _wrap_LWTCP_connect_socket_set(lua_State* L) {
   int SWIG_arg = 0;
   struct _LWTCP *arg1 = (struct _LWTCP *) 0 ;
   SOCKET arg2 ;
   SOCKET *argp2 ;
   
-  SWIG_check_num_args("_LWTCP::ConnectSocket",2,2)
-  if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("_LWTCP::ConnectSocket",1,"struct _LWTCP *");
-  if(!lua_isuserdata(L,2)) SWIG_fail_arg("_LWTCP::ConnectSocket",2,"SOCKET");
+  SWIG_check_num_args("_LWTCP::connect_socket",2,2)
+  if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("_LWTCP::connect_socket",1,"struct _LWTCP *");
+  if(!lua_isuserdata(L,2)) SWIG_fail_arg("_LWTCP::connect_socket",2,"SOCKET");
   
   if (!SWIG_IsOK(SWIG_ConvertPtr(L,1,(void**)&arg1,SWIGTYPE_p__LWTCP,0))){
-    SWIG_fail_ptr("LWTCP_ConnectSocket_set",1,SWIGTYPE_p__LWTCP);
+    SWIG_fail_ptr("LWTCP_connect_socket_set",1,SWIGTYPE_p__LWTCP);
   }
   
   
   if (!SWIG_IsOK(SWIG_ConvertPtr(L,2,(void**)&argp2,SWIGTYPE_p_SOCKET,0))){
-    SWIG_fail_ptr("LWTCP_ConnectSocket_set",2,SWIGTYPE_p_SOCKET);
+    SWIG_fail_ptr("LWTCP_connect_socket_set",2,SWIGTYPE_p_SOCKET);
   }
   arg2 = *argp2;
   
-  if (arg1) (arg1)->ConnectSocket = arg2;
+  if (arg1) (arg1)->connect_socket = arg2;
   
   return SWIG_arg;
   
@@ -63483,19 +63509,19 @@ fail:
 }
 
 
-static int _wrap_LWTCP_ConnectSocket_get(lua_State* L) {
+static int _wrap_LWTCP_connect_socket_get(lua_State* L) {
   int SWIG_arg = 0;
   struct _LWTCP *arg1 = (struct _LWTCP *) 0 ;
   SOCKET result;
   
-  SWIG_check_num_args("_LWTCP::ConnectSocket",1,1)
-  if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("_LWTCP::ConnectSocket",1,"struct _LWTCP *");
+  SWIG_check_num_args("_LWTCP::connect_socket",1,1)
+  if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("_LWTCP::connect_socket",1,"struct _LWTCP *");
   
   if (!SWIG_IsOK(SWIG_ConvertPtr(L,1,(void**)&arg1,SWIGTYPE_p__LWTCP,0))){
-    SWIG_fail_ptr("LWTCP_ConnectSocket_get",1,SWIGTYPE_p__LWTCP);
+    SWIG_fail_ptr("LWTCP_connect_socket_get",1,SWIGTYPE_p__LWTCP);
   }
   
-  result =  ((arg1)->ConnectSocket);
+  result =  ((arg1)->connect_socket);
   {
     SOCKET * resultptr;
     resultptr = (SOCKET *) malloc(sizeof(SOCKET));
@@ -64413,7 +64439,7 @@ static int _proxy__wrap_new_LWTCP(lua_State *L) {
     return 1;
 }
 static swig_lua_attribute swig_LWTCP_attributes[] = {
-    { "ConnectSocket", _wrap_LWTCP_ConnectSocket_get, _wrap_LWTCP_ConnectSocket_set },
+    { "connect_socket", _wrap_LWTCP_connect_socket_get, _wrap_LWTCP_connect_socket_set },
     { "result", _wrap_LWTCP_result_get, _wrap_LWTCP_result_set },
     { "ptr", _wrap_LWTCP_ptr_get, _wrap_LWTCP_ptr_set },
     { "hints", _wrap_LWTCP_hints_get, _wrap_LWTCP_hints_set },
@@ -81722,6 +81748,7 @@ static swig_lua_method swig_SwigModule_methods[]= {
     { "rmsg_rparams", _wrap_rmsg_rparams},
     { "rmsg_quitapp", _wrap_rmsg_quitapp},
     { "rmsg_loadtex", _wrap_rmsg_loadtex},
+    { "rmsg_start_text_input_activity", _wrap_rmsg_start_text_input_activity},
     { "lwparabola_three_points_on_2d_plane", _wrap_lwparabola_three_points_on_2d_plane},
     { "lwparabola_param_t", _wrap_lwparabola_param_t},
     { "lwparabola_p_from_param_t", _wrap_lwparabola_p_from_param_t},

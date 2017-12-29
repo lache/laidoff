@@ -25,7 +25,7 @@ void tcp_on_connect(LWTCP* tcp, const char* path_prefix) {
 }
 
 int tcp_send_sendbuf(LWTCP* tcp, int s) {
-    int send_result = (int)send(tcp->ConnectSocket, tcp->sendbuf, s, 0);
+    int send_result = (int)send(tcp->connect_socket, tcp->sendbuf, s, 0);
     if (send_result < 0) {
         tcp->send_fail = 1;
     }
@@ -92,7 +92,7 @@ int tcp_send_get_leaderboard_reveal_player(LWTCP* tcp, int backoffMs, const LWUN
     p.Count = count;
     memcpy(tcp->sendbuf, &p, sizeof(p));
     tcp->on_leaderboard_packet = 0; // do nothing when reply packet received
-    int send_result = (int)send(tcp->ConnectSocket, tcp->sendbuf, sizeof(p), 0);
+    int send_result = (int)send(tcp->connect_socket, tcp->sendbuf, sizeof(p), 0);
     if (send_result < 0) {
         LOGI("Send result error: %d", send_result);
         if (backoffMs > 10 * 1000 /* 10 seconds */) {
@@ -123,7 +123,7 @@ int tcp_send_get_leaderboard(LWTCP* tcp, int backoffMs, int start_index, int cou
     p.Count = count;
     memcpy(tcp->sendbuf, &p, sizeof(p));
     tcp->on_leaderboard_packet = on_leaderboard_packet;
-    int send_result = (int)send(tcp->ConnectSocket, tcp->sendbuf, sizeof(p), 0);
+    int send_result = (int)send(tcp->connect_socket, tcp->sendbuf, sizeof(p), 0);
     if (send_result < 0) {
         LOGI("Send result error: %d", send_result);
         if (backoffMs > 10 * 1000 /* 10 seconds */) {
@@ -154,7 +154,7 @@ int tcp_send_push_token(LWTCP* tcp, int backoffMs, int domain, const char* push_
     memcpy(p.Id, tcp->user_id.v, sizeof(p.Id));
     p.Push_token[sizeof(p.Push_token) - 1] = '\0';
     memcpy(tcp->sendbuf, &p, sizeof(p));
-    int send_result = (int)send(tcp->ConnectSocket, tcp->sendbuf, sizeof(p), 0);
+    int send_result = (int)send(tcp->connect_socket, tcp->sendbuf, sizeof(p), 0);
     if (send_result < 0) {
         LOGI("Send result error: %d", send_result);
         if (backoffMs > 10 * 1000 /* 10 seconds */) {

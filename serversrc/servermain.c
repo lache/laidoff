@@ -301,13 +301,13 @@ void select_server(LWSERVER* server, LWCONN* conn, LWTCP* reward_service) {
     fd_set readfds;
     FD_ZERO(&readfds);
     FD_SET(server->s, &readfds);
-    if (reward_service && reward_service->ConnectSocket != INVALID_SOCKET) {
-        FD_SET(reward_service->ConnectSocket, &readfds);
+    if (reward_service && reward_service->connect_socket != INVALID_SOCKET) {
+        FD_SET(reward_service->connect_socket, &readfds);
     }
     struct timeval tv;
     tv.tv_sec = 0;
     tv.tv_usec = 2500; // 400 Hz
-    int maxfds = (int)(LWMAX(reward_service->ConnectSocket, server->s)) + 1;
+    int maxfds = (int)(LWMAX(reward_service->connect_socket, server->s)) + 1;
     int rv = select(maxfds, &readfds, NULL, NULL, &tv);
     LOGIx("select() return value: %d", rv);
     //try to receive some data, this is a blocking call
@@ -320,16 +320,16 @@ void select_server(LWSERVER* server, LWCONN* conn, LWTCP* reward_service) {
 //            break;
         default:
             if (reward_service
-                && reward_service->ConnectSocket != INVALID_SOCKET
-                && FD_ISSET(reward_service->ConnectSocket, &readfds)) {
-                int recv_count = (int)recv(reward_service->ConnectSocket,
+                && reward_service->connect_socket != INVALID_SOCKET
+                && FD_ISSET(reward_service->connect_socket, &readfds)) {
+                int recv_count = (int)recv(reward_service->connect_socket,
                                            reward_service->recvbuf,
                                            (size_t)reward_service->recvbuflen,
                                            MSG_DONTWAIT);
                 if (recv_count == 0) {
                     LOGEP("Recv size 0 from reward server. Disconnected.");
-                    closesocket(reward_service->ConnectSocket);
-                    reward_service->ConnectSocket = INVALID_SOCKET;
+                    closesocket(reward_service->connect_socket);
+                    reward_service->connect_socket = INVALID_SOCKET;
                 }
             }
             if (FD_ISSET(server->s, &readfds)) {
@@ -722,7 +722,7 @@ int tcp_send_battle_result(LWTCP* tcp,
     p.BattleTimeSec = (int)roundf(puck_game_elapsed_time(puck_game->update_tick, logic_hz));
     p.TotalHp = puck_game->player.total_hp;
     memcpy(tcp->sendbuf, &p, sizeof(p));
-    int send_result = (int)send(tcp->ConnectSocket, tcp->sendbuf, sizeof(p), 0);
+    int send_result = (int)send(tcp->connect_socket, tcp->sendbuf, sizeof(p), 0);
     if (send_result < 0) {
         if (backoffMs > 10 * 1000 /* 10 seconds */) {
             LOGEP("tcp_send_battle_result: all retries failed!!!");
