@@ -559,7 +559,8 @@ public class LaidoffNativeActivity extends NativeActivity implements RewardedVid
         input.setImeOptions(input.getImeOptions() | EditorInfo.IME_FLAG_NO_EXTRACT_UI | EditorInfo.IME_ACTION_DONE);
         // Specify the type of input expected; this, for example, sets the input as a password, and will mask the text
         input.setInputType(InputType.TYPE_CLASS_TEXT);
-        input.requestFocus();
+        //input.requestFocus();
+        input.clearFocus();
         builder.setView(input);
         // Set up the buttons
         builder.setPositiveButton(getString(R.string.change_nickname), new DialogInterface.OnClickListener() {
