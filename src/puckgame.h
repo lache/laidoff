@@ -169,6 +169,8 @@ typedef struct _LWPUCKGAME {
     void(*on_puck_wall_collision)(LWPUCKGAME*, float, float);
     void(*on_puck_tower_collision)(LWPUCKGAME*, float, float);
     void(*on_puck_player_collision)(LWPUCKGAME*, float, float);
+	void(*on_player_dash)(LWPUCKGAME*);
+	void(*on_finished)(LWPUCKGAME*, int);
 	void* server;
 	int battle_id;
 	unsigned int token;

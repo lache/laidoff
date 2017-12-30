@@ -6,26 +6,23 @@ import android.app.NativeActivity;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.res.AssetManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.media.AudioManager;
+import android.media.MediaPlayer;
 import android.media.SoundPool;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.text.InputType;
 import android.util.Log;
-import android.view.KeyEvent;
 import android.view.View;
 import android.view.WindowManager;
 import android.view.inputmethod.EditorInfo;
-import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.ads.AdRequest;
@@ -68,8 +65,21 @@ public class LaidoffNativeActivity extends NativeActivity implements RewardedVid
     private static LaidoffNativeActivity INSTANCE;
     public static final String LOG_TAG = "and9";
     private RewardedVideoAd mRewardedVideoAd;
-    private int mSound_MetalHit;
     private SoundPool mSoundPool;
+    private int mSoundCollapse;
+    private int mSoundCollision;
+    private int mSoundDamage;
+    private int mSoundDash1;
+    private int mSoundDash2;
+    private int mSoundDefeat;
+    private int mSoundIntroBgm;
+    private int mSoundVictory;
+    private int mSoundSwoosh;
+    private int mSoundClick;
+    private int mSoundReady;
+    private int mSoundSteady;
+    private int mSoundGo;
+    private static MediaPlayer mBgmPlayer;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -108,7 +118,7 @@ public class LaidoffNativeActivity extends NativeActivity implements RewardedVid
         downloadResFromServer();
 
         //noinspection deprecation
-        mSoundPool = new SoundPool(5, AudioManager.STREAM_MUSIC, 0);
+        mSoundPool = new SoundPool(15, AudioManager.STREAM_MUSIC, 0);
         mSoundPool.setOnLoadCompleteListener(new SoundPool.OnLoadCompleteListener() {
             @Override
             public void onLoadComplete(SoundPool soundPool, int sampleId,
@@ -118,7 +128,22 @@ public class LaidoffNativeActivity extends NativeActivity implements RewardedVid
                 //mSoundPool.play(sampleId, 1, 1, 0, 0, 1);
             }
         });
-        mSound_MetalHit = mSoundPool.load(getApplicationContext(), R.raw.sfx_metal_hit, 1);
+        mSoundCollapse = mSoundPool.load(getApplicationContext(), R.raw.collapse, 1);
+        mSoundCollision = mSoundPool.load(getApplicationContext(), R.raw.collision, 1);
+        mSoundDamage = mSoundPool.load(getApplicationContext(), R.raw.damage, 1);
+        mSoundDash1 = mSoundPool.load(getApplicationContext(), R.raw.dash1, 1);
+        mSoundDash2 = mSoundPool.load(getApplicationContext(), R.raw.dash2, 1);
+        mSoundDefeat = mSoundPool.load(getApplicationContext(), R.raw.defeat, 1);
+        mSoundIntroBgm = mSoundPool.load(getApplicationContext(), R.raw.introbgm, 1);
+        mSoundVictory = mSoundPool.load(getApplicationContext(), R.raw.victory, 1);
+        mSoundSwoosh = mSoundPool.load(getApplicationContext(), R.raw.swoosh, 1);
+        mSoundClick = mSoundPool.load(getApplicationContext(), R.raw.click, 1);
+        mSoundReady = mSoundPool.load(getApplicationContext(), R.raw.ready, 1);
+        mSoundSteady = mSoundPool.load(getApplicationContext(), R.raw.steady, 1);
+        mSoundGo = mSoundPool.load(getApplicationContext(), R.raw.go, 1);
+
+        mBgmPlayer = MediaPlayer.create(getApplicationContext(), R.raw.introbgm);
+        mBgmPlayer.setLooping(true);
     }
 
     private void enableImmersiveMode() {
@@ -156,8 +181,56 @@ public class LaidoffNativeActivity extends NativeActivity implements RewardedVid
         mRewardedVideoAd.loadAd(getString(R.string.reward_video_ad_test), new AdRequest.Builder().build());
     }
 
-    public void playMetalHitSound() {
-        mSoundPool.play(mSound_MetalHit, 1, 1, 0, 0, 1);
+    public void playCollapse() {
+        mSoundPool.play(mSoundCollapse, 1, 1, 0, 0, 1);
+    }
+
+    public void playCollision() {
+        mSoundPool.play(mSoundCollision, 1, 1, 0, 0, 1);
+    }
+
+    public void playDamage() {
+        mSoundPool.play(mSoundDamage, 1, 1, 0, 0, 1);
+    }
+
+    public void playDash1() {
+        mSoundPool.play(mSoundDash1, 1, 1, 0, 0, 1);
+    }
+
+    public void playDash2() {
+        mSoundPool.play(mSoundDash2, 1, 1, 0, 0, 1);
+    }
+
+    public void playDefeat() {
+        mSoundPool.play(mSoundDefeat, 1, 1, 0, 0, 1);
+    }
+
+    public void playIntroBgm() {
+        mSoundPool.play(mSoundIntroBgm, 1, 1, 0, 0, 1);
+    }
+
+    public void playVictory() {
+        mSoundPool.play(mSoundVictory, 1, 1, 0, 0, 1);
+    }
+
+    public void playSwoosh() {
+        mSoundPool.play(mSoundSwoosh, 1, 1, 0, 0, 1);
+    }
+
+    public void playClick() {
+        mSoundPool.play(mSoundClick, 1, 1, 0, 0, 1);
+    }
+
+    public void playReady() {
+        mSoundPool.play(mSoundReady, 1, 1, 0, 0, 1);
+    }
+
+    public void playSteady() {
+        mSoundPool.play(mSoundSteady, 1, 1, 0, 0, 1);
+    }
+
+    public void playGo() {
+        mSoundPool.play(mSoundGo, 1, 1, 0, 0, 1);
     }
 
     private void downloadResFromServer() {
@@ -250,6 +323,7 @@ public class LaidoffNativeActivity extends NativeActivity implements RewardedVid
         }
         super.onPause();
         Log.d(LOG_TAG, "onPause()");
+        mBgmPlayer.pause();
     }
 
     @Override
@@ -259,6 +333,7 @@ public class LaidoffNativeActivity extends NativeActivity implements RewardedVid
         }
         super.onResume();
         Log.d(LOG_TAG, "onResume()");
+        mBgmPlayer.start();
     }
 
 
@@ -317,8 +392,68 @@ public class LaidoffNativeActivity extends NativeActivity implements RewardedVid
     }
 
     @SuppressWarnings("unused")
-    public static void startPlayMetalHitSound(String dummy) {
-        INSTANCE.playMetalHitSound();
+    public static void startCollapseSound(String dummy) {
+        INSTANCE.playCollapse();
+    }
+
+    @SuppressWarnings("unused")
+    public static void startCollisionSound(String dummy) {
+        INSTANCE.playCollision();
+    }
+
+    @SuppressWarnings("unused")
+    public static void startDamageSound(String dummy) {
+        INSTANCE.playDamage();
+    }
+
+    @SuppressWarnings("unused")
+    public static void startDash1Sound(String dummy) {
+        INSTANCE.playDash1();
+    }
+
+    @SuppressWarnings("unused")
+    public static void startDash2Sound(String dummy) {
+        INSTANCE.playDash2();
+    }
+
+    @SuppressWarnings("unused")
+    public static void startDefeatSound(String dummy) {
+        INSTANCE.playDefeat();
+    }
+
+    @SuppressWarnings("unused")
+    public static void startIntroBgmSound(String dummy) {
+        INSTANCE.playIntroBgm();
+    }
+
+    @SuppressWarnings("unused")
+    public static void startVictorySound(String dummy) {
+        INSTANCE.playVictory();
+    }
+
+    @SuppressWarnings("unused")
+    public static void startSwooshSound(String dummy) {
+        INSTANCE.playSwoosh();
+    }
+
+    @SuppressWarnings("unused")
+    public static void startClickSound(String dummy) {
+        INSTANCE.playClick();
+    }
+
+    @SuppressWarnings("unused")
+    public static void startReadySound(String dummy) {
+        INSTANCE.playReady();
+    }
+
+    @SuppressWarnings("unused")
+    public static void startSteadySound(String dummy) {
+        INSTANCE.playSteady();
+    }
+
+    @SuppressWarnings("unused")
+    public static void startGoSound(String dummy) {
+        INSTANCE.playGo();
     }
 
     public static String getPackageVersion() {

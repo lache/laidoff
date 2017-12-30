@@ -922,6 +922,8 @@ static void dequeue_puck_game_state_and_apply(LWCONTEXT* pLwc) {
             if (new_state.bf.player_current_hp == 0) {
                 tower->collapsing = 1;
                 tower->collapsing_time = 0;
+                play_sound(LWS_COLLAPSE);
+                play_sound(LWS_VICTORY);
             }
             tower->last_damaged_at = lwtimepoint_now_seconds();
         }
@@ -937,6 +939,8 @@ static void dequeue_puck_game_state_and_apply(LWCONTEXT* pLwc) {
             if (new_state.bf.target_current_hp == 0) {
                 tower->collapsing = 1;
                 tower->collapsing_time = 0;
+                play_sound(LWS_COLLAPSE);
+                play_sound(LWS_DEFEAT);
             }
             tower->last_damaged_at = lwtimepoint_now_seconds();
         }

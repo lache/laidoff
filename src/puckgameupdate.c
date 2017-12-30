@@ -92,7 +92,7 @@ static void puck_game_on_puck_wall_collision(LWPUCKGAME* puck_game, float vdlen,
     // play hit sound only if sufficient velocity difference
     LOGIx("puck_game_on_puck_wall_collision vdlen=%f, depth=%f", vdlen, depth);
     if (vdlen > 0.5f && depth > LWEPSILON) {
-        play_sound(LWS_METAL_HIT);
+        play_sound(LWS_COLLISION);
     }
 }
 
@@ -100,7 +100,7 @@ static void puck_game_on_puck_tower_collision(LWPUCKGAME* puck_game, float vdlen
     // play hit sound only if sufficient velocity difference
     LOGIx("puck_game_on_puck_wall_collision vdlen=%f, depth=%f", vdlen, depth);
     if (vdlen > 0.5f && depth > LWEPSILON) {
-        play_sound(LWS_METAL_HIT);
+        play_sound(LWS_COLLISION);
     }
 }
 
@@ -108,10 +108,23 @@ static void puck_game_on_puck_player_collision(LWPUCKGAME* puck_game, float vdle
     // play hit sound only if sufficient velocity difference
     LOGIx("puck_game_on_puck_wall_collision vdlen=%f, depth=%f", vdlen, depth);
     if (vdlen > 0.5f && depth > LWEPSILON) {
-        play_sound(LWS_METAL_HIT);
+        play_sound(LWS_COLLISION);
     }
     LWCONTEXT* pLwc = (LWCONTEXT*)puck_game->pLwc;
     script_on_near_puck_player(pLwc->script, puck_game_dashing(&puck_game->remote_dash[0]));
+}
+
+static void puck_game_on_player_dash(LWPUCKGAME* puck_game) {
+    play_sound(LWS_DASH2);
+}
+
+static void puck_game_on_finished(LWPUCKGAME* puck_game, int winner) {
+    if (puck_game->player_no == winner) {
+        play_sound(LWS_VICTORY);
+    } else {
+        play_sound(LWS_DEFEAT);
+    }
+    play_sound(LWS_COLLAPSE);
 }
 
 static void update_tower(LWPUCKGAME* puck_game, float delta_time) {
@@ -132,6 +145,8 @@ void update_puck_game(LWCONTEXT* pLwc, LWPUCKGAME* puck_game, double delta_time)
     puck_game->on_puck_wall_collision = puck_game_on_puck_wall_collision;
     puck_game->on_puck_tower_collision = puck_game_on_puck_tower_collision;
     puck_game->on_puck_player_collision = puck_game_on_puck_player_collision;
+    puck_game->on_player_dash = puck_game_on_player_dash;
+    puck_game->on_finished = puck_game_on_finished;
     // tick physics engine only if practice mode (single play mode)
     if (puck_game->game_state == LPGS_PRACTICE || puck_game->game_state == LPGS_TUTORIAL) {
         // update puck game time is done in the function below
@@ -146,6 +161,7 @@ void update_puck_game(LWCONTEXT* pLwc, LWPUCKGAME* puck_game, double delta_time)
             int boundary = LPGB_E + i;
             puck_game->boundary_impact[boundary] = puck_game->boundary_impact_start;
             puck_game->boundary_impact_player_no[boundary] = puck_game->puck_owner_player_no;
+            play_sound(LWS_COLLISION);
         }
     }
     // clear wall hit bit here only on online mode
@@ -392,6 +408,8 @@ void puck_game_spawn_tower_damage_text(LWCONTEXT* pLwc, LWPUCKGAME* puck_game, L
     char damage_str[16];
     sprintf(damage_str, "%d", damage);
     spawn_damage_text(pLwc, ui_point[0], ui_point[1], 0, damage_str, LDTC_UI);
+    play_sound(LWS_DAMAGE);
+    play_sound(LWS_COLLISION);
 }
 
 void puck_game_tower_damage_test(LWCONTEXT* pLwc, LWPUCKGAME* puck_game, LWPUCKGAMEPLAYER* player, LWPUCKGAMETOWER* tower, int damage) {

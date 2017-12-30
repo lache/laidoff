@@ -181,7 +181,7 @@ void play_player_hp_desc_anim(LWCONTEXT* pLwc, const int player_slot,
 	if (cmd_result_a->type == LBCR_MISSED) {
 		snprintf(damage_str, ARRAY_SIZE(damage_str), "MISSED");
 
-		play_sound(LWS_WING);
+		play_sound(LWS_DASH1);
 
 	} else {
 		// 데미지는 음수이기 때문에 - 붙여서 양수로 바꿔줌
@@ -190,7 +190,7 @@ void play_player_hp_desc_anim(LWCONTEXT* pLwc, const int player_slot,
 		player->shake_duration = 0.15f;
 		player->shake_magitude = 0.03f;
 
-		play_sound(LWS_HIT);
+		play_sound(LWS_COLLISION);
 
 	}
 
@@ -366,7 +366,7 @@ void play_enemy_hp_desc_anim(LWCONTEXT* pLwc, LWENEMY* enemy, int enemy_slot,
 		enemy->evasion_anim.t = enemy->evasion_anim.max_t = 0.25f;
 		enemy->evasion_anim.max_v = 0.15f;
 
-		play_sound(LWS_WING);
+		play_sound(LWS_DASH1);
 
 	} else {
 		// 데미지는 음수이기 때문에 - 붙여서 양수로 바꿔줌
@@ -375,7 +375,7 @@ void play_enemy_hp_desc_anim(LWCONTEXT* pLwc, LWENEMY* enemy, int enemy_slot,
 		enemy->c.shake_duration = 0.15f;
 		enemy->c.shake_magitude = 0.03f;
 
-		play_sound(LWS_HIT);
+		play_sound(LWS_COLLISION);
 	}
 
 	// TODO: MISSED 일 때 트레일을 그리지 않으면 전투가 도중에 멈추는 문제가 있어서 무조건 그려줌

@@ -3,28 +3,26 @@
 #include "lwmacro.h"
 
 #ifdef __cplusplus
-extern "C" {;
+extern "C" { ;
 #endif
 
 typedef enum _LW_SOUND {
-    LWS_METAL_HIT,
-	LWS_DIE,
-	LWS_HIT,
-	LWS_POINT,
-	LWS_SWOOSHING,
-	LWS_WING,
+    LWS_COLLAPSE,
+    LWS_COLLISION,
+    LWS_DAMAGE,
+    LWS_DASH1,
+    LWS_DASH2,
+    LWS_DEFEAT,
+    LWS_INTROBGM,
+    LWS_VICTORY,
+    LWS_SWOOSH,
+    LWS_CLICK,
+    LWS_READY,
+    LWS_STEADY,
+    LWS_GO,
 
-	LWS_COUNT,
+    LWS_COUNT,
 } LW_SOUND;
-
-static const char* SOUND_FILE[] = {
-    ASSETS_BASE_PATH "ogg" PATH_SEPARATOR "sfx_metal_hit.ogg",
-    ASSETS_BASE_PATH "ogg" PATH_SEPARATOR "sfx_die.ogg",
-    ASSETS_BASE_PATH "ogg" PATH_SEPARATOR "sfx_hit.ogg",
-    ASSETS_BASE_PATH "ogg" PATH_SEPARATOR "sfx_point.ogg",
-    ASSETS_BASE_PATH "ogg" PATH_SEPARATOR "sfx_swooshing.ogg",
-    ASSETS_BASE_PATH "ogg" PATH_SEPARATOR "sfx_wing.ogg",
-};
 
 void play_sound(LW_SOUND lws);
 

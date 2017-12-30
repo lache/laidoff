@@ -5,6 +5,7 @@
 #include "numcomp.h"
 #include <assert.h>
 #include "file.h"
+#include "sound.h"
 
 static void call_collision_callback(LWPUCKGAME* puck_game,
                                     const dContact* contact,
@@ -415,6 +416,9 @@ void near_puck_tower(LWPUCKGAME* puck_game, dGeomID puck_geom, LWPUCKGAMETOWER* 
                     tower->collapsing_time = 0;
                     puck_game->battle_phase = tower->owner_player_no == 1 ? LSP_FINISHED_VICTORY_P2 : LSP_FINISHED_VICTORY_P1;
                     puck_game->battle_control_ui_alpha = 0;
+                    if (puck_game->on_finished) {
+                        puck_game->on_finished(puck_game, tower->owner_player_no == 1 ? 2 : 1);
+                    }
                 }
             }
             tower->shake_remain_time = puck_game->tower_shake_time;
@@ -584,6 +588,9 @@ void puck_game_commit_dash(LWPUCKGAME* puck_game, LWPUCKGAMEDASH* dash, float dx
     dash->dir_x = dx;
     dash->dir_y = dy;
     dash->last_time = puck_game->time;
+    if (puck_game->on_player_dash) {
+        puck_game->on_player_dash(puck_game);
+    }
 }
 
 void puck_game_commit_dash_to_puck(LWPUCKGAME* puck_game, LWPUCKGAMEDASH* dash, int player_no) {
@@ -662,6 +669,9 @@ void puck_game_reset_battle_state(LWPUCKGAME* puck_game) {
     dRandSetSeed(0);
     puck_game->update_tick = 0;
     puck_game->prepare_step_waited_tick = 0;
+    if (puck_game->battle_phase != LSP_READY) {
+        play_sound(LWS_READY);
+    }
     puck_game->battle_phase = LSP_READY;
     // recreate all battle objects if not exists
     create_all_battle_objects(puck_game);
@@ -900,6 +910,7 @@ void puck_game_roll_world(LWPUCKGAME* puck_game, int dir, int axis, float target
         puck_game->world_roll_axis = axis;
         puck_game->world_roll_target = target;
         puck_game->world_roll_dirty = 1;
+        play_sound(LWS_SWOOSH);
     }
 }
 
@@ -909,6 +920,7 @@ void puck_game_roll_to_battle(LWPUCKGAME* puck_game) {
         LOGI("World roll to battle began...");
         puck_game->world_roll_target = 0;
         puck_game->world_roll_dirty = 1;
+        play_sound(LWS_SWOOSH);
     }
 }
 
@@ -918,6 +930,7 @@ void puck_game_roll_to_practice(LWPUCKGAME* puck_game) {
         LOGI("World roll to practice began...");
         puck_game->world_roll_target = 0;
         puck_game->world_roll_dirty = 1;
+        play_sound(LWS_SWOOSH);
     }
 }
 
@@ -927,6 +940,7 @@ void puck_game_roll_to_tutorial(LWPUCKGAME* puck_game) {
         LOGI("World roll to tutorial began...");
         puck_game->world_roll_target = 0;
         puck_game->world_roll_dirty = 1;
+        play_sound(LWS_SWOOSH);
     }
 }
 
@@ -964,6 +978,9 @@ void puck_game_update_tick(LWPUCKGAME* puck_game, int update_frequency) {
     if (puck_game->battle_phase == LSP_READY) {
         puck_game->prepare_step_waited_tick++;
         if (puck_game->prepare_step_waited_tick >= puck_game->prepare_step_wait_tick) {
+            if (puck_game->battle_phase != LSP_STEADY) {
+                play_sound(LWS_STEADY);
+            }
             puck_game->battle_phase = LSP_STEADY;
             puck_game->prepare_step_waited_tick = 0;
             puck_game->battle_control_ui_alpha = 0.2f;
@@ -971,6 +988,9 @@ void puck_game_update_tick(LWPUCKGAME* puck_game, int update_frequency) {
     } else if (puck_game->battle_phase == LSP_STEADY) {
         puck_game->prepare_step_waited_tick++;
         if (puck_game->prepare_step_waited_tick >= puck_game->prepare_step_wait_tick) {
+            if (puck_game->battle_phase != LSP_GO) {
+                play_sound(LWS_GO);
+            }
             puck_game->battle_phase = LSP_GO;
             puck_game->prepare_step_waited_tick = 0;
             puck_game->battle_control_ui_alpha = 1.0f;

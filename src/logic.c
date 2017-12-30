@@ -24,6 +24,7 @@
 #include "lwtcpclient.h"
 #include "lwime.h"
 #include "puckgame.h"
+#include "sound.h"
 
 void toggle_font_texture_test_mode(LWCONTEXT* pLwc);
 void lw_request_remote_notification_device_token(LWCONTEXT* pLwc);
@@ -734,8 +735,9 @@ int lw_write_tcp_addr(LWCONTEXT* pLwc, const char* tcp_addr) {
 }
 
 void lwc_update(LWCONTEXT* pLwc, double delta_time) {
-
-    deltatime_tick_delta(pLwc->update_dt, delta_time);
+    if (pLwc->update_dt) {
+        deltatime_tick_delta(pLwc->update_dt, delta_time);
+    }
 
     //const float delta_time = (float)deltatime_delta_time(pLwc->update_dt);
 
@@ -932,6 +934,7 @@ static int loop_pipe_reader(zloop_t* loop, zsock_t* pipe, void* args) {
             if (pLwc->puck_game->world_roll_dirty == 0) {
                 LOGIx("UI Event: %s (w_ratio=%.2f, h_ratio=%.2f)", m->id, m->w_ratio, m->h_ratio);
                 script_emit_ui_event(pLwc->L, m->id, m->w_ratio, m->h_ratio);
+                play_sound(LWS_CLICK);
             } else {
                 LOGI("UI Event '%s' suppressed since state is dirty", m->id);
             }
