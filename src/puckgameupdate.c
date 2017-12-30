@@ -161,7 +161,9 @@ void update_puck_game(LWCONTEXT* pLwc, LWPUCKGAME* puck_game, double delta_time)
             int boundary = LPGB_E + i;
             puck_game->boundary_impact[boundary] = puck_game->boundary_impact_start;
             puck_game->boundary_impact_player_no[boundary] = puck_game->puck_owner_player_no;
-            play_sound(LWS_COLLISION);
+            if (remote) {
+                play_sound(LWS_COLLISION);
+            }
         }
     }
     // clear wall hit bit here only on online mode
@@ -409,7 +411,10 @@ void puck_game_spawn_tower_damage_text(LWCONTEXT* pLwc, LWPUCKGAME* puck_game, L
     sprintf(damage_str, "%d", damage);
     spawn_damage_text(pLwc, ui_point[0], ui_point[1], 0, damage_str, LDTC_UI);
     play_sound(LWS_DAMAGE);
-    play_sound(LWS_COLLISION);
+    const int remote = puck_game_remote(pLwc, puck_game);
+    if (remote) {
+        play_sound(LWS_COLLISION);
+    }
 }
 
 void puck_game_tower_damage_test(LWCONTEXT* pLwc, LWPUCKGAME* puck_game, LWPUCKGAMEPLAYER* player, LWPUCKGAMETOWER* tower, int damage) {
