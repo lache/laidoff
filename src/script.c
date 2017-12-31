@@ -718,7 +718,7 @@ int script_emit_ui_event(void* L, const char* id, float w_ratio, float h_ratio) 
 	lua_pushstring(L, id); // push 2nd argument
     lua_pushnumber(L, w_ratio); // push 3rd argument
     lua_pushnumber(L, h_ratio); // push 4th argument
-	// do the call (1 arguments, 1 result)
+	// do the call (3 arguments, 1 result)
 	if (lua_pcall(L, 3, 1, 0) != 0) {
 		LOGE(LWLOGPOS "error: %s", lua_tostring(L, -1));
 	}
@@ -729,6 +729,24 @@ int script_emit_ui_event(void* L, const char* id, float w_ratio, float h_ratio) 
 	ret = (int)lua_tonumber(L, -1);
 	lua_pop(L, 1); // pop returned value
 	return ret;
+}
+
+void script_get_string(void* L, const char* id, char* ret, int ret_max_len) {
+    // push functions and arguments
+    lua_getglobal(L, "get_string"); // function to be called
+    lua_pushstring(L, id); // push 2nd argument
+    // do the call (1 arguments, 1 result)
+    if (lua_pcall(L, 1, 1, 0) != 0) {
+        LOGE(LWLOGPOS "error: %s", lua_tostring(L, -1));
+    }
+    /* retrieve result */
+    if (!lua_isstring(L, -1)) {
+        LOGE(LWLOGPOS "error: %s", lua_tostring(L, -1));
+    }
+    const char* ret_v = lua_tostring(L, -1);
+    strncpy(ret, ret_v, ret_max_len - 1);
+    ret[ret_max_len - 1] = '\0';
+    lua_pop(L, 1); // pop returned value
 }
 
 void script_on_near_puck_player(void* _script, int dashing) {
