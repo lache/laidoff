@@ -13,29 +13,28 @@
 
 #ifdef SWIG
 #   define PATH_SEPARATOR "\\"
-#   define ASSETS_BASE_PATH "assets" PATH_SEPARATOR
+#   define ASSETS_BASE_PATH "selected-assets" PATH_SEPARATOR "assets" PATH_SEPARATOR
 #   define LwStaticAssert(x,y)
 #   define ARRAY_SIZE(arr) 0 // Swig has no support of compile time arithmetic
 #elif LW_PLATFORM_WIN32
 #   include <stdlib.h>
 #   define PATH_SEPARATOR "\\"
-#   define ASSETS_BASE_PATH "assets" PATH_SEPARATOR
+#   define ASSETS_BASE_PATH "selected-assets" PATH_SEPARATOR "assets" PATH_SEPARATOR
 #   define LwStaticAssert(x,y) _STATIC_ASSERT(x)
 #   define ARRAY_SIZE _countof
 #elif LW_PLATFORM_OSX
 #   define PATH_SEPARATOR "/"
-#   define ASSETS_BASE_PATH "/Users/kimgeoyeob/laidoff/assets/"
+#   define ASSETS_BASE_PATH PATH_SEPARATOR "Users" PATH_SEPARATOR "kimgeoyeob" PATH_SEPARATOR "laidoff" PATH_SEPARATOR "selected-assets" PATH_SEPARATOR "assets" PATH_SEPARATOR
 #   define LwStaticAssert(x,y) //_STATIC_ASSERT(x) // diabled...
 #   define ARRAY_SIZE(arr) (sizeof(arr) / sizeof((arr)[0]))
 #elif LW_PLATFORM_LINUX
 #   define PATH_SEPARATOR "/"
-#   define ASSETS_BASE_PATH "/home/gasbank/laidoff/assets/"
+#   define ASSETS_BASE_PATH PATH_SEPARATOR "home" PATH_SEPARATOR "gasbank" PATH_SEPARATOR "laidoff" PATH_SEPARATOR "assets" PATH_SEPARATOR
 #   define LwStaticAssert(x,y) //_STATIC_ASSERT(x) // diabled...
 #   define ARRAY_SIZE(arr) (sizeof(arr) / sizeof((arr)[0]))
 #elif LW_PLATFORM_ANDROID || LW_PLATFORM_IOS || LW_PLATFORM_IOS_SIMULATOR
 #   define PATH_SEPARATOR "/"
 #   define ASSETS_BASE_PATH
-
 #   define LwStaticAssert(x,y) //static_assert((x),(y))
 #   define BUILD_BUG_ON_ZERO(e) (sizeof(struct { int:-!!(e); }))
 #   define __must_be_array(a) \
