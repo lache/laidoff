@@ -2923,6 +2923,7 @@
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE = "6c7ce2c3-d0cf-4a0f-9662-772ebd883d9c";
 				PROVISIONING_PROFILE_SPECIFIER = "Laidoff Development";
+				TARGETED_DEVICE_FAMILY = 1;
 			};
 			name = Debug;
 		};
@@ -2959,6 +2960,7 @@
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE = "73257faf-fdb7-4f91-a403-1065689dcaec";
 				PROVISIONING_PROFILE_SPECIFIER = "Laidoff Adhoc";
+				TARGETED_DEVICE_FAMILY = 1;
 			};
 			name = Release;
 		};
