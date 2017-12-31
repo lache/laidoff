@@ -76,8 +76,11 @@ char * create_string_from_file(const char * filename) {
     NSString *pathname = [[NSBundle mainBundle] pathForResource:[NSString stringWithFormat:@"assets/%s", filename] ofType:@""];
     
     NSString *str = [NSString stringWithContentsOfFile:pathname encoding:NSUTF8StringEncoding error:nil];
-    
-    return strdup((char *)[str UTF8String]);
+    if (str) {
+        return strdup((char *)[str UTF8String]);
+    } else {
+        return 0;
+    }
 }
 
 void release_string(char * d) {
