@@ -38,3 +38,4 @@ match-server/match-server
 /imgui_log.txt
 
 clientlog.txt
+ios/build-appstore
