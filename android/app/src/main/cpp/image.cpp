@@ -83,7 +83,7 @@ extern "C" JNIEXPORT void JNICALL Java_com_popsongremix_laidoff_LaidoffNativeAct
     env->ReleaseStringUTFChars(assetpath, buffer);
 }
 
-extern "C" JNIEXPORT void JNICALL Java_com_popsongremix_laidoff_TextInputActivity_sendInputText(JNIEnv * env, jclass cls, jstring text) {
+extern "C" JNIEXPORT void JNICALL Java_com_popsongremix_laidoff_LaidoffNativeActivity_sendInputText(JNIEnv * env, jclass cls, jstring text) {
     const char *buffer = env->GetStringUTFChars(text, JNI_FALSE);
 
     strcpy(lw_get_text_input_for_writing(), buffer);

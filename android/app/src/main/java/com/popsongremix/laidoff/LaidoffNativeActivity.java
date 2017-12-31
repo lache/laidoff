@@ -1,6 +1,5 @@
 package com.popsongremix.laidoff;
 
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.NativeActivity;
 import android.content.Context;
@@ -16,24 +15,12 @@ import android.media.MediaPlayer;
 import android.media.SoundPool;
 import android.os.Build;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
 import android.text.InputType;
 import android.util.Log;
 import android.view.View;
 import android.view.WindowManager;
 import android.view.inputmethod.EditorInfo;
 import android.widget.EditText;
-import android.widget.Toast;
-
-import com.google.android.gms.ads.AdRequest;
-import com.google.android.gms.ads.reward.RewardItem;
-import com.google.android.gms.ads.reward.RewardedVideoAd;
-import com.google.android.gms.ads.reward.RewardedVideoAdListener;
-import com.google.android.gms.auth.api.signin.GoogleSignIn;
-import com.google.android.gms.auth.api.signin.GoogleSignInClient;
-import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
 import com.google.firebase.iid.FirebaseInstanceId;
 
 import java.io.File;
@@ -42,7 +29,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Locale;
 
-public class LaidoffNativeActivity extends NativeActivity implements RewardedVideoAdListener {
+public class LaidoffNativeActivity extends NativeActivity {
     static {
         System.loadLibrary("zmq");
         System.loadLibrary("czmq");
@@ -62,9 +49,10 @@ public class LaidoffNativeActivity extends NativeActivity implements RewardedVid
     @SuppressWarnings("SameParameterValue")
     public static native void setWindowSize(int width, int height, long pLwcLong);
 
+    public static native void sendInputText(String text);
+
     private static LaidoffNativeActivity INSTANCE;
     public static final String LOG_TAG = "and9";
-    private RewardedVideoAd mRewardedVideoAd;
     private SoundPool mSoundPool;
     private int mSoundCollapse;
     private int mSoundCollision;
@@ -86,18 +74,9 @@ public class LaidoffNativeActivity extends NativeActivity implements RewardedVid
         INSTANCE = this;
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main);
-        // AdMob
-        //MobileAds.initialize(this, getString(R.string.admob_id));
-        // Interstitial
-        //mRewardedVideoAd = MobileAds.getRewardedVideoAdInstance(this);
-        //mRewardedVideoAd.setRewardedVideoAdListener(this);
         // enable immersive mode
         enableImmersiveMode();
-
-        //SignInActivity.startSignIn(this);
-
         Log.i(LOG_TAG, "Device Android Version: " + Build.VERSION.SDK_INT);
-
         AssetsLoader assetsLoader = new AssetsLoader(this);
         Log.i(LOG_TAG, "APK Path: " + assetsLoader.GetAPKPath());
         assetsLoader.registerAllAssetsOfType("tex");
@@ -174,11 +153,6 @@ public class LaidoffNativeActivity extends NativeActivity implements RewardedVid
 //                        }
                     }
                 });
-    }
-
-    private void loadRewardedVideoAd() {
-        // production: ca-app-pub-5072035175916776/9587253247
-        mRewardedVideoAd.loadAd(getString(R.string.reward_video_ad_test), new AdRequest.Builder().build());
     }
 
     public void playCollapse() {
@@ -308,9 +282,6 @@ public class LaidoffNativeActivity extends NativeActivity implements RewardedVid
 
     @Override
     public void onDestroy() {
-        if (mRewardedVideoAd != null) {
-            mRewardedVideoAd.destroy(this);
-        }
         super.onDestroy();
 
         Log.d(LOG_TAG, "onDestroy()");
@@ -318,9 +289,6 @@ public class LaidoffNativeActivity extends NativeActivity implements RewardedVid
 
     @Override
     public void onPause() {
-        if (mRewardedVideoAd != null) {
-            mRewardedVideoAd.pause(this);
-        }
         super.onPause();
         Log.d(LOG_TAG, "onPause()");
         mBgmPlayer.pause();
@@ -328,9 +296,6 @@ public class LaidoffNativeActivity extends NativeActivity implements RewardedVid
 
     @Override
     public void onResume() {
-        if (mRewardedVideoAd != null) {
-            mRewardedVideoAd.resume(this);
-        }
         super.onResume();
         Log.d(LOG_TAG, "onResume()");
         mBgmPlayer.start();
@@ -351,39 +316,39 @@ public class LaidoffNativeActivity extends NativeActivity implements RewardedVid
 
     @SuppressWarnings("unused")
     public static void startRewardVideo(String dummy) {
-        INSTANCE.runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                INSTANCE.loadRewardedVideoAd();
-            }
-        });
+//        INSTANCE.runOnUiThread(new Runnable() {
+//            @Override
+//            public void run() {
+//                INSTANCE.loadRewardedVideoAd();
+//            }
+//        });
     }
 
     @SuppressWarnings("unused")
     public static void startSignIn(final int v1, final int v2, final int v3, final int v4) {
-        INSTANCE.runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                Intent intent = new Intent(INSTANCE, SignInActivity.class);
-                Bundle b = new Bundle();
-                b.putInt("userId[0]", v1);
-                b.putInt("userId[1]", v2);
-                b.putInt("userId[2]", v3);
-                b.putInt("userId[3]", v4);
-                intent.putExtras(b); //Put your id to your next Intent
-                INSTANCE.startActivity(intent);
-            }
-        });
+//        INSTANCE.runOnUiThread(new Runnable() {
+//            @Override
+//            public void run() {
+//                Intent intent = new Intent(INSTANCE, SignInActivity.class);
+//                Bundle b = new Bundle();
+//                b.putInt("userId[0]", v1);
+//                b.putInt("userId[1]", v2);
+//                b.putInt("userId[2]", v3);
+//                b.putInt("userId[3]", v4);
+//                intent.putExtras(b); //Put your id to your next Intent
+//                INSTANCE.startActivity(intent);
+//            }
+//        });
     }
 
     @SuppressWarnings("unused")
     public static void startSignOut(String dummy) {
-        INSTANCE.runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                INSTANCE.signOut();
-            }
-        });
+//        INSTANCE.runOnUiThread(new Runnable() {
+//            @Override
+//            public void run() {
+//                INSTANCE.signOut();
+//            }
+//        });
     }
 
     @SuppressWarnings("unused")
@@ -493,62 +458,9 @@ public class LaidoffNativeActivity extends NativeActivity implements RewardedVid
         }
     }
 
-    // AdMob reward video callbacks
-
-    public void onRewarded(RewardItem reward) {
-        Toast.makeText(this, "onRewarded! currency: " + reward.getType() + "  amount: " +
-                reward.getAmount(), Toast.LENGTH_SHORT).show();
-        // Reward the user.
-    }
-
-    public void onRewardedVideoAdLeftApplication() {
-        Toast.makeText(this, "onRewardedVideoAdLeftApplication",
-                Toast.LENGTH_SHORT).show();
-    }
-
-    public void onRewardedVideoAdClosed() {
-        Toast.makeText(this, "onRewardedVideoAdClosed", Toast.LENGTH_SHORT).show();
-    }
-
-    public void onRewardedVideoAdFailedToLoad(int errorCode) {
-        Toast.makeText(this, "onRewardedVideoAdFailedToLoad", Toast.LENGTH_SHORT).show();
-    }
-
-    public void onRewardedVideoAdLoaded() {
-        Toast.makeText(this, "onRewardedVideoAdLoaded", Toast.LENGTH_SHORT).show();
-        if (mRewardedVideoAd.isLoaded()) {
-            mRewardedVideoAd.show();
-        }
-    }
-
-    public void onRewardedVideoAdOpened() {
-        Toast.makeText(this, "onRewardedVideoAdOpened", Toast.LENGTH_SHORT).show();
-    }
-
-    public void onRewardedVideoStarted() {
-        Toast.makeText(this, "onRewardedVideoStarted", Toast.LENGTH_SHORT).show();
-    }
-
-    private void signOut() {
-        GoogleSignInClient signInClient = GoogleSignIn.getClient(this,
-                GoogleSignInOptions.DEFAULT_GAMES_SIGN_IN);
-        final Activity activity = this;
-        signInClient.signOut().addOnCompleteListener(this,
-                new OnCompleteListener<Void>() {
-                    @Override
-                    public void onComplete(@NonNull Task<Void> task) {
-                        // at this point, the user is signed out.
-                        Log.i(LOG_TAG, "Signed out successfully");
-                        Toast.makeText(activity, "Signed out successfully", Toast.LENGTH_LONG).show();
-                    }
-                });
-    }
-
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-
-        SignInActivity.onSignInActivityResult(this, requestCode, data);
     }
 
     public void showNicknameInputDialog() {
@@ -566,7 +478,7 @@ public class LaidoffNativeActivity extends NativeActivity implements RewardedVid
         builder.setPositiveButton(getString(R.string.change_nickname), new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                TextInputActivity.sendInputText(input.getText().toString());
+                sendInputText(input.getText().toString());
             }
         });
         builder.show();

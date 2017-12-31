@@ -1,4 +1,4 @@
-package com.popsongremix.laidoff;
+package com.popsongremix.login;
 
 import android.app.Activity;
 import android.content.Context;
@@ -26,7 +26,7 @@ public class TextInputActivity extends Activity {
     private EditText mInputText;
     private Button mConfirmButton;
 
-    public static native void sendInputText(String text);
+    //public static native void sendInputText(String text);
     private AdView mAdView;
 
     @Override
@@ -66,7 +66,7 @@ public class TextInputActivity extends Activity {
     }
 
     private void confirmInputText() {
-        sendInputText(mInputText.getText().toString());
+        //sendInputText(mInputText.getText().toString());
         finish();
     }
 }

@@ -1,4 +1,4 @@
-package com.popsongremix.laidoff;
+package com.popsongremix.login;
 
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -47,7 +47,7 @@ import okhttp3.OkHttpClient;
 public class SignInActivity extends Activity {
     static int RC_SIGN_IN = 20000;
     public static final String LOG_TAG = "SignIn";
-    public static native void setNickname(String text);
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -204,7 +204,7 @@ public class SignInActivity extends Activity {
                             Log.i(LOG_TAG, "Player Banner Image Portrait URI: " + player.getBannerImagePortraitUri());
                             Log.i(LOG_TAG, "Player Has Icon Image: " + player.hasIconImage());
 
-                            setNickname(player.getDisplayName());
+
                         } else {
                             Log.e(LOG_TAG, "getCurrentPlayer() error: " + task.toString());
                         }
