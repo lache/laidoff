@@ -57,7 +57,7 @@ android {
 
         externalNativeBuild {
             cmake {
-                if (project.hasProperty('downloadAssets') && project.downloadAssets) {
+                if (project.hasProperty('downloadAssets')) {
                     arguments '-DANDROID_PLATFORM=android-19',
                             '-DANDROID_TOOLCHAIN=clang',
                             '-DLW_DOWNLOAD_ASSETS=1'
