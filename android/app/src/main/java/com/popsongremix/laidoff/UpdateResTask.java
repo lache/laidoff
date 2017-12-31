@@ -221,7 +221,7 @@ class UpdateResTask extends AsyncTask<UpdateResTaskParam, Void, File> {
         }
     }
 
-    void onResourceLoadFinished() {
+    public static void onResourceLoadFinished() {
         String result = LaidoffNativeActivity.signalResourceReady(LaidoffNativeActivity.class);
         Log.i(LaidoffNativeActivity.LOG_TAG, "onResourceLoadFinished() [JAVA] - calling signalResourceReady() result: " + result);
     }

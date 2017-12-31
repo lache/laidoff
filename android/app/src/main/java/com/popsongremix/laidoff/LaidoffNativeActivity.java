@@ -79,22 +79,25 @@ public class LaidoffNativeActivity extends NativeActivity {
         Log.i(LOG_TAG, "Device Android Version: " + Build.VERSION.SDK_INT);
         AssetsLoader assetsLoader = new AssetsLoader(this);
         Log.i(LOG_TAG, "APK Path: " + assetsLoader.GetAPKPath());
-        assetsLoader.registerAllAssetsOfType("tex");
-        assetsLoader.registerAllAssetsOfType("pkm");
-        assetsLoader.registerAllAssetsOfType("ktx");
-        assetsLoader.registerAllAssetsOfType("vbo");
-        assetsLoader.registerAllAssetsOfType("svbo");
-        assetsLoader.registerAllAssetsOfType("armature");
         assetsLoader.registerAllAssetsOfType("action");
-        assetsLoader.registerAllAssetsOfType("fnt");
+        assetsLoader.registerAllAssetsOfType("armature");
+        assetsLoader.registerAllAssetsOfType("atlas");
+        assetsLoader.registerAllAssetsOfType("conf");
         assetsLoader.registerAllAssetsOfType("d");
-        assetsLoader.registerAllAssetsOfType("glsl");
-        assetsLoader.registerAllAssetsOfType("l");
+        assetsLoader.registerAllAssetsOfType("fanim");
         assetsLoader.registerAllAssetsOfType("field");
+        assetsLoader.registerAllAssetsOfType("fnt");
+        assetsLoader.registerAllAssetsOfType("fvbo");
+        assetsLoader.registerAllAssetsOfType("glsl");
+        assetsLoader.registerAllAssetsOfType("ktx");
+        assetsLoader.registerAllAssetsOfType("l");
         assetsLoader.registerAllAssetsOfType("nav");
+        assetsLoader.registerAllAssetsOfType("ogg");
+        assetsLoader.registerAllAssetsOfType("pkm");
+        assetsLoader.registerAllAssetsOfType("svbo");
+        assetsLoader.registerAllAssetsOfType("tex");
+        assetsLoader.registerAllAssetsOfType("vbo");
         sendApkPath(assetsLoader.GetAPKPath(), getApplicationContext().getFilesDir().getAbsolutePath(), getPackageVersion());
-
-        downloadResFromServer();
 
         //noinspection deprecation
         mSoundPool = new SoundPool(15, AudioManager.STREAM_MUSIC, 0);
@@ -123,6 +126,11 @@ public class LaidoffNativeActivity extends NativeActivity {
 
         mBgmPlayer = MediaPlayer.create(getApplicationContext(), R.raw.introbgm);
         mBgmPlayer.setLooping(true);
+
+        // Download latest assets from server
+        //downloadResFromServer();
+        // or.. use embedded assets
+        UpdateResTask.onResourceLoadFinished();
     }
 
     private void enableImmersiveMode() {

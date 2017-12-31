@@ -119,7 +119,11 @@ char* create_asset_file_from_downloaded(const char* filename, size_t* size, int 
 }
 
 char* create_binary_from_file(const char* filename, size_t* size) {
+#ifdef LW_DOWNLOAD_ASSETS
     int from_downloaded = 1;
+#else
+    int from_downloaded = 0;
+#endif
     if (from_downloaded) {
         return create_asset_file_from_downloaded(filename, size, 1);
     } else {
@@ -129,7 +133,11 @@ char* create_binary_from_file(const char* filename, size_t* size) {
 
 char* create_string_from_file(const char* filename) {
     LOGI("create_string_from_file: %s", filename);
+#ifdef LW_DOWNLOAD_ASSETS
     int from_downloaded = 1;
+#else
+    int from_downloaded = 0;
+#endif
     size_t size;
     if (from_downloaded) {
         return create_asset_file_from_downloaded(filename, &size, 0);

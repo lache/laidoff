@@ -861,8 +861,7 @@ void init_lwc_runtime_data(LWCONTEXT* pLwc) {
 
     reset_runtime_context(pLwc);
 
-    //pLwc->pFnt = load_fnt(ASSETS_BASE_PATH "fnt" PATH_SEPARATOR "arita-semi-bold.fnt");
-
+#if LW_FULL_FEATURED
     pLwc->dialog = create_string_from_file(ASSETS_BASE_PATH "d" PATH_SEPARATOR "d1.txt");
     if (pLwc->dialog) {
         pLwc->dialog_bytelen = (int)strlen(pLwc->dialog);
@@ -870,6 +869,7 @@ void init_lwc_runtime_data(LWCONTEXT* pLwc) {
     else {
         LOGE("dialog loading failed.");
     }
+#endif
 }
 
 static int loop_logic_update(zloop_t* loop, int timer_id, void* args) {

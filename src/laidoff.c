@@ -1457,9 +1457,10 @@ LWCONTEXT* lw_init_initial_size(int width, int height) {
     
     pLwc->mq = init_mq(logic_server_addr(pLwc->server_index), pLwc->def_sys_msg);
     
+#if LW_FULL_FEATURED
     init_armature(pLwc);
-    
     init_action(pLwc);
+#endif
     
     lwparabola_test();
     

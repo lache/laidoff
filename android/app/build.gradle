@@ -56,19 +56,20 @@ android {
         }
 
         externalNativeBuild {
-            if (keystoreProperties.hasProperty('autoBuild')) {
-                cmake {
-                    arguments '-DANDROID_PLATFORM=android-19',
-                            '-DANDROID_TOOLCHAIN=clang',
-                            '-DLW_AUTO_BUILD=1'
+            cmake {
+                arguments '-DANDROID_PLATFORM=android-19',
+                        '-DANDROID_TOOLCHAIN=clang'
+
+                if (keystoreProperties.hasProperty('autoBuild')) {
+                    arguments.add('-DLW_AUTO_BUILD=1')
                 }
-            } else {
-                cmake {
-                    arguments '-DANDROID_PLATFORM=android-19',
-                            '-DANDROID_TOOLCHAIN=clang'
+                if (project.hasProperty('downloadAssets') && project.downloadAssets) {
+                    arguments.add('-DLW_DOWNLOAD_ASSETS=1')
+                }
+                if (project.hasProperty('fullFeatured') && project.fullFeatured) {
+                    arguments.add('-DLW_FULL_FEATURED=1')
                 }
             }
-
         }
 
         signingConfig signingConfigs.config
@@ -108,10 +109,28 @@ android {
         //main.java.srcDirs += 'src/main/../../../..'
 
         //main.assets.srcDirs += '../../assets'
+        main.assets.srcDirs += '../../selected-assets/assets'
     }
 
     aaptOptions {
-        noCompress 'vbo', 'png', 'tga', 'fnt', 'txt', 'pvr', 'pkm', 'ktx', 'glsl', 'lua', 'svbo', 'arm', 'act', 'field', 'nav', 'ogg'
+        noCompress 'act',
+                'arm',
+                'json',
+                'txt',
+                'fanim',
+                'field',
+                'fnt',
+                'tga',
+                'fvbo',
+                'glsl',
+                'ktx',
+                'lua',
+                'nav',
+                'ogg',
+                'pkm',
+                'svbo',
+                'png',
+                'vbo'
     }
 }
 
