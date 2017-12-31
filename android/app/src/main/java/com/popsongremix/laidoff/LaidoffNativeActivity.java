@@ -127,10 +127,13 @@ public class LaidoffNativeActivity extends NativeActivity {
         mBgmPlayer = MediaPlayer.create(getApplicationContext(), R.raw.introbgm);
         mBgmPlayer.setLooping(true);
 
-        // Download latest assets from server
-        //downloadResFromServer();
-        // or.. use embedded assets
-        UpdateResTask.onResourceLoadFinished();
+        if (BuildConfig.DOWNLOAD_ASSETS) {
+            // Download latest assets from server
+            downloadResFromServer();
+        } else {
+            // or.. use embedded assets
+            UpdateResTask.onResourceLoadFinished();
+        }
     }
 
     private void enableImmersiveMode() {

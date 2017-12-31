@@ -26,23 +26,28 @@ const char* action_filename[] = {
 void load_action(const char* filename, LWANIMACTION* action) {
 	size_t s;
 	char* p = create_binary_from_file(filename, &s);
-	action->d = p;
-
-	action->fps = *(float*)p;
-	p += sizeof(float);
-	action->last_key_f = *(float*)p;
-	p += sizeof(float);
-	action->anim_curve_num = *(int*)p;
-	p += sizeof(int);
-	action->anim_curve = action->anim_curve_num ? (LWANIMCURVE*)p : 0;
-	p += sizeof(LWANIMCURVE) * action->anim_curve_num;
-	action->anim_key_num = *(int*)p;
-	p += sizeof(int);
-	action->anim_key = action->anim_key_num ? (LWANIMKEY*)p : 0;
-	p += sizeof(LWANIMKEY) * action->anim_key_num;
-	action->anim_marker_num = *(int*)p;
-	p += sizeof(int);
-	action->anim_marker = action->anim_marker_num ? (LWANIMMARKER*)p : 0;
+    if (p) {
+        action->d = p;
+        
+        action->fps = *(float*)p;
+        p += sizeof(float);
+        action->last_key_f = *(float*)p;
+        p += sizeof(float);
+        action->anim_curve_num = *(int*)p;
+        p += sizeof(int);
+        action->anim_curve = action->anim_curve_num ? (LWANIMCURVE*)p : 0;
+        p += sizeof(LWANIMCURVE) * action->anim_curve_num;
+        action->anim_key_num = *(int*)p;
+        p += sizeof(int);
+        action->anim_key = action->anim_key_num ? (LWANIMKEY*)p : 0;
+        p += sizeof(LWANIMKEY) * action->anim_key_num;
+        action->anim_marker_num = *(int*)p;
+        p += sizeof(int);
+        action->anim_marker = action->anim_marker_num ? (LWANIMMARKER*)p : 0;
+    } else {
+        LOGE("load_action: %s FILE NOT FOUND", filename);
+        memset(action, 0, sizeof(LWANIMACTION));
+    }
 }
 
 void unload_action(LWANIMACTION* action) {

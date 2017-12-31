@@ -83,11 +83,22 @@ android {
             ndk {
                 abiFilters 'x86'
             }
+            buildConfigField "boolean", "FULL_FEATURED", "false"
+            buildConfigField "boolean", "DOWNLOAD_ASSETS", "false"
         }
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'),
                     'proguard-rules.pro'
+            buildConfigField "boolean", "FULL_FEATURED", "true"
+            buildConfigField "boolean", "DOWNLOAD_ASSETS", "true"
+        }
+        releaseSingapore {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'),
+                    'proguard-rules.pro'
+            buildConfigField "boolean", "FULL_FEATURED", "false"
+            buildConfigField "boolean", "DOWNLOAD_ASSETS", "false"
         }
         releaseEmulator {
             minifyEnabled false
@@ -96,20 +107,19 @@ android {
             ndk {
                 abiFilters 'x86'
             }
+            buildConfigField "boolean", "FULL_FEATURED", "true"
+            buildConfigField "boolean", "DOWNLOAD_ASSETS", "true"
         }
+    }
+
+    sourceSets {
+        releaseSingapore.assets.srcDirs += '../../selected-assets/assets'
     }
 
     externalNativeBuild {
         cmake {
             path 'src/main/cpp/CMakeLists.txt'
         }
-    }
-
-    sourceSets {
-        //main.java.srcDirs += 'src/main/../../../..'
-
-        //main.assets.srcDirs += '../../assets'
-        main.assets.srcDirs += '../../selected-assets/assets'
     }
 
     aaptOptions {
