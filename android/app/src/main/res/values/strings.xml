@@ -3,10 +3,10 @@
     <string name="remote_assets_base_path">http://sky.popsongremix.com/laidoff/assets</string>
     <string name="remote_apk_base_path">http://sky.popsongremix.com/laidoff/apk</string>
     <string name="list_file_name">list.txt</string>
-    <string name="app_name">Rumble</string>
-    <string name="no_conn">인터넷 연결 확인 오네가이</string>
-    <string name="error">에러</string>
-    <string name="exit">종료</string>
+    <string name="app_name">Ball Rumble</string>
+    <string name="no_conn">ERROR: Check your internet connection</string>
+    <string name="error">ERROR</string>
+    <string name="exit">QUIT</string>
     <string name="title_activity_text">Text</string>
 
     <string name="hello_world_main">Hello World, main</string>
