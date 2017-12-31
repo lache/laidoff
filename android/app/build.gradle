@@ -57,14 +57,8 @@ android {
 
         externalNativeBuild {
             cmake {
-                if (project.hasProperty('downloadAssets')) {
-                    arguments '-DANDROID_PLATFORM=android-19',
-                            '-DANDROID_TOOLCHAIN=clang',
-                            '-DLW_DOWNLOAD_ASSETS=1'
-                } else {
-                    arguments '-DANDROID_PLATFORM=android-19',
-                            '-DANDROID_TOOLCHAIN=clang'
-                }
+                arguments '-DANDROID_PLATFORM=android-19',
+                        '-DANDROID_TOOLCHAIN=clang'
             }
         }
 
@@ -85,6 +79,9 @@ android {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'),
                     'proguard-rules.pro'
+            ndk {
+                abiFilters 'x86'
+            }
             buildConfigField "boolean", "DOWNLOAD_ASSETS", "true"
         }
         releaseSingapore {
