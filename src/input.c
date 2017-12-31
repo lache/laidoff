@@ -14,6 +14,7 @@
 #include "lwdirpad.h"
 #include "lwtcpclient.h"
 #include "rmsg.h"
+#include "file.h"
 
 static void convert_touch_coord_to_ui_coord(LWCONTEXT* pLwc, float *x, float *y) {
     if (pLwc->height < pLwc->width) {
@@ -190,8 +191,15 @@ void lw_trigger_mouse_release(LWCONTEXT* pLwc, float x, float y, int pointer_id)
     if (pLwc->game_scene != LGS_ADMIN
         && x > +pLwc->aspect_ratio - 0.25f
         && y > 1.0f - 0.25f) {
-
-        change_to_admin(pLwc);
+        if (is_file_exist(pLwc->user_data_path, "admin")) {
+            change_to_admin(pLwc);
+        } else {
+            static int admin_count = 0;
+            admin_count++;
+            if (admin_count > 20) {
+                touch_file(pLwc->user_data_path, "admin");
+            }
+        }
         return;
     }
 
