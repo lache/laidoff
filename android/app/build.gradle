@@ -57,17 +57,13 @@ android {
 
         externalNativeBuild {
             cmake {
-                arguments '-DANDROID_PLATFORM=android-19',
-                        '-DANDROID_TOOLCHAIN=clang'
-
-                if (keystoreProperties.hasProperty('autoBuild')) {
-                    arguments.add('-DLW_AUTO_BUILD=1')
-                }
                 if (project.hasProperty('downloadAssets') && project.downloadAssets) {
-                    arguments.add('-DLW_DOWNLOAD_ASSETS=1')
-                }
-                if (project.hasProperty('fullFeatured') && project.fullFeatured) {
-                    arguments.add('-DLW_FULL_FEATURED=1')
+                    arguments '-DANDROID_PLATFORM=android-19',
+                            '-DANDROID_TOOLCHAIN=clang',
+                            '-DLW_DOWNLOAD_ASSETS=1'
+                } else {
+                    arguments '-DANDROID_PLATFORM=android-19',
+                            '-DANDROID_TOOLCHAIN=clang'
                 }
             }
         }
