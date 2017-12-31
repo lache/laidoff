@@ -228,7 +228,7 @@ void push_recursive_traceback(lua_State* L_coro, lua_State* L) {
 			lua_pop(L_coro, 1);
 			lua_pushstring(L_coro, tb);
 		} else {
-			LOGE(LWLOGPOS "coro metadata table corrupted");
+			LOGEP("coro metadata table corrupted");
 			abort();
 		}
 	}
@@ -563,7 +563,7 @@ const char* script_prefix_path() {
 
 static void s_cleanup_coro(LWSCRIPT* script, int idx) {
 	if (!script->coro[idx].valid) {
-		LOGF(LWLOGPOS "invalid pool entry to be cleaned up");
+		LOGFP("invalid pool entry to be cleaned up");
 	}
 	lua_State* L = script->coro[idx].L;
 	if (L) {
@@ -660,11 +660,11 @@ int script_emit_anim_marker(void* L, int key, const char* name) {
 	lua_pushstring(L, name); // push 2nd argument
 	// do the call (2 arguments, 1 result)
 	if (lua_pcall(L, 2, 1, 0) != 0) {
-		LOGE(LWLOGPOS "error: %s", lua_tostring(L, -1));
+		LOGEP("error: %s", lua_tostring(L, -1));
 	}	
 	/* retrieve result */
 	if (!lua_isnumber(L, -1)) {
-		LOGE(LWLOGPOS "error: %s", lua_tostring(L, -1));
+		LOGEP("error: %s", lua_tostring(L, -1));
 	}
 	ret = (int)lua_tonumber(L, -1);
 	lua_pop(L, 1); // pop returned value
@@ -679,11 +679,11 @@ int script_emit_near(void* L, int key1, int key2) {
 	lua_pushinteger(L, key2); // push 1st argument
 	// do the call (2 arguments, 1 result)
 	if (lua_pcall(L, 2, 1, 0) != 0) {
-		LOGE(LWLOGPOS "error: %s", lua_tostring(L, -1));
+		LOGEP("error: %s", lua_tostring(L, -1));
 	}
 	// retrieve result
 	if (!lua_isnumber(L, -1)) {
-		LOGE(LWLOGPOS "error: %s", lua_tostring(L, -1));
+		LOGEP("error: %s", lua_tostring(L, -1));
 	}
 	ret = (int)lua_tonumber(L, -1);
 	lua_pop(L, 1); // pop returned value
@@ -700,11 +700,11 @@ int script_emit_logic_frame_finish(void* L, float delta_time) {
 	lua_pushnumber(L, delta_time); // push 1st argument
 	// do the call (0 arguments, 1 result)
 	if (lua_pcall(L, 1, 1, 0) != 0) {
-		LOGE(LWLOGPOS "error: %s", lua_tostring(L, -1));
+		LOGEP("error: %s", lua_tostring(L, -1));
 	}
 	// retrieve result
 	if (!lua_isnumber(L, -1)) {
-		LOGE(LWLOGPOS "error: %s", lua_tostring(L, -1));
+		LOGEP("error: %s", lua_tostring(L, -1));
 	}
 	ret = (int)lua_tonumber(L, -1);
 	lua_pop(L, 1); // pop returned value
@@ -720,11 +720,11 @@ int script_emit_ui_event(void* L, const char* id, float w_ratio, float h_ratio) 
     lua_pushnumber(L, h_ratio); // push 4th argument
 	// do the call (3 arguments, 1 result)
 	if (lua_pcall(L, 3, 1, 0) != 0) {
-		LOGE(LWLOGPOS "error: %s", lua_tostring(L, -1));
+		LOGEP("error: %s", lua_tostring(L, -1));
 	}
 	/* retrieve result */
 	if (!lua_isnumber(L, -1)) {
-		LOGE(LWLOGPOS "error: %s", lua_tostring(L, -1));
+		LOGEP("error: %s", lua_tostring(L, -1));
 	}
 	ret = (int)lua_tonumber(L, -1);
 	lua_pop(L, 1); // pop returned value
@@ -737,11 +737,11 @@ void script_get_string(void* L, const char* id, char* ret, int ret_max_len) {
     lua_pushstring(L, id); // push 2nd argument
     // do the call (1 arguments, 1 result)
     if (lua_pcall(L, 1, 1, 0) != 0) {
-        LOGE(LWLOGPOS "error: %s", lua_tostring(L, -1));
+        LOGEP("error: %s", lua_tostring(L, -1));
     }
     /* retrieve result */
     if (!lua_isstring(L, -1)) {
-        LOGE(LWLOGPOS "error: %s", lua_tostring(L, -1));
+        LOGEP("error: %s", lua_tostring(L, -1));
     }
     const char* ret_v = lua_tostring(L, -1);
     strncpy(ret, ret_v, ret_max_len - 1);

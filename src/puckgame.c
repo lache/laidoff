@@ -141,14 +141,14 @@ void puck_game_create_control_joint(LWPUCKGAME* puck_game, int lpgo) {
     } else if (lpgo == LPGO_PLAYER) {
         create_control_joint(puck_game, lpgo, &puck_game->player_control_joint_group, &puck_game->player_control_joint);
     } else {
-        LOGE(LWLOGPOS "invalid lpgo");
+        LOGEP("invalid lpgo");
     }
 }
 
 // This function setup all dynamic objects needed for 1vs1 battle.
 // It allows a 'partial' creation state.
 // (can be called safely even if subset of battle objects exist)
-static void create_all_battle_objects(LWPUCKGAME* puck_game) {
+void puck_game_create_all_battle_objects(LWPUCKGAME* puck_game) {
     // create tower geoms
     for (int i = 0; i < LW_PUCK_GAME_TOWER_COUNT; i++) {
         if (puck_game->tower[i].geom == 0) {
@@ -175,8 +175,8 @@ static void create_all_battle_objects(LWPUCKGAME* puck_game) {
     }
 }
 
-// This function is a reverse of create_all_battle_objects().
-static void destroy_all_battle_objects(LWPUCKGAME* puck_game) {
+// This function is a reverse of puck_game_create_all_battle_objects().
+void puck_game_destroy_all_battle_objects(LWPUCKGAME* puck_game) {
     // destroy tower geoms
     for (int i = 0; i < LW_PUCK_GAME_TOWER_COUNT; i++) {
         if (puck_game->tower[i].geom) {
@@ -304,7 +304,7 @@ void delete_puck_game(LWPUCKGAME** puck_game) {
             dGeomDestroy((*puck_game)->boundary[i]);
         }
     }
-    destroy_all_battle_objects(*puck_game);
+    puck_game_destroy_all_battle_objects(*puck_game);
     dSpaceDestroy((*puck_game)->space);
     dWorldDestroy((*puck_game)->world);
     free(*puck_game);
@@ -664,72 +664,6 @@ void puck_game_reset_go(LWPUCKGAME* puck_game, LWPUCKGAMEOBJECT* go, float x, fl
     go->wall_hit_count = 0;
 }
 
-void puck_game_reset_battle_state(LWPUCKGAME* puck_game) {
-    // reset physics engine random seed again
-    dRandSetSeed(0);
-    puck_game->update_tick = 0;
-    puck_game->prepare_step_waited_tick = 0;
-    if (puck_game->battle_phase != LSP_READY) {
-        play_sound(LWS_READY);
-    }
-    puck_game->battle_phase = LSP_READY;
-    // recreate all battle objects if not exists
-    create_all_battle_objects(puck_game);
-    for (int i = 0; i < LW_PUCK_GAME_TOWER_COUNT; i++) {
-        puck_game->tower[i].hp = puck_game->tower_total_hp;
-        puck_game->tower[i].collapsing = 0;
-    }
-    puck_game_reset_go(puck_game, &puck_game->go[LPGO_PUCK], 0.0f, 0.0f, puck_game->go[LPGO_PUCK].radius);
-    puck_game_reset_go(puck_game, &puck_game->go[LPGO_PLAYER], -puck_game->go_start_pos, -puck_game->go_start_pos, puck_game->go[LPGO_PUCK].radius);
-    puck_game_reset_go(puck_game, &puck_game->go[LPGO_TARGET], +puck_game->go_start_pos, +puck_game->go_start_pos, puck_game->go[LPGO_PUCK].radius);
-    puck_game->player.total_hp = puck_game->hp;
-    puck_game->player.current_hp = puck_game->hp;
-    puck_game->target.total_hp = puck_game->hp;
-    puck_game->target.current_hp = puck_game->hp;
-    memset(puck_game->remote_control, 0, sizeof(puck_game->remote_control));
-    puck_game->control_flags &= ~LPGCF_HIDE_TIMER;
-    puck_game->control_flags &= ~LPGCF_HIDE_PULL_BUTTON;
-    puck_game->control_flags &= ~LPGCF_HIDE_DASH_BUTTON;
-    // reset bogus control variables
-    puck_game->target_dx = 0;
-    puck_game->target_dy = 0;
-    puck_game->target_dlen_ratio = 0;
-    // re-seed bogus rng
-    pcg32_srandom_r(&puck_game->bogus_rng, 0x01041685967ULL, 0x027855157ULL);
-    // reset dash state
-    memset(puck_game->remote_dash, 0, sizeof(puck_game->remote_dash));
-}
-
-void puck_game_reset_tutorial_state(LWPUCKGAME* puck_game) {
-    puck_game->update_tick = 0;
-    puck_game->prepare_step_waited_tick = 0;
-    puck_game->battle_phase = LSP_TUTORIAL;
-    for (int i = 0; i < LW_PUCK_GAME_TOWER_COUNT; i++) {
-        puck_game->tower[i].hp = puck_game->tower_total_hp;
-        puck_game->tower[i].collapsing = 0;
-    }
-    // tutorial starts with an empty scene
-    destroy_all_battle_objects(puck_game);
-    puck_game->player.total_hp = puck_game->hp;
-    puck_game->player.current_hp = puck_game->hp;
-    puck_game->target.total_hp = puck_game->hp;
-    puck_game->target.current_hp = puck_game->hp;
-    memset(puck_game->remote_control, 0, sizeof(puck_game->remote_control));
-    puck_game->control_flags |= LPGCF_HIDE_TIMER;
-    // reset dash state
-    memset(puck_game->remote_dash, 0, sizeof(puck_game->remote_dash));
-}
-
-void puck_game_reset(LWPUCKGAME* puck_game) {
-    puck_game_reset_battle_state(puck_game);
-    puck_game->game_state = LPGS_MAIN_MENU;
-    puck_game->world_roll = (float)LWDEG2RAD(180);
-    puck_game->world_roll_dir = 1;
-    puck_game->world_roll_axis = 1;
-    puck_game->world_roll_target = puck_game->world_roll;
-    puck_game->world_roll_target_follow_ratio = 0.075f;
-}
-
 void puck_game_remote_state_reset(LWPUCKGAME* puck_game, LWPSTATE* state) {
     state->bf.puck_owner_player_no = 0;
     state->bf.player_current_hp = puck_game->hp;
@@ -742,7 +676,7 @@ void puck_game_remote_state_reset(LWPUCKGAME* puck_game, LWPSTATE* state) {
 
 void puck_game_tower_pos(vec4 p_out, const LWPUCKGAME* puck_game, int owner_player_no) {
     if (owner_player_no != 1 && owner_player_no != 2) {
-        LOGE(LWLOGPOS "invalid owner_player_no: %d", owner_player_no);
+        LOGEP("invalid owner_player_no: %d", owner_player_no);
         return;
     }
     p_out[0] = puck_game->tower_pos * puck_game->tower_pos_multiplier[owner_player_no - 1][0];
@@ -903,54 +837,6 @@ int puck_game_dash(LWPUCKGAME* puck_game, LWPUCKGAMEDASH* dash, int player_no) {
     return 0;
 }
 
-void puck_game_roll_world(LWPUCKGAME* puck_game, int dir, int axis, float target) {
-    if (puck_game->world_roll_dirty == 0) {
-        LOGI("World roll began...");
-        puck_game->world_roll_dir = dir;
-        puck_game->world_roll_axis = axis;
-        puck_game->world_roll_target = target;
-        puck_game->world_roll_dirty = 1;
-        play_sound(LWS_SWOOSH);
-    }
-}
-
-void puck_game_roll_to_battle(LWPUCKGAME* puck_game) {
-    if (puck_game->world_roll_dirty == 0) {
-        puck_game->game_state = LPGS_BATTLE;
-        LOGI("World roll to battle began...");
-        puck_game->world_roll_target = 0;
-        puck_game->world_roll_dirty = 1;
-        play_sound(LWS_SWOOSH);
-    }
-}
-
-void puck_game_roll_to_practice(LWPUCKGAME* puck_game) {
-    if (puck_game->world_roll_dirty == 0) {
-        puck_game->game_state = LPGS_PRACTICE;
-        LOGI("World roll to practice began...");
-        puck_game->world_roll_target = 0;
-        puck_game->world_roll_dirty = 1;
-        play_sound(LWS_SWOOSH);
-    }
-}
-
-void puck_game_roll_to_tutorial(LWPUCKGAME* puck_game) {
-    if (puck_game->world_roll_dirty == 0) {
-        puck_game->game_state = LPGS_TUTORIAL;
-        LOGI("World roll to tutorial began...");
-        puck_game->world_roll_target = 0;
-        puck_game->world_roll_dirty = 1;
-        play_sound(LWS_SWOOSH);
-    }
-}
-
-void puck_game_roll_to_main_menu(LWPUCKGAME* puck_game) {
-    if (puck_game->world_roll_dirty == 0) {
-        puck_game->game_state = LPGS_MAIN_MENU;
-        puck_game_roll_world(puck_game, 1, 1, (float)LWDEG2RAD(180));
-    }
-}
-
 void puck_game_set_searching_str(LWPUCKGAME* puck_game, const char* str) {
     strcpy(puck_game->searching_str, str);
 }
@@ -979,7 +865,9 @@ void puck_game_update_tick(LWPUCKGAME* puck_game, int update_frequency) {
         puck_game->prepare_step_waited_tick++;
         if (puck_game->prepare_step_waited_tick >= puck_game->prepare_step_wait_tick) {
             if (puck_game->battle_phase != LSP_STEADY) {
-                play_sound(LWS_STEADY);
+                if (puck_game->on_steady) {
+                    puck_game->on_steady(puck_game);
+                }
             }
             puck_game->battle_phase = LSP_STEADY;
             puck_game->prepare_step_waited_tick = 0;
@@ -989,7 +877,9 @@ void puck_game_update_tick(LWPUCKGAME* puck_game, int update_frequency) {
         puck_game->prepare_step_waited_tick++;
         if (puck_game->prepare_step_waited_tick >= puck_game->prepare_step_wait_tick) {
             if (puck_game->battle_phase != LSP_GO) {
-                play_sound(LWS_GO);
+                if (puck_game->on_go) {
+                    puck_game->on_go(puck_game);
+                }
             }
             puck_game->battle_phase = LSP_GO;
             puck_game->prepare_step_waited_tick = 0;
@@ -1025,4 +915,72 @@ void puck_game_update_tick(LWPUCKGAME* puck_game, int update_frequency) {
 
 void puck_game_set_tower_invincible(LWPUCKGAME* puck_game, int tower_index, int v) {
     puck_game->tower[tower_index].invincible = v;
+}
+
+void puck_game_reset_battle_state(LWPUCKGAME* puck_game) {
+    // reset physics engine random seed again
+    dRandSetSeed(0);
+    puck_game->update_tick = 0;
+    puck_game->prepare_step_waited_tick = 0;
+    if (puck_game->battle_phase != LSP_READY) {
+        if (puck_game->on_ready) {
+            puck_game->on_ready(puck_game);
+        }
+    }
+    puck_game->battle_phase = LSP_READY;
+    // recreate all battle objects if not exists
+    puck_game_create_all_battle_objects(puck_game);
+    for (int i = 0; i < LW_PUCK_GAME_TOWER_COUNT; i++) {
+        puck_game->tower[i].hp = puck_game->tower_total_hp;
+        puck_game->tower[i].collapsing = 0;
+    }
+    puck_game_reset_go(puck_game, &puck_game->go[LPGO_PUCK], 0.0f, 0.0f, puck_game->go[LPGO_PUCK].radius);
+    puck_game_reset_go(puck_game, &puck_game->go[LPGO_PLAYER], -puck_game->go_start_pos, -puck_game->go_start_pos, puck_game->go[LPGO_PUCK].radius);
+    puck_game_reset_go(puck_game, &puck_game->go[LPGO_TARGET], +puck_game->go_start_pos, +puck_game->go_start_pos, puck_game->go[LPGO_PUCK].radius);
+    puck_game->player.total_hp = puck_game->hp;
+    puck_game->player.current_hp = puck_game->hp;
+    puck_game->target.total_hp = puck_game->hp;
+    puck_game->target.current_hp = puck_game->hp;
+    memset(puck_game->remote_control, 0, sizeof(puck_game->remote_control));
+    puck_game->control_flags &= ~LPGCF_HIDE_TIMER;
+    puck_game->control_flags &= ~LPGCF_HIDE_PULL_BUTTON;
+    puck_game->control_flags &= ~LPGCF_HIDE_DASH_BUTTON;
+    // reset bogus control variables
+    puck_game->target_dx = 0;
+    puck_game->target_dy = 0;
+    puck_game->target_dlen_ratio = 0;
+    // re-seed bogus rng
+    pcg32_srandom_r(&puck_game->bogus_rng, 0x01041685967ULL, 0x027855157ULL);
+    // reset dash state
+    memset(puck_game->remote_dash, 0, sizeof(puck_game->remote_dash));
+}
+
+void puck_game_reset_tutorial_state(LWPUCKGAME* puck_game) {
+    puck_game->update_tick = 0;
+    puck_game->prepare_step_waited_tick = 0;
+    puck_game->battle_phase = LSP_TUTORIAL;
+    for (int i = 0; i < LW_PUCK_GAME_TOWER_COUNT; i++) {
+        puck_game->tower[i].hp = puck_game->tower_total_hp;
+        puck_game->tower[i].collapsing = 0;
+    }
+    // tutorial starts with an empty scene
+    puck_game_destroy_all_battle_objects(puck_game);
+    puck_game->player.total_hp = puck_game->hp;
+    puck_game->player.current_hp = puck_game->hp;
+    puck_game->target.total_hp = puck_game->hp;
+    puck_game->target.current_hp = puck_game->hp;
+    memset(puck_game->remote_control, 0, sizeof(puck_game->remote_control));
+    puck_game->control_flags |= LPGCF_HIDE_TIMER;
+    // reset dash state
+    memset(puck_game->remote_dash, 0, sizeof(puck_game->remote_dash));
+}
+
+void puck_game_reset(LWPUCKGAME* puck_game) {
+    puck_game_reset_battle_state(puck_game);
+    puck_game->game_state = LPGS_MAIN_MENU;
+    puck_game->world_roll = (float)LWDEG2RAD(180);
+    puck_game->world_roll_dir = 1;
+    puck_game->world_roll_axis = 1;
+    puck_game->world_roll_target = puck_game->world_roll;
+    puck_game->world_roll_target_follow_ratio = 0.075f;
 }

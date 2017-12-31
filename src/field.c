@@ -256,7 +256,7 @@ void resolve_player_event_collision(LWCONTEXT* pLwc) {
 
 int field_create_sphere_script_collider(LWFIELD* field, int obj_key, LW_SPACE_GROUP space_group, float radius, float x, float y, float z) {
     if (field == 0) {
-        LOGE(LWLOGPOS "field null");
+        LOGEP("field null");
         return -2;
     }
     for (int i = 0; i < MAX_SCRIPT_GEOM; i++) {
@@ -267,25 +267,25 @@ int field_create_sphere_script_collider(LWFIELD* field, int obj_key, LW_SPACE_GR
             return i;
         }
     }
-    LOGE(LWLOGPOS "exceeds");
+    LOGEP("exceeds");
     return -1;
 }
 
 void field_geom_set_position(LWFIELD* field, int geom_idx, float x, float y, float z) {
     if (geom_idx < 0 || geom_idx >= MAX_SCRIPT_GEOM) {
-        LOGE(LWLOGPOS "range error: %d", geom_idx);
+        LOGEP("range error: %d", geom_idx);
         return;
     }
     if (field->script_geom[geom_idx]) {
         dGeomSetPosition(field->script_geom[geom_idx], x, y, z);
     } else {
-        LOGE(LWLOGPOS "null: %d", geom_idx);
+        LOGEP("null: %d", geom_idx);
     }
 }
 
 void field_destroy_script_collider(LWFIELD* field, int geom_idx) {
     if (geom_idx < 0 || geom_idx >= MAX_SCRIPT_GEOM) {
-        LOGE(LWLOGPOS "range error: %d", geom_idx);
+        LOGEP("range error: %d", geom_idx);
         return;
     }
     if (field->script_geom[geom_idx]) {
@@ -1292,17 +1292,17 @@ int spawn_field_object(LWFIELD* field,
             return i;
         }
     }
-    LOGE(LWLOGPOS "pool excceded");
+    LOGEP("pool excceded");
     return -1;
 }
 
 int despawn_field_object(struct _LWCONTEXT *pLwc, int idx) {
     if (idx < 0 || idx >= MAX_FIELD_OBJECT) {
-        LOGE(LWLOGPOS "index error");
+        LOGEP("index error");
         return -1;
     }
     if (!pLwc->field->field_object[idx].valid) {
-        LOGE(LWLOGPOS "not valid entry error");
+        LOGEP("not valid entry error");
         return -1;
     }
     pLwc->field->field_object[idx].valid = 0;
@@ -1330,7 +1330,7 @@ void despawn_all_field_object(LWFIELD* field) {
 
 LWFIELDOBJECT* field_object(LWFIELD* field, int idx) {
     if (idx < 0 || idx >= MAX_FIELD_OBJECT) {
-        LOGE(LWLOGPOS "index error");
+        LOGEP("index error");
         return 0;
     }
     return &field->field_object[idx];
@@ -1338,7 +1338,7 @@ LWFIELDOBJECT* field_object(LWFIELD* field, int idx) {
 
 float* field_field_object_location_rawptr(LWFIELD* field, int idx) {
     if (idx < 0 || idx >= MAX_FIELD_OBJECT) {
-        LOGE(LWLOGPOS "index error");
+        LOGEP("index error");
         return 0;
     }
     return &field->field_object[idx].x;
@@ -1346,7 +1346,7 @@ float* field_field_object_location_rawptr(LWFIELD* field, int idx) {
 
 float* field_field_object_orientation_rawptr(LWFIELD* field, int idx) {
     if (idx < 0 || idx >= MAX_FIELD_OBJECT) {
-        LOGE(LWLOGPOS "index error");
+        LOGEP("index error");
         return 0;
     }
     return &field->field_object[idx].rot_z;

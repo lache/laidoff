@@ -461,7 +461,7 @@ void* nav_path_query_test(LWNAV* nav) {
 
 void* nav_path_query(LWNAV* nav, int idx) {
 	if (idx < 0 || idx >= MAX_PATH_QUERY) {
-		LOGE(LWLOGPOS "index error");
+		LOGEP("index error");
 		return 0;
 	}
 	return &nav->path_query[idx];
@@ -476,7 +476,7 @@ int nav_new_path_query(LWNAV* nav) {
 		start_new_path_query_test(nav, &nav->path_query[i]);
 		return i;
 	}
-	LOGE(LWLOGPOS "preallocated pool exceeded error");
+	LOGEP("preallocated pool exceeded error");
 	return -1;
 }
 
@@ -492,11 +492,11 @@ void nav_reset_deterministic_seed(LWNAV* nav) {
 
 int nav_update_output_path_query(LWNAV* nav, int idx, int val) {
 	if (idx < 0 || idx >= MAX_PATH_QUERY) {
-		LOGE(LWLOGPOS "index error");
+		LOGEP("index error");
 		return -1;
 	}
 	if (!nav->path_query[idx].valid) {
-		LOGE(LWLOGPOS "invalid entry error");
+		LOGEP("invalid entry error");
 		return -1;
 	}
 	nav->path_query[idx].update_output = val;
@@ -505,11 +505,11 @@ int nav_update_output_path_query(LWNAV* nav, int idx, int val) {
 
 int nav_bind_path_query_output_location(LWNAV* nav, int idx, LWFIELD* field, int field_object_idx) {
 	if (idx < 0 || idx >= MAX_PATH_QUERY) {
-		LOGE(LWLOGPOS "path query index error");
+		LOGEP("path query index error");
 		return -1;
 	}
 	if (!nav->path_query[idx].valid) {
-		LOGE(LWLOGPOS "invalid entry error");
+		LOGEP("invalid entry error");
 		return -1;
 	}
 	nav->path_query_output_location[idx] = field_field_object_location_rawptr(field, field_object_idx);

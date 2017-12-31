@@ -68,13 +68,15 @@ typedef enum _LW_PUCK_GAME_PACKET {
 #define LW_PUCK_GAME_QUEUE_TYPE_NEAREST_SCORE (1)
 
 typedef enum _LWP_STATE_PHASE {
-    LSP_READY = 0,
-    LSP_STEADY = 1,
-    LSP_GO = 2,
-    LSP_FINISHED_DRAW = 3,
-    LSP_FINISHED_VICTORY_P1 = 4,
-    LSP_FINISHED_VICTORY_P2 = 5,
-    LSP_TUTORIAL = 6,
+    LSP_INIT = 0,
+    LSP_READY = 1,
+    LSP_STEADY = 2,
+    LSP_GO = 3,
+    LSP_FINISHED_DRAW = 4,
+    LSP_FINISHED_VICTORY_P1 = 5,
+    LSP_FINISHED_VICTORY_P2 = 6,
+    LSP_TUTORIAL = 7,
+    LSP_MAX_BIT = 7, // should fit in 3-bit
 } LWP_STATE_PHASE;
 
 typedef enum _LWP_STATE_WALL_HIT_BIT {

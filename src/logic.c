@@ -356,7 +356,7 @@ void load_scene_async(LWCONTEXT* pLwc, zactor_t* actor, LW_GAME_SCENE next_game_
 
 void logic_emit_ui_event_async(LWCONTEXT* pLwc, const char* id, float w_ratio, float h_ratio) {
     if (strlen(id) > LW_UI_IDENTIFIER_LENGTH - 1) {
-        LOGE(LWLOGPOS "id('%s') length exceeds (max %d)", id, LW_UI_IDENTIFIER_LENGTH - 1);
+        LOGEP("id('%s') length exceeds (max %d)", id, LW_UI_IDENTIFIER_LENGTH - 1);
         return;
     }
     zmsg_t* msg = zmsg_new();
@@ -729,7 +729,7 @@ int lw_write_tcp_addr(LWCONTEXT* pLwc, const char* tcp_addr) {
     fputs(conf, f);
     fclose(f);
 #else
-    LOGE(LWLOGPOS "NOT IMPLEMENTED YET");
+    LOGEP("NOT IMPLEMENTED YET");
 #endif
     return 0;
 }
@@ -888,7 +888,7 @@ static int loop_logic_update(zloop_t* loop, int timer_id, void* args) {
 static int loop_pipe_reader(zloop_t* loop, zsock_t* pipe, void* args) {
     LWCONTEXT* pLwc = args;
     zmsg_t* msg = zmsg_recv(pipe);
-    LOGIx(LWLOGPOS "Message received through pipe");
+    LOGIPx(LWLOGPOS "Message received through pipe");
     zframe_t* f = zmsg_first(msg);
     while (f) {
         byte* d = zframe_data(f);

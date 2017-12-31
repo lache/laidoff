@@ -25,3 +25,8 @@ void puck_game_clear_match_data(LWCONTEXT* pLwc, LWPUCKGAME* puck_game);
 void puck_game_update_world_roll(LWPUCKGAME* puck_game);
 int puck_game_is_tutorial_completed(const LWPUCKGAME* puck_game);
 int puck_game_is_tutorial_stoppable(const LWPUCKGAME* puck_game);
+void puck_game_roll_world(LWPUCKGAME* puck_game, int dir, int axis, float target);
+void puck_game_roll_to_battle(LWPUCKGAME* puck_game);
+void puck_game_roll_to_practice(LWPUCKGAME* puck_game);
+void puck_game_roll_to_tutorial(LWPUCKGAME* puck_game);
+void puck_game_roll_to_main_menu(LWPUCKGAME* puck_game);

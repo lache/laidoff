@@ -707,8 +707,7 @@ int tcp_send_battle_result(LWTCP* tcp,
                            int winner,
                            int logic_hz) {
     if (tcp == 0) {
-        LOGE(LWLOGPOS
-                     "tcp null");
+        LOGEP("tcp null");
         return -1;
     }
     NEW_TCP_PACKET_CAPITAL(LWPBATTLERESULT, p);

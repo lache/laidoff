@@ -118,6 +118,18 @@ static void puck_game_on_player_dash(LWPUCKGAME* puck_game) {
     play_sound(LWS_DASH2);
 }
 
+static void puck_game_on_ready(LWPUCKGAME* puck_game) {
+    play_sound(LWS_READY);
+}
+
+static void puck_game_on_steady(LWPUCKGAME* puck_game) {
+    play_sound(LWS_STEADY);
+}
+
+static void puck_game_on_go(LWPUCKGAME* puck_game) {
+    play_sound(LWS_GO);
+}
+
 static void puck_game_on_finished(LWPUCKGAME* puck_game, int winner) {
     if (puck_game->player_no == winner) {
         play_sound(LWS_VICTORY);
@@ -146,6 +158,9 @@ void update_puck_game(LWCONTEXT* pLwc, LWPUCKGAME* puck_game, double delta_time)
     puck_game->on_puck_tower_collision = puck_game_on_puck_tower_collision;
     puck_game->on_puck_player_collision = puck_game_on_puck_player_collision;
     puck_game->on_player_dash = puck_game_on_player_dash;
+    puck_game->on_ready = puck_game_on_ready;
+    puck_game->on_steady = puck_game_on_steady;
+    puck_game->on_go = puck_game_on_go;
     puck_game->on_finished = puck_game_on_finished;
     // tick physics engine only if practice mode (single play mode)
     if (puck_game->game_state == LPGS_PRACTICE || puck_game->game_state == LPGS_TUTORIAL) {
@@ -445,4 +460,52 @@ int puck_game_is_tutorial_completed(const LWPUCKGAME* puck_game) {
 
 int puck_game_is_tutorial_stoppable(const LWPUCKGAME* puck_game) {
     return puck_game_is_tutorial_completed(puck_game);
+}
+
+void puck_game_roll_world(LWPUCKGAME* puck_game, int dir, int axis, float target) {
+    if (puck_game->world_roll_dirty == 0) {
+        LOGI("World roll began...");
+        puck_game->world_roll_dir = dir;
+        puck_game->world_roll_axis = axis;
+        puck_game->world_roll_target = target;
+        puck_game->world_roll_dirty = 1;
+        play_sound(LWS_SWOOSH);
+    }
+}
+
+void puck_game_roll_to_battle(LWPUCKGAME* puck_game) {
+    if (puck_game->world_roll_dirty == 0) {
+        puck_game->game_state = LPGS_BATTLE;
+        LOGI("World roll to battle began...");
+        puck_game->world_roll_target = 0;
+        puck_game->world_roll_dirty = 1;
+        play_sound(LWS_SWOOSH);
+    }
+}
+
+void puck_game_roll_to_practice(LWPUCKGAME* puck_game) {
+    if (puck_game->world_roll_dirty == 0) {
+        puck_game->game_state = LPGS_PRACTICE;
+        LOGI("World roll to practice began...");
+        puck_game->world_roll_target = 0;
+        puck_game->world_roll_dirty = 1;
+        play_sound(LWS_SWOOSH);
+    }
+}
+
+void puck_game_roll_to_tutorial(LWPUCKGAME* puck_game) {
+    if (puck_game->world_roll_dirty == 0) {
+        puck_game->game_state = LPGS_TUTORIAL;
+        LOGI("World roll to tutorial began...");
+        puck_game->world_roll_target = 0;
+        puck_game->world_roll_dirty = 1;
+        play_sound(LWS_SWOOSH);
+    }
+}
+
+void puck_game_roll_to_main_menu(LWPUCKGAME* puck_game) {
+    if (puck_game->world_roll_dirty == 0) {
+        puck_game->game_state = LPGS_MAIN_MENU;
+        puck_game_roll_world(puck_game, 1, 1, (float)LWDEG2RAD(180));
+    }
 }

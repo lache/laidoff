@@ -8,7 +8,7 @@
 GLuint lw_create_vertex_shader(LW_VERTEX_SHADER lwvs, const char* path) {
     char* vst = create_string_from_file(path);
     if (!vst) {
-        LOGE(LWLOGPOS "file not found: %s", path);
+        LOGEP("file not found: %s", path);
         return -1;
     }
     GLuint vertex_shader = glCreateShader(GL_VERTEX_SHADER);
@@ -23,7 +23,7 @@ GLuint lw_create_vertex_shader(LW_VERTEX_SHADER lwvs, const char* path) {
         // The maxLength includes the NULL character
         GLchar *errorLog = (GLchar *)calloc(maxLength, sizeof(GLchar));
         glGetShaderInfoLog(vertex_shader, maxLength, &maxLength, errorLog);
-        LOGE(LWLOGPOS "LW_VERTEX_SHADER [%d] Error (length:%d): %s", lwvs, maxLength, errorLog);
+        LOGEP("LW_VERTEX_SHADER [%d] Error (length:%d): %s", lwvs, maxLength, errorLog);
         free(errorLog);
         // Provide the info log in whatever manor you deem best.
         // Exit with failure.

@@ -88,7 +88,7 @@ int tcp_send_get_leaderboard_reveal_player(LWTCP* tcp, int backoffMs, const LWUN
     if (send_result < 0) {
         LOGI("Send result error: %d", send_result);
         if (backoffMs > 10 * 1000 /* 10 seconds */) {
-            LOGE(LWLOGPOS "failed");
+            LOGEP("failed");
             return -1;
         } else if (backoffMs > 0) {
 #if LW_PLATFORM_WIN32
@@ -119,7 +119,7 @@ int tcp_send_get_leaderboard(LWTCP* tcp, int backoffMs, int start_index, int cou
     if (send_result < 0) {
         LOGI("Send result error: %d", send_result);
         if (backoffMs > 10 * 1000 /* 10 seconds */) {
-            LOGE(LWLOGPOS "failed");
+            LOGEP("failed");
             return -1;
         } else if (backoffMs > 0) {
 #if LW_PLATFORM_WIN32

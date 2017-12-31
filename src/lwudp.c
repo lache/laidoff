@@ -122,7 +122,7 @@ void udp_update(LWCONTEXT* pLwc, LWUDP* udp) {
             }
 #else
             // Socket recovery needed
-            LOGE(LWLOGPOS "UDP socket error! Socket recovery needed...");
+            LOGEP("UDP socket error! Socket recovery needed...");
             udp->ready = 0;
             return;
 #endif

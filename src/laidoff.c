@@ -638,7 +638,7 @@ void handle_rmsg_spawn(LWCONTEXT* pLwc, const LWFIELDRENDERCOMMAND* cmd) {
             return;
         }
     }
-    LOGE(LWLOGPOS "maximum capacity exceeded");
+    LOGEP("maximum capacity exceeded");
     abort();
 }
 
@@ -651,7 +651,7 @@ void handle_rmsg_anim(LWCONTEXT* pLwc, const LWFIELDRENDERCOMMAND* cmd) {
             return;
         }
     }
-    LOGE(LWLOGPOS "object key %d not exist", cmd->key);
+    LOGEP("object key %d not exist", cmd->key);
     abort();
 }
 
@@ -662,7 +662,7 @@ void handle_rmsg_despawn(LWCONTEXT* pLwc, const LWFIELDRENDERCOMMAND* cmd) {
             return;
         }
     }
-    LOGE(LWLOGPOS "object key %d not exist", cmd->key);
+    LOGEP("object key %d not exist", cmd->key);
     abort();
 }
 
@@ -673,7 +673,7 @@ void handle_rmsg_pos(LWCONTEXT* pLwc, const LWFIELDRENDERCOMMAND* cmd) {
             return;
         }
     }
-    LOGE(LWLOGPOS "object key %d not exist", cmd->key);
+    LOGEP("object key %d not exist", cmd->key);
     abort();
 }
 
@@ -684,7 +684,7 @@ void handle_rmsg_turn(LWCONTEXT* pLwc, const LWFIELDRENDERCOMMAND* cmd) {
             return;
         }
     }
-    LOGE(LWLOGPOS "object key %d not exist", cmd->key);
+    LOGEP("object key %d not exist", cmd->key);
     abort();
 }
 
@@ -705,7 +705,7 @@ void handle_rmsg_rparams(LWCONTEXT* pLwc, const LWFIELDRENDERCOMMAND* cmd) {
             return;
         }
     }
-    LOGE(LWLOGPOS "object key %d not exist", cmd->key);
+    LOGEP("object key %d not exist", cmd->key);
     abort();
 }
 
@@ -716,7 +716,7 @@ void handle_rmsg_bulletspawnheight(LWCONTEXT* pLwc, const LWFIELDRENDERCOMMAND* 
             return;
         }
     }
-    LOGE(LWLOGPOS "object key %d not exist", cmd->key);
+    LOGEP("object key %d not exist", cmd->key);
     abort();
 }
 
@@ -947,7 +947,7 @@ static void dequeue_puck_game_state_and_apply(LWCONTEXT* pLwc) {
         // If the battle is finished (called once)
         if (puck_game_state_phase_finished(pLwc->puck_game_state.bf.phase) == 0
             && puck_game_state_phase_finished(new_state.bf.phase) == 1) {
-            LOGI(LWLOGPOS "Battle finished. Destroying UDP context...");
+            LOGIP("Battle finished. Destroying UDP context...");
             destroy_udp(&pLwc->udp);
             //puck_game_roll_to_main_menu(pLwc->puck_game);
             pLwc->puck_game->battle_control_ui_alpha = 0.0f;
@@ -1501,7 +1501,7 @@ void lw_set_device_model(LWCONTEXT* pLwc, const char* model) {
 }
 
 void lw_set_size(LWCONTEXT* pLwc, int w, int h) {
-    LOGI(LWLOGPOS "window size old (%d, %d) --> new (%d, %d)", pLwc->width, pLwc->height, w, h);
+    LOGIP("window size old (%d, %d) --> new (%d, %d)", pLwc->width, pLwc->height, w, h);
     pLwc->width = w;
     pLwc->height = h;
     if (pLwc->width > 0 && pLwc->height > 0) {

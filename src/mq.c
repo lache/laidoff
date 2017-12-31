@@ -393,7 +393,7 @@ static void s_mq_poll_ready(void* _pLwc, void* _mq, void* sm, void* field) {
 			void* msg_unaligned = kvmsg_body(kvmsg);
 			char msg_aligned[2048];
 			if (msg_size > sizeof(msg_aligned)) {
-				LOGE(LWLOGPOS "msg_size exceeded (%d) maximum (%d)", msg_size, sizeof(msg_aligned));
+				LOGEP("msg_size exceeded (%d) maximum (%d)", msg_size, sizeof(msg_aligned));
 			}
 			// Should not use 'memcpy'. It is not supported on unaligned addresses.
 			for (size_t i = 0; i < msg_size; i++) {

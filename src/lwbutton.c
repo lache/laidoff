@@ -64,12 +64,12 @@ LWBUTTON* lwbutton_append(const LWCONTEXT* pLwc,
                           float w,
                           float h) {
     if (button_list->button_count >= ARRAY_SIZE(button_list->button)) {
-        LOGE(LWLOGPOS "ARRAY_SIZE(button_list->button) exceeded");
+        LOGEP("ARRAY_SIZE(button_list->button) exceeded");
         return 0;
     }
     LWBUTTON* b = &button_list->button[button_list->button_count];
     if (strlen(id) > ARRAY_SIZE(b->id) - 1) {
-        LOGE(LWLOGPOS "ARRAY_SIZE(b->id) exceeded");
+        LOGEP("ARRAY_SIZE(b->id) exceeded");
         return 0;
     }
     strcpy(b->id, id);
@@ -93,7 +93,7 @@ int lwbutton_press(const LWCONTEXT* pLwc,
                    float* w_ratio,
                    float* h_ratio) {
     if (button_list->button_count >= ARRAY_SIZE(button_list->button)) {
-        LOGE(LWLOGPOS "ARRAY_SIZE(button_list->button) exceeded");
+        LOGEP("ARRAY_SIZE(button_list->button) exceeded");
         return -1;
     }
     for (int i = 0; i < button_list->button_count; i++) {
@@ -112,7 +112,7 @@ int lwbutton_press(const LWCONTEXT* pLwc,
 
 const char* lwbutton_id(const LWBUTTONLIST* button_list, int idx) {
     if (idx >= ARRAY_SIZE(button_list->button)) {
-        LOGE(LWLOGPOS "ARRAY_SIZE(button_list->button) exceeded");
+        LOGEP("ARRAY_SIZE(button_list->button) exceeded");
         return 0;
     }
     return button_list->button[idx].id;
