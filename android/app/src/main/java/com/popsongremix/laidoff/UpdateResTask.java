@@ -163,7 +163,7 @@ class UpdateResTask extends AsyncTask<UpdateResTaskParam, Void, File> {
             }
         } else {
             Log.i(LaidoffNativeActivity.LOG_TAG, "Resource update not needed. (latest list file)");
-            onResourceLoadFinished();
+            onResourceLoadFinished(true);
         }
     }
 
@@ -204,12 +204,12 @@ class UpdateResTask extends AsyncTask<UpdateResTaskParam, Void, File> {
                 if (dtp.sequenceNumber.incrementAndGet() == dtp.totalSequenceNumber) {
                     Log.i(LaidoffNativeActivity.LOG_TAG, "Resource update finished.");
                     dtp.urt.writeListEtag();
-                    dtp.urt.onResourceLoadFinished();
+                    dtp.urt.onResourceLoadFinished(true);
                 }
             }
         } else {
             Log.i(LaidoffNativeActivity.LOG_TAG, "Resource update not needed. (latest list file)");
-            onResourceLoadFinished();
+            onResourceLoadFinished(true);
         }
     }
 
@@ -221,8 +221,8 @@ class UpdateResTask extends AsyncTask<UpdateResTaskParam, Void, File> {
         }
     }
 
-    public static void onResourceLoadFinished() {
-        String result = LaidoffNativeActivity.signalResourceReady(LaidoffNativeActivity.class);
+    public static void onResourceLoadFinished(boolean downloadAssets) {
+        String result = LaidoffNativeActivity.signalResourceReady(LaidoffNativeActivity.class, downloadAssets ? 1 : 0);
         Log.i(LaidoffNativeActivity.LOG_TAG, "onResourceLoadFinished() [JAVA] - calling signalResourceReady() result: " + result);
     }
 }

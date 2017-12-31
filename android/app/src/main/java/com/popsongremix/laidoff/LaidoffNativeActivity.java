@@ -36,7 +36,7 @@ public class LaidoffNativeActivity extends NativeActivity {
         System.loadLibrary("native-activity");
     }
 
-    public static native String signalResourceReady(Class<LaidoffNativeActivity> and9NativeActivityClass);
+    public static native String signalResourceReady(Class<LaidoffNativeActivity> and9NativeActivityClass, int downloadAssets);
 
     public static native int pushTextureData(int width, int height, int[] data, int texAtlasIndex);
 
@@ -132,7 +132,7 @@ public class LaidoffNativeActivity extends NativeActivity {
             downloadResFromServer();
         } else {
             // or.. use embedded assets
-            UpdateResTask.onResourceLoadFinished();
+            UpdateResTask.onResourceLoadFinished(false);
         }
     }
 

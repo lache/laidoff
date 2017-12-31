@@ -68,6 +68,7 @@ static jobject s_obj_from_java;
 static jobject s_obj_from_cpp;
 static ALooper* s_looper_from_cpp;
 static bool s_java_activity_created;
+static int s_download_assets;
 
 #define JAVA_NATIVE_ACTIVITY_NAME "com.popsongremix.laidoff.LaidoffNativeActivity"
 #define TEXT_INPUT_ACTIVITY_NAME "com.popsongremix.laidoff.TextInputActivity"
@@ -918,7 +919,8 @@ Java_com_popsongremix_laidoff_LaidoffNativeActivity_getUserId(JNIEnv* env, jobje
 
 extern "C" JNIEXPORT jstring JNICALL
 Java_com_popsongremix_laidoff_LaidoffNativeActivity_signalResourceReady(JNIEnv* env, jobject obj,
-                                                                        jclass and9NativeActivityClass) {
+                                                                        jclass and9NativeActivityClass,
+                                                                        int downloadAssets) {
     s_env_from_java = env;
     s_obj_from_java = obj;
 
@@ -927,10 +929,15 @@ Java_com_popsongremix_laidoff_LaidoffNativeActivity_signalResourceReady(JNIEnv* 
     std::string hello = "Hello from C++";
 
     s_java_activity_created = true;
+    s_download_assets = downloadAssets;
 
     ALooper_wake(s_looper_from_cpp);
 
     return env->NewStringUTF(hello.c_str());
+}
+
+extern "C" int lw_download_assets() {
+    return s_download_assets;
 }
 
 extern "C" void lw_app_quit(LWCONTEXT* pLwc, void* native_context) {

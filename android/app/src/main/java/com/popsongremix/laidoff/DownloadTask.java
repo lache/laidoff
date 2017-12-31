@@ -153,7 +153,7 @@ class DownloadTask extends AsyncTask<DownloadTaskParams, Void, GetFileResult> {
         if (dtp.sequenceNumber.incrementAndGet() == dtp.totalSequenceNumber) {
             Log.i(LaidoffNativeActivity.LOG_TAG, "Resource update finished.");
             dtp.urt.writeListEtag();
-            dtp.urt.onResourceLoadFinished();
+            dtp.urt.onResourceLoadFinished(true);
         }
     }
 

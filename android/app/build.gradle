@@ -79,21 +79,18 @@ android {
             ndk {
                 abiFilters 'x86'
             }
-            buildConfigField "boolean", "FULL_FEATURED", "false"
-            buildConfigField "boolean", "DOWNLOAD_ASSETS", "false"
+            buildConfigField "boolean", "DOWNLOAD_ASSETS", "true"
         }
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'),
                     'proguard-rules.pro'
-            buildConfigField "boolean", "FULL_FEATURED", "true"
             buildConfigField "boolean", "DOWNLOAD_ASSETS", "true"
         }
         releaseSingapore {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'),
                     'proguard-rules.pro'
-            buildConfigField "boolean", "FULL_FEATURED", "false"
             buildConfigField "boolean", "DOWNLOAD_ASSETS", "false"
         }
         releaseEmulator {
@@ -103,7 +100,6 @@ android {
             ndk {
                 abiFilters 'x86'
             }
-            buildConfigField "boolean", "FULL_FEATURED", "true"
             buildConfigField "boolean", "DOWNLOAD_ASSETS", "true"
         }
     }

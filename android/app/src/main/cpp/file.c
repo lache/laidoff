@@ -22,6 +22,7 @@ static NativeAsset nativeAssetArray[512];
 static int nativeAssetLength;
 static char apkPath[2048];
 static char filesPath[2048];
+int lw_download_assets();
 
 void set_apk_path(const char* apk_path) {
     strcpy(apkPath, apk_path);
@@ -119,12 +120,8 @@ char* create_asset_file_from_downloaded(const char* filename, size_t* size, int 
 }
 
 char* create_binary_from_file(const char* filename, size_t* size) {
-#ifdef LW_DOWNLOAD_ASSETS
-    int from_downloaded = 1;
-#else
-    int from_downloaded = 0;
-#endif
-    if (from_downloaded) {
+    LOGI("create_binary_from_file: %s", filename);
+    if (lw_download_assets()) {
         return create_asset_file_from_downloaded(filename, size, 1);
     } else {
         return create_asset_file(filename, size, 1);
@@ -133,13 +130,8 @@ char* create_binary_from_file(const char* filename, size_t* size) {
 
 char* create_string_from_file(const char* filename) {
     LOGI("create_string_from_file: %s", filename);
-#ifdef LW_DOWNLOAD_ASSETS
-    int from_downloaded = 1;
-#else
-    int from_downloaded = 0;
-#endif
     size_t size;
-    if (from_downloaded) {
+    if (lw_download_assets()) {
         return create_asset_file_from_downloaded(filename, &size, 0);
     } else {
         return create_asset_file(filename, &size, 0);
