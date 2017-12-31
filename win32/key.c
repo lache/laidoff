@@ -230,31 +230,6 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
 		toggle_font_texture_test_mode(pLwc);
 	}
 
-	if (key == GLFW_KEY_KP_1 && action == GLFW_PRESS) {
-		play_sound(LWS_DIE);
-		lw_set_kp(pLwc, 1);
-	}
-
-	if (key == GLFW_KEY_KP_2 && action == GLFW_PRESS) {
-		play_sound(LWS_HIT);
-		lw_set_kp(pLwc, 2);
-	}
-
-	if (key == GLFW_KEY_KP_3 && action == GLFW_PRESS) {
-		play_sound(LWS_POINT);
-		lw_set_kp(pLwc, 3);
-	}
-
-	if (key == GLFW_KEY_KP_4 && action == GLFW_PRESS) {
-		play_sound(LWS_SWOOSHING);
-		lw_set_kp(pLwc, 4);
-	}
-
-	if (key == GLFW_KEY_KP_5 && action == GLFW_PRESS) {
-		play_sound(LWS_WING);
-		lw_set_kp(pLwc, 5);
-	}
-
     // World Roll West
     if (key == GLFW_KEY_KP_4 && action == GLFW_PRESS) {
         puck_game_roll_world(pLwc->puck_game, 1, 1, (float)LWDEG2RAD(180));
