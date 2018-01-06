@@ -158,6 +158,11 @@ int create_sound_source_pool() {
 #define HRESULT int
 #endif
 
+#if LW_PLATFORM_OSX
+extern "C" void preload_all_sound_osx();
+extern "C" void unload_all_sound_osx();
+#endif
+
 extern "C" HRESULT init_ext_sound_lib() {
 #if LW_PLATFORM_WIN32 && LW_ENABLE_SOUND
 
@@ -183,6 +188,9 @@ extern "C" HRESULT init_ext_sound_lib() {
     //BOOL r = PlaySound(sound_buffer, NULL, SND_MEMORY | SND_ASYNC);
 
     return S_OK;
+#elif LW_PLATFORM_OSX
+    preload_all_sound_osx();
+    return 0;
 #else
     return 0;
 #endif
@@ -193,8 +201,15 @@ extern "C" void destroy_ext_sound_lib() {
     for (int i = 0; i < LWS_COUNT; i++) {
         release_sound(i);
     }
+#elif LW_PLATFORM_OSX
+    unload_all_sound_osx();
+#else
 #endif
 }
+
+#if LW_PLATFORM_OSX
+extern "C" void play_sound_osx(LW_SOUND lws);
+#endif
 
 extern "C" void play_sound(LW_SOUND lws) {
 #if LW_ENABLE_SOUND
@@ -207,6 +222,8 @@ extern "C" void play_sound(LW_SOUND lws) {
     }
     // VERY SLOW win32 VERSION - DO NOT USE
     //PlaySound(sound_pool[lws].buffer, NULL, SND_MEMORY | SND_ASYNC);
+#elif LW_PLATFORM_OSX
+    play_sound_osx(lws);
 #endif
 }
 

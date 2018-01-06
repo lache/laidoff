@@ -1,11 +1,3 @@
-//
-//  osx_image.m
-//  Project
-//
-//  Created by 김거엽 on 2017. 4. 15..
-//
-//
-
 #import <Foundation/Foundation.h>
 #import "lwbitmapcontext.h"
 
@@ -85,3 +77,4 @@ void unload_png_osx(LWBITMAPCONTEXT* pBitmapContext) {
     free(pBitmapContext->data);
     pBitmapContext->data = 0;
 }
+

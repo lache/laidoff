@@ -157,6 +157,7 @@ elseif (APPLE)
             win32/sound.cpp
             win32/net.c
             osx/osx_image.m
+            osx/osx_sound.m
             assets # mac os executable bundles its external resources
             )
 elseif (RPI)
