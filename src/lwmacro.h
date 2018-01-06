@@ -24,7 +24,7 @@
 #   define ARRAY_SIZE _countof
 #elif LW_PLATFORM_OSX
 #   define PATH_SEPARATOR "/"
-#   define ASSETS_BASE_PATH PATH_SEPARATOR "Users" PATH_SEPARATOR "kimgeoyeob" PATH_SEPARATOR "laidoff" PATH_SEPARATOR "selected-assets" PATH_SEPARATOR "assets" PATH_SEPARATOR
+#   define ASSETS_BASE_PATH "assets" PATH_SEPARATOR
 #   define LwStaticAssert(x,y) //_STATIC_ASSERT(x) // diabled...
 #   define ARRAY_SIZE(arr) (sizeof(arr) / sizeof((arr)[0]))
 #elif LW_PLATFORM_LINUX

@@ -3,9 +3,17 @@
 
 #include "file.h"
 #include "lwlog.h"
+#include "platform_detection.h"
+
+#if LW_PLATFORM_OSX
+char* get_assets_path(const char* filename);
+#endif
 
 char* create_string_from_file(const char* filename)
 {
+#if LW_PLATFORM_OSX
+    filename = get_assets_path(filename);
+#endif
 	FILE* f;
 	f = fopen(filename, "r");
     if (f) {
@@ -17,9 +25,15 @@ char* create_string_from_file(const char* filename)
         d[last_byte] = '\0';
         fclose(f);
         LOGI("create_string_from_file: %s (%d bytes) loaded to memory.", filename, (int)last_byte);
+#if LW_PLATFORM_OSX
+        free(filename);
+#endif
         return d;
     }
     LOGE("create_string_from_file: %s [ERROR] FILE NOT FOUND.", filename);
+#if LW_PLATFORM_OSX
+    free(filename);
+#endif
     return 0;
 }
 
@@ -30,6 +44,9 @@ void release_string(char* d)
 
 char* create_binary_from_file(const char* filename, size_t* size)
 {
+#if LW_PLATFORM_OSX
+    filename = get_assets_path(filename);
+#endif
 	FILE* f;
 	f = fopen(filename, "rb");
     if (f) {
@@ -41,9 +58,15 @@ char* create_binary_from_file(const char* filename, size_t* size)
         *size = f_size;
         fclose(f);
         LOGI("create_binary_from_file: %s (%d bytes) loaded to memory.", filename, f_size);
+#if LW_PLATFORM_OSX
+        free(filename);
+#endif
         return d;
     }
     LOGE("create_binary_from_file: %s [ERROR] FILE NOT FOUND.", filename);
+#if LW_PLATFORM_OSX
+    free(filename);
+#endif
     return 0;
 }
 

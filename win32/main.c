@@ -115,11 +115,22 @@ static int make_multiple_instances_nonoverlapping(GLFWwindow* window, const RECT
 }
 #endif
 
+#if LW_PLATFORM_OSX
+void test_main_bundle_path(const char* filename);
+#endif
+
 int main(int argc, char* argv[]) {
     LOGI("LAIDOFF: Greetings.");
 
     while (!directory_exists("assets") && LwChangeDirectory("..")) {
     }
+    
+#if LW_PLATFORM_OSX
+    char cwd[2048];
+    getcwd(cwd, 2048);
+    LOGI("CWD: %s", cwd);
+    test_main_bundle_path("test.resource");
+#endif
 
     glfwSetErrorCallback(error_callback);
 

@@ -29,12 +29,12 @@ if (MSVC)
     #set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /wd4996")
     set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} /D_CRT_NONSTDC_NO_WARNINGS /D_CRT_SECURE_NO_WARNINGS /WX")
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /D_CRT_NONSTDC_NO_WARNINGS /D_CRT_SECURE_NO_WARNINGS /WX")
-endif()
+endif ()
 
 # ZeroMQ CMake 의존성 추가
 
 # ZeroMQ 라이브러리 중 테스트 프로젝트는 빌드하지 않는다.
-set (ZMQ_BUILD_TESTS OFF CACHE BOOL "" FORCE)
+set(ZMQ_BUILD_TESTS OFF CACHE BOOL "" FORCE)
 
 add_subdirectory(zeromq-4.2.1)
 
@@ -44,11 +44,11 @@ if (APPLE)
     # ZeroMQ 프로젝트는 ZeroMQ 솔루션 디렉토리에 모은다.
     set_target_properties(libzmq libzmq-static PROPERTIES FOLDER "ZeroMQ")
     set_target_properties(libzmq-static PROPERTIES EXCLUDE_FROM_ALL 1 EXCLUDE_FROM_DEFAULT_BUILD 1)
-else()
+else ()
     # ZeroMQ 프로젝트는 ZeroMQ 솔루션 디렉토리에 모은다.
     set_target_properties(libzmq libzmq-static local_lat local_thr remote_lat remote_thr inproc_lat inproc_thr PROPERTIES FOLDER "ZeroMQ")
     set_target_properties(libzmq-static local_lat local_thr remote_lat remote_thr inproc_lat inproc_thr PROPERTIES EXCLUDE_FROM_ALL 1 EXCLUDE_FROM_DEFAULT_BUILD 1)
-endif()
+endif ()
 
 include_directories(zeromq-4.2.1/include)
 
@@ -83,7 +83,7 @@ include_directories("imgui")
 include_directories(/opt/vc/include /opt/vc/include/interface/vcos/pthreads /opt/vc/include/interface/vmcs_host/linux /opt/vc/src/hello_pi/libs/ilclient /opt/vc/src/hello_pi/libs/vgfont)
 
 # pthread deps on Linux server build
-find_package (Threads)
+find_package(Threads)
 
 
 include(CheckIncludeFile)
@@ -91,13 +91,13 @@ CHECK_INCLUDE_FILE(/opt/vc/include/bcm_host.h BCM_HOST_AVAILABLE)
 
 if (MSVC)
     add_definitions(-D_CRT_SECURE_NO_WARNINGS)
-endif()
+endif ()
 
 add_definitions(-DdDOUBLE)
 
 if (WIN32)
     set(ICON win32/laidoff.rc)
-	set(SERVERICON win32/server/laidoff-server.rc)
+    set(SERVERICON win32/server/laidoff-server.rc)
     set(WINCODEC Windowscodecs) # Windows Imaging Codecs
     set(WINDSHOW Strmiids) # DirectShow
     set(WINMM Winmm) # PlaySound
@@ -144,6 +144,8 @@ elseif (APPLE)
     set(ICON osx/laidoff.icns)
     set_source_files_properties(osx/laidoff.icns PROPERTIES
             MACOSX_PACKAGE_LOCATION "Resources")
+    set_source_files_properties(assets PROPERTIES
+            MACOSX_PACKAGE_LOCATION "Resources")
 
     set(OSX_DEPS
             win32/etc1.cpp
@@ -155,6 +157,7 @@ elseif (APPLE)
             win32/sound.cpp
             win32/net.c
             osx/osx_image.m
+            assets # mac os executable bundles its external resources
             )
 elseif (RPI)
 
@@ -163,7 +166,7 @@ elseif (RPI)
 
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DRPI")
 
-    SET(CMAKE_EXE_LINKER_FLAGS  "${CMAKE_EXE_LINKER_FLAGS} -L/opt/vc/lib/ -lbrcmGLESv2 -lbrcmEGL -lopenmaxil -lbcm_host -lvcos -lvchiq_arm -lpthread -lrt -lm -L/opt/vc/src/hello_pi/libs/ilclient -L/opt/vc/src/hello_pi/libs/vgfont" )
+    SET(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -L/opt/vc/lib/ -lbrcmGLESv2 -lbrcmEGL -lopenmaxil -lbcm_host -lvcos -lvchiq_arm -lpthread -lrt -lm -L/opt/vc/src/hello_pi/libs/ilclient -L/opt/vc/src/hello_pi/libs/vgfont")
 
     set(RPI_DEPS
             win32/etc1.cpp
@@ -189,7 +192,7 @@ elseif (UNIX)
             ios/laidoff/net.c
             rpi/rpi_image.c
             )
-endif()
+endif ()
 
 set(GLAD "${GLFW_SOURCE_DIR}/deps/glad/glad.h"
         "${GLFW_SOURCE_DIR}/deps/glad.c")
@@ -278,7 +281,7 @@ if (MSVC)
             LINK_FLAGS "/ENTRY:mainCRTStartup")
 elseif (APPLE)
 
-endif()
+endif ()
 
 # 빌드 결과를 한곳으로 모은다. (DLL, EXE)
 if (NOT SERVER_ONLY)

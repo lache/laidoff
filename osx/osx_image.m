@@ -9,6 +9,20 @@
 #import <Foundation/Foundation.h>
 #import "lwbitmapcontext.h"
 
+void test_main_bundle_path(const char* filename) {
+    NSString *path = [NSString stringWithFormat:@"%@/%s",
+                      [[NSBundle mainBundle] resourcePath],
+                      filename];
+    NSLog(@"mainBundle resource path: %@", path);
+}
+
+char* get_assets_path(const char* filename) {
+    NSString *path = [NSString stringWithFormat:@"%@/%s",
+                      [[NSBundle mainBundle] resourcePath],
+                      filename];
+    return strdup([path UTF8String]);
+}
+
 CGImageRef CGImageRef_load(const char *filename) {
     /*
     NSString *path = [NSString stringWithFormat:@"%@/%s",
