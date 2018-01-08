@@ -110,7 +110,8 @@ typedef struct _LWPUCKGAMEBOGUSPARAM {
 
 typedef struct _LWPUCKGAME {
 	// ---- Static game data begin
-	float world_size;
+	float world_width;
+    float world_height;
     float wall_height;
 	float dash_interval;
 	float dash_duration;
@@ -148,7 +149,8 @@ typedef struct _LWPUCKGAME {
     int player_lvt;
     // ---- Static game data end
     int prepare_step_wait_tick; // wait ticks for each 'ready....' and 'steady....' battle phases
-    float world_size_half;
+    float world_width_half;
+    float world_height_half;
     float tower_pos_multiplier[LW_PUCK_GAME_TOWER_COUNT][2];
     float tower_collapsing_z_rot_angle[LW_PUCK_GAME_TOWER_COUNT];
 	dWorldID world;
@@ -233,6 +235,7 @@ typedef struct _LWPUCKGAME {
 
 LWPUCKGAME* new_puck_game(int update_frequency);
 void puck_game_set_static_default_values(LWPUCKGAME* puck_game);
+void puck_game_set_secondary_static_default_values(LWPUCKGAME* puck_game);
 void delete_puck_game(LWPUCKGAME** puck_game);
 void puck_game_push(LWPUCKGAME* puck_game);
 float puck_game_dash_gauge_ratio(LWPUCKGAME* puck_game, const LWPUCKGAMEDASH* dash);
@@ -273,3 +276,6 @@ void puck_game_destroy_all_battle_objects(LWPUCKGAME* puck_game);
 void puck_game_reset_battle_state(LWPUCKGAME* puck_game);
 void puck_game_reset_tutorial_state(LWPUCKGAME* puck_game);
 void puck_game_reset(LWPUCKGAME* puck_game);
+void puck_game_set_tower_pos_multiplier(LWPUCKGAME* puck_game, int index, float mx, float my);
+void puck_game_create_walls(LWPUCKGAME* puck_game);
+void puck_game_destroy_walls(LWPUCKGAME* puck_game);

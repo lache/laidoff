@@ -56848,21 +56848,21 @@ static swig_lua_class *swig_LWPUCKGAMEBOGUSPARAM_bases[] = {0};
 static const char *swig_LWPUCKGAMEBOGUSPARAM_base_names[] = {0};
 static swig_lua_class _wrap_class_LWPUCKGAMEBOGUSPARAM = { "LWPUCKGAMEBOGUSPARAM", "LWPUCKGAMEBOGUSPARAM", &SWIGTYPE_p__LWPUCKGAMEBOGUSPARAM,_proxy__wrap_new_LWPUCKGAMEBOGUSPARAM, swig_delete_LWPUCKGAMEBOGUSPARAM, swig_LWPUCKGAMEBOGUSPARAM_methods, swig_LWPUCKGAMEBOGUSPARAM_attributes, &swig_LWPUCKGAMEBOGUSPARAM_Sf_SwigStatic, swig_LWPUCKGAMEBOGUSPARAM_meta, swig_LWPUCKGAMEBOGUSPARAM_bases, swig_LWPUCKGAMEBOGUSPARAM_base_names };
 
-static int _wrap_LWPUCKGAME_world_size_set(lua_State* L) {
+static int _wrap_LWPUCKGAME_world_width_set(lua_State* L) {
   int SWIG_arg = 0;
   struct _LWPUCKGAME *arg1 = (struct _LWPUCKGAME *) 0 ;
   float arg2 ;
   
-  SWIG_check_num_args("_LWPUCKGAME::world_size",2,2)
-  if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("_LWPUCKGAME::world_size",1,"struct _LWPUCKGAME *");
-  if(!lua_isnumber(L,2)) SWIG_fail_arg("_LWPUCKGAME::world_size",2,"float");
+  SWIG_check_num_args("_LWPUCKGAME::world_width",2,2)
+  if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("_LWPUCKGAME::world_width",1,"struct _LWPUCKGAME *");
+  if(!lua_isnumber(L,2)) SWIG_fail_arg("_LWPUCKGAME::world_width",2,"float");
   
   if (!SWIG_IsOK(SWIG_ConvertPtr(L,1,(void**)&arg1,SWIGTYPE_p__LWPUCKGAME,0))){
-    SWIG_fail_ptr("LWPUCKGAME_world_size_set",1,SWIGTYPE_p__LWPUCKGAME);
+    SWIG_fail_ptr("LWPUCKGAME_world_width_set",1,SWIGTYPE_p__LWPUCKGAME);
   }
   
   arg2 = (float)lua_tonumber(L, 2);
-  if (arg1) (arg1)->world_size = arg2;
+  if (arg1) (arg1)->world_width = arg2;
   
   return SWIG_arg;
   
@@ -56874,19 +56874,69 @@ fail:
 }
 
 
-static int _wrap_LWPUCKGAME_world_size_get(lua_State* L) {
+static int _wrap_LWPUCKGAME_world_width_get(lua_State* L) {
   int SWIG_arg = 0;
   struct _LWPUCKGAME *arg1 = (struct _LWPUCKGAME *) 0 ;
   float result;
   
-  SWIG_check_num_args("_LWPUCKGAME::world_size",1,1)
-  if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("_LWPUCKGAME::world_size",1,"struct _LWPUCKGAME *");
+  SWIG_check_num_args("_LWPUCKGAME::world_width",1,1)
+  if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("_LWPUCKGAME::world_width",1,"struct _LWPUCKGAME *");
   
   if (!SWIG_IsOK(SWIG_ConvertPtr(L,1,(void**)&arg1,SWIGTYPE_p__LWPUCKGAME,0))){
-    SWIG_fail_ptr("LWPUCKGAME_world_size_get",1,SWIGTYPE_p__LWPUCKGAME);
+    SWIG_fail_ptr("LWPUCKGAME_world_width_get",1,SWIGTYPE_p__LWPUCKGAME);
   }
   
-  result = (float) ((arg1)->world_size);
+  result = (float) ((arg1)->world_width);
+  lua_pushnumber(L, (lua_Number) result); SWIG_arg++;
+  return SWIG_arg;
+  
+  if(0) SWIG_fail;
+  
+fail:
+  lua_error(L);
+  return SWIG_arg;
+}
+
+
+static int _wrap_LWPUCKGAME_world_height_set(lua_State* L) {
+  int SWIG_arg = 0;
+  struct _LWPUCKGAME *arg1 = (struct _LWPUCKGAME *) 0 ;
+  float arg2 ;
+  
+  SWIG_check_num_args("_LWPUCKGAME::world_height",2,2)
+  if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("_LWPUCKGAME::world_height",1,"struct _LWPUCKGAME *");
+  if(!lua_isnumber(L,2)) SWIG_fail_arg("_LWPUCKGAME::world_height",2,"float");
+  
+  if (!SWIG_IsOK(SWIG_ConvertPtr(L,1,(void**)&arg1,SWIGTYPE_p__LWPUCKGAME,0))){
+    SWIG_fail_ptr("LWPUCKGAME_world_height_set",1,SWIGTYPE_p__LWPUCKGAME);
+  }
+  
+  arg2 = (float)lua_tonumber(L, 2);
+  if (arg1) (arg1)->world_height = arg2;
+  
+  return SWIG_arg;
+  
+  if(0) SWIG_fail;
+  
+fail:
+  lua_error(L);
+  return SWIG_arg;
+}
+
+
+static int _wrap_LWPUCKGAME_world_height_get(lua_State* L) {
+  int SWIG_arg = 0;
+  struct _LWPUCKGAME *arg1 = (struct _LWPUCKGAME *) 0 ;
+  float result;
+  
+  SWIG_check_num_args("_LWPUCKGAME::world_height",1,1)
+  if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("_LWPUCKGAME::world_height",1,"struct _LWPUCKGAME *");
+  
+  if (!SWIG_IsOK(SWIG_ConvertPtr(L,1,(void**)&arg1,SWIGTYPE_p__LWPUCKGAME,0))){
+    SWIG_fail_ptr("LWPUCKGAME_world_height_get",1,SWIGTYPE_p__LWPUCKGAME);
+  }
+  
+  result = (float) ((arg1)->world_height);
   lua_pushnumber(L, (lua_Number) result); SWIG_arg++;
   return SWIG_arg;
   
@@ -58698,21 +58748,21 @@ fail:
 }
 
 
-static int _wrap_LWPUCKGAME_world_size_half_set(lua_State* L) {
+static int _wrap_LWPUCKGAME_world_width_half_set(lua_State* L) {
   int SWIG_arg = 0;
   struct _LWPUCKGAME *arg1 = (struct _LWPUCKGAME *) 0 ;
   float arg2 ;
   
-  SWIG_check_num_args("_LWPUCKGAME::world_size_half",2,2)
-  if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("_LWPUCKGAME::world_size_half",1,"struct _LWPUCKGAME *");
-  if(!lua_isnumber(L,2)) SWIG_fail_arg("_LWPUCKGAME::world_size_half",2,"float");
+  SWIG_check_num_args("_LWPUCKGAME::world_width_half",2,2)
+  if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("_LWPUCKGAME::world_width_half",1,"struct _LWPUCKGAME *");
+  if(!lua_isnumber(L,2)) SWIG_fail_arg("_LWPUCKGAME::world_width_half",2,"float");
   
   if (!SWIG_IsOK(SWIG_ConvertPtr(L,1,(void**)&arg1,SWIGTYPE_p__LWPUCKGAME,0))){
-    SWIG_fail_ptr("LWPUCKGAME_world_size_half_set",1,SWIGTYPE_p__LWPUCKGAME);
+    SWIG_fail_ptr("LWPUCKGAME_world_width_half_set",1,SWIGTYPE_p__LWPUCKGAME);
   }
   
   arg2 = (float)lua_tonumber(L, 2);
-  if (arg1) (arg1)->world_size_half = arg2;
+  if (arg1) (arg1)->world_width_half = arg2;
   
   return SWIG_arg;
   
@@ -58724,19 +58774,69 @@ fail:
 }
 
 
-static int _wrap_LWPUCKGAME_world_size_half_get(lua_State* L) {
+static int _wrap_LWPUCKGAME_world_width_half_get(lua_State* L) {
   int SWIG_arg = 0;
   struct _LWPUCKGAME *arg1 = (struct _LWPUCKGAME *) 0 ;
   float result;
   
-  SWIG_check_num_args("_LWPUCKGAME::world_size_half",1,1)
-  if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("_LWPUCKGAME::world_size_half",1,"struct _LWPUCKGAME *");
+  SWIG_check_num_args("_LWPUCKGAME::world_width_half",1,1)
+  if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("_LWPUCKGAME::world_width_half",1,"struct _LWPUCKGAME *");
   
   if (!SWIG_IsOK(SWIG_ConvertPtr(L,1,(void**)&arg1,SWIGTYPE_p__LWPUCKGAME,0))){
-    SWIG_fail_ptr("LWPUCKGAME_world_size_half_get",1,SWIGTYPE_p__LWPUCKGAME);
+    SWIG_fail_ptr("LWPUCKGAME_world_width_half_get",1,SWIGTYPE_p__LWPUCKGAME);
   }
   
-  result = (float) ((arg1)->world_size_half);
+  result = (float) ((arg1)->world_width_half);
+  lua_pushnumber(L, (lua_Number) result); SWIG_arg++;
+  return SWIG_arg;
+  
+  if(0) SWIG_fail;
+  
+fail:
+  lua_error(L);
+  return SWIG_arg;
+}
+
+
+static int _wrap_LWPUCKGAME_world_height_half_set(lua_State* L) {
+  int SWIG_arg = 0;
+  struct _LWPUCKGAME *arg1 = (struct _LWPUCKGAME *) 0 ;
+  float arg2 ;
+  
+  SWIG_check_num_args("_LWPUCKGAME::world_height_half",2,2)
+  if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("_LWPUCKGAME::world_height_half",1,"struct _LWPUCKGAME *");
+  if(!lua_isnumber(L,2)) SWIG_fail_arg("_LWPUCKGAME::world_height_half",2,"float");
+  
+  if (!SWIG_IsOK(SWIG_ConvertPtr(L,1,(void**)&arg1,SWIGTYPE_p__LWPUCKGAME,0))){
+    SWIG_fail_ptr("LWPUCKGAME_world_height_half_set",1,SWIGTYPE_p__LWPUCKGAME);
+  }
+  
+  arg2 = (float)lua_tonumber(L, 2);
+  if (arg1) (arg1)->world_height_half = arg2;
+  
+  return SWIG_arg;
+  
+  if(0) SWIG_fail;
+  
+fail:
+  lua_error(L);
+  return SWIG_arg;
+}
+
+
+static int _wrap_LWPUCKGAME_world_height_half_get(lua_State* L) {
+  int SWIG_arg = 0;
+  struct _LWPUCKGAME *arg1 = (struct _LWPUCKGAME *) 0 ;
+  float result;
+  
+  SWIG_check_num_args("_LWPUCKGAME::world_height_half",1,1)
+  if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("_LWPUCKGAME::world_height_half",1,"struct _LWPUCKGAME *");
+  
+  if (!SWIG_IsOK(SWIG_ConvertPtr(L,1,(void**)&arg1,SWIGTYPE_p__LWPUCKGAME,0))){
+    SWIG_fail_ptr("LWPUCKGAME_world_height_half_get",1,SWIGTYPE_p__LWPUCKGAME);
+  }
+  
+  result = (float) ((arg1)->world_height_half);
   lua_pushnumber(L, (lua_Number) result); SWIG_arg++;
   return SWIG_arg;
   
@@ -63083,7 +63183,8 @@ static int _proxy__wrap_new_LWPUCKGAME(lua_State *L) {
     return 1;
 }
 static swig_lua_attribute swig_LWPUCKGAME_attributes[] = {
-    { "world_size", _wrap_LWPUCKGAME_world_size_get, _wrap_LWPUCKGAME_world_size_set },
+    { "world_width", _wrap_LWPUCKGAME_world_width_get, _wrap_LWPUCKGAME_world_width_set },
+    { "world_height", _wrap_LWPUCKGAME_world_height_get, _wrap_LWPUCKGAME_world_height_set },
     { "wall_height", _wrap_LWPUCKGAME_wall_height_get, _wrap_LWPUCKGAME_wall_height_set },
     { "dash_interval", _wrap_LWPUCKGAME_dash_interval_get, _wrap_LWPUCKGAME_dash_interval_set },
     { "dash_duration", _wrap_LWPUCKGAME_dash_duration_get, _wrap_LWPUCKGAME_dash_duration_set },
@@ -63120,7 +63221,8 @@ static swig_lua_attribute swig_LWPUCKGAME_attributes[] = {
     { "puck_lvt", _wrap_LWPUCKGAME_puck_lvt_get, _wrap_LWPUCKGAME_puck_lvt_set },
     { "player_lvt", _wrap_LWPUCKGAME_player_lvt_get, _wrap_LWPUCKGAME_player_lvt_set },
     { "prepare_step_wait_tick", _wrap_LWPUCKGAME_prepare_step_wait_tick_get, _wrap_LWPUCKGAME_prepare_step_wait_tick_set },
-    { "world_size_half", _wrap_LWPUCKGAME_world_size_half_get, _wrap_LWPUCKGAME_world_size_half_set },
+    { "world_width_half", _wrap_LWPUCKGAME_world_width_half_get, _wrap_LWPUCKGAME_world_width_half_set },
+    { "world_height_half", _wrap_LWPUCKGAME_world_height_half_get, _wrap_LWPUCKGAME_world_height_half_set },
     { "tower_pos_multiplier", _wrap_LWPUCKGAME_tower_pos_multiplier_get, _wrap_LWPUCKGAME_tower_pos_multiplier_set },
     { "tower_collapsing_z_rot_angle", _wrap_LWPUCKGAME_tower_collapsing_z_rot_angle_get, _wrap_LWPUCKGAME_tower_collapsing_z_rot_angle_set },
     { "world", _wrap_LWPUCKGAME_world_get, _wrap_LWPUCKGAME_world_set },
@@ -63267,6 +63369,29 @@ static int _wrap_puck_game_set_static_default_values(lua_State* L) {
   }
   
   puck_game_set_static_default_values(arg1);
+  
+  return SWIG_arg;
+  
+  if(0) SWIG_fail;
+  
+fail:
+  lua_error(L);
+  return SWIG_arg;
+}
+
+
+static int _wrap_puck_game_set_secondary_static_default_values(lua_State* L) {
+  int SWIG_arg = 0;
+  LWPUCKGAME *arg1 = (LWPUCKGAME *) 0 ;
+  
+  SWIG_check_num_args("puck_game_set_secondary_static_default_values",1,1)
+  if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("puck_game_set_secondary_static_default_values",1,"LWPUCKGAME *");
+  
+  if (!SWIG_IsOK(SWIG_ConvertPtr(L,1,(void**)&arg1,SWIGTYPE_p__LWPUCKGAME,0))){
+    SWIG_fail_ptr("puck_game_set_secondary_static_default_values",1,SWIGTYPE_p__LWPUCKGAME);
+  }
+  
+  puck_game_set_secondary_static_default_values(arg1);
   
   return SWIG_arg;
   
@@ -64393,6 +64518,84 @@ static int _wrap_puck_game_reset(lua_State* L) {
   }
   
   puck_game_reset(arg1);
+  
+  return SWIG_arg;
+  
+  if(0) SWIG_fail;
+  
+fail:
+  lua_error(L);
+  return SWIG_arg;
+}
+
+
+static int _wrap_puck_game_set_tower_pos_multiplier(lua_State* L) {
+  int SWIG_arg = 0;
+  LWPUCKGAME *arg1 = (LWPUCKGAME *) 0 ;
+  int arg2 ;
+  float arg3 ;
+  float arg4 ;
+  
+  SWIG_check_num_args("puck_game_set_tower_pos_multiplier",4,4)
+  if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("puck_game_set_tower_pos_multiplier",1,"LWPUCKGAME *");
+  if(!lua_isnumber(L,2)) SWIG_fail_arg("puck_game_set_tower_pos_multiplier",2,"int");
+  if(!lua_isnumber(L,3)) SWIG_fail_arg("puck_game_set_tower_pos_multiplier",3,"float");
+  if(!lua_isnumber(L,4)) SWIG_fail_arg("puck_game_set_tower_pos_multiplier",4,"float");
+  
+  if (!SWIG_IsOK(SWIG_ConvertPtr(L,1,(void**)&arg1,SWIGTYPE_p__LWPUCKGAME,0))){
+    SWIG_fail_ptr("puck_game_set_tower_pos_multiplier",1,SWIGTYPE_p__LWPUCKGAME);
+  }
+  
+  arg2 = (int)lua_tonumber(L, 2);
+  arg3 = (float)lua_tonumber(L, 3);
+  arg4 = (float)lua_tonumber(L, 4);
+  puck_game_set_tower_pos_multiplier(arg1,arg2,arg3,arg4);
+  
+  return SWIG_arg;
+  
+  if(0) SWIG_fail;
+  
+fail:
+  lua_error(L);
+  return SWIG_arg;
+}
+
+
+static int _wrap_puck_game_create_walls(lua_State* L) {
+  int SWIG_arg = 0;
+  LWPUCKGAME *arg1 = (LWPUCKGAME *) 0 ;
+  
+  SWIG_check_num_args("puck_game_create_walls",1,1)
+  if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("puck_game_create_walls",1,"LWPUCKGAME *");
+  
+  if (!SWIG_IsOK(SWIG_ConvertPtr(L,1,(void**)&arg1,SWIGTYPE_p__LWPUCKGAME,0))){
+    SWIG_fail_ptr("puck_game_create_walls",1,SWIGTYPE_p__LWPUCKGAME);
+  }
+  
+  puck_game_create_walls(arg1);
+  
+  return SWIG_arg;
+  
+  if(0) SWIG_fail;
+  
+fail:
+  lua_error(L);
+  return SWIG_arg;
+}
+
+
+static int _wrap_puck_game_destroy_walls(lua_State* L) {
+  int SWIG_arg = 0;
+  LWPUCKGAME *arg1 = (LWPUCKGAME *) 0 ;
+  
+  SWIG_check_num_args("puck_game_destroy_walls",1,1)
+  if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("puck_game_destroy_walls",1,"LWPUCKGAME *");
+  
+  if (!SWIG_IsOK(SWIG_ConvertPtr(L,1,(void**)&arg1,SWIGTYPE_p__LWPUCKGAME,0))){
+    SWIG_fail_ptr("puck_game_destroy_walls",1,SWIGTYPE_p__LWPUCKGAME);
+  }
+  
+  puck_game_destroy_walls(arg1);
   
   return SWIG_arg;
   
@@ -82805,6 +83008,7 @@ static swig_lua_method swig_SwigModule_methods[]= {
     { "puck_game_set_static_default_values_client", _wrap_puck_game_set_static_default_values_client},
     { "new_puck_game", _wrap_new_puck_game},
     { "puck_game_set_static_default_values", _wrap_puck_game_set_static_default_values},
+    { "puck_game_set_secondary_static_default_values", _wrap_puck_game_set_secondary_static_default_values},
     { "delete_puck_game", _wrap_delete_puck_game},
     { "puck_game_push", _wrap_puck_game_push},
     { "puck_game_dash_gauge_ratio", _wrap_puck_game_dash_gauge_ratio},
@@ -82845,6 +83049,9 @@ static swig_lua_method swig_SwigModule_methods[]= {
     { "puck_game_reset_battle_state", _wrap_puck_game_reset_battle_state},
     { "puck_game_reset_tutorial_state", _wrap_puck_game_reset_tutorial_state},
     { "puck_game_reset", _wrap_puck_game_reset},
+    { "puck_game_set_tower_pos_multiplier", _wrap_puck_game_set_tower_pos_multiplier},
+    { "puck_game_create_walls", _wrap_puck_game_create_walls},
+    { "puck_game_destroy_walls", _wrap_puck_game_destroy_walls},
     { "new_tcp", _wrap_new_tcp},
     { "destroy_tcp", _wrap_destroy_tcp},
     { "tcp_update", _wrap_tcp_update},

@@ -1088,9 +1088,9 @@ static void render_floor(const LWCONTEXT *pLwc,
     mat4x4 rot;
     mat4x4_identity(rot);
 
-    float sx = puck_game->world_size_half;
-    float sy = puck_game->world_size_half;
-    float sz = puck_game->world_size_half;
+    float sx = puck_game->world_width_half;
+    float sy = puck_game->world_height_half;
+    float sz = 1.0f;
     float x = 0.0f, y = 0.0f, z = 0.0f;
 
     mat4x4 model;
@@ -1159,14 +1159,14 @@ static void render_default_stage(const LWCONTEXT *pLwc,
                 wall_shader_index,
                 view,
                 0,
-                puck_game->world_size_half,
+                puck_game->world_height_half,
                 0,
                 (float)LWDEG2RAD(90),
                 0,
                 LVT_CENTER_BOTTOM_ANCHORED_SQUARE,
-                puck_game->world_size_half,
+                puck_game->world_width_half,
                 puck_game->wall_height / 2,
-                puck_game->world_size_half,
+                puck_game->world_width_half,
                 sphere_render_uniform,
                 LPGB_N);
     // South wall
@@ -1176,14 +1176,14 @@ static void render_default_stage(const LWCONTEXT *pLwc,
                 wall_shader_index,
                 view,
                 0,
-                -puck_game->world_size_half,
+                -puck_game->world_height_half,
                 0,
                 (float)LWDEG2RAD(-90),
                 0,
                 LVT_CENTER_TOP_ANCHORED_SQUARE,
-                puck_game->world_size_half,
+                puck_game->world_width_half,
                 puck_game->wall_height / 2,
-                puck_game->world_size_half,
+                puck_game->world_width_half,
                 sphere_render_uniform,
                 LPGB_S);
     // East wall
@@ -1192,15 +1192,15 @@ static void render_default_stage(const LWCONTEXT *pLwc,
                 puck_game,
                 wall_shader_index,
                 view,
-                puck_game->world_size_half,
+                puck_game->world_width_half,
                 0,
                 0,
                 0,
                 (float)LWDEG2RAD(90),
                 LVT_LEFT_CENTER_ANCHORED_SQUARE,
                 puck_game->wall_height / 2,
-                puck_game->world_size_half,
-                puck_game->world_size_half,
+                puck_game->world_height_half,
+                puck_game->world_height_half,
                 sphere_render_uniform,
                 LPGB_E);
     // West wall
@@ -1209,15 +1209,15 @@ static void render_default_stage(const LWCONTEXT *pLwc,
                 puck_game,
                 wall_shader_index,
                 view,
-                -puck_game->world_size_half,
+                -puck_game->world_width_half,
                 0,
                 0,
                 0,
                 (float)LWDEG2RAD(-90),
                 LVT_RIGHT_CENTER_ANCHORED_SQUARE,
                 puck_game->wall_height / 2,
-                puck_game->world_size_half,
-                puck_game->world_size_half,
+                puck_game->world_height_half,
+                puck_game->world_height_half,
                 sphere_render_uniform,
                 LPGB_W);
 }
@@ -2084,8 +2084,8 @@ void lwc_render_physics(const LWCONTEXT* pLwc, const mat4x4 view, const mat4x4 p
         },
         // float arrow_center[2];
         {
-            fire ? +player_controlled_pos[0] / puck_game->world_size : 999.0f,
-            fire ? -player_controlled_pos[1] / puck_game->world_size : 999.0f,
+            fire ? +player_controlled_pos[0] / puck_game->world_width : 999.0f,
+            fire ? -player_controlled_pos[1] / puck_game->world_height : 999.0f,
         },
         // float arrow_scale;
         arrow_scale,

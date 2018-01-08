@@ -605,7 +605,7 @@
 		566373291EBA52D3001DA3F4 /* customization.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = customization.cpp; sourceTree = "<group>"; };
 		5663732A1EBA52D3001DA3F4 /* malloc.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = malloc.cpp; sourceTree = "<group>"; };
 		5663732B1EBA52D3001DA3F4 /* threadlocalstorage.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = threadlocalstorage.cpp; sourceTree = "<group>"; };
-		567F39BD1EA29BC90081EB67 /* assets */ = {isa = PBXFileReference; lastKnownFileType = folder; name = assets; path = "../selected-assets/assets"; sourceTree = "<group>"; };
+		567F39BD1EA29BC90081EB67 /* assets */ = {isa = PBXFileReference; lastKnownFileType = folder; name = assets; path = ../assets; sourceTree = "<group>"; };
 		567F39BF1EA2A2F70081EB67 /* image.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = image.cpp; path = ../../win32/image.cpp; sourceTree = "<group>"; };
 		567F39C11EA2A4600081EB67 /* etc1.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = etc1.cpp; path = ../../win32/etc1.cpp; sourceTree = "<group>"; };
 		567F39C41EA2A7500081EB67 /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };

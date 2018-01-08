@@ -145,10 +145,51 @@ void puck_game_create_control_joint(LWPUCKGAME* puck_game, int lpgo) {
     }
 }
 
+void puck_game_create_walls(LWPUCKGAME* puck_game) {
+    // dCreatePlane(..., a, b, c, d); ==> plane equation: a*x + b*y + c*z = d
+    if (puck_game->boundary[LPGB_GROUND] == 0) {
+        puck_game->boundary[LPGB_GROUND] = dCreatePlane(puck_game->space, 0, 0, 1, 0);
+    }
+    if (puck_game->boundary[LPGB_E] == 0) {
+        puck_game->boundary[LPGB_E] = dCreatePlane(puck_game->space, -1, 0, 0, -puck_game->world_width_half);
+    }
+    if (puck_game->boundary[LPGB_W] == 0) {
+        puck_game->boundary[LPGB_W] = dCreatePlane(puck_game->space, 1, 0, 0, -puck_game->world_width_half);
+    }
+    if (puck_game->boundary[LPGB_S] == 0) {
+        puck_game->boundary[LPGB_S] = dCreatePlane(puck_game->space, 0, 1, 0, -puck_game->world_height_half);
+    }
+    if (puck_game->boundary[LPGB_N] == 0) {
+        puck_game->boundary[LPGB_N] = dCreatePlane(puck_game->space, 0, -1, 0, -puck_game->world_height_half);
+    }
+    if (puck_game->boundary[LPGB_DIAGONAL_1] == 0) {
+        //puck_game->boundary[LPGB_DIAGONAL_1] = dCreatePlane(puck_game->space, -1, -1, 0, 0);
+    }
+    if (puck_game->boundary[LPGB_DIAGONAL_2] == 0) {
+        //puck_game->boundary[LPGB_DIAGONAL_2] = dCreatePlane(puck_game->space, +1, +1, 0, 0);
+    }
+    for (int i = 0; i < LPGB_COUNT; i++) {
+        if (puck_game->boundary[i]) {
+            dGeomSetData(puck_game->boundary[i], (void*)i);
+        }
+    }
+}
+
+void puck_game_destroy_walls(LWPUCKGAME* puck_game) {
+    for (int i = 0; i < LPGB_COUNT; i++) {
+        if (puck_game->boundary[i]) {
+            dGeomDestroy(puck_game->boundary[i]);
+            puck_game->boundary[i] = 0;
+        }
+    }
+}
+
 // This function setup all dynamic objects needed for 1vs1 battle.
 // It allows a 'partial' creation state.
 // (can be called safely even if subset of battle objects exist)
 void puck_game_create_all_battle_objects(LWPUCKGAME* puck_game) {
+    // create walls
+    puck_game_create_walls(puck_game);
     // create tower geoms
     for (int i = 0; i < LW_PUCK_GAME_TOWER_COUNT; i++) {
         if (puck_game->tower[i].geom == 0) {
@@ -177,6 +218,8 @@ void puck_game_create_all_battle_objects(LWPUCKGAME* puck_game) {
 
 // This function is a reverse of puck_game_create_all_battle_objects().
 void puck_game_destroy_all_battle_objects(LWPUCKGAME* puck_game) {
+    // destroy walls
+    puck_game_destroy_walls(puck_game);
     // destroy tower geoms
     for (int i = 0; i < LW_PUCK_GAME_TOWER_COUNT; i++) {
         if (puck_game->tower[i].geom) {
@@ -216,19 +259,6 @@ LWPUCKGAME* new_puck_game(int update_frequency) {
     dInitODE2(0);
     puck_game->world = dWorldCreate();
     puck_game->space = dHashSpaceCreate(0);
-    // dCreatePlane(..., a, b, c, d); ==> plane equation: a*x + b*y + c*z = d
-    puck_game->boundary[LPGB_GROUND] = dCreatePlane(puck_game->space, 0, 0, 1, 0);
-    puck_game->boundary[LPGB_E] = dCreatePlane(puck_game->space, -1, 0, 0, -puck_game->world_size_half);
-    puck_game->boundary[LPGB_W] = dCreatePlane(puck_game->space, 1, 0, 0, -puck_game->world_size_half);
-    puck_game->boundary[LPGB_S] = dCreatePlane(puck_game->space, 0, 1, 0, -puck_game->world_size_half);
-    puck_game->boundary[LPGB_N] = dCreatePlane(puck_game->space, 0, -1, 0, -puck_game->world_size_half);
-    //puck_game->boundary[LPGB_DIAGONAL_1] = dCreatePlane(puck_game->space, -1, -1, 0, 0);
-    //puck_game->boundary[LPGB_DIAGONAL_2] = dCreatePlane(puck_game->space, +1, +1, 0, 0);
-    for (int i = 0; i < LPGB_COUNT; i++) {
-        if (puck_game->boundary[i]) {
-            dGeomSetData(puck_game->boundary[i], (void*)i);
-        }
-    }
     // set global physics engine parameters
     dWorldSetGravity(puck_game->world, 0, 0, -9.81f);
     dWorldSetCFM(puck_game->world, 1e-5f);
@@ -245,7 +275,8 @@ LWPUCKGAME* new_puck_game(int update_frequency) {
 
 void puck_game_set_static_default_values(LWPUCKGAME* puck_game) {
     // datasheet begin
-    puck_game->world_size = 4.0f;
+    puck_game->world_width = 4.0f;
+    puck_game->world_height = 4.0f;
     puck_game->wall_height = 0.8f;
     puck_game->dash_interval = 1.2f;
     puck_game->dash_duration = 0.1f;
@@ -276,40 +307,38 @@ void puck_game_set_static_default_values(LWPUCKGAME* puck_game) {
     puck_game->player_dash_speed = 6.0f;
     puck_game->boundary_impact_falloff_speed = 10.0f;
     puck_game->boundary_impact_start = 3.0f;
+    // tower pos
+    int tower_pos_multiplier_index = 0;
+    puck_game_set_tower_pos_multiplier(puck_game, tower_pos_multiplier_index, -1, -1);
+    puck_game->tower_collapsing_z_rot_angle[tower_pos_multiplier_index] = (float)LWDEG2RAD(180);
+    tower_pos_multiplier_index++;
+    puck_game_set_tower_pos_multiplier(puck_game, tower_pos_multiplier_index, +1, +1);
+    puck_game->tower_collapsing_z_rot_angle[tower_pos_multiplier_index] = (float)LWDEG2RAD(0);
+    tower_pos_multiplier_index++;
+    if (tower_pos_multiplier_index != LW_PUCK_GAME_TOWER_COUNT) {
+        LOGE("Runtime assertion error");
+        exit(-1);
+    }
     // datasheet end
-    puck_game->world_size_half = puck_game->world_size / 2;
+    puck_game_set_secondary_static_default_values(puck_game);
+}
+
+void puck_game_set_secondary_static_default_values(LWPUCKGAME* puck_game) {
+    puck_game->world_width_half = puck_game->world_width / 2;
+    puck_game->world_height_half = puck_game->world_height / 2;
     puck_game->player.total_hp = puck_game->hp;
     puck_game->player.current_hp = puck_game->hp;
     puck_game->target.total_hp = puck_game->hp;
     puck_game->target.current_hp = puck_game->hp;
     puck_game->puck_reflect_size = 1.0f;
-    int tower_pos_multiplier_index = 0;
-    puck_game->tower_pos_multiplier[tower_pos_multiplier_index][0] = -1;
-    puck_game->tower_pos_multiplier[tower_pos_multiplier_index][1] = -1;
-    puck_game->tower_collapsing_z_rot_angle[tower_pos_multiplier_index] = (float)LWDEG2RAD(180);
-    tower_pos_multiplier_index++;
-    /*puck_game->tower_pos_multiplier[tower_pos_multiplier_index][0] = -1;
-     puck_game->tower_pos_multiplier[tower_pos_multiplier_index][1] = +1;
-     tower_pos_multiplier_index++;*/
-    puck_game->tower_pos_multiplier[tower_pos_multiplier_index][0] = +1;
-    puck_game->tower_pos_multiplier[tower_pos_multiplier_index][1] = +1;
-    puck_game->tower_collapsing_z_rot_angle[tower_pos_multiplier_index] = (float)LWDEG2RAD(0);
-    tower_pos_multiplier_index++;
-    /*puck_game->tower_pos_multiplier[tower_pos_multiplier_index][0] = +1;
-     puck_game->tower_pos_multiplier[tower_pos_multiplier_index][1] = -1;
-     tower_pos_multiplier_index++;*/
-    if (tower_pos_multiplier_index != LW_PUCK_GAME_TOWER_COUNT) {
-        LOGE("Runtime assertion error");
-        exit(-1);
-    }
+}
+
+void puck_game_set_tower_pos_multiplier(LWPUCKGAME* puck_game, int index, float mx, float my) {
+    puck_game->tower_pos_multiplier[index][0] = mx;
+    puck_game->tower_pos_multiplier[index][1] = my;
 }
 
 void delete_puck_game(LWPUCKGAME** puck_game) {
-    for (int i = 0; i < LPGB_COUNT; i++) {
-        if ((*puck_game)->boundary[i]) {
-            dGeomDestroy((*puck_game)->boundary[i]);
-        }
-    }
     puck_game_destroy_all_battle_objects(*puck_game);
     dSpaceDestroy((*puck_game)->space);
     dWorldDestroy((*puck_game)->world);

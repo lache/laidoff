@@ -148,6 +148,7 @@ function on_ui_event(id, w_ratio, h_ratio)
 		lo.puck_game_reset_view_proj(c, c.puck_game)
 		lo.puck_game_roll_to_tutorial(c.puck_game)
 		lo.lwcontext_set_custom_puck_game_stage(c, lo.LVT_DONTCARE, lo.LAE_DONTCARE)
+		lo.puck_game_create_walls(c.puck_game)
 		start_coro(function()
 			lo.puck_game_set_tutorial_guide_str(c.puck_game, '')
 			-- restore to full HP
@@ -289,10 +290,12 @@ function on_ui_event(id, w_ratio, h_ratio)
 		c.puck_game.player_sphere_radius = 0.2
 		c.puck_game.target_sphere_radius = 0.2
 		c.puck_game.puck_sphere_radius = 0.3
-		print(lo.LVT_PLAYER)
-		print(lo.LAE_PUCK_PLAYER)
 		c.puck_game.puck_lvt = lo.LVT_PUCK_PLAYER
-		c.puck_game.puck_lae = lo.LAE_PUCK_PLAYER_KTX
+		c.puck_game.puck_lae = lo.LAE_PUCK_GRAY_KTX
+		c.puck_game.world_width = 7
+		lo.puck_game_set_tower_pos_multiplier(c.puck_game, 0, -3, 0)
+		lo.puck_game_set_tower_pos_multiplier(c.puck_game, 1, 3, 0)
+		lo.puck_game_set_secondary_static_default_values(c.puck_game)
 		lo.puck_game_reset_tutorial_state(c.puck_game)
 		lo.puck_game_reset_battle_state(c.puck_game)
 		lo.puck_game_clear_match_data(c, c.puck_game)
