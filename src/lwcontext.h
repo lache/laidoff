@@ -368,6 +368,8 @@ typedef struct _LWCONTEXT {
     int show_stat;
     int viewport_x;
     int viewport_y;
+    LW_VBO_TYPE puck_game_stage_lvt;
+    LW_ATLAS_ENUM puck_game_stage_lae;
 } LWCONTEXT;
 
 #ifdef __cplusplus
@@ -382,6 +384,7 @@ void* lwcontext_mq(LWCONTEXT* pLwc);
 LWFIELD* lwcontext_field(LWCONTEXT* pLwc);
 void lwcontext_inc_rmsg_send(LWCONTEXT* pLwc);
 void lwcontext_inc_rmsg_recv(LWCONTEXT* pLwc);
+void lwcontext_set_custom_puck_game_stage(LWCONTEXT* pLwc, LW_VBO_TYPE lvt, LW_ATLAS_ENUM lae);
 #ifdef __cplusplus
 };
 #endif

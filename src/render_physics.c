@@ -369,7 +369,7 @@ static void render_go(const LWCONTEXT* pLwc,
     mat4x4_identity(proj_view_model);
     mat4x4_mul(proj_view_model, proj, view_model);
 
-    const LW_VBO_TYPE lvt = go->red_overlay ? LVT_PUCK : LVT_PUCK_PLAYER;
+    const LW_VBO_TYPE lvt = go->red_overlay ? puck_game->puck_lvt : puck_game->player_lvt;
     lazy_glBindBuffer(pLwc, lvt);
     bind_all_vertex_attrib(pLwc, lvt);
     glActiveTexture(GL_TEXTURE0);
@@ -1004,7 +1004,12 @@ static void render_physics_menu(const LWCONTEXT *pLwc, const mat4x4 proj, const 
     glDrawArrays(GL_TRIANGLES, 0, pLwc->vertex_buffer[lvt].vertex_count);
 }
 
-static void render_floor_cover(const LWCONTEXT *pLwc, const mat4x4 proj, const mat4x4 view, const LWPUCKGAME* puck_game) {
+static void render_custom_stage(const LWCONTEXT* pLwc,
+                                const mat4x4 proj,
+                                const mat4x4 view,
+                                const LWPUCKGAME* puck_game,
+                                LW_VBO_TYPE lvt,
+                                LW_ATLAS_ENUM lae) {
     int shader_index = LWST_DEFAULT;
     const LWSHADER* shader = &pLwc->shader[shader_index];
     lazy_glUseProgram(pLwc, shader_index);
@@ -1031,17 +1036,28 @@ static void render_floor_cover(const LWCONTEXT *pLwc, const mat4x4 proj, const m
     mat4x4 proj_view_model;
     mat4x4_identity(proj_view_model);
     mat4x4_mul(proj_view_model, proj, view_model);
-    lazy_glBindBuffer(pLwc, LVT_PUCK_FLOOR_COVER);
-    bind_all_vertex_attrib(pLwc, LVT_PUCK_FLOOR_COVER);
+    lazy_glBindBuffer(pLwc, lvt);
+    bind_all_vertex_attrib(pLwc, lvt);
     glActiveTexture(GL_TEXTURE0);
-    lazy_tex_atlas_glBindTexture(pLwc, LAE_PUCK_FLOOR_COVER);
+    lazy_tex_atlas_glBindTexture(pLwc, lae);
     set_tex_filter(GL_LINEAR, GL_LINEAR);
     glUniformMatrix4fv(shader->mvp_location, 1, GL_FALSE, (const GLfloat*)proj_view_model);
     glUniformMatrix4fv(shader->m_location, 1, GL_FALSE, (const GLfloat*)model);
-    glDrawArrays(GL_TRIANGLES, 0, pLwc->vertex_buffer[LVT_PUCK_FLOOR_COVER].vertex_count);
+    glDrawArrays(GL_TRIANGLES, 0, pLwc->vertex_buffer[lvt].vertex_count);
 }
 
-static void render_floor(const LWCONTEXT *pLwc, const mat4x4 proj, const LWPUCKGAME *puck_game, int shader_index, const mat4x4 view,
+static void render_floor_cover(const LWCONTEXT* pLwc,
+                               const mat4x4 proj,
+                               const mat4x4 view,
+                               const LWPUCKGAME* puck_game) {
+    render_custom_stage(pLwc, proj, view, puck_game, LVT_PUCK_FLOOR_COVER, LAE_PUCK_FLOOR_COVER);
+}
+
+static void render_floor(const LWCONTEXT *pLwc,
+                         const mat4x4 proj,
+                         const LWPUCKGAME *puck_game,
+                         int shader_index,
+                         const mat4x4 view,
                          const LWSPHERERENDERUNIFORM* sphere_render_uniform) {
 
     const LWSHADER* shader = &pLwc->shader[shader_index];
@@ -1122,6 +1138,88 @@ static void render_floor(const LWCONTEXT *pLwc, const mat4x4 proj, const LWPUCKG
     glUniformMatrix4fv(shader->mvp_location, 1, GL_FALSE, (const GLfloat*)proj_view_model);
     glUniformMatrix4fv(shader->m_location, 1, GL_FALSE, (const GLfloat*)model);
     glDrawArrays(GL_TRIANGLES, 0, pLwc->vertex_buffer[lvt].vertex_count);
+}
+
+static void render_default_stage(const LWCONTEXT *pLwc,
+                                 const mat4x4 proj,
+                                 const mat4x4 view,
+                                 const LWPUCKGAME *puck_game,
+                                 int floor_shader_index,
+                                 int wall_shader_index,
+                                 const LWSPHERERENDERUNIFORM* sphere_render_uniform) {
+    
+    // Floor cover
+    render_floor_cover(pLwc, proj, view, puck_game);
+    // Floor
+    render_floor(pLwc, proj, puck_game, floor_shader_index, view, sphere_render_uniform);
+    // North wall
+    render_wall(pLwc,
+                proj,
+                puck_game,
+                wall_shader_index,
+                view,
+                0,
+                puck_game->world_size_half,
+                0,
+                (float)LWDEG2RAD(90),
+                0,
+                LVT_CENTER_BOTTOM_ANCHORED_SQUARE,
+                puck_game->world_size_half,
+                puck_game->wall_height / 2,
+                puck_game->world_size_half,
+                sphere_render_uniform,
+                LPGB_N);
+    // South wall
+    render_wall(pLwc,
+                proj,
+                puck_game,
+                wall_shader_index,
+                view,
+                0,
+                -puck_game->world_size_half,
+                0,
+                (float)LWDEG2RAD(-90),
+                0,
+                LVT_CENTER_TOP_ANCHORED_SQUARE,
+                puck_game->world_size_half,
+                puck_game->wall_height / 2,
+                puck_game->world_size_half,
+                sphere_render_uniform,
+                LPGB_S);
+    // East wall
+    render_wall(pLwc,
+                proj,
+                puck_game,
+                wall_shader_index,
+                view,
+                puck_game->world_size_half,
+                0,
+                0,
+                0,
+                (float)LWDEG2RAD(90),
+                LVT_LEFT_CENTER_ANCHORED_SQUARE,
+                puck_game->wall_height / 2,
+                puck_game->world_size_half,
+                puck_game->world_size_half,
+                sphere_render_uniform,
+                LPGB_E);
+    // West wall
+    render_wall(pLwc,
+                proj,
+                puck_game,
+                wall_shader_index,
+                view,
+                -puck_game->world_size_half,
+                0,
+                0,
+                0,
+                (float)LWDEG2RAD(-90),
+                LVT_RIGHT_CENTER_ANCHORED_SQUARE,
+                puck_game->wall_height / 2,
+                puck_game->world_size_half,
+                puck_game->world_size_half,
+                sphere_render_uniform,
+                LPGB_W);
 }
 
 static void render_battle_result_popup(const LWCONTEXT* pLwc,
@@ -1328,11 +1426,13 @@ static void render_main_menu(const LWCONTEXT* pLwc, const LWPUCKGAME* puck_game,
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE);
     glDepthMask(GL_FALSE);
+    glDisable(GL_DEPTH_TEST);
 
     glDrawArrays(GL_TRIANGLES, 0, pLwc->vertex_buffer[vbo_index].vertex_count);
 
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     glDepthMask(GL_TRUE);
+    glEnable(GL_DEPTH_TEST);
 }
 
 static void render_icon_amount(const LWCONTEXT* pLwc,
@@ -1458,9 +1558,13 @@ static void render_top_bar_nickname(const LWCONTEXT* pLwc, const LWPUCKGAME* puc
     *top_bar_x_cursor += width + top_bar_x_cursor_margin;
 }
 
-static void render_main_menu_ui_layer(const LWCONTEXT* pLwc, const LWPUCKGAME* puck_game,
-                                      const mat4x4 view, const mat4x4 proj, const mat4x4 ui_proj,
-                                      int remote, const float* player_controlled_pos) {
+static void render_main_menu_ui_layer(const LWCONTEXT* pLwc,
+                                      const LWPUCKGAME* puck_game,
+                                      const mat4x4 view,
+                                      const mat4x4 proj,
+                                      const mat4x4 ui_proj,
+                                      int remote,
+                                      const float* player_controlled_pos) {
     // reset viewport temporarily
     const int viewport_x = pLwc->viewport_x;
     const int viewport_y = pLwc->viewport_y;
@@ -1679,9 +1783,13 @@ static void render_dash_ring_gauge_player_pos(const LWCONTEXT* pLwc, const LWPUC
     render_dash_ring_gauge(pLwc, player_controlled_pos_vec4_world_roll, ui_alpha);
 }
 
-static void render_battle_ui_layer(const LWCONTEXT* pLwc, const LWPUCKGAME* puck_game,
-                                   const mat4x4 view, const mat4x4 proj, const mat4x4 ui_proj,
-                                   int remote, const float* player_controlled_pos) {
+static void render_battle_ui_layer(const LWCONTEXT* pLwc,
+                                   const LWPUCKGAME* puck_game,
+                                   const mat4x4 view,
+                                   const mat4x4 proj,
+                                   const mat4x4 ui_proj,
+                                   int remote,
+                                   const float* player_controlled_pos) {
     const LWPSTATE* state = &pLwc->puck_game_state;
     const LWPUCKGAMEPLAYER* player = &puck_game->player;
     const LWPUCKGAMEPLAYER* target = &puck_game->target;
@@ -1995,103 +2103,94 @@ void lwc_render_physics(const LWCONTEXT* pLwc, const mat4x4 view, const mat4x4 p
 
     render_physics_menu(pLwc, proj, view, puck_game);
 
-    // Floor cover
-    render_floor_cover(pLwc, proj, view, puck_game);
-    // Floor
-    render_floor(pLwc, proj, puck_game, floor_shader_index, view, &sphere_render_uniform);
-    // North wall
-    render_wall(pLwc,
-                proj,
-                puck_game,
-                wall_shader_index,
-                view,
-                0,
-                puck_game->world_size_half,
-                0,
-                (float)LWDEG2RAD(90),
-                0,
-                LVT_CENTER_BOTTOM_ANCHORED_SQUARE,
-                puck_game->world_size_half,
-                puck_game->wall_height / 2,
-                puck_game->world_size_half,
-                &sphere_render_uniform,
-                LPGB_N);
-    // South wall
-    render_wall(pLwc,
-                proj,
-                puck_game,
-                wall_shader_index,
-                view,
-                0,
-                -puck_game->world_size_half,
-                0,
-                (float)LWDEG2RAD(-90),
-                0,
-                LVT_CENTER_TOP_ANCHORED_SQUARE,
-                puck_game->world_size_half,
-                puck_game->wall_height / 2,
-                puck_game->world_size_half,
-                &sphere_render_uniform,
-                LPGB_S);
-    // East wall
-    render_wall(pLwc,
-                proj,
-                puck_game,
-                wall_shader_index,
-                view,
-                puck_game->world_size_half,
-                0,
-                0,
-                0,
-                (float)LWDEG2RAD(90),
-                LVT_LEFT_CENTER_ANCHORED_SQUARE,
-                puck_game->wall_height / 2,
-                puck_game->world_size_half,
-                puck_game->world_size_half,
-                &sphere_render_uniform,
-                LPGB_E);
-    // West wall
-    render_wall(pLwc,
-                proj,
-                puck_game,
-                wall_shader_index,
-                view,
-                -puck_game->world_size_half,
-                0,
-                0,
-                0,
-                (float)LWDEG2RAD(-90),
-                LVT_RIGHT_CENTER_ANCHORED_SQUARE,
-                puck_game->wall_height / 2,
-                puck_game->world_size_half,
-                puck_game->world_size_half,
-                &sphere_render_uniform,
-                LPGB_W);
+    if (pLwc->puck_game_stage_lvt != LVT_DONTCARE
+        && pLwc->puck_game_stage_lae != LAE_DONTCARE) {
+        render_custom_stage(pLwc,
+                            proj,
+                            view,
+                            puck_game,
+                            pLwc->puck_game_stage_lvt,
+                            pLwc->puck_game_stage_lae);
+    } else {
+        render_default_stage(pLwc,
+                             proj,
+                             view,
+                             puck_game,
+                             floor_shader_index,
+                             wall_shader_index,
+                             &sphere_render_uniform);
+    }
+    
     const int player_no = pLwc->puck_game->player_no;
     // Game object: Puck
-    lw_load_tex(pLwc, LAE_PUCK_GRAY_KTX);
-    render_go(pLwc, view, proj, puck_game, &puck_game->go[LPGO_PUCK], pLwc->tex_atlas[LAE_PUCK_GRAY_KTX],
-              1.0f, remote_puck_pos, state->puck_rot, remote, !remote ? puck_game->go[LPGO_PUCK].speed : state->puck_speed,
+    const int puck_lae = puck_game->puck_lae;
+    lw_load_tex(pLwc, puck_lae);
+    render_go(pLwc,
+              view,
+              proj,
+              puck_game,
+              &puck_game->go[LPGO_PUCK],
+              pLwc->tex_atlas[puck_lae],
+              1.0f,
+              remote_puck_pos,
+              state->puck_rot,
+              remote,
+              !remote ? puck_game->go[LPGO_PUCK].speed : state->puck_speed,
               LWST_DEFAULT);
     // Game object: Player
-    int player_lae = player_no == 2 ? LAE_PUCK_ENEMY_KTX : LAE_PUCK_PLAYER_KTX;
+    const int player_lae = player_no == 2 ? puck_game->target_lae : puck_game->player_lae;
     lw_load_tex(pLwc, player_lae);
-    render_go(pLwc, view, proj, puck_game, &puck_game->go[LPGO_PLAYER], pLwc->tex_atlas[player_lae],
-              1.0f, remote_player_pos, state->player_rot, remote, 0,
+    render_go(pLwc,
+              view,
+              proj,
+              puck_game,
+              &puck_game->go[LPGO_PLAYER],
+              pLwc->tex_atlas[player_lae],
+              1.0f,
+              remote_player_pos,
+              state->player_rot,
+              remote,
+              0,
               LWST_DEFAULT);
     if (remote ? state->bf.player_pull : puck_game->remote_control[0].pull_puck) {
-        render_radial_wave(pLwc, view, proj, puck_game, &puck_game->go[LPGO_PLAYER], pLwc->tex_atlas[player_lae],
-                           1.0f, remote_player_pos, state->player_rot, remote, 0);
+        render_radial_wave(pLwc,
+                           view,
+                           proj,
+                           puck_game,
+                           &puck_game->go[LPGO_PLAYER],
+                           pLwc->tex_atlas[player_lae],
+                           1.0f,
+                           remote_player_pos,
+                           state->player_rot,
+                           remote,
+                           0);
     }
     // Game object: Enemy
-    int target_lae = player_no == 2 ? LAE_PUCK_PLAYER_KTX : LAE_PUCK_ENEMY_KTX;
+    const int target_lae = player_no == 2 ? puck_game->player_lae : puck_game->target_lae;
     lw_load_tex(pLwc, target_lae);
-    render_go(pLwc, view, proj, puck_game, &puck_game->go[LPGO_TARGET], pLwc->tex_atlas[target_lae],
-              1.0f, remote_target_pos, state->target_rot, remote, 0,
+    render_go(pLwc,
+              view,
+              proj,
+              puck_game,
+              &puck_game->go[LPGO_TARGET],
+              pLwc->tex_atlas[target_lae],
+              1.0f,
+              remote_target_pos,
+              state->target_rot, remote,
+              0,
               LWST_DEFAULT);
     if (state->bf.target_pull) {
-        render_radial_wave(pLwc, view, proj, puck_game, &puck_game->go[LPGO_TARGET], pLwc->tex_atlas[target_lae],
-                           1.0f, remote_target_pos, state->target_rot, remote, 0);
+        render_radial_wave(pLwc,
+                           view,
+                           proj,
+                           puck_game,
+                           &puck_game->go[LPGO_TARGET],
+                           pLwc->tex_atlas[target_lae],
+                           1.0f,
+                           remote_target_pos,
+                           state->target_rot,
+                           remote,
+                           0);
     }
     // Towers
     for (int i = 0; i < LW_PUCK_GAME_TOWER_COUNT; i++) {
@@ -2146,7 +2245,9 @@ void lwc_render_physics(const LWCONTEXT* pLwc, const mat4x4 view, const mat4x4 p
         case LPGS_BATTLE:
         {
             if (puck_game->battle_ui_alpha) {
+                glDisable(GL_DEPTH_TEST);
                 render_battle_ui_layer(pLwc, puck_game, view, proj, pLwc->proj, remote, player_controlled_pos);
+                glEnable(GL_DEPTH_TEST);
             }
             break;
         }
@@ -2155,8 +2256,10 @@ void lwc_render_physics(const LWCONTEXT* pLwc, const mat4x4 view, const mat4x4 p
             break;
         }
     }
+    glDisable(GL_DEPTH_TEST);
     // render buttons (shared)
     render_lwbutton(pLwc, &pLwc->button_list);
     // popup UI layer
     render_popup_ui_layer(pLwc);
+    glEnable(GL_DEPTH_TEST);
 }

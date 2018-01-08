@@ -121,7 +121,9 @@ typedef struct _LWPUCKGAME {
     float jump_shake_time;
 	float puck_damage_contact_speed_threshold;
     float sphere_mass;
-    float sphere_radius;
+    float puck_sphere_radius;
+    float player_sphere_radius;
+    float target_sphere_radius;
 	float total_time;
     float fire_max_force;
     float fire_max_vel;
@@ -139,8 +141,13 @@ typedef struct _LWPUCKGAME {
     float player_dash_speed;
     float boundary_impact_falloff_speed;
     float boundary_impact_start;
-    int prepare_step_wait_tick; // wait ticks for each 'ready....' and 'steady....' battle phases
+    int puck_lae;
+    int player_lae;
+    int target_lae;
+    int puck_lvt;
+    int player_lvt;
     // ---- Static game data end
+    int prepare_step_wait_tick; // wait ticks for each 'ready....' and 'steady....' battle phases
     float world_size_half;
     float tower_pos_multiplier[LW_PUCK_GAME_TOWER_COUNT][2];
     float tower_collapsing_z_rot_angle[LW_PUCK_GAME_TOWER_COUNT];
@@ -225,6 +232,7 @@ typedef struct _LWPUCKGAME {
 } LWPUCKGAME;
 
 LWPUCKGAME* new_puck_game(int update_frequency);
+void puck_game_set_static_default_values(LWPUCKGAME* puck_game);
 void delete_puck_game(LWPUCKGAME** puck_game);
 void puck_game_push(LWPUCKGAME* puck_game);
 float puck_game_dash_gauge_ratio(LWPUCKGAME* puck_game, const LWPUCKGAMEDASH* dash);
@@ -253,7 +261,7 @@ int puck_game_dash_can_cast(const LWPUCKGAME* puck_game, const LWPUCKGAMEDASH* d
 void puck_game_set_searching_str(LWPUCKGAME* puck_game, const char* str);
 void puck_game_set_tutorial_guide_str(LWPUCKGAME* puck_game, const char* str);
 void puck_game_update_tick(LWPUCKGAME* puck_game, int update_frequency);
-void puck_game_create_go(LWPUCKGAME* puck_game, int lpgo, float x, float y, float z);
+void puck_game_create_go(LWPUCKGAME* puck_game, int lpgo, float x, float y, float z, float radius);
 void puck_game_create_control_joint(LWPUCKGAME* puck_game, int lpgo);
 void puck_game_reset_go(LWPUCKGAME* puck_game, LWPUCKGAMEOBJECT* go, float x, float y, float z);
 void puck_game_create_tower_geom(LWPUCKGAME* puck_game, int i);

@@ -40,3 +40,8 @@ void lwcontext_inc_rmsg_send(LWCONTEXT* pLwc) {
 void lwcontext_inc_rmsg_recv(LWCONTEXT* pLwc) {
 	pLwc->rmsg_recv_count++;
 }
+
+void lwcontext_set_custom_puck_game_stage(LWCONTEXT* pLwc, LW_VBO_TYPE lvt, LW_ATLAS_ENUM lae) {
+    pLwc->puck_game_stage_lvt = lvt;
+    pLwc->puck_game_stage_lae = lae;
+}

@@ -1428,7 +1428,8 @@ LWCONTEXT* lw_init_initial_size(int width, int height) {
     //test_image();
     
     LWCONTEXT* pLwc = (LWCONTEXT *)calloc(1, sizeof(LWCONTEXT));
-    
+    pLwc->puck_game_stage_lvt = LVT_DONTCARE;
+    pLwc->puck_game_stage_lae = LAE_DONTCARE;
     pLwc->control_flags = LCF_PUCK_GAME_DASH /*| LCF_PUCK_GAME_JUMP | LCF_PUCK_GAME_PULL*/;
     
     parse_conf(pLwc);
@@ -1466,6 +1467,7 @@ LWCONTEXT* lw_init_initial_size(int width, int height) {
     pLwc->update_interval = 1.0 / pLwc->update_frequency;// 1 / 120.0;// 0.02; // seconds
     
     pLwc->puck_game = new_puck_game(pLwc->update_frequency);
+    puck_game_set_static_default_values_client(pLwc->puck_game);
     pLwc->puck_game->pLwc = pLwc;
     
     float dir_pad_origin_x, dir_pad_origin_y;

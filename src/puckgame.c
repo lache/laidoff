@@ -130,8 +130,8 @@ static void destroy_control_joint(LWPUCKGAME* puck_game, dJointGroupID* joint_gr
     *control_joint = 0;
 }
 
-void puck_game_create_go(LWPUCKGAME* puck_game, int lpgo, float x, float y, float z) {
-    create_go(puck_game, lpgo, puck_game->sphere_mass, puck_game->sphere_radius);
+void puck_game_create_go(LWPUCKGAME* puck_game, int lpgo, float x, float y, float z, float radius) {
+    create_go(puck_game, lpgo, puck_game->sphere_mass, radius);
     puck_game_reset_go(puck_game, &puck_game->go[lpgo], x, y, z);
 }
 
@@ -157,13 +157,13 @@ void puck_game_create_all_battle_objects(LWPUCKGAME* puck_game) {
     }
     // create game objects (puck, player, target)
     if (puck_game->go[LPGO_PUCK].geom == 0) {
-        puck_game_create_go(puck_game, LPGO_PUCK, 0, 0, 0);
+        puck_game_create_go(puck_game, LPGO_PUCK, 0, 0, 0, puck_game->puck_sphere_radius);
     }
     if (puck_game->go[LPGO_PLAYER].geom == 0) {
-        puck_game_create_go(puck_game, LPGO_PLAYER, 0, 0, 0);
+        puck_game_create_go(puck_game, LPGO_PLAYER, 0, 0, 0, puck_game->player_sphere_radius);
     }
     if (puck_game->go[LPGO_TARGET].geom == 0) {
-        puck_game_create_go(puck_game, LPGO_TARGET, 0, 0, 0);
+        puck_game_create_go(puck_game, LPGO_TARGET, 0, 0, 0, puck_game->target_sphere_radius);
     }
     // Create target control joint
     if (puck_game->target_control_joint_group == 0) {
@@ -207,64 +207,9 @@ LWPUCKGAME* new_puck_game(int update_frequency) {
     // Static game data
     LWPUCKGAME* puck_game = malloc(sizeof(LWPUCKGAME));
     memset(puck_game, 0, sizeof(LWPUCKGAME));
-    // datasheet begin
-    puck_game->world_size = 4.0f;
-    puck_game->wall_height = 0.8f;
-    puck_game->dash_interval = 1.2f;
-    puck_game->dash_duration = 0.1f;
-    puck_game->dash_shake_time = 0.3f;
-    puck_game->hp_shake_time = 0.3f;
-    puck_game->jump_force = 35.0f;
-    puck_game->jump_interval = 0.5f;
-    puck_game->jump_shake_time = 0.5f;
-    puck_game->puck_damage_contact_speed_threshold = 1.1f;
-    puck_game->sphere_mass = 0.1f;
-    puck_game->sphere_radius = 0.12f; //0.16f;
-    puck_game->total_time = 60.0f;
-    puck_game->fire_max_force = 35.0f;
-    puck_game->fire_max_vel = 5.0f;
-    puck_game->fire_interval = 1.5f;
-    puck_game->fire_duration = 0.2f;
-    puck_game->fire_shake_time = 0.5f;
-    puck_game->tower_pos = 1.1f;
-    puck_game->tower_radius = 0.3f; //0.825f / 2;
-    puck_game->tower_mesh_radius = 0.825f / 2; // Check tower.blend file
-    puck_game->tower_total_hp = 5;
-    puck_game->tower_shake_time = 0.2f;
-    puck_game->go_start_pos = 0.6f;
-    puck_game->hp = 5;
-    puck_game->player_max_move_speed = 1.0f;
-    puck_game->player_dash_speed = 6.0f;
-    puck_game->boundary_impact_falloff_speed = 10.0f;
-    puck_game->boundary_impact_start = 3.0f;
+    puck_game_set_static_default_values(puck_game);
     puck_game->prepare_step_wait_tick = 2 * update_frequency;
-    // datasheet end
-    puck_game->world_size_half = puck_game->world_size / 2;
-    puck_game->player.total_hp = puck_game->hp;
-    puck_game->player.current_hp = puck_game->hp;
-    puck_game->target.total_hp = puck_game->hp;
-    puck_game->target.current_hp = puck_game->hp;
-    puck_game->puck_reflect_size = 1.0f;
-    int tower_pos_multiplier_index = 0;
-    puck_game->tower_pos_multiplier[tower_pos_multiplier_index][0] = -1;
-    puck_game->tower_pos_multiplier[tower_pos_multiplier_index][1] = -1;
-    puck_game->tower_collapsing_z_rot_angle[tower_pos_multiplier_index] = (float)LWDEG2RAD(180);
-    tower_pos_multiplier_index++;
-    /*puck_game->tower_pos_multiplier[tower_pos_multiplier_index][0] = -1;
-    puck_game->tower_pos_multiplier[tower_pos_multiplier_index][1] = +1;
-    tower_pos_multiplier_index++;*/
-    puck_game->tower_pos_multiplier[tower_pos_multiplier_index][0] = +1;
-    puck_game->tower_pos_multiplier[tower_pos_multiplier_index][1] = +1;
-    puck_game->tower_collapsing_z_rot_angle[tower_pos_multiplier_index] = (float)LWDEG2RAD(0);
-    tower_pos_multiplier_index++;
-    /*puck_game->tower_pos_multiplier[tower_pos_multiplier_index][0] = +1;
-    puck_game->tower_pos_multiplier[tower_pos_multiplier_index][1] = -1;
-    tower_pos_multiplier_index++;*/
-    if (tower_pos_multiplier_index != LW_PUCK_GAME_TOWER_COUNT) {
-        LOGE("Runtime assertion error");
-        exit(-1);
-    }
-
+    
     // ------
 
     // Initialize OpenDE
@@ -296,6 +241,67 @@ LWPUCKGAME* new_puck_game(int update_frequency) {
     // flag this instance is ready to run simulation
     puck_game->init_ready = 1;
     return puck_game;
+}
+
+void puck_game_set_static_default_values(LWPUCKGAME* puck_game) {
+    // datasheet begin
+    puck_game->world_size = 4.0f;
+    puck_game->wall_height = 0.8f;
+    puck_game->dash_interval = 1.2f;
+    puck_game->dash_duration = 0.1f;
+    puck_game->dash_shake_time = 0.3f;
+    puck_game->hp_shake_time = 0.3f;
+    puck_game->jump_force = 35.0f;
+    puck_game->jump_interval = 0.5f;
+    puck_game->jump_shake_time = 0.5f;
+    puck_game->puck_damage_contact_speed_threshold = 1.1f;
+    puck_game->sphere_mass = 0.1f;
+    puck_game->puck_sphere_radius = 0.12f; //0.16f;
+    puck_game->player_sphere_radius = 0.12f; //0.16f;
+    puck_game->target_sphere_radius = 0.12f; //0.16f;
+    puck_game->total_time = 60.0f;
+    puck_game->fire_max_force = 35.0f;
+    puck_game->fire_max_vel = 5.0f;
+    puck_game->fire_interval = 1.5f;
+    puck_game->fire_duration = 0.2f;
+    puck_game->fire_shake_time = 0.5f;
+    puck_game->tower_pos = 1.1f;
+    puck_game->tower_radius = 0.3f; //0.825f / 2;
+    puck_game->tower_mesh_radius = 0.825f / 2; // Check tower.blend file
+    puck_game->tower_total_hp = 5;
+    puck_game->tower_shake_time = 0.2f;
+    puck_game->go_start_pos = 0.6f;
+    puck_game->hp = 5;
+    puck_game->player_max_move_speed = 1.0f;
+    puck_game->player_dash_speed = 6.0f;
+    puck_game->boundary_impact_falloff_speed = 10.0f;
+    puck_game->boundary_impact_start = 3.0f;
+    // datasheet end
+    puck_game->world_size_half = puck_game->world_size / 2;
+    puck_game->player.total_hp = puck_game->hp;
+    puck_game->player.current_hp = puck_game->hp;
+    puck_game->target.total_hp = puck_game->hp;
+    puck_game->target.current_hp = puck_game->hp;
+    puck_game->puck_reflect_size = 1.0f;
+    int tower_pos_multiplier_index = 0;
+    puck_game->tower_pos_multiplier[tower_pos_multiplier_index][0] = -1;
+    puck_game->tower_pos_multiplier[tower_pos_multiplier_index][1] = -1;
+    puck_game->tower_collapsing_z_rot_angle[tower_pos_multiplier_index] = (float)LWDEG2RAD(180);
+    tower_pos_multiplier_index++;
+    /*puck_game->tower_pos_multiplier[tower_pos_multiplier_index][0] = -1;
+     puck_game->tower_pos_multiplier[tower_pos_multiplier_index][1] = +1;
+     tower_pos_multiplier_index++;*/
+    puck_game->tower_pos_multiplier[tower_pos_multiplier_index][0] = +1;
+    puck_game->tower_pos_multiplier[tower_pos_multiplier_index][1] = +1;
+    puck_game->tower_collapsing_z_rot_angle[tower_pos_multiplier_index] = (float)LWDEG2RAD(0);
+    tower_pos_multiplier_index++;
+    /*puck_game->tower_pos_multiplier[tower_pos_multiplier_index][0] = +1;
+     puck_game->tower_pos_multiplier[tower_pos_multiplier_index][1] = -1;
+     tower_pos_multiplier_index++;*/
+    if (tower_pos_multiplier_index != LW_PUCK_GAME_TOWER_COUNT) {
+        LOGE("Runtime assertion error");
+        exit(-1);
+    }
 }
 
 void delete_puck_game(LWPUCKGAME** puck_game) {

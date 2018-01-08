@@ -397,6 +397,38 @@ void puck_game_reset_view_proj(LWCONTEXT* pLwc, LWPUCKGAME* puck_game) {
     mat4x4_look_at(pLwc->puck_game_view, eye, center, up);
 }
 
+
+// half_height: 3.0f
+// near: 0.1f, far: 100.0f
+// eye: 0, -8, 14
+// center: 0, 0.3, 0
+void puck_game_reset_view_proj_ortho(LWCONTEXT* pLwc,
+                                     LWPUCKGAME* puck_game,
+                                     float half_height,
+                                     float near,
+                                     float far,
+                                     float eye_x,
+                                     float eye_y,
+                                     float eye_z,
+                                     float center_x,
+                                     float center_y,
+                                     float center_z) {
+    mat4x4_ortho(pLwc->puck_game_proj,
+                 -half_height * pLwc->aspect_ratio,
+                 +half_height * pLwc->aspect_ratio,
+                 -half_height,
+                 +half_height,
+                 near,
+                 far);
+    vec3 eye = { eye_x, eye_y, eye_z };
+    vec3 center = { center_x, center_y, center_z };
+    vec3 up = { 0, 1, 0 };
+//    if (puck_game->player_no == 2) {
+//        up[1] = -1.0f;
+//    }
+    mat4x4_look_at(pLwc->puck_game_view, eye, center, up);
+}
+
 void puck_game_fire(LWCONTEXT* pLwc, LWPUCKGAME* puck_game, float puck_fire_dx, float puck_fire_dy, float puck_fire_dlen) {
     puck_game_commit_fire(puck_game, &puck_game->remote_fire[0], 1, puck_fire_dx, puck_fire_dy, puck_fire_dlen);
     LWPFIRE packet_fire;
@@ -508,4 +540,12 @@ void puck_game_roll_to_main_menu(LWPUCKGAME* puck_game) {
         puck_game->game_state = LPGS_MAIN_MENU;
         puck_game_roll_world(puck_game, 1, 1, (float)LWDEG2RAD(180));
     }
+}
+
+void puck_game_set_static_default_values_client(LWPUCKGAME* puck_game) {
+    puck_game->puck_lae = LAE_PUCK_GRAY_KTX;
+    puck_game->player_lae = LAE_PUCK_PLAYER_KTX;
+    puck_game->target_lae = LAE_PUCK_ENEMY_KTX;
+    puck_game->puck_lvt = LVT_PUCK;
+    puck_game->player_lvt = LVT_PUCK_PLAYER;
 }

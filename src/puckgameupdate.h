@@ -13,6 +13,17 @@ void puck_game_pull_puck_start(LWCONTEXT* pLwc, LWPUCKGAME* puck_game);
 void puck_game_pull_puck_stop(LWCONTEXT* pLwc, LWPUCKGAME* puck_game);
 void puck_game_pull_puck_toggle(LWCONTEXT* pLwc, LWPUCKGAME* puck_game);
 void puck_game_reset_view_proj(LWCONTEXT* pLwc, LWPUCKGAME* puck_game);
+void puck_game_reset_view_proj_ortho(LWCONTEXT* pLwc,
+                                     LWPUCKGAME* puck_game,
+                                     float half_height,
+                                     float near,
+                                     float far,
+                                     float eye_x,
+                                     float eye_y,
+                                     float eye_z,
+                                     float center_x,
+                                     float center_y,
+                                     float center_z);
 void puck_game_jump(LWCONTEXT* pLwc, LWPUCKGAME* puck_game);
 void puck_game_fire(LWCONTEXT* pLwc, LWPUCKGAME* puck_game, float puck_fire_dx, float puck_fire_dy, float puck_fire_dlen);
 void puck_game_shake_player(LWPUCKGAME* puck_game, LWPUCKGAMEPLAYER* player);
@@ -30,3 +41,5 @@ void puck_game_roll_to_battle(LWPUCKGAME* puck_game);
 void puck_game_roll_to_practice(LWPUCKGAME* puck_game);
 void puck_game_roll_to_tutorial(LWPUCKGAME* puck_game);
 void puck_game_roll_to_main_menu(LWPUCKGAME* puck_game);
+void puck_game_set_static_default_values_client(LWPUCKGAME* puck_game);
+

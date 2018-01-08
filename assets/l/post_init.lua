@@ -103,16 +103,21 @@ function on_ui_event(id, w_ratio, h_ratio)
 		return 0
 	elseif id == 'practice_button' then
 		print('[script]practice_button')
+		lo.puck_game_set_static_default_values(c.puck_game)
+		lo.puck_game_set_static_default_values_client(c.puck_game)
+		lo.puck_game_reset_tutorial_state(c.puck_game)
 		lo.puck_game_reset_battle_state(c.puck_game)
 		lo.puck_game_clear_match_data(c, c.puck_game)
 		lo.puck_game_reset_view_proj(c, c.puck_game)
 		lo.puck_game_roll_to_practice(c.puck_game)
+		lo.lwcontext_set_custom_puck_game_stage(c, lo.LVT_DONTCARE, lo.LAE_DONTCARE)
 	elseif id == 'back_button' then
 		print('[script]back_button')
 		lo.puck_game_set_tower_invincible(c.puck_game, 0, 0)
 		lo.puck_game_set_tower_invincible(c.puck_game, 1, 0)
 		lo.puck_game_set_dash_disabled(c.puck_game, 1, 0)
 		lo.puck_game_set_bogus_disabled(c.puck_game, 0)
+		lo.lwcontext_set_custom_puck_game_stage(c, lo.LVT_DONTCARE, lo.LAE_DONTCARE)
 		if c.puck_game.game_state == lo.LPGS_SEARCHING then
 			lo.tcp_send_cancelqueue(c.tcp, c.tcp.user_id)
 			c.puck_game.game_state = lo.LPGS_MAIN_MENU
@@ -132,6 +137,8 @@ function on_ui_event(id, w_ratio, h_ratio)
 	elseif id == 'tutorial_button' then
 		--lo.show_sys_msg(c.def_sys_msg, 'TUTORIAL: under construction')
 		print('[script]tutorial_button')
+		lo.puck_game_set_static_default_values(c.puck_game)
+		lo.puck_game_set_static_default_values_client(c.puck_game)
 		lo.puck_game_set_tower_invincible(c.puck_game, 0, 0)
 		lo.puck_game_set_tower_invincible(c.puck_game, 1, 0)
 		lo.puck_game_set_dash_disabled(c.puck_game, 1, 1)
@@ -140,6 +147,7 @@ function on_ui_event(id, w_ratio, h_ratio)
 		lo.puck_game_clear_match_data(c, c.puck_game)
 		lo.puck_game_reset_view_proj(c, c.puck_game)
 		lo.puck_game_roll_to_tutorial(c.puck_game)
+		lo.lwcontext_set_custom_puck_game_stage(c, lo.LVT_DONTCARE, lo.LAE_DONTCARE)
 		start_coro(function()
 			lo.puck_game_set_tutorial_guide_str(c.puck_game, '')
 			-- restore to full HP
@@ -150,12 +158,12 @@ function on_ui_event(id, w_ratio, h_ratio)
 			c.puck_game.control_flags = c.puck_game.control_flags | lo.LPGCF_HIDE_PULL_BUTTON | lo.LPGCF_HIDE_DASH_BUTTON
 			lo.puck_game_set_tutorial_guide_str(c.puck_game, T['환영합니다!'])
 			yield_wait_ms(1500)
-			lo.puck_game_create_go(c.puck_game, lo.LPGO_PLAYER, 0, 0, 10);
+			lo.puck_game_create_go(c.puck_game, lo.LPGO_PLAYER, 0, 0, 10, c.puck_game.player_sphere_radius);
 			lo.puck_game_set_tutorial_guide_str(c.puck_game, T['왼쪽 <스틱>으로 플레이어를 움직여보세요.'])
 			lo.puck_game_create_control_joint(c.puck_game, lo.LPGO_PLAYER)
 			c.puck_game.battle_control_ui_alpha = 1
 			yield_wait_ms(4000)
-			lo.puck_game_create_go(c.puck_game, lo.LPGO_PUCK, 1, 0, 10);
+			lo.puck_game_create_go(c.puck_game, lo.LPGO_PUCK, 1, 0, 10, c.puck_game.puck_sphere_radius);
 			--------------------------------------
 			local near_count = 2
 			local near_msg = T['흰색 공과 부딪쳐보세요. (%d/%d)']
@@ -213,7 +221,7 @@ function on_ui_event(id, w_ratio, h_ratio)
 			--------------------------------------
 			lo.puck_game_set_tutorial_guide_str(c.puck_game, T['마지막으로 <적 플레이어>을 소환하겠습니다.'])
 			yield_wait_ms(2000)
-			lo.puck_game_create_go(c.puck_game, lo.LPGO_TARGET, 1, 0, 10);
+			lo.puck_game_create_go(c.puck_game, lo.LPGO_TARGET, 1, 0, 10, c.puck_game.target_sphere_radius);
 			-- at first, bogus does not use dash
 			lo.puck_game_set_dash_disabled(c.puck_game, 1, 1)
 			
@@ -252,6 +260,9 @@ function on_ui_event(id, w_ratio, h_ratio)
 		lo.puck_game_clear_match_data(c, c.puck_game)
 		lo.puck_game_reset_battle_state(c.puck_game)
 		lo.tcp_send_queue3(c.tcp, c.tcp.user_id, lo.LW_PUCK_GAME_QUEUE_TYPE_NEAREST_SCORE)
+		lo.lwcontext_set_custom_puck_game_stage(c, lo.LVT_DONTCARE, lo.LAE_DONTCARE)
+		lo.puck_game_set_static_default_values(c.puck_game)
+		lo.puck_game_set_static_default_values_client(c.puck_game)
 	elseif id == 'leaderboard_button' then
 		lo.show_leaderboard(c)
 	elseif id == 'leaderboard_page_button' then
@@ -273,6 +284,19 @@ function on_ui_event(id, w_ratio, h_ratio)
 	elseif id == 'change_nickname_button' then
 		lo.start_nickname_text_input_activity(c)
 	elseif id == 'settings' then
+		lo.puck_game_reset_view_proj_ortho(c, c.puck_game, 1.9, 0.1, 100, 0, -8, 14, 0, 0.3, 0)
+		lo.lwcontext_set_custom_puck_game_stage(c, lo.LVT_FOOTBALL_GROUND, lo.LAE_FOOTBALL_GROUND)
+		c.puck_game.player_sphere_radius = 0.2
+		c.puck_game.target_sphere_radius = 0.2
+		c.puck_game.puck_sphere_radius = 0.3
+		print(lo.LVT_PLAYER)
+		print(lo.LAE_PUCK_PLAYER)
+		c.puck_game.puck_lvt = lo.LVT_PUCK_PLAYER
+		c.puck_game.puck_lae = lo.LAE_PUCK_PLAYER_KTX
+		lo.puck_game_reset_tutorial_state(c.puck_game)
+		lo.puck_game_reset_battle_state(c.puck_game)
+		lo.puck_game_clear_match_data(c, c.puck_game)
+		lo.puck_game_roll_to_practice(c.puck_game)
 	else
 		lo.construct_set_preview_enable(c.construct, 0)
 		return 0
