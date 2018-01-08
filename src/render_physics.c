@@ -1801,7 +1801,7 @@ static void render_battle_ui_layer(const LWCONTEXT* pLwc,
     // HP gauges (player & target)
     const char* target_nickname = puck_game->battle_id ? puck_game->target_nickname : "Bogus Opponent";
     const int player_current_hp = remote ? state->bf.player_current_hp : puck_game->player.current_hp;
-    if (puck_game->tower[0].geom) {
+    if (puck_game->hide_hp_star == 0 && puck_game->tower[0].geom) {
         char player_score[32];
         sprintf(player_score, "%d", puck_game->score);
 //        const float gauge_width = pLwc->aspect_ratio * 0.9f;
@@ -1824,7 +1824,7 @@ static void render_battle_ui_layer(const LWCONTEXT* pLwc,
         render_nickname_score(pLwc, 1, ui_alpha, puck_game->nickname, player_score, world_right_top_end_ui_point);
     }
     const int target_current_hp = remote ? state->bf.target_current_hp : puck_game->target.current_hp;
-    if (puck_game->tower[1].geom) {
+    if (puck_game->hide_hp_star == 0 && puck_game->tower[1].geom) {
         char target_score[32];
         sprintf(target_score, "%d", puck_game->target_score);
 //        const float gauge_width = pLwc->aspect_ratio * 0.9f;
@@ -1858,10 +1858,10 @@ static void render_battle_ui_layer(const LWCONTEXT* pLwc,
                      ui_alpha);
     }
     // HP star (test)
-    if (puck_game->tower[0].geom) {
+    if (puck_game->hide_hp_star == 0 && puck_game->tower[0].geom) {
         render_hp_star(pLwc, puck_game, ui_alpha, player_current_hp, 1, player->hp_shake_remain_time, world_right_top_end_ui_point);
     }
-    if (puck_game->tower[1].geom) {
+    if (puck_game->hide_hp_star == 0 && puck_game->tower[1].geom) {
         render_hp_star(pLwc, puck_game, ui_alpha, target_current_hp, 0, target->hp_shake_remain_time, world_right_top_end_ui_point);
     }
     // Match state text (bottom of the screen)

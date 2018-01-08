@@ -370,6 +370,10 @@ typedef struct _LWCONTEXT {
     int viewport_y;
     LW_VBO_TYPE puck_game_stage_lvt;
     LW_ATLAS_ENUM puck_game_stage_lae;
+    vec3 eye;
+    vec3 center;
+    vec3 up;
+    float eye_x_offset;
 } LWCONTEXT;
 
 #ifdef __cplusplus

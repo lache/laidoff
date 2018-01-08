@@ -211,7 +211,7 @@ void update_puck_game(LWCONTEXT* pLwc, LWPUCKGAME* puck_game, double delta_time)
     const int send_udp = remote && puck_game_state_phase_finished(pLwc->puck_game_state.bf.phase) == 0;
     
     if (dir_pad_dragging) {
-        LOGIx("dx=%.2f, dy=%.2f, dlen=%.2f, dlen_max=%.2f", dx, dy, dlen, dlen_max);
+        LOGIx("dx=%.2f, dy=%.2f, dlen=%.2f, dlen_max=%.2f, dlen_ratio=%.2f", dx, dy, dlen, dlen_max, dlen_ratio);
         if (send_udp) {
             LWPMOVE packet_move;
             packet_move.type = LPGP_LWPMOVE;
@@ -357,7 +357,11 @@ void puck_game_target_stop(LWPUCKGAME* puck_game) {
 }
 
 void puck_game_target_dash(LWPUCKGAME* puck_game, int player_no) {
-    puck_game_commit_dash(puck_game, &puck_game->remote_dash[player_no - 1], puck_game->last_remote_dx, puck_game->last_remote_dy);
+    puck_game_commit_dash(puck_game,
+                          &puck_game->remote_dash[player_no - 1],
+                          puck_game->last_remote_dx,
+                          puck_game->last_remote_dy,
+                          player_no);
 }
 
 void puck_game_pull_puck_start(LWCONTEXT* pLwc, LWPUCKGAME* puck_game) {
@@ -420,13 +424,16 @@ void puck_game_reset_view_proj_ortho(LWCONTEXT* pLwc,
                  +half_height,
                  near,
                  far);
-    vec3 eye = { eye_x, eye_y, eye_z };
-    vec3 center = { center_x, center_y, center_z };
-    vec3 up = { 0, 1, 0 };
-//    if (puck_game->player_no == 2) {
-//        up[1] = -1.0f;
-//    }
-    mat4x4_look_at(pLwc->puck_game_view, eye, center, up);
+    pLwc->eye[0] = eye_x;
+    pLwc->eye[1] = eye_y;
+    pLwc->eye[2] = eye_z;
+    pLwc->center[0] = center_x;
+    pLwc->center[1] = center_y;
+    pLwc->center[2] = center_z;
+    pLwc->up[0] = 0;
+    pLwc->up[1] = 1;
+    pLwc->up[2] = 0;
+    mat4x4_look_at(pLwc->puck_game_view, pLwc->eye, pLwc->center, pLwc->up);
 }
 
 void puck_game_fire(LWCONTEXT* pLwc, LWPUCKGAME* puck_game, float puck_fire_dx, float puck_fire_dy, float puck_fire_dlen) {
@@ -549,3 +556,17 @@ void puck_game_set_static_default_values_client(LWPUCKGAME* puck_game) {
     puck_game->puck_lvt = LVT_PUCK;
     puck_game->player_lvt = LVT_PUCK_PLAYER;
 }
+
+void puck_game_follow_cam(LWCONTEXT* pLwc, LWPUCKGAME* puck_game) {
+    if (puck_game->follow_cam) {
+        const float player_x = puck_game->go[LPGO_PLAYER].pos[0];
+        const float cam_x = pLwc->eye[0] + pLwc->eye_x_offset;
+        //if (fabsf(player_x - cam_x) > 1.0f) {
+            pLwc->eye_x_offset += (player_x - cam_x) * 0.05f;
+        //}
+        vec3 eye = { pLwc->eye[0] + pLwc->eye_x_offset, pLwc->eye[1], pLwc->eye[2] };
+        vec3 center = { pLwc->center[0] + pLwc->eye_x_offset, pLwc->center[1], pLwc->center[2] };
+        mat4x4_look_at(pLwc->puck_game_view, eye, center, pLwc->up);
+    }
+}
+

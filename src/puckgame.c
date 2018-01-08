@@ -319,6 +319,9 @@ void puck_game_set_static_default_values(LWPUCKGAME* puck_game) {
         LOGE("Runtime assertion error");
         exit(-1);
     }
+    puck_game->follow_cam = 0;
+    puck_game->hide_hp_star = 0;
+    puck_game->dash_by_direction = 0;
     // datasheet end
     puck_game_set_secondary_static_default_values(puck_game);
 }
@@ -618,7 +621,9 @@ void puck_game_commit_jump(LWPUCKGAME* puck_game, LWPUCKGAMEJUMP* jump, int play
     jump->last_time = puck_game->time;
 }
 
-void puck_game_commit_dash(LWPUCKGAME* puck_game, LWPUCKGAMEDASH* dash, float dx, float dy) {
+void puck_game_commit_dash(LWPUCKGAME* puck_game, LWPUCKGAMEDASH* dash, float dx, float dy, int player_no) {
+    assert(player_no == 1 || player_no == 2);
+    puck_game->battle_stat[player_no - 1].Dash++;
     dash->remain_time = puck_game->dash_duration;
     dash->dir_x = dx;
     dash->dir_y = dy;
@@ -634,9 +639,7 @@ void puck_game_commit_dash_to_puck(LWPUCKGAME* puck_game, LWPUCKGAMEDASH* dash, 
     const float ddlen = sqrtf(dx * dx + dy * dy);
     dx /= ddlen;
     dy /= ddlen;
-    puck_game_commit_dash(puck_game, dash, dx, dy);
-    assert(player_no == 1 || player_no == 2);
-    puck_game->battle_stat[player_no - 1].Dash++;
+    puck_game_commit_dash(puck_game, dash, dx, dy, player_no);
 }
 
 float puck_game_elapsed_time(int update_tick, int update_frequency) {
@@ -737,6 +740,10 @@ void puck_game_control_bogus(LWPUCKGAME* puck_game, const LWPUCKGAMEBOGUSPARAM* 
     float ideal_target_dy = puck_game->go[LPGO_PUCK].pos[1] - puck_game->go[LPGO_TARGET].pos[1];
     puck_game->target_dx = (1.0f - bogus_param->target_follow_agility) * puck_game->target_dx + bogus_param->target_follow_agility * ideal_target_dx;
     puck_game->target_dy = (1.0f - bogus_param->target_follow_agility) * puck_game->target_dy + bogus_param->target_follow_agility * ideal_target_dy;
+    // normalize target dx, dy
+    float target_dlen = sqrtf(puck_game->target_dx * puck_game->target_dx + puck_game->target_dy * puck_game->target_dy);
+    puck_game->target_dx /= target_dlen;
+    puck_game->target_dy /= target_dlen;
     
     float ideal_target_dx2 = ideal_target_dx * ideal_target_dx;
     float ideal_target_dy2 = ideal_target_dy * ideal_target_dy;
@@ -753,6 +760,11 @@ void puck_game_control_bogus(LWPUCKGAME* puck_game, const LWPUCKGAMEBOGUSPARAM* 
     puck_game->remote_control[1].dy = puck_game->target_dy;
     puck_game->remote_control[1].dlen = puck_game->target_dlen_ratio;
     puck_game->remote_control[1].pull_puck = 0;
+    
+    LOGIx("[BOGUS] dx=%.2f, dy=%.2f, dlen=xxxx, dlen_max=xxxx, dlen_ratio=%.2f",
+         puck_game->target_dx,
+         puck_game->target_dy,
+         puck_game->target_dlen_ratio);
 
     // dash
     int bogus_player_no = puck_game->player_no == 2 ? 1 : 2;
@@ -867,8 +879,11 @@ int puck_game_dash(LWPUCKGAME* puck_game, LWPUCKGAMEDASH* dash, int player_no) {
     }
 
     // Start dash!
-    puck_game_commit_dash_to_puck(puck_game, dash, player_no);
-    //puck_game_commit_dash(puck_game, &puck_game->dash, dx, dy);
+    if (puck_game->dash_by_direction) {
+        puck_game_commit_dash(puck_game, dash, puck_game->remote_control[0].dx, puck_game->remote_control[0].dy, player_no);
+    } else {
+        puck_game_commit_dash_to_puck(puck_game, dash, player_no);
+    }
     return 0;
 }
 
@@ -1019,3 +1034,4 @@ void puck_game_reset(LWPUCKGAME* puck_game) {
     puck_game->world_roll_target = puck_game->world_roll;
     puck_game->world_roll_target_follow_ratio = 0.075f;
 }
+

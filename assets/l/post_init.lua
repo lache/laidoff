@@ -113,6 +113,9 @@ function on_ui_event(id, w_ratio, h_ratio)
 		lo.lwcontext_set_custom_puck_game_stage(c, lo.LVT_DONTCARE, lo.LAE_DONTCARE)
 	elseif id == 'back_button' then
 		print('[script]back_button')
+		c.eye_x_offset = 0
+		c.puck_game.follow_cam = 0
+		lo.puck_game_reset_view_proj(c, c.puck_game)
 		lo.puck_game_set_tower_invincible(c.puck_game, 0, 0)
 		lo.puck_game_set_tower_invincible(c.puck_game, 1, 0)
 		lo.puck_game_set_dash_disabled(c.puck_game, 1, 0)
@@ -287,14 +290,21 @@ function on_ui_event(id, w_ratio, h_ratio)
 	elseif id == 'settings' then
 		lo.puck_game_reset_view_proj_ortho(c, c.puck_game, 1.9, 0.1, 100, 0, -8, 14, 0, 0.3, 0)
 		lo.lwcontext_set_custom_puck_game_stage(c, lo.LVT_FOOTBALL_GROUND, lo.LAE_FOOTBALL_GROUND)
+		c.puck_game.dash_by_direction = 1
+		c.puck_game.follow_cam = 1
 		c.puck_game.player_sphere_radius = 0.2
 		c.puck_game.target_sphere_radius = 0.2
 		c.puck_game.puck_sphere_radius = 0.3
 		c.puck_game.puck_lvt = lo.LVT_PUCK_PLAYER
 		c.puck_game.puck_lae = lo.LAE_PUCK_GRAY_KTX
-		c.puck_game.world_width = 7
-		lo.puck_game_set_tower_pos_multiplier(c.puck_game, 0, -3, 0)
-		lo.puck_game_set_tower_pos_multiplier(c.puck_game, 1, 3, 0)
+		c.puck_game.world_width = 12
+		c.puck_game.tower_pos = 1
+		c.puck_game.hide_hp_star = 1
+		c.puck_game.player_max_move_speed = 2 -- double it
+		c.puck_game.player_dash_speed = 12 -- 
+		--c.puck_game.dash_duration = 0.2 -- double it
+		lo.puck_game_set_tower_pos_multiplier(c.puck_game, 0, -6, 0)
+		lo.puck_game_set_tower_pos_multiplier(c.puck_game, 1, 6, 0)
 		lo.puck_game_set_secondary_static_default_values(c.puck_game)
 		lo.puck_game_reset_tutorial_state(c.puck_game)
 		lo.puck_game_reset_battle_state(c.puck_game)

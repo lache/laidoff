@@ -42,4 +42,5 @@ void puck_game_roll_to_practice(LWPUCKGAME* puck_game);
 void puck_game_roll_to_tutorial(LWPUCKGAME* puck_game);
 void puck_game_roll_to_main_menu(LWPUCKGAME* puck_game);
 void puck_game_set_static_default_values_client(LWPUCKGAME* puck_game);
+void puck_game_follow_cam(LWCONTEXT* pLwc, LWPUCKGAME* puck_game);
 

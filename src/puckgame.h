@@ -142,6 +142,9 @@ typedef struct _LWPUCKGAME {
     float player_dash_speed;
     float boundary_impact_falloff_speed;
     float boundary_impact_start;
+    int follow_cam;
+    int hide_hp_star;
+    int dash_by_direction;
     int puck_lae;
     int player_lae;
     int target_lae;
@@ -245,7 +248,7 @@ int puck_game_dashing(LWPUCKGAMEDASH* dash);
 int puck_game_jumping(LWPUCKGAMEJUMP* jump);
 void puck_game_near_callback(void *data, dGeomID o1, dGeomID o2);
 void puck_game_commit_jump(LWPUCKGAME* puck_game, LWPUCKGAMEJUMP* jump, int player_no);
-void puck_game_commit_dash(LWPUCKGAME* puck_game, LWPUCKGAMEDASH* dash, float dx, float dy);
+void puck_game_commit_dash(LWPUCKGAME* puck_game, LWPUCKGAMEDASH* dash, float dx, float dy, int player_no);
 void puck_game_commit_dash_to_puck(LWPUCKGAME* puck_game, LWPUCKGAMEDASH* dash, int player_no);
 float puck_game_remain_time(float total_time, int update_tick, int update_frequency);
 float puck_game_elapsed_time(int update_tick, int update_frequency);
@@ -279,3 +282,4 @@ void puck_game_reset(LWPUCKGAME* puck_game);
 void puck_game_set_tower_pos_multiplier(LWPUCKGAME* puck_game, int index, float mx, float my);
 void puck_game_create_walls(LWPUCKGAME* puck_game);
 void puck_game_destroy_walls(LWPUCKGAME* puck_game);
+
