@@ -63,20 +63,35 @@ static void create_go(LWPUCKGAME* puck_game, LW_PUCK_GAME_OBJECT lpgo, float mas
     LWPUCKGAMEOBJECT* go = &puck_game->go[lpgo];
     go->puck_game = puck_game;
     go->radius = radius;
-    const float testgo_radius = go->radius;
     assert(go->geom == 0);
-    go->geom = dCreateSphere(puck_game->space, testgo_radius);
+    go->geom = dCreateSphere(puck_game->space, radius);
     assert(go->body == 0);
     go->body = dBodyCreate(puck_game->world);
     dMass m;
-    dMassSetSphereTotal(&m, mass, testgo_radius);
+    dMassSetSphereTotal(&m, mass, radius);
     dBodySetMass(go->body, &m);
     dBodySetData(go->body, go);
     dBodySetMovedCallback(go->body, testgo_move_callback);
-    //dBodySetLinearVel(go->body, -2.0f, 3.0f, 0);
     dGeomSetBody(go->geom, go->body);
-    //dBodySetDamping(go->body, 1e-2f, 1e-2f);
-    //dBodySetAutoDisableLinearThreshold(go->body, 0.05f);
+    go->capsule = 0;
+}
+
+static void create_capsule_go(LWPUCKGAME* puck_game, LW_PUCK_GAME_OBJECT lpgo, float mass, float radius, float length) {
+    LWPUCKGAMEOBJECT* go = &puck_game->go[lpgo];
+    go->puck_game = puck_game;
+    go->radius = radius;
+    go->length = length;
+    assert(go->geom == 0);
+    go->geom = dCreateCapsule(puck_game->space, radius, length);
+    assert(go->body == 0);
+    go->body = dBodyCreate(puck_game->world);
+    dMass m;
+    dMassSetCapsuleTotal(&m, mass, 2/*z-axis*/, radius, length);
+    dBodySetMass(go->body, &m);
+    dBodySetData(go->body, go);
+    dBodySetMovedCallback(go->body, testgo_move_callback);
+    dGeomSetBody(go->geom, go->body);
+    go->capsule = 1;
 }
 
 static void destroy_go(LWPUCKGAME* puck_game, LW_PUCK_GAME_OBJECT lpgo) {
@@ -132,6 +147,11 @@ static void destroy_control_joint(LWPUCKGAME* puck_game, dJointGroupID* joint_gr
 
 void puck_game_create_go(LWPUCKGAME* puck_game, int lpgo, float x, float y, float z, float radius) {
     create_go(puck_game, lpgo, puck_game->sphere_mass, radius);
+    puck_game_reset_go(puck_game, &puck_game->go[lpgo], x, y, z);
+}
+
+void puck_game_create_capsule_go(LWPUCKGAME* puck_game, int lpgo, float x, float y, float z, float radius, float length) {
+    create_capsule_go(puck_game, lpgo, puck_game->sphere_mass, radius, length);
     puck_game_reset_go(puck_game, &puck_game->go[lpgo], x, y, z);
 }
 
@@ -201,10 +221,18 @@ void puck_game_create_all_battle_objects(LWPUCKGAME* puck_game) {
         puck_game_create_go(puck_game, LPGO_PUCK, 0, 0, 0, puck_game->puck_sphere_radius);
     }
     if (puck_game->go[LPGO_PLAYER].geom == 0) {
-        puck_game_create_go(puck_game, LPGO_PLAYER, 0, 0, 0, puck_game->player_sphere_radius);
+        if (puck_game->player_capsule) {
+            puck_game_create_capsule_go(puck_game, LPGO_PLAYER, 0, 0, 0, puck_game->player_sphere_radius, puck_game->player_capsule_length);
+        } else {
+            puck_game_create_go(puck_game, LPGO_PLAYER, 0, 0, 0, puck_game->player_sphere_radius);
+        }
     }
     if (puck_game->go[LPGO_TARGET].geom == 0) {
-        puck_game_create_go(puck_game, LPGO_TARGET, 0, 0, 0, puck_game->target_sphere_radius);
+        if (puck_game->player_capsule) {
+            puck_game_create_capsule_go(puck_game, LPGO_TARGET, 0, 0, 0, puck_game->target_sphere_radius, puck_game->player_capsule_length);
+        } else {
+            puck_game_create_go(puck_game, LPGO_TARGET, 0, 0, 0, puck_game->target_sphere_radius);
+        }
     }
     // Create target control joint
     if (puck_game->target_control_joint_group == 0) {
@@ -324,6 +352,7 @@ void puck_game_set_static_default_values(LWPUCKGAME* puck_game) {
     puck_game->follow_cam = 0;
     puck_game->hide_hp_star = 0;
     puck_game->dash_by_direction = 0;
+    puck_game->player_capsule = 0;
     // datasheet end
     puck_game_set_secondary_static_default_values(puck_game);
 }
@@ -945,6 +974,16 @@ void puck_game_update_tick(LWPUCKGAME* puck_game, int update_frequency) {
         dSpaceCollide(puck_game->space, puck_game, puck_game_near_callback);
         dWorldQuickStep(puck_game->world, 1.0f / 60);
         dJointGroupEmpty(puck_game->contact_joint_group);
+    }
+    if (puck_game->go[LPGO_PLAYER].capsule) {
+        dQuaternion q = { 1, 0, 0, 0 };
+        dBodySetQuaternion(puck_game->go[LPGO_PLAYER].body, q);
+        dBodySetAngularVel(puck_game->go[LPGO_PLAYER].body, 0, 0, 0);
+    }
+    if (puck_game->go[LPGO_TARGET].capsule) {
+        dQuaternion q = { 1, 0, 0, 0 };
+        dBodySetQuaternion(puck_game->go[LPGO_TARGET].body, q);
+        dBodySetAngularVel(puck_game->go[LPGO_TARGET].body, 0, 0, 0);
     }
     // update last contact puck body
     if (puck_game->player.puck_contacted == 0) {

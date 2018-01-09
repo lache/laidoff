@@ -297,6 +297,8 @@ function on_ui_event(id, w_ratio, h_ratio)
 		c.puck_game.puck_sphere_radius = 0.3
 		c.puck_game.puck_lvt = lo.LVT_PUCK_PLAYER
 		c.puck_game.puck_lae = lo.LAE_PUCK_GRAY_KTX
+		c.puck_game.player_lvt = lo.LVT_PLAYER_CAPSULE
+		c.puck_game.player_lae = lo.LAE_PLAYER_CAPSULE
 		c.puck_game.world_width = 12
 		c.puck_game.tower_pos = 1
 		c.puck_game.hide_hp_star = 1
@@ -306,6 +308,8 @@ function on_ui_event(id, w_ratio, h_ratio)
 		c.puck_game.sphere_mass = 1
 		c.puck_game.control_joint_max_force = 100
 		c.puck_game.bounce = 0.5
+		c.puck_game.player_capsule = 1
+		c.puck_game.player_capsule_length = 0.3
 		lo.puck_game_set_tower_pos_multiplier(c.puck_game, 0, -6, 0)
 		lo.puck_game_set_tower_pos_multiplier(c.puck_game, 1, 6, 0)
 		lo.puck_game_set_secondary_static_default_values(c.puck_game)

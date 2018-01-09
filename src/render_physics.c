@@ -303,6 +303,9 @@ static void render_go(const LWCONTEXT* pLwc,
 
 
     float sx = render_scale * go->radius, sy = render_scale * go->radius, sz = render_scale * go->radius;
+    if (go->capsule) {
+        sx = sy = sz = 1;
+    }
     float x = render_scale * (remote_pos ? remote_pos[0] : go->pos[0]);
     float y = render_scale * (remote_pos ? remote_pos[1] : go->pos[1]);
     float z = render_scale * (remote_pos ? remote_pos[2] : go->pos[2]);

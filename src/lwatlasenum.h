@@ -138,6 +138,7 @@ typedef enum _LW_ATLAS_ENUM {
         LAE_STOP_MARK_ALPHA,
         LAE_UI_BUTTON_ATLAS,
     LAE_FOOTBALL_GROUND,
+    LAE_PLAYER_CAPSULE,
         LAE_COUNT,
     
     LAE_DONTCARE,
@@ -283,6 +284,7 @@ static const char *tex_atlas_filename[] = {
         ASSETS_BASE_PATH "ktx" PATH_SEPARATOR "stop-mark-a_alpha.ktx",
         ASSETS_BASE_PATH "ktx" PATH_SEPARATOR "ui-button-atlas.ktx",
     ASSETS_BASE_PATH "ktx" PATH_SEPARATOR "football-ground.ktx",
+    ASSETS_BASE_PATH "ktx" PATH_SEPARATOR "player-capsule.ktx",
 };
 
 #define MAX_TEX_ATLAS LAE_COUNT

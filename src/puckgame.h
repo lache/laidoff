@@ -33,11 +33,13 @@ typedef struct _LWPUCKGAMEOBJECT {
 	float pos[3]; // read-only
 	float move_rad; // angle on x-y plane
 	float radius;
+    float length; // only valid if capsule
 	mat4x4 rot;
 	LWPUCKGAME* puck_game;
 	int wall_hit_count;
 	float speed;
 	int red_overlay;
+    int capsule;
 } LWPUCKGAMEOBJECT;
 
 typedef struct _LWPUCKGAMEJUMP {
@@ -125,6 +127,7 @@ typedef struct _LWPUCKGAME {
     float puck_sphere_radius;
     float player_sphere_radius;
     float target_sphere_radius;
+    float player_capsule_length;
 	float total_time;
     float fire_max_force;
     float fire_max_vel;
@@ -147,6 +150,7 @@ typedef struct _LWPUCKGAME {
     int follow_cam;
     int hide_hp_star;
     int dash_by_direction;
+    int player_capsule;
     int puck_lae;
     int player_lae;
     int target_lae;
@@ -270,6 +274,7 @@ void puck_game_set_searching_str(LWPUCKGAME* puck_game, const char* str);
 void puck_game_set_tutorial_guide_str(LWPUCKGAME* puck_game, const char* str);
 void puck_game_update_tick(LWPUCKGAME* puck_game, int update_frequency);
 void puck_game_create_go(LWPUCKGAME* puck_game, int lpgo, float x, float y, float z, float radius);
+void puck_game_create_capsule_go(LWPUCKGAME* puck_game, int lpgo, float x, float y, float z, float radius, float length);
 void puck_game_create_control_joint(LWPUCKGAME* puck_game, int lpgo);
 void puck_game_reset_go(LWPUCKGAME* puck_game, LWPUCKGAMEOBJECT* go, float x, float y, float z);
 void puck_game_create_tower_geom(LWPUCKGAME* puck_game, int i);
