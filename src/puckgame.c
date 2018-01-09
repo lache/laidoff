@@ -118,8 +118,8 @@ static void create_control_joint(LWPUCKGAME* puck_game, LW_PUCK_GAME_OBJECT atta
     dJointSetLMotorAxis(*control_joint, 0, 0, 1, 0, 0); // x-axis actuator
     dJointSetLMotorAxis(*control_joint, 1, 0, 0, 1, 0); // y-axis actuator
     dJointAttach(*control_joint, puck_game->go[attach_target].body, 0);
-    dJointSetLMotorParam(*control_joint, dParamFMax1, 10.0f);
-    dJointSetLMotorParam(*control_joint, dParamFMax2, 10.0f);
+    dJointSetLMotorParam(*control_joint, dParamFMax1, puck_game->control_joint_max_force);
+    dJointSetLMotorParam(*control_joint, dParamFMax2, puck_game->control_joint_max_force);
 }
 
 static void destroy_control_joint(LWPUCKGAME* puck_game, dJointGroupID* joint_group, dJointID* control_joint) {
@@ -307,6 +307,8 @@ void puck_game_set_static_default_values(LWPUCKGAME* puck_game) {
     puck_game->player_dash_speed = 6.0f;
     puck_game->boundary_impact_falloff_speed = 10.0f;
     puck_game->boundary_impact_start = 3.0f;
+    puck_game->control_joint_max_force = 10.0f;
+    puck_game->bounce = 0.9f;
     // tower pos
     int tower_pos_multiplier_index = 0;
     puck_game_set_tower_pos_multiplier(puck_game, tower_pos_multiplier_index, -1, -1);
@@ -529,7 +531,7 @@ void puck_game_near_callback(void* data, dGeomID geom1, dGeomID geom2) {
         LWPUCKGAMETOWER* tower = 0;
         for (int i = 0; i < num_contact; i++) {
             // bounce is the amount of "bouncyness".
-            contact[i].surface.bounce = 0.9f;
+            contact[i].surface.bounce = puck_game->bounce;
             // bounce_vel is the minimum incoming velocity to cause a bounce
             contact[i].surface.bounce_vel = 0.1f;
             // constraint force mixing parameter

@@ -300,9 +300,12 @@ function on_ui_event(id, w_ratio, h_ratio)
 		c.puck_game.world_width = 12
 		c.puck_game.tower_pos = 1
 		c.puck_game.hide_hp_star = 1
-		c.puck_game.player_max_move_speed = 2 -- double it
-		c.puck_game.player_dash_speed = 12 -- 
+		c.puck_game.player_max_move_speed = 1 -- double it
+		c.puck_game.player_dash_speed = 6 -- 
 		--c.puck_game.dash_duration = 0.2 -- double it
+		c.puck_game.sphere_mass = 1
+		c.puck_game.control_joint_max_force = 100
+		c.puck_game.bounce = 0.5
 		lo.puck_game_set_tower_pos_multiplier(c.puck_game, 0, -6, 0)
 		lo.puck_game_set_tower_pos_multiplier(c.puck_game, 1, 6, 0)
 		lo.puck_game_set_secondary_static_default_values(c.puck_game)

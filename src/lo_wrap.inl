@@ -58706,6 +58706,106 @@ fail:
 }
 
 
+static int _wrap_LWPUCKGAME_control_joint_max_force_set(lua_State* L) {
+  int SWIG_arg = 0;
+  struct _LWPUCKGAME *arg1 = (struct _LWPUCKGAME *) 0 ;
+  float arg2 ;
+  
+  SWIG_check_num_args("_LWPUCKGAME::control_joint_max_force",2,2)
+  if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("_LWPUCKGAME::control_joint_max_force",1,"struct _LWPUCKGAME *");
+  if(!lua_isnumber(L,2)) SWIG_fail_arg("_LWPUCKGAME::control_joint_max_force",2,"float");
+  
+  if (!SWIG_IsOK(SWIG_ConvertPtr(L,1,(void**)&arg1,SWIGTYPE_p__LWPUCKGAME,0))){
+    SWIG_fail_ptr("LWPUCKGAME_control_joint_max_force_set",1,SWIGTYPE_p__LWPUCKGAME);
+  }
+  
+  arg2 = (float)lua_tonumber(L, 2);
+  if (arg1) (arg1)->control_joint_max_force = arg2;
+  
+  return SWIG_arg;
+  
+  if(0) SWIG_fail;
+  
+fail:
+  lua_error(L);
+  return SWIG_arg;
+}
+
+
+static int _wrap_LWPUCKGAME_control_joint_max_force_get(lua_State* L) {
+  int SWIG_arg = 0;
+  struct _LWPUCKGAME *arg1 = (struct _LWPUCKGAME *) 0 ;
+  float result;
+  
+  SWIG_check_num_args("_LWPUCKGAME::control_joint_max_force",1,1)
+  if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("_LWPUCKGAME::control_joint_max_force",1,"struct _LWPUCKGAME *");
+  
+  if (!SWIG_IsOK(SWIG_ConvertPtr(L,1,(void**)&arg1,SWIGTYPE_p__LWPUCKGAME,0))){
+    SWIG_fail_ptr("LWPUCKGAME_control_joint_max_force_get",1,SWIGTYPE_p__LWPUCKGAME);
+  }
+  
+  result = (float) ((arg1)->control_joint_max_force);
+  lua_pushnumber(L, (lua_Number) result); SWIG_arg++;
+  return SWIG_arg;
+  
+  if(0) SWIG_fail;
+  
+fail:
+  lua_error(L);
+  return SWIG_arg;
+}
+
+
+static int _wrap_LWPUCKGAME_bounce_set(lua_State* L) {
+  int SWIG_arg = 0;
+  struct _LWPUCKGAME *arg1 = (struct _LWPUCKGAME *) 0 ;
+  float arg2 ;
+  
+  SWIG_check_num_args("_LWPUCKGAME::bounce",2,2)
+  if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("_LWPUCKGAME::bounce",1,"struct _LWPUCKGAME *");
+  if(!lua_isnumber(L,2)) SWIG_fail_arg("_LWPUCKGAME::bounce",2,"float");
+  
+  if (!SWIG_IsOK(SWIG_ConvertPtr(L,1,(void**)&arg1,SWIGTYPE_p__LWPUCKGAME,0))){
+    SWIG_fail_ptr("LWPUCKGAME_bounce_set",1,SWIGTYPE_p__LWPUCKGAME);
+  }
+  
+  arg2 = (float)lua_tonumber(L, 2);
+  if (arg1) (arg1)->bounce = arg2;
+  
+  return SWIG_arg;
+  
+  if(0) SWIG_fail;
+  
+fail:
+  lua_error(L);
+  return SWIG_arg;
+}
+
+
+static int _wrap_LWPUCKGAME_bounce_get(lua_State* L) {
+  int SWIG_arg = 0;
+  struct _LWPUCKGAME *arg1 = (struct _LWPUCKGAME *) 0 ;
+  float result;
+  
+  SWIG_check_num_args("_LWPUCKGAME::bounce",1,1)
+  if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("_LWPUCKGAME::bounce",1,"struct _LWPUCKGAME *");
+  
+  if (!SWIG_IsOK(SWIG_ConvertPtr(L,1,(void**)&arg1,SWIGTYPE_p__LWPUCKGAME,0))){
+    SWIG_fail_ptr("LWPUCKGAME_bounce_get",1,SWIGTYPE_p__LWPUCKGAME);
+  }
+  
+  result = (float) ((arg1)->bounce);
+  lua_pushnumber(L, (lua_Number) result); SWIG_arg++;
+  return SWIG_arg;
+  
+  if(0) SWIG_fail;
+  
+fail:
+  lua_error(L);
+  return SWIG_arg;
+}
+
+
 static int _wrap_LWPUCKGAME_follow_cam_set(lua_State* L) {
   int SWIG_arg = 0;
   struct _LWPUCKGAME *arg1 = (struct _LWPUCKGAME *) 0 ;
@@ -63623,6 +63723,8 @@ static swig_lua_attribute swig_LWPUCKGAME_attributes[] = {
     { "player_dash_speed", _wrap_LWPUCKGAME_player_dash_speed_get, _wrap_LWPUCKGAME_player_dash_speed_set },
     { "boundary_impact_falloff_speed", _wrap_LWPUCKGAME_boundary_impact_falloff_speed_get, _wrap_LWPUCKGAME_boundary_impact_falloff_speed_set },
     { "boundary_impact_start", _wrap_LWPUCKGAME_boundary_impact_start_get, _wrap_LWPUCKGAME_boundary_impact_start_set },
+    { "control_joint_max_force", _wrap_LWPUCKGAME_control_joint_max_force_get, _wrap_LWPUCKGAME_control_joint_max_force_set },
+    { "bounce", _wrap_LWPUCKGAME_bounce_get, _wrap_LWPUCKGAME_bounce_set },
     { "follow_cam", _wrap_LWPUCKGAME_follow_cam_get, _wrap_LWPUCKGAME_follow_cam_set },
     { "hide_hp_star", _wrap_LWPUCKGAME_hide_hp_star_get, _wrap_LWPUCKGAME_hide_hp_star_set },
     { "dash_by_direction", _wrap_LWPUCKGAME_dash_by_direction_get, _wrap_LWPUCKGAME_dash_by_direction_set },

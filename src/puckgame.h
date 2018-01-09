@@ -142,6 +142,8 @@ typedef struct _LWPUCKGAME {
     float player_dash_speed;
     float boundary_impact_falloff_speed;
     float boundary_impact_start;
+    float control_joint_max_force;
+    float bounce;
     int follow_cam;
     int hide_hp_star;
     int dash_by_direction;
