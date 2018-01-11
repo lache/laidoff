@@ -19,7 +19,7 @@
 #elif LW_PLATFORM_WIN32
 #   include <stdlib.h>
 #   define PATH_SEPARATOR "\\"
-#   define ASSETS_BASE_PATH "selected-assets" PATH_SEPARATOR "assets" PATH_SEPARATOR
+#   define ASSETS_BASE_PATH "assets" PATH_SEPARATOR
 #   define LwStaticAssert(x,y) _STATIC_ASSERT(x)
 #   define ARRAY_SIZE _countof
 #elif LW_PLATFORM_OSX

@@ -287,6 +287,7 @@ void update_puck_game(LWCONTEXT* pLwc, LWPUCKGAME* puck_game, double delta_time)
     //update_world_roll(puck_game);
     update_boundary_impact(puck_game, (float)delta_time);
     update_tower(puck_game, (float)delta_time);
+    puck_game_update_battle_result_popup(pLwc, puck_game, puck_game->battle_phase, puck_game->player_no);
 }
 
 void puck_game_jump(LWCONTEXT* pLwc, LWPUCKGAME* puck_game) {
@@ -409,8 +410,8 @@ void puck_game_reset_view_proj(LWCONTEXT* pLwc, LWPUCKGAME* puck_game) {
 void puck_game_reset_view_proj_ortho(LWCONTEXT* pLwc,
                                      LWPUCKGAME* puck_game,
                                      float half_height,
-                                     float near,
-                                     float far,
+                                     float near_z,
+                                     float far_z,
                                      float eye_x,
                                      float eye_y,
                                      float eye_z,
@@ -422,8 +423,8 @@ void puck_game_reset_view_proj_ortho(LWCONTEXT* pLwc,
                  +half_height * pLwc->aspect_ratio,
                  -half_height,
                  +half_height,
-                 near,
-                 far);
+                 near_z,
+                 far_z);
     pLwc->eye[0] = eye_x;
     pLwc->eye[1] = eye_y;
     pLwc->eye[2] = eye_z;
@@ -570,3 +571,40 @@ void puck_game_follow_cam(LWCONTEXT* pLwc, LWPUCKGAME* puck_game) {
     }
 }
 
+void puck_game_update_battle_result_popup(LWCONTEXT* pLwc, LWPUCKGAME* puck_game, LWP_STATE_PHASE battle_phase, int player_no) {
+    int new_score = 0;
+    switch (battle_phase) {
+    case LSP_READY:
+    case LSP_STEADY:
+    case LSP_GO:
+        return;
+    case LSP_FINISHED_DRAW: // DRAW == TIMEOUT
+        new_score = puck_game->matched2.draw_score;
+        break;
+    case LSP_FINISHED_VICTORY_P1:
+        new_score = player_no == 2 ? puck_game->matched2.defeat_score : puck_game->matched2.victory_score;
+        break;
+    case LSP_FINISHED_VICTORY_P2:
+        new_score = player_no == 2 ? puck_game->matched2.victory_score : puck_game->matched2.defeat_score;
+        break;
+    }
+    // show score diff message
+    int score_diff = new_score - puck_game->score;
+    if (score_diff
+        && puck_game->game_state == LPGS_BATTLE
+        && puck_game_state_phase_finished(battle_phase)) {
+        char points_acquired_lost[64];
+        char points_singular_plural[64];
+        if (score_diff > 0) {
+            script_get_string(pLwc->L, "STR_POINTS_ACQUIRED", points_acquired_lost, sizeof(points_acquired_lost));
+            script_get_string(pLwc->L, score_diff == 1 ? "STR_POINTS_SINGULAR" : "STR_POINTS_PLURAL", points_singular_plural, sizeof(points_singular_plural));
+            sprintf(puck_game->score_message, points_acquired_lost, score_diff, points_singular_plural);
+        } else if (score_diff < 0) {
+            script_get_string(pLwc->L, "STR_POINTS_LOST", points_acquired_lost, sizeof(points_acquired_lost));
+            script_get_string(pLwc->L, -score_diff == 1 ? "STR_POINTS_SINGULAR" : "STR_POINTS_PLURAL", points_singular_plural, sizeof(points_singular_plural));
+            sprintf(puck_game->score_message, points_acquired_lost, -score_diff, points_singular_plural);
+        }
+    } else {
+        puck_game->score_message[0] = '\0';
+    }
+}

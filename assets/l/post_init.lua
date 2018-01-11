@@ -1,6 +1,6 @@
 print('post_init.lua visible')
 local inspect = require('inspect')
-local T = require('strings_en')
+local T = require('strings_ko')
 -- Utility functions begin
 
 function lo.new_vec3(x, y, z)

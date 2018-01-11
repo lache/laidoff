@@ -744,7 +744,7 @@ void script_get_string(void* L, const char* id, char* ret, int ret_max_len) {
         LOGEP("error: %s", lua_tostring(L, -1));
     }
     const char* ret_v = lua_tostring(L, -1);
-    strncpy(ret, ret_v, ret_max_len - 1);
+    strncpy(ret, ret_v, ret_max_len);
     ret[ret_max_len - 1] = '\0';
     lua_pop(L, 1); // pop returned value
 }

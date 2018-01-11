@@ -17,6 +17,7 @@
 #include <assert.h>
 #include "lwtimepoint.h"
 #include "render_leaderboard.h"
+#include "script.h"
 
 typedef struct _LWSPHERERENDERUNIFORM {
     float sphere_col_ratio[3];
@@ -1238,7 +1239,6 @@ static void render_battle_result_popup(const LWCONTEXT* pLwc,
     const float sprite_width = 1.5f;
     const float x = 0.0f;
     float y = 0.0f;
-    int new_score = 0;
     switch (battle_phase) {
     case LSP_READY:
         sprite_name = "ready.png";
@@ -1269,31 +1269,25 @@ static void render_battle_result_popup(const LWCONTEXT* pLwc,
         lae = LAE_RESULT_TITLE_ATLAS;
         lae_alpha = LAE_RESULT_TITLE_ATLAS_ALPHA;
         lac = LAC_RESULT_TITLE;
-            new_score = puck_game->matched2.draw_score;
         break;
     case LSP_FINISHED_VICTORY_P1:
         sprite_name = player_no == 2 ? "defeat.png" : "victory.png";
         lae = LAE_RESULT_TITLE_ATLAS;
         lae_alpha = LAE_RESULT_TITLE_ATLAS_ALPHA;
         lac = LAC_RESULT_TITLE;
-            new_score = player_no == 2 ? puck_game->matched2.defeat_score : puck_game->matched2.victory_score;
         break;
     case LSP_FINISHED_VICTORY_P2:
         sprite_name = player_no == 2 ? "victory.png" : "defeat.png";
         lae = LAE_RESULT_TITLE_ATLAS;
         lae_alpha = LAE_RESULT_TITLE_ATLAS_ALPHA;
         lac = LAC_RESULT_TITLE;
-            new_score = player_no == 2 ? puck_game->matched2.victory_score : puck_game->matched2.defeat_score;
         break;
     default:
         // required parameters will be invalid if this is the case.
         return;
     }
     // show score diff message
-    int score_diff = new_score - puck_game->score;
-    if (score_diff
-        && puck_game->game_state == LPGS_BATTLE
-        && puck_game_state_phase_finished(battle_phase)) {
+    if (puck_game->score_message[0]) {
         // Render text
         LWTEXTBLOCK text_block;
         text_block.align = LTBA_CENTER_CENTER;
@@ -1308,13 +1302,7 @@ static void render_battle_result_popup(const LWCONTEXT* pLwc,
         text_block.begin_index = 0;
         float text_block_x = 0.0f;
         float text_block_y = 0.5f;
-        char score_message[64];
-        text_block.text = score_message;
-        if (score_diff > 0) {
-            sprintf(score_message, "%d point%s acquired!", score_diff, score_diff == 1 ? "" : "s");
-        } else if (score_diff < 0) {
-            sprintf(score_message, "%d point%s lost!", -score_diff, -score_diff == 1 ? "" : "s");
-        }
+        text_block.text = puck_game->score_message;
         text_block.text_block_x = text_block_x;
         text_block.text_block_y = text_block_y;
         text_block.text_bytelen = (int)strlen(text_block.text);

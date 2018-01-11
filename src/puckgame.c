@@ -1075,4 +1075,3 @@ void puck_game_reset(LWPUCKGAME* puck_game) {
     puck_game->world_roll_target = puck_game->world_roll;
     puck_game->world_roll_target_follow_ratio = 0.075f;
 }
-

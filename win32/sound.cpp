@@ -132,7 +132,7 @@ void release_sound(int i) {
 
 int create_sound_source_pool() {
     for (int i = 0; i < MAX_MONO_SOUND_SOURCE_POOL; i++) {
-        mono_sound_source_pool[i].wf = sound_pool[LWS_WING].wf;
+        mono_sound_source_pool[i].wf = sound_pool[LWS_COLLISION].wf;
 
         if (FAILED(g_engine->CreateSourceVoice(&mono_sound_source_pool[i].source, &mono_sound_source_pool[i].wf))) {
             return -1;
@@ -142,7 +142,7 @@ int create_sound_source_pool() {
     }
 
     for (int i = 0; i < MAX_STEREO_SOUND_SOURCE_POOL; i++) {
-        stereo_sound_source_pool[i].wf = sound_pool[LWS_DIE].wf;
+        stereo_sound_source_pool[i].wf = sound_pool[LWS_COLLISION].wf;
 
         if (FAILED(g_engine->CreateSourceVoice(&stereo_sound_source_pool[i].source, &stereo_sound_source_pool[i].wf))) {
             return -1;

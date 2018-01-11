@@ -16,8 +16,8 @@ void puck_game_reset_view_proj(LWCONTEXT* pLwc, LWPUCKGAME* puck_game);
 void puck_game_reset_view_proj_ortho(LWCONTEXT* pLwc,
                                      LWPUCKGAME* puck_game,
                                      float half_height,
-                                     float near,
-                                     float far,
+                                     float near_z,
+                                     float far_z,
                                      float eye_x,
                                      float eye_y,
                                      float eye_z,
@@ -43,4 +43,4 @@ void puck_game_roll_to_tutorial(LWPUCKGAME* puck_game);
 void puck_game_roll_to_main_menu(LWPUCKGAME* puck_game);
 void puck_game_set_static_default_values_client(LWPUCKGAME* puck_game);
 void puck_game_follow_cam(LWCONTEXT* pLwc, LWPUCKGAME* puck_game);
-
+void puck_game_update_battle_result_popup(LWCONTEXT* pLwc, LWPUCKGAME* puck_game, LWP_STATE_PHASE battle_phase, int player_no);

@@ -9,6 +9,7 @@
 #include "input.h"
 #include "script.h"
 #include "logic.h"
+#include "puckgameupdate.h"
 #if LW_PLATFORM_WIN32
 #include "lwimgui.h"
 #endif
