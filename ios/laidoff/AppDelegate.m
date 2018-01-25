@@ -80,7 +80,7 @@ didRegisterUserNotificationSettings:(UIUserNotificationSettings *)notificationSe
 }
 
 - (void)application:(UIApplication *)application didReceiveRemoteNotification:(NSDictionary *)userInfo  {
-    application.applicationIconBadgeNumber = 1;
+    application.applicationIconBadgeNumber = 0;
     //self.textView.text = [userInfo description];
     // We can determine whether an application is launched as a result of the user tapping the action
     // button or whether the notification was delivered to the already-running application by examining
