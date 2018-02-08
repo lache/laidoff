@@ -39,3 +39,7 @@ match-server/match-server
 
 clientlog.txt
 ios/build-appstore
+/admin
+/user1/tutorial-finished
+/user2/tutorial-finished
+/user3/tutorial-finished
