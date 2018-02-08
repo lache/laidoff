@@ -94,6 +94,9 @@ typedef struct _LWPUCKGAMETOWER {
 } LWPUCKGAMETOWER;
 
 #define LW_PUCK_GAME_TOWER_COUNT (2)
+#define LW_PUCK_GAME_MAX_PLAYER_COUNT_ON_TEAM (2)
+#define LW_PUCK_GAME_PLAYER_TEAM (0)
+#define LW_PUCK_GAME_TARGET_TEAM (1)
 
 typedef enum _LW_PUCK_GAME_CONTROL_FLAGS {
     LPGCF_HIDE_TIMER = 1 << 0,
@@ -160,7 +163,7 @@ typedef struct _LWPUCKGAME {
     int prepare_step_wait_tick; // wait ticks for each 'ready....' and 'steady....' battle phases
     float world_width_half;
     float world_height_half;
-    float tower_pos_multiplier[LW_PUCK_GAME_TOWER_COUNT][2];
+    float tower_pos_multiplier[LW_PUCK_GAME_TOWER_COUNT][2]; // '2' is for x- and y-axis.
     float tower_collapsing_z_rot_angle[LW_PUCK_GAME_TOWER_COUNT];
 	dWorldID world;
 	dSpaceID space;
@@ -170,16 +173,16 @@ typedef struct _LWPUCKGAME {
     LWPUCKGAMETOWER tower[LW_PUCK_GAME_TOWER_COUNT];
 	LWPUCKGAMEOBJECT go[LPGO_COUNT];
 	dJointGroupID contact_joint_group;
-	dJointGroupID player_control_joint_group;
-	dJointGroupID target_control_joint_group;
+	dJointGroupID player_control_joint_group[LW_PUCK_GAME_MAX_PLAYER_COUNT_ON_TEAM];
+	dJointGroupID target_control_joint_group[LW_PUCK_GAME_MAX_PLAYER_COUNT_ON_TEAM];
 	dJointGroupID puck_pull_control_joint_group;
-	dJointID player_control_joint; // player 1
-	dJointID target_control_joint; // player 2
+	dJointID player_control_joint[LW_PUCK_GAME_MAX_PLAYER_COUNT_ON_TEAM]; // player 1
+	dJointID target_control_joint[LW_PUCK_GAME_MAX_PLAYER_COUNT_ON_TEAM]; // player 2
 	dJointID puck_pull_control_joint;
 	int push;
 	float time;
-	LWPUCKGAMEPLAYER player;
-	LWPUCKGAMEPLAYER target;
+	LWPUCKGAMEPLAYER pg_player[LW_PUCK_GAME_MAX_PLAYER_COUNT_ON_TEAM];
+	LWPUCKGAMEPLAYER pg_target[LW_PUCK_GAME_MAX_PLAYER_COUNT_ON_TEAM];
 	float last_remote_dx;
 	float last_remote_dy;
 	void(*on_player_damaged)(LWPUCKGAME*);
@@ -198,17 +201,21 @@ typedef struct _LWPUCKGAME {
 	unsigned int player_no;
 	unsigned int c1_token;
 	unsigned int c2_token;
-	LWREMOTEPLAYERCONTROL remote_control[2];
-	LWPUCKGAMEDASH remote_dash[2];
-    LWPUCKGAMEJUMP remote_jump[2];
-    LWPUCKGAMEFIRE remote_fire[2];
+    unsigned int c3_token;
+    unsigned int c4_token;
+    LWREMOTEPLAYERCONTROL remote_control[2][LW_PUCK_GAME_MAX_PLAYER_COUNT_ON_TEAM]; // '2': 0 - PLAYER TEAM, 1 - TARGET TEAM
+	LWPUCKGAMEDASH remote_dash[2][LW_PUCK_GAME_MAX_PLAYER_COUNT_ON_TEAM]; // '2': 0 - PLAYER TEAM, 1 - TARGET TEAM
+    LWPUCKGAMEJUMP remote_jump[2][LW_PUCK_GAME_MAX_PLAYER_COUNT_ON_TEAM]; // '2': 0 - PLAYER TEAM, 1 - TARGET TEAM
+    LWPUCKGAMEFIRE remote_fire[2][LW_PUCK_GAME_MAX_PLAYER_COUNT_ON_TEAM]; // '2': 0 - PLAYER TEAM, 1 - TARGET TEAM
 	int init_ready;
     LWP_STATE_PHASE battle_phase;
 	int update_tick;
-	char nickname[LW_NICKNAME_MAX_LEN];
-	char target_nickname[LW_NICKNAME_MAX_LEN];
+	char nickname[LW_PUCK_GAME_MAX_PLAYER_COUNT_ON_TEAM][LW_NICKNAME_MAX_LEN];
+	char target_nickname[LW_PUCK_GAME_MAX_PLAYER_COUNT_ON_TEAM][LW_NICKNAME_MAX_LEN];
     unsigned int id1[4];
     unsigned int id2[4];
+    unsigned int id3[4];
+    unsigned int id4[4];
     int puck_owner_player_no;
     float puck_reflect_size;
     int world_roll_axis; // 0: x-axis, 1: y-axis, 2: z-axis
@@ -218,9 +225,9 @@ typedef struct _LWPUCKGAME {
     float world_roll_target_follow_ratio;
     int world_roll_dirty;
     void* pLwc; // opaque pointer to LWCONTEXT
-    float target_dx;
-    float target_dy;
-    float target_dlen_ratio;
+    float target_dx[LW_PUCK_GAME_MAX_PLAYER_COUNT_ON_TEAM];
+    float target_dy[LW_PUCK_GAME_MAX_PLAYER_COUNT_ON_TEAM];
+    float target_dlen_ratio[LW_PUCK_GAME_MAX_PLAYER_COUNT_ON_TEAM];
     float battle_ui_alpha;
     float battle_control_ui_alpha;
     float main_menu_ui_alpha;
@@ -231,9 +238,9 @@ typedef struct _LWPUCKGAME {
     int wall_hit_bit_send_buf_1; // reset at every UDP state sync send (P1)
     int wall_hit_bit_send_buf_2; // reset at every UDP state sync send (P2)
     LWPBATTLERESULT_STAT battle_stat[2];
-    int score;
-    int rank;
-    int target_score;
+    int player_score[LW_PUCK_GAME_MAX_PLAYER_COUNT_ON_TEAM];
+    int player_rank[LW_PUCK_GAME_MAX_PLAYER_COUNT_ON_TEAM];
+    int target_score[LW_PUCK_GAME_MAX_PLAYER_COUNT_ON_TEAM];
     int control_flags;
     char tutorial_guide_str[512];
     int bogus_disabled;
@@ -290,4 +297,5 @@ void puck_game_reset(LWPUCKGAME* puck_game);
 void puck_game_set_tower_pos_multiplier(LWPUCKGAME* puck_game, int index, float mx, float my);
 void puck_game_create_walls(LWPUCKGAME* puck_game);
 void puck_game_destroy_walls(LWPUCKGAME* puck_game);
-
+LWPUCKGAMEPLAYER* puck_game_player(LWPUCKGAME* puck_game, int index);
+LWPUCKGAMEPLAYER* puck_game_target(LWPUCKGAME* puck_game, int index);

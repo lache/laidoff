@@ -64,21 +64,21 @@ void update_boundary_impact(LWPUCKGAME* puck_game, float delta_time) {
 void update_shake(LWPUCKGAME* puck_game, float delta_time) {
     for (int i = 0; i < 2; i++) {
         // Decrease shake remain time
-        if (puck_game->remote_dash[i].shake_remain_time > 0) {
-            puck_game->remote_dash[i].shake_remain_time = LWMAX(0, puck_game->remote_dash[i].shake_remain_time - (float)delta_time);
+        if (puck_game->remote_dash[i][0].shake_remain_time > 0) {
+            puck_game->remote_dash[i][0].shake_remain_time = LWMAX(0, puck_game->remote_dash[i][0].shake_remain_time - (float)delta_time);
         }
         // Jump
-        if (puck_game->remote_jump[i].shake_remain_time > 0) {
-            puck_game->remote_jump[i].shake_remain_time = LWMAX(0, puck_game->remote_jump[i].shake_remain_time - (float)delta_time);
+        if (puck_game->remote_jump[i][0].shake_remain_time > 0) {
+            puck_game->remote_jump[i][0].shake_remain_time = LWMAX(0, puck_game->remote_jump[i][0].shake_remain_time - (float)delta_time);
         }
     }
     // Decrease HP remain time (player)
-    if (puck_game->player.hp_shake_remain_time > 0) {
-        puck_game->player.hp_shake_remain_time = LWMAX(0, puck_game->player.hp_shake_remain_time - (float)delta_time);
+    if (puck_game->pg_player[0].hp_shake_remain_time > 0) {
+        puck_game->pg_player[0].hp_shake_remain_time = LWMAX(0, puck_game->pg_player[0].hp_shake_remain_time - (float)delta_time);
     }
     // Decrease HP remain time (target)
-    if (puck_game->target.hp_shake_remain_time > 0) {
-        puck_game->target.hp_shake_remain_time = LWMAX(0, puck_game->target.hp_shake_remain_time - (float)delta_time);
+    if (puck_game->pg_target[0].hp_shake_remain_time > 0) {
+        puck_game->pg_target[0].hp_shake_remain_time = LWMAX(0, puck_game->pg_target[0].hp_shake_remain_time - (float)delta_time);
     }
     // Tower shake
     for (int i = 0; i < LW_PUCK_GAME_TOWER_COUNT; i++) {
@@ -111,7 +111,7 @@ static void puck_game_on_puck_player_collision(LWPUCKGAME* puck_game, float vdle
         play_sound(LWS_COLLISION);
     }
     LWCONTEXT* pLwc = (LWCONTEXT*)puck_game->pLwc;
-    script_on_near_puck_player(pLwc->script, puck_game_dashing(&puck_game->remote_dash[0]));
+    script_on_near_puck_player(pLwc->script, puck_game_dashing(&puck_game->remote_dash[LW_PUCK_GAME_PLAYER_TEAM][0]));
 }
 
 static void puck_game_on_player_dash(LWPUCKGAME* puck_game) {
@@ -203,10 +203,10 @@ void update_puck_game(LWCONTEXT* pLwc, LWPUCKGAME* puck_game, double delta_time)
     // make dlen_ratio ^ 4
     dlen_ratio *= dlen_ratio;
     dlen_ratio *= dlen_ratio;
-    puck_game->remote_control[0].dir_pad_dragging = pLwc->left_dir_pad.dragging;
-    puck_game->remote_control[0].dx = dx;
-    puck_game->remote_control[0].dy = dy;
-    puck_game->remote_control[0].dlen = dlen_ratio;
+    puck_game->remote_control[LW_PUCK_GAME_PLAYER_TEAM][0].dir_pad_dragging = pLwc->left_dir_pad.dragging;
+    puck_game->remote_control[LW_PUCK_GAME_PLAYER_TEAM][0].dx = dx;
+    puck_game->remote_control[LW_PUCK_GAME_PLAYER_TEAM][0].dy = dy;
+    puck_game->remote_control[LW_PUCK_GAME_PLAYER_TEAM][0].dlen = dlen_ratio;
 
     const int send_udp = remote && puck_game_state_phase_finished(pLwc->puck_game_state.bf.phase) == 0;
     
@@ -233,7 +233,7 @@ void update_puck_game(LWCONTEXT* pLwc, LWPUCKGAME* puck_game, double delta_time)
     }
 
     // Pull
-    if (puck_game->remote_control[0].pull_puck) {
+    if (puck_game->remote_control[LW_PUCK_GAME_PLAYER_TEAM][0].pull_puck) {
         if (send_udp) {
             LWPPULLSTART p;
             p.type = LPGP_LWPPULLSTART;
@@ -296,7 +296,7 @@ void puck_game_jump(LWCONTEXT* pLwc, LWPUCKGAME* puck_game) {
         return;
     }
     // Check already effective jump
-    if (puck_game_jumping(&puck_game->remote_jump[0])) {
+    if (puck_game_jumping(&puck_game->remote_jump[LW_PUCK_GAME_PLAYER_TEAM][0])) {
         return;
     }
     // Check effective move input
@@ -307,12 +307,12 @@ void puck_game_jump(LWCONTEXT* pLwc, LWPUCKGAME* puck_game) {
 
     // Check cooltime
     if (puck_game_jump_cooltime(puck_game) < puck_game->jump_interval) {
-        puck_game->remote_jump[0].shake_remain_time = puck_game->jump_shake_time;
+        puck_game->remote_jump[LW_PUCK_GAME_PLAYER_TEAM][0].shake_remain_time = puck_game->jump_shake_time;
         return;
     }
 
     // Start jump!
-    puck_game_commit_jump(puck_game, &puck_game->remote_jump[0], 1);
+    puck_game_commit_jump(puck_game, &puck_game->remote_jump[LW_PUCK_GAME_PLAYER_TEAM][0], 1);
 
     const int remote = puck_game_remote(pLwc, puck_game);
 
@@ -327,7 +327,7 @@ void puck_game_jump(LWCONTEXT* pLwc, LWPUCKGAME* puck_game) {
 }
 
 void puck_game_dash_and_send(LWCONTEXT* pLwc, LWPUCKGAME* puck_game) {
-    LWPUCKGAMEDASH* dash = &puck_game->remote_dash[puck_game->player_no == 2 ? 1 : 0];
+    LWPUCKGAMEDASH* dash = &puck_game->remote_dash[puck_game->player_no == 2 ? 1 : 0][0];
     if (puck_game_dash(puck_game, dash, puck_game->player_no == 2 ? 2 : 1) == 0) {
         const int remote = puck_game_remote(pLwc, puck_game);
         const int send_udp = remote && puck_game_state_phase_finished(pLwc->puck_game_state.bf.phase) == 0;
@@ -342,7 +342,7 @@ void puck_game_dash_and_send(LWCONTEXT* pLwc, LWPUCKGAME* puck_game) {
 }
 
 void puck_game_target_move(LWPUCKGAME* puck_game, float dx, float dy) {
-    dJointID tcj = puck_game->target_control_joint;
+    dJointID tcj = puck_game->target_control_joint[0];
     float player_speed = 0.5f;
     dJointSetLMotorParam(tcj, dParamVel1, player_speed * dx);
     dJointSetLMotorParam(tcj, dParamVel2, player_speed * dy);
@@ -351,7 +351,7 @@ void puck_game_target_move(LWPUCKGAME* puck_game, float dx, float dy) {
 }
 
 void puck_game_target_stop(LWPUCKGAME* puck_game) {
-    dJointID tcj = puck_game->target_control_joint;
+    dJointID tcj = puck_game->target_control_joint[0];
     float player_speed = 0.5f;
     dJointSetLMotorParam(tcj, dParamVel1, 0);
     dJointSetLMotorParam(tcj, dParamVel2, 0);
@@ -359,22 +359,22 @@ void puck_game_target_stop(LWPUCKGAME* puck_game) {
 
 void puck_game_target_dash(LWPUCKGAME* puck_game, int player_no) {
     puck_game_commit_dash(puck_game,
-                          &puck_game->remote_dash[player_no - 1],
+                          &puck_game->remote_dash[player_no - 1][0],
                           puck_game->last_remote_dx,
                           puck_game->last_remote_dy,
                           player_no);
 }
 
 void puck_game_pull_puck_start(LWCONTEXT* pLwc, LWPUCKGAME* puck_game) {
-    puck_game->remote_control[0].pull_puck = 1;
+    puck_game->remote_control[LW_PUCK_GAME_PLAYER_TEAM][0].pull_puck = 1;
 }
 
 void puck_game_pull_puck_stop(LWCONTEXT* pLwc, LWPUCKGAME* puck_game) {
-    puck_game->remote_control[0].pull_puck = 0;
+    puck_game->remote_control[LW_PUCK_GAME_PLAYER_TEAM][0].pull_puck = 0;
 }
 
 void puck_game_pull_puck_toggle(LWCONTEXT* pLwc, LWPUCKGAME* puck_game) {
-    if (puck_game->remote_control[0].pull_puck) {
+    if (puck_game->remote_control[LW_PUCK_GAME_PLAYER_TEAM][0].pull_puck) {
         puck_game_pull_puck_stop(pLwc, puck_game);
     } else {
         puck_game_pull_puck_start(pLwc, puck_game);
@@ -438,7 +438,7 @@ void puck_game_reset_view_proj_ortho(LWCONTEXT* pLwc,
 }
 
 void puck_game_fire(LWCONTEXT* pLwc, LWPUCKGAME* puck_game, float puck_fire_dx, float puck_fire_dy, float puck_fire_dlen) {
-    puck_game_commit_fire(puck_game, &puck_game->remote_fire[0], 1, puck_fire_dx, puck_fire_dy, puck_fire_dlen);
+    puck_game_commit_fire(puck_game, &puck_game->remote_fire[LW_PUCK_GAME_PLAYER_TEAM][0], 1, puck_fire_dx, puck_fire_dy, puck_fire_dlen);
     LWPFIRE packet_fire;
     packet_fire.type = LPGP_LWPFIRE;
     packet_fire.battle_id = pLwc->puck_game->battle_id;
@@ -478,13 +478,13 @@ void puck_game_tower_damage_test(LWCONTEXT* pLwc, LWPUCKGAME* puck_game, LWPUCKG
 }
 
 void puck_game_player_tower_decrease_hp_test(LWPUCKGAME* puck_game) {
-    puck_game_tower_damage_test(puck_game->pLwc, puck_game, &puck_game->player, &puck_game->tower[0], 1);
+    puck_game_tower_damage_test(puck_game->pLwc, puck_game, &puck_game->pg_player[0], &puck_game->tower[0], 1);
     LWCONTEXT* pLwc = (LWCONTEXT*)puck_game->pLwc;
     script_on_target_attack(pLwc->script);
 }
 
 void puck_game_target_tower_decrease_hp_test(LWPUCKGAME* puck_game) {
-    puck_game_tower_damage_test(puck_game->pLwc, puck_game, &puck_game->target, &puck_game->tower[1], 1);
+    puck_game_tower_damage_test(puck_game->pLwc, puck_game, &puck_game->pg_target[0], &puck_game->tower[1], 1);
     LWCONTEXT* pLwc = (LWCONTEXT*)puck_game->pLwc;
     script_on_player_attack(pLwc->script);
 }
@@ -589,7 +589,7 @@ void puck_game_update_battle_result_popup(LWCONTEXT* pLwc, LWPUCKGAME* puck_game
         break;
     }
     // show score diff message
-    int score_diff = new_score - puck_game->score;
+    int score_diff = new_score - puck_game->player_score[0];
     if (score_diff
         && puck_game->game_state == LPGS_BATTLE
         && puck_game_state_phase_finished(battle_phase)) {

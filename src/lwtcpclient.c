@@ -225,8 +225,8 @@ int parse_recv_packets(LWTCP* tcp) {
             // create UDP socket for battle sync
             pLwc->udp = new_udp();
             // make a copy of target nickname
-            memcpy(pLwc->puck_game->target_nickname, p->target_nickname, sizeof(p->target_nickname));
-            pLwc->puck_game->target_score = p->target_score;
+            memcpy(pLwc->puck_game->target_nickname[0], p->target_nickname, sizeof(p->target_nickname));
+            pLwc->puck_game->target_score[0] = p->target_score;
             pLwc->udp_host_addr.host_resolved = *(unsigned long*)p->ipaddr;
             sprintf(pLwc->udp_host_addr.host, "%d.%d.%d.%d",
                     ((int)pLwc->udp_host_addr.host_resolved >> 0) & 0xff,
@@ -280,16 +280,16 @@ int parse_recv_packets(LWTCP* tcp) {
                  pLwc->tcp->user_id.v[1],
                  pLwc->tcp->user_id.v[2],
                  pLwc->tcp->user_id.v[3]);
-            memcpy(pLwc->puck_game->nickname, p->nickname, sizeof(char) * LW_NICKNAME_MAX_LEN);
-            pLwc->puck_game->rank = p->rank;
-            pLwc->puck_game->score = p->score;
+            memcpy(pLwc->puck_game->nickname[0], p->nickname, sizeof(char) * LW_NICKNAME_MAX_LEN);
+            pLwc->puck_game->player_rank[0] = p->rank;
+            pLwc->puck_game->player_score[0] = p->score;
         } else if (CHECK_PACKET(packet_type, packet_size, LWPNICK)) {
             LOGI("LWPNICK received");
             LWPNICK* p = (LWPNICK*)cursor;
             LOGI("Cached user nick: %s", p->nickname);
-            memcpy(pLwc->puck_game->nickname, p->nickname, sizeof(char) * LW_NICKNAME_MAX_LEN);
-            pLwc->puck_game->score = p->score;
-            pLwc->puck_game->rank = p->rank;
+            memcpy(pLwc->puck_game->nickname[0], p->nickname, sizeof(char) * LW_NICKNAME_MAX_LEN);
+            pLwc->puck_game->player_score[0] = p->score;
+            pLwc->puck_game->player_rank[0] = p->rank;
         } else if (CHECK_PACKET(packet_type, packet_size, LWPSYSMSG)) {
             LOGI("LWPSYSMSG received");
             LWPSYSMSG* p = (LWPSYSMSG*)cursor;
@@ -309,7 +309,7 @@ int parse_recv_packets(LWTCP* tcp) {
             LWPSETNICKNAMERESULT* p = (LWPSETNICKNAMERESULT*)cursor;
             switch (p->Result) {
             case LW_SET_NICKNAME_RESULT_OK:
-                strcpy(pLwc->puck_game->nickname, p->Nickname);
+                strcpy(pLwc->puck_game->nickname[0], p->Nickname);
                 sprintf(nicknameMsg, "Nickname changed to [%s].", p->Nickname);
                 break;
             case LW_SET_NICKNAME_RESULT_TOO_SHORT:

@@ -17,8 +17,8 @@ return function ()
 	start_coro(function()
 		lo.puck_game_set_tutorial_guide_str(c.puck_game, '')
 		-- restore to full HP
-		c.puck_game.player.current_hp = c.puck_game.hp;
-		c.puck_game.target.current_hp = c.puck_game.hp;
+		lo.puck_game_player(c.puck_game, 0).current_hp = c.puck_game.hp;
+		lo.puck_game_target(c.puck_game, 0).current_hp = c.puck_game.hp;
 		-- hide pull and dash buttons
 		-- (left dir pad not already hidden since UI alpha is 0)
 		c.puck_game.control_flags = c.puck_game.control_flags | lo.LPGCF_HIDE_PULL_BUTTON | lo.LPGCF_HIDE_DASH_BUTTON

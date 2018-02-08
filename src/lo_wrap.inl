@@ -2833,53 +2833,58 @@ SWIG_Lua_dostring(lua_State *L, const char *str) {
 #define SWIGTYPE_p_a_4__a_4__float swig_types[173]
 #define SWIGTYPE_p_a_4__float swig_types[174]
 #define SWIGTYPE_p_a_8__LWSPRITE swig_types[175]
-#define SWIGTYPE_p_a__32___char swig_types[176]
-#define SWIGTYPE_p_addrinfo swig_types[177]
-#define SWIGTYPE_p_byte swig_types[178]
-#define SWIGTYPE_p_char swig_types[179]
-#define SWIGTYPE_p_dBodyID swig_types[180]
-#define SWIGTYPE_p_dGeomID swig_types[181]
-#define SWIGTYPE_p_dJointGroupID swig_types[182]
-#define SWIGTYPE_p_dJointID swig_types[183]
-#define SWIGTYPE_p_dSpaceID swig_types[184]
-#define SWIGTYPE_p_dWorldID swig_types[185]
-#define SWIGTYPE_p_f_p_q_const__struct__LWCONTEXT_float_float_float__void swig_types[186]
-#define SWIGTYPE_p_f_p_struct__LWCONTEXT__void swig_types[187]
-#define SWIGTYPE_p_f_p_struct__LWPUCKGAME__void swig_types[188]
-#define SWIGTYPE_p_f_p_struct__LWPUCKGAME_float_float__void swig_types[189]
-#define SWIGTYPE_p_f_p_struct__LWPUCKGAME_int__void swig_types[190]
-#define SWIGTYPE_p_f_p_struct__LWTCP__int swig_types[191]
-#define SWIGTYPE_p_f_p_struct__LWTCP_p_q_const__char__void swig_types[192]
-#define SWIGTYPE_p_float swig_types[193]
-#define SWIGTYPE_p_int swig_types[194]
-#define SWIGTYPE_p_int64_t swig_types[195]
-#define SWIGTYPE_p_p__LWDELTATIME swig_types[196]
-#define SWIGTYPE_p_p__LWPS swig_types[197]
-#define SWIGTYPE_p_p__LWPUCKGAME swig_types[198]
-#define SWIGTYPE_p_p__LWSKILL swig_types[199]
-#define SWIGTYPE_p_p__LWTCP swig_types[200]
-#define SWIGTYPE_p_p__kvmsg swig_types[201]
-#define SWIGTYPE_p_p_char swig_types[202]
-#define SWIGTYPE_p_p_tinyobj_material_t swig_types[203]
-#define SWIGTYPE_p_p_tinyobj_shape_t swig_types[204]
-#define SWIGTYPE_p_p_void swig_types[205]
-#define SWIGTYPE_p_pcg_state_setseq_64 swig_types[206]
-#define SWIGTYPE_p_short swig_types[207]
-#define SWIGTYPE_p_size_t swig_types[208]
-#define SWIGTYPE_p_tinyobj_attrib_t swig_types[209]
-#define SWIGTYPE_p_tinyobj_material_t swig_types[210]
-#define SWIGTYPE_p_tinyobj_shape_t swig_types[211]
-#define SWIGTYPE_p_tinyobj_vertex_index_t swig_types[212]
-#define SWIGTYPE_p_uint32_t swig_types[213]
-#define SWIGTYPE_p_uint64_t swig_types[214]
-#define SWIGTYPE_p_unsigned_char swig_types[215]
-#define SWIGTYPE_p_unsigned_int swig_types[216]
-#define SWIGTYPE_p_unsigned_long swig_types[217]
-#define SWIGTYPE_p_unsigned_short swig_types[218]
-#define SWIGTYPE_p_void swig_types[219]
-#define SWIGTYPE_p_zhash_t swig_types[220]
-static swig_type_info *swig_types[222];
-static swig_module_info swig_module = {swig_types, 221, 0, 0, 0, 0};
+#define SWIGTYPE_p_a_LW_NICKNAME_MAX_LEN__char swig_types[176]
+#define SWIGTYPE_p_a__2____LWPUCKGAMEDASH swig_types[177]
+#define SWIGTYPE_p_a__2____LWPUCKGAMEFIRE swig_types[178]
+#define SWIGTYPE_p_a__2____LWPUCKGAMEJUMP swig_types[179]
+#define SWIGTYPE_p_a__2____LWREMOTEPLAYERCONTROL swig_types[180]
+#define SWIGTYPE_p_a__32___char swig_types[181]
+#define SWIGTYPE_p_addrinfo swig_types[182]
+#define SWIGTYPE_p_byte swig_types[183]
+#define SWIGTYPE_p_char swig_types[184]
+#define SWIGTYPE_p_dBodyID swig_types[185]
+#define SWIGTYPE_p_dGeomID swig_types[186]
+#define SWIGTYPE_p_dJointGroupID swig_types[187]
+#define SWIGTYPE_p_dJointID swig_types[188]
+#define SWIGTYPE_p_dSpaceID swig_types[189]
+#define SWIGTYPE_p_dWorldID swig_types[190]
+#define SWIGTYPE_p_f_p_q_const__struct__LWCONTEXT_float_float_float__void swig_types[191]
+#define SWIGTYPE_p_f_p_struct__LWCONTEXT__void swig_types[192]
+#define SWIGTYPE_p_f_p_struct__LWPUCKGAME__void swig_types[193]
+#define SWIGTYPE_p_f_p_struct__LWPUCKGAME_float_float__void swig_types[194]
+#define SWIGTYPE_p_f_p_struct__LWPUCKGAME_int__void swig_types[195]
+#define SWIGTYPE_p_f_p_struct__LWTCP__int swig_types[196]
+#define SWIGTYPE_p_f_p_struct__LWTCP_p_q_const__char__void swig_types[197]
+#define SWIGTYPE_p_float swig_types[198]
+#define SWIGTYPE_p_int swig_types[199]
+#define SWIGTYPE_p_int64_t swig_types[200]
+#define SWIGTYPE_p_p__LWDELTATIME swig_types[201]
+#define SWIGTYPE_p_p__LWPS swig_types[202]
+#define SWIGTYPE_p_p__LWPUCKGAME swig_types[203]
+#define SWIGTYPE_p_p__LWSKILL swig_types[204]
+#define SWIGTYPE_p_p__LWTCP swig_types[205]
+#define SWIGTYPE_p_p__kvmsg swig_types[206]
+#define SWIGTYPE_p_p_char swig_types[207]
+#define SWIGTYPE_p_p_tinyobj_material_t swig_types[208]
+#define SWIGTYPE_p_p_tinyobj_shape_t swig_types[209]
+#define SWIGTYPE_p_p_void swig_types[210]
+#define SWIGTYPE_p_pcg_state_setseq_64 swig_types[211]
+#define SWIGTYPE_p_short swig_types[212]
+#define SWIGTYPE_p_size_t swig_types[213]
+#define SWIGTYPE_p_tinyobj_attrib_t swig_types[214]
+#define SWIGTYPE_p_tinyobj_material_t swig_types[215]
+#define SWIGTYPE_p_tinyobj_shape_t swig_types[216]
+#define SWIGTYPE_p_tinyobj_vertex_index_t swig_types[217]
+#define SWIGTYPE_p_uint32_t swig_types[218]
+#define SWIGTYPE_p_uint64_t swig_types[219]
+#define SWIGTYPE_p_unsigned_char swig_types[220]
+#define SWIGTYPE_p_unsigned_int swig_types[221]
+#define SWIGTYPE_p_unsigned_long swig_types[222]
+#define SWIGTYPE_p_unsigned_short swig_types[223]
+#define SWIGTYPE_p_void swig_types[224]
+#define SWIGTYPE_p_zhash_t swig_types[225]
+static swig_type_info *swig_types[227];
+static swig_module_info swig_module = {swig_types, 226, 0, 0, 0, 0};
 #define SWIG_TypeQuery(name) SWIG_TypeQueryModule(&swig_module, &swig_module, name)
 #define SWIG_MangledTypeQuery(name) SWIG_MangledTypeQueryModule(&swig_module, &swig_module, name)
 
@@ -46431,6 +46436,23 @@ fail:
 }
 
 
+static int _wrap_SOUND_FILE_get(lua_State* L) {
+  int SWIG_arg = 0;
+  char **result = 0 ;
+  
+  SWIG_check_num_args("SOUND_FILE",0,0)
+  result = (char **)(char **)SOUND_FILE;
+  SWIG_NewPointerObj(L,result,SWIGTYPE_p_p_char,0); SWIG_arg++; 
+  return SWIG_arg;
+  
+  if(0) SWIG_fail;
+  
+fail:
+  lua_error(L);
+  return SWIG_arg;
+}
+
+
 static int _wrap_play_sound(lua_State* L) {
   int SWIG_arg = 0;
   LW_SOUND arg1 ;
@@ -54076,6 +54098,42 @@ fail:
 }
 
 
+static int _wrap_puck_game_update_battle_result_popup(lua_State* L) {
+  int SWIG_arg = 0;
+  LWCONTEXT *arg1 = (LWCONTEXT *) 0 ;
+  LWPUCKGAME *arg2 = (LWPUCKGAME *) 0 ;
+  LWP_STATE_PHASE arg3 ;
+  int arg4 ;
+  
+  SWIG_check_num_args("puck_game_update_battle_result_popup",4,4)
+  if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("puck_game_update_battle_result_popup",1,"LWCONTEXT *");
+  if(!SWIG_isptrtype(L,2)) SWIG_fail_arg("puck_game_update_battle_result_popup",2,"LWPUCKGAME *");
+  if(!lua_isnumber(L,3)) SWIG_fail_arg("puck_game_update_battle_result_popup",3,"LWP_STATE_PHASE");
+  if(!lua_isnumber(L,4)) SWIG_fail_arg("puck_game_update_battle_result_popup",4,"int");
+  
+  if (!SWIG_IsOK(SWIG_ConvertPtr(L,1,(void**)&arg1,SWIGTYPE_p__LWCONTEXT,0))){
+    SWIG_fail_ptr("puck_game_update_battle_result_popup",1,SWIGTYPE_p__LWCONTEXT);
+  }
+  
+  
+  if (!SWIG_IsOK(SWIG_ConvertPtr(L,2,(void**)&arg2,SWIGTYPE_p__LWPUCKGAME,0))){
+    SWIG_fail_ptr("puck_game_update_battle_result_popup",2,SWIGTYPE_p__LWPUCKGAME);
+  }
+  
+  arg3 = (LWP_STATE_PHASE)(int)lua_tonumber(L, 3);
+  arg4 = (int)lua_tonumber(L, 4);
+  puck_game_update_battle_result_popup(arg1,arg2,arg3,arg4);
+  
+  return SWIG_arg;
+  
+  if(0) SWIG_fail;
+  
+fail:
+  lua_error(L);
+  return SWIG_arg;
+}
+
+
 static int _wrap_LWPUCKGAMEOBJECT_geom_set(lua_State* L) {
   int SWIG_arg = 0;
   struct _LWPUCKGAMEOBJECT *arg1 = (struct _LWPUCKGAMEOBJECT *) 0 ;
@@ -60156,24 +60214,26 @@ fail:
 static int _wrap_LWPUCKGAME_player_control_joint_group_set(lua_State* L) {
   int SWIG_arg = 0;
   struct _LWPUCKGAME *arg1 = (struct _LWPUCKGAME *) 0 ;
-  dJointGroupID arg2 ;
-  dJointGroupID *argp2 ;
+  dJointGroupID *arg2 ;
   
   SWIG_check_num_args("_LWPUCKGAME::player_control_joint_group",2,2)
   if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("_LWPUCKGAME::player_control_joint_group",1,"struct _LWPUCKGAME *");
-  if(!lua_isuserdata(L,2)) SWIG_fail_arg("_LWPUCKGAME::player_control_joint_group",2,"dJointGroupID");
+  if(!SWIG_isptrtype(L,2)) SWIG_fail_arg("_LWPUCKGAME::player_control_joint_group",2,"dJointGroupID [(2)]");
   
   if (!SWIG_IsOK(SWIG_ConvertPtr(L,1,(void**)&arg1,SWIGTYPE_p__LWPUCKGAME,0))){
     SWIG_fail_ptr("LWPUCKGAME_player_control_joint_group_set",1,SWIGTYPE_p__LWPUCKGAME);
   }
   
   
-  if (!SWIG_IsOK(SWIG_ConvertPtr(L,2,(void**)&argp2,SWIGTYPE_p_dJointGroupID,0))){
+  if (!SWIG_IsOK(SWIG_ConvertPtr(L,2,(void**)&arg2,SWIGTYPE_p_dJointGroupID,0))){
     SWIG_fail_ptr("LWPUCKGAME_player_control_joint_group_set",2,SWIGTYPE_p_dJointGroupID);
   }
-  arg2 = *argp2;
   
-  if (arg1) (arg1)->player_control_joint_group = arg2;
+  {
+    size_t ii;
+    dJointGroupID *b = (dJointGroupID *) arg1->player_control_joint_group;
+    for (ii = 0; ii < (size_t)(2); ii++) b[ii] = *((dJointGroupID *) arg2 + ii);
+  }
   
   return SWIG_arg;
   
@@ -60188,7 +60248,7 @@ fail:
 static int _wrap_LWPUCKGAME_player_control_joint_group_get(lua_State* L) {
   int SWIG_arg = 0;
   struct _LWPUCKGAME *arg1 = (struct _LWPUCKGAME *) 0 ;
-  dJointGroupID result;
+  dJointGroupID *result = 0 ;
   
   SWIG_check_num_args("_LWPUCKGAME::player_control_joint_group",1,1)
   if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("_LWPUCKGAME::player_control_joint_group",1,"struct _LWPUCKGAME *");
@@ -60197,13 +60257,8 @@ static int _wrap_LWPUCKGAME_player_control_joint_group_get(lua_State* L) {
     SWIG_fail_ptr("LWPUCKGAME_player_control_joint_group_get",1,SWIGTYPE_p__LWPUCKGAME);
   }
   
-  result =  ((arg1)->player_control_joint_group);
-  {
-    dJointGroupID * resultptr;
-    resultptr = (dJointGroupID *) malloc(sizeof(dJointGroupID));
-    memmove(resultptr, &result, sizeof(dJointGroupID));
-    SWIG_NewPointerObj(L,(void *) resultptr,SWIGTYPE_p_dJointGroupID,1); SWIG_arg++;
-  }
+  result = (dJointGroupID *)(dJointGroupID *) ((arg1)->player_control_joint_group);
+  SWIG_NewPointerObj(L,result,SWIGTYPE_p_dJointGroupID,0); SWIG_arg++; 
   return SWIG_arg;
   
   if(0) SWIG_fail;
@@ -60217,24 +60272,26 @@ fail:
 static int _wrap_LWPUCKGAME_target_control_joint_group_set(lua_State* L) {
   int SWIG_arg = 0;
   struct _LWPUCKGAME *arg1 = (struct _LWPUCKGAME *) 0 ;
-  dJointGroupID arg2 ;
-  dJointGroupID *argp2 ;
+  dJointGroupID *arg2 ;
   
   SWIG_check_num_args("_LWPUCKGAME::target_control_joint_group",2,2)
   if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("_LWPUCKGAME::target_control_joint_group",1,"struct _LWPUCKGAME *");
-  if(!lua_isuserdata(L,2)) SWIG_fail_arg("_LWPUCKGAME::target_control_joint_group",2,"dJointGroupID");
+  if(!SWIG_isptrtype(L,2)) SWIG_fail_arg("_LWPUCKGAME::target_control_joint_group",2,"dJointGroupID [(2)]");
   
   if (!SWIG_IsOK(SWIG_ConvertPtr(L,1,(void**)&arg1,SWIGTYPE_p__LWPUCKGAME,0))){
     SWIG_fail_ptr("LWPUCKGAME_target_control_joint_group_set",1,SWIGTYPE_p__LWPUCKGAME);
   }
   
   
-  if (!SWIG_IsOK(SWIG_ConvertPtr(L,2,(void**)&argp2,SWIGTYPE_p_dJointGroupID,0))){
+  if (!SWIG_IsOK(SWIG_ConvertPtr(L,2,(void**)&arg2,SWIGTYPE_p_dJointGroupID,0))){
     SWIG_fail_ptr("LWPUCKGAME_target_control_joint_group_set",2,SWIGTYPE_p_dJointGroupID);
   }
-  arg2 = *argp2;
   
-  if (arg1) (arg1)->target_control_joint_group = arg2;
+  {
+    size_t ii;
+    dJointGroupID *b = (dJointGroupID *) arg1->target_control_joint_group;
+    for (ii = 0; ii < (size_t)(2); ii++) b[ii] = *((dJointGroupID *) arg2 + ii);
+  }
   
   return SWIG_arg;
   
@@ -60249,7 +60306,7 @@ fail:
 static int _wrap_LWPUCKGAME_target_control_joint_group_get(lua_State* L) {
   int SWIG_arg = 0;
   struct _LWPUCKGAME *arg1 = (struct _LWPUCKGAME *) 0 ;
-  dJointGroupID result;
+  dJointGroupID *result = 0 ;
   
   SWIG_check_num_args("_LWPUCKGAME::target_control_joint_group",1,1)
   if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("_LWPUCKGAME::target_control_joint_group",1,"struct _LWPUCKGAME *");
@@ -60258,13 +60315,8 @@ static int _wrap_LWPUCKGAME_target_control_joint_group_get(lua_State* L) {
     SWIG_fail_ptr("LWPUCKGAME_target_control_joint_group_get",1,SWIGTYPE_p__LWPUCKGAME);
   }
   
-  result =  ((arg1)->target_control_joint_group);
-  {
-    dJointGroupID * resultptr;
-    resultptr = (dJointGroupID *) malloc(sizeof(dJointGroupID));
-    memmove(resultptr, &result, sizeof(dJointGroupID));
-    SWIG_NewPointerObj(L,(void *) resultptr,SWIGTYPE_p_dJointGroupID,1); SWIG_arg++;
-  }
+  result = (dJointGroupID *)(dJointGroupID *) ((arg1)->target_control_joint_group);
+  SWIG_NewPointerObj(L,result,SWIGTYPE_p_dJointGroupID,0); SWIG_arg++; 
   return SWIG_arg;
   
   if(0) SWIG_fail;
@@ -60339,24 +60391,26 @@ fail:
 static int _wrap_LWPUCKGAME_player_control_joint_set(lua_State* L) {
   int SWIG_arg = 0;
   struct _LWPUCKGAME *arg1 = (struct _LWPUCKGAME *) 0 ;
-  dJointID arg2 ;
-  dJointID *argp2 ;
+  dJointID *arg2 ;
   
   SWIG_check_num_args("_LWPUCKGAME::player_control_joint",2,2)
   if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("_LWPUCKGAME::player_control_joint",1,"struct _LWPUCKGAME *");
-  if(!lua_isuserdata(L,2)) SWIG_fail_arg("_LWPUCKGAME::player_control_joint",2,"dJointID");
+  if(!SWIG_isptrtype(L,2)) SWIG_fail_arg("_LWPUCKGAME::player_control_joint",2,"dJointID [(2)]");
   
   if (!SWIG_IsOK(SWIG_ConvertPtr(L,1,(void**)&arg1,SWIGTYPE_p__LWPUCKGAME,0))){
     SWIG_fail_ptr("LWPUCKGAME_player_control_joint_set",1,SWIGTYPE_p__LWPUCKGAME);
   }
   
   
-  if (!SWIG_IsOK(SWIG_ConvertPtr(L,2,(void**)&argp2,SWIGTYPE_p_dJointID,0))){
+  if (!SWIG_IsOK(SWIG_ConvertPtr(L,2,(void**)&arg2,SWIGTYPE_p_dJointID,0))){
     SWIG_fail_ptr("LWPUCKGAME_player_control_joint_set",2,SWIGTYPE_p_dJointID);
   }
-  arg2 = *argp2;
   
-  if (arg1) (arg1)->player_control_joint = arg2;
+  {
+    size_t ii;
+    dJointID *b = (dJointID *) arg1->player_control_joint;
+    for (ii = 0; ii < (size_t)(2); ii++) b[ii] = *((dJointID *) arg2 + ii);
+  }
   
   return SWIG_arg;
   
@@ -60371,7 +60425,7 @@ fail:
 static int _wrap_LWPUCKGAME_player_control_joint_get(lua_State* L) {
   int SWIG_arg = 0;
   struct _LWPUCKGAME *arg1 = (struct _LWPUCKGAME *) 0 ;
-  dJointID result;
+  dJointID *result = 0 ;
   
   SWIG_check_num_args("_LWPUCKGAME::player_control_joint",1,1)
   if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("_LWPUCKGAME::player_control_joint",1,"struct _LWPUCKGAME *");
@@ -60380,13 +60434,8 @@ static int _wrap_LWPUCKGAME_player_control_joint_get(lua_State* L) {
     SWIG_fail_ptr("LWPUCKGAME_player_control_joint_get",1,SWIGTYPE_p__LWPUCKGAME);
   }
   
-  result =  ((arg1)->player_control_joint);
-  {
-    dJointID * resultptr;
-    resultptr = (dJointID *) malloc(sizeof(dJointID));
-    memmove(resultptr, &result, sizeof(dJointID));
-    SWIG_NewPointerObj(L,(void *) resultptr,SWIGTYPE_p_dJointID,1); SWIG_arg++;
-  }
+  result = (dJointID *)(dJointID *) ((arg1)->player_control_joint);
+  SWIG_NewPointerObj(L,result,SWIGTYPE_p_dJointID,0); SWIG_arg++; 
   return SWIG_arg;
   
   if(0) SWIG_fail;
@@ -60400,24 +60449,26 @@ fail:
 static int _wrap_LWPUCKGAME_target_control_joint_set(lua_State* L) {
   int SWIG_arg = 0;
   struct _LWPUCKGAME *arg1 = (struct _LWPUCKGAME *) 0 ;
-  dJointID arg2 ;
-  dJointID *argp2 ;
+  dJointID *arg2 ;
   
   SWIG_check_num_args("_LWPUCKGAME::target_control_joint",2,2)
   if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("_LWPUCKGAME::target_control_joint",1,"struct _LWPUCKGAME *");
-  if(!lua_isuserdata(L,2)) SWIG_fail_arg("_LWPUCKGAME::target_control_joint",2,"dJointID");
+  if(!SWIG_isptrtype(L,2)) SWIG_fail_arg("_LWPUCKGAME::target_control_joint",2,"dJointID [(2)]");
   
   if (!SWIG_IsOK(SWIG_ConvertPtr(L,1,(void**)&arg1,SWIGTYPE_p__LWPUCKGAME,0))){
     SWIG_fail_ptr("LWPUCKGAME_target_control_joint_set",1,SWIGTYPE_p__LWPUCKGAME);
   }
   
   
-  if (!SWIG_IsOK(SWIG_ConvertPtr(L,2,(void**)&argp2,SWIGTYPE_p_dJointID,0))){
+  if (!SWIG_IsOK(SWIG_ConvertPtr(L,2,(void**)&arg2,SWIGTYPE_p_dJointID,0))){
     SWIG_fail_ptr("LWPUCKGAME_target_control_joint_set",2,SWIGTYPE_p_dJointID);
   }
-  arg2 = *argp2;
   
-  if (arg1) (arg1)->target_control_joint = arg2;
+  {
+    size_t ii;
+    dJointID *b = (dJointID *) arg1->target_control_joint;
+    for (ii = 0; ii < (size_t)(2); ii++) b[ii] = *((dJointID *) arg2 + ii);
+  }
   
   return SWIG_arg;
   
@@ -60432,7 +60483,7 @@ fail:
 static int _wrap_LWPUCKGAME_target_control_joint_get(lua_State* L) {
   int SWIG_arg = 0;
   struct _LWPUCKGAME *arg1 = (struct _LWPUCKGAME *) 0 ;
-  dJointID result;
+  dJointID *result = 0 ;
   
   SWIG_check_num_args("_LWPUCKGAME::target_control_joint",1,1)
   if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("_LWPUCKGAME::target_control_joint",1,"struct _LWPUCKGAME *");
@@ -60441,13 +60492,8 @@ static int _wrap_LWPUCKGAME_target_control_joint_get(lua_State* L) {
     SWIG_fail_ptr("LWPUCKGAME_target_control_joint_get",1,SWIGTYPE_p__LWPUCKGAME);
   }
   
-  result =  ((arg1)->target_control_joint);
-  {
-    dJointID * resultptr;
-    resultptr = (dJointID *) malloc(sizeof(dJointID));
-    memmove(resultptr, &result, sizeof(dJointID));
-    SWIG_NewPointerObj(L,(void *) resultptr,SWIGTYPE_p_dJointID,1); SWIG_arg++;
-  }
+  result = (dJointID *)(dJointID *) ((arg1)->target_control_joint);
+  SWIG_NewPointerObj(L,result,SWIGTYPE_p_dJointID,0); SWIG_arg++; 
   return SWIG_arg;
   
   if(0) SWIG_fail;
@@ -60619,25 +60665,29 @@ fail:
 }
 
 
-static int _wrap_LWPUCKGAME_player_set(lua_State* L) {
+static int _wrap_LWPUCKGAME_pg_player_set(lua_State* L) {
   int SWIG_arg = 0;
   struct _LWPUCKGAME *arg1 = (struct _LWPUCKGAME *) 0 ;
-  LWPUCKGAMEPLAYER *arg2 = (LWPUCKGAMEPLAYER *) 0 ;
+  LWPUCKGAMEPLAYER *arg2 ;
   
-  SWIG_check_num_args("_LWPUCKGAME::player",2,2)
-  if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("_LWPUCKGAME::player",1,"struct _LWPUCKGAME *");
-  if(!SWIG_isptrtype(L,2)) SWIG_fail_arg("_LWPUCKGAME::player",2,"LWPUCKGAMEPLAYER *");
+  SWIG_check_num_args("_LWPUCKGAME::pg_player",2,2)
+  if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("_LWPUCKGAME::pg_player",1,"struct _LWPUCKGAME *");
+  if(!SWIG_isptrtype(L,2)) SWIG_fail_arg("_LWPUCKGAME::pg_player",2,"LWPUCKGAMEPLAYER [(2)]");
   
   if (!SWIG_IsOK(SWIG_ConvertPtr(L,1,(void**)&arg1,SWIGTYPE_p__LWPUCKGAME,0))){
-    SWIG_fail_ptr("LWPUCKGAME_player_set",1,SWIGTYPE_p__LWPUCKGAME);
+    SWIG_fail_ptr("LWPUCKGAME_pg_player_set",1,SWIGTYPE_p__LWPUCKGAME);
   }
   
   
   if (!SWIG_IsOK(SWIG_ConvertPtr(L,2,(void**)&arg2,SWIGTYPE_p__LWPUCKGAMEPLAYER,0))){
-    SWIG_fail_ptr("LWPUCKGAME_player_set",2,SWIGTYPE_p__LWPUCKGAMEPLAYER);
+    SWIG_fail_ptr("LWPUCKGAME_pg_player_set",2,SWIGTYPE_p__LWPUCKGAMEPLAYER);
   }
   
-  if (arg1) (arg1)->player = *arg2;
+  {
+    size_t ii;
+    LWPUCKGAMEPLAYER *b = (LWPUCKGAMEPLAYER *) arg1->pg_player;
+    for (ii = 0; ii < (size_t)(2); ii++) b[ii] = *((LWPUCKGAMEPLAYER *) arg2 + ii);
+  }
   
   return SWIG_arg;
   
@@ -60649,19 +60699,19 @@ fail:
 }
 
 
-static int _wrap_LWPUCKGAME_player_get(lua_State* L) {
+static int _wrap_LWPUCKGAME_pg_player_get(lua_State* L) {
   int SWIG_arg = 0;
   struct _LWPUCKGAME *arg1 = (struct _LWPUCKGAME *) 0 ;
   LWPUCKGAMEPLAYER *result = 0 ;
   
-  SWIG_check_num_args("_LWPUCKGAME::player",1,1)
-  if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("_LWPUCKGAME::player",1,"struct _LWPUCKGAME *");
+  SWIG_check_num_args("_LWPUCKGAME::pg_player",1,1)
+  if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("_LWPUCKGAME::pg_player",1,"struct _LWPUCKGAME *");
   
   if (!SWIG_IsOK(SWIG_ConvertPtr(L,1,(void**)&arg1,SWIGTYPE_p__LWPUCKGAME,0))){
-    SWIG_fail_ptr("LWPUCKGAME_player_get",1,SWIGTYPE_p__LWPUCKGAME);
+    SWIG_fail_ptr("LWPUCKGAME_pg_player_get",1,SWIGTYPE_p__LWPUCKGAME);
   }
   
-  result = (LWPUCKGAMEPLAYER *)& ((arg1)->player);
+  result = (LWPUCKGAMEPLAYER *)(LWPUCKGAMEPLAYER *) ((arg1)->pg_player);
   SWIG_NewPointerObj(L,result,SWIGTYPE_p__LWPUCKGAMEPLAYER,0); SWIG_arg++; 
   return SWIG_arg;
   
@@ -60673,25 +60723,29 @@ fail:
 }
 
 
-static int _wrap_LWPUCKGAME_target_set(lua_State* L) {
+static int _wrap_LWPUCKGAME_pg_target_set(lua_State* L) {
   int SWIG_arg = 0;
   struct _LWPUCKGAME *arg1 = (struct _LWPUCKGAME *) 0 ;
-  LWPUCKGAMEPLAYER *arg2 = (LWPUCKGAMEPLAYER *) 0 ;
+  LWPUCKGAMEPLAYER *arg2 ;
   
-  SWIG_check_num_args("_LWPUCKGAME::target",2,2)
-  if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("_LWPUCKGAME::target",1,"struct _LWPUCKGAME *");
-  if(!SWIG_isptrtype(L,2)) SWIG_fail_arg("_LWPUCKGAME::target",2,"LWPUCKGAMEPLAYER *");
+  SWIG_check_num_args("_LWPUCKGAME::pg_target",2,2)
+  if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("_LWPUCKGAME::pg_target",1,"struct _LWPUCKGAME *");
+  if(!SWIG_isptrtype(L,2)) SWIG_fail_arg("_LWPUCKGAME::pg_target",2,"LWPUCKGAMEPLAYER [(2)]");
   
   if (!SWIG_IsOK(SWIG_ConvertPtr(L,1,(void**)&arg1,SWIGTYPE_p__LWPUCKGAME,0))){
-    SWIG_fail_ptr("LWPUCKGAME_target_set",1,SWIGTYPE_p__LWPUCKGAME);
+    SWIG_fail_ptr("LWPUCKGAME_pg_target_set",1,SWIGTYPE_p__LWPUCKGAME);
   }
   
   
   if (!SWIG_IsOK(SWIG_ConvertPtr(L,2,(void**)&arg2,SWIGTYPE_p__LWPUCKGAMEPLAYER,0))){
-    SWIG_fail_ptr("LWPUCKGAME_target_set",2,SWIGTYPE_p__LWPUCKGAMEPLAYER);
+    SWIG_fail_ptr("LWPUCKGAME_pg_target_set",2,SWIGTYPE_p__LWPUCKGAMEPLAYER);
   }
   
-  if (arg1) (arg1)->target = *arg2;
+  {
+    size_t ii;
+    LWPUCKGAMEPLAYER *b = (LWPUCKGAMEPLAYER *) arg1->pg_target;
+    for (ii = 0; ii < (size_t)(2); ii++) b[ii] = *((LWPUCKGAMEPLAYER *) arg2 + ii);
+  }
   
   return SWIG_arg;
   
@@ -60703,19 +60757,19 @@ fail:
 }
 
 
-static int _wrap_LWPUCKGAME_target_get(lua_State* L) {
+static int _wrap_LWPUCKGAME_pg_target_get(lua_State* L) {
   int SWIG_arg = 0;
   struct _LWPUCKGAME *arg1 = (struct _LWPUCKGAME *) 0 ;
   LWPUCKGAMEPLAYER *result = 0 ;
   
-  SWIG_check_num_args("_LWPUCKGAME::target",1,1)
-  if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("_LWPUCKGAME::target",1,"struct _LWPUCKGAME *");
+  SWIG_check_num_args("_LWPUCKGAME::pg_target",1,1)
+  if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("_LWPUCKGAME::pg_target",1,"struct _LWPUCKGAME *");
   
   if (!SWIG_IsOK(SWIG_ConvertPtr(L,1,(void**)&arg1,SWIGTYPE_p__LWPUCKGAME,0))){
-    SWIG_fail_ptr("LWPUCKGAME_target_get",1,SWIGTYPE_p__LWPUCKGAME);
+    SWIG_fail_ptr("LWPUCKGAME_pg_target_get",1,SWIGTYPE_p__LWPUCKGAME);
   }
   
-  result = (LWPUCKGAMEPLAYER *)& ((arg1)->target);
+  result = (LWPUCKGAMEPLAYER *)(LWPUCKGAMEPLAYER *) ((arg1)->pg_target);
   SWIG_NewPointerObj(L,result,SWIGTYPE_p__LWPUCKGAMEPLAYER,0); SWIG_arg++; 
   return SWIG_arg;
   
@@ -61671,28 +61725,136 @@ fail:
 }
 
 
+static int _wrap_LWPUCKGAME_c3_token_set(lua_State* L) {
+  int SWIG_arg = 0;
+  struct _LWPUCKGAME *arg1 = (struct _LWPUCKGAME *) 0 ;
+  unsigned int arg2 ;
+  
+  SWIG_check_num_args("_LWPUCKGAME::c3_token",2,2)
+  if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("_LWPUCKGAME::c3_token",1,"struct _LWPUCKGAME *");
+  if(!lua_isnumber(L,2)) SWIG_fail_arg("_LWPUCKGAME::c3_token",2,"unsigned int");
+  
+  if (!SWIG_IsOK(SWIG_ConvertPtr(L,1,(void**)&arg1,SWIGTYPE_p__LWPUCKGAME,0))){
+    SWIG_fail_ptr("LWPUCKGAME_c3_token_set",1,SWIGTYPE_p__LWPUCKGAME);
+  }
+  
+  SWIG_contract_assert((lua_tonumber(L,2)>=0),"number must not be negative")
+  arg2 = (unsigned int)lua_tonumber(L, 2);
+  if (arg1) (arg1)->c3_token = arg2;
+  
+  return SWIG_arg;
+  
+  if(0) SWIG_fail;
+  
+fail:
+  lua_error(L);
+  return SWIG_arg;
+}
+
+
+static int _wrap_LWPUCKGAME_c3_token_get(lua_State* L) {
+  int SWIG_arg = 0;
+  struct _LWPUCKGAME *arg1 = (struct _LWPUCKGAME *) 0 ;
+  unsigned int result;
+  
+  SWIG_check_num_args("_LWPUCKGAME::c3_token",1,1)
+  if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("_LWPUCKGAME::c3_token",1,"struct _LWPUCKGAME *");
+  
+  if (!SWIG_IsOK(SWIG_ConvertPtr(L,1,(void**)&arg1,SWIGTYPE_p__LWPUCKGAME,0))){
+    SWIG_fail_ptr("LWPUCKGAME_c3_token_get",1,SWIGTYPE_p__LWPUCKGAME);
+  }
+  
+  result = (unsigned int) ((arg1)->c3_token);
+  lua_pushnumber(L, (lua_Number) result); SWIG_arg++;
+  return SWIG_arg;
+  
+  if(0) SWIG_fail;
+  
+fail:
+  lua_error(L);
+  return SWIG_arg;
+}
+
+
+static int _wrap_LWPUCKGAME_c4_token_set(lua_State* L) {
+  int SWIG_arg = 0;
+  struct _LWPUCKGAME *arg1 = (struct _LWPUCKGAME *) 0 ;
+  unsigned int arg2 ;
+  
+  SWIG_check_num_args("_LWPUCKGAME::c4_token",2,2)
+  if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("_LWPUCKGAME::c4_token",1,"struct _LWPUCKGAME *");
+  if(!lua_isnumber(L,2)) SWIG_fail_arg("_LWPUCKGAME::c4_token",2,"unsigned int");
+  
+  if (!SWIG_IsOK(SWIG_ConvertPtr(L,1,(void**)&arg1,SWIGTYPE_p__LWPUCKGAME,0))){
+    SWIG_fail_ptr("LWPUCKGAME_c4_token_set",1,SWIGTYPE_p__LWPUCKGAME);
+  }
+  
+  SWIG_contract_assert((lua_tonumber(L,2)>=0),"number must not be negative")
+  arg2 = (unsigned int)lua_tonumber(L, 2);
+  if (arg1) (arg1)->c4_token = arg2;
+  
+  return SWIG_arg;
+  
+  if(0) SWIG_fail;
+  
+fail:
+  lua_error(L);
+  return SWIG_arg;
+}
+
+
+static int _wrap_LWPUCKGAME_c4_token_get(lua_State* L) {
+  int SWIG_arg = 0;
+  struct _LWPUCKGAME *arg1 = (struct _LWPUCKGAME *) 0 ;
+  unsigned int result;
+  
+  SWIG_check_num_args("_LWPUCKGAME::c4_token",1,1)
+  if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("_LWPUCKGAME::c4_token",1,"struct _LWPUCKGAME *");
+  
+  if (!SWIG_IsOK(SWIG_ConvertPtr(L,1,(void**)&arg1,SWIGTYPE_p__LWPUCKGAME,0))){
+    SWIG_fail_ptr("LWPUCKGAME_c4_token_get",1,SWIGTYPE_p__LWPUCKGAME);
+  }
+  
+  result = (unsigned int) ((arg1)->c4_token);
+  lua_pushnumber(L, (lua_Number) result); SWIG_arg++;
+  return SWIG_arg;
+  
+  if(0) SWIG_fail;
+  
+fail:
+  lua_error(L);
+  return SWIG_arg;
+}
+
+
 static int _wrap_LWPUCKGAME_remote_control_set(lua_State* L) {
   int SWIG_arg = 0;
   struct _LWPUCKGAME *arg1 = (struct _LWPUCKGAME *) 0 ;
-  LWREMOTEPLAYERCONTROL *arg2 ;
+  LWREMOTEPLAYERCONTROL (*arg2)[(2)] ;
   
   SWIG_check_num_args("_LWPUCKGAME::remote_control",2,2)
   if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("_LWPUCKGAME::remote_control",1,"struct _LWPUCKGAME *");
-  if(!SWIG_isptrtype(L,2)) SWIG_fail_arg("_LWPUCKGAME::remote_control",2,"LWREMOTEPLAYERCONTROL [2]");
+  if(!SWIG_isptrtype(L,2)) SWIG_fail_arg("_LWPUCKGAME::remote_control",2,"LWREMOTEPLAYERCONTROL [2][(2)]");
   
   if (!SWIG_IsOK(SWIG_ConvertPtr(L,1,(void**)&arg1,SWIGTYPE_p__LWPUCKGAME,0))){
     SWIG_fail_ptr("LWPUCKGAME_remote_control_set",1,SWIGTYPE_p__LWPUCKGAME);
   }
   
   
-  if (!SWIG_IsOK(SWIG_ConvertPtr(L,2,(void**)&arg2,SWIGTYPE_p__LWREMOTEPLAYERCONTROL,0))){
-    SWIG_fail_ptr("LWPUCKGAME_remote_control_set",2,SWIGTYPE_p__LWREMOTEPLAYERCONTROL);
+  if (!SWIG_IsOK(SWIG_ConvertPtr(L,2,(void**)&arg2,SWIGTYPE_p_a__2____LWREMOTEPLAYERCONTROL,0))){
+    SWIG_fail_ptr("LWPUCKGAME_remote_control_set",2,SWIGTYPE_p_a__2____LWREMOTEPLAYERCONTROL);
   }
   
   {
-    size_t ii;
-    LWREMOTEPLAYERCONTROL *b = (LWREMOTEPLAYERCONTROL *) arg1->remote_control;
-    for (ii = 0; ii < (size_t)2; ii++) b[ii] = *((LWREMOTEPLAYERCONTROL *) arg2 + ii);
+    LWREMOTEPLAYERCONTROL (*inp)[(2)] = (LWREMOTEPLAYERCONTROL (*)[(2)])(arg2);
+    LWREMOTEPLAYERCONTROL (*dest)[(2)] = (LWREMOTEPLAYERCONTROL (*)[(2)])(arg1->remote_control);
+    size_t ii = 0;
+    for (; ii < 2; ++ii) {
+      LWREMOTEPLAYERCONTROL *ip = inp[ii];
+      LWREMOTEPLAYERCONTROL *dp = dest[ii];
+      size_t jj = 0;
+      for (; jj < (2); ++jj) dp[jj] = ip[jj];
+    }
   }
   
   return SWIG_arg;
@@ -61708,7 +61870,7 @@ fail:
 static int _wrap_LWPUCKGAME_remote_control_get(lua_State* L) {
   int SWIG_arg = 0;
   struct _LWPUCKGAME *arg1 = (struct _LWPUCKGAME *) 0 ;
-  LWREMOTEPLAYERCONTROL *result = 0 ;
+  LWREMOTEPLAYERCONTROL (*result)[(2)] = 0 ;
   
   SWIG_check_num_args("_LWPUCKGAME::remote_control",1,1)
   if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("_LWPUCKGAME::remote_control",1,"struct _LWPUCKGAME *");
@@ -61717,8 +61879,8 @@ static int _wrap_LWPUCKGAME_remote_control_get(lua_State* L) {
     SWIG_fail_ptr("LWPUCKGAME_remote_control_get",1,SWIGTYPE_p__LWPUCKGAME);
   }
   
-  result = (LWREMOTEPLAYERCONTROL *)(LWREMOTEPLAYERCONTROL *) ((arg1)->remote_control);
-  SWIG_NewPointerObj(L,result,SWIGTYPE_p__LWREMOTEPLAYERCONTROL,0); SWIG_arg++; 
+  result = (LWREMOTEPLAYERCONTROL (*)[(2)])(LWREMOTEPLAYERCONTROL (*)[(2)]) ((arg1)->remote_control);
+  SWIG_NewPointerObj(L,result,SWIGTYPE_p_a__2____LWREMOTEPLAYERCONTROL,0); SWIG_arg++; 
   return SWIG_arg;
   
   if(0) SWIG_fail;
@@ -61732,25 +61894,31 @@ fail:
 static int _wrap_LWPUCKGAME_remote_dash_set(lua_State* L) {
   int SWIG_arg = 0;
   struct _LWPUCKGAME *arg1 = (struct _LWPUCKGAME *) 0 ;
-  LWPUCKGAMEDASH *arg2 ;
+  LWPUCKGAMEDASH (*arg2)[(2)] ;
   
   SWIG_check_num_args("_LWPUCKGAME::remote_dash",2,2)
   if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("_LWPUCKGAME::remote_dash",1,"struct _LWPUCKGAME *");
-  if(!SWIG_isptrtype(L,2)) SWIG_fail_arg("_LWPUCKGAME::remote_dash",2,"LWPUCKGAMEDASH [2]");
+  if(!SWIG_isptrtype(L,2)) SWIG_fail_arg("_LWPUCKGAME::remote_dash",2,"LWPUCKGAMEDASH [2][(2)]");
   
   if (!SWIG_IsOK(SWIG_ConvertPtr(L,1,(void**)&arg1,SWIGTYPE_p__LWPUCKGAME,0))){
     SWIG_fail_ptr("LWPUCKGAME_remote_dash_set",1,SWIGTYPE_p__LWPUCKGAME);
   }
   
   
-  if (!SWIG_IsOK(SWIG_ConvertPtr(L,2,(void**)&arg2,SWIGTYPE_p__LWPUCKGAMEDASH,0))){
-    SWIG_fail_ptr("LWPUCKGAME_remote_dash_set",2,SWIGTYPE_p__LWPUCKGAMEDASH);
+  if (!SWIG_IsOK(SWIG_ConvertPtr(L,2,(void**)&arg2,SWIGTYPE_p_a__2____LWPUCKGAMEDASH,0))){
+    SWIG_fail_ptr("LWPUCKGAME_remote_dash_set",2,SWIGTYPE_p_a__2____LWPUCKGAMEDASH);
   }
   
   {
-    size_t ii;
-    LWPUCKGAMEDASH *b = (LWPUCKGAMEDASH *) arg1->remote_dash;
-    for (ii = 0; ii < (size_t)2; ii++) b[ii] = *((LWPUCKGAMEDASH *) arg2 + ii);
+    LWPUCKGAMEDASH (*inp)[(2)] = (LWPUCKGAMEDASH (*)[(2)])(arg2);
+    LWPUCKGAMEDASH (*dest)[(2)] = (LWPUCKGAMEDASH (*)[(2)])(arg1->remote_dash);
+    size_t ii = 0;
+    for (; ii < 2; ++ii) {
+      LWPUCKGAMEDASH *ip = inp[ii];
+      LWPUCKGAMEDASH *dp = dest[ii];
+      size_t jj = 0;
+      for (; jj < (2); ++jj) dp[jj] = ip[jj];
+    }
   }
   
   return SWIG_arg;
@@ -61766,7 +61934,7 @@ fail:
 static int _wrap_LWPUCKGAME_remote_dash_get(lua_State* L) {
   int SWIG_arg = 0;
   struct _LWPUCKGAME *arg1 = (struct _LWPUCKGAME *) 0 ;
-  LWPUCKGAMEDASH *result = 0 ;
+  LWPUCKGAMEDASH (*result)[(2)] = 0 ;
   
   SWIG_check_num_args("_LWPUCKGAME::remote_dash",1,1)
   if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("_LWPUCKGAME::remote_dash",1,"struct _LWPUCKGAME *");
@@ -61775,8 +61943,8 @@ static int _wrap_LWPUCKGAME_remote_dash_get(lua_State* L) {
     SWIG_fail_ptr("LWPUCKGAME_remote_dash_get",1,SWIGTYPE_p__LWPUCKGAME);
   }
   
-  result = (LWPUCKGAMEDASH *)(LWPUCKGAMEDASH *) ((arg1)->remote_dash);
-  SWIG_NewPointerObj(L,result,SWIGTYPE_p__LWPUCKGAMEDASH,0); SWIG_arg++; 
+  result = (LWPUCKGAMEDASH (*)[(2)])(LWPUCKGAMEDASH (*)[(2)]) ((arg1)->remote_dash);
+  SWIG_NewPointerObj(L,result,SWIGTYPE_p_a__2____LWPUCKGAMEDASH,0); SWIG_arg++; 
   return SWIG_arg;
   
   if(0) SWIG_fail;
@@ -61790,25 +61958,31 @@ fail:
 static int _wrap_LWPUCKGAME_remote_jump_set(lua_State* L) {
   int SWIG_arg = 0;
   struct _LWPUCKGAME *arg1 = (struct _LWPUCKGAME *) 0 ;
-  LWPUCKGAMEJUMP *arg2 ;
+  LWPUCKGAMEJUMP (*arg2)[(2)] ;
   
   SWIG_check_num_args("_LWPUCKGAME::remote_jump",2,2)
   if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("_LWPUCKGAME::remote_jump",1,"struct _LWPUCKGAME *");
-  if(!SWIG_isptrtype(L,2)) SWIG_fail_arg("_LWPUCKGAME::remote_jump",2,"LWPUCKGAMEJUMP [2]");
+  if(!SWIG_isptrtype(L,2)) SWIG_fail_arg("_LWPUCKGAME::remote_jump",2,"LWPUCKGAMEJUMP [2][(2)]");
   
   if (!SWIG_IsOK(SWIG_ConvertPtr(L,1,(void**)&arg1,SWIGTYPE_p__LWPUCKGAME,0))){
     SWIG_fail_ptr("LWPUCKGAME_remote_jump_set",1,SWIGTYPE_p__LWPUCKGAME);
   }
   
   
-  if (!SWIG_IsOK(SWIG_ConvertPtr(L,2,(void**)&arg2,SWIGTYPE_p__LWPUCKGAMEJUMP,0))){
-    SWIG_fail_ptr("LWPUCKGAME_remote_jump_set",2,SWIGTYPE_p__LWPUCKGAMEJUMP);
+  if (!SWIG_IsOK(SWIG_ConvertPtr(L,2,(void**)&arg2,SWIGTYPE_p_a__2____LWPUCKGAMEJUMP,0))){
+    SWIG_fail_ptr("LWPUCKGAME_remote_jump_set",2,SWIGTYPE_p_a__2____LWPUCKGAMEJUMP);
   }
   
   {
-    size_t ii;
-    LWPUCKGAMEJUMP *b = (LWPUCKGAMEJUMP *) arg1->remote_jump;
-    for (ii = 0; ii < (size_t)2; ii++) b[ii] = *((LWPUCKGAMEJUMP *) arg2 + ii);
+    LWPUCKGAMEJUMP (*inp)[(2)] = (LWPUCKGAMEJUMP (*)[(2)])(arg2);
+    LWPUCKGAMEJUMP (*dest)[(2)] = (LWPUCKGAMEJUMP (*)[(2)])(arg1->remote_jump);
+    size_t ii = 0;
+    for (; ii < 2; ++ii) {
+      LWPUCKGAMEJUMP *ip = inp[ii];
+      LWPUCKGAMEJUMP *dp = dest[ii];
+      size_t jj = 0;
+      for (; jj < (2); ++jj) dp[jj] = ip[jj];
+    }
   }
   
   return SWIG_arg;
@@ -61824,7 +61998,7 @@ fail:
 static int _wrap_LWPUCKGAME_remote_jump_get(lua_State* L) {
   int SWIG_arg = 0;
   struct _LWPUCKGAME *arg1 = (struct _LWPUCKGAME *) 0 ;
-  LWPUCKGAMEJUMP *result = 0 ;
+  LWPUCKGAMEJUMP (*result)[(2)] = 0 ;
   
   SWIG_check_num_args("_LWPUCKGAME::remote_jump",1,1)
   if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("_LWPUCKGAME::remote_jump",1,"struct _LWPUCKGAME *");
@@ -61833,8 +62007,8 @@ static int _wrap_LWPUCKGAME_remote_jump_get(lua_State* L) {
     SWIG_fail_ptr("LWPUCKGAME_remote_jump_get",1,SWIGTYPE_p__LWPUCKGAME);
   }
   
-  result = (LWPUCKGAMEJUMP *)(LWPUCKGAMEJUMP *) ((arg1)->remote_jump);
-  SWIG_NewPointerObj(L,result,SWIGTYPE_p__LWPUCKGAMEJUMP,0); SWIG_arg++; 
+  result = (LWPUCKGAMEJUMP (*)[(2)])(LWPUCKGAMEJUMP (*)[(2)]) ((arg1)->remote_jump);
+  SWIG_NewPointerObj(L,result,SWIGTYPE_p_a__2____LWPUCKGAMEJUMP,0); SWIG_arg++; 
   return SWIG_arg;
   
   if(0) SWIG_fail;
@@ -61848,25 +62022,31 @@ fail:
 static int _wrap_LWPUCKGAME_remote_fire_set(lua_State* L) {
   int SWIG_arg = 0;
   struct _LWPUCKGAME *arg1 = (struct _LWPUCKGAME *) 0 ;
-  LWPUCKGAMEFIRE *arg2 ;
+  LWPUCKGAMEFIRE (*arg2)[(2)] ;
   
   SWIG_check_num_args("_LWPUCKGAME::remote_fire",2,2)
   if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("_LWPUCKGAME::remote_fire",1,"struct _LWPUCKGAME *");
-  if(!SWIG_isptrtype(L,2)) SWIG_fail_arg("_LWPUCKGAME::remote_fire",2,"LWPUCKGAMEFIRE [2]");
+  if(!SWIG_isptrtype(L,2)) SWIG_fail_arg("_LWPUCKGAME::remote_fire",2,"LWPUCKGAMEFIRE [2][(2)]");
   
   if (!SWIG_IsOK(SWIG_ConvertPtr(L,1,(void**)&arg1,SWIGTYPE_p__LWPUCKGAME,0))){
     SWIG_fail_ptr("LWPUCKGAME_remote_fire_set",1,SWIGTYPE_p__LWPUCKGAME);
   }
   
   
-  if (!SWIG_IsOK(SWIG_ConvertPtr(L,2,(void**)&arg2,SWIGTYPE_p__LWPUCKGAMEFIRE,0))){
-    SWIG_fail_ptr("LWPUCKGAME_remote_fire_set",2,SWIGTYPE_p__LWPUCKGAMEFIRE);
+  if (!SWIG_IsOK(SWIG_ConvertPtr(L,2,(void**)&arg2,SWIGTYPE_p_a__2____LWPUCKGAMEFIRE,0))){
+    SWIG_fail_ptr("LWPUCKGAME_remote_fire_set",2,SWIGTYPE_p_a__2____LWPUCKGAMEFIRE);
   }
   
   {
-    size_t ii;
-    LWPUCKGAMEFIRE *b = (LWPUCKGAMEFIRE *) arg1->remote_fire;
-    for (ii = 0; ii < (size_t)2; ii++) b[ii] = *((LWPUCKGAMEFIRE *) arg2 + ii);
+    LWPUCKGAMEFIRE (*inp)[(2)] = (LWPUCKGAMEFIRE (*)[(2)])(arg2);
+    LWPUCKGAMEFIRE (*dest)[(2)] = (LWPUCKGAMEFIRE (*)[(2)])(arg1->remote_fire);
+    size_t ii = 0;
+    for (; ii < 2; ++ii) {
+      LWPUCKGAMEFIRE *ip = inp[ii];
+      LWPUCKGAMEFIRE *dp = dest[ii];
+      size_t jj = 0;
+      for (; jj < (2); ++jj) dp[jj] = ip[jj];
+    }
   }
   
   return SWIG_arg;
@@ -61882,7 +62062,7 @@ fail:
 static int _wrap_LWPUCKGAME_remote_fire_get(lua_State* L) {
   int SWIG_arg = 0;
   struct _LWPUCKGAME *arg1 = (struct _LWPUCKGAME *) 0 ;
-  LWPUCKGAMEFIRE *result = 0 ;
+  LWPUCKGAMEFIRE (*result)[(2)] = 0 ;
   
   SWIG_check_num_args("_LWPUCKGAME::remote_fire",1,1)
   if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("_LWPUCKGAME::remote_fire",1,"struct _LWPUCKGAME *");
@@ -61891,8 +62071,8 @@ static int _wrap_LWPUCKGAME_remote_fire_get(lua_State* L) {
     SWIG_fail_ptr("LWPUCKGAME_remote_fire_get",1,SWIGTYPE_p__LWPUCKGAME);
   }
   
-  result = (LWPUCKGAMEFIRE *)(LWPUCKGAMEFIRE *) ((arg1)->remote_fire);
-  SWIG_NewPointerObj(L,result,SWIGTYPE_p__LWPUCKGAMEFIRE,0); SWIG_arg++; 
+  result = (LWPUCKGAMEFIRE (*)[(2)])(LWPUCKGAMEFIRE (*)[(2)]) ((arg1)->remote_fire);
+  SWIG_NewPointerObj(L,result,SWIGTYPE_p_a__2____LWPUCKGAMEFIRE,0); SWIG_arg++; 
   return SWIG_arg;
   
   if(0) SWIG_fail;
@@ -62056,23 +62236,30 @@ fail:
 static int _wrap_LWPUCKGAME_nickname_set(lua_State* L) {
   int SWIG_arg = 0;
   struct _LWPUCKGAME *arg1 = (struct _LWPUCKGAME *) 0 ;
-  char *arg2 ;
+  char (*arg2)[LW_NICKNAME_MAX_LEN] ;
   
   SWIG_check_num_args("_LWPUCKGAME::nickname",2,2)
   if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("_LWPUCKGAME::nickname",1,"struct _LWPUCKGAME *");
-  if(!SWIG_lua_isnilstring(L,2)) SWIG_fail_arg("_LWPUCKGAME::nickname",2,"char [LW_NICKNAME_MAX_LEN]");
+  if(!SWIG_isptrtype(L,2)) SWIG_fail_arg("_LWPUCKGAME::nickname",2,"char [(2)][LW_NICKNAME_MAX_LEN]");
   
   if (!SWIG_IsOK(SWIG_ConvertPtr(L,1,(void**)&arg1,SWIGTYPE_p__LWPUCKGAME,0))){
     SWIG_fail_ptr("LWPUCKGAME_nickname_set",1,SWIGTYPE_p__LWPUCKGAME);
   }
   
-  arg2 = (char *)lua_tostring(L, 2);
+  
+  if (!SWIG_IsOK(SWIG_ConvertPtr(L,2,(void**)&arg2,SWIGTYPE_p_a_LW_NICKNAME_MAX_LEN__char,0))){
+    SWIG_fail_ptr("LWPUCKGAME_nickname_set",2,SWIGTYPE_p_a_LW_NICKNAME_MAX_LEN__char);
+  }
+  
   {
-    if(arg2) {
-      strncpy((char*)arg1->nickname, (const char *)arg2, LW_NICKNAME_MAX_LEN-1);
-      arg1->nickname[LW_NICKNAME_MAX_LEN-1] = 0;
-    } else {
-      arg1->nickname[0] = 0;
+    char (*inp)[LW_NICKNAME_MAX_LEN] = (char (*)[LW_NICKNAME_MAX_LEN])(arg2);
+    char (*dest)[LW_NICKNAME_MAX_LEN] = (char (*)[LW_NICKNAME_MAX_LEN])(arg1->nickname);
+    size_t ii = 0;
+    for (; ii < (2); ++ii) {
+      char *ip = inp[ii];
+      char *dp = dest[ii];
+      size_t jj = 0;
+      for (; jj < LW_NICKNAME_MAX_LEN; ++jj) dp[jj] = ip[jj];
     }
   }
   
@@ -62089,7 +62276,7 @@ fail:
 static int _wrap_LWPUCKGAME_nickname_get(lua_State* L) {
   int SWIG_arg = 0;
   struct _LWPUCKGAME *arg1 = (struct _LWPUCKGAME *) 0 ;
-  char *result = 0 ;
+  char (*result)[LW_NICKNAME_MAX_LEN] = 0 ;
   
   SWIG_check_num_args("_LWPUCKGAME::nickname",1,1)
   if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("_LWPUCKGAME::nickname",1,"struct _LWPUCKGAME *");
@@ -62098,8 +62285,8 @@ static int _wrap_LWPUCKGAME_nickname_get(lua_State* L) {
     SWIG_fail_ptr("LWPUCKGAME_nickname_get",1,SWIGTYPE_p__LWPUCKGAME);
   }
   
-  result = (char *)(char *) ((arg1)->nickname);
-  lua_pushstring(L,(const char *)result); SWIG_arg++;
+  result = (char (*)[LW_NICKNAME_MAX_LEN])(char (*)[LW_NICKNAME_MAX_LEN]) ((arg1)->nickname);
+  SWIG_NewPointerObj(L,result,SWIGTYPE_p_a_LW_NICKNAME_MAX_LEN__char,0); SWIG_arg++; 
   return SWIG_arg;
   
   if(0) SWIG_fail;
@@ -62113,23 +62300,30 @@ fail:
 static int _wrap_LWPUCKGAME_target_nickname_set(lua_State* L) {
   int SWIG_arg = 0;
   struct _LWPUCKGAME *arg1 = (struct _LWPUCKGAME *) 0 ;
-  char *arg2 ;
+  char (*arg2)[LW_NICKNAME_MAX_LEN] ;
   
   SWIG_check_num_args("_LWPUCKGAME::target_nickname",2,2)
   if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("_LWPUCKGAME::target_nickname",1,"struct _LWPUCKGAME *");
-  if(!SWIG_lua_isnilstring(L,2)) SWIG_fail_arg("_LWPUCKGAME::target_nickname",2,"char [LW_NICKNAME_MAX_LEN]");
+  if(!SWIG_isptrtype(L,2)) SWIG_fail_arg("_LWPUCKGAME::target_nickname",2,"char [(2)][LW_NICKNAME_MAX_LEN]");
   
   if (!SWIG_IsOK(SWIG_ConvertPtr(L,1,(void**)&arg1,SWIGTYPE_p__LWPUCKGAME,0))){
     SWIG_fail_ptr("LWPUCKGAME_target_nickname_set",1,SWIGTYPE_p__LWPUCKGAME);
   }
   
-  arg2 = (char *)lua_tostring(L, 2);
+  
+  if (!SWIG_IsOK(SWIG_ConvertPtr(L,2,(void**)&arg2,SWIGTYPE_p_a_LW_NICKNAME_MAX_LEN__char,0))){
+    SWIG_fail_ptr("LWPUCKGAME_target_nickname_set",2,SWIGTYPE_p_a_LW_NICKNAME_MAX_LEN__char);
+  }
+  
   {
-    if(arg2) {
-      strncpy((char*)arg1->target_nickname, (const char *)arg2, LW_NICKNAME_MAX_LEN-1);
-      arg1->target_nickname[LW_NICKNAME_MAX_LEN-1] = 0;
-    } else {
-      arg1->target_nickname[0] = 0;
+    char (*inp)[LW_NICKNAME_MAX_LEN] = (char (*)[LW_NICKNAME_MAX_LEN])(arg2);
+    char (*dest)[LW_NICKNAME_MAX_LEN] = (char (*)[LW_NICKNAME_MAX_LEN])(arg1->target_nickname);
+    size_t ii = 0;
+    for (; ii < (2); ++ii) {
+      char *ip = inp[ii];
+      char *dp = dest[ii];
+      size_t jj = 0;
+      for (; jj < LW_NICKNAME_MAX_LEN; ++jj) dp[jj] = ip[jj];
     }
   }
   
@@ -62146,7 +62340,7 @@ fail:
 static int _wrap_LWPUCKGAME_target_nickname_get(lua_State* L) {
   int SWIG_arg = 0;
   struct _LWPUCKGAME *arg1 = (struct _LWPUCKGAME *) 0 ;
-  char *result = 0 ;
+  char (*result)[LW_NICKNAME_MAX_LEN] = 0 ;
   
   SWIG_check_num_args("_LWPUCKGAME::target_nickname",1,1)
   if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("_LWPUCKGAME::target_nickname",1,"struct _LWPUCKGAME *");
@@ -62155,8 +62349,8 @@ static int _wrap_LWPUCKGAME_target_nickname_get(lua_State* L) {
     SWIG_fail_ptr("LWPUCKGAME_target_nickname_get",1,SWIGTYPE_p__LWPUCKGAME);
   }
   
-  result = (char *)(char *) ((arg1)->target_nickname);
-  lua_pushstring(L,(const char *)result); SWIG_arg++;
+  result = (char (*)[LW_NICKNAME_MAX_LEN])(char (*)[LW_NICKNAME_MAX_LEN]) ((arg1)->target_nickname);
+  SWIG_NewPointerObj(L,result,SWIGTYPE_p_a_LW_NICKNAME_MAX_LEN__char,0); SWIG_arg++; 
   return SWIG_arg;
   
   if(0) SWIG_fail;
@@ -62272,6 +62466,122 @@ static int _wrap_LWPUCKGAME_id2_get(lua_State* L) {
   }
   
   result = (unsigned int *)(unsigned int *) ((arg1)->id2);
+  SWIG_NewPointerObj(L,result,SWIGTYPE_p_unsigned_int,0); SWIG_arg++; 
+  return SWIG_arg;
+  
+  if(0) SWIG_fail;
+  
+fail:
+  lua_error(L);
+  return SWIG_arg;
+}
+
+
+static int _wrap_LWPUCKGAME_id3_set(lua_State* L) {
+  int SWIG_arg = 0;
+  struct _LWPUCKGAME *arg1 = (struct _LWPUCKGAME *) 0 ;
+  unsigned int *arg2 ;
+  
+  SWIG_check_num_args("_LWPUCKGAME::id3",2,2)
+  if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("_LWPUCKGAME::id3",1,"struct _LWPUCKGAME *");
+  if(!SWIG_isptrtype(L,2)) SWIG_fail_arg("_LWPUCKGAME::id3",2,"unsigned int [4]");
+  
+  if (!SWIG_IsOK(SWIG_ConvertPtr(L,1,(void**)&arg1,SWIGTYPE_p__LWPUCKGAME,0))){
+    SWIG_fail_ptr("LWPUCKGAME_id3_set",1,SWIGTYPE_p__LWPUCKGAME);
+  }
+  
+  
+  if (!SWIG_IsOK(SWIG_ConvertPtr(L,2,(void**)&arg2,SWIGTYPE_p_unsigned_int,0))){
+    SWIG_fail_ptr("LWPUCKGAME_id3_set",2,SWIGTYPE_p_unsigned_int);
+  }
+  
+  {
+    size_t ii;
+    unsigned int *b = (unsigned int *) arg1->id3;
+    for (ii = 0; ii < (size_t)4; ii++) b[ii] = *((unsigned int *) arg2 + ii);
+  }
+  
+  return SWIG_arg;
+  
+  if(0) SWIG_fail;
+  
+fail:
+  lua_error(L);
+  return SWIG_arg;
+}
+
+
+static int _wrap_LWPUCKGAME_id3_get(lua_State* L) {
+  int SWIG_arg = 0;
+  struct _LWPUCKGAME *arg1 = (struct _LWPUCKGAME *) 0 ;
+  unsigned int *result = 0 ;
+  
+  SWIG_check_num_args("_LWPUCKGAME::id3",1,1)
+  if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("_LWPUCKGAME::id3",1,"struct _LWPUCKGAME *");
+  
+  if (!SWIG_IsOK(SWIG_ConvertPtr(L,1,(void**)&arg1,SWIGTYPE_p__LWPUCKGAME,0))){
+    SWIG_fail_ptr("LWPUCKGAME_id3_get",1,SWIGTYPE_p__LWPUCKGAME);
+  }
+  
+  result = (unsigned int *)(unsigned int *) ((arg1)->id3);
+  SWIG_NewPointerObj(L,result,SWIGTYPE_p_unsigned_int,0); SWIG_arg++; 
+  return SWIG_arg;
+  
+  if(0) SWIG_fail;
+  
+fail:
+  lua_error(L);
+  return SWIG_arg;
+}
+
+
+static int _wrap_LWPUCKGAME_id4_set(lua_State* L) {
+  int SWIG_arg = 0;
+  struct _LWPUCKGAME *arg1 = (struct _LWPUCKGAME *) 0 ;
+  unsigned int *arg2 ;
+  
+  SWIG_check_num_args("_LWPUCKGAME::id4",2,2)
+  if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("_LWPUCKGAME::id4",1,"struct _LWPUCKGAME *");
+  if(!SWIG_isptrtype(L,2)) SWIG_fail_arg("_LWPUCKGAME::id4",2,"unsigned int [4]");
+  
+  if (!SWIG_IsOK(SWIG_ConvertPtr(L,1,(void**)&arg1,SWIGTYPE_p__LWPUCKGAME,0))){
+    SWIG_fail_ptr("LWPUCKGAME_id4_set",1,SWIGTYPE_p__LWPUCKGAME);
+  }
+  
+  
+  if (!SWIG_IsOK(SWIG_ConvertPtr(L,2,(void**)&arg2,SWIGTYPE_p_unsigned_int,0))){
+    SWIG_fail_ptr("LWPUCKGAME_id4_set",2,SWIGTYPE_p_unsigned_int);
+  }
+  
+  {
+    size_t ii;
+    unsigned int *b = (unsigned int *) arg1->id4;
+    for (ii = 0; ii < (size_t)4; ii++) b[ii] = *((unsigned int *) arg2 + ii);
+  }
+  
+  return SWIG_arg;
+  
+  if(0) SWIG_fail;
+  
+fail:
+  lua_error(L);
+  return SWIG_arg;
+}
+
+
+static int _wrap_LWPUCKGAME_id4_get(lua_State* L) {
+  int SWIG_arg = 0;
+  struct _LWPUCKGAME *arg1 = (struct _LWPUCKGAME *) 0 ;
+  unsigned int *result = 0 ;
+  
+  SWIG_check_num_args("_LWPUCKGAME::id4",1,1)
+  if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("_LWPUCKGAME::id4",1,"struct _LWPUCKGAME *");
+  
+  if (!SWIG_IsOK(SWIG_ConvertPtr(L,1,(void**)&arg1,SWIGTYPE_p__LWPUCKGAME,0))){
+    SWIG_fail_ptr("LWPUCKGAME_id4_get",1,SWIGTYPE_p__LWPUCKGAME);
+  }
+  
+  result = (unsigned int *)(unsigned int *) ((arg1)->id4);
   SWIG_NewPointerObj(L,result,SWIGTYPE_p_unsigned_int,0); SWIG_arg++; 
   return SWIG_arg;
   
@@ -62736,18 +63046,26 @@ fail:
 static int _wrap_LWPUCKGAME_target_dx_set(lua_State* L) {
   int SWIG_arg = 0;
   struct _LWPUCKGAME *arg1 = (struct _LWPUCKGAME *) 0 ;
-  float arg2 ;
+  float *arg2 ;
   
   SWIG_check_num_args("_LWPUCKGAME::target_dx",2,2)
   if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("_LWPUCKGAME::target_dx",1,"struct _LWPUCKGAME *");
-  if(!lua_isnumber(L,2)) SWIG_fail_arg("_LWPUCKGAME::target_dx",2,"float");
+  if(!SWIG_isptrtype(L,2)) SWIG_fail_arg("_LWPUCKGAME::target_dx",2,"float [(2)]");
   
   if (!SWIG_IsOK(SWIG_ConvertPtr(L,1,(void**)&arg1,SWIGTYPE_p__LWPUCKGAME,0))){
     SWIG_fail_ptr("LWPUCKGAME_target_dx_set",1,SWIGTYPE_p__LWPUCKGAME);
   }
   
-  arg2 = (float)lua_tonumber(L, 2);
-  if (arg1) (arg1)->target_dx = arg2;
+  
+  if (!SWIG_IsOK(SWIG_ConvertPtr(L,2,(void**)&arg2,SWIGTYPE_p_float,0))){
+    SWIG_fail_ptr("LWPUCKGAME_target_dx_set",2,SWIGTYPE_p_float);
+  }
+  
+  {
+    size_t ii;
+    float *b = (float *) arg1->target_dx;
+    for (ii = 0; ii < (size_t)(2); ii++) b[ii] = *((float *) arg2 + ii);
+  }
   
   return SWIG_arg;
   
@@ -62762,7 +63080,7 @@ fail:
 static int _wrap_LWPUCKGAME_target_dx_get(lua_State* L) {
   int SWIG_arg = 0;
   struct _LWPUCKGAME *arg1 = (struct _LWPUCKGAME *) 0 ;
-  float result;
+  float *result = 0 ;
   
   SWIG_check_num_args("_LWPUCKGAME::target_dx",1,1)
   if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("_LWPUCKGAME::target_dx",1,"struct _LWPUCKGAME *");
@@ -62771,8 +63089,8 @@ static int _wrap_LWPUCKGAME_target_dx_get(lua_State* L) {
     SWIG_fail_ptr("LWPUCKGAME_target_dx_get",1,SWIGTYPE_p__LWPUCKGAME);
   }
   
-  result = (float) ((arg1)->target_dx);
-  lua_pushnumber(L, (lua_Number) result); SWIG_arg++;
+  result = (float *)(float *) ((arg1)->target_dx);
+  SWIG_NewPointerObj(L,result,SWIGTYPE_p_float,0); SWIG_arg++; 
   return SWIG_arg;
   
   if(0) SWIG_fail;
@@ -62786,18 +63104,26 @@ fail:
 static int _wrap_LWPUCKGAME_target_dy_set(lua_State* L) {
   int SWIG_arg = 0;
   struct _LWPUCKGAME *arg1 = (struct _LWPUCKGAME *) 0 ;
-  float arg2 ;
+  float *arg2 ;
   
   SWIG_check_num_args("_LWPUCKGAME::target_dy",2,2)
   if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("_LWPUCKGAME::target_dy",1,"struct _LWPUCKGAME *");
-  if(!lua_isnumber(L,2)) SWIG_fail_arg("_LWPUCKGAME::target_dy",2,"float");
+  if(!SWIG_isptrtype(L,2)) SWIG_fail_arg("_LWPUCKGAME::target_dy",2,"float [(2)]");
   
   if (!SWIG_IsOK(SWIG_ConvertPtr(L,1,(void**)&arg1,SWIGTYPE_p__LWPUCKGAME,0))){
     SWIG_fail_ptr("LWPUCKGAME_target_dy_set",1,SWIGTYPE_p__LWPUCKGAME);
   }
   
-  arg2 = (float)lua_tonumber(L, 2);
-  if (arg1) (arg1)->target_dy = arg2;
+  
+  if (!SWIG_IsOK(SWIG_ConvertPtr(L,2,(void**)&arg2,SWIGTYPE_p_float,0))){
+    SWIG_fail_ptr("LWPUCKGAME_target_dy_set",2,SWIGTYPE_p_float);
+  }
+  
+  {
+    size_t ii;
+    float *b = (float *) arg1->target_dy;
+    for (ii = 0; ii < (size_t)(2); ii++) b[ii] = *((float *) arg2 + ii);
+  }
   
   return SWIG_arg;
   
@@ -62812,7 +63138,7 @@ fail:
 static int _wrap_LWPUCKGAME_target_dy_get(lua_State* L) {
   int SWIG_arg = 0;
   struct _LWPUCKGAME *arg1 = (struct _LWPUCKGAME *) 0 ;
-  float result;
+  float *result = 0 ;
   
   SWIG_check_num_args("_LWPUCKGAME::target_dy",1,1)
   if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("_LWPUCKGAME::target_dy",1,"struct _LWPUCKGAME *");
@@ -62821,8 +63147,8 @@ static int _wrap_LWPUCKGAME_target_dy_get(lua_State* L) {
     SWIG_fail_ptr("LWPUCKGAME_target_dy_get",1,SWIGTYPE_p__LWPUCKGAME);
   }
   
-  result = (float) ((arg1)->target_dy);
-  lua_pushnumber(L, (lua_Number) result); SWIG_arg++;
+  result = (float *)(float *) ((arg1)->target_dy);
+  SWIG_NewPointerObj(L,result,SWIGTYPE_p_float,0); SWIG_arg++; 
   return SWIG_arg;
   
   if(0) SWIG_fail;
@@ -62836,18 +63162,26 @@ fail:
 static int _wrap_LWPUCKGAME_target_dlen_ratio_set(lua_State* L) {
   int SWIG_arg = 0;
   struct _LWPUCKGAME *arg1 = (struct _LWPUCKGAME *) 0 ;
-  float arg2 ;
+  float *arg2 ;
   
   SWIG_check_num_args("_LWPUCKGAME::target_dlen_ratio",2,2)
   if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("_LWPUCKGAME::target_dlen_ratio",1,"struct _LWPUCKGAME *");
-  if(!lua_isnumber(L,2)) SWIG_fail_arg("_LWPUCKGAME::target_dlen_ratio",2,"float");
+  if(!SWIG_isptrtype(L,2)) SWIG_fail_arg("_LWPUCKGAME::target_dlen_ratio",2,"float [(2)]");
   
   if (!SWIG_IsOK(SWIG_ConvertPtr(L,1,(void**)&arg1,SWIGTYPE_p__LWPUCKGAME,0))){
     SWIG_fail_ptr("LWPUCKGAME_target_dlen_ratio_set",1,SWIGTYPE_p__LWPUCKGAME);
   }
   
-  arg2 = (float)lua_tonumber(L, 2);
-  if (arg1) (arg1)->target_dlen_ratio = arg2;
+  
+  if (!SWIG_IsOK(SWIG_ConvertPtr(L,2,(void**)&arg2,SWIGTYPE_p_float,0))){
+    SWIG_fail_ptr("LWPUCKGAME_target_dlen_ratio_set",2,SWIGTYPE_p_float);
+  }
+  
+  {
+    size_t ii;
+    float *b = (float *) arg1->target_dlen_ratio;
+    for (ii = 0; ii < (size_t)(2); ii++) b[ii] = *((float *) arg2 + ii);
+  }
   
   return SWIG_arg;
   
@@ -62862,7 +63196,7 @@ fail:
 static int _wrap_LWPUCKGAME_target_dlen_ratio_get(lua_State* L) {
   int SWIG_arg = 0;
   struct _LWPUCKGAME *arg1 = (struct _LWPUCKGAME *) 0 ;
-  float result;
+  float *result = 0 ;
   
   SWIG_check_num_args("_LWPUCKGAME::target_dlen_ratio",1,1)
   if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("_LWPUCKGAME::target_dlen_ratio",1,"struct _LWPUCKGAME *");
@@ -62871,8 +63205,8 @@ static int _wrap_LWPUCKGAME_target_dlen_ratio_get(lua_State* L) {
     SWIG_fail_ptr("LWPUCKGAME_target_dlen_ratio_get",1,SWIGTYPE_p__LWPUCKGAME);
   }
   
-  result = (float) ((arg1)->target_dlen_ratio);
-  lua_pushnumber(L, (lua_Number) result); SWIG_arg++;
+  result = (float *)(float *) ((arg1)->target_dlen_ratio);
+  SWIG_NewPointerObj(L,result,SWIGTYPE_p_float,0); SWIG_arg++; 
   return SWIG_arg;
   
   if(0) SWIG_fail;
@@ -63398,21 +63732,29 @@ fail:
 }
 
 
-static int _wrap_LWPUCKGAME_score_set(lua_State* L) {
+static int _wrap_LWPUCKGAME_player_score_set(lua_State* L) {
   int SWIG_arg = 0;
   struct _LWPUCKGAME *arg1 = (struct _LWPUCKGAME *) 0 ;
-  int arg2 ;
+  int *arg2 ;
   
-  SWIG_check_num_args("_LWPUCKGAME::score",2,2)
-  if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("_LWPUCKGAME::score",1,"struct _LWPUCKGAME *");
-  if(!lua_isnumber(L,2)) SWIG_fail_arg("_LWPUCKGAME::score",2,"int");
+  SWIG_check_num_args("_LWPUCKGAME::player_score",2,2)
+  if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("_LWPUCKGAME::player_score",1,"struct _LWPUCKGAME *");
+  if(!SWIG_isptrtype(L,2)) SWIG_fail_arg("_LWPUCKGAME::player_score",2,"int [(2)]");
   
   if (!SWIG_IsOK(SWIG_ConvertPtr(L,1,(void**)&arg1,SWIGTYPE_p__LWPUCKGAME,0))){
-    SWIG_fail_ptr("LWPUCKGAME_score_set",1,SWIGTYPE_p__LWPUCKGAME);
+    SWIG_fail_ptr("LWPUCKGAME_player_score_set",1,SWIGTYPE_p__LWPUCKGAME);
   }
   
-  arg2 = (int)lua_tonumber(L, 2);
-  if (arg1) (arg1)->score = arg2;
+  
+  if (!SWIG_IsOK(SWIG_ConvertPtr(L,2,(void**)&arg2,SWIGTYPE_p_int,0))){
+    SWIG_fail_ptr("LWPUCKGAME_player_score_set",2,SWIGTYPE_p_int);
+  }
+  
+  {
+    size_t ii;
+    int *b = (int *) arg1->player_score;
+    for (ii = 0; ii < (size_t)(2); ii++) b[ii] = *((int *) arg2 + ii);
+  }
   
   return SWIG_arg;
   
@@ -63424,20 +63766,20 @@ fail:
 }
 
 
-static int _wrap_LWPUCKGAME_score_get(lua_State* L) {
+static int _wrap_LWPUCKGAME_player_score_get(lua_State* L) {
   int SWIG_arg = 0;
   struct _LWPUCKGAME *arg1 = (struct _LWPUCKGAME *) 0 ;
-  int result;
+  int *result = 0 ;
   
-  SWIG_check_num_args("_LWPUCKGAME::score",1,1)
-  if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("_LWPUCKGAME::score",1,"struct _LWPUCKGAME *");
+  SWIG_check_num_args("_LWPUCKGAME::player_score",1,1)
+  if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("_LWPUCKGAME::player_score",1,"struct _LWPUCKGAME *");
   
   if (!SWIG_IsOK(SWIG_ConvertPtr(L,1,(void**)&arg1,SWIGTYPE_p__LWPUCKGAME,0))){
-    SWIG_fail_ptr("LWPUCKGAME_score_get",1,SWIGTYPE_p__LWPUCKGAME);
+    SWIG_fail_ptr("LWPUCKGAME_player_score_get",1,SWIGTYPE_p__LWPUCKGAME);
   }
   
-  result = (int) ((arg1)->score);
-  lua_pushnumber(L, (lua_Number) result); SWIG_arg++;
+  result = (int *)(int *) ((arg1)->player_score);
+  SWIG_NewPointerObj(L,result,SWIGTYPE_p_int,0); SWIG_arg++; 
   return SWIG_arg;
   
   if(0) SWIG_fail;
@@ -63448,21 +63790,29 @@ fail:
 }
 
 
-static int _wrap_LWPUCKGAME_rank_set(lua_State* L) {
+static int _wrap_LWPUCKGAME_player_rank_set(lua_State* L) {
   int SWIG_arg = 0;
   struct _LWPUCKGAME *arg1 = (struct _LWPUCKGAME *) 0 ;
-  int arg2 ;
+  int *arg2 ;
   
-  SWIG_check_num_args("_LWPUCKGAME::rank",2,2)
-  if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("_LWPUCKGAME::rank",1,"struct _LWPUCKGAME *");
-  if(!lua_isnumber(L,2)) SWIG_fail_arg("_LWPUCKGAME::rank",2,"int");
+  SWIG_check_num_args("_LWPUCKGAME::player_rank",2,2)
+  if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("_LWPUCKGAME::player_rank",1,"struct _LWPUCKGAME *");
+  if(!SWIG_isptrtype(L,2)) SWIG_fail_arg("_LWPUCKGAME::player_rank",2,"int [(2)]");
   
   if (!SWIG_IsOK(SWIG_ConvertPtr(L,1,(void**)&arg1,SWIGTYPE_p__LWPUCKGAME,0))){
-    SWIG_fail_ptr("LWPUCKGAME_rank_set",1,SWIGTYPE_p__LWPUCKGAME);
+    SWIG_fail_ptr("LWPUCKGAME_player_rank_set",1,SWIGTYPE_p__LWPUCKGAME);
   }
   
-  arg2 = (int)lua_tonumber(L, 2);
-  if (arg1) (arg1)->rank = arg2;
+  
+  if (!SWIG_IsOK(SWIG_ConvertPtr(L,2,(void**)&arg2,SWIGTYPE_p_int,0))){
+    SWIG_fail_ptr("LWPUCKGAME_player_rank_set",2,SWIGTYPE_p_int);
+  }
+  
+  {
+    size_t ii;
+    int *b = (int *) arg1->player_rank;
+    for (ii = 0; ii < (size_t)(2); ii++) b[ii] = *((int *) arg2 + ii);
+  }
   
   return SWIG_arg;
   
@@ -63474,20 +63824,20 @@ fail:
 }
 
 
-static int _wrap_LWPUCKGAME_rank_get(lua_State* L) {
+static int _wrap_LWPUCKGAME_player_rank_get(lua_State* L) {
   int SWIG_arg = 0;
   struct _LWPUCKGAME *arg1 = (struct _LWPUCKGAME *) 0 ;
-  int result;
+  int *result = 0 ;
   
-  SWIG_check_num_args("_LWPUCKGAME::rank",1,1)
-  if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("_LWPUCKGAME::rank",1,"struct _LWPUCKGAME *");
+  SWIG_check_num_args("_LWPUCKGAME::player_rank",1,1)
+  if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("_LWPUCKGAME::player_rank",1,"struct _LWPUCKGAME *");
   
   if (!SWIG_IsOK(SWIG_ConvertPtr(L,1,(void**)&arg1,SWIGTYPE_p__LWPUCKGAME,0))){
-    SWIG_fail_ptr("LWPUCKGAME_rank_get",1,SWIGTYPE_p__LWPUCKGAME);
+    SWIG_fail_ptr("LWPUCKGAME_player_rank_get",1,SWIGTYPE_p__LWPUCKGAME);
   }
   
-  result = (int) ((arg1)->rank);
-  lua_pushnumber(L, (lua_Number) result); SWIG_arg++;
+  result = (int *)(int *) ((arg1)->player_rank);
+  SWIG_NewPointerObj(L,result,SWIGTYPE_p_int,0); SWIG_arg++; 
   return SWIG_arg;
   
   if(0) SWIG_fail;
@@ -63501,18 +63851,26 @@ fail:
 static int _wrap_LWPUCKGAME_target_score_set(lua_State* L) {
   int SWIG_arg = 0;
   struct _LWPUCKGAME *arg1 = (struct _LWPUCKGAME *) 0 ;
-  int arg2 ;
+  int *arg2 ;
   
   SWIG_check_num_args("_LWPUCKGAME::target_score",2,2)
   if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("_LWPUCKGAME::target_score",1,"struct _LWPUCKGAME *");
-  if(!lua_isnumber(L,2)) SWIG_fail_arg("_LWPUCKGAME::target_score",2,"int");
+  if(!SWIG_isptrtype(L,2)) SWIG_fail_arg("_LWPUCKGAME::target_score",2,"int [(2)]");
   
   if (!SWIG_IsOK(SWIG_ConvertPtr(L,1,(void**)&arg1,SWIGTYPE_p__LWPUCKGAME,0))){
     SWIG_fail_ptr("LWPUCKGAME_target_score_set",1,SWIGTYPE_p__LWPUCKGAME);
   }
   
-  arg2 = (int)lua_tonumber(L, 2);
-  if (arg1) (arg1)->target_score = arg2;
+  
+  if (!SWIG_IsOK(SWIG_ConvertPtr(L,2,(void**)&arg2,SWIGTYPE_p_int,0))){
+    SWIG_fail_ptr("LWPUCKGAME_target_score_set",2,SWIGTYPE_p_int);
+  }
+  
+  {
+    size_t ii;
+    int *b = (int *) arg1->target_score;
+    for (ii = 0; ii < (size_t)(2); ii++) b[ii] = *((int *) arg2 + ii);
+  }
   
   return SWIG_arg;
   
@@ -63527,7 +63885,7 @@ fail:
 static int _wrap_LWPUCKGAME_target_score_get(lua_State* L) {
   int SWIG_arg = 0;
   struct _LWPUCKGAME *arg1 = (struct _LWPUCKGAME *) 0 ;
-  int result;
+  int *result = 0 ;
   
   SWIG_check_num_args("_LWPUCKGAME::target_score",1,1)
   if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("_LWPUCKGAME::target_score",1,"struct _LWPUCKGAME *");
@@ -63536,8 +63894,8 @@ static int _wrap_LWPUCKGAME_target_score_get(lua_State* L) {
     SWIG_fail_ptr("LWPUCKGAME_target_score_get",1,SWIGTYPE_p__LWPUCKGAME);
   }
   
-  result = (int) ((arg1)->target_score);
-  lua_pushnumber(L, (lua_Number) result); SWIG_arg++;
+  result = (int *)(int *) ((arg1)->target_score);
+  SWIG_NewPointerObj(L,result,SWIGTYPE_p_int,0); SWIG_arg++; 
   return SWIG_arg;
   
   if(0) SWIG_fail;
@@ -63863,6 +64221,63 @@ fail:
 }
 
 
+static int _wrap_LWPUCKGAME_score_message_set(lua_State* L) {
+  int SWIG_arg = 0;
+  struct _LWPUCKGAME *arg1 = (struct _LWPUCKGAME *) 0 ;
+  char *arg2 ;
+  
+  SWIG_check_num_args("_LWPUCKGAME::score_message",2,2)
+  if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("_LWPUCKGAME::score_message",1,"struct _LWPUCKGAME *");
+  if(!SWIG_lua_isnilstring(L,2)) SWIG_fail_arg("_LWPUCKGAME::score_message",2,"char [64]");
+  
+  if (!SWIG_IsOK(SWIG_ConvertPtr(L,1,(void**)&arg1,SWIGTYPE_p__LWPUCKGAME,0))){
+    SWIG_fail_ptr("LWPUCKGAME_score_message_set",1,SWIGTYPE_p__LWPUCKGAME);
+  }
+  
+  arg2 = (char *)lua_tostring(L, 2);
+  {
+    if(arg2) {
+      strncpy((char*)arg1->score_message, (const char *)arg2, 64-1);
+      arg1->score_message[64-1] = 0;
+    } else {
+      arg1->score_message[0] = 0;
+    }
+  }
+  
+  return SWIG_arg;
+  
+  if(0) SWIG_fail;
+  
+fail:
+  lua_error(L);
+  return SWIG_arg;
+}
+
+
+static int _wrap_LWPUCKGAME_score_message_get(lua_State* L) {
+  int SWIG_arg = 0;
+  struct _LWPUCKGAME *arg1 = (struct _LWPUCKGAME *) 0 ;
+  char *result = 0 ;
+  
+  SWIG_check_num_args("_LWPUCKGAME::score_message",1,1)
+  if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("_LWPUCKGAME::score_message",1,"struct _LWPUCKGAME *");
+  
+  if (!SWIG_IsOK(SWIG_ConvertPtr(L,1,(void**)&arg1,SWIGTYPE_p__LWPUCKGAME,0))){
+    SWIG_fail_ptr("LWPUCKGAME_score_message_get",1,SWIGTYPE_p__LWPUCKGAME);
+  }
+  
+  result = (char *)(char *) ((arg1)->score_message);
+  lua_pushstring(L,(const char *)result); SWIG_arg++;
+  return SWIG_arg;
+  
+  if(0) SWIG_fail;
+  
+fail:
+  lua_error(L);
+  return SWIG_arg;
+}
+
+
 static int _wrap_new_LWPUCKGAME(lua_State* L) {
   int SWIG_arg = 0;
   struct _LWPUCKGAME *result = 0 ;
@@ -63958,8 +64373,8 @@ static swig_lua_attribute swig_LWPUCKGAME_attributes[] = {
     { "puck_pull_control_joint", _wrap_LWPUCKGAME_puck_pull_control_joint_get, _wrap_LWPUCKGAME_puck_pull_control_joint_set },
     { "push", _wrap_LWPUCKGAME_push_get, _wrap_LWPUCKGAME_push_set },
     { "time", _wrap_LWPUCKGAME_time_get, _wrap_LWPUCKGAME_time_set },
-    { "player", _wrap_LWPUCKGAME_player_get, _wrap_LWPUCKGAME_player_set },
-    { "target", _wrap_LWPUCKGAME_target_get, _wrap_LWPUCKGAME_target_set },
+    { "pg_player", _wrap_LWPUCKGAME_pg_player_get, _wrap_LWPUCKGAME_pg_player_set },
+    { "pg_target", _wrap_LWPUCKGAME_pg_target_get, _wrap_LWPUCKGAME_pg_target_set },
     { "last_remote_dx", _wrap_LWPUCKGAME_last_remote_dx_get, _wrap_LWPUCKGAME_last_remote_dx_set },
     { "last_remote_dy", _wrap_LWPUCKGAME_last_remote_dy_get, _wrap_LWPUCKGAME_last_remote_dy_set },
     { "on_player_damaged", _wrap_LWPUCKGAME_on_player_damaged_get, _wrap_LWPUCKGAME_on_player_damaged_set },
@@ -63978,6 +64393,8 @@ static swig_lua_attribute swig_LWPUCKGAME_attributes[] = {
     { "player_no", _wrap_LWPUCKGAME_player_no_get, _wrap_LWPUCKGAME_player_no_set },
     { "c1_token", _wrap_LWPUCKGAME_c1_token_get, _wrap_LWPUCKGAME_c1_token_set },
     { "c2_token", _wrap_LWPUCKGAME_c2_token_get, _wrap_LWPUCKGAME_c2_token_set },
+    { "c3_token", _wrap_LWPUCKGAME_c3_token_get, _wrap_LWPUCKGAME_c3_token_set },
+    { "c4_token", _wrap_LWPUCKGAME_c4_token_get, _wrap_LWPUCKGAME_c4_token_set },
     { "remote_control", _wrap_LWPUCKGAME_remote_control_get, _wrap_LWPUCKGAME_remote_control_set },
     { "remote_dash", _wrap_LWPUCKGAME_remote_dash_get, _wrap_LWPUCKGAME_remote_dash_set },
     { "remote_jump", _wrap_LWPUCKGAME_remote_jump_get, _wrap_LWPUCKGAME_remote_jump_set },
@@ -63989,6 +64406,8 @@ static swig_lua_attribute swig_LWPUCKGAME_attributes[] = {
     { "target_nickname", _wrap_LWPUCKGAME_target_nickname_get, _wrap_LWPUCKGAME_target_nickname_set },
     { "id1", _wrap_LWPUCKGAME_id1_get, _wrap_LWPUCKGAME_id1_set },
     { "id2", _wrap_LWPUCKGAME_id2_get, _wrap_LWPUCKGAME_id2_set },
+    { "id3", _wrap_LWPUCKGAME_id3_get, _wrap_LWPUCKGAME_id3_set },
+    { "id4", _wrap_LWPUCKGAME_id4_get, _wrap_LWPUCKGAME_id4_set },
     { "puck_owner_player_no", _wrap_LWPUCKGAME_puck_owner_player_no_get, _wrap_LWPUCKGAME_puck_owner_player_no_set },
     { "puck_reflect_size", _wrap_LWPUCKGAME_puck_reflect_size_get, _wrap_LWPUCKGAME_puck_reflect_size_set },
     { "world_roll_axis", _wrap_LWPUCKGAME_world_roll_axis_get, _wrap_LWPUCKGAME_world_roll_axis_set },
@@ -64011,8 +64430,8 @@ static swig_lua_attribute swig_LWPUCKGAME_attributes[] = {
     { "wall_hit_bit_send_buf_1", _wrap_LWPUCKGAME_wall_hit_bit_send_buf_1_get, _wrap_LWPUCKGAME_wall_hit_bit_send_buf_1_set },
     { "wall_hit_bit_send_buf_2", _wrap_LWPUCKGAME_wall_hit_bit_send_buf_2_get, _wrap_LWPUCKGAME_wall_hit_bit_send_buf_2_set },
     { "battle_stat", _wrap_LWPUCKGAME_battle_stat_get, _wrap_LWPUCKGAME_battle_stat_set },
-    { "score", _wrap_LWPUCKGAME_score_get, _wrap_LWPUCKGAME_score_set },
-    { "rank", _wrap_LWPUCKGAME_rank_get, _wrap_LWPUCKGAME_rank_set },
+    { "player_score", _wrap_LWPUCKGAME_player_score_get, _wrap_LWPUCKGAME_player_score_set },
+    { "player_rank", _wrap_LWPUCKGAME_player_rank_get, _wrap_LWPUCKGAME_player_rank_set },
     { "target_score", _wrap_LWPUCKGAME_target_score_get, _wrap_LWPUCKGAME_target_score_set },
     { "control_flags", _wrap_LWPUCKGAME_control_flags_get, _wrap_LWPUCKGAME_control_flags_set },
     { "tutorial_guide_str", _wrap_LWPUCKGAME_tutorial_guide_str_get, _wrap_LWPUCKGAME_tutorial_guide_str_set },
@@ -64020,6 +64439,7 @@ static swig_lua_attribute swig_LWPUCKGAME_attributes[] = {
     { "bogus_opponent", _wrap_LWPUCKGAME_bogus_opponent_get, _wrap_LWPUCKGAME_bogus_opponent_set },
     { "bogus_rng", _wrap_LWPUCKGAME_bogus_rng_get, _wrap_LWPUCKGAME_bogus_rng_set },
     { "matched2", _wrap_LWPUCKGAME_matched2_get, _wrap_LWPUCKGAME_matched2_set },
+    { "score_message", _wrap_LWPUCKGAME_score_message_get, _wrap_LWPUCKGAME_score_message_set },
     {0,0,0}
 };
 static swig_lua_method swig_LWPUCKGAME_methods[]= {
@@ -65358,6 +65778,60 @@ static int _wrap_puck_game_destroy_walls(lua_State* L) {
   
   puck_game_destroy_walls(arg1);
   
+  return SWIG_arg;
+  
+  if(0) SWIG_fail;
+  
+fail:
+  lua_error(L);
+  return SWIG_arg;
+}
+
+
+static int _wrap_puck_game_player(lua_State* L) {
+  int SWIG_arg = 0;
+  LWPUCKGAME *arg1 = (LWPUCKGAME *) 0 ;
+  int arg2 ;
+  LWPUCKGAMEPLAYER *result = 0 ;
+  
+  SWIG_check_num_args("puck_game_player",2,2)
+  if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("puck_game_player",1,"LWPUCKGAME *");
+  if(!lua_isnumber(L,2)) SWIG_fail_arg("puck_game_player",2,"int");
+  
+  if (!SWIG_IsOK(SWIG_ConvertPtr(L,1,(void**)&arg1,SWIGTYPE_p__LWPUCKGAME,0))){
+    SWIG_fail_ptr("puck_game_player",1,SWIGTYPE_p__LWPUCKGAME);
+  }
+  
+  arg2 = (int)lua_tonumber(L, 2);
+  result = (LWPUCKGAMEPLAYER *)puck_game_player(arg1,arg2);
+  SWIG_NewPointerObj(L,result,SWIGTYPE_p__LWPUCKGAMEPLAYER,0); SWIG_arg++; 
+  return SWIG_arg;
+  
+  if(0) SWIG_fail;
+  
+fail:
+  lua_error(L);
+  return SWIG_arg;
+}
+
+
+static int _wrap_puck_game_target(lua_State* L) {
+  int SWIG_arg = 0;
+  LWPUCKGAME *arg1 = (LWPUCKGAME *) 0 ;
+  int arg2 ;
+  LWPUCKGAMEPLAYER *result = 0 ;
+  
+  SWIG_check_num_args("puck_game_target",2,2)
+  if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("puck_game_target",1,"LWPUCKGAME *");
+  if(!lua_isnumber(L,2)) SWIG_fail_arg("puck_game_target",2,"int");
+  
+  if (!SWIG_IsOK(SWIG_ConvertPtr(L,1,(void**)&arg1,SWIGTYPE_p__LWPUCKGAME,0))){
+    SWIG_fail_ptr("puck_game_target",1,SWIGTYPE_p__LWPUCKGAME);
+  }
+  
+  arg2 = (int)lua_tonumber(L, 2);
+  result = (LWPUCKGAMEPLAYER *)puck_game_target(arg1,arg2);
+  SWIG_NewPointerObj(L,result,SWIGTYPE_p__LWPUCKGAMEPLAYER,0); SWIG_arg++; 
   return SWIG_arg;
   
   if(0) SWIG_fail;
@@ -82679,6 +83153,7 @@ static swig_lua_attribute swig_SwigModule_attributes[] = {
     { "shader_filename", _wrap_shader_filename_get, SWIG_Lua_set_immutable },
     { "SKILL_DATA_LIST", _wrap_SKILL_DATA_LIST_get, SWIG_Lua_set_immutable },
     { "vbo_filename", _wrap_vbo_filename_get, SWIG_Lua_set_immutable },
+    { "SOUND_FILE", _wrap_SOUND_FILE_get, SWIG_Lua_set_immutable },
     { "SPRITE_DATA", _wrap_SPRITE_DATA_get, SWIG_Lua_set_immutable },
     { "full_square_vertices", _wrap_full_square_vertices_get, SWIG_Lua_set_immutable },
     { "armature_filename", _wrap_armature_filename_get, SWIG_Lua_set_immutable },
@@ -82957,7 +83432,7 @@ static swig_lua_const_info swig_SwigModule_constants[]= {
     {SWIG_LUA_CONSTTAB_INT("LGS_SPLASH", LGS_SPLASH)},
     {SWIG_LUA_CONSTTAB_INT("LGS_LEADERBOARD", LGS_LEADERBOARD)},
     {SWIG_LUA_CONSTTAB_STRING("__LW_STRING_LINE__", "61")},
-    {SWIG_LUA_CONSTTAB_STRING("LWLOGPOS", "src/lwlog.h(62): ")},
+    {SWIG_LUA_CONSTTAB_STRING("LWLOGPOS", "src\\lwlog.h(62): ")},
     {SWIG_LUA_CONSTTAB_INT("LPT_GRID", LPT_GRID)},
     {SWIG_LUA_CONSTTAB_INT("LPT_SOLID_RED", LPT_SOLID_RED)},
     {SWIG_LUA_CONSTTAB_INT("LPT_SOLID_GREEN", LPT_SOLID_GREEN)},
@@ -83171,6 +83646,9 @@ static swig_lua_const_info swig_SwigModule_constants[]= {
     {SWIG_LUA_CONSTTAB_INT("LPGS_BATTLE_PREPARE", LPGS_BATTLE_PREPARE)},
     {SWIG_LUA_CONSTTAB_INT("LPGS_BATTLE", LPGS_BATTLE)},
     {SWIG_LUA_CONSTTAB_INT("LW_PUCK_GAME_TOWER_COUNT", (2))},
+    {SWIG_LUA_CONSTTAB_INT("LW_PUCK_GAME_MAX_PLAYER_COUNT_ON_TEAM", (2))},
+    {SWIG_LUA_CONSTTAB_INT("LW_PUCK_GAME_PLAYER_TEAM", (0))},
+    {SWIG_LUA_CONSTTAB_INT("LW_PUCK_GAME_TARGET_TEAM", (1))},
     {SWIG_LUA_CONSTTAB_INT("LPGCF_HIDE_TIMER", LPGCF_HIDE_TIMER)},
     {SWIG_LUA_CONSTTAB_INT("LPGCF_HIDE_LEFT_DIR_PAD", LPGCF_HIDE_LEFT_DIR_PAD)},
     {SWIG_LUA_CONSTTAB_INT("LPGCF_HIDE_DASH_BUTTON", LPGCF_HIDE_DASH_BUTTON)},
@@ -83770,6 +84248,7 @@ static swig_lua_method swig_SwigModule_methods[]= {
     { "puck_game_roll_to_main_menu", _wrap_puck_game_roll_to_main_menu},
     { "puck_game_set_static_default_values_client", _wrap_puck_game_set_static_default_values_client},
     { "puck_game_follow_cam", _wrap_puck_game_follow_cam},
+    { "puck_game_update_battle_result_popup", _wrap_puck_game_update_battle_result_popup},
     { "new_puck_game", _wrap_new_puck_game},
     { "puck_game_set_static_default_values", _wrap_puck_game_set_static_default_values},
     { "puck_game_set_secondary_static_default_values", _wrap_puck_game_set_secondary_static_default_values},
@@ -83817,6 +84296,8 @@ static swig_lua_method swig_SwigModule_methods[]= {
     { "puck_game_set_tower_pos_multiplier", _wrap_puck_game_set_tower_pos_multiplier},
     { "puck_game_create_walls", _wrap_puck_game_create_walls},
     { "puck_game_destroy_walls", _wrap_puck_game_destroy_walls},
+    { "puck_game_player", _wrap_puck_game_player},
+    { "puck_game_target", _wrap_puck_game_target},
     { "new_tcp", _wrap_new_tcp},
     { "destroy_tcp", _wrap_destroy_tcp},
     { "tcp_update", _wrap_tcp_update},
@@ -84171,6 +84652,11 @@ static swig_type_info _swigt__p_a_3__float = {"_p_a_3__float", "vec3 *|float (*)
 static swig_type_info _swigt__p_a_4__a_4__float = {"_p_a_4__a_4__float", "mat4x4 *|float (*)[4][4]", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_a_4__float = {"_p_a_4__float", "quat *|float (*)[4]|vec4 *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_a_8__LWSPRITE = {"_p_a_8__LWSPRITE", "LWSPRITE (*)[8]", 0, 0, (void*)0, 0};
+static swig_type_info _swigt__p_a_LW_NICKNAME_MAX_LEN__char = {"_p_a_LW_NICKNAME_MAX_LEN__char", "char (*)[LW_NICKNAME_MAX_LEN]", 0, 0, (void*)0, 0};
+static swig_type_info _swigt__p_a__2____LWPUCKGAMEDASH = {"_p_a__2____LWPUCKGAMEDASH", "struct _LWPUCKGAMEDASH (*)[(2)]|LWPUCKGAMEDASH (*)[(2)]", 0, 0, (void*)0, 0};
+static swig_type_info _swigt__p_a__2____LWPUCKGAMEFIRE = {"_p_a__2____LWPUCKGAMEFIRE", "struct _LWPUCKGAMEFIRE (*)[(2)]|LWPUCKGAMEFIRE (*)[(2)]", 0, 0, (void*)0, 0};
+static swig_type_info _swigt__p_a__2____LWPUCKGAMEJUMP = {"_p_a__2____LWPUCKGAMEJUMP", "struct _LWPUCKGAMEJUMP (*)[(2)]|LWPUCKGAMEJUMP (*)[(2)]", 0, 0, (void*)0, 0};
+static swig_type_info _swigt__p_a__2____LWREMOTEPLAYERCONTROL = {"_p_a__2____LWREMOTEPLAYERCONTROL", "struct _LWREMOTEPLAYERCONTROL (*)[(2)]|LWREMOTEPLAYERCONTROL (*)[(2)]", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_a__32___char = {"_p_a__32___char", "char (*)[(32)]", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_addrinfo = {"_p_addrinfo", "struct addrinfo *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_byte = {"_p_byte", "byte *", 0, 0, (void*)0, 0};
@@ -84394,6 +84880,11 @@ static swig_type_info *swig_type_initial[] = {
   &_swigt__p_a_4__a_4__float,
   &_swigt__p_a_4__float,
   &_swigt__p_a_8__LWSPRITE,
+  &_swigt__p_a_LW_NICKNAME_MAX_LEN__char,
+  &_swigt__p_a__2____LWPUCKGAMEDASH,
+  &_swigt__p_a__2____LWPUCKGAMEFIRE,
+  &_swigt__p_a__2____LWPUCKGAMEJUMP,
+  &_swigt__p_a__2____LWREMOTEPLAYERCONTROL,
   &_swigt__p_a__32___char,
   &_swigt__p_addrinfo,
   &_swigt__p_byte,
@@ -84617,6 +85108,11 @@ static swig_cast_info _swigc__p_a_3__float[] = {  {&_swigt__p_a_3__float, 0, 0, 
 static swig_cast_info _swigc__p_a_4__a_4__float[] = {  {&_swigt__p_a_4__a_4__float, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_a_4__float[] = {  {&_swigt__p_a_4__float, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_a_8__LWSPRITE[] = {  {&_swigt__p_a_8__LWSPRITE, 0, 0, 0},{0, 0, 0, 0}};
+static swig_cast_info _swigc__p_a_LW_NICKNAME_MAX_LEN__char[] = {  {&_swigt__p_a_LW_NICKNAME_MAX_LEN__char, 0, 0, 0},{0, 0, 0, 0}};
+static swig_cast_info _swigc__p_a__2____LWPUCKGAMEDASH[] = {  {&_swigt__p_a__2____LWPUCKGAMEDASH, 0, 0, 0},{0, 0, 0, 0}};
+static swig_cast_info _swigc__p_a__2____LWPUCKGAMEFIRE[] = {  {&_swigt__p_a__2____LWPUCKGAMEFIRE, 0, 0, 0},{0, 0, 0, 0}};
+static swig_cast_info _swigc__p_a__2____LWPUCKGAMEJUMP[] = {  {&_swigt__p_a__2____LWPUCKGAMEJUMP, 0, 0, 0},{0, 0, 0, 0}};
+static swig_cast_info _swigc__p_a__2____LWREMOTEPLAYERCONTROL[] = {  {&_swigt__p_a__2____LWREMOTEPLAYERCONTROL, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_a__32___char[] = {  {&_swigt__p_a__32___char, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_addrinfo[] = {  {&_swigt__p_addrinfo, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_byte[] = {  {&_swigt__p_byte, 0, 0, 0},{0, 0, 0, 0}};
@@ -84840,6 +85336,11 @@ static swig_cast_info *swig_cast_initial[] = {
   _swigc__p_a_4__a_4__float,
   _swigc__p_a_4__float,
   _swigc__p_a_8__LWSPRITE,
+  _swigc__p_a_LW_NICKNAME_MAX_LEN__char,
+  _swigc__p_a__2____LWPUCKGAMEDASH,
+  _swigc__p_a__2____LWPUCKGAMEFIRE,
+  _swigc__p_a__2____LWPUCKGAMEJUMP,
+  _swigc__p_a__2____LWREMOTEPLAYERCONTROL,
   _swigc__p_a__32___char,
   _swigc__p_addrinfo,
   _swigc__p_byte,

@@ -912,7 +912,7 @@ static void dequeue_puck_game_state_and_apply(LWCONTEXT* pLwc) {
         // 'target' is currently opponent player
         const int player_damage = pLwc->puck_game_state.bf.player_current_hp - new_state.bf.player_current_hp;
         if (player_damage > 0) {
-            puck_game_shake_player(pLwc->puck_game, &pLwc->puck_game->player);
+            puck_game_shake_player(pLwc->puck_game, &pLwc->puck_game->pg_player[0]);
             LWPUCKGAMETOWER* tower = &pLwc->puck_game->tower[pLwc->puck_game->player_no == 2 ? 1 : 0/*player*/];
             puck_game_spawn_tower_damage_text(pLwc,
                                               pLwc->puck_game,
@@ -929,7 +929,7 @@ static void dequeue_puck_game_state_and_apply(LWCONTEXT* pLwc) {
         }
         const int target_damage = pLwc->puck_game_state.bf.target_current_hp - new_state.bf.target_current_hp;
         if (target_damage > 0) {
-            puck_game_shake_player(pLwc->puck_game, &pLwc->puck_game->target);
+            puck_game_shake_player(pLwc->puck_game, &pLwc->puck_game->pg_target[0]);
             LWPUCKGAMETOWER* tower = &pLwc->puck_game->tower[pLwc->puck_game->player_no == 2 ? 0 : 1/*target*/];
             puck_game_spawn_tower_damage_text(pLwc,
                                               pLwc->puck_game,

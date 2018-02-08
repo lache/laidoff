@@ -367,7 +367,7 @@ void select_server(LWSERVER* server, LWCONN* conn, LWTCP* reward_service) {
                             int player_no = check_token(server, (LWPUDPHEADER*)p, &pg);
                             if (check_player_no(player_no)) {
                                 //LOGI("MOVE dx=%.2f dy=%.2f", p->dx, p->dy);
-                                LWREMOTEPLAYERCONTROL* control = &pg->remote_control[control_index_from_player_no(player_no)];
+                                LWREMOTEPLAYERCONTROL* control = &pg->remote_control[control_index_from_player_no(player_no)][0];
                                 control->dir_pad_dragging = 1;
                                 control->dx = p->dx;
                                 control->dy = p->dy;
@@ -387,7 +387,7 @@ void select_server(LWSERVER* server, LWCONN* conn, LWTCP* reward_service) {
                             int player_no = check_token(server, (LWPUDPHEADER*)p, &pg);
                             if (check_player_no(player_no)) {
                                 //LOGI("STOP");
-                                LWREMOTEPLAYERCONTROL* control = &pg->remote_control[control_index_from_player_no(player_no)];
+                                LWREMOTEPLAYERCONTROL* control = &pg->remote_control[control_index_from_player_no(player_no)][0];
                                 control->dir_pad_dragging = 0;
                                 add_conn_with_token(conn,
                                                     LW_CONN_CAPACITY,
@@ -404,7 +404,7 @@ void select_server(LWSERVER* server, LWCONN* conn, LWTCP* reward_service) {
                             int player_no = check_token(server, (LWPUDPHEADER*)p, &pg);
                             if (check_player_no(player_no)) {
                                 //LOGI("DASH");
-                                LWPUCKGAMEDASH* dash = &pg->remote_dash[control_index_from_player_no(player_no)];
+                                LWPUCKGAMEDASH* dash = &pg->remote_dash[control_index_from_player_no(player_no)][0];
                                 puck_game_commit_dash_to_puck(pg, dash, player_no);
                                 add_conn_with_token(conn,
                                                     LW_CONN_CAPACITY,
@@ -421,7 +421,7 @@ void select_server(LWSERVER* server, LWCONN* conn, LWTCP* reward_service) {
                             int player_no = check_token(server, (LWPUDPHEADER*)p, &pg);
                             if (check_player_no(player_no)) {
                                 //LOGI("JUMP");
-                                LWPUCKGAMEJUMP* jump = &pg->remote_jump[control_index_from_player_no(player_no)];
+                                LWPUCKGAMEJUMP* jump = &pg->remote_jump[control_index_from_player_no(player_no)][0];
                                 puck_game_commit_jump(pg, jump, player_no);
                                 add_conn_with_token(conn,
                                                     LW_CONN_CAPACITY,
@@ -438,7 +438,7 @@ void select_server(LWSERVER* server, LWCONN* conn, LWTCP* reward_service) {
                             int player_no = check_token(server, (LWPUDPHEADER*)p, &pg);
                             if (check_player_no(player_no)) {
                                 //LOGI("FIRE");
-                                LWPUCKGAMEFIRE* fire = &pg->remote_fire[control_index_from_player_no(player_no)];
+                                LWPUCKGAMEFIRE* fire = &pg->remote_fire[control_index_from_player_no(player_no)][0];
                                 puck_game_commit_fire(pg, fire, player_no, p->dx, p->dy, p->dlen);
                                 add_conn_with_token(conn,
                                                     LW_CONN_CAPACITY,
@@ -455,7 +455,7 @@ void select_server(LWSERVER* server, LWCONN* conn, LWTCP* reward_service) {
                             int player_no = check_token(server, (LWPUDPHEADER*)p, &pg);
                             if (check_player_no(player_no)) {
                                 //LOGI("PULL START");
-                                LWREMOTEPLAYERCONTROL* control = &pg->remote_control[control_index_from_player_no(player_no)];
+                                LWREMOTEPLAYERCONTROL* control = &pg->remote_control[control_index_from_player_no(player_no)][0];
                                 control->pull_puck = 1;
                                 add_conn_with_token(conn,
                                                     LW_CONN_CAPACITY,
@@ -472,7 +472,7 @@ void select_server(LWSERVER* server, LWCONN* conn, LWTCP* reward_service) {
                             int player_no = check_token(server, (LWPUDPHEADER*)p, &pg);
                             if (check_player_no(player_no)) {
                                 //LOGI("PULL STOP");
-                                LWREMOTEPLAYERCONTROL* control = &pg->remote_control[control_index_from_player_no(player_no)];
+                                LWREMOTEPLAYERCONTROL* control = &pg->remote_control[control_index_from_player_no(player_no)][0];
                                 control->pull_puck = 0;
                                 add_conn_with_token(conn,
                                                     LW_CONN_CAPACITY,
@@ -515,8 +515,8 @@ int tcp_admin_server_entry(void* context) {
             LWPUCKGAME* puck_game = new_puck_game(server->update_frequency);
             memcpy(puck_game->id1, p->Id1, sizeof(puck_game->id1));
             memcpy(puck_game->id2, p->Id2, sizeof(puck_game->id2));
-            memcpy(puck_game->nickname, p->Nickname1, sizeof(puck_game->nickname));
-            memcpy(puck_game->target_nickname, p->Nickname2, sizeof(puck_game->target_nickname));
+            memcpy(puck_game->nickname[0], p->Nickname1, sizeof(puck_game->nickname));
+            memcpy(puck_game->target_nickname[0], p->Nickname2, sizeof(puck_game->target_nickname));
             const int battle_id = server->battle_counter + 1; // battle id is 1-based index
             LOGI("LWPCREATEBATTLE: Create a new puck game instance '%s' vs '%s' (battle id = %d) (bot = %d)",
                  p->Nickname1, p->Nickname2, battle_id, p->BotBattle);
@@ -556,8 +556,8 @@ int tcp_admin_server_entry(void* context) {
             } else {
                 LWPUCKGAME* pg = server->puck_game_pool[p->Battle_id - 1];
                 if (pg->c1_token == p->Token || pg->c2_token == p->Token) {
-                    pg->player.current_hp = 1;
-                    pg->target.current_hp = 1;
+                    pg->pg_player[0].current_hp = 1;
+                    pg->pg_target[0].current_hp = 1;
                 }
             }
         } else if (base->type == LPGP_LWPCHECKBATTLEVALID && base->size == sizeof(LWPCHECKBATTLEVALID)) {
@@ -609,12 +609,12 @@ void send_puck_game_state2(LWSERVER* server,
                            struct sockaddr* sa) {
     LW_PUCK_GAME_OBJECT player_go_enum = LPGO_PLAYER;
     LW_PUCK_GAME_OBJECT target_go_enum = LPGO_TARGET;
-    const LWPUCKGAMEPLAYER* player = &puck_game->player;
-    const LWPUCKGAMEPLAYER* target = &puck_game->target;
+    const LWPUCKGAMEPLAYER* player = &puck_game->pg_player[0];
+    const LWPUCKGAMEPLAYER* target = &puck_game->pg_target[0];
     const int* wall_hit_bit = &puck_game->wall_hit_bit_send_buf_1;
     if (player_no == 2) {
-        player = &puck_game->target;
-        target = &puck_game->player;
+        player = &puck_game->pg_target[0];
+        target = &puck_game->pg_player[0];
         wall_hit_bit = &puck_game->wall_hit_bit_send_buf_2;
     }
     LWPSTATE2 packet_state;
@@ -632,8 +632,8 @@ void send_puck_game_state2(LWSERVER* server,
     packet_state.bf.target_total_hp = (unsigned int)target->total_hp;
     packet_state.bf.puck_owner_player_no = (unsigned int)puck_game->puck_owner_player_no;
     packet_state.bf.phase = (unsigned int)puck_game->battle_phase;
-    packet_state.bf.player_pull = (unsigned int)puck_game->remote_control[0].pull_puck;
-    packet_state.bf.target_pull = (unsigned int)puck_game->remote_control[1].pull_puck;
+    packet_state.bf.player_pull = (unsigned int)puck_game->remote_control[LW_PUCK_GAME_PLAYER_TEAM][0].pull_puck;
+    packet_state.bf.target_pull = (unsigned int)puck_game->remote_control[LW_PUCK_GAME_TARGET_TEAM][0].pull_puck;
     packet_state.bf.wall_hit_bit = (unsigned int)*wall_hit_bit;
     if (*wall_hit_bit && player_no == 1) {
         LOGIx("WALL HIT BIT: %d", *wall_hit_bit);
@@ -681,13 +681,13 @@ void broadcast_state_packet(LWSERVER* server, const LWCONN* conn, int conn_capac
 }
 
 static int puck_game_winner(const LWPUCKGAME* puck_game) {
-    if (puck_game->player.current_hp > 0
-        && puck_game->target.current_hp > 0
+    if (puck_game->pg_player[0].current_hp > 0
+        && puck_game->pg_target[0].current_hp > 0
         && puck_game->time < puck_game->total_time) {
         // not yet finished
         return -1;
     }
-    const int hp_diff = puck_game->player.current_hp - puck_game->target.current_hp;
+    const int hp_diff = puck_game->pg_player[0].current_hp - puck_game->pg_target[0].current_hp;
     if (hp_diff == 0) {
         return 0;
     } else if (hp_diff > 0) {
@@ -719,7 +719,7 @@ int tcp_send_battle_result(LWTCP* tcp,
     p.Player[0].Stat = puck_game->battle_stat[0];
     p.Player[1].Stat = puck_game->battle_stat[1];
     p.BattleTimeSec = (int)roundf(puck_game_elapsed_time(puck_game->update_tick, logic_hz));
-    p.TotalHp = puck_game->player.total_hp;
+    p.TotalHp = puck_game->pg_player[0].total_hp;
     memcpy(tcp->send_buf, &p, sizeof(p));
     int send_result = (int)send(tcp->connect_socket, tcp->send_buf, sizeof(p), 0);
     if (send_result < 0) {
@@ -753,8 +753,8 @@ void process_battle_reward(LWPUCKGAME* puck_game, LWTCP* reward_service, int log
                            puck_game,
                            puck_game->id1,
                            puck_game->id2,
-                           puck_game->nickname,
-                           puck_game->target_nickname,
+                           puck_game->nickname[0],
+                           puck_game->target_nickname[0],
                            puck_game_winner(puck_game),
                            logic_hz);
 }
@@ -831,8 +831,8 @@ int main(int argc, char* argv[]) {
                             && update_puck_game(server, puck_game, logic_timestep) < 0) {
                             LOGI("Battle finished. (battle id = %d)", puck_game->battle_id);
                             // update last HP stat
-                            puck_game->battle_stat[0].Hp = puck_game->player.current_hp;
-                            puck_game->battle_stat[1].Hp = puck_game->target.current_hp;
+                            puck_game->battle_stat[0].Hp = puck_game->pg_player[0].current_hp;
+                            puck_game->battle_stat[1].Hp = puck_game->pg_target[0].current_hp;
                             // process reward
                             process_battle_reward(puck_game, reward_service, logic_hz);
                         }

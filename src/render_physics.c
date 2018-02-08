@@ -97,9 +97,9 @@ static void render_tower_normal(const LWCONTEXT* pLwc, const mat4x4 view, const 
         }
     } else {
         if (tower->owner_player_no == 1) {
-            hp_ratio = (float)puck_game->player.current_hp / puck_game->player.total_hp;
+            hp_ratio = (float)puck_game->pg_player[0].current_hp / puck_game->pg_player[0].total_hp;
         } else {
-            hp_ratio = (float)puck_game->target.current_hp / puck_game->target.total_hp;
+            hp_ratio = (float)puck_game->pg_target[0].current_hp / puck_game->pg_target[0].total_hp;
         }
     }
     int hp = (int)ceilf(pLwc->puck_game->tower_total_hp * hp_ratio);
@@ -240,7 +240,12 @@ static void render_tower_normal_2(const LWCONTEXT* pLwc, const mat4x4 view, cons
         bind_all_vertex_attrib(pLwc, lvt);
         glActiveTexture(GL_TEXTURE0);
 
-        int tower_lae = tower->owner_player_no == 2 ? LAE_TOWER_BASE_2_TARGET : LAE_TOWER_BASE_2_PLAYER;
+        int tower_lae = 0;
+        if (puck_game->player_no == 2) {
+            tower_lae = tower->owner_player_no == 2 ? LAE_TOWER_BASE_2_PLAYER : LAE_TOWER_BASE_2_TARGET;
+        } else {
+            tower_lae = tower->owner_player_no == 2 ? LAE_TOWER_BASE_2_TARGET : LAE_TOWER_BASE_2_PLAYER;
+        }
         lazy_tex_atlas_glBindTexture(pLwc, tower_lae);
         set_tex_filter(GL_LINEAR, GL_LINEAR);
         glUniformMatrix4fv(shader->mvp_location, 1, GL_FALSE, (const GLfloat*)proj_view_model);
@@ -1512,7 +1517,7 @@ static void render_top_bar_rank(const LWCONTEXT* pLwc, const LWPUCKGAME* puck_ga
     const LW_ATLAS_ENUM lae_alpha = LAE_RANK_ICON_ALPHA;
     char str[32];
     if (no_record == 0) {
-        sprintf(str, "%d", puck_game->rank + 1); // rank is zero-based
+        sprintf(str, "%d", puck_game->player_rank[0] + 1); // rank is zero-based
     } else {
         sprintf(str, "--");
     }
@@ -1529,7 +1534,7 @@ static void render_top_bar_energy(const LWCONTEXT* pLwc, const LWPUCKGAME* puck_
     const LW_ATLAS_ENUM lae_alpha = LAE_ENERGY_ICON_ALPHA;
     char str[32];
     if (no_record == 0) {
-        sprintf(str, "%d", puck_game->score);
+        sprintf(str, "%d", puck_game->player_score[0]);
     } else {
         sprintf(str, "--");
     }
@@ -1543,7 +1548,7 @@ static void render_top_bar_nickname(const LWCONTEXT* pLwc, const LWPUCKGAME* puc
     const float x = *top_bar_x_cursor;
     const float y = 1.0f - height / 2;
     const LW_ATLAS_ENUM lae = LAE_PROFILE_ICON;
-    const char* str = pLwc->puck_game->nickname;
+    const char* str = pLwc->puck_game->nickname[0];
     lw_load_tex(pLwc, lae);
     render_icon_amount(pLwc, puck_game, x, y, width, height, str, lae, LAE_DONTCARE, 1.0f, 1.0f, 1.0f);
     *top_bar_x_cursor += width + top_bar_x_cursor_margin;
@@ -1578,7 +1583,7 @@ static void render_main_menu_ui_layer(const LWCONTEXT* pLwc,
     const float top_bar_x_cursor_margin = 0.05f;
     // nickname (background, icon, text)
     render_top_bar_nickname(pLwc, puck_game, &top_bar_x_cursor, top_bar_x_cursor_margin);
-    const int no_record = puck_game->rank < 0;
+    const int no_record = puck_game->player_rank[0] < 0;
     // energy (background, icon, text)
     //render_top_bar_energy(pLwc, puck_game, &top_bar_x_cursor, top_bar_x_cursor_margin, no_record);
     // rank (background, icon, text)
@@ -1782,19 +1787,19 @@ static void render_battle_ui_layer(const LWCONTEXT* pLwc,
                                    int remote,
                                    const float* player_controlled_pos) {
     const LWPSTATE* state = &pLwc->puck_game_state;
-    const LWPUCKGAMEPLAYER* player = &puck_game->player;
-    const LWPUCKGAMEPLAYER* target = &puck_game->target;
+    const LWPUCKGAMEPLAYER* player = &puck_game->pg_player[0];
+    const LWPUCKGAMEPLAYER* target = &puck_game->pg_target[0];
     float ui_alpha = puck_game->battle_ui_alpha;
     float control_ui_alpha = puck_game->battle_control_ui_alpha;
     vec2 world_right_top_end_ui_point;
     calculate_world_right_top_end_ui_point(pLwc, puck_game, world_right_top_end_ui_point);
     //render_solid_vb_ui(pLwc, world_right_top_end_ui_point[0], world_right_top_end_ui_point[1], 0.1f, 0.1f, 0, LVT_CENTER_CENTER_ANCHORED_SQUARE, 0.5f, 1.0f, 1.0f, 1.0f, 1.0f);
     // HP gauges (player & target)
-    const char* target_nickname = puck_game->battle_id ? puck_game->target_nickname : "Bogus Opponent";
-    const int player_current_hp = remote ? state->bf.player_current_hp : puck_game->player.current_hp;
+    const char* target_nickname = puck_game->battle_id ? puck_game->target_nickname[0] : "Bogus Opponent";
+    const int player_current_hp = remote ? state->bf.player_current_hp : puck_game->pg_player[0].current_hp;
     if (puck_game->hide_hp_star == 0 && puck_game->tower[0].geom) {
         char player_score[32];
-        sprintf(player_score, "%d", puck_game->score);
+        sprintf(player_score, "%d", puck_game->player_score[0]);
 //        const float gauge_width = pLwc->aspect_ratio * 0.9f;
 //        const float gauge_height = 0.075f;
 //        const float gauge1_x = (-world_right_top_end_ui_point[0] - pLwc->aspect_ratio) / 2 + gauge_width / 2;
@@ -1812,12 +1817,12 @@ static void render_battle_ui_layer(const LWCONTEXT* pLwc,
 //                        puck_game->nickname,
 //                        player_score,
 //                        ui_alpha);
-        render_nickname_score(pLwc, 1, ui_alpha, puck_game->nickname, player_score, world_right_top_end_ui_point);
+        render_nickname_score(pLwc, 1, ui_alpha, puck_game->nickname[0], player_score, world_right_top_end_ui_point);
     }
-    const int target_current_hp = remote ? state->bf.target_current_hp : puck_game->target.current_hp;
+    const int target_current_hp = remote ? state->bf.target_current_hp : puck_game->pg_target[0].current_hp;
     if (puck_game->hide_hp_star == 0 && puck_game->tower[1].geom) {
         char target_score[32];
-        sprintf(target_score, "%d", puck_game->target_score);
+        sprintf(target_score, "%d", puck_game->target_score[0]);
 //        const float gauge_width = pLwc->aspect_ratio * 0.9f;
 //        const float gauge_height = 0.075f;
 //        const float gauge2_x = pLwc->aspect_ratio - gauge_width / 2;
@@ -1897,7 +1902,7 @@ static void render_battle_ui_layer(const LWCONTEXT* pLwc,
     const float button_y_0 = -0.50f;
     if ((pLwc->control_flags & LCF_PUCK_GAME_PULL)
         && ((puck_game->control_flags & LPGCF_HIDE_PULL_BUTTON) == 0)) {
-        int pull_puck = puck_game->remote_control[0].pull_puck;
+        int pull_puck = puck_game->remote_control[LW_PUCK_GAME_PLAYER_TEAM][0].pull_puck;
         lwbutton_lae_append(pLwc,
                             &(((LWCONTEXT*)pLwc)->button_list),
                             "pull_button",
@@ -2143,7 +2148,7 @@ void lwc_render_physics(const LWCONTEXT* pLwc, const mat4x4 view, const mat4x4 p
               remote,
               0,
               LWST_DEFAULT);
-    if (remote ? state->bf.player_pull : puck_game->remote_control[0].pull_puck) {
+    if (remote ? state->bf.player_pull : puck_game->remote_control[LW_PUCK_GAME_PLAYER_TEAM][0].pull_puck) {
         render_radial_wave(pLwc,
                            view,
                            proj,
