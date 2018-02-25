@@ -9,6 +9,89 @@
 #include "lwcontext.h"
 #include "file.h"
 
+class LWHTMLUI {
+public:
+	LWHTMLUI(const LWCONTEXT* pLwc, int w, int h)
+		: container(pLwc, w, h), client_width(w), client_height(h)
+	{
+		std::shared_ptr<char> master_css_str(create_string_from_file(ASSETS_BASE_PATH "css" PATH_SEPARATOR "master.css"), free);
+		browser_context.load_master_stylesheet(master_css_str.get());
+	}
+	void load_page(const char* html_path) {
+		std::shared_ptr<char> html_str(create_string_from_file(html_path), free);
+		doc = litehtml::document::createFromString(html_str.get(), &container, &browser_context);
+	}
+	void render_page() {
+		doc->render(client_width);
+	}
+	void draw() {
+		litehtml::position clip(0, 0, client_width, client_height);
+		doc->draw(0, 0, 0, &clip);
+	}
+	void on_lbutton_down(int x, int y) {
+		if (doc) {
+			litehtml::position::vector redraw_boxes;
+			doc->on_lbutton_down(x, y, x, y, redraw_boxes);
+			last_lbutton_down_element = doc->root()->get_element_by_point(x, y, x, y);
+		}
+	}
+	void on_lbutton_up(int x, int y) {
+		if (doc) {
+			litehtml::position::vector redraw_boxes;
+			if (last_lbutton_down_element == doc->root()->get_element_by_point(x, y, x, y)) {
+				doc->on_lbutton_up(x, y, x, y, redraw_boxes);
+			}
+			last_lbutton_down_element.reset();
+		}
+	}
+	void on_over(int x, int y) {
+		if (doc) {
+			litehtml::position::vector redraw_boxes;
+			doc->on_mouse_over(x, y, x, y, redraw_boxes);
+		}
+	}
+private:
+	LWHTMLUI();
+	LWHTMLUI(const LWHTMLUI&);
+	litehtml::context browser_context;
+	litehtml::text_container container;
+	litehtml::document::ptr doc;
+	int client_width;
+	int client_height;
+	litehtml::element::ptr last_lbutton_down_element;
+};
+
+void* htmlui_new(const LWCONTEXT* pLwc) {
+	return new LWHTMLUI(pLwc, pLwc->width, pLwc->height);
+}
+
+void htmlui_destroy(void** c) {
+	delete(*c);
+	*c = 0;
+}
+
+void htmlui_load_render_draw(void* c, const char* html_path) {
+	LWHTMLUI* htmlui = (LWHTMLUI*)c;
+	htmlui->load_page(html_path);
+	htmlui->render_page();
+	htmlui->draw();
+}
+
+void htmlui_on_lbutton_down(void* c, int x, int y) {
+	LWHTMLUI* htmlui = (LWHTMLUI*)c;
+	htmlui->on_lbutton_down(x, y);
+}
+
+void htmlui_on_lbutton_up(void* c, int x, int y) {
+	LWHTMLUI* htmlui = (LWHTMLUI*)c;
+	htmlui->on_lbutton_up(x, y);
+}
+
+void htmlui_on_over(void* c, int x, int y) {
+	LWHTMLUI* htmlui = (LWHTMLUI*)c;
+	htmlui->on_over(x, y);
+}
+
 int test_html_ui(const LWCONTEXT* pLwc) {
 	litehtml::context browser_context;
 	//browser_context.load_master_stylesheet()

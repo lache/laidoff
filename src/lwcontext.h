@@ -374,6 +374,7 @@ typedef struct _LWCONTEXT {
     vec3 center;
     vec3 up;
     float eye_x_offset;
+	void* htmlui;
 } LWCONTEXT;
 
 #ifdef __cplusplus

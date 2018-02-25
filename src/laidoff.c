@@ -53,6 +53,7 @@
 #include "render_leaderboard.h"
 #include "numcomp_puck_game.h"
 #include "lwvbo.h"
+#include "htmlui.h"
 // SWIG output file
 #include "lo_wrap.inl"
 
@@ -1484,6 +1485,9 @@ LWCONTEXT* lw_init_initial_size(int width, int height) {
                  dir_pad_origin_y,
                  0.1f,
                  0.2f);
+
+	pLwc->htmlui = htmlui_new(pLwc);
+
     return pLwc;
 }
 
@@ -1619,6 +1623,8 @@ void lw_deinit(LWCONTEXT* pLwc) {
     deltatime_destroy(&pLwc->update_dt);
     
     delete_puck_game(&pLwc->puck_game);
+
+	htmlui_destroy(&pLwc->htmlui);
     
     free(pLwc);
 }

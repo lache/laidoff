@@ -1,5 +1,7 @@
 #pragma once
-
+#ifdef __cplusplus
+extern "C" {
+#endif
 void render_solid_box_ui_lvt_flip_y_uv(const LWCONTEXT* pLwc,
                                        float x,
                                        float y,
@@ -121,3 +123,6 @@ void render_solid_vb_ui_alpha_uv_shader(const LWCONTEXT* pLwc,
                                         int shader_index);
 void lwc_enable_additive_blending();
 void lwc_disable_additive_blending();
+#ifdef __cplusplus
+}
+#endif

@@ -385,5 +385,9 @@ void render_query_text_block_alpha(const LWCONTEXT* pLwc, const LWTEXTBLOCK* tex
 			);
 		}
 	}
-}
 
+	if (query_result) {
+		query_result->total_glyph_width = prop_font_size * size_scaled_xadvance_accum * pLwc->aspect_ratio / pLwc->width * 2;
+		query_result->glyph_height = text_block->text_block_line_height;
+	}
+}

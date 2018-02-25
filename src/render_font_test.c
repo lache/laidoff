@@ -125,8 +125,10 @@ void lwc_render_font_test_fbo(const LWCONTEXT* pLwc) {
 	//test_text_block.align = LTBA_RIGHT_BOTTOM;
 	//render_text_block(pLwc, &test_text_block);
 
-	test_html_ui(pLwc);
+	//test_html_ui(pLwc);
 
+	htmlui_load_render_draw(pLwc->htmlui, ASSETS_BASE_PATH "html" PATH_SEPARATOR "HTMLPage1.html");
+	
 	glEnable(GL_DEPTH_TEST);
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
