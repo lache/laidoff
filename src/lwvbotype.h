@@ -141,3 +141,9 @@ typedef enum _LW_PS_VBO_TYPE {
 
 	LPVT_COUNT,
 } LW_PS_VBO_TYPE;
+
+typedef enum _LW_PS0_VBO_TYPE {
+	LP0VT_DEFAULT, // rose particle emitter
+
+	LP0VT_COUNT,
+} LW_PS0_VBO_TYPE;

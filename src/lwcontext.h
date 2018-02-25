@@ -80,6 +80,7 @@ extern const char* tex_font_atlas_filename[2];
 #define SKIN_VERTEX_BUFFER_COUNT LSVT_COUNT
 #define FAN_VERTEX_BUFFER_COUNT LFVT_COUNT
 #define PS_VERTEX_BUFFER_COUNT LPVT_COUNT
+#define PS0_VERTEX_BUFFER_COUNT LP0VT_COUNT
 #define MAX_DELTA_TIME_HISTORY (60)
 #define LW_MAX_CONF_TOKEN (1024)
 
@@ -128,8 +129,10 @@ typedef struct _LWCONTEXT {
 	GLuint skin_vao[SKIN_VERTEX_BUFFER_COUNT];
 	// Aim sector(fan) VAO
 	GLuint fan_vao[FAN_VERTEX_BUFFER_COUNT];
-	// Particle system VAO
+	// Particle system VAO (EMITTER2)
 	GLuint ps_vao[PS_VERTEX_BUFFER_COUNT];
+	// Particle system VAO (EMITTER)
+	GLuint ps0_vao[PS0_VERTEX_BUFFER_COUNT];
 	// General texture atlas
 	GLuint tex_atlas[MAX_TEX_ATLAS];
     int tex_atlas_ready[MAX_TEX_ATLAS];

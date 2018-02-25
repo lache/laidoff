@@ -16,7 +16,6 @@ extern LWEMITTER2OBJECT emitter2_object;
 static void s_render_rose(const LWCONTEXT* pLwc) {
 	int shader_index = LWST_EMITTER;
 	lazy_glUseProgram(pLwc, shader_index);
-	glBindBuffer(GL_ARRAY_BUFFER, pLwc->particle_buffer);
 	mat4x4 identity;
 	mat4x4_identity(identity);
 	glUniformMatrix4fv(pLwc->shader[shader_index].projection_matrix_location, 1, 0, (const GLfloat*)identity);
@@ -26,17 +25,9 @@ static void s_render_rose(const LWCONTEXT* pLwc) {
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, pLwc->tex_programmed[LPT_DIR_PAD]);
 	glUniform1i(pLwc->shader[shader_index].texture_location, 0);
-    if (pLwc->shader[shader_index].theta_location >= 0) {
-        glEnableVertexAttribArray(pLwc->shader[shader_index].theta_location);
-        glVertexAttribPointer(pLwc->shader[shader_index].theta_location, 1, GL_FLOAT, GL_FALSE, sizeof(LWPARTICLE), (void*)LWOFFSETOF(LWPARTICLE, theta));
-    }
-    if (pLwc->shader[shader_index].shade_location >= 0) {
-        glEnableVertexAttribArray(pLwc->shader[shader_index].shade_location);
-        glVertexAttribPointer(pLwc->shader[shader_index].shade_location, 3, GL_FLOAT, GL_FALSE, sizeof(LWPARTICLE), (void*)LWOFFSETOF(LWPARTICLE, shade));
-    }
+	glBindBuffer(GL_ARRAY_BUFFER, pLwc->particle_buffer);
+	bind_all_ps0_vertex_attrib(pLwc, LP0VT_DEFAULT);
 	glDrawArrays(GL_POINTS, 0, NUM_PARTICLES);
-	glDisableVertexAttribArray(pLwc->shader[shader_index].theta_location);
-	glDisableVertexAttribArray(pLwc->shader[shader_index].shade_location);
 }
 
 void ps_render_explosion(const LWCONTEXT* pLwc, const LWEMITTER2OBJECT* emit_object, const mat4x4 proj_view, const mat4x4 model) {

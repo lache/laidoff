@@ -142,9 +142,9 @@ void lw_trigger_mouse_move(LWCONTEXT* pLwc, float x, float y, int pointer_id) {
 
 	convert_touch_coord_to_ui_coord(pLwc, &x, &y);
 
-	htmlui_on_over(pLwc->htmlui,
+	/*htmlui_on_over(pLwc->htmlui,
 		(int)((x + pLwc->aspect_ratio) * pLwc->width / (2.0f * pLwc->aspect_ratio)),
-						 (int)((1.0f - y) * pLwc->height / 2.0f));
+						 (int)((1.0f - y) * pLwc->height / 2.0f));*/
 
 	pLwc->last_mouse_move_delta_x = x - pLwc->last_mouse_move_x;
 	pLwc->last_mouse_move_delta_y = y - pLwc->last_mouse_move_y;

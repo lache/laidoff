@@ -381,6 +381,18 @@ void set_ps_vertex_attrib_pointer(const LWCONTEXT* pLwc, int shader_index) {
     }
 }
 
+void set_ps0_vertex_attrib_pointer(const LWCONTEXT* pLwc, int shader_index) {
+	lw_create_lazy_shader_program(pLwc, (LW_SHADER_TYPE)shader_index);
+	if (pLwc->shader[shader_index].theta_location >= 0) {
+		glEnableVertexAttribArray(pLwc->shader[shader_index].theta_location);
+		glVertexAttribPointer(pLwc->shader[shader_index].theta_location, 1, GL_FLOAT, GL_FALSE, sizeof(LWPARTICLE), (void*)LWOFFSETOF(LWPARTICLE, theta));
+	}
+	if (pLwc->shader[shader_index].shade_location >= 0) {
+		glEnableVertexAttribArray(pLwc->shader[shader_index].shade_location);
+		glVertexAttribPointer(pLwc->shader[shader_index].shade_location, 3, GL_FLOAT, GL_FALSE, sizeof(LWPARTICLE), (void*)LWOFFSETOF(LWPARTICLE, shade));
+	}
+}
+
 static void gen_all_vao(LWCONTEXT* pLwc) {
     // Vertex Array Objects
 #if LW_SUPPORT_VAO
@@ -460,6 +472,22 @@ static void init_ps_vao(LWCONTEXT* pLwc, int shader_index) {
 #endif
 }
 
+static void init_ps0_vao(LWCONTEXT* pLwc, int shader_index) {
+	// Particle System 0 (rose emitter) Vertex Array Objects
+#if LW_SUPPORT_VAO
+	assert(PS0_VERTEX_BUFFER_COUNT == 1);
+	glGenVertexArrays(PS0_VERTEX_BUFFER_COUNT, pLwc->ps0_vao);
+	for (int i = 0; i < PS0_VERTEX_BUFFER_COUNT; i++) {
+		glBindVertexArray(pLwc->ps0_vao[i]);
+		glBindBuffer(GL_ARRAY_BUFFER, pLwc->particle_buffer);
+		set_ps0_vertex_attrib_pointer(pLwc, shader_index);
+	}
+
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
+	glBindVertexArray(0);
+#endif
+}
+
 void lw_clear_color() {
     // Alpha component should be 1 in RPI platform.
     glClearColor(0x44 / 255.f, 0x4c / 255.f, 0x50 / 255.f, 1);
@@ -484,6 +512,7 @@ static void init_gl_context(LWCONTEXT* pLwc) {
     init_skin_vao(pLwc, LWST_SKIN);
     init_fan_vao(pLwc, LWST_FAN);
     init_ps_vao(pLwc, LWST_EMITTER2);
+	init_ps0_vao(pLwc, LWST_EMITTER);
     // load all textures
     init_load_textures(pLwc);
     // load font metadata
@@ -1128,6 +1157,14 @@ static void bind_all_ps_vertex_attrib_shader(const LWCONTEXT* pLwc, int shader_i
 #endif
 }
 
+static void bind_all_ps0_vertex_attrib_shader(const LWCONTEXT* pLwc, int shader_index, int vbo_index) {
+#if LW_PLATFORM_WIN32 || LW_PLATFORM_OSX
+	glBindVertexArray(pLwc->ps0_vao[vbo_index]);
+#else
+	set_ps0_vertex_attrib_pointer(pLwc, shader_index);
+#endif
+}
+
 void bind_all_fvertex_attrib(const LWCONTEXT* pLwc, int fvbo_index) {
     bind_all_fvertex_attrib_shader(pLwc, LWST_DEFAULT_NORMAL, fvbo_index);
 }
@@ -1154,6 +1191,10 @@ void bind_all_fan_vertex_attrib(const LWCONTEXT* pLwc, int vbo_index) {
 
 void bind_all_ps_vertex_attrib(const LWCONTEXT* pLwc, int vbo_index) {
     bind_all_ps_vertex_attrib_shader(pLwc, LWST_EMITTER2, vbo_index);
+}
+
+void bind_all_ps0_vertex_attrib(const LWCONTEXT* pLwc, int vbo_index) {
+	bind_all_ps0_vertex_attrib_shader(pLwc, LWST_EMITTER, vbo_index);
 }
 
 void load_pkm_hw_decoding(const char *tex_atlas_filename) {
@@ -1600,6 +1641,7 @@ void lw_deinit(LWCONTEXT* pLwc) {
     glDeleteVertexArrays(SKIN_VERTEX_BUFFER_COUNT, pLwc->skin_vao);
     glDeleteVertexArrays(FAN_VERTEX_BUFFER_COUNT, pLwc->fan_vao);
     glDeleteVertexArrays(PS_VERTEX_BUFFER_COUNT, pLwc->ps_vao);
+	glDeleteVertexArrays(PS0_VERTEX_BUFFER_COUNT, pLwc->ps0_vao);
 #endif
     
     lw_delete_all_shader_program(pLwc);

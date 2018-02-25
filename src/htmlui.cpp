@@ -31,6 +31,7 @@ public:
 	void on_lbutton_down(int x, int y) {
 		if (doc) {
 			litehtml::position::vector redraw_boxes;
+			doc->on_mouse_over(x, y, x, y, redraw_boxes);
 			doc->on_lbutton_down(x, y, x, y, redraw_boxes);
 			last_lbutton_down_element = doc->root()->get_element_by_point(x, y, x, y);
 		}
@@ -39,6 +40,7 @@ public:
 		if (doc) {
 			litehtml::position::vector redraw_boxes;
 			if (last_lbutton_down_element == doc->root()->get_element_by_point(x, y, x, y)) {
+				doc->on_mouse_over(x, y, x, y, redraw_boxes);
 				doc->on_lbutton_up(x, y, x, y, redraw_boxes);
 			}
 			last_lbutton_down_element.reset();

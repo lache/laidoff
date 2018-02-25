@@ -48,7 +48,7 @@ void lw_setup_vao(LWCONTEXT* pLwc, int lvt) {
         //assert(pLwc->shader[vbo_filename[lvt].shader_index].program);
         set_vertex_attrib_pointer(pLwc, vbo_filename[lvt].shader_index);
         pLwc->vao_ready[lvt] = 1;
-    }
+	}
 #endif
 }
 
