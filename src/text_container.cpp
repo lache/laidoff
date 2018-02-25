@@ -65,7 +65,7 @@ static void fill_text_block(const LWCONTEXT* pLwc, LWTEXTBLOCK* text_block, int 
 int litehtml::text_container::text_width(const litehtml::tchar_t * text, litehtml::uint_ptr hFont) {
 	LWTEXTBLOCK text_block;
 	LWTEXTBLOCKQUERYRESULT query_result;
-	int size = font_sizes[int(hFont)];
+	int size = font_sizes[(int)(size_t)hFont];
 	litehtml::web_color c;
 	fill_text_block(pLwc, &text_block, 0, 0, text, size, c);
 	render_query_only_text_block(pLwc, &text_block, &query_result);
@@ -74,7 +74,7 @@ int litehtml::text_container::text_width(const litehtml::tchar_t * text, litehtm
 
 void litehtml::text_container::draw_text(litehtml::uint_ptr hdc, const litehtml::tchar_t * text, litehtml::uint_ptr hFont, litehtml::web_color color, const litehtml::position & pos) {
 	//wprintf(_t("draw_text: '%s' (x=%d,y=%d,color=0x%02X%02X%02X|%02X)\n"), text, pos.x, pos.y, color.red, color.green, color.blue, color.alpha);
-	int size = font_sizes[int(hFont)];
+	int size = font_sizes[(int)(size_t)hFont];
 	LWTEXTBLOCK text_block;
 	fill_text_block(pLwc, &text_block, pos.x, pos.y, text, size, color);
 	render_text_block(pLwc, &text_block);
