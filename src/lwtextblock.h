@@ -19,6 +19,10 @@ typedef struct _LWTEXTBLOCK {
 	int multiline;
 } LWTEXTBLOCK;
 
+typedef struct _LWTEXTBLOCKQUERYRESULT {
+	float total_glyph_width;
+	float glyph_height;
+} LWTEXTBLOCKQUERYRESULT;
 
 #define DEFAULT_TEXT_BLOCK_WIDTH (4.0f)
 

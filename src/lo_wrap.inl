@@ -2987,6 +2987,7 @@ static swig_module_info swig_module = {swig_types, 226, 0, 0, 0, 0};
 #include "lwtcp.h"
 #include "lwtcpclient.h"
 #include "puckgamepacket.h"
+#include "htmlui.h"
 #ifdef WIN32
 #pragma warning(pop)
 #endif
@@ -82719,6 +82720,30 @@ static swig_lua_class *swig_LWPSETBATTLEPRESET_bases[] = {0};
 static const char *swig_LWPSETBATTLEPRESET_base_names[] = {0};
 static swig_lua_class _wrap_class_LWPSETBATTLEPRESET = { "LWPSETBATTLEPRESET", "LWPSETBATTLEPRESET", &SWIGTYPE_p__LWPSETBATTLEPRESET,_proxy__wrap_new_LWPSETBATTLEPRESET, swig_delete_LWPSETBATTLEPRESET, swig_LWPSETBATTLEPRESET_methods, swig_LWPSETBATTLEPRESET_attributes, &swig_LWPSETBATTLEPRESET_Sf_SwigStatic, swig_LWPSETBATTLEPRESET_meta, swig_LWPSETBATTLEPRESET_bases, swig_LWPSETBATTLEPRESET_base_names };
 
+static int _wrap_test_html_ui(lua_State* L) {
+  int SWIG_arg = 0;
+  LWCONTEXT *arg1 = (LWCONTEXT *) 0 ;
+  int result;
+  
+  SWIG_check_num_args("test_html_ui",1,1)
+  if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("test_html_ui",1,"LWCONTEXT *");
+  
+  if (!SWIG_IsOK(SWIG_ConvertPtr(L,1,(void**)&arg1,SWIGTYPE_p__LWCONTEXT,0))){
+    SWIG_fail_ptr("test_html_ui",1,SWIGTYPE_p__LWCONTEXT);
+  }
+  
+  result = (int)test_html_ui(arg1);
+  lua_pushnumber(L, (lua_Number) result); SWIG_arg++;
+  return SWIG_arg;
+  
+  if(0) SWIG_fail;
+  
+fail:
+  lua_error(L);
+  return SWIG_arg;
+}
+
+
 static int _wrap_new_int(lua_State* L) {
   int SWIG_arg = 0;
   int arg1 ;
@@ -84319,6 +84344,7 @@ static swig_lua_method swig_SwigModule_methods[]= {
     { "lw_tcp_addr", _wrap_lw_tcp_addr},
     { "lw_tcp_port_str", _wrap_lw_tcp_port_str},
     { "lw_tcp_port", _wrap_lw_tcp_port},
+    { "test_html_ui", _wrap_test_html_ui},
     { "new_int", _wrap_new_int},
     { "delete_int", _wrap_delete_int},
     { "int_getitem", _wrap_int_getitem},

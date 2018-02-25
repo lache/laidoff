@@ -70,10 +70,7 @@ android {
             debuggable true
             jniDebuggable true
             signingConfig signingConfigs.debugSign
-            ndk {
-                abiFilters 'x86'
-            }
-            buildConfigField "boolean", "DOWNLOAD_ASSETS", "true"
+            buildConfigField "boolean", "DOWNLOAD_ASSETS", "false"
         }
         release {
             minifyEnabled false
@@ -102,6 +99,7 @@ android {
     }
 
     sourceSets {
+        debug.assets.srcDirs += '../../selected-assets/assets'
         releaseSingapore.assets.srcDirs += '../../selected-assets/assets'
     }
 
@@ -129,7 +127,9 @@ android {
                 'pkm',
                 'svbo',
                 'png',
-                'vbo'
+                'vbo',
+                'css',
+                'html'
     }
 }
 

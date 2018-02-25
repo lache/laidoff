@@ -14,6 +14,7 @@ set(CMAKE_C_STANDARD 11)
 add_subdirectory(tinycthread)
 if (NOT SERVER_ONLY)
     add_subdirectory(glfw-3.2.1)
+	add_subdirectory(litehtml)
 else (NOT SERVER_ONLY)
 
 endif (NOT SERVER_ONLY)
@@ -75,6 +76,7 @@ include_directories("ode/ode/src")
 include_directories("recastnavigation/Detour/Include")
 include_directories("zmq/include")
 include_directories("imgui")
+include_directories("litehtml/include")
 
 #include_directories(libpng-1.6.28)
 
@@ -94,6 +96,7 @@ if (MSVC)
 endif ()
 
 add_definitions(-DdDOUBLE)
+add_definitions(-DLITEHTML_UTF8)
 
 if (WIN32)
     set(ICON win32/laidoff.rc)
@@ -238,6 +241,7 @@ if (NOT SERVER_ONLY)
             glfw
             libzmq
             czmq
+			litehtml
             ${WINCODEC}
             ${WINDSHOW}
             ${WINOPENGL32}

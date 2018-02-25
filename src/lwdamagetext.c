@@ -21,7 +21,6 @@ int spawn_damage_text_color(LWCONTEXT* pLwc, float x, float y, float z, const ch
 			dt->coord = coord;
 
 			LWTEXTBLOCK *tb = &dt->text_block;
-
 			tb->text = dt->text;
 			tb->text_bytelen = (int)strlen(tb->text);
 			tb->begin_index = 0;

@@ -5,12 +5,24 @@ add_library(app-glue STATIC
             ${ANDROID_NDK}/sources/android/native_app_glue/android_native_app_glue.c)
 
 # now build app's shared lib
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=gnu++11 -DdDOUBLE")
-set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -DdDOUBLE")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=gnu++11")
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS}")
+
+add_definitions(-DdDOUBLE)
+# On non-windows environment, LITEHTML_UTF8 is default. (see litehtml/src/os_types.h)
+#add_definitions(-DLITEHTML_UTF8)
 
 if(DEFINED ENV{autoBuild})
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DLW_AUTO_BUILD")
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -DLW_AUTO_BUILD")
+endif()
+
+if(${ANDROID_ABI} STREQUAL "armeabi-v7a")
+    include_directories(${ANDROID_SYSROOT}/usr/include/arm-linux-androideabi)
+elseif(${ANDROID_ABI} STREQUAL "arm64-v8a")
+    include_directories(${ANDROID_SYSROOT}/usr/include/aarch64-linux-android)
+else()
+    include_directories(${ANDROID_SYSROOT}/usr/include/arm-linux-androideabi)
 endif()
 
 # Android Studio에서 CMake 빌드 오류나는 부분 수정
@@ -44,6 +56,9 @@ set_target_properties(czmq_selftest zmakecert zsp PROPERTIES EXCLUDE_FROM_ALL 1 
 
 include_directories(czmq/include)
 
+# litehtml CMake 의존성 추가
+add_subdirectory(../../../../../litehtml litehtml)
+include_directories("../../../../../litehtml/include")
 
 
 file(GLOB LUA_LIB
@@ -96,7 +111,8 @@ target_include_directories(native-activity PRIVATE
                            ../../../../../ode/include
                            ../../../../../ode/ou/include
                            ../../../../../ode/ode/src
-                           ../../../../../recastnavigation/Detour/Include)
+                           ../../../../../recastnavigation/Detour/Include
+						   ../../../../../litehtml/include)
 
 # add lib dependencies
 target_link_libraries(native-activity
@@ -106,6 +122,5 @@ target_link_libraries(native-activity
                       GLESv2
                       log
                       libzmq
-                      czmq)
-
-
+                      czmq
+					  litehtml)
