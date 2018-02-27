@@ -35,3 +35,9 @@ typedef struct _LWFANVERTEX {
 	float theta;
 	float index;
 } LWFANVERTEX;
+
+typedef struct _LWCOLORVERTEX {
+    float x, y, z;
+    float nx, ny, nz;
+    float r, g, b;
+} LWCOLORVERTEX;

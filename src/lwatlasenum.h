@@ -9,34 +9,34 @@ typedef enum _LW_ATLAS_ENUM {
     LAE_C2_PNG,
     LAE_TWIRL_XXX_PNG,
     LAE_BG_ROAD_PNG,
-    
+
     LAE_BG_KITCHEN,
     LAE_BG_MART_IN,
     LAE_BG_MART_OUT,
     LAE_BG_ROAD,
     LAE_BG_ROOM,
     LAE_BG_ROOM_CEILING,
-    
+
     LAE_P_DOHEE,
     LAE_P_DOHEE_ALPHA,
     LAE_P_MOTHER,
     LAE_P_MOTHER_ALPHA,
-    
+
     LAE_U_DIALOG_BALLOON,
-    
+
     LAE_BG_KITCHEN_KTX,
     LAE_BG_MART_IN_KTX,
     LAE_BG_MART_OUT_KTX,
     LAE_BG_ROAD_KTX,
     LAE_BG_ROOM_KTX,
     LAE_BG_ROOM_CEILING_KTX,
-    
+
     LAE_FX_TRAIL,
     LAE_FX_TRAIL_ALPHA,
-    
+
     LAE_U_GLOW,
     LAE_U_GLOW_ALPHA,
-    
+
     LAE_U_ENEMY_SCOPE_KTX,
     LAE_U_ENEMY_SCOPE_ALPHA_KTX,
     LAE_U_ENEMY_TURN_KTX,
@@ -45,7 +45,7 @@ typedef enum _LW_ATLAS_ENUM {
     LAE_U_PLAYER_TURN_ALPHA_KTX,
     LAE_U_FIST_ICON_KTX,
     LAE_U_FIST_ICON_ALPHA_KTX,
-    
+
     LAE_C_BIKER_KTX,
     LAE_C_BIKER_ALPHA_KTX,
     LAE_C_MADAM_KTX,
@@ -56,7 +56,7 @@ typedef enum _LW_ATLAS_ENUM {
     LAE_C_TOFU_ALPHA_KTX,
     LAE_C_TREE_KTX,
     LAE_C_TREE_ALPHA_KTX,
-    
+
     LAE_3D_PLAYER_TEX_KTX,
     LAE_3D_FLOOR_TEX_KTX,
     LAE_3D_FLOOR2_TEX_KTX,
@@ -79,24 +79,24 @@ typedef enum _LW_ATLAS_ENUM {
     LAE_PUCK_ENEMY_KTX,
     LAE_PUCK_PLAYER_KTX,
     LAE_PUCK_FLOOR_KTX,
-    
+
     LAE_BB_CATAPULT,
     LAE_BB_CROSSBOW,
     LAE_BB_GUNTOWER,
     LAE_BB_PYRO,
     LAE_BB_TURRET,
-    
+
     LAE_SPLASH512512,
-    
+
     LAE_BEAM_KTX,
-    
+
     LAE_BUTTON_PULL,
     LAE_BUTTON_PULL_ALPHA,
     LAE_BUTTON_DASH,
     LAE_BUTTON_DASH_ALPHA,
     LAE_BUTTON_JUMP,
     LAE_BUTTON_JUMP_ALPHA,
-    
+
     LAE_ARROW,
     LAE_RADIALWAVE,
     LAE_LINEARWAVE,
@@ -132,15 +132,17 @@ typedef enum _LW_ATLAS_ENUM {
     LAE_PUCK_FLOOR_COVER,
     LAE_TOWER_BASE_2_PLAYER,
     LAE_TOWER_BASE_2_TARGET,
-        LAE_EXCLAMATION_MARK,
-        LAE_EXCLAMATION_MARK_ALPHA,
-        LAE_STOP_MARK,
-        LAE_STOP_MARK_ALPHA,
-        LAE_UI_BUTTON_ATLAS,
+    LAE_EXCLAMATION_MARK,
+    LAE_EXCLAMATION_MARK_ALPHA,
+    LAE_STOP_MARK,
+    LAE_STOP_MARK_ALPHA,
+    LAE_UI_BUTTON_ATLAS,
     LAE_FOOTBALL_GROUND,
     LAE_PLAYER_CAPSULE,
-        LAE_COUNT,
-    
+        LAE_WAVE,
+        LAE_WAVE_ALPHA,
+    LAE_COUNT,
+
     LAE_DONTCARE,
     LAE_ZERO_FOR_BLACK,
 } LW_ATLAS_ENUM;
@@ -150,37 +152,37 @@ static const char *tex_atlas_filename[] = {
     ASSETS_BASE_PATH "tex" PATH_SEPARATOR "atlas01.png",
     ASSETS_BASE_PATH "tex" PATH_SEPARATOR "Twirl.png",
     ASSETS_BASE_PATH "tex" PATH_SEPARATOR "bg-road.png",
-    
-    
+
+
     ASSETS_BASE_PATH "pkm" PATH_SEPARATOR "bg-kitchen.pkm",
     ASSETS_BASE_PATH "pkm" PATH_SEPARATOR "bg-mart-in.pkm",
     ASSETS_BASE_PATH "pkm" PATH_SEPARATOR "bg-mart-out.pkm",
     ASSETS_BASE_PATH "pkm" PATH_SEPARATOR "bg-road.pkm",
     ASSETS_BASE_PATH "pkm" PATH_SEPARATOR "bg-room.pkm",
     ASSETS_BASE_PATH "pkm" PATH_SEPARATOR "bg-room-ceiling.pkm",
-    
-    
+
+
     ASSETS_BASE_PATH "pkm" PATH_SEPARATOR "p-dohee.pkm",
     ASSETS_BASE_PATH "pkm" PATH_SEPARATOR "p-dohee_alpha.pkm",
     ASSETS_BASE_PATH "pkm" PATH_SEPARATOR "p-mother.pkm",
     ASSETS_BASE_PATH "pkm" PATH_SEPARATOR "p-mother_alpha.pkm",
-    
-    
+
+
     ASSETS_BASE_PATH "pkm" PATH_SEPARATOR "u-dialog-balloon.pkm",
-    
+
     ASSETS_BASE_PATH "ktx" PATH_SEPARATOR "bg-kitchen.ktx",
     ASSETS_BASE_PATH "ktx" PATH_SEPARATOR "bg-mart-in.ktx",
     ASSETS_BASE_PATH "ktx" PATH_SEPARATOR "bg-mart-out.ktx",
     ASSETS_BASE_PATH "ktx" PATH_SEPARATOR "bg-road.ktx",
     ASSETS_BASE_PATH "ktx" PATH_SEPARATOR "bg-room.ktx",
     ASSETS_BASE_PATH "ktx" PATH_SEPARATOR "bg-room-ceiling.ktx",
-    
+
     ASSETS_BASE_PATH "pkm" PATH_SEPARATOR "fx-trail.pkm",
     ASSETS_BASE_PATH "pkm" PATH_SEPARATOR "fx-trail_alpha.pkm",
-    
+
     ASSETS_BASE_PATH "pkm" PATH_SEPARATOR "u-glow.pkm",
     ASSETS_BASE_PATH "pkm" PATH_SEPARATOR "u-glow_alpha.pkm",
-    
+
     ASSETS_BASE_PATH "ktx" PATH_SEPARATOR "u-enemy-scope-a.ktx",
     ASSETS_BASE_PATH "ktx" PATH_SEPARATOR "u-enemy-scope-a_alpha.ktx",
     ASSETS_BASE_PATH "ktx" PATH_SEPARATOR "u-enemy-turn-a.ktx",
@@ -189,8 +191,8 @@ static const char *tex_atlas_filename[] = {
     ASSETS_BASE_PATH "ktx" PATH_SEPARATOR "u-player-turn-a_alpha.ktx",
     ASSETS_BASE_PATH "ktx" PATH_SEPARATOR "u-fist-icon-a.ktx",
     ASSETS_BASE_PATH "ktx" PATH_SEPARATOR "u-fist-icon-a_alpha.ktx",
-    
-    
+
+
     ASSETS_BASE_PATH "ktx" PATH_SEPARATOR "c-biker-a.ktx",
     ASSETS_BASE_PATH "ktx" PATH_SEPARATOR "c-biker-a_alpha.ktx",
     ASSETS_BASE_PATH "ktx" PATH_SEPARATOR "c-madam-a.ktx",
@@ -201,7 +203,7 @@ static const char *tex_atlas_filename[] = {
     ASSETS_BASE_PATH "ktx" PATH_SEPARATOR "c-tofu-a_alpha.ktx",
     ASSETS_BASE_PATH "ktx" PATH_SEPARATOR "c-tree-a.ktx",
     ASSETS_BASE_PATH "ktx" PATH_SEPARATOR "c-tree-a_alpha.ktx",
-    
+
     ASSETS_BASE_PATH "ktx" PATH_SEPARATOR "3d-player-tex.ktx",
     ASSETS_BASE_PATH "ktx" PATH_SEPARATOR "3d-floor-tex.ktx",
     ASSETS_BASE_PATH "ktx" PATH_SEPARATOR "3d-floor2-tex.ktx",
@@ -224,25 +226,25 @@ static const char *tex_atlas_filename[] = {
     ASSETS_BASE_PATH "ktx" PATH_SEPARATOR "puck-enemy.ktx",
     ASSETS_BASE_PATH "ktx" PATH_SEPARATOR "puck-player.ktx",
     ASSETS_BASE_PATH "ktx" PATH_SEPARATOR "puck-floor.ktx",
-    
-    
+
+
     ASSETS_BASE_PATH "ktx" PATH_SEPARATOR "bb-catapult.ktx",
     ASSETS_BASE_PATH "ktx" PATH_SEPARATOR "bb-crossbow.ktx",
     ASSETS_BASE_PATH "ktx" PATH_SEPARATOR "bb-guntower.ktx",
     ASSETS_BASE_PATH "ktx" PATH_SEPARATOR "bb-pyro.ktx",
     ASSETS_BASE_PATH "ktx" PATH_SEPARATOR "bb-turret.ktx",
-    
+
     ASSETS_BASE_PATH "ktx" PATH_SEPARATOR "splash512512.ktx",
-    
+
     ASSETS_BASE_PATH "ktx" PATH_SEPARATOR "fx-beam.ktx",
-    
+
     ASSETS_BASE_PATH "ktx" PATH_SEPARATOR "button-pull-a.ktx",
     ASSETS_BASE_PATH "ktx" PATH_SEPARATOR "button-pull-a_alpha.ktx",
     ASSETS_BASE_PATH "ktx" PATH_SEPARATOR "button-dash-a.ktx",
     ASSETS_BASE_PATH "ktx" PATH_SEPARATOR "button-dash-a_alpha.ktx",
     ASSETS_BASE_PATH "ktx" PATH_SEPARATOR "button-jump-a.ktx",
     ASSETS_BASE_PATH "ktx" PATH_SEPARATOR "button-jump-a_alpha.ktx",
-    
+
     ASSETS_BASE_PATH "ktx" PATH_SEPARATOR "arrow.ktx",
     ASSETS_BASE_PATH "ktx" PATH_SEPARATOR "radialwave.ktx",
     ASSETS_BASE_PATH "ktx" PATH_SEPARATOR "linearwave.ktx",
@@ -285,6 +287,8 @@ static const char *tex_atlas_filename[] = {
         ASSETS_BASE_PATH "ktx" PATH_SEPARATOR "ui-button-atlas.ktx",
     ASSETS_BASE_PATH "ktx" PATH_SEPARATOR "football-ground.ktx",
     ASSETS_BASE_PATH "ktx" PATH_SEPARATOR "player-capsule.ktx",
+        ASSETS_BASE_PATH "ktx" PATH_SEPARATOR "wave-a.ktx",
+        ASSETS_BASE_PATH "ktx" PATH_SEPARATOR "wave-a_alpha.ktx",
 };
 
 #define MAX_TEX_ATLAS LAE_COUNT

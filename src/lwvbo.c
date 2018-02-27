@@ -5,7 +5,7 @@
 #include <assert.h>
 #include "laidoff.h"
 
-void lw_load_vbo(LWCONTEXT* pLwc, const char* filename, LWVBO* pVbo) {
+void lw_load_vbo(LWCONTEXT* pLwc, const char* filename, LWVBO* pVbo, int stride_in_bytes) {
     GLuint vbo = 0;
     glGenBuffers(1, &vbo);
     glBindBuffer(GL_ARRAY_BUFFER, vbo);
@@ -24,7 +24,13 @@ void lw_load_vbo(LWCONTEXT* pLwc, const char* filename, LWVBO* pVbo) {
 void lw_load_all_vbo(LWCONTEXT* pLwc) {
     for (int i = 0; i < LVT_COUNT; i++) {
         if (vbo_filename[i].filename[0] != '\0') {
-            lw_load_vbo(pLwc, vbo_filename[i].filename, &pLwc->vertex_buffer[i]);
+            int stride_in_bytes = 0;
+            if (vbo_filename[i].shader_index != LWST_DEFAULT_NORMAL_COLOR) {
+                stride_in_bytes = lwvertex_stride_in_bytes;
+            } else {
+                stride_in_bytes = lwcolorvertex_stride_in_bytes;
+            }
+            lw_load_vbo(pLwc, vbo_filename[i].filename, &pLwc->vertex_buffer[i], stride_in_bytes);
         }
     }
 }
@@ -34,7 +40,13 @@ static void lw_lazy_load_vbo(LWCONTEXT* pLwc, LW_VBO_TYPE lvt) {
     if (vbo->vertex_buffer) {
         return;
     }
-    lw_load_vbo(pLwc, vbo_filename[lvt].filename, &pLwc->vertex_buffer[lvt]);
+    int stride_in_bytes = 0;
+    if (vbo_filename[lvt].shader_index != LWST_DEFAULT_NORMAL_COLOR) {
+        stride_in_bytes = lwvertex_stride_in_bytes;
+    } else {
+        stride_in_bytes = lwcolorvertex_stride_in_bytes;
+    }
+    lw_load_vbo(pLwc, vbo_filename[lvt].filename, &pLwc->vertex_buffer[lvt], stride_in_bytes);
 }
 
 void lw_setup_vao(LWCONTEXT* pLwc, int lvt) {
@@ -46,7 +58,11 @@ void lw_setup_vao(LWCONTEXT* pLwc, int lvt) {
         assert(pLwc->vertex_buffer[lvt].vertex_buffer);
         glBindBuffer(GL_ARRAY_BUFFER, pLwc->vertex_buffer[lvt].vertex_buffer);
         //assert(pLwc->shader[vbo_filename[lvt].shader_index].program);
-        set_vertex_attrib_pointer(pLwc, vbo_filename[lvt].shader_index);
+		if (vbo_filename[lvt].shader_index != LWST_DEFAULT_NORMAL_COLOR) {
+			set_vertex_attrib_pointer(pLwc, vbo_filename[lvt].shader_index);
+		} else {
+			set_color_vertex_attrib_pointer(pLwc, vbo_filename[lvt].shader_index);
+		}
         pLwc->vao_ready[lvt] = 1;
 	}
 #endif

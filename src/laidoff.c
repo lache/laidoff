@@ -287,26 +287,48 @@ void set_vertex_attrib_pointer(const LWCONTEXT* pLwc, int shader_index) {
     if (pLwc->shader[shader_index].vpos_location >= 0) {
         glEnableVertexAttribArray((GLuint)pLwc->shader[shader_index].vpos_location);
         glVertexAttribPointer((GLuint)pLwc->shader[shader_index].vpos_location, 3, GL_FLOAT, GL_FALSE,
-                              stride_in_bytes, (void *)0);
+                              lwvertex_stride_in_bytes, (void *)0);
     }
     // vertex color / normal
     if (pLwc->shader[shader_index].vcol_location >= 0) {
         glEnableVertexAttribArray((GLuint)pLwc->shader[shader_index].vcol_location);
         glVertexAttribPointer((GLuint)pLwc->shader[shader_index].vcol_location, 3, GL_FLOAT, GL_FALSE,
-                              stride_in_bytes, (void *)(sizeof(float) * 3));
+                              lwvertex_stride_in_bytes, (void *)(sizeof(float) * 3));
     }
     // uv coordinates
     if (pLwc->shader[shader_index].vuv_location >= 0) {
         glEnableVertexAttribArray((GLuint)pLwc->shader[shader_index].vuv_location);
         glVertexAttribPointer((GLuint)pLwc->shader[shader_index].vuv_location, 2, GL_FLOAT, GL_FALSE,
-                              stride_in_bytes, (void *)(sizeof(float) * (3 + 3)));
+                              lwvertex_stride_in_bytes, (void *)(sizeof(float) * (3 + 3)));
     }
     // scale-9 coordinates
     if (pLwc->shader[shader_index].vs9_location >= 0) {
         glEnableVertexAttribArray((GLuint)pLwc->shader[shader_index].vs9_location);
         glVertexAttribPointer((GLuint)pLwc->shader[shader_index].vs9_location, 2, GL_FLOAT, GL_FALSE,
-                              stride_in_bytes, (void *)(sizeof(float) * (3 + 3 + 2)));
+                              lwvertex_stride_in_bytes, (void *)(sizeof(float) * (3 + 3 + 2)));
     }
+}
+
+void set_color_vertex_attrib_pointer(const LWCONTEXT* pLwc, int shader_index) {
+	lw_create_lazy_shader_program(pLwc, (LW_SHADER_TYPE)shader_index);
+	// vertex coordinates
+	if (pLwc->shader[shader_index].vpos_location >= 0) {
+		glEnableVertexAttribArray((GLuint)pLwc->shader[shader_index].vpos_location);
+		glVertexAttribPointer((GLuint)pLwc->shader[shader_index].vpos_location, 3, GL_FLOAT, GL_FALSE,
+                              lwcolorvertex_stride_in_bytes, (void *)0);
+	}
+	// vertex normal
+	if (pLwc->shader[shader_index].vnor_location >= 0) {
+		glEnableVertexAttribArray((GLuint)pLwc->shader[shader_index].vnor_location);
+		glVertexAttribPointer((GLuint)pLwc->shader[shader_index].vnor_location, 3, GL_FLOAT, GL_FALSE,
+                              lwcolorvertex_stride_in_bytes, (void *)(sizeof(float) * 3));
+	}
+	// vertex color
+	if (pLwc->shader[shader_index].vcol_location >= 0) {
+		glEnableVertexAttribArray((GLuint)pLwc->shader[shader_index].vcol_location);
+		glVertexAttribPointer((GLuint)pLwc->shader[shader_index].vcol_location, 3, GL_FLOAT, GL_FALSE,
+							  lwcolorvertex_stride_in_bytes, (void *)(sizeof(float) * (3 + 3)));
+	}
 }
 
 void set_skin_vertex_attrib_pointer(const LWCONTEXT* pLwc, int shader_index) {
@@ -1127,9 +1149,13 @@ static void bind_all_fvertex_attrib_shader(const LWCONTEXT* pLwc, int shader_ind
 
 static void bind_all_vertex_attrib_shader(const LWCONTEXT* pLwc, int shader_index, int vbo_index) {
 #if LW_PLATFORM_WIN32 || LW_PLATFORM_OSX
-    glBindVertexArray(pLwc->vao[vbo_index]);
+	glBindVertexArray(pLwc->vao[vbo_index]);
 #else
-    set_vertex_attrib_pointer(pLwc, shader_index);
+	if (shader_index != LWST_DEFAULT_NORMAL_COLOR) {
+		set_vertex_attrib_pointer(pLwc, shader_index);
+    } else {
+        set_color_vertex_attrib_pointer(pLwc, shader_index);
+    }
 #endif
 }
 
@@ -1171,6 +1197,10 @@ void bind_all_fvertex_attrib(const LWCONTEXT* pLwc, int fvbo_index) {
 
 void bind_all_vertex_attrib(const LWCONTEXT* pLwc, int vbo_index) {
     bind_all_vertex_attrib_shader(pLwc, LWST_DEFAULT, vbo_index);
+}
+
+void bind_all_color_vertex_attrib(const LWCONTEXT* pLwc, int vbo_index) {
+    bind_all_vertex_attrib_shader(pLwc, LWST_DEFAULT_NORMAL_COLOR, vbo_index);
 }
 
 void bind_all_vertex_attrib_font(const LWCONTEXT* pLwc, int vbo_index) {

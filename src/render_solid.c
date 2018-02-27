@@ -178,11 +178,11 @@ void render_solid_vb_ui_flip_y_uv_shader_rot(const LWCONTEXT* pLwc,
 
     lazy_glBindBuffer(pLwc, lvt);
     bind_all_vertex_attrib(pLwc, lvt);
-	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_2D, tex_index);
-	//assert(tex_index);
-	set_tex_filter(GL_LINEAR, GL_LINEAR);
-	//set_tex_filter(GL_NEAREST, GL_NEAREST);
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D, tex_index);
+    //assert(tex_index);
+    set_tex_filter(GL_LINEAR, GL_LINEAR);
+    //set_tex_filter(GL_NEAREST, GL_NEAREST);
     glUniformMatrix4fv(pLwc->shader[shader_index].mvp_location, 1, GL_FALSE, (const GLfloat*)proj_view_model);
     glDrawArrays(GL_TRIANGLES, 0, pLwc->vertex_buffer[lvt].vertex_count);
 }
@@ -251,22 +251,25 @@ void render_solid_vb_ui_alpha_uv(const LWCONTEXT* pLwc,
                                        shader_index);
 }
 
-void render_solid_vb_ui_alpha_uv_shader(const LWCONTEXT* pLwc,
-                                        float x,
-                                        float y,
-                                        float w,
-                                        float h,
-                                        GLuint tex_index,
-                                        GLuint tex_alpha_index,
-                                        enum _LW_VBO_TYPE lvt,
-                                        float alpha_multiplier,
-                                        float over_r,
-                                        float over_g,
-                                        float over_b,
-                                        float oratio,
-                                        const float* uv_offset,
-                                        const float* uv_scale,
-                                        int shader_index) {
+void render_solid_vb_ui_alpha_uv_shader_view_proj(const LWCONTEXT* pLwc,
+                                                  float x,
+                                                  float y,
+                                                  float w,
+                                                  float h,
+                                                  GLuint tex_index,
+                                                  GLuint tex_alpha_index,
+                                                  enum _LW_VBO_TYPE lvt,
+                                                  float alpha_multiplier,
+                                                  float over_r,
+                                                  float over_g,
+                                                  float over_b,
+                                                  float oratio,
+                                                  const float* uv_offset,
+                                                  const float* uv_scale,
+                                                  int shader_index,
+                                                  const mat4x4 view,
+                                                  const mat4x4 proj) {
+
     const LWSHADER* shader = &pLwc->shader[shader_index];
 
     lazy_glUseProgram(pLwc, shader_index);
@@ -285,7 +288,6 @@ void render_solid_vb_ui_alpha_uv_shader(const LWCONTEXT* pLwc,
 
     mat4x4 model_translate;
     mat4x4 model;
-    mat4x4 identity_view; mat4x4_identity(identity_view);
     mat4x4 view_model;
     mat4x4 proj_view_model;
     mat4x4 model_scale;
@@ -295,26 +297,47 @@ void render_solid_vb_ui_alpha_uv_shader(const LWCONTEXT* pLwc,
     mat4x4_translate(model_translate, x, y, 0);
     mat4x4_identity(model);
     mat4x4_mul(model, model_translate, model_scale);
-    mat4x4_mul(view_model, identity_view, model);
+    mat4x4_mul(view_model, view, model);
     mat4x4_identity(proj_view_model);
-    mat4x4_mul(proj_view_model, pLwc->proj, view_model);
+    mat4x4_mul(proj_view_model, proj, view_model);
 
     lazy_glBindBuffer(pLwc, lvt);
     bind_all_vertex_attrib_etc1_with_alpha(pLwc, lvt);
     glActiveTexture(GL_TEXTURE0);
     assert(tex_index);
-    glBindTexture(GL_TEXTURE_2D, tex_index);
+    lazy_tex_atlas_glBindTexture(pLwc, tex_index);
     set_tex_filter(GL_LINEAR, GL_LINEAR);
     if (shader_index == LWST_ETC1) {
         glActiveTexture(GL_TEXTURE1);
         assert(tex_alpha_index);
-        glBindTexture(GL_TEXTURE_2D, tex_alpha_index);
+        lazy_tex_atlas_glBindTexture(pLwc, tex_alpha_index);
         set_tex_filter(GL_LINEAR, GL_LINEAR);
     } else {
         assert(tex_alpha_index == 0);
     }
     glUniformMatrix4fv(shader->mvp_location, 1, GL_FALSE, (const GLfloat*)proj_view_model);
     glDrawArrays(GL_TRIANGLES, 0, pLwc->vertex_buffer[lvt].vertex_count);
+}
+
+void render_solid_vb_ui_alpha_uv_shader(const LWCONTEXT* pLwc,
+                                        float x,
+                                        float y,
+                                        float w,
+                                        float h,
+                                        GLuint tex_index,
+                                        GLuint tex_alpha_index,
+                                        enum _LW_VBO_TYPE lvt,
+                                        float alpha_multiplier,
+                                        float over_r,
+                                        float over_g,
+                                        float over_b,
+                                        float oratio,
+                                        const float* uv_offset,
+                                        const float* uv_scale,
+                                        int shader_index) {
+    mat4x4 identity_view;
+    mat4x4_identity(identity_view);
+    render_solid_vb_ui_alpha_uv_shader_view_proj(pLwc, x, y, w, h, tex_index, tex_alpha_index, lvt, alpha_multiplier, over_r, over_g, over_b, oratio, uv_offset, uv_scale, shader_index, identity_view, pLwc->proj);
 }
 
 void render_solid_vb_ui(const LWCONTEXT* pLwc,

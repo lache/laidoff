@@ -24,7 +24,7 @@ void load_fvbo(LWCONTEXT* pLwc, const char* filename, LWFVBO* fvbo) {
     memcpy(fvbo->vertex_count_per_cell, layout.num_vertices, sizeof(int) * layout.total_cell_object_count);
 
     GLuint vbo = 0;
-    int buffer_size = stride_in_bytes * fvbo->total_vertex_count;
+    int buffer_size = lwvertex_stride_in_bytes * fvbo->total_vertex_count;
     glGenBuffers(1, &vbo);
     glBindBuffer(GL_ARRAY_BUFFER, vbo);
     glBufferData(GL_ARRAY_BUFFER, buffer_size, layout.buffer_data, GL_STATIC_DRAW);

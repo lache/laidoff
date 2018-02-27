@@ -12,7 +12,7 @@ keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
 
 def versionProperties = new Properties()
 
-versionProperties['versionCode'] = "1"
+versionProperties['versionCode'] = "754"
 versionProperties['versionName'] = "0.1.0"
 
 if (project.hasProperty('versionName')) {
@@ -70,6 +70,9 @@ android {
             debuggable true
             jniDebuggable true
             signingConfig signingConfigs.debugSign
+            ndk {
+                abiFilters 'x86'
+            }
             buildConfigField "boolean", "DOWNLOAD_ASSETS", "false"
         }
         release {

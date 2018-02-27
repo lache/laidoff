@@ -70,6 +70,7 @@ void set_tex_filter(int min_filter, int mag_filter);
 
 void bind_all_fvertex_attrib(const LWCONTEXT* pLwc, int fvbo_index);
 void bind_all_vertex_attrib(const LWCONTEXT* pLwc, int vbo_index);
+void bind_all_color_vertex_attrib(const LWCONTEXT* pLwc, int vbo_index);
 void bind_all_vertex_attrib_font(const LWCONTEXT* pLwc, int vbo_index);
 void bind_all_vertex_attrib_etc1_with_alpha(const LWCONTEXT* pLwc, int vbo_index);
 void bind_all_skin_vertex_attrib(const LWCONTEXT* pLwc, int vbo_index);
@@ -90,6 +91,7 @@ void lw_start_text_input_activity(LWCONTEXT* pLwc, int tag); // Native text inpu
 void lw_set_device_model(LWCONTEXT* pLwc, const char* model);
 void lw_flag_logic_actor_to_quit_and_wait(LWCONTEXT* pLwc);
 void set_vertex_attrib_pointer(const LWCONTEXT* pLwc, int shader_index);
+void set_color_vertex_attrib_pointer(const LWCONTEXT* pLwc, int shader_index);
 void load_png_pkm_sw_decoding(LWCONTEXT* pLwc, int i);
 void set_package_version(const char* package_version);
 void init_font_fbo(LWCONTEXT* pLwc);

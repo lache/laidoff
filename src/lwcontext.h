@@ -37,8 +37,13 @@
 
 // Vertex attributes: Coordinates (3xf) + Normal (3xf) + UV (2xf) + S9 (2xf)
 // See Also: LWVERTEX
-static const GLsizei stride_in_bytes = (GLsizei)(sizeof(float) * (3 + 3 + 2 + 2));
+static const GLsizei lwvertex_stride_in_bytes = (GLsizei)(sizeof(float) * (3 + 3 + 2 + 2));
 LwStaticAssert(sizeof(LWVERTEX) == (GLsizei)(sizeof(float) * (3 + 3 + 2 + 2)), "LWVERTEX size error");
+
+// Color Vertex attributes: Coordinates (3xf) + Normal (3xf) + Color (3xf)
+// See Also: LWCOLORVERTEX
+static const GLsizei lwcolorvertex_stride_in_bytes = (GLsizei)(sizeof(float) * (3 + 3 + 3));
+LwStaticAssert(sizeof(LWCOLORVERTEX) == (GLsizei)(sizeof(float) * (3 + 3 + 3)), "LWCOLORVERTEX size error");
 
 // Skin Vertex attributes: Coordinates (3xf) + Normal (3xf) + UV (2xf) + Bone Weight (4xf) + Bone Matrix (4xi)
 // See Also: LWSKINVERTEX
