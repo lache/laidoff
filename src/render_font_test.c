@@ -1,4 +1,4 @@
-﻿#include <string.h>
+#include <string.h>
 #include "render_font_test.h"
 #include "lwcontext.h"
 #include "render_text_block.h"
@@ -223,6 +223,8 @@ void lwc_render_font_test(const LWCONTEXT* pLwc) {
     for (int i = 0; i < ARRAY_SIZE(wave); i++) {
         if (wave[i].valid) {
             float alpha = LWMAX(0, sinf(wave[i].age * ((float)M_PI / 2.0f)));
+            lw_load_tex(pLwc, LAE_WAVE);
+            lw_load_tex(pLwc, LAE_WAVE_ALPHA);
             render_solid_vb_ui_alpha_uv_shader_view_proj(pLwc, 0, wave[i].y, 3.0f + 0.5f * alpha, 2.5f, LAE_WAVE, LAE_WAVE_ALPHA, LVT_CENTER_CENTER_ANCHORED_SQUARE, alpha, 0, 0, 0, 0, default_uv_offset, default_uv_scale, LWST_ETC1, view, proj);
             wave[i].y -= delta_time * 1.5f;
             wave[i].age += delta_time;

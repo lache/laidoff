@@ -305,12 +305,12 @@ void render_solid_vb_ui_alpha_uv_shader_view_proj(const LWCONTEXT* pLwc,
     bind_all_vertex_attrib_etc1_with_alpha(pLwc, lvt);
     glActiveTexture(GL_TEXTURE0);
     assert(tex_index);
-    lazy_tex_atlas_glBindTexture(pLwc, tex_index);
+    glBindTexture(GL_TEXTURE_2D, tex_index);
     set_tex_filter(GL_LINEAR, GL_LINEAR);
     if (shader_index == LWST_ETC1) {
         glActiveTexture(GL_TEXTURE1);
         assert(tex_alpha_index);
-        lazy_tex_atlas_glBindTexture(pLwc, tex_alpha_index);
+        glBindTexture(GL_TEXTURE_2D, tex_alpha_index);
         set_tex_filter(GL_LINEAR, GL_LINEAR);
     } else {
         assert(tex_alpha_index == 0);
