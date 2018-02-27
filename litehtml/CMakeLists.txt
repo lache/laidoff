@@ -65,7 +65,7 @@ set(SOURCE_GUMBO    src/gumbo/attribute.c
                     src/gumbo/tag.c
                     src/gumbo/tokenizer.c
                     src/gumbo/utf8.c
-                    src/gumbo/util.c
+                    src/gumbo/gumboutil.c
                     src/gumbo/vector.c
 )
 
