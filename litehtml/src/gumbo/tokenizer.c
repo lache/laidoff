@@ -58,7 +58,7 @@
 #include "token_type.h"
 #include "tokenizer_states.h"
 #include "utf8.h"
-#include "util.h"
+#include "gumboutil.h"
 #include "vector.h"
 
 // Compared against _script_data_buffer to determine if we're in double-escaped

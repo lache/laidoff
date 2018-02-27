@@ -33,7 +33,7 @@
 #include "error.h"
 #include "string_piece.h"
 #include "utf8.h"
-#include "util.h"
+#include "gumboutil.h"
 
 struct GumboInternalParser;
 

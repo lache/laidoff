@@ -21,7 +21,7 @@
 #include <string.h>
 #include <strings.h>
 
-#include "util.h"
+#include "gumboutil.h"
 
 struct GumboInternalParser;
 

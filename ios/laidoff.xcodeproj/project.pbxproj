@@ -290,7 +290,6 @@
 		6C295EA2204310700052999C /* README.md in Resources */ = {isa = PBXBuildFile; fileRef = 6C295E1D204310700052999C /* README.md */; };
 		6C295EA3204310700052999C /* .gitignore in Resources */ = {isa = PBXBuildFile; fileRef = 6C295E1E204310700052999C /* .gitignore */; };
 		6C295EA4204310700052999C /* string_buffer.c in Sources */ = {isa = PBXBuildFile; fileRef = 6C295E23204310700052999C /* string_buffer.c */; };
-		6C295EA5204310700052999C /* util.c in Sources */ = {isa = PBXBuildFile; fileRef = 6C295E26204310700052999C /* util.c */; };
 		6C295EA6204310700052999C /* char_ref.rl in Resources */ = {isa = PBXBuildFile; fileRef = 6C295E27204310700052999C /* char_ref.rl */; };
 		6C295EA7204310700052999C /* vector.c in Sources */ = {isa = PBXBuildFile; fileRef = 6C295E2A204310700052999C /* vector.c */; };
 		6C295EA8204310700052999C /* attribute.c in Sources */ = {isa = PBXBuildFile; fileRef = 6C295E2B204310700052999C /* attribute.c */; };
@@ -450,6 +449,7 @@
 		6CA16DA11EA210BB00DB7AF0 /* lvm.c in Sources */ = {isa = PBXBuildFile; fileRef = 6CA16D7C1EA210BB00DB7AF0 /* lvm.c */; };
 		6CA16DA21EA210BB00DB7AF0 /* lzio.c in Sources */ = {isa = PBXBuildFile; fileRef = 6CA16D7E1EA210BB00DB7AF0 /* lzio.c */; };
 		6CA16DA41EA2110E00DB7AF0 /* lwios.m in Sources */ = {isa = PBXBuildFile; fileRef = 6CA16DA31EA2110E00DB7AF0 /* lwios.m */; };
+		6CDDC6A42045D12E00AE3394 /* gumboutil.c in Sources */ = {isa = PBXBuildFile; fileRef = 6CDDC6A22045D12D00AE3394 /* gumboutil.c */; };
 		6CEB73DF1FD3CF5500D92EED /* numcomp_puck_game.c in Sources */ = {isa = PBXBuildFile; fileRef = 6CEB73DE1FD3CF5500D92EED /* numcomp_puck_game.c */; };
 		6CFFC41F1FE82250005FBFDE /* lwatlasenum.c in Sources */ = {isa = PBXBuildFile; fileRef = 6CFFC41E1FE8224F005FBFDE /* lwatlasenum.c */; };
 /* End PBXBuildFile section */
@@ -1038,7 +1038,6 @@
 		6C295E23204310700052999C /* string_buffer.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = string_buffer.c; sourceTree = "<group>"; };
 		6C295E24204310700052999C /* error.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = error.h; sourceTree = "<group>"; };
 		6C295E25204310700052999C /* tag_enum.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = tag_enum.h; sourceTree = "<group>"; };
-		6C295E26204310700052999C /* util.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = util.c; sourceTree = "<group>"; };
 		6C295E27204310700052999C /* char_ref.rl */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = char_ref.rl; sourceTree = "<group>"; };
 		6C295E28204310700052999C /* insertion_mode.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = insertion_mode.h; sourceTree = "<group>"; };
 		6C295E29204310700052999C /* parser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = parser.h; sourceTree = "<group>"; };
@@ -1055,7 +1054,6 @@
 		6C295E34204310700052999C /* string_buffer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = string_buffer.h; sourceTree = "<group>"; };
 		6C295E35204310700052999C /* error.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = error.c; sourceTree = "<group>"; };
 		6C295E36204310700052999C /* tag.in */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = tag.in; sourceTree = "<group>"; };
-		6C295E37204310700052999C /* util.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = util.h; sourceTree = "<group>"; };
 		6C295E38204310700052999C /* tag.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = tag.c; sourceTree = "<group>"; };
 		6C295E39204310700052999C /* char_ref.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = char_ref.h; sourceTree = "<group>"; };
 		6C295E3A204310700052999C /* vector.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = vector.h; sourceTree = "<group>"; };
@@ -1391,6 +1389,8 @@
 		6CA16D7E1EA210BB00DB7AF0 /* lzio.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = lzio.c; sourceTree = "<group>"; };
 		6CA16D7F1EA210BB00DB7AF0 /* lzio.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = lzio.h; sourceTree = "<group>"; };
 		6CA16DA31EA2110E00DB7AF0 /* lwios.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = lwios.m; sourceTree = "<group>"; };
+		6CDDC6A22045D12D00AE3394 /* gumboutil.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = gumboutil.c; sourceTree = "<group>"; };
+		6CDDC6A32045D12D00AE3394 /* gumboutil.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = gumboutil.h; sourceTree = "<group>"; };
 		6CEB73DD1FD3CF5500D92EED /* numcomp_puck_game.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = numcomp_puck_game.h; sourceTree = "<group>"; };
 		6CEB73DE1FD3CF5500D92EED /* numcomp_puck_game.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = numcomp_puck_game.c; sourceTree = "<group>"; };
 		6CFFC41E1FE8224F005FBFDE /* lwatlasenum.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = lwatlasenum.c; sourceTree = "<group>"; };
@@ -2276,10 +2276,11 @@
 		6C295E22204310700052999C /* gumbo */ = {
 			isa = PBXGroup;
 			children = (
+				6CDDC6A22045D12D00AE3394 /* gumboutil.c */,
+				6CDDC6A32045D12D00AE3394 /* gumboutil.h */,
 				6C295E23204310700052999C /* string_buffer.c */,
 				6C295E24204310700052999C /* error.h */,
 				6C295E25204310700052999C /* tag_enum.h */,
-				6C295E26204310700052999C /* util.c */,
 				6C295E27204310700052999C /* char_ref.rl */,
 				6C295E28204310700052999C /* insertion_mode.h */,
 				6C295E29204310700052999C /* parser.h */,
@@ -2296,7 +2297,6 @@
 				6C295E34204310700052999C /* string_buffer.h */,
 				6C295E35204310700052999C /* error.c */,
 				6C295E36204310700052999C /* tag.in */,
-				6C295E37204310700052999C /* util.h */,
 				6C295E38204310700052999C /* tag.c */,
 				6C295E39204310700052999C /* char_ref.h */,
 				6C295E3A204310700052999C /* vector.h */,
@@ -2920,7 +2920,6 @@
 				2640E17C1FE7F9A900504A37 /* lwvbo.c in Sources */,
 				566373301EBA52D3001DA3F4 /* collision_cylinder_box.cpp in Sources */,
 				566373701EBA52D4001DA3F4 /* plane.cpp in Sources */,
-				6C295EA5204310700052999C /* util.c in Sources */,
 				26457DBD1FBC1C5B00FFEE74 /* lwdirpad.c in Sources */,
 				6C7739F41FB4B5AA001014DE /* lwuidim.c in Sources */,
 				56F189BB1EC751950019312F /* ztrie.c in Sources */,
@@ -3117,6 +3116,7 @@
 				6CA16D831EA210BB00DB7AF0 /* lbitlib.c in Sources */,
 				56F189AC1EC751950019312F /* zloop.c in Sources */,
 				6C2751D21FDAC8E100D1266A /* lwfvbo.c in Sources */,
+				6CDDC6A42045D12E00AE3394 /* gumboutil.c in Sources */,
 				56F188AA1EC74DB60019312F /* curve_client.cpp in Sources */,
 				6C7739D41FB4B5AA001014DE /* lwbutton.c in Sources */,
 				6C7739C81FB4B5AA001014DE /* lwudp.c in Sources */,

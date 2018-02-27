@@ -24,7 +24,7 @@
 #include "error.h"
 #include "gumbo.h"
 #include "parser.h"
-#include "util.h"
+#include "gumboutil.h"
 #include "vector.h"
 
 const int kUtf8ReplacementChar = 0xFFFD;

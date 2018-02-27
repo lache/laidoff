@@ -29,7 +29,7 @@
 #include "tokenizer.h"
 #include "tokenizer_states.h"
 #include "utf8.h"
-#include "util.h"
+#include "gumboutil.h"
 #include "vector.h"
 
 #define AVOID_UNUSED_VARIABLE_WARNING(i) (void)(i)

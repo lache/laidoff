@@ -22,7 +22,7 @@
 #include <strings.h>
 
 #include "string_piece.h"
-#include "util.h"
+#include "gumboutil.h"
 
 struct GumboInternalParser;
 

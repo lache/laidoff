@@ -14,7 +14,7 @@
 //
 // Author: jdtang@google.com (Jonathan Tang)
 
-#include "util.h"
+#include "gumboutil.h"
 
 #include <assert.h>
 #include <stdlib.h>

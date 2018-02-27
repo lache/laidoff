@@ -24,7 +24,7 @@
 #include "gumbo.h"
 #include "parser.h"
 #include "string_buffer.h"
-#include "util.h"
+#include "gumboutil.h"
 #include "vector.h"
 
 // Prints a formatted message to a StringBuffer.  This automatically resizes the
