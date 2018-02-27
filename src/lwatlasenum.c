@@ -30,6 +30,7 @@ void lw_load_tex(const LWCONTEXT* _pLwc, int lae) {
         return;
     }
     glBindTexture(GL_TEXTURE_2D, pLwc->tex_atlas[lae]);
+    GLenum err = glGetError();
     size_t tex_atlas_filename_len = (int)strlen(tex_atlas_filename[lae]);
     size_t filename_index = tex_atlas_filename_len;
     // take only filename

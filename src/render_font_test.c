@@ -207,7 +207,7 @@ void lwc_render_font_test(const LWCONTEXT* pLwc) {
     //glShadeModel(GL_FLAT);
     glDrawArrays(GL_TRIANGLES, 0, pLwc->vertex_buffer[lvt].vertex_count);
 
-    glDisable(GL_DEPTH_TEST);
+    
     if (last_wave_spawn + 1.1f < (float)pLwc->app_time) {
         for (int i = 0; i < ARRAY_SIZE(wave); i++) {
             if (wave[i].valid == 0) {
@@ -235,7 +235,7 @@ void lwc_render_font_test(const LWCONTEXT* pLwc) {
     }
 
     // UI
-    
+    glDisable(GL_DEPTH_TEST);
     render_solid_box_ui_lvt_flip_y_uv(pLwc, 0, 0, 2 * pLwc->aspect_ratio, 2/*flip_y*/, pLwc->font_fbo.color_tex, LVT_CENTER_CENTER_ANCHORED_SQUARE, 1);
     glEnable(GL_DEPTH_TEST);
 }
