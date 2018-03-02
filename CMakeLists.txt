@@ -28,6 +28,9 @@ if (MSVC)
     # disable warning C4996: 'The POSIX name for this item is deprecated. Instead, use the ISO C and C++ conformant name'.
     #set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} /wd4996")
     #set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /wd4996")
+	# disable warning C4819: 'The file contains a character that cannot be represented in the current code page (949).'
+	set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} /wd4819")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /wd4819")
     set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} /D_CRT_NONSTDC_NO_WARNINGS /D_CRT_SECURE_NO_WARNINGS /WX")
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /D_CRT_NONSTDC_NO_WARNINGS /D_CRT_SECURE_NO_WARNINGS /WX")
 endif ()
@@ -280,8 +283,7 @@ else (NOT SERVER_ONLY)
     set(WINDOWS_BINARIES laidoff-server)
 endif (NOT SERVER_ONLY)
 
-if (MSVC)
-    # Tell MSVC to use 'main' instead of 'WinMain' for Windows subsystem executables
+if (MSVC)# Tell MSVC to use 'main' instead of 'WinMain' for Windows subsystem executables
     set_target_properties(${WINDOWS_BINARIES} PROPERTIES
             LINK_FLAGS "/ENTRY:mainCRTStartup")
 elseif (APPLE)
