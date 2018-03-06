@@ -7,7 +7,7 @@
 #include "htmlui.h"
 #include "linmath.h"
 
-void lwc_render_font_test_fbo(const LWCONTEXT* pLwc) {
+void lwc_render_font_test_fbo(const LWCONTEXT* pLwc, const char* html_path) {
 	glBindFramebuffer(GL_FRAMEBUFFER, pLwc->font_fbo.fbo);
 	glDisable(GL_DEPTH_TEST);
 
@@ -129,7 +129,7 @@ void lwc_render_font_test_fbo(const LWCONTEXT* pLwc) {
 
 	//test_html_ui(pLwc);
 
-	htmlui_load_render_draw(pLwc->htmlui, ASSETS_BASE_PATH "html" PATH_SEPARATOR "HTMLPage1.html");
+	htmlui_load_render_draw(pLwc->htmlui, html_path);
 	
 	glEnable(GL_DEPTH_TEST);
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);

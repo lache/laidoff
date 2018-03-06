@@ -8,11 +8,12 @@
 #include "lwmacro.h"
 #include "lwcontext.h"
 #include "file.h"
+#include "render_font_test.h"
 
 class LWHTMLUI {
 public:
 	LWHTMLUI(const LWCONTEXT* pLwc, int w, int h)
-		: container(pLwc, w, h), client_width(w), client_height(h)
+		: pLwc(pLwc), container(pLwc, w, h), client_width(w), client_height(h)
 	{
 		std::shared_ptr<char> master_css_str(create_string_from_file(ASSETS_BASE_PATH "css" PATH_SEPARATOR "master.css"), free);
 		browser_context.load_master_stylesheet(master_css_str.get());
@@ -52,6 +53,15 @@ public:
 			doc->on_mouse_over(x, y, x, y, redraw_boxes);
 		}
 	}
+    void set_next_html_path(const char* html_path) {
+        next_html_path = html_path;
+    }
+    void load_next_html_path() {
+        if (next_html_path.empty() == false) {
+            lwc_render_font_test_fbo(pLwc, next_html_path.c_str());
+            next_html_path.clear();
+        }
+    }
 private:
 	LWHTMLUI();
 	LWHTMLUI(const LWHTMLUI&);
@@ -61,6 +71,8 @@ private:
 	int client_width;
 	int client_height;
 	litehtml::element::ptr last_lbutton_down_element;
+    std::string next_html_path;
+    const LWCONTEXT* pLwc;
 };
 
 void* htmlui_new(const LWCONTEXT* pLwc) {
@@ -126,4 +138,14 @@ int test_html_ui(const LWCONTEXT* pLwc) {
 	free(test_html_str);
 
 	return 0;
+}
+
+void htmlui_set_next_html_path(void* c, const char* html_path) {
+    LWHTMLUI* htmlui = (LWHTMLUI*)c;
+    htmlui->set_next_html_path(html_path);
+}
+
+void htmlui_load_next_html_path(void* c) {
+    LWHTMLUI* htmlui = (LWHTMLUI*)c;
+    htmlui->load_next_html_path();
 }

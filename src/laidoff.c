@@ -1135,6 +1135,7 @@ void lwc_render(const LWCONTEXT* pLwc) {
     // Rendering stats
     render_stat(pLwc);
     render_addr(pLwc);
+    htmlui_load_next_html_path(pLwc->htmlui);
     // Set rendering flag to 0 (ignoring const-ness......)
     lwcontext_set_rendering((LWCONTEXT*)pLwc, 0);
 }

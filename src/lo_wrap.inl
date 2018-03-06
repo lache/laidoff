@@ -45321,15 +45321,18 @@ fail:
 static int _wrap_lwc_render_font_test_fbo(lua_State* L) {
   int SWIG_arg = 0;
   LWCONTEXT *arg1 = (LWCONTEXT *) 0 ;
+  char *arg2 = (char *) 0 ;
   
-  SWIG_check_num_args("lwc_render_font_test_fbo",1,1)
+  SWIG_check_num_args("lwc_render_font_test_fbo",2,2)
   if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("lwc_render_font_test_fbo",1,"LWCONTEXT const *");
+  if(!SWIG_lua_isnilstring(L,2)) SWIG_fail_arg("lwc_render_font_test_fbo",2,"char const *");
   
   if (!SWIG_IsOK(SWIG_ConvertPtr(L,1,(void**)&arg1,SWIGTYPE_p__LWCONTEXT,0))){
     SWIG_fail_ptr("lwc_render_font_test_fbo",1,SWIGTYPE_p__LWCONTEXT);
   }
   
-  lwc_render_font_test_fbo((struct _LWCONTEXT const *)arg1);
+  arg2 = (char *)lua_tostring(L, 2);
+  lwc_render_font_test_fbo((struct _LWCONTEXT const *)arg1,(char const *)arg2);
   
   return SWIG_arg;
   
@@ -46267,6 +46270,108 @@ static int _wrap_render_solid_vb_ui_alpha_uv(lua_State* L) {
   }
   
   render_solid_vb_ui_alpha_uv((struct _LWCONTEXT const *)arg1,arg2,arg3,arg4,arg5,arg6,arg7,arg8,arg9,arg10,arg11,arg12,arg13,(float const *)arg14,(float const *)arg15);
+  
+  return SWIG_arg;
+  
+  if(0) SWIG_fail;
+  
+fail:
+  lua_error(L);
+  return SWIG_arg;
+}
+
+
+static int _wrap_render_solid_vb_ui_alpha_uv_shader_view_proj(lua_State* L) {
+  int SWIG_arg = 0;
+  LWCONTEXT *arg1 = (LWCONTEXT *) 0 ;
+  float arg2 ;
+  float arg3 ;
+  float arg4 ;
+  float arg5 ;
+  GLuint arg6 ;
+  GLuint arg7 ;
+  enum _LW_VBO_TYPE arg8 ;
+  float arg9 ;
+  float arg10 ;
+  float arg11 ;
+  float arg12 ;
+  float arg13 ;
+  float *arg14 = (float *) 0 ;
+  float *arg15 = (float *) 0 ;
+  int arg16 ;
+  vec4 *arg17 ;
+  vec4 *arg18 ;
+  GLuint *argp6 ;
+  GLuint *argp7 ;
+  
+  SWIG_check_num_args("render_solid_vb_ui_alpha_uv_shader_view_proj",18,18)
+  if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("render_solid_vb_ui_alpha_uv_shader_view_proj",1,"LWCONTEXT const *");
+  if(!lua_isnumber(L,2)) SWIG_fail_arg("render_solid_vb_ui_alpha_uv_shader_view_proj",2,"float");
+  if(!lua_isnumber(L,3)) SWIG_fail_arg("render_solid_vb_ui_alpha_uv_shader_view_proj",3,"float");
+  if(!lua_isnumber(L,4)) SWIG_fail_arg("render_solid_vb_ui_alpha_uv_shader_view_proj",4,"float");
+  if(!lua_isnumber(L,5)) SWIG_fail_arg("render_solid_vb_ui_alpha_uv_shader_view_proj",5,"float");
+  if(!lua_isuserdata(L,6)) SWIG_fail_arg("render_solid_vb_ui_alpha_uv_shader_view_proj",6,"GLuint");
+  if(!lua_isuserdata(L,7)) SWIG_fail_arg("render_solid_vb_ui_alpha_uv_shader_view_proj",7,"GLuint");
+  if(!lua_isnumber(L,8)) SWIG_fail_arg("render_solid_vb_ui_alpha_uv_shader_view_proj",8,"enum _LW_VBO_TYPE");
+  if(!lua_isnumber(L,9)) SWIG_fail_arg("render_solid_vb_ui_alpha_uv_shader_view_proj",9,"float");
+  if(!lua_isnumber(L,10)) SWIG_fail_arg("render_solid_vb_ui_alpha_uv_shader_view_proj",10,"float");
+  if(!lua_isnumber(L,11)) SWIG_fail_arg("render_solid_vb_ui_alpha_uv_shader_view_proj",11,"float");
+  if(!lua_isnumber(L,12)) SWIG_fail_arg("render_solid_vb_ui_alpha_uv_shader_view_proj",12,"float");
+  if(!lua_isnumber(L,13)) SWIG_fail_arg("render_solid_vb_ui_alpha_uv_shader_view_proj",13,"float");
+  if(!SWIG_isptrtype(L,14)) SWIG_fail_arg("render_solid_vb_ui_alpha_uv_shader_view_proj",14,"float const *");
+  if(!SWIG_isptrtype(L,15)) SWIG_fail_arg("render_solid_vb_ui_alpha_uv_shader_view_proj",15,"float const *");
+  if(!lua_isnumber(L,16)) SWIG_fail_arg("render_solid_vb_ui_alpha_uv_shader_view_proj",16,"int");
+  if(!SWIG_isptrtype(L,17)) SWIG_fail_arg("render_solid_vb_ui_alpha_uv_shader_view_proj",17,"mat4x4 const");
+  if(!SWIG_isptrtype(L,18)) SWIG_fail_arg("render_solid_vb_ui_alpha_uv_shader_view_proj",18,"mat4x4 const");
+  
+  if (!SWIG_IsOK(SWIG_ConvertPtr(L,1,(void**)&arg1,SWIGTYPE_p__LWCONTEXT,0))){
+    SWIG_fail_ptr("render_solid_vb_ui_alpha_uv_shader_view_proj",1,SWIGTYPE_p__LWCONTEXT);
+  }
+  
+  arg2 = (float)lua_tonumber(L, 2);
+  arg3 = (float)lua_tonumber(L, 3);
+  arg4 = (float)lua_tonumber(L, 4);
+  arg5 = (float)lua_tonumber(L, 5);
+  
+  if (!SWIG_IsOK(SWIG_ConvertPtr(L,6,(void**)&argp6,SWIGTYPE_p_GLuint,0))){
+    SWIG_fail_ptr("render_solid_vb_ui_alpha_uv_shader_view_proj",6,SWIGTYPE_p_GLuint);
+  }
+  arg6 = *argp6;
+  
+  
+  if (!SWIG_IsOK(SWIG_ConvertPtr(L,7,(void**)&argp7,SWIGTYPE_p_GLuint,0))){
+    SWIG_fail_ptr("render_solid_vb_ui_alpha_uv_shader_view_proj",7,SWIGTYPE_p_GLuint);
+  }
+  arg7 = *argp7;
+  
+  arg8 = (enum _LW_VBO_TYPE)(int)lua_tonumber(L, 8);
+  arg9 = (float)lua_tonumber(L, 9);
+  arg10 = (float)lua_tonumber(L, 10);
+  arg11 = (float)lua_tonumber(L, 11);
+  arg12 = (float)lua_tonumber(L, 12);
+  arg13 = (float)lua_tonumber(L, 13);
+  
+  if (!SWIG_IsOK(SWIG_ConvertPtr(L,14,(void**)&arg14,SWIGTYPE_p_float,0))){
+    SWIG_fail_ptr("render_solid_vb_ui_alpha_uv_shader_view_proj",14,SWIGTYPE_p_float);
+  }
+  
+  
+  if (!SWIG_IsOK(SWIG_ConvertPtr(L,15,(void**)&arg15,SWIGTYPE_p_float,0))){
+    SWIG_fail_ptr("render_solid_vb_ui_alpha_uv_shader_view_proj",15,SWIGTYPE_p_float);
+  }
+  
+  arg16 = (int)lua_tonumber(L, 16);
+  
+  if (!SWIG_IsOK(SWIG_ConvertPtr(L,17,(void**)&arg17,SWIGTYPE_p_a_4__float,0))){
+    SWIG_fail_ptr("render_solid_vb_ui_alpha_uv_shader_view_proj",17,SWIGTYPE_p_a_4__float);
+  }
+  
+  
+  if (!SWIG_IsOK(SWIG_ConvertPtr(L,18,(void**)&arg18,SWIGTYPE_p_a_4__float,0))){
+    SWIG_fail_ptr("render_solid_vb_ui_alpha_uv_shader_view_proj",18,SWIGTYPE_p_a_4__float);
+  }
+  
+  render_solid_vb_ui_alpha_uv_shader_view_proj((struct _LWCONTEXT const *)arg1,arg2,arg3,arg4,arg5,arg6,arg7,arg8,arg9,arg10,arg11,arg12,arg13,(float const *)arg14,(float const *)arg15,arg16,(float const (*)[4])arg17,(float const (*)[4])arg18);
   
   return SWIG_arg;
   
@@ -84505,6 +84610,8 @@ static swig_lua_const_info swig_SwigModule_constants[]= {
     {SWIG_LUA_CONSTTAB_INT("LAE_UI_BUTTON_ATLAS", LAE_UI_BUTTON_ATLAS)},
     {SWIG_LUA_CONSTTAB_INT("LAE_FOOTBALL_GROUND", LAE_FOOTBALL_GROUND)},
     {SWIG_LUA_CONSTTAB_INT("LAE_PLAYER_CAPSULE", LAE_PLAYER_CAPSULE)},
+    {SWIG_LUA_CONSTTAB_INT("LAE_WAVE", LAE_WAVE)},
+    {SWIG_LUA_CONSTTAB_INT("LAE_WAVE_ALPHA", LAE_WAVE_ALPHA)},
     {SWIG_LUA_CONSTTAB_INT("LAE_COUNT", LAE_COUNT)},
     {SWIG_LUA_CONSTTAB_INT("LAE_DONTCARE", LAE_DONTCARE)},
     {SWIG_LUA_CONSTTAB_INT("LAE_ZERO_FOR_BLACK", LAE_ZERO_FOR_BLACK)},
@@ -85329,6 +85436,7 @@ static swig_lua_method swig_SwigModule_methods[]= {
     { "render_solid_vb_ui_flip_y_uv_shader", _wrap_render_solid_vb_ui_flip_y_uv_shader},
     { "render_solid_vb_ui_flip_y_uv_shader_rot", _wrap_render_solid_vb_ui_flip_y_uv_shader_rot},
     { "render_solid_vb_ui_alpha_uv", _wrap_render_solid_vb_ui_alpha_uv},
+    { "render_solid_vb_ui_alpha_uv_shader_view_proj", _wrap_render_solid_vb_ui_alpha_uv_shader_view_proj},
     { "render_solid_vb_ui_alpha_uv_shader", _wrap_render_solid_vb_ui_alpha_uv_shader},
     { "lwc_enable_additive_blending", _wrap_lwc_enable_additive_blending},
     { "lwc_disable_additive_blending", _wrap_lwc_disable_additive_blending},

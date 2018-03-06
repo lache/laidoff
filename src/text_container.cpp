@@ -7,6 +7,7 @@
 #include "render_text_block.h"
 #include "render_solid.h"
 #include "lwlog.h"
+#include "htmlui.h"
 using namespace litehtml;
 
 litehtml::text_container::text_container(const LWCONTEXT* pLwc, int w, int h)
@@ -144,6 +145,12 @@ void litehtml::text_container::link(const std::shared_ptr<litehtml::document>& d
 
 void litehtml::text_container::on_anchor_click(const litehtml::tchar_t * url, const litehtml::element::ptr & el) {
 	LOGI("on_anchor_click: %s", url);
+    const char* path_prefix = ASSETS_BASE_PATH "html" PATH_SEPARATOR;
+    char path[1024] = { 0, };
+    strcat(path, path_prefix);
+    strcat(path, url);
+    //lwc_render_font_test_fbo(pLwc, path);
+    htmlui_set_next_html_path(pLwc->htmlui, path);
 }
 
 void litehtml::text_container::set_cursor(const litehtml::tchar_t * cursor) {

@@ -62,7 +62,7 @@ void change_to_font_test(LWCONTEXT* pLwc) {
     // Initialize test font FBO
     init_font_fbo(pLwc);
     // Render font FBO using render-to-texture
-    lwc_render_font_test_fbo(pLwc);
+    lwc_render_font_test_fbo(pLwc, ASSETS_BASE_PATH "html" PATH_SEPARATOR "HTMLPage1.html");
 }
 
 void change_to_admin(LWCONTEXT* pLwc) {
