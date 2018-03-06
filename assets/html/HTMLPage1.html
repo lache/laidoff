@@ -23,9 +23,32 @@
             right: 0;
             text-align:right;
         }
+        #parent{
+		    /*margin: 0 auto;*/
+		    width: 70%;
+		    background-color: rgba(255, 0, 0, 0.7);
+		}
+		#child-left{
+		    float: left;
+		    display:block;
+		    width: 80%;
+		    background-color: rgba(255, 0, 0, 0.7);
+		}
+		#child-right{
+		    float: right;
+		    display:block;
+		    width: 20%;
+		    background-color: rgba(0, 0, 0, 0.7);
+		}
+		.select-button {
+			padding: 5pt;
+			text-align: center;
+			display: block;
+			background-color: rgba(0,200,200,0.8);
+		}
     </style>
 </head>
-<body style="margin:0px;color:white">
+<body style="margin:0px;color:white;font-size:1em">
 
     <div>
         자금 1,172,100,000원<br />
@@ -41,7 +64,79 @@
         13:15<br />
     </div>
 
-    <a style="display:inline-block;background-color:rgba(255, 0, 0, 0.7);padding: 85px 85px;" href="HTMLPage2.html">버튼</a>
+    <a style="display:inline-block;background-color:rgba(255, 0, 0, 0.7);padding:5pt" href="HTMLPage2.html">두 번째 페이지로...</a>
+
+	<a style="display:inline-block;background-color:rgba(0, 0, 0, 0.7);width:30%;text-align: center;" href="HTMLPage2.html">선택 아이템 1</a>
+
+	<div style="margin:0 auto;background-color:rgba(0, 0, 0, 0.8);width:70%;">
+		<div style="padding:2pt;text-align:center;font-size:1.5em">계약 선택</div>
+	</div>
+
+	<table style="margin:0 auto; width:70%; background-color: rgba(0,0,0,0.7);">
+		<tr>
+			<td>
+				인천 - 요코하마 (500.0 km)<br/>
+				보수: 50,000,000원<br/>
+				화물: 300 t<br/>
+			</td>
+			<td>
+				<a class="select-button" href="HTMLPage2.html">선택</a>
+			</td>
+			<td>
+				인천 - 요코하마 (500.0 km)<br/>
+				보수: 50,000,000원<br/>
+				화물: 300 t<br/>
+			</td>
+			<td>
+				<a class="select-button" href="HTMLPage2.html">선택</a>
+			</td>
+		</tr>
+		<tr>
+			<td>
+				으히히히<br/>
+				보수: 50,000,000원<br/>
+				화물: 300 t<br/>
+			</td>
+			<td>
+				<a class="select-button" href="HTMLPage2.html">선택</a>
+			</td>
+			<td>
+				dfdsfsdfds인천 - 요코하마 (500.0 km)<br/>
+				보수: 50,000,000원<br/>
+				화물: 300 t<br/>
+			</td>
+			<td>
+				<a class="select-button" href="HTMLPage2.html">선택</a>
+			</td>
+		</tr>
+	</table>
+
+	
+	<div id="parent">
+		<div id="child-left">
+			<div style="padding:3pt;">
+				인천 - 요코하마 (500.0 km)<br/>
+				보수: 50,000,000원<br/>
+				화물: 300 t<br/>
+			</div>
+		</div>
+		<div id="child-right">
+			<div style="padding:3pt; text-align:center;">
+				선택
+			</div>
+		</div>
+	</div>
+
+	<div id="parent">
+		<div id="child-left">
+			<div style="padding:3pt;">
+				노선 1
+			</div>
+		</div>
+		<div id="child-right">
+			<a style="padding:3pt;text-align:center;display:block;background-color: rgba(0,0,0,0.7);" href="HTMLPage2.html">선택</a>
+		</div>
+	</div>
 
     <!--
     <div class="bottom">

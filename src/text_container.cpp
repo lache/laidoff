@@ -18,11 +18,11 @@ litehtml::text_container::~text_container() {
 }
 
 litehtml::uint_ptr litehtml::text_container::create_font(const litehtml::tchar_t * faceName, int size, int weight, litehtml::font_style italic, unsigned int decoration, litehtml::font_metrics * fm) {
-	//wprintf(_t("create_font: faceName=%s, size=%d, weight=%d\n"), faceName, size, weight);
+	LOGIx("create_font: faceName=%s, size=%d, weight=%d\n", faceName, size, weight);
 	size_t font_idx = font_sizes.size();
 	font_sizes.push_back(size);
-	fm->height = int(size * 0.8f * pLwc->height / 720.f);
-	fm->descent = int(size * 0.1f * pLwc->height / 720.f);
+	fm->height = static_cast<int>(roundf(size * 0.8f * pLwc->height / 720.f));
+	fm->descent = static_cast<int>(roundf(size * 0.1f * pLwc->height / 720.f));
 	return litehtml::uint_ptr(font_idx);// litehtml::uint_ptr();
 }
 
@@ -47,6 +47,7 @@ static float conv_coord_y(const LWCONTEXT* pLwc, int y) {
 
 static void fill_text_block(const LWCONTEXT* pLwc, LWTEXTBLOCK* text_block, int x, int y, const char* text, int size, const litehtml::web_color& color) {
 	text_block->text_block_width = 999.0f;// 2.00f * aspect_ratio;
+    LOGIx("font size: %d", size);
 	text_block->text_block_line_height = size / 72.0f;
 	text_block->size = size / 72.0f;
 	SET_COLOR_RGBA_FLOAT(text_block->color_normal_glyph, color.red / 255.0f, color.green / 255.0f, color.blue / 255.0f, 1);
@@ -82,7 +83,7 @@ void litehtml::text_container::draw_text(litehtml::uint_ptr hdc, const litehtml:
 }
 
 int litehtml::text_container::pt_to_px(int pt) {
-	return static_cast<int>(pt / 10.0f * 36.0f);
+	return static_cast<int>(roundf(pt * 3.6f * pLwc->width / 640.0f));
 }
 
 int litehtml::text_container::get_default_font_size() const {
@@ -114,7 +115,7 @@ void litehtml::text_container::draw_background(litehtml::uint_ptr hdc, const lit
 		conv_coord_x(pLwc, bg.border_box.x),
 		conv_coord_y(pLwc, bg.border_box.y),
 		conv_size_x(pLwc, bg.border_box.width),
-		conv_size_x(pLwc, bg.border_box.height),
+		conv_size_y(pLwc, bg.border_box.height),
 		0,
 		LVT_LEFT_TOP_ANCHORED_SQUARE,
 		bg.color.alpha / 255.0f,
