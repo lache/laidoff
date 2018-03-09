@@ -147,22 +147,26 @@ void lwc_render_font_test(const LWCONTEXT* pLwc) {
 	LW_GL_VIEWPORT();
     glClearColor(0 / 255.f, 94 / 255.f, 190 / 255.f, 1);//lw_clear_color();
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+    float ship_y = 0.0f + (float)pLwc->app_time;
 	
     float half_height = 20.0f;
     float near_z = 0.1f;
     float far_z = 1000.0f;
-    float cam_r = sinf((float)pLwc->app_time / 4) / 5.0f;
+    float cam_r = sinf((float)pLwc->app_time / 4) / 4.0f;
     float c_r = cosf(cam_r);
     float s_r = sinf(cam_r);
-    float eye_x = 5.0f;
-    float eye_y = -2.5f;
-    vec3 eye = { c_r * eye_x - s_r * eye_y, s_r * eye_x + c_r * eye_y, 5.0f };
-    vec3 center = { 0, 0, 0 };
-
-    float cam_a = atan2f(eye[1], eye[0]);
+    float eye_x = 50.0f;
+    float eye_y = -25.0f;
+    vec3 eye = { c_r * eye_x - s_r * eye_y, s_r * eye_x + c_r * eye_y, 50.0f }; // eye position
+    eye[1] += ship_y;
+    vec3 center = { 0, ship_y, 0 }; // look position
+    vec3 center_to_eye;
+    vec3_sub(center_to_eye, eye, center);
+    float cam_a = atan2f(center_to_eye[1], center_to_eye[0]);
     vec3 right = { -sinf(cam_a),cosf(cam_a),0 };
     vec3 eye_right;
-    vec3_mul_cross(eye_right, eye, right);
+    vec3_mul_cross(eye_right, center_to_eye, right);
     vec3 up;
     vec3_norm(up, eye_right);
     mat4x4 proj, view;
@@ -175,45 +179,109 @@ void lwc_render_font_test(const LWCONTEXT* pLwc) {
                  far_z);
     mat4x4_look_at(view, eye, center, up);
 
-    mat4x4 rot;
-    mat4x4_identity(rot);
-
-    float sx = 1, sy = 1, sz = 1;
-    float x = 0, y = 0, z = 0;
-    mat4x4 model;
-    mat4x4_identity(model);
-    mat4x4_mul(model, model, rot);
-    mat4x4_scale_aniso(model, model, sx, sy, sz);
-
-    mat4x4 model_translate;
-    mat4x4_translate(model_translate, x, y, z);
-
-    mat4x4_mul(model, model_translate, model);
-
-    mat4x4 view_model;
-    mat4x4_mul(view_model, view, model);
-
-    mat4x4 proj_view_model;
-    mat4x4_identity(proj_view_model);
-    mat4x4_mul(proj_view_model, proj, view_model);
     int shader_index = LWST_DEFAULT_NORMAL_COLOR;
     const LWSHADER* shader = &pLwc->shader[shader_index];
     lazy_glUseProgram(pLwc, shader_index);
-    const LW_VBO_TYPE lvt = LVT_SHIP;
-    lazy_glBindBuffer(pLwc, lvt);
-    bind_all_color_vertex_attrib(pLwc, lvt);
-    glUniformMatrix4fv(shader->mvp_location, 1, GL_FALSE, (const GLfloat*)proj_view_model);
-    glUniformMatrix4fv(shader->m_location, 1, GL_FALSE, (const GLfloat*)model);
-    //glShadeModel(GL_FLAT);
-    glDrawArrays(GL_TRIANGLES, 0, pLwc->vertex_buffer[lvt].vertex_count);
+    {
+        mat4x4 rot;
+        mat4x4_identity(rot);
 
+        float sx = 1, sy = 1, sz = 1;
+        float x = 0, y = ship_y, z = 0;
+        mat4x4 model;
+        mat4x4_identity(model);
+        mat4x4_mul(model, model, rot);
+        mat4x4_scale_aniso(model, model, sx, sy, sz);
+
+        mat4x4 model_translate;
+        mat4x4_translate(model_translate, x, y, z);
+
+        mat4x4_mul(model, model_translate, model);
+
+        mat4x4 view_model;
+        mat4x4_mul(view_model, view, model);
+
+        mat4x4 proj_view_model;
+        mat4x4_identity(proj_view_model);
+        mat4x4_mul(proj_view_model, proj, view_model);
+
+        const LW_VBO_TYPE lvt = LVT_SHIP;
+        lazy_glBindBuffer(pLwc, lvt);
+        bind_all_color_vertex_attrib(pLwc, lvt);
+        glUniformMatrix4fv(shader->mvp_location, 1, GL_FALSE, (const GLfloat*)proj_view_model);
+        glUniformMatrix4fv(shader->m_location, 1, GL_FALSE, (const GLfloat*)model);
+        //glShadeModel(GL_FLAT);
+        glDrawArrays(GL_TRIANGLES, 0, pLwc->vertex_buffer[lvt].vertex_count);
+    }
+    {
+        mat4x4 rot;
+        mat4x4_identity(rot);
+
+        float sx = 1, sy = 1, sz = 1;
+        float x = 0, y = 0, z = 0;
+        mat4x4 model;
+        mat4x4_identity(model);
+        mat4x4_mul(model, model, rot);
+        mat4x4_scale_aniso(model, model, sx, sy, sz);
+
+        mat4x4 model_translate;
+        mat4x4_translate(model_translate, x, y, z);
+
+        mat4x4_mul(model, model_translate, model);
+
+        mat4x4 view_model;
+        mat4x4_mul(view_model, view, model);
+
+        mat4x4 proj_view_model;
+        mat4x4_identity(proj_view_model);
+        mat4x4_mul(proj_view_model, proj, view_model);
+
+        const LW_VBO_TYPE lvt = LVT_PORT;
+        lazy_glBindBuffer(pLwc, lvt);
+        bind_all_color_vertex_attrib(pLwc, lvt);
+        glUniformMatrix4fv(shader->mvp_location, 1, GL_FALSE, (const GLfloat*)proj_view_model);
+        glUniformMatrix4fv(shader->m_location, 1, GL_FALSE, (const GLfloat*)model);
+        //glShadeModel(GL_FLAT);
+        glDrawArrays(GL_TRIANGLES, 0, pLwc->vertex_buffer[lvt].vertex_count);
+    }
+    {
+        mat4x4 rot;
+        mat4x4_identity(rot);
+
+        float sx = 1, sy = 1, sz = 1;
+        float x = 0, y = 160, z = 0;
+        mat4x4 model;
+        mat4x4_identity(model);
+        mat4x4_mul(model, model, rot);
+        mat4x4_scale_aniso(model, model, sx, sy, sz);
+
+        mat4x4 model_translate;
+        mat4x4_translate(model_translate, x, y, z);
+
+        mat4x4_mul(model, model_translate, model);
+
+        mat4x4 view_model;
+        mat4x4_mul(view_model, view, model);
+
+        mat4x4 proj_view_model;
+        mat4x4_identity(proj_view_model);
+        mat4x4_mul(proj_view_model, proj, view_model);
+
+        const LW_VBO_TYPE lvt = LVT_PORT;
+        lazy_glBindBuffer(pLwc, lvt);
+        bind_all_color_vertex_attrib(pLwc, lvt);
+        glUniformMatrix4fv(shader->mvp_location, 1, GL_FALSE, (const GLfloat*)proj_view_model);
+        glUniformMatrix4fv(shader->m_location, 1, GL_FALSE, (const GLfloat*)model);
+        //glShadeModel(GL_FLAT);
+        glDrawArrays(GL_TRIANGLES, 0, pLwc->vertex_buffer[lvt].vertex_count);
+    }
     
     if (last_wave_spawn + 1.1f < (float)pLwc->app_time) {
         for (int i = 0; i < ARRAY_SIZE(wave); i++) {
             if (wave[i].valid == 0) {
                 last_wave_spawn = (float)pLwc->app_time;
                 wave[i].age = 0;
-                wave[i].y = -5.5f;
+                wave[i].y = -5.5f + ship_y;
                 wave[i].valid = 1;
                 break;
             }

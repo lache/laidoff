@@ -52,6 +52,7 @@ typedef enum _LW_VBO_TYPE
     LVT_FOOTBALL_GROUND,
     LVT_PLAYER_CAPSULE,
 	LVT_SHIP,
+    LVT_PORT,
 
 	LVT_COUNT,
     LVT_DONTCARE,
@@ -115,6 +116,7 @@ static const LWVBOFILENAME vbo_filename[] = {
     { LVT_FOOTBALL_GROUND, ASSETS_BASE_PATH "vbo" PATH_SEPARATOR "football-ground.vbo", LWST_DEFAULT, },
     { LVT_PLAYER_CAPSULE, ASSETS_BASE_PATH "vbo" PATH_SEPARATOR "player-capsule.vbo", LWST_DEFAULT, },
 	{ LVT_SHIP, ASSETS_BASE_PATH "cvbo" PATH_SEPARATOR "ship.cvbo", LWST_DEFAULT_NORMAL_COLOR, },
+    { LVT_PORT, ASSETS_BASE_PATH "cvbo" PATH_SEPARATOR "port.cvbo", LWST_DEFAULT_NORMAL_COLOR, },
 };
 LwStaticAssert(ARRAY_SIZE(vbo_filename) == LVT_COUNT, "LVT_COUNT error");
 
