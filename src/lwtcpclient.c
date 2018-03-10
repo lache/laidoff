@@ -24,6 +24,16 @@ void tcp_on_connect(LWTCP* tcp, const char* path_prefix) {
             tcp_send_newuser(tcp);
         }
         request_player_reveal_leaderboard(tcp);
+    } else {
+        // Transport Tycoon Lee
+        char landing_page_url[512] = { 0, };
+        pcg32_srandom(time(0), time(0));
+        sprintf(landing_page_url, "?u=%08X%08X%08X%08X",
+                pcg32_random(),
+                pcg32_random(),
+                pcg32_random(),
+                pcg32_random());
+        tcp_send_httpget(tcp, landing_page_url);
     }
 }
 
