@@ -77,7 +77,10 @@ typedef struct _LWTCP {
     int send_fail;
     double send_fail_time;
     void (*on_leaderboard_packet)(LWCONTEXT*);
+    char html_response[1024 * 10];
     char html_body[1024 * 10];
+    int html_body_parse_start;
+    int html_wait;
 } LWTCP;
 
 LWTCP* new_tcp(LWCONTEXT* pLwc,

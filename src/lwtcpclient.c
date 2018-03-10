@@ -179,13 +179,18 @@ int tcp_send_setnickname(LWTCP* tcp, const LWUNIQUEID* id, const char* nickname)
 }
 
 int tcp_send_httpget(LWTCP* tcp, const char* url) {
-    LOGI("Sending LWPHTTPGET");
+    LOGI("Sending LWPHTTPGET: %s", url);
+    if (tcp->html_wait) {
+        LOGI("Sending LWPHTTPGET ignored (wait flag up)");
+        return -1;
+    }
+    tcp->html_wait = 1;
     //NEW_TCP_PACKET_CAPITAL(LWPHTTPGET, p);
     //memcpy(p.Url, url, sizeof(p.Url));
     //memcpy(tcp->send_buf, &p, sizeof(p));
     //return tcp_send_sendbuf(tcp, sizeof(p));
     memset(tcp->send_buf, 0, sizeof(tcp->send_buf));
-    sprintf(tcp->send_buf, "GET /%s HTTP/1.1\r\nHost: ttl.lacti.me\r\n\r\n", url);
+    sprintf(tcp->send_buf, "GET /%s HTTP/1.1\r\nHost: ttl.lacti.me\r\nConnection: Keep-Alive\r\n\r\n", url);
     return tcp_send_sendbuf(tcp, strlen(tcp->send_buf));
 }
 
@@ -212,6 +217,64 @@ static void debug_print_leaderboard(const LWPLEADERBOARD* p) {
     }
 }
 
+int parse_content_length(const char* html_response) {
+    const char* content_length_str = strstr(html_response, "\r\nContent-Length: ");
+    int content_length = -1;
+    if (content_length_str) {
+        content_length = atoi(content_length_str + strlen("\r\nContent-Length: "));
+    }
+    return content_length;
+}
+
+int parse_body_length(const char* html_response) {
+    const char* body_str = strstr(html_response, "\r\n\r\n");
+    if (body_str) {
+        const char* body = strstr(html_response, "\r\n\r\n") + strlen("\r\n\r\n");
+        return strlen(body);
+    } else {
+        return -1;
+    }
+}
+
+void refresh_body(LWTCP* tcp, void* htmlui, const char* html_response) {
+    const char* body = strstr(html_response, "\r\n\r\n") + strlen("\r\n\r\n");
+    LOGI("HTTP Packet Total: %d bytes (received but not parsed)", tcp->recv_buf_not_parsed);
+    LOGI("HTTP Packet Body: %d bytes", strlen(body));
+    memset(tcp->html_body, 0, sizeof(tcp->html_body));
+    strcpy(tcp->html_body, body);
+    htmlui_set_refresh_html_body(htmlui, 1);
+    // overlapping prevent down
+    tcp->html_wait = 0;
+}
+
+int append_and_refresh_body(LWTCP* tcp, void* htmlui, char* cursor) {
+    size_t prev_len = strlen(tcp->html_response);
+    char* prev_body_str = strstr(tcp->html_response, "\r\n\r\n");
+    int prev_body_len = -1;
+    if (prev_body_str) {
+        char* prev_body = prev_body_str + strlen("\r\n\r\n");
+        prev_body_len = strlen(prev_body);
+    }
+    strncat(tcp->html_response, cursor, tcp->recv_buf_not_parsed);
+    tcp->html_response[prev_len + tcp->recv_buf_not_parsed] = 0; // null terminate
+    int content_length = parse_content_length(tcp->html_response);
+    int body_length = parse_body_length(tcp->html_response);
+    if (content_length != -1 && content_length <= body_length) {
+        LOGI("HTTP body_length / content_length = %d / %d", body_length, content_length);
+        char* body = strstr(tcp->html_response, "\r\n\r\n") + strlen("\r\n\r\n");
+        body[body_length] = 0;
+        tcp->html_body_parse_start = 0;
+        refresh_body(tcp, htmlui, tcp->html_response);
+        if (prev_body_len < 0) {
+            return tcp->recv_buf_not_parsed;
+        } else {
+            return body_length - prev_body_len;
+        }
+        
+    }
+    return tcp->recv_buf_not_parsed;
+}
+
 int parse_recv_packets(LWTCP* tcp) {
     LWCONTEXT* pLwc = tcp->pLwc;
     // too small for parsing
@@ -223,13 +286,15 @@ int parse_recv_packets(LWTCP* tcp) {
     while (1) {
         unsigned short packet_size = *(unsigned short*)(cursor + 0);
         // HTTP packet?
-        if (strncmp("HTTP/1.1 ", cursor, strlen("HTTP/1.1 ")) == 0) {
-            const char* body = strstr(cursor, "\r\n\r\n") + strlen("\r\n\r\n");
-            LOGI("HTTP Packet Body: %s", body);
-            memset(tcp->html_body, 0, sizeof(tcp->html_body));
-            strcpy(tcp->html_body, body);
-            htmlui_set_refresh_html_body(pLwc->htmlui, 1);
+        if (strncmp("H", cursor, strlen("H")) == 0 && tcp->html_body_parse_start == 0) {
+            tcp->html_body_parse_start = 1;
+            memset(tcp->html_response, 0, sizeof(tcp->html_response));
+            append_and_refresh_body(tcp, pLwc->htmlui, cursor);
             return tcp->recv_buf_not_parsed;
+        }
+        if (tcp->html_body_parse_start == 1) {
+            strcat(tcp->html_response, cursor);
+            return append_and_refresh_body(tcp, pLwc->htmlui, cursor);
         }
         // still incomplete packet
         if (packet_size == 0 || packet_size > tcp->recv_buf_not_parsed - parsed_bytes) {
@@ -376,4 +441,3 @@ const char* lw_tcp_port_str(const LWCONTEXT* pLwc) {
 int lw_tcp_port(const LWCONTEXT* pLwc) {
     return pLwc->tcp_host_addr.port;
 }
-

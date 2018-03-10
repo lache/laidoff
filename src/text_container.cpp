@@ -152,6 +152,7 @@ void litehtml::text_container::on_anchor_click(const litehtml::tchar_t * url, co
     strcat(path, path_prefix);
     strcat(path, url);
     //htmlui_set_next_html_path(pLwc->htmlui, path);
+    // prevent request overlapping
     tcp_send_httpget(pLwc->tcp, url);
 }
 
