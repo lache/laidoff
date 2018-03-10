@@ -27,13 +27,21 @@ void tcp_on_connect(LWTCP* tcp, const char* path_prefix) {
     } else {
         // Transport Tycoon Lee
         char landing_page_url[512] = { 0, };
+        char user_id_str[512] = { 0, };
         pcg32_srandom(time(0), time(0));
-        sprintf(landing_page_url, "?u=%08X%08X%08X%08X",
-                pcg32_random(),
-                pcg32_random(),
-                pcg32_random(),
-                pcg32_random());
-        //tcp_send_httpget(tcp, landing_page_url);
+
+        if (is_file_exist(tcp->pLwc->user_data_path, "ttl-user-id.dat") == 0) {
+            sprintf(user_id_str, "%08X%08X%08X%08X",
+                    pcg32_random(),
+                    pcg32_random(),
+                    pcg32_random(),
+                    pcg32_random());
+            write_file_string(tcp->pLwc->user_data_path, "ttl-user-id.dat", user_id_str);
+        } else {
+            read_file_string(tcp->pLwc->user_data_path, "ttl-user-id.dat", sizeof(user_id_str), user_id_str);
+        }
+        sprintf(landing_page_url, "/?u=%s", user_id_str);
+        tcp_send_httpget(tcp, landing_page_url);
     }
 }
 
@@ -197,7 +205,7 @@ int tcp_send_httpget(LWTCP* tcp, const char* url) {
     }
     tcp->html_wait = 1;
     memset(tcp->send_buf, 0, sizeof(tcp->send_buf));
-    sprintf(tcp->send_buf, "GET /%s HTTP/1.1\r\nHost: ttl.lacti.me\r\nConnection: Keep-Alive\r\n\r\n", url);
+    sprintf(tcp->send_buf, "GET %s HTTP/1.1\r\nHost: ttl.lacti.me\r\nConnection: Keep-Alive\r\n\r\n", url);
     return tcp_send_sendbuf(tcp, strlen(tcp->send_buf));
 }
 

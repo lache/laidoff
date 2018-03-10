@@ -105,7 +105,7 @@ void litehtml::text_container::load_image(const litehtml::tchar_t * src, const l
 
 void litehtml::text_container::get_image_size(const litehtml::tchar_t * src, const litehtml::tchar_t * baseurl, litehtml::size & sz) {
     LOGI("get_image_size: src=%s,baseurl=%s", src, baseurl);
-	sz.width = static_cast<int>(roundf(100 * pLwc->aspect_ratio * pLwc->width / 640.0f));
+	sz.width = static_cast<int>(roundf(291 * pLwc->width / 640.0f));
     sz.height = static_cast<int>(roundf(100 * pLwc->height / 360.0f));
 }
 
@@ -188,8 +188,8 @@ void litehtml::text_container::on_anchor_click(const litehtml::tchar_t * url, co
     char path[1024] = { 0, };
     strcat(path, path_prefix);
     strcat(path, url);
-    htmlui_set_next_html_path(pLwc->htmlui, path);
-    //tcp_send_httpget(pLwc->tcp, url);
+    //htmlui_set_next_html_path(pLwc->htmlui, path);
+    tcp_send_httpget(pLwc->tcp, url);
 }
 
 void litehtml::text_container::set_cursor(const litehtml::tchar_t * cursor) {

@@ -16,6 +16,8 @@ void concat_path(char* path, const char* path1, const char* path2);
 const char* package_version();
 int is_file_exist(const char* path_prefix, const char* filename);
 void touch_file(const char* path_prefix, const char* filename);
+void write_file_string(const char* path_prefix, const char* filename, const char* str);
+void read_file_string(const char* path_prefix, const char* filename, size_t str_out_len, char* str_out);
 #ifdef __cplusplus
 };
 #endif

@@ -97,3 +97,31 @@ void touch_file(const char* path_prefix, const char* filename) {
     fclose(f);
     LOGIP("File '%s' touched.", path);
 }
+
+void write_file_string(const char* path_prefix, const char* filename, const char* str) {
+    char path[1024] = { 0, };
+    concat_path(path, path_prefix, filename);
+    FILE* f = fopen(path, "w");
+    if (f == 0) {
+        // no cached user id exists
+        LOGEP("CRITICAL ERROR: Cannot open file '%s' for writing...", path);
+        exit(-99);
+    }
+    fprintf(f, str);
+    fclose(f);
+    LOGIP("File '%s' written.", path);
+}
+
+void read_file_string(const char* path_prefix, const char* filename, size_t str_out_len, char* str_out) {
+    char path[1024] = { 0, };
+    concat_path(path, path_prefix, filename);
+    FILE* f = fopen(path, "r");
+    if (f == 0) {
+        // no cached user id exists
+        LOGEP("CRITICAL ERROR: Cannot open file '%s' for reading...", path);
+        exit(-99);
+    }
+    fscanf(f, "%s", str_out);
+    fclose(f);
+    LOGIP("File '%s' read.", path);
+}
