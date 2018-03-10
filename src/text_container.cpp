@@ -104,28 +104,65 @@ void litehtml::text_container::load_image(const litehtml::tchar_t * src, const l
 }
 
 void litehtml::text_container::get_image_size(const litehtml::tchar_t * src, const litehtml::tchar_t * baseurl, litehtml::size & sz) {
-	sz.width = 100;
-	sz.height = 50;
-	//wprintf(_t("get_image_size: src=%s,baseurl=%s\n"), src, baseurl);
+    LOGI("get_image_size: src=%s,baseurl=%s", src, baseurl);
+	sz.width = static_cast<int>(roundf(100 * pLwc->aspect_ratio * pLwc->width / 640.0f));
+    sz.height = static_cast<int>(roundf(100 * pLwc->height / 360.0f));
 }
 
 void litehtml::text_container::draw_background(litehtml::uint_ptr hdc, const litehtml::background_paint & bg) {
-	//wprintf(_t("draw_background: x=%d,y=%d,w=%d,h=%d,color=0x%02X%02X%02X|%02X,image=%s,baseurl=%s\n"), bg.border_box.x, bg.border_box.y, bg.border_box.width, bg.border_box.height, bg.color.red, bg.color.green, bg.color.blue, bg.color.alpha, bg.image.c_str(), bg.baseurl.c_str());
-	render_solid_vb_ui_flip_y_uv_shader(
-		pLwc,
-		conv_coord_x(pLwc, bg.border_box.x),
-		conv_coord_y(pLwc, bg.border_box.y),
-		conv_size_x(pLwc, bg.border_box.width),
-		conv_size_y(pLwc, bg.border_box.height),
-		0,
-		LVT_LEFT_TOP_ANCHORED_SQUARE,
-		bg.color.alpha / 255.0f,
-		bg.color.red / 255.0f,
-		bg.color.green / 255.0f,
-		bg.color.blue / 255.0f,
-		1.0f,
-		0,
-		LWST_DEFAULT);
+    bool show_test_image = false;
+    int lae = LAE_TTL_TITLE;
+    int lae_alpha = LAE_TTL_TITLE_ALPHA;
+    if (bg.image.length()) {
+        LOGI("draw_background [IMAGE]: x=%d,y=%d,w=%d,h=%d,color=0x%02X%02X%02X|%02X,image=%s,baseurl=%s",
+             bg.border_box.x,
+             bg.border_box.y,
+             bg.border_box.width,
+             bg.border_box.height,
+             bg.color.red,
+             bg.color.green,
+             bg.color.blue,
+             bg.color.alpha,
+             bg.image.c_str(),
+             bg.baseurl.c_str());
+        show_test_image = 1;
+        lazy_tex_atlas_glBindTexture(pLwc, lae);
+        lazy_tex_atlas_glBindTexture(pLwc, lae_alpha);
+    }
+    if (show_test_image)         {
+        render_solid_vb_ui_alpha(
+            pLwc,
+            conv_coord_x(pLwc, bg.border_box.x),
+            conv_coord_y(pLwc, bg.border_box.y),
+            conv_size_x(pLwc, bg.border_box.width),
+            conv_size_y(pLwc, bg.border_box.height),
+            show_test_image ? pLwc->tex_atlas[lae] : 0,
+            show_test_image ? pLwc->tex_atlas[lae_alpha] : 0,
+            LVT_LEFT_TOP_ANCHORED_SQUARE,
+            show_test_image ? 1.0f : bg.color.alpha / 255.0f,
+            show_test_image ? 1.0f : bg.color.red / 255.0f,
+            show_test_image ? 1.0f : bg.color.green / 255.0f,
+            show_test_image ? 1.0f : bg.color.blue / 255.0f,
+            show_test_image ? 0.0f : 1.0f
+        );
+    } else {
+        render_solid_vb_ui_flip_y_uv_shader(
+            pLwc,
+            conv_coord_x(pLwc, bg.border_box.x),
+            conv_coord_y(pLwc, bg.border_box.y),
+            conv_size_x(pLwc, bg.border_box.width),
+            conv_size_y(pLwc, bg.border_box.height),
+            show_test_image ? pLwc->tex_atlas[lae] : 0,
+            LVT_LEFT_TOP_ANCHORED_SQUARE,
+            show_test_image ? 1.0f : bg.color.alpha / 255.0f,
+            show_test_image ? 1.0f : bg.color.red / 255.0f,
+            show_test_image ? 1.0f : bg.color.green / 255.0f,
+            show_test_image ? 1.0f : bg.color.blue / 255.0f,
+            show_test_image ? 0.0f : 1.0f,
+            0,
+            LWST_DEFAULT
+        );
+    }
 }
 
 void litehtml::text_container::draw_borders(litehtml::uint_ptr hdc, const litehtml::borders & borders, const litehtml::position & draw_pos, bool root) {
@@ -151,9 +188,8 @@ void litehtml::text_container::on_anchor_click(const litehtml::tchar_t * url, co
     char path[1024] = { 0, };
     strcat(path, path_prefix);
     strcat(path, url);
-    //htmlui_set_next_html_path(pLwc->htmlui, path);
-    // prevent request overlapping
-    tcp_send_httpget(pLwc->tcp, url);
+    htmlui_set_next_html_path(pLwc->htmlui, path);
+    //tcp_send_httpget(pLwc->tcp, url);
 }
 
 void litehtml::text_container::set_cursor(const litehtml::tchar_t * cursor) {

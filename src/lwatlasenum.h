@@ -141,6 +141,8 @@ typedef enum _LW_ATLAS_ENUM {
     LAE_PLAYER_CAPSULE,
         LAE_WAVE,
         LAE_WAVE_ALPHA,
+        LAE_TTL_TITLE,
+        LAE_TTL_TITLE_ALPHA,
     LAE_COUNT,
 
     LAE_DONTCARE,
@@ -289,13 +291,21 @@ static const char *tex_atlas_filename[] = {
     ASSETS_BASE_PATH "ktx" PATH_SEPARATOR "player-capsule.ktx",
         ASSETS_BASE_PATH "ktx" PATH_SEPARATOR "wave-a.ktx",
         ASSETS_BASE_PATH "ktx" PATH_SEPARATOR "wave-a_alpha.ktx",
+        ASSETS_BASE_PATH "ktx" PATH_SEPARATOR "ttl-title-a.ktx",
+        ASSETS_BASE_PATH "ktx" PATH_SEPARATOR "ttl-title-a_alpha.ktx",
 };
 
 #define MAX_TEX_ATLAS LAE_COUNT
 
 LwStaticAssert(ARRAY_SIZE(tex_atlas_filename) == LAE_COUNT, "LAE_COUNT error");
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 void lw_load_tex(const LWCONTEXT* _pLwc, int lae);
 void lazy_tex_atlas_glBindTexture(const LWCONTEXT* _pLwc, int lae);
 void lw_load_tex_async(const LWCONTEXT* _pLwc, int lae);
 void lw_calculate_all_tex_atlas_hash(LWCONTEXT* pLwc);
+#ifdef __cplusplus
+}
+#endif

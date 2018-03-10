@@ -43,8 +43,6 @@ typedef enum _LW_PUCK_GAME_PACKET {
     LPGP_LWPQUEUE3 = 221,
     LPGP_LWPRETRYQUEUE2 = 222,
     LPGP_LWPGETLEADERBOARDREVEALPLAYER = 223,
-    LPGP_LWPHTTPGET = 224,
-    LPGP_LWPHTTPRESPONSE = 225,
     // should be less than 256 (packet type field: unsigned char type)
     LPGP_SENTIAL_UNSIGNED_CHAR = 255,
 	// internal admin tcp
@@ -506,17 +504,5 @@ typedef struct _LWPSETBATTLEPRESET {
     // Camera
     float camera_height;
 } LWPSETBATTLEPRESET;
-
-typedef struct _LWPHTTPGET {
-    unsigned short Size;
-    unsigned short Type;
-    unsigned char Url[512];
-} LWPHTTPGET;
-
-typedef struct _LWPHTTPRESPONSE {
-    unsigned short Size;
-    unsigned short Type;
-    unsigned char Body[1024 * 8 - sizeof(unsigned short) * 2];
-} LWPHTTPRESPONSE;
 
 //#pragma pack(pop)
