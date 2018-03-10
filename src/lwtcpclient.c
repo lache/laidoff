@@ -286,14 +286,14 @@ int parse_recv_packets(LWTCP* tcp) {
     while (1) {
         unsigned short packet_size = *(unsigned short*)(cursor + 0);
         // HTTP packet?
-        if (strncmp("H", cursor, strlen("H")) == 0 && tcp->html_body_parse_start == 0) {
+        if (strncmp("HTTP/1.1", cursor, strlen("HTTP/1.1")) == 0 && tcp->html_body_parse_start == 0) {
             tcp->html_body_parse_start = 1;
             memset(tcp->html_response, 0, sizeof(tcp->html_response));
             append_and_refresh_body(tcp, pLwc->htmlui, cursor);
             return tcp->recv_buf_not_parsed;
         }
         if (tcp->html_body_parse_start == 1) {
-            strcat(tcp->html_response, cursor);
+            //strcat(tcp->html_response, cursor);
             return append_and_refresh_body(tcp, pLwc->htmlui, cursor);
         }
         // still incomplete packet
