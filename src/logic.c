@@ -1001,7 +1001,8 @@ void lwc_start_logic_thread(LWCONTEXT* pLwc) {
     init_font_fbo(pLwc);
     // Render font FBO using render-to-texture
     //lwc_render_font_test_fbo(pLwc, ASSETS_BASE_PATH "html" PATH_SEPARATOR "HTMLPage1.html");
-    load_scene_async(pLwc, pLwc->logic_actor, LGS_FONT_TEST);
+    //load_scene_async(pLwc, pLwc->logic_actor, LGS_FONT_TEST);
+    load_scene_async(pLwc, pLwc->logic_actor, LGS_PHYSICS);
 }
 
 const char* logic_server_addr(int idx) {

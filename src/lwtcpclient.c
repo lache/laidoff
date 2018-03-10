@@ -14,7 +14,7 @@
 #include "htmlui.h"
 
 void tcp_on_connect(LWTCP* tcp, const char* path_prefix) {
-    if (0) {
+    if (1) {
         if (get_cached_user_id(path_prefix, &tcp->user_id) == 0) {
             LOGI("Cached user id: %08x-%08x-%08x-%08x",
                  tcp->user_id.v[0], tcp->user_id.v[1], tcp->user_id.v[2], tcp->user_id.v[3]);
