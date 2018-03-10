@@ -9,11 +9,16 @@
 #include "lwcontext.h"
 #include "file.h"
 #include "render_font_test.h"
+#include "lwtcp.h"
 
 class LWHTMLUI {
 public:
 	LWHTMLUI(const LWCONTEXT* pLwc, int w, int h)
-		: pLwc(pLwc), container(pLwc, w, h), client_width(w), client_height(h)
+		: pLwc(pLwc)
+        , container(pLwc, w, h)
+        , client_width(w)
+        , client_height(h)
+        , refresh_html_body(0)
 	{
 		std::shared_ptr<char> master_css_str(create_string_from_file(ASSETS_BASE_PATH "css" PATH_SEPARATOR "master.css"), free);
 		browser_context.load_master_stylesheet(master_css_str.get());
@@ -22,6 +27,9 @@ public:
 		std::shared_ptr<char> html_str(create_string_from_file(html_path), free);
 		doc = litehtml::document::createFromString(html_str.get(), &container, &browser_context);
 	}
+    void load_body(const char* html_body) {
+        doc = litehtml::document::createFromString(html_body, &container, &browser_context);
+    }
 	void render_page() {
 		doc->render(client_width);
 	}
@@ -56,10 +64,19 @@ public:
     void set_next_html_path(const char* html_path) {
         next_html_path = html_path;
     }
+    void set_refresh_html_body(int v) {
+        refresh_html_body = v;
+    }
     void load_next_html_path() {
         if (next_html_path.empty() == false) {
             lwc_render_font_test_fbo(pLwc, next_html_path.c_str());
             next_html_path.clear();
+        }
+    }
+    void load_next_html_body() {
+        if (refresh_html_body) {
+            lwc_render_font_test_fbo_body(pLwc, pLwc->tcp->html_body);
+            refresh_html_body = 0;
         }
     }
 private:
@@ -72,6 +89,7 @@ private:
 	int client_height;
 	litehtml::element::ptr last_lbutton_down_element;
     std::string next_html_path;
+    int refresh_html_body;
     const LWCONTEXT* pLwc;
 };
 
@@ -89,6 +107,13 @@ void htmlui_load_render_draw(void* c, const char* html_path) {
 	htmlui->load_page(html_path);
 	htmlui->render_page();
 	htmlui->draw();
+}
+
+void htmlui_load_render_draw_body(void* c, const char* html_body) {
+    LWHTMLUI* htmlui = (LWHTMLUI*)c;
+    htmlui->load_body(html_body);
+    htmlui->render_page();
+    htmlui->draw();
 }
 
 void htmlui_on_lbutton_down(void* c, int x, int y) {
@@ -148,4 +173,14 @@ void htmlui_set_next_html_path(void* c, const char* html_path) {
 void htmlui_load_next_html_path(void* c) {
     LWHTMLUI* htmlui = (LWHTMLUI*)c;
     htmlui->load_next_html_path();
+}
+
+void htmlui_set_refresh_html_body(void* c, int v) {
+    LWHTMLUI* htmlui = (LWHTMLUI*)c;
+    htmlui->set_refresh_html_body(v);
+}
+
+void htmlui_load_next_html_body(void* c) {
+    LWHTMLUI* htmlui = (LWHTMLUI*)c;
+    htmlui->load_next_html_body();
 }

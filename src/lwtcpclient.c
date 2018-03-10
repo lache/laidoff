@@ -11,17 +11,20 @@
 #include "lwudp.h"
 #include "puckgameupdate.h"
 #include "logic.h"
+#include "htmlui.h"
 
 void tcp_on_connect(LWTCP* tcp, const char* path_prefix) {
-    if (get_cached_user_id(path_prefix, &tcp->user_id) == 0) {
-        LOGI("Cached user id: %08x-%08x-%08x-%08x",
-             tcp->user_id.v[0], tcp->user_id.v[1], tcp->user_id.v[2], tcp->user_id.v[3]);
-        tcp_send_querynick(tcp, &tcp->user_id);
-    } else {
-        // Request a new user to be created
-        tcp_send_newuser(tcp);
+    if (0) {
+        if (get_cached_user_id(path_prefix, &tcp->user_id) == 0) {
+            LOGI("Cached user id: %08x-%08x-%08x-%08x",
+                 tcp->user_id.v[0], tcp->user_id.v[1], tcp->user_id.v[2], tcp->user_id.v[3]);
+            tcp_send_querynick(tcp, &tcp->user_id);
+        } else {
+            // Request a new user to be created
+            tcp_send_newuser(tcp);
+        }
+        request_player_reveal_leaderboard(tcp);
     }
-    request_player_reveal_leaderboard(tcp);
 }
 
 int tcp_send_newuser(LWTCP* tcp) {
@@ -175,6 +178,17 @@ int tcp_send_setnickname(LWTCP* tcp, const LWUNIQUEID* id, const char* nickname)
     return tcp_send_sendbuf(tcp, sizeof(p));
 }
 
+int tcp_send_httpget(LWTCP* tcp, const char* url) {
+    LOGI("Sending LWPHTTPGET");
+    //NEW_TCP_PACKET_CAPITAL(LWPHTTPGET, p);
+    //memcpy(p.Url, url, sizeof(p.Url));
+    //memcpy(tcp->send_buf, &p, sizeof(p));
+    //return tcp_send_sendbuf(tcp, sizeof(p));
+    memset(tcp->send_buf, 0, sizeof(tcp->send_buf));
+    sprintf(tcp->send_buf, "GET /%s HTTP/1.1\r\nHost: ttl.lacti.me\r\n\r\n", url);
+    return tcp_send_sendbuf(tcp, strlen(tcp->send_buf));
+}
+
 static void debug_print_leaderboard(const LWPLEADERBOARD* p) {
     LOGI("Count: %d", p->Count);
     LOGI("First Item Rank: %d", p->First_item_rank);
@@ -208,6 +222,15 @@ int parse_recv_packets(LWTCP* tcp) {
     char* cursor = tcp->recv_buf;
     while (1) {
         unsigned short packet_size = *(unsigned short*)(cursor + 0);
+        // HTTP packet?
+        if (strncmp("HTTP/1.1 ", cursor, strlen("HTTP/1.1 ")) == 0) {
+            const char* body = strstr(cursor, "\r\n\r\n") + strlen("\r\n\r\n");
+            LOGI("HTTP Packet Body: %s", body);
+            memset(tcp->html_body, 0, sizeof(tcp->html_body));
+            strcpy(tcp->html_body, body);
+            htmlui_set_refresh_html_body(pLwc->htmlui, 1);
+            return tcp->recv_buf_not_parsed;
+        }
         // still incomplete packet
         if (packet_size == 0 || packet_size > tcp->recv_buf_not_parsed - parsed_bytes) {
             return parsed_bytes;
@@ -329,6 +352,10 @@ int parse_recv_packets(LWTCP* tcp) {
                 break;
             }
             show_sys_msg(pLwc->def_sys_msg, nicknameMsg);
+        } else if (CHECK_PACKET(packet_type, packet_size, LWPHTTPRESPONSE)) {
+            LOGI("LWPHTTPRESPONSE received");
+            LWPHTTPRESPONSE* p = (LWPHTTPRESPONSE*)cursor;
+            LOGI("LWPHTTPRESPONSE body: %s", p->Body);
         } else {
             LOGE("Unknown TCP packet");
         }

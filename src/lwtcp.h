@@ -22,7 +22,7 @@
 #include "lwuniqueid.h"
 #include "lwhostaddr.h"
 
-#define LW_TCP_BUFLEN 2048
+#define LW_TCP_BUFLEN (1024*8)
 
 typedef struct _LWCONTEXT LWCONTEXT;
 typedef struct _LWTCP LWTCP;
@@ -77,6 +77,7 @@ typedef struct _LWTCP {
     int send_fail;
     double send_fail_time;
     void (*on_leaderboard_packet)(LWCONTEXT*);
+    char html_body[1024 * 10];
 } LWTCP;
 
 LWTCP* new_tcp(LWCONTEXT* pLwc,

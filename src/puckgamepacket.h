@@ -9,14 +9,15 @@ typedef enum _LW_PUCK_GAME_PACKET {
 	LPGP_LWPTARGETDAMAGED,
 	// udp
 	LPGP_LWPMOVE = 100,
-	LPGP_LWPSTOP,
-	LPGP_LWPDASH,
-	LPGP_LWPPULLSTART,
-	LPGP_LWPPULLSTOP,
-	LPGP_LWPSTATE,
-    LPGP_LWPJUMP,
-    LPGP_LWPFIRE,
-    LPGP_LWPSTATE2,
+	LPGP_LWPSTOP = 101,
+	LPGP_LWPDASH = 102,
+	LPGP_LWPPULLSTART = 103,
+	LPGP_LWPPULLSTOP = 104,
+	LPGP_LWPSTATE = 105,
+    LPGP_LWPJUMP = 106,
+    LPGP_LWPFIRE = 107,
+    LPGP_LWPSTATE2 = 108,
+    LPGP_LWPTTLFULLSTATE = 109,
 	// tcp
 	LPGP_LWPQUEUE2 = 200,
 	LPGP_LWPMAYBEMATCHED = 201,
@@ -42,6 +43,8 @@ typedef enum _LW_PUCK_GAME_PACKET {
     LPGP_LWPQUEUE3 = 221,
     LPGP_LWPRETRYQUEUE2 = 222,
     LPGP_LWPGETLEADERBOARDREVEALPLAYER = 223,
+    LPGP_LWPHTTPGET = 224,
+    LPGP_LWPHTTPRESPONSE = 225,
     // should be less than 256 (packet type field: unsigned char type)
     LPGP_SENTIAL_UNSIGNED_CHAR = 255,
 	// internal admin tcp
@@ -235,6 +238,20 @@ typedef struct _LWPSTATE2 {
     LWPSTATE2GAMEOBJECT go[3]; // [3] --> [0]:puck, [1]:player, [2]:target
     LWPSTATEBITFIELD bf; // bitfield
 } LWPSTATE2;
+
+// UDP
+typedef struct _LWPTTLFULLSTATEOBJECT {
+    int id;
+    float x, y, a;
+} LWPTTLFULLSTATEOBJECT;
+
+typedef struct _LWPTTLFULLSTATE {
+    unsigned char type;
+    unsigned char padding0;
+    unsigned char padding1;
+    unsigned char padding2;
+    LWPTTLFULLSTATEOBJECT objects[64];
+} LWPTTLFULLSTATE;
 
 // should be 4-byte aligned...
 // (Cgo compatibility issue)
@@ -489,5 +506,17 @@ typedef struct _LWPSETBATTLEPRESET {
     // Camera
     float camera_height;
 } LWPSETBATTLEPRESET;
+
+typedef struct _LWPHTTPGET {
+    unsigned short Size;
+    unsigned short Type;
+    unsigned char Url[512];
+} LWPHTTPGET;
+
+typedef struct _LWPHTTPRESPONSE {
+    unsigned short Size;
+    unsigned short Type;
+    unsigned char Body[1024 * 8 - sizeof(unsigned short) * 2];
+} LWPHTTPRESPONSE;
 
 //#pragma pack(pop)

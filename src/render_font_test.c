@@ -7,6 +7,21 @@
 #include "htmlui.h"
 #include "linmath.h"
 
+void lwc_render_font_test_fbo_body(const LWCONTEXT* pLwc, const char* html_body) {
+    glBindFramebuffer(GL_FRAMEBUFFER, pLwc->font_fbo.fbo);
+    glDisable(GL_DEPTH_TEST);
+
+    glViewport(0, 0, pLwc->font_fbo.width, pLwc->font_fbo.height);
+    glClearColor(0x44 / 255.f, 0x4c / 255.f, 0x50 / 255.f, 0); // alpha should be cleared to zero
+                                                               //lw_clear_color();
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+    htmlui_load_render_draw_body(pLwc->htmlui, html_body);
+
+    glEnable(GL_DEPTH_TEST);
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+}
+
 void lwc_render_font_test_fbo(const LWCONTEXT* pLwc, const char* html_path) {
 	glBindFramebuffer(GL_FRAMEBUFFER, pLwc->font_fbo.fbo);
 	glDisable(GL_DEPTH_TEST);

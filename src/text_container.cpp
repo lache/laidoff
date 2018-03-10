@@ -8,6 +8,7 @@
 #include "render_solid.h"
 #include "lwlog.h"
 #include "htmlui.h"
+#include "lwtcpclient.h"
 using namespace litehtml;
 
 litehtml::text_container::text_container(const LWCONTEXT* pLwc, int w, int h)
@@ -150,8 +151,8 @@ void litehtml::text_container::on_anchor_click(const litehtml::tchar_t * url, co
     char path[1024] = { 0, };
     strcat(path, path_prefix);
     strcat(path, url);
-    //lwc_render_font_test_fbo(pLwc, path);
-    htmlui_set_next_html_path(pLwc->htmlui, path);
+    //htmlui_set_next_html_path(pLwc->htmlui, path);
+    tcp_send_httpget(pLwc->tcp, url);
 }
 
 void litehtml::text_container::set_cursor(const litehtml::tchar_t * cursor) {

@@ -1,5 +1,7 @@
 #pragma once
-
+#ifdef __cplusplus
+extern "C" {
+#endif
 typedef struct _LWCONTEXT LWCONTEXT;
 typedef struct _LWTCP LWTCP;
 typedef struct _LWUNIQUEID LWUNIQUEID;
@@ -15,7 +17,11 @@ int tcp_send_get_leaderboard(LWTCP* tcp, int backoffMs, int start_index, int cou
 int tcp_send_get_leaderboard_reveal_player(LWTCP* tcp, int backoffMs, const LWUNIQUEID* user_id, int count);
 int tcp_send_setnickname(LWTCP* tcp, const LWUNIQUEID* id, const char* nickname);
 int tcp_send_cancelqueue(LWTCP* tcp, const LWUNIQUEID* id);
+int tcp_send_httpget(LWTCP* tcp, const char* url);
 int parse_recv_packets(LWTCP* tcp);
 const char* lw_tcp_addr(const LWCONTEXT* pLwc);
 const char* lw_tcp_port_str(const LWCONTEXT* pLwc);
 int lw_tcp_port(const LWCONTEXT* pLwc);
+#ifdef __cplusplus
+}
+#endif

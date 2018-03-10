@@ -8,11 +8,14 @@ extern "C" {
 	void* htmlui_new(const LWCONTEXT* pLwc);
 	void htmlui_destroy(void** c);
 	void htmlui_load_render_draw(void* c, const char* html_path);
+    void htmlui_load_render_draw_body(void* c, const char* html_body);
 	void htmlui_on_lbutton_down(void* c, int x, int y);
 	void htmlui_on_lbutton_up(void* c, int x, int y);
 	void htmlui_on_over(void* c, int x, int y);
     void htmlui_set_next_html_path(void* c, const char* html_path);
     void htmlui_load_next_html_path(void* c);
+    void htmlui_set_refresh_html_body(void* c, int v);
+    void htmlui_load_next_html_body(void* c);
 #ifdef __cplusplus
 }
 #endif
