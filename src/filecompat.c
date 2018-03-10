@@ -107,7 +107,7 @@ void write_file_string(const char* path_prefix, const char* filename, const char
         LOGEP("CRITICAL ERROR: Cannot open file '%s' for writing...", path);
         exit(-99);
     }
-    fprintf(f, str);
+    fprintf(f, "%s", str);
     fclose(f);
     LOGIP("File '%s' written.", path);
 }
