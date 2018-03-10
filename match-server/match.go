@@ -202,8 +202,14 @@ func handleRequest(req *HandleRequestRequest) {
 		for readLen > 0 {
 			packetSize := binary.LittleEndian.Uint16(buf)
 			packetType := binary.LittleEndian.Uint16(buf[2:])
+			log.Printf("  readLen %v", readLen)
 			log.Printf("  Size %v", packetSize)
 			log.Printf("  Type %v", packetType)
+
+			if readLen != int(packetSize) {
+				// Unknown packet should be ignored
+				break
+			}
 
 			switch packetType {
 			case convert.LPGPLWPQUEUE2:
@@ -249,6 +255,9 @@ func handleRequest(req *HandleRequestRequest) {
 				handler.HandleGetLeaderboardRevealPlayer(buf, req.Conn, req.ServiceList)
 			case convert.LPGPLWPSETNICKNAME:
 				handler.HandleSetNickname(buf, req.Conn, req.ServiceList.Db)
+			default:
+				// Unknown packet should be ignored
+				break
 			}
 			readLen = readLen - int(packetSize)
 			buf = buf[packetSize:]
