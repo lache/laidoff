@@ -98,9 +98,9 @@ void* htmlui_new(const LWCONTEXT* pLwc) {
 }
 
 void htmlui_destroy(void** c) {
-    LWHTMLUI* htmlui = (LWHTMLUI*)c;
-	delete(htmlui);
-	*c = 0;
+    LWHTMLUI** htmlui = (LWHTMLUI**)c;
+	delete(*htmlui);
+	*htmlui = 0;
 }
 
 void htmlui_load_render_draw(void* c, const char* html_path) {
