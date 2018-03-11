@@ -86,7 +86,7 @@ void net_rtt_test(LWCONTEXT* pLwc) {
 	}
 
 	fromSize = sizeof(fromAddr);
-	if ((respStringLen = recvfrom(sock, echoBuffer, ECHOMAX, 0, (struct sockaddr *) &fromAddr, &fromSize)) < 0) {
+	if ((respStringLen = recvfrom(sock, echoBuffer, ECHOMAX, 0, (struct sockaddr *) &fromAddr, (socklen_t*)&fromSize)) < 0) {
 		DieWithError("recvfrom() failed");
 	} else {
 		if (echoServAddr.sin_addr.s_addr != fromAddr.sin_addr.s_addr) {

@@ -158,12 +158,6 @@ set_texture_parameter(const LWCONTEXT* pLwc, LWENUM _LW_ATLAS_ENUM lae, LWENUM _
                                  );
 }
 
-static void init_gl_shaders(LWCONTEXT* pLwc) {
-    lw_create_all_vertex_shader(pLwc);
-    lw_create_all_frag_shader(pLwc);
-    lw_create_all_shader_program(pLwc);
-}
-
 static void load_skin_vbo(LWCONTEXT* pLwc, const char *filename, LWVBO *pSvbo) {
     GLuint vbo = 0;
     glGenBuffers(1, &vbo);
@@ -171,7 +165,6 @@ static void load_skin_vbo(LWCONTEXT* pLwc, const char *filename, LWVBO *pSvbo) {
     
     size_t mesh_file_size = 0;
     char *mesh_vbo_data = create_binary_from_file(filename, &mesh_file_size);
-    LWSKINVERTEX* mesh_vbo_data_debug = (LWSKINVERTEX*)mesh_vbo_data;
     glBufferData(GL_ARRAY_BUFFER, mesh_file_size, mesh_vbo_data, GL_STATIC_DRAW);
     release_binary(mesh_vbo_data);
     
@@ -424,17 +417,6 @@ static void gen_all_vao(LWCONTEXT* pLwc) {
 #endif
 }
 
-static void init_all_vao(LWCONTEXT* pLwc) {
-    // Vertex Array Objects
-#if LW_SUPPORT_VAO
-    for (int i = 0; i < VERTEX_BUFFER_COUNT; i++) {
-        lw_setup_vao(pLwc, i);
-    }
-    glBindBuffer(GL_ARRAY_BUFFER, 0);
-    glBindVertexArray(0);
-#endif
-}
-
 static void init_fvao(LWCONTEXT* pLwc, int shader_index) {
     // Vertex Array Objects for FVBO
 #if LW_SUPPORT_VAO
@@ -521,7 +503,6 @@ void init_ps(LWCONTEXT* pLwc) {
 }
 
 static void init_gl_context(LWCONTEXT* pLwc) {
-    //init_gl_shaders(pLwc);
     init_vbo(pLwc);
     init_fvbo(pLwc);
     init_fanim(pLwc);
@@ -529,7 +510,6 @@ static void init_gl_context(LWCONTEXT* pLwc) {
     init_ps(pLwc);
     // Vertex Array Objects (used only when LW_SUPPORT_VAO is set)
     gen_all_vao(pLwc);
-    //init_all_vao(pLwc);
     init_fvao(pLwc, LWST_DEFAULT_NORMAL);
     init_skin_vao(pLwc, LWST_SKIN);
     init_fan_vao(pLwc, LWST_FAN);
@@ -1049,19 +1029,6 @@ static void dequeue_puck_game_state2_and_push_to_state_queue(LWCONTEXT* pLwc) {
     }
 }
 
-static void dequeue_from_state_queue(LWCONTEXT* pLwc) {
-    int size = ringbuffer_size(&pLwc->udp->state_ring_buffer);
-    if (size >= 1) {
-        while (ringbuffer_size(&pLwc->udp->state_ring_buffer) >= 6) {
-            LWPSTATE pout_unused;
-            ringbuffer_dequeue(&pLwc->udp->state_ring_buffer, &pout_unused);
-        }
-        dequeue_puck_game_state_and_apply(pLwc);
-    } else {
-        LOGIx("Puck game state buffer underrun");
-    }
-}
-
 static void dequeue_from_state2_queue(LWCONTEXT* pLwc) {
     int size = ringbuffer_size(&pLwc->udp->state2_ring_buffer);
     if (size >= 1) {
@@ -1295,12 +1262,6 @@ void load_png_pkm_sw_decoding(LWCONTEXT* pLwc, int i) {
     } else {
         LOGE("create_image: %s not loaded. Width=%d, height=%d", tex_atlas_filename[i],
              bitmap_context.width, bitmap_context.height);
-    }
-}
-
-static void load_tex_files(LWCONTEXT* pLwc) {
-    for (int i = 0; i < MAX_TEX_ATLAS; i++) {
-        lw_load_tex(pLwc, i);
     }
 }
 

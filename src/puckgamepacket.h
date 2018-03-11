@@ -77,7 +77,7 @@ typedef enum _LWP_STATE_PHASE {
     LSP_FINISHED_VICTORY_P1 = 5,
     LSP_FINISHED_VICTORY_P2 = 6,
     LSP_TUTORIAL = 7,
-    LSP_MAX_BIT = 7, // should fit in 3-bit
+    LSP_MAX_BIT = 8, // should fit in 3-bit
 } LWP_STATE_PHASE;
 
 typedef enum _LWP_STATE_WALL_HIT_BIT {

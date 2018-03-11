@@ -131,7 +131,6 @@ void udp_update(LWCONTEXT* pLwc, LWUDP* udp) {
         switch (packet_type) {
             case LPGP_LWPSTATE:
             {
-                LWPSTATE* p = (LWPSTATE*)udp->buf;
                 if (udp->recv_len != sizeof(LWPSTATE)) {
                     LOGE("LWPSTATE: Size error %d (%zu expected)", udp->recv_len, sizeof(LWPSTATE));
                 }

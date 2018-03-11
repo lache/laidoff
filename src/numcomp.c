@@ -119,7 +119,6 @@ void numcomp_batch_test_vec3() {
                              11, -2.0f, +2.0f,
                              11, -2.0f, +2.0f,
                              10, +0.0f, +5.0f);
-    const int random_mask = 0x00ffffff;
     float v_high_z[3] = { 0, 0, 10.0f };
     numcomp_test_vec3_print(v_high_z, &p2);
     float v_low_z[3] = { 0, 0, -10.0f };
@@ -238,8 +237,8 @@ void numcomp_convert_euler_xyz_to_quaternion(float *q, float ex, float ey, float
 // Rotation matrix --> XYZ Euler
 void numcomp_convert_rotation_matrix_to_euler(float* ex, float* ey, float* ez, const mat4x4 m) {
     float m11 = m[0][0], m12 = m[1][0], m13 = m[2][0];
-    float m21 = m[0][1], m22 = m[1][1], m23 = m[2][1];
-    float m31 = m[0][2], m32 = m[1][2], m33 = m[2][2];
+    float                m22 = m[1][1], m23 = m[2][1];
+    float                m32 = m[1][2], m33 = m[2][2];
     *ey = asinf((float)LWMAX(LWMIN(m13, 1.0), -1.0));
     if (fabsf(m13) < 0.999999f) {
         *ex = atan2f(-m23, m33);

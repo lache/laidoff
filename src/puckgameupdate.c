@@ -352,7 +352,6 @@ void puck_game_target_move(LWPUCKGAME* puck_game, float dx, float dy) {
 
 void puck_game_target_stop(LWPUCKGAME* puck_game) {
     dJointID tcj = puck_game->target_control_joint[0];
-    float player_speed = 0.5f;
     dJointSetLMotorParam(tcj, dParamVel1, 0);
     dJointSetLMotorParam(tcj, dParamVel2, 0);
 }
@@ -574,18 +573,24 @@ void puck_game_follow_cam(LWCONTEXT* pLwc, LWPUCKGAME* puck_game) {
 void puck_game_update_battle_result_popup(LWCONTEXT* pLwc, LWPUCKGAME* puck_game, LWP_STATE_PHASE battle_phase, int player_no) {
     int new_score = 0;
     switch (battle_phase) {
-    case LSP_READY:
-    case LSP_STEADY:
-    case LSP_GO:
+        case LSP_INIT:
+        break;
+        case LSP_READY:
+        case LSP_STEADY:
+        case LSP_GO:
         return;
-    case LSP_FINISHED_DRAW: // DRAW == TIMEOUT
+        case LSP_FINISHED_DRAW: // DRAW == TIMEOUT
         new_score = puck_game->matched2.draw_score;
         break;
-    case LSP_FINISHED_VICTORY_P1:
+        case LSP_FINISHED_VICTORY_P1:
         new_score = player_no == 2 ? puck_game->matched2.defeat_score : puck_game->matched2.victory_score;
         break;
-    case LSP_FINISHED_VICTORY_P2:
+        case LSP_FINISHED_VICTORY_P2:
         new_score = player_no == 2 ? puck_game->matched2.victory_score : puck_game->matched2.defeat_score;
+        break;
+        case LSP_TUTORIAL:
+        break;
+        case LSP_MAX_BIT:
         break;
     }
     // show score diff message

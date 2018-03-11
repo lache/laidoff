@@ -52,123 +52,6 @@ void mult_world_roll(mat4x4 model, int axis, int dir, float angle) {
     mat4x4_mul(model, world_roll_rot, model);
 }
 
-static void render_tower_normal(const LWCONTEXT* pLwc, const mat4x4 view, const mat4x4 proj, const LWPUCKGAME* puck_game, const float* pos, const LWPUCKGAMETOWER* tower, int remote) {
-    int shader_index = LWST_DEFAULT_NORMAL;
-    const LWSHADER* shader = &pLwc->shader[shader_index];
-    lazy_glUseProgram(pLwc, shader_index);
-    glUniform2fv(shader->vuvoffset_location, 1, default_uv_offset);
-    glUniform2fv(shader->vuvscale_location, 1, default_uv_scale);
-    glUniform2fv(shader->vs9offset_location, 1, default_uv_offset);
-    glUniform1f(shader->alpha_multiplier_location, 1.0f);
-    glUniform1i(shader->diffuse_location, 0); // 0 means GL_TEXTURE0
-    glUniform1i(shader->alpha_only_location, 1); // 1 means GL_TEXTURE1
-    glUniform3f(shader->overlay_color_location, 1, 1, 1);
-    glUniform1f(shader->overlay_color_ratio_location, 0);
-
-    mat4x4 rot;
-    mat4x4_identity(rot);
-    float sx = puck_game->tower_radius / puck_game->tower_mesh_radius;
-    float sy = sx;
-    float sz = sx;
-
-    float hp_ratio = 0;
-    if (remote) {
-        float hp_ratio1 = 0;
-        float hp_ratio2 = 0;
-        if (pLwc->puck_game_state.bf.player_total_hp) {
-            hp_ratio1 = (float)pLwc->puck_game_state.bf.player_current_hp / pLwc->puck_game_state.bf.player_total_hp;
-        }
-        if (pLwc->puck_game_state.bf.target_total_hp) {
-            hp_ratio2 = (float)pLwc->puck_game_state.bf.target_current_hp / pLwc->puck_game_state.bf.target_total_hp;
-        }
-
-        if (tower->owner_player_no == 1) {
-            if (pLwc->puck_game->player_no == 2) {
-                hp_ratio = hp_ratio2;
-            } else {
-                hp_ratio = hp_ratio1;
-            }
-        } else {
-            if (pLwc->puck_game->player_no == 2) {
-                hp_ratio = hp_ratio1;
-            } else {
-                hp_ratio = hp_ratio2;
-            }
-        }
-    } else {
-        if (tower->owner_player_no == 1) {
-            hp_ratio = (float)puck_game->pg_player[0].current_hp / puck_game->pg_player[0].total_hp;
-        } else {
-            hp_ratio = (float)puck_game->pg_target[0].current_hp / puck_game->pg_target[0].total_hp;
-        }
-    }
-    int hp = (int)ceilf(pLwc->puck_game->tower_total_hp * hp_ratio);
-
-    glUniform1f(shader->overlay_color_ratio_location, 1);
-
-    LWTOWERRENDERDATA tower_render_data[] = {
-        { LVT_TOWER_BASE, 0.1f, 0.1f, 0.1f },
-        { LVT_TOWER_1, 0.2f, 0.9f, 0.2f },
-        { LVT_TOWER_2, 0.2f, 0.9f, 0.2f },
-        { LVT_TOWER_3, 0.2f, 0.9f, 0.2f },
-        { LVT_TOWER_4, 0.2f, 0.9f, 0.2f },
-        { LVT_TOWER_5, 0.2f, 0.9f, 0.2f },
-    };
-    for (int i = 0; i < ARRAY_SIZE(tower_render_data); i++) {
-        float x = pos[0];
-        float y = pos[1];
-        float z = pos[2];
-        // Positional offset by shake
-        if (tower->shake_remain_time > 0) {
-            const float ratio = tower->shake_remain_time / pLwc->puck_game->tower_shake_time;
-            const float shake_magnitude = 0.03f;
-            x += ratio * (2 * rand() / (float)RAND_MAX - 1.0f) * shake_magnitude * pLwc->aspect_ratio;
-            y += ratio * (2 * rand() / (float)RAND_MAX - 1.0f) * shake_magnitude;
-        }
-
-        mat4x4 model;
-        mat4x4_identity(model);
-        mat4x4_mul(model, model, rot);
-        mat4x4_scale_aniso(model, model, sx, sy, sz);
-        //mat4x4_scale_aniso(model, model, 5, 5, 5);
-
-        mat4x4 model_translate;
-        mat4x4_translate(model_translate, x, y, z);
-
-        mat4x4_mul(model, model_translate, model);
-
-        mult_world_roll(model, puck_game->world_roll_axis, puck_game->world_roll_dir, puck_game->world_roll);
-
-        mat4x4 view_model;
-        mat4x4_mul(view_model, view, model);
-
-        mat4x4 proj_view_model;
-        mat4x4_identity(proj_view_model);
-        mat4x4_mul(proj_view_model, proj, view_model);
-
-        const LWTOWERRENDERDATA* d = tower_render_data + i;
-        float r = d->r;
-        float g = d->g;
-        float b = d->b;
-        if (i > 0 && 5 - (i - 1) > hp) {
-            r = 0.7f;
-            g = 0.1f;
-        }
-        glUniform3f(shader->overlay_color_location, r, g, b);
-        const LW_VBO_TYPE lvt = d->lvt;
-
-        lazy_glBindBuffer(pLwc, lvt);
-        bind_all_vertex_attrib(pLwc, lvt);
-        glActiveTexture(GL_TEXTURE0);
-        glBindTexture(GL_TEXTURE_2D, 0);
-        set_tex_filter(GL_LINEAR, GL_LINEAR);
-        //set_tex_filter(GL_NEAREST, GL_NEAREST);
-        glUniformMatrix4fv(shader->mvp_location, 1, GL_FALSE, (const GLfloat*)proj_view_model);
-        glUniformMatrix4fv(shader->m_location, 1, GL_FALSE, (const GLfloat*)model);
-        glDrawArrays(GL_TRIANGLES, 0, pLwc->vertex_buffer[lvt].vertex_count);
-    }
-}
-
 static void render_tower_normal_2(const LWCONTEXT* pLwc, const mat4x4 view, const mat4x4 proj, const LWPUCKGAME* puck_game, const float* pos, const LWPUCKGAMETOWER* tower, int remote) {
     int shader_index = LWST_DEFAULT;
     const LWSHADER* shader = &pLwc->shader[shader_index];
@@ -630,7 +513,7 @@ static void render_dash_ring_gauge(const LWCONTEXT* pLwc, vec4 player_pos, float
 }
 
 static void render_searching_state(const LWCONTEXT* pLwc, const LWPUCKGAME* puck_game) {
-    if (puck_game->searching_str == 0) {
+    if (puck_game->searching_str[0] == 0) {
         return;
     }
     // Render text
@@ -653,54 +536,6 @@ static void render_searching_state(const LWCONTEXT* pLwc, const LWPUCKGAME* puck
     text_block.text_block_y = 0;
     render_text_block(pLwc, &text_block);
 }
-
-static void render_match_state(const LWCONTEXT* pLwc, float ui_alpha) {
-    // Render text
-    LWTEXTBLOCK text_block;
-    text_block.align = LTBA_CENTER_BOTTOM;
-    text_block.text_block_width = DEFAULT_TEXT_BLOCK_WIDTH;
-    text_block.text_block_line_height = DEFAULT_TEXT_BLOCK_LINE_HEIGHT_E;
-    text_block.size = DEFAULT_TEXT_BLOCK_SIZE_C;
-    text_block.multiline = 1;
-    SET_COLOR_RGBA_FLOAT(text_block.color_normal_glyph, 1, 1, 1, ui_alpha);
-    SET_COLOR_RGBA_FLOAT(text_block.color_normal_outline, 0, 0, 0, ui_alpha);
-    SET_COLOR_RGBA_FLOAT(text_block.color_emp_glyph, 1, 1, 0, ui_alpha);
-    SET_COLOR_RGBA_FLOAT(text_block.color_emp_outline, 0, 0, 0, ui_alpha);
-    char str[128];
-    if (puck_game_state_phase_finished(pLwc->puck_game_state.bf.phase)) {
-        int hp_diff = pLwc->puck_game_state.bf.player_current_hp - pLwc->puck_game_state.bf.target_current_hp;
-        if (hp_diff == 0) {
-            sprintf(str, u8"DRAW (BID:%d) (TOUCH 'JUMP' TO REMATCH)", pLwc->puck_game->battle_id);
-        } else if (hp_diff > 0) {
-            if (pLwc->puck_game->battle_id == 0) {
-                sprintf(str, "YOU WON (BID:%d) (Searching...) [PRACTICE MODE]", pLwc->puck_game->battle_id);
-            } else {
-                sprintf(str, "YOU WON (BID:%d) (TOUCH 'JUMP' TO REMATCH)", pLwc->puck_game->battle_id);
-            }
-        } else {
-            if (pLwc->puck_game->battle_id == 0) {
-                sprintf(str, "YOU LOST (BID:%d) (Searching...) [PRACTICE MODE]", pLwc->puck_game->battle_id);
-            } else {
-                sprintf(str, "YOU LOST (BID:%d) (TOUCH 'JUMP' TO REMATCH)", pLwc->puck_game->battle_id);
-            }
-        }
-    } else {
-        if (pLwc->puck_game->token) {
-            sprintf(str, "FIGHT!!! (BID:%d)", pLwc->puck_game->battle_id);
-        } else {
-            sprintf(str, "Searching... [PRACTICE MODE]");
-        }
-    }
-
-    text_block.text = str;
-    text_block.text_bytelen = (int)strlen(text_block.text);
-    text_block.begin_index = 0;
-    text_block.end_index = text_block.text_bytelen;
-    text_block.text_block_x = 0;
-    text_block.text_block_y = -0.9f;
-    render_text_block(pLwc, &text_block);
-}
-
 static void render_nickname_score(const LWCONTEXT* pLwc,
                                   int left,
                                   float ui_alpha,
@@ -736,134 +571,6 @@ static void render_nickname_score(const LWCONTEXT* pLwc,
     text_block.end_index = text_block.text_bytelen;
     text_block.text_block_x = x;
     text_block.text_block_y = 0.225f;
-    render_text_block(pLwc, &text_block);
-}
-
-static void render_hp_gauge(const LWCONTEXT* pLwc,
-                            float w,
-                            float h,
-                            float x,
-                            float y,
-                            int current_hp,
-                            int total_hp,
-                            float hp_shake_remain_time,
-                            int left,
-                            const char* str1,
-                            const char* str2,
-                            float ui_alpha) {
-    const float gauge_width = w;
-    const float gauge_height = h;
-    //const float gauge_flush_height = 0.07f;
-    const float base_color = 0.1f;
-    // Positional offset by shake
-    if (hp_shake_remain_time > 0) {
-        const float ratio = hp_shake_remain_time / pLwc->puck_game->hp_shake_time;
-        const float shake_magnitude = 0.02f;
-        x += ratio * (2 * rand() / (float)RAND_MAX - 1.0f) * shake_magnitude * pLwc->aspect_ratio;
-        y += ratio * (2 * rand() / (float)RAND_MAX - 1.0f) * shake_magnitude;
-    }
-    // Render background (gray)
-    render_solid_vb_ui(pLwc,
-                       x,
-                       y,
-                       gauge_width,
-                       gauge_height,
-                       0,
-                       LVT_CENTER_BOTTOM_ANCHORED_SQUARE,
-                       1, base_color, base_color, base_color, 1);
-    const float cell_border = 0.015f;
-    if (total_hp > 0) {
-        const float cell_width = (gauge_width - cell_border * (total_hp + 1)) / total_hp;
-        const float cell_x_0 = x - gauge_width / 2 + cell_border;
-        const float cell_x_stride = cell_width + cell_border;
-        for (int i = 0; i < total_hp; i++) {
-            float r = base_color, g = base_color, b = base_color;
-            if (left) {
-                if (total_hp - current_hp > i) {
-                    r = 1;
-                } else {
-                    g = 1;
-                }
-            } else {
-                if (i < current_hp) {
-                    g = 1;
-                } else {
-                    r = 1;
-                }
-            }
-
-            // Render foreground (green or red)
-            render_solid_vb_ui(pLwc,
-                               cell_x_0 + cell_x_stride * i,
-                               y + gauge_height / 2,
-                               cell_width,
-                               gauge_height - cell_border * 2,
-                               0,
-                               LVT_LEFT_CENTER_ANCHORED_SQUARE,
-                               ui_alpha, r, g, b, 1);
-        }
-    }
-}
-
-static void render_dash_gauge(const LWCONTEXT* pLwc) {
-    const float margin_x = 1.5f;
-    const float margin_y = 0.3f;
-    const float gauge_width = 0.75f;
-    const float gauge_height = 0.07f;
-    //const float gauge_flush_height = 0.07f;
-    const float base_color = 0.3f;
-    float x = -pLwc->aspect_ratio + margin_x;
-    float y = 1 - margin_y;
-    const LWPUCKGAMEDASH* dash = puck_game_single_play_dash_object(pLwc->puck_game);
-    const float boost_gauge_ratio = puck_game_dash_gauge_ratio(pLwc->puck_game, dash);
-    // Positioinal offset by shake
-    if (dash->shake_remain_time > 0) {
-        const float ratio = dash->shake_remain_time / pLwc->puck_game->dash_shake_time;
-        const float shake_magnitude = 0.02f;
-        x += ratio * (2 * rand() / (float)RAND_MAX - 1.0f) * shake_magnitude * pLwc->aspect_ratio;
-        y += ratio * (2 * rand() / (float)RAND_MAX - 1.0f) * shake_magnitude;
-    }
-    // Render background (red)
-    if (boost_gauge_ratio < 1.0f) {
-        render_solid_vb_ui(pLwc,
-                           x - gauge_width * boost_gauge_ratio, y, gauge_width * (1.0f - boost_gauge_ratio), gauge_height,
-                           0,
-                           LVT_RIGHT_BOTTOM_ANCHORED_SQUARE,
-                           1, 1, base_color, base_color, 1);
-    }
-    // Render foreground (green)
-    render_solid_vb_ui(pLwc,
-                       x, y, gauge_width * boost_gauge_ratio, gauge_height,
-                       0,
-                       LVT_RIGHT_BOTTOM_ANCHORED_SQUARE,
-                       1, base_color, 1, base_color, 1);
-    if (boost_gauge_ratio < 1.0f) {
-        // Render flush gauge
-        render_solid_vb_ui(pLwc,
-                           x, y + boost_gauge_ratio / 4.0f, gauge_width, gauge_height,
-                           0,
-                           LVT_RIGHT_BOTTOM_ANCHORED_SQUARE,
-                           powf(1.0f - boost_gauge_ratio, 3.0f), base_color, 1, base_color, 1);
-    }
-    // Render text
-    LWTEXTBLOCK text_block;
-    text_block.align = LTBA_RIGHT_BOTTOM;
-    text_block.text_block_width = DEFAULT_TEXT_BLOCK_WIDTH;
-    text_block.text_block_line_height = DEFAULT_TEXT_BLOCK_LINE_HEIGHT_E;
-    text_block.size = DEFAULT_TEXT_BLOCK_SIZE_F;
-    text_block.multiline = 1;
-    SET_COLOR_RGBA_FLOAT(text_block.color_normal_glyph, 1, 1, 1, 1);
-    SET_COLOR_RGBA_FLOAT(text_block.color_normal_outline, 0, 0, 0, 1);
-    SET_COLOR_RGBA_FLOAT(text_block.color_emp_glyph, 1, 1, 0, 1);
-    SET_COLOR_RGBA_FLOAT(text_block.color_emp_outline, 0, 0, 0, 1);
-    char str[32];
-    sprintf(str, "%.1f%% DASH GAUGE", boost_gauge_ratio * 100);
-    text_block.text = str;
-    text_block.text_bytelen = (int)strlen(text_block.text);
-    text_block.begin_index = 0;
-    text_block.end_index = text_block.text_bytelen;
-    text_block.text_block_x = x;
-    text_block.text_block_y = y;
     render_text_block(pLwc, &text_block);
 }
 
@@ -1508,40 +1215,6 @@ static void render_icon_amount(const LWCONTEXT* pLwc,
     render_text_block(pLwc, &text_block);
 }
 
-static void render_top_bar_rank(const LWCONTEXT* pLwc, const LWPUCKGAME* puck_game, float* top_bar_x_cursor, float top_bar_x_cursor_margin, int no_record) {
-    const float width = 0.4f;
-    const float height = 0.15f;
-    const float x = *top_bar_x_cursor + width / 2;
-    const float y = 1.0f - height / 2;
-    const LW_ATLAS_ENUM lae = LAE_RANK_ICON;
-    const LW_ATLAS_ENUM lae_alpha = LAE_RANK_ICON_ALPHA;
-    char str[32];
-    if (no_record == 0) {
-        sprintf(str, "%d", puck_game->player_rank[0] + 1); // rank is zero-based
-    } else {
-        sprintf(str, "--");
-    }
-    render_icon_amount(pLwc, puck_game, x, y, width, height, str, lae, lae_alpha, 0.9f, 1.0f, 0.9f);
-    *top_bar_x_cursor += width + top_bar_x_cursor_margin;
-}
-
-static void render_top_bar_energy(const LWCONTEXT* pLwc, const LWPUCKGAME* puck_game, float* top_bar_x_cursor, float top_bar_x_cursor_margin, int no_record) {
-    const float width = 0.4f;
-    const float height = 0.15f;
-    const float x = *top_bar_x_cursor + width / 2;
-    const float y = 1.0f - height / 2;
-    const LW_ATLAS_ENUM lae = LAE_ENERGY_ICON;
-    const LW_ATLAS_ENUM lae_alpha = LAE_ENERGY_ICON_ALPHA;
-    char str[32];
-    if (no_record == 0) {
-        sprintf(str, "%d", puck_game->player_score[0]);
-    } else {
-        sprintf(str, "--");
-    }
-    render_icon_amount(pLwc, puck_game, x, y, width, height, str, lae, lae_alpha, 0.4f, 0.9f, 1.0f);
-    *top_bar_x_cursor += width + top_bar_x_cursor_margin;
-}
-
 static void render_top_bar_nickname(const LWCONTEXT* pLwc, const LWPUCKGAME* puck_game, float* top_bar_x_cursor, float top_bar_x_cursor_margin) {
     const float width = 1.4f;
     const float height = 0.175f;
@@ -1583,11 +1256,6 @@ static void render_main_menu_ui_layer(const LWCONTEXT* pLwc,
     const float top_bar_x_cursor_margin = 0.05f;
     // nickname (background, icon, text)
     render_top_bar_nickname(pLwc, puck_game, &top_bar_x_cursor, top_bar_x_cursor_margin);
-    const int no_record = puck_game->player_rank[0] < 0;
-    // energy (background, icon, text)
-    //render_top_bar_energy(pLwc, puck_game, &top_bar_x_cursor, top_bar_x_cursor_margin, no_record);
-    // rank (background, icon, text)
-    //render_top_bar_rank(pLwc, puck_game, &top_bar_x_cursor, top_bar_x_cursor_margin, no_record);
     // buttons
     float button_alpha = 0.0f; // alpha zeroed intentionally (nonzero only when debugging)
     lwbutton_lae_append(pLwc,

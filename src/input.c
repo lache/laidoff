@@ -192,8 +192,6 @@ void lw_trigger_mouse_release(LWCONTEXT* pLwc, float x, float y, int pointer_id)
 
 	const float fist_button_x_center = pLwc->aspect_ratio - 0.3f - 0.75f / 2;
 	const float fist_button_y_center = -1 + 0.75f / 2;
-	const float fist_button_w = 0.75f;
-	const float fist_button_h = 0.75f;
 
 	const float top_button_x_center = fist_button_x_center;
 	const float top_button_y_center = -fist_button_y_center;

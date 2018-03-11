@@ -31,7 +31,6 @@ static void call_collision_callback(LWPUCKGAME* puck_game,
 
 static void testgo_move_callback(dBodyID b) {
     LWPUCKGAMEOBJECT* go = (LWPUCKGAMEOBJECT*)dBodyGetData(b);
-    LWPUCKGAME* puck_game = go->puck_game;
 
     // Position
     const dReal* p = dBodyGetPosition(b);
@@ -190,7 +189,7 @@ void puck_game_create_walls(LWPUCKGAME* puck_game) {
     }
     for (int i = 0; i < LPGB_COUNT; i++) {
         if (puck_game->boundary[i]) {
-            dGeomSetData(puck_game->boundary[i], (void*)i);
+            dGeomSetData(puck_game->boundary[i], (void*)(uintptr_t)i);
         }
     }
 }

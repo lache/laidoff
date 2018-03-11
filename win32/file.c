@@ -12,7 +12,8 @@ char* get_assets_path(const char* filename);
 char* create_string_from_file(const char* filename)
 {
 #if LW_PLATFORM_OSX
-    filename = get_assets_path(filename);
+    char* filename_should_free = get_assets_path(filename);
+    filename = filename_should_free;
 #endif
 	FILE* f;
 	f = fopen(filename, "r");
@@ -26,13 +27,13 @@ char* create_string_from_file(const char* filename)
         fclose(f);
         LOGI("create_string_from_file: %s (%d bytes) loaded to memory.", filename, (int)last_byte);
 #if LW_PLATFORM_OSX
-        free(filename);
+        free(filename_should_free);
 #endif
         return d;
     }
     LOGE("create_string_from_file: %s [ERROR] FILE NOT FOUND.", filename);
 #if LW_PLATFORM_OSX
-    free(filename);
+    free(filename_should_free);
 #endif
     return 0;
 }
@@ -45,7 +46,8 @@ void release_string(char* d)
 char* create_binary_from_file(const char* filename, size_t* size)
 {
 #if LW_PLATFORM_OSX
-    filename = get_assets_path(filename);
+    char* filename_should_free = get_assets_path(filename);
+    filename = filename_should_free;
 #endif
 	FILE* f;
 	f = fopen(filename, "rb");
@@ -59,13 +61,13 @@ char* create_binary_from_file(const char* filename, size_t* size)
         fclose(f);
         LOGI("create_binary_from_file: %s (%d bytes) loaded to memory.", filename, f_size);
 #if LW_PLATFORM_OSX
-        free(filename);
+        free(filename_should_free);
 #endif
         return d;
     }
     LOGE("create_binary_from_file: %s [ERROR] FILE NOT FOUND.", filename);
 #if LW_PLATFORM_OSX
-    free(filename);
+    free(filename_should_free);
 #endif
     return 0;
 }

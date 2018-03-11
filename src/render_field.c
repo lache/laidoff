@@ -71,37 +71,6 @@ static void render_field_object(const LWCONTEXT* pLwc, int vbo_index, GLuint tex
     render_field_object_rot(pLwc, vbo_index, tex_id, view, proj, x, y, z, sx, sy, sz, alpha_multiplier, mipmap, mat_rot);
 }
 
-static void render_ground(const LWCONTEXT* pLwc, const mat4x4 view, const mat4x4 proj) {
-    int shader_index = LWST_DEFAULT;
-    const int vbo_index = LVT_CENTER_CENTER_ANCHORED_SQUARE;
-    
-    const float quad_scale = 10;
-    mat4x4 model;
-    mat4x4_identity(model);
-    mat4x4_rotate_X(model, model, 0);
-    mat4x4_scale_aniso(model, model, quad_scale, quad_scale, quad_scale);
-    
-    mat4x4 view_model;
-    mat4x4_mul(view_model, view, model);
-    
-    mat4x4 proj_view_model;
-    mat4x4_identity(proj_view_model);
-    mat4x4_mul(proj_view_model, proj, view_model);
-    
-    lazy_glBindBuffer(pLwc, vbo_index);
-    bind_all_vertex_attrib(pLwc, vbo_index);
-    glUniformMatrix4fv(pLwc->shader[shader_index].mvp_location, 1, GL_FALSE, (const GLfloat*)proj_view_model);
-    glBindTexture(GL_TEXTURE_2D, pLwc->tex_programmed[LPT_GRID]);
-    set_tex_filter(GL_LINEAR_MIPMAP_LINEAR, GL_LINEAR);
-    
-    const float gird_uv_offset[2] = { 0, 0 };
-    const float grid_uv_scale[2] = { quad_scale, quad_scale };
-    
-    glUniform2fv(pLwc->shader[shader_index].vuvoffset_location, 1, gird_uv_offset);
-    glUniform2fv(pLwc->shader[shader_index].vuvscale_location, 1, grid_uv_scale);
-    glDrawArrays(GL_TRIANGLES, 0, pLwc->vertex_buffer[vbo_index].vertex_count);
-}
-
 void render_fist_button(const LWCONTEXT* pLwc) {
     const float fist_icon_margin_x = 0.3f;
     const float fist_icon_margin_y = 0.2f;
@@ -273,7 +242,6 @@ static void s_render_path_query_test_player(const LWCONTEXT* pLwc, const mat4x4 
 
 static void s_render_construct_preview_model(const LWCONTEXT* pLwc, const mat4x4 view, const mat4x4 perspective, float x, float y, float z, float a) {
     if (pLwc->construct.preview_enable) {
-        const float model_radius = 2.5f;
         render_tower_yaw(pLwc, perspective, view, x, y, a,
                          pLwc->construct.preview.anim_action_id,
                          FLT_MAX,
@@ -476,7 +444,6 @@ static void s_render_render_command_shadow(const LWCONTEXT* pLwc, mat4x4 view, m
     glBlendFunc(GL_SRC_ALPHA, GL_ONE);
     glBlendEquation(GL_FUNC_REVERSE_SUBTRACT);
     glDepthMask(GL_FALSE);
-    const double now = lwtimepoint_now_seconds();
     for (int i = 0; i < MAX_RENDER_QUEUE_CAPACITY; i++) {
         const LWFIELDRENDERCOMMAND* cmd = &pLwc->render_command[i];
         if (cmd->key == 0) {

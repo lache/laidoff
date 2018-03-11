@@ -123,8 +123,8 @@ const float full_panel_width_margin = 0.6f;
 
 static void s_create_full_panel_bg_vbo(LWCONTEXT* pLwc) {
     const float c0[3] = { 0.2f, 0.2f, 0.2f };
-    const float c1[3] = { 0.3f, 0.3f, 0.3f };
-    const float c2[3] = { 0.4f, 0.4f, 0.4f };
+    //const float c1[3] = { 0.3f, 0.3f, 0.3f };
+    //const float c2[3] = { 0.4f, 0.4f, 0.4f };
     const LWVERTEX full_panel_bg[] = {
         { -full_panel_width/2 + full_panel_trim, -full_panel_height / 2,    0, c0[0], c0[1], c0[2], 0, 1, 0, 0 },
         { full_panel_width/2,    -full_panel_height / 2,    0, c0[0], c0[1], c0[2], 1, 1, 0, 0 },

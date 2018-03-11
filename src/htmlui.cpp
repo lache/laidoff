@@ -13,9 +13,9 @@
 
 class LWHTMLUI {
 public:
-	LWHTMLUI(const LWCONTEXT* pLwc, int w, int h)
-		: pLwc(pLwc)
-        , container(pLwc, w, h)
+	LWHTMLUI(const LWCONTEXT* _pLwc, int w, int h)
+		: pLwc(_pLwc)
+        , container(_pLwc, w, h)
         , client_width(w)
         , client_height(h)
         , refresh_html_body(0)
@@ -82,6 +82,7 @@ public:
 private:
 	LWHTMLUI();
 	LWHTMLUI(const LWHTMLUI&);
+    const LWCONTEXT* pLwc;
 	litehtml::context browser_context;
 	litehtml::text_container container;
 	litehtml::document::ptr doc;
@@ -90,7 +91,6 @@ private:
 	litehtml::element::ptr last_lbutton_down_element;
     std::string next_html_path;
     int refresh_html_body;
-    const LWCONTEXT* pLwc;
 };
 
 void* htmlui_new(const LWCONTEXT* pLwc) {
@@ -98,7 +98,8 @@ void* htmlui_new(const LWCONTEXT* pLwc) {
 }
 
 void htmlui_destroy(void** c) {
-	delete(*c);
+    LWHTMLUI* htmlui = (LWHTMLUI*)c;
+	delete(htmlui);
 	*c = 0;
 }
 

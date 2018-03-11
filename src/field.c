@@ -262,7 +262,7 @@ int field_create_sphere_script_collider(LWFIELD* field, int obj_key, LW_SPACE_GR
     for (int i = 0; i < MAX_SCRIPT_GEOM; i++) {
         if (field->script_geom[i] == 0) {
             field->script_geom[i] = dCreateSphere(field->space_group[space_group], radius);
-            dGeomSetData(field->script_geom[i], (void*)obj_key);
+            dGeomSetData(field->script_geom[i], (void*)(uintptr_t)obj_key);
             dGeomSetPosition(field->script_geom[i], x, y, z);
             return i;
         }
@@ -326,7 +326,7 @@ LWFIELD* load_field(const char* filename) {
     field->ray_max_length = 50;
     for (int i = 0; i < LRI_COUNT; i++) {
         field->ray[i] = dCreateRay(field->space_group[LSG_RAY], field->ray_max_length);
-        dGeomSetData(field->ray[i], (void*)i); // Use ray ID as custom data for quick indexing in near callback
+        dGeomSetData(field->ray[i], (void*)(uintptr_t)i); // Use ray ID as custom data for quick indexing in near callback
         dGeomSetPosition(field->ray[i], field->player_pos[0], field->player_pos[1], field->player_pos[2]);
         dMatrix3 r;
         dRFromAxisAndAngle(r, 1, 0, 0, M_PI); // Make ray direction downward (-Z axis)
@@ -368,43 +368,9 @@ LWFIELD* load_field(const char* filename) {
     return field;
 }
 
-static int s_is_ray_or_player_geom(const LWFIELD* field, dGeomID o) {
-    if (field->player_geom == o) {
-        return 1;
-    }
-    
-    for (int i = 0; i < LRI_COUNT; i++) {
-        if (field->ray[i] == o) {
-            return 1;
-        }
-    }
-    
-    return 0;
-}
-
 static void field_world_ray_near(void* data, dGeomID o1, dGeomID o2) {
     LWFIELD* field = ((LWCONTEXT*)data)->field;
     assert(dGeomGetSpace(o1) == field->space_group[LSG_WORLD]);
-    assert(dGeomGetSpace(o2) == field->space_group[LSG_RAY]);
-    
-    dContact contact[MAX_FIELD_CONTACT];
-    int n = dCollide(o1, o2, MAX_FIELD_CONTACT, &contact[0].geom, sizeof(dContact));
-    for (int i = 0; i < n; i++) {
-        // Get ray index from custom data
-        // Note that the return value of dGeomGetData is coerced to integer since LW_RAY_ID is a sparse enum
-        const LW_RAY_ID lri = (int)dGeomGetData(o2);
-        // Negate normal direction of contact result data
-        dNegateVector3(contact[i].geom.normal);
-        // Copy to ours
-        field->ray_result[lri][field->ray_result_count[lri]] = contact[i];
-        // Increase ray result count
-        field->ray_result_count[lri]++;
-    }
-}
-
-static void field_enemy_ray_near(void *data, dGeomID o1, dGeomID o2) {
-    LWFIELD* field = (LWFIELD*)data;
-    assert(dGeomGetSpace(o1) == field->space_group[LSG_ENEMY]);
     assert(dGeomGetSpace(o2) == field->space_group[LSG_RAY]);
     
     dContact contact[MAX_FIELD_CONTACT];
@@ -713,7 +679,6 @@ void move_player_to_ground(LWFIELD* field) {
 }
 
 void move_aim_ray(LWFIELD* field, float aim_theta, float rot_z) {
-    dVector3 up = { 1, 0, 0 };
     for (int i = LRI_AIM_SECTOR_FIRST_INCLUSIVE; i <= LRI_AIM_SECTOR_LAST_INCLUSIVE; i++) {
         dGeomSetPosition(field->ray[i], field->player_pos[0], field->player_pos[1], field->player_pos[2] - field->player_length / 2 /* foot level */);
         
@@ -1143,7 +1108,7 @@ void field_spawn_sphere(LWFIELD* field, vec3 pos, vec3 vel, int bullet_id) {
         dBodySetLinearVel(field->sphere_body[i], vel[0], vel[1], vel[2]);
         dGeomSphereSetRadius(field->sphere[i], 0.1f);
         dGeomEnable(field->sphere[i]);
-        dGeomSetData(field->sphere[i], (void*)i);
+        dGeomSetData(field->sphere[i], (void*)(uintptr_t)i);
         field->sphere_bullet_id[i] = bullet_id;
         field->sphere_vel[i][0] = vel[0];
         field->sphere_vel[i][1] = vel[1];

@@ -366,7 +366,6 @@ static void s_mq_poll_ready(void* _pLwc, void* _mq, void* sm, void* field) {
 	LWMESSAGEQUEUE* mq = (LWMESSAGEQUEUE*)_mq;
 	LWCONTEXT* pLwc = (LWCONTEXT*)_pLwc;
 	zmq_pollitem_t items[] = { { zsock_resolve(mq->subscriber), 0, ZMQ_POLLIN, 0 } };
-	double t0 = zclock_mono() / 1e3;
 	
 	zmq_poller_event_t *events;
 	void *poller;
@@ -393,7 +392,7 @@ static void s_mq_poll_ready(void* _pLwc, void* _mq, void* sm, void* field) {
 			void* msg_unaligned = kvmsg_body(kvmsg);
 			char msg_aligned[2048];
 			if (msg_size > sizeof(msg_aligned)) {
-				LOGEP("msg_size exceeded (%d) maximum (%d)", msg_size, sizeof(msg_aligned));
+				LOGEP("msg_size exceeded (%zd) maximum (%zd)", msg_size, sizeof(msg_aligned));
 			}
 			// Should not use 'memcpy'. It is not supported on unaligned addresses.
 			for (size_t i = 0; i < msg_size; i++) {
@@ -420,7 +419,7 @@ static void s_mq_poll_ready(void* _pLwc, void* _mq, void* sm, void* field) {
 				}
 				case 0x02:
 				{
-					LWACTIONMSG* msg = (LWACTIONMSG*)msg_aligned;
+					//LWACTIONMSG* msg = (LWACTIONMSG*)msg_aligned;
 					// TODO Update action field only
 					break;
 				}
@@ -471,9 +470,7 @@ static void s_mq_poll_ready(void* _pLwc, void* _mq, void* sm, void* field) {
 		}
 	}
 	zmq_poll_noalloc_unprep(&events, &poller);
-	double t1 = zclock_mono() / 1e3 - t0;
-	//printf("%.3f sec\n", t1);
-
+	
 	if (zclock_time() >= mq->alarm) {
 		s_send_pos(pLwc, mq, 0);
 		mq->alarm = zclock_time() + 200;

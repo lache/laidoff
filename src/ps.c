@@ -8,13 +8,13 @@
 
 #define NUM_PS_INSTANCE (16)
 
-LWEMITTER emitter = { 0 };
+LWEMITTER emitter = {};
 pcg32_random_t rng;
 float time_current;
 float time_max;
 int time_direction;
-LWEMITTER2OBJECT emitter2_object = { 0 };
-LWEMITTER2 emitter2 = { 0 };
+LWEMITTER2OBJECT emitter2_object = {};
+LWEMITTER2 emitter2 = {};
 
 typedef struct _LWPSINST {
 	int valid;
@@ -84,8 +84,7 @@ void load_emitter2(LWCONTEXT* pLwc) {
 	// Set global factors
 	float growth = emitter2.eRadius / emitter2.eVelocity;       // Growth time
 	emitter2_object.life = growth + emitter2.eDecay + oDecay;                    // Simulation lifetime
-
-	float drag = 10.00f;                                            // Drag (air resistance)
+                                          // Drag (air resistance)
 	emitter2_object.gravity[0] = 0;
 	emitter2_object.gravity[1] = 0;// -9.81f * (1.0f / drag);			  // 7
 
@@ -179,7 +178,6 @@ void ps_play_new_pos(LWPS* ps, const vec3 pos) {
 		float growth = emitter2.eRadius / emitter2.eVelocity;
 		ps->inst[i].emit_object.life = growth + emitter2.eDecay + oDecay;
 
-		float drag = 10.00f;
 		ps->inst[i].emit_object.gravity[0] = 0;
 		ps->inst[i].emit_object.gravity[1] = 0;// -9.81f * (1.0f / drag);
 		ps->inst[i].emit_object.time = 0;

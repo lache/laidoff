@@ -155,7 +155,7 @@ typedef struct _LWWAVE {
     float y;
     float age;
 } LWWAVE;
-LWWAVE wave[5] = { 0, };
+LWWAVE wave[5] = {};
 float last_wave_spawn = 0;
 
 void lwc_render_font_test(const LWCONTEXT* pLwc) {
