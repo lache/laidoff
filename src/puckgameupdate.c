@@ -147,6 +147,75 @@ static void update_tower(LWPUCKGAME* puck_game, float delta_time) {
     }
 }
 
+static void send_udp_frame_sync(LWCONTEXT* pLwc, LWPUCKGAME* puck_game, int remote) {
+    // syncing at 60 fps
+    float app_time = (float)pLwc->app_time;
+    if (app_time < puck_game->last_udp_frame_sync_sent + 1/60.0f) {
+        return;
+    }
+    puck_game->last_udp_frame_sync_sent = app_time;
+    
+    float dx, dy, dlen;
+    int dir_pad_dragging = lw_get_normalized_dir_pad_input(pLwc, &pLwc->left_dir_pad, &dx, &dy, &dlen);
+    const float dlen_max = pLwc->left_dir_pad.max_follow_distance;
+    if (dlen > dlen_max) {
+        dlen = dlen_max;
+    }
+    float dlen_ratio = dlen / dlen_max;
+    // make dlen_ratio ^ 4
+    dlen_ratio *= dlen_ratio;
+    dlen_ratio *= dlen_ratio;
+    puck_game->remote_control[LW_PUCK_GAME_PLAYER_TEAM][0].dir_pad_dragging = pLwc->left_dir_pad.dragging;
+    puck_game->remote_control[LW_PUCK_GAME_PLAYER_TEAM][0].dx = dx;
+    puck_game->remote_control[LW_PUCK_GAME_PLAYER_TEAM][0].dy = dy;
+    puck_game->remote_control[LW_PUCK_GAME_PLAYER_TEAM][0].dlen = dlen_ratio;
+
+    const int send_udp = remote && puck_game_state_phase_finished(pLwc->puck_game_state.bf.phase) == 0;
+    
+    if (dir_pad_dragging) {
+        LOGIx("dx=%.2f, dy=%.2f, dlen=%.2f, dlen_max=%.2f, dlen_ratio=%.2f", dx, dy, dlen, dlen_max, dlen_ratio);
+        if (send_udp) {
+            LWPMOVE packet_move;
+            packet_move.type = LPGP_LWPMOVE;
+            packet_move.battle_id = pLwc->puck_game->battle_id;
+            packet_move.token = pLwc->puck_game->token;
+            packet_move.dx = pLwc->puck_game->player_no == 2 ? -dx : dx;
+            packet_move.dy = pLwc->puck_game->player_no == 2 ? -dy : dy;
+            packet_move.dlen = dlen_ratio;
+            udp_send(pLwc->udp, (const char*)&packet_move, sizeof(packet_move));
+        }
+    } else {
+        if (send_udp) {
+            LWPSTOP packet_stop;
+            packet_stop.type = LPGP_LWPSTOP;
+            packet_stop.battle_id = pLwc->puck_game->battle_id;
+            packet_stop.token = pLwc->puck_game->token;
+            udp_send(pLwc->udp, (const char*)&packet_stop, sizeof(packet_stop));
+        }
+    }
+    
+    // Pull
+    if (puck_game->control_flags & LPGCF_HIDE_PULL_BUTTON) {
+        if (puck_game->remote_control[LW_PUCK_GAME_PLAYER_TEAM][0].pull_puck) {
+            if (send_udp) {
+                LWPPULLSTART p;
+                p.type = LPGP_LWPPULLSTART;
+                p.battle_id = pLwc->puck_game->battle_id;
+                p.token = pLwc->puck_game->token;
+                udp_send(pLwc->udp, (const char*)&p, sizeof(p));
+            }
+        } else {
+            if (send_udp) {
+                LWPPULLSTOP p;
+                p.type = LPGP_LWPPULLSTOP;
+                p.battle_id = pLwc->puck_game->battle_id;
+                p.token = pLwc->puck_game->token;
+                udp_send(pLwc->udp, (const char*)&p, sizeof(p));
+            }
+        }
+    }
+}
+
 void update_puck_game(LWCONTEXT* pLwc, LWPUCKGAME* puck_game, double delta_time) {
     if (!puck_game->world) {
         return;
@@ -193,63 +262,10 @@ void update_puck_game(LWCONTEXT* pLwc, LWPUCKGAME* puck_game, double delta_time)
     } else if (puck_game->battle_phase == LSP_GO) {
         puck_game->battle_control_ui_alpha = 1.0f;
     }
-    float dx, dy, dlen;
-    int dir_pad_dragging = lw_get_normalized_dir_pad_input(pLwc, &pLwc->left_dir_pad, &dx, &dy, &dlen);
-    const float dlen_max = pLwc->left_dir_pad.max_follow_distance;
-    if (dlen > dlen_max) {
-        dlen = dlen_max;
-    }
-    float dlen_ratio = dlen / dlen_max;
-    // make dlen_ratio ^ 4
-    dlen_ratio *= dlen_ratio;
-    dlen_ratio *= dlen_ratio;
-    puck_game->remote_control[LW_PUCK_GAME_PLAYER_TEAM][0].dir_pad_dragging = pLwc->left_dir_pad.dragging;
-    puck_game->remote_control[LW_PUCK_GAME_PLAYER_TEAM][0].dx = dx;
-    puck_game->remote_control[LW_PUCK_GAME_PLAYER_TEAM][0].dy = dy;
-    puck_game->remote_control[LW_PUCK_GAME_PLAYER_TEAM][0].dlen = dlen_ratio;
-
-    const int send_udp = remote && puck_game_state_phase_finished(pLwc->puck_game_state.bf.phase) == 0;
     
-    if (dir_pad_dragging) {
-        LOGIx("dx=%.2f, dy=%.2f, dlen=%.2f, dlen_max=%.2f, dlen_ratio=%.2f", dx, dy, dlen, dlen_max, dlen_ratio);
-        if (send_udp) {
-            LWPMOVE packet_move;
-            packet_move.type = LPGP_LWPMOVE;
-            packet_move.battle_id = pLwc->puck_game->battle_id;
-            packet_move.token = pLwc->puck_game->token;
-            packet_move.dx = pLwc->puck_game->player_no == 2 ? -dx : dx;
-            packet_move.dy = pLwc->puck_game->player_no == 2 ? -dy : dy;
-            packet_move.dlen = dlen_ratio;
-            udp_send(pLwc->udp, (const char*)&packet_move, sizeof(packet_move));
-        }
-    } else {
-        if (send_udp) {
-            LWPSTOP packet_stop;
-            packet_stop.type = LPGP_LWPSTOP;
-            packet_stop.battle_id = pLwc->puck_game->battle_id;
-            packet_stop.token = pLwc->puck_game->token;
-            udp_send(pLwc->udp, (const char*)&packet_stop, sizeof(packet_stop));
-        }
-    }
+    // send outgoing frame-sync udp packets
+    send_udp_frame_sync(pLwc, puck_game, remote);
 
-    // Pull
-    if (puck_game->remote_control[LW_PUCK_GAME_PLAYER_TEAM][0].pull_puck) {
-        if (send_udp) {
-            LWPPULLSTART p;
-            p.type = LPGP_LWPPULLSTART;
-            p.battle_id = pLwc->puck_game->battle_id;
-            p.token = pLwc->puck_game->token;
-            udp_send(pLwc->udp, (const char*)&p, sizeof(p));
-        }
-    } else {
-        if (send_udp) {
-            LWPPULLSTOP p;
-            p.type = LPGP_LWPPULLSTOP;
-            p.battle_id = pLwc->puck_game->battle_id;
-            p.token = pLwc->puck_game->token;
-            udp_send(pLwc->udp, (const char*)&p, sizeof(p));
-        }
-    }
     // control bogus (AI player)
     if (puck_game->bogus_disabled == 0) {
         if (puck_game->game_state == LPGS_TUTORIAL) {
