@@ -1,6 +1,7 @@
 #pragma once
 
 #include <linmath.h>
+#include "pcg_basic.h"
 
 typedef struct _LWCONTEXT LWCONTEXT;
 
@@ -45,15 +46,27 @@ typedef struct _LWEMITTER2OBJECT {
 	vec3 pos;
 } LWEMITTER2OBJECT;
 
+typedef struct _LWPSCONTEXT {
+    LWEMITTER emitter;
+    pcg32_random_t rng;
+    float time_current;
+    float time_max;
+    int time_direction;
+    LWEMITTER2OBJECT emitter2_object;
+    LWEMITTER2 emitter2;
+} LWPSCONTEXT;
+
 typedef struct _LWPS LWPS;
 
-void ps_load_particles(LWCONTEXT* pLwc);
-void ps_load_emitter(LWCONTEXT* pLwc);
-void ps_test_update(LWCONTEXT* pLwc);
+void ps_load_particles(LWCONTEXT* pLwc, LWPSCONTEXT* c);
+void ps_load_emitter(LWCONTEXT* pLwc, LWPSCONTEXT* c);
+void ps_test_update(LWCONTEXT* pLwc, LWPSCONTEXT* c);
 void* ps_new();
 void ps_update(LWPS* ps, double delta_time);
 void ps_destroy(LWPS** ps);
 LWEMITTER2OBJECT* ps_emit_object_begin(LWPS* ps);
 LWEMITTER2OBJECT* ps_emit_object_next(LWPS* ps, LWEMITTER2OBJECT* cursor);
-void ps_play_new_pos(LWPS* ps, const vec3 pos);
-void ps_play_new(LWPS* ps);
+void ps_play_new_pos(LWPSCONTEXT* c, LWPS* ps, const vec3 pos);
+void ps_play_new(LWPSCONTEXT* c, LWPS* ps);
+void* ps_new_context();
+void ps_destroy_context(void** c);

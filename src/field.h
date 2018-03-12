@@ -41,6 +41,7 @@ typedef struct _LWPATHQUERY LWPATHQUERY;
 typedef struct _LWNAV LWNAV;
 typedef struct _LWFIELDMESH LWFIELDMESH;
 typedef struct _LWPS LWPS;
+typedef struct _LWPSCONTEXT LWPSCONTEXT;
 
 void move_player(LWCONTEXT* pLwc);
 void resolve_player_event_collision(LWCONTEXT* pLwc);

@@ -453,7 +453,8 @@ static void field_player_bullet_near(void* data, dGeomID o1, dGeomID o2) {
 }
 
 static void field_world_bullet_near(void* data, dGeomID o1, dGeomID o2) {
-    LWFIELD* field = ((LWCONTEXT*)data)->field;
+    LWCONTEXT* pLwc = (LWCONTEXT*)data;
+    LWFIELD* field = (LWFIELD*)pLwc->field;
     assert(dGeomGetSpace(o1) == field->space_group[LSG_WORLD]);
     assert(dGeomGetSpace(o2) == field->space_group[LSG_BULLET]);
     
@@ -472,7 +473,7 @@ static void field_world_bullet_near(void* data, dGeomID o1, dGeomID o2) {
             (float)contact[0].geom.pos[1],
             (float)contact[0].geom.pos[2],
         };
-        ps_play_new_pos(field->ps, pos);
+        ps_play_new_pos(pLwc->ps_context, field->ps, pos);
     }
 }
 

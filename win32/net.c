@@ -2,6 +2,7 @@
 #include <stdio.h>      /* for printf(), fprintf() */
 #if LW_PLATFORM_WIN32
 #include <winsock.h>    /* for socket(),... */
+typedef int socklen_t;
 #else
 #include <fcntl.h>
 #include <sys/socket.h>

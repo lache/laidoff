@@ -92,6 +92,7 @@ extern const char* tex_font_atlas_filename[2];
 typedef struct _LWPUCKGAME LWPUCKGAME;
 typedef struct _LWUDP LWUDP;
 typedef struct _LWTCP LWTCP;
+typedef struct _LWPSCONTEXT LWPSCONTEXT;
 
 typedef enum _LW_CONTROL_FLAGS {
     LCF_PUCK_GAME_RIGHT_DIR_PAD = 1 << 0,
@@ -382,7 +383,8 @@ typedef struct _LWCONTEXT {
     vec3 center;
     vec3 up;
     float eye_x_offset;
-	void* htmlui;
+	void* htmlui; // LWHTMLUI
+    LWPSCONTEXT* ps_context; // LWPSCONTEXT
 } LWCONTEXT;
 
 #ifdef __cplusplus

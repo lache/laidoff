@@ -577,7 +577,7 @@ static void s_render_test_particle(const LWCONTEXT* pLwc, const mat4x4 view, con
         mat4x4_identity(model);
         mat4x4_translate_in_place(model, emit_object->pos[0], emit_object->pos[1], emit_object->pos[2]);
         mat4x4_rotate_Z(model, model, (float)LWDEG2RAD(45));
-        ps_render_explosion(pLwc, emit_object, proj_view, model);
+        ps_render_explosion(pLwc, pLwc->ps_context, emit_object, proj_view, model);
         emit_object = ps_emit_object_next(field_ps(pLwc->field), emit_object);
     }
     lwc_disable_additive_blending();

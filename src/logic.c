@@ -815,7 +815,7 @@ void lwc_update(LWCONTEXT* pLwc, double delta_time) {
     }
 
     if (pLwc->game_scene == LGS_PARTICLE_SYSTEM) {
-        ps_test_update(pLwc);
+        ps_test_update(pLwc, pLwc->ps_context);
     }
 
     if (pLwc->game_scene == LGS_FIELD || pLwc->game_scene == LGS_PHYSICS) {

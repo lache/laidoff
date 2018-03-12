@@ -131,7 +131,8 @@ void render_paramed_skin(const LWCONTEXT* pLwc,
         return;
     }
     
-    vec3 bone_trans[MAX_BONE] = {};
+    vec3 bone_trans[MAX_BONE];
+    memset(bone_trans, 0, sizeof(bone_trans));
     
     vec3 bone_scale[MAX_BONE];
     for (int i = 0; i < armature->count; i++) {

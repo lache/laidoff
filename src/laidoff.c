@@ -498,8 +498,9 @@ void lw_clear_color() {
 }
 
 void init_ps(LWCONTEXT* pLwc) {
-    ps_load_emitter(pLwc);
-    ps_load_particles(pLwc);
+    pLwc->ps_context = ps_new_context(pLwc);
+    ps_load_emitter(pLwc, pLwc->ps_context);
+    ps_load_particles(pLwc, pLwc->ps_context);
 }
 
 static void init_gl_context(LWCONTEXT* pLwc) {
@@ -1089,7 +1090,7 @@ void lwc_render(const LWCONTEXT* pLwc) {
     } else if (pLwc->game_scene == LGS_PHYSICS) {
         lwc_render_physics(pLwc, pLwc->puck_game_view, pLwc->puck_game_proj);
     } else if (pLwc->game_scene == LGS_PARTICLE_SYSTEM) {
-        lwc_render_ps(pLwc);
+        lwc_render_ps(pLwc, pLwc->ps_context);
     } else if (pLwc->game_scene == LGS_UI) {
         lwc_render_ui(pLwc);
     } else if (pLwc->game_scene == LGS_SPLASH) {
@@ -1660,6 +1661,8 @@ void lw_deinit(LWCONTEXT* pLwc) {
     delete_puck_game(&pLwc->puck_game);
 
 	htmlui_destroy(&pLwc->htmlui);
+
+    ps_destroy_context(&pLwc->ps_context);
     
     free(pLwc);
 }
