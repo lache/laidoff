@@ -4,6 +4,7 @@
 #include "laidoff.h"
 #include "lwlog.h"
 #include <assert.h>
+#include <string.h>
 
 static void render_ground(const LWCONTEXT* pLwc, const mat4x4 view, const mat4x4 proj) {
     int shader_index = LWST_DEFAULT;
