@@ -1,4 +1,6 @@
 {
-  "ClientTcpHost": "puck-highend.popsongremix.com",
-  "ConnPort": "19856"
+  "ClientTcpHost": "p.popsongremix.com",
+  "ConnPort": "19856",
+  "ClientTcpTtlHost": "p.popsongremix.com",
+  "TtlConnPort": "3000"
 }
