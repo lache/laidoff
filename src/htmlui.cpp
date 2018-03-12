@@ -75,7 +75,7 @@ public:
     }
     void load_next_html_body() {
         if (refresh_html_body) {
-            lwc_render_font_test_fbo_body(pLwc, pLwc->tcp->html_body);
+            lwc_render_font_test_fbo_body(pLwc, pLwc->tcp_ttl->html_body);
             refresh_html_body = 0;
         }
     }

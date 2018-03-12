@@ -1374,6 +1374,13 @@ static void parse_conf(LWCONTEXT* pLwc) {
                 LOGI("ConnPort: %.*s", t[i + 1].end - t[i + 1].start, conf_str + t[i + 1].start);
                 strncpy(pLwc->tcp_host_addr.port_str, conf_str + t[i + 1].start, t[i + 1].end - t[i + 1].start);
                 pLwc->tcp_host_addr.port = atoi(pLwc->tcp_host_addr.port_str);
+            } else if (jsoneq(conf_str, &t[i], "ClientTcpTtlHost") == 0) {
+                LOGI("ClientTcpTtlHost: %.*s", t[i + 1].end - t[i + 1].start, conf_str + t[i + 1].start);
+                strncpy(pLwc->tcp_ttl_host_addr.host, conf_str + t[i + 1].start, t[i + 1].end - t[i + 1].start);
+            } else if (jsoneq(conf_str, &t[i], "TtlConnPort") == 0) {
+                LOGI("TtlConnPort: %.*s", t[i + 1].end - t[i + 1].start, conf_str + t[i + 1].start);
+                strncpy(pLwc->tcp_ttl_host_addr.port_str, conf_str + t[i + 1].start, t[i + 1].end - t[i + 1].start);
+                pLwc->tcp_ttl_host_addr.port = atoi(pLwc->tcp_ttl_host_addr.port_str);
             }
         }
         release_string(conf_str);

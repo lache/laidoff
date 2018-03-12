@@ -184,12 +184,16 @@ void litehtml::text_container::link(const std::shared_ptr<litehtml::document>& d
 
 void litehtml::text_container::on_anchor_click(const litehtml::tchar_t * url, const litehtml::element::ptr & el) {
 	LOGI("on_anchor_click: %s", url);
-    const char* path_prefix = ASSETS_BASE_PATH "html" PATH_SEPARATOR;
-    char path[1024] = { 0, };
-    strcat(path, path_prefix);
-    strcat(path, url);
-    //htmlui_set_next_html_path(pLwc->htmlui, path);
-    tcp_send_httpget(pLwc->tcp, url);
+    if (strcmp(url, "script:go_online()") == 0) {
+        tcp_request_landing_page(pLwc->tcp_ttl, pLwc->user_data_path);
+    } else {
+        const char* path_prefix = ASSETS_BASE_PATH "html" PATH_SEPARATOR;
+        char path[1024] = { 0, };
+        strcat(path, path_prefix);
+        strcat(path, url);
+        //htmlui_set_next_html_path(pLwc->htmlui, path);
+        tcp_send_httpget(pLwc->tcp_ttl, url);
+    }
 }
 
 void litehtml::text_container::set_cursor(const litehtml::tchar_t * cursor) {

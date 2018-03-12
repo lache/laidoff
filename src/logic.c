@@ -456,16 +456,16 @@ void reset_battle_context(LWCONTEXT* pLwc) {
     }
 
     set_creature_data(
-            &pLwc->player[0],
-            "Player",
-            1,
-            50,
-            50,
-            30,
-            30,
-            1,
-            5,
-            38
+        &pLwc->player[0],
+        "Player",
+        1,
+        50,
+        50,
+        30,
+        30,
+        1,
+        5,
+        38
     );
     pLwc->player[0].stat = ENEMY_DATA_LIST[0].c.stat;
     pLwc->player[0].skill[0] = &SKILL_DATA_LIST[0];
@@ -476,48 +476,48 @@ void reset_battle_context(LWCONTEXT* pLwc) {
     pLwc->player[0].skill[5] = &SKILL_DATA_LIST[5];
 
     set_creature_data(
-            &pLwc->player[1],
-            u8"Screenwriter",
-            2,
-            25,
-            50,
-            30,
-            30,
-            2,
-            1,
-            30
+        &pLwc->player[1],
+        u8"Screenwriter",
+        2,
+        25,
+        50,
+        30,
+        30,
+        2,
+        1,
+        30
     );
     pLwc->player[1].stat = ENEMY_DATA_LIST[0].c.stat;
     pLwc->player[1].skill[0] = &SKILL_DATA_LIST[0];
     pLwc->player[1].skill[1] = &SKILL_DATA_LIST[2];
 
     set_creature_data(
-            &pLwc->player[2],
-            u8"Nail Clipper",
-            3,
-            46,
-            46,
-            15,
-            55,
-            3,
-            0,
-            50
+        &pLwc->player[2],
+        u8"Nail Clipper",
+        3,
+        46,
+        46,
+        15,
+        55,
+        3,
+        0,
+        50
     );
     pLwc->player[2].stat = ENEMY_DATA_LIST[0].c.stat;
     pLwc->player[2].skill[0] = &SKILL_DATA_LIST[0];
     pLwc->player[2].skill[1] = &SKILL_DATA_LIST[3];
 
     set_creature_data(
-            &pLwc->player[3],
-            u8"Great Writer",
-            8,
-            105,
-            105,
-            0,
-            20,
-            4,
-            45,
-            56
+        &pLwc->player[3],
+        u8"Great Writer",
+        8,
+        105,
+        105,
+        0,
+        20,
+        4,
+        45,
+        56
     );
     pLwc->player[3].stat = ENEMY_DATA_LIST[0].c.stat;
     pLwc->player[3].skill[0] = &SKILL_DATA_LIST[0];
@@ -704,8 +704,7 @@ void logic_update_default_projection(LWCONTEXT* pLwc) {
 
     if (ratio > 1) {
         mat4x4_ortho(pLwc->proj, -ratio, ratio, -1.f, 1.f, 1.f, -1.f);
-    }
-    else {
+    } else {
         mat4x4_ortho(pLwc->proj, -1.f, 1.f, -1 / ratio, 1 / ratio, 1.f, -1.f);
     }
 }
@@ -721,7 +720,7 @@ int lw_write_tcp_addr(LWCONTEXT* pLwc, const char* tcp_addr) {
         LOGE("Cannot open user id file cache for writing...");
         return -1;
     }
-    char conf[1024] = {0,};
+    char conf[1024] = { 0, };
     sprintf(conf, "{\n"
             "  \"ClientTcpHost\": \"%s\",\n"
             "  \"ConnPort\": \"19856\"\n"
@@ -782,6 +781,10 @@ void lwc_update(LWCONTEXT* pLwc, double delta_time) {
         tcp_update(pLwc->tcp);
     }
 
+    if (pLwc->tcp_ttl) {
+        tcp_update(pLwc->tcp_ttl);
+    }
+
     //****//
     // fix delta time
     //lwcontext_delta_time(pLwc) = 1.0f / 60;
@@ -836,21 +839,21 @@ void lwc_update(LWCONTEXT* pLwc, double delta_time) {
     // Check for a new native user text input
     if (pLwc->last_text_input_seq != lw_get_text_input_seq()) {
         switch (lw_text_input_tag()) {
-            case LITI_NICKNAME:
-            {
-                //char nicknameMsg[256];
-                //sprintf(nicknameMsg, "Changing nickname to %s...", lw_get_text_input());
-                //show_sys_msg(pLwc->def_sys_msg, nicknameMsg);
-                tcp_send_setnickname(pLwc->tcp, &pLwc->tcp->user_id, lw_get_text_input());
-                break;
-            }
-            case LITI_SERVER_ADDR:
-            {
-                lw_write_tcp_addr(pLwc, lw_get_text_input());
-                break;
-            }
-            default:
-                break;
+        case LITI_NICKNAME:
+        {
+            //char nicknameMsg[256];
+            //sprintf(nicknameMsg, "Changing nickname to %s...", lw_get_text_input());
+            //show_sys_msg(pLwc->def_sys_msg, nicknameMsg);
+            tcp_send_setnickname(pLwc->tcp, &pLwc->tcp->user_id, lw_get_text_input());
+            break;
+        }
+        case LITI_SERVER_ADDR:
+        {
+            lw_write_tcp_addr(pLwc, lw_get_text_input());
+            break;
+        }
+        default:
+            break;
         }
         pLwc->last_text_input_seq = lw_get_text_input_seq();
     }
@@ -864,8 +867,7 @@ void init_lwc_runtime_data(LWCONTEXT* pLwc) {
     pLwc->dialog = create_string_from_file(ASSETS_BASE_PATH "d" PATH_SEPARATOR "d1.txt");
     if (pLwc->dialog) {
         pLwc->dialog_bytelen = (int)strlen(pLwc->dialog);
-    }
-    else {
+    } else {
         LOGE("dialog loading failed.");
     }
 }
@@ -961,6 +963,11 @@ static void s_logic_worker(zsock_t *pipe, void *args) {
                         &pLwc->tcp_host_addr,
                         tcp_on_connect,
                         parse_recv_packets);
+    pLwc->tcp_ttl = new_tcp(pLwc,
+                            pLwc->user_data_path,
+                            &pLwc->tcp_ttl_host_addr,
+                            tcp_ttl_on_connect,
+                            parse_recv_packets);
     zloop_t* loop = zloop_new();
     pLwc->logic_loop = loop;
     logic_start_logic_update_job(pLwc);

@@ -343,8 +343,10 @@ typedef struct _LWCONTEXT {
 	LWPUCKGAME* puck_game;
 	// UDP context
 	LWUDP* udp;
-	// TCP context
+	// TCP context (ball rumble)
 	LWTCP* tcp;
+    // TCP context (transport tycoon lee)
+    LWTCP* tcp_ttl;
 	// Puck game remote(server) state
 	LWPSTATE puck_game_state;
 	// Puck game remote state last received time (sec)
@@ -363,6 +365,7 @@ typedef struct _LWCONTEXT {
 	mat4x4 puck_game_proj;
 	LWHOSTADDR tcp_host_addr;
 	LWHOSTADDR udp_host_addr;
+    LWHOSTADDR tcp_ttl_host_addr;
 	int last_text_input_seq;
     LWDIRPAD left_dir_pad;
     LWDIRPAD right_dir_pad;
