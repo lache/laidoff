@@ -12,10 +12,9 @@ void lwc_render_font_test_fbo_body(const LWCONTEXT* pLwc, const char* html_body)
     glDisable(GL_DEPTH_TEST);
 
     glViewport(0, 0, pLwc->font_fbo.width, pLwc->font_fbo.height);
-    glClearColor(0x44 / 255.f, 0x4c / 255.f, 0x50 / 255.f, 0); // alpha should be cleared to zero
-                                                               //lw_clear_color();
+    glClearColor(0, 0, 0, 0);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
+    glBlendFuncSeparate(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA, GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
     htmlui_load_render_draw_body(pLwc->htmlui, html_body);
 
     glEnable(GL_DEPTH_TEST);
@@ -27,9 +26,10 @@ void lwc_render_font_test_fbo(const LWCONTEXT* pLwc, const char* html_path) {
 	glDisable(GL_DEPTH_TEST);
 
 	glViewport(0, 0, pLwc->font_fbo.width, pLwc->font_fbo.height);
-    glClearColor(0x44 / 255.f, 0x4c / 255.f, 0x50 / 255.f, 0); // alpha should be cleared to zero
+    glClearColor(0, 0, 0, 0); // alpha should be cleared to zero
 	//lw_clear_color();
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    glBlendFuncSeparate(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA, GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
 
 	//LWTEXTBLOCK test_text_block;
 	//test_text_block.text_block_width = 999.0f;// 2.00f * aspect_ratio;
@@ -158,13 +158,9 @@ typedef struct _LWWAVE {
 static LWWAVE wave[5];
 float last_wave_spawn = 0;
 
-void lwc_render_font_test(const LWCONTEXT* pLwc) {
-	LW_GL_VIEWPORT();
-    glClearColor(0 / 255.f, 94 / 255.f, 190 / 255.f, 1);//lw_clear_color();
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
+static void render_world(const LWCONTEXT* pLwc) {
     float ship_y = 0.0f + (float)pLwc->app_time;
-	
+
     float half_height = 20.0f;
     float near_z = 0.1f;
     float far_z = 1000.0f;
@@ -290,7 +286,7 @@ void lwc_render_font_test(const LWCONTEXT* pLwc) {
         //glShadeModel(GL_FLAT);
         glDrawArrays(GL_TRIANGLES, 0, pLwc->vertex_buffer[lvt].vertex_count);
     }
-    
+
     if (last_wave_spawn + 1.1f < (float)pLwc->app_time) {
         for (int i = 0; i < ARRAY_SIZE(wave); i++) {
             if (wave[i].valid == 0) {
@@ -333,9 +329,20 @@ void lwc_render_font_test(const LWCONTEXT* pLwc) {
             }
         }
     }
+}
 
+void lwc_render_font_test(const LWCONTEXT* pLwc) {
+	LW_GL_VIEWPORT();
+    glClearColor(0 / 255.f, 94 / 255.f, 190 / 255.f, 1);//lw_clear_color();
+    //glClearColor(1, 1, 1, 1);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    
+    // render world
+    render_world(pLwc);
     // UI
     glDisable(GL_DEPTH_TEST);
-    render_solid_box_ui_lvt_flip_y_uv(pLwc, 0, 0, 2 * pLwc->aspect_ratio, 2/*flip_y*/, pLwc->font_fbo.color_tex, LVT_CENTER_CENTER_ANCHORED_SQUARE, 1);
+    glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
+    render_solid_box_ui_lvt_flip_y_uv(pLwc, 0, 0, 2 * pLwc->aspect_ratio, 2, pLwc->font_fbo.color_tex, LVT_CENTER_CENTER_ANCHORED_SQUARE, 1);
     glEnable(GL_DEPTH_TEST);
 }

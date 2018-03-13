@@ -90,7 +90,7 @@ int load_ktx_hw_or_sw(const char* tex_atlas_filename, int* width, int* height)
             // TODO: iOS texture
 #if LW_PLATFORM_WIN32 || LW_PLATFORM_OSX || LW_PLATFORM_IOS || LW_PLATFORM_IOS_SIMULATOR || LW_PLATFORM_RPI || LW_PLATFORM_LINUX
 			char* decoded_rgb_data = load_software_decode_etc1_rgb(mip_width, mip_height, d);
-
+            glGetError(); // clear previous errors
 			glTexImage2D(GL_TEXTURE_2D, i, GL_RGB, mip_width, mip_height, 0,
 				GL_RGB, GL_UNSIGNED_BYTE, decoded_rgb_data);
 
@@ -105,6 +105,9 @@ int load_ktx_hw_or_sw(const char* tex_atlas_filename, int* width, int* height)
 				mip_width,
 				mip_height,
 				error_enum);
+            if (error_enum) {
+                LOGE("GL Call Error!: %d", error_enum);
+            }
 
 			data_offset += 4 + data_size;
 		}
