@@ -39,7 +39,7 @@ def update_list():
 
 def sync_s3():
 	print('Syncing s3...')
-	subprocess.call(['aws.cmd' if os.name == 'nt' else 'aws', 's3', 'sync', 'assets', 's3://sky.popsongremix.com/laidoff/assets', '--acl', 'public-read'])
+	subprocess.call(['aws' if os.name == 'nt' else 'aws', 's3', 'sync', 'assets', 's3://sky.popsongremix.com/laidoff/assets', '--acl', 'public-read'])
 		
 if __name__ == '__main__':
 	if sys.version_info[0] < 3:
