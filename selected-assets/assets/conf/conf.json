@@ -1,4 +1,6 @@
 {
   "ClientTcpHost": "p.popsongremix.com",
-  "ConnPort": "19856"
+  "ConnPort": "19856",
+  "ClientTcpTtlHost": "p.popsongremix.com",
+  "TtlConnPort": "3000"
 }
