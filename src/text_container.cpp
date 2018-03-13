@@ -169,8 +169,11 @@ void litehtml::text_container::draw_background(litehtml::uint_ptr hdc, const lit
     }
 }
 
-void litehtml::text_container::draw_border_rect(int x, int y, int w, int h, LW_VBO_TYPE lvt, const litehtml::web_color& color) const {
+void litehtml::text_container::draw_border_rect(const litehtml::border& border, int x, int y, int w, int h, LW_VBO_TYPE lvt, const litehtml::web_color& color) const {
     if (w <= 0 || h <= 0) {
+        return;
+    }
+    if (border.style == border_style_none || border.style == border_style_hidden) {
         return;
     }
     render_solid_vb_ui_flip_y_uv_shader(
@@ -203,13 +206,13 @@ void litehtml::text_container::draw_borders(litehtml::uint_ptr hdc, const liteht
           borders.bottom.width,
           root);
     // left border
-    draw_border_rect(draw_pos.x, draw_pos.y, borders.left.width, draw_pos.height, LVT_LEFT_TOP_ANCHORED_SQUARE, borders.left.color);
+    draw_border_rect(borders.left, draw_pos.x, draw_pos.y, borders.left.width, draw_pos.height, LVT_LEFT_TOP_ANCHORED_SQUARE, borders.left.color);
     // right border
-    draw_border_rect(draw_pos.x + draw_pos.width, draw_pos.y, borders.right.width, draw_pos.height, LVT_RIGHT_TOP_ANCHORED_SQUARE, borders.right.color);
+    draw_border_rect(borders.right, draw_pos.x + draw_pos.width, draw_pos.y, borders.right.width, draw_pos.height, LVT_RIGHT_TOP_ANCHORED_SQUARE, borders.right.color);
     // top border
-    draw_border_rect(draw_pos.x, draw_pos.y, draw_pos.width, borders.top.width, LVT_LEFT_TOP_ANCHORED_SQUARE, borders.top.color);
+    draw_border_rect(borders.top, draw_pos.x, draw_pos.y, draw_pos.width, borders.top.width, LVT_LEFT_TOP_ANCHORED_SQUARE, borders.top.color);
     // bottom border
-    draw_border_rect(draw_pos.x, draw_pos.y + draw_pos.height, draw_pos.width, borders.bottom.width, LVT_LEFT_BOTTOM_ANCHORED_SQUARE, borders.bottom.color);
+    draw_border_rect(borders.bottom, draw_pos.x, draw_pos.y + draw_pos.height, draw_pos.width, borders.bottom.width, LVT_LEFT_BOTTOM_ANCHORED_SQUARE, borders.bottom.color);
 }
 
 void litehtml::text_container::set_caption(const litehtml::tchar_t * caption) {
