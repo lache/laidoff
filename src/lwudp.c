@@ -83,11 +83,7 @@ static unsigned long udp_hostname_to_ip(const char* hostname) {
     // loop through all the results and connect to the first we can
     for (p = servinfo; p != NULL; p = p->ai_next) {
         h = (struct sockaddr_in *) p->ai_addr;
-#if LW_PLATFORM_WIN32
-        ip = h->sin_addr.S_un.S_addr;
-#else
         ip = h->sin_addr.s_addr;
-#endif
         break;
     }
 
