@@ -66,6 +66,10 @@ set_target_properties(czmq czmq_selftest zmakecert zsp PROPERTIES FOLDER "ZeroMQ
 # CZMQ 프로젝트는 ZeroMQ 솔루션 디렉토리에 모은다.
 set_target_properties(czmq_selftest zmakecert zsp PROPERTIES EXCLUDE_FROM_ALL 1 EXCLUDE_FROM_DEFAULT_BUILD 1)
 
+# lz4
+
+add_subdirectory(lz4/contrib/cmake_unofficial)
+
 include_directories(czmq/include)
 
 
@@ -80,6 +84,7 @@ include_directories("recastnavigation/Detour/Include")
 include_directories("zmq/include")
 include_directories("imgui")
 include_directories("litehtml/include")
+include_directories("lz4/lib")
 
 #include_directories(libpng-1.6.28)
 
@@ -251,6 +256,7 @@ if (NOT SERVER_ONLY)
             ${WINMM}
             ${WINXAUDIO2}
             ${WINSOCK2}
+		lz4_static
             )
 endif (NOT SERVER_ONLY)
 

@@ -9,6 +9,7 @@
 #if LW_PLATFORM_WIN32
 #include <Ws2tcpip.h>
 #endif
+#include "lz4.h"
 
 static int make_socket_nonblocking(int sock) {
 #if defined(WIN32) || defined(_WIN32) || defined(IMN_PIM)
@@ -290,6 +291,11 @@ void udp_sea_update(LWCONTEXT* pLwc, LWUDP* udp) {
             LOGIx("LWPTTLFULLSTATE: %d objects.", p->count);
             memcpy(&pLwc->ttl_full_state, p, sizeof(LWPTTLFULLSTATE));
             
+            const char* orig = "hello my friend. can you compress this message?hello my friend. can you compress this message?hello my friend. can you compress this message?hello my friend. can you compress this message?hello my friend. can you compress this message?hello my friend. can you compress this message?hello my friend. can you compress this message?hello my friend. can you compress this message?hello my friend. can you compress this message?hello my friend. can you compress this message?hello my friend. can you compress this message?hello my friend. can you compress this message?hello my friend. can you compress this message?hello my friend. can you compress this message?hello my friend. can you compress this message?hello my friend. can you compress this message?hello my friend. can you compress this message?hello my friend. can you compress this message?hello my friend. can you compress this message?hello my friend. can you compress this message?hello my friend. can you compress this message?hello my friend. can you compress this message?hello my friend. can you compress this message?hello my friend. can you compress this message?";
+            char compressed[1024];
+            int orig_size = strlen(orig);
+            int compressed_size = LZ4_compress_default(orig, compressed, strlen(orig), 1024);
+            LOGIx("...");
             break;
         }
         }
