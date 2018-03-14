@@ -18,6 +18,7 @@ typedef enum _LW_PUCK_GAME_PACKET {
     LPGP_LWPFIRE = 107,
     LPGP_LWPSTATE2 = 108,
     LPGP_LWPTTLFULLSTATE = 109,
+    LPGP_LWPTTLPING = 110,
 	// tcp
 	LPGP_LWPQUEUE2 = 200,
 	LPGP_LWPMAYBEMATCHED = 201,
@@ -239,17 +240,29 @@ typedef struct _LWPSTATE2 {
 
 // UDP
 typedef struct _LWPTTLFULLSTATEOBJECT {
+    float x0, y0;
+    float x1, y1;
     int id;
-    float x, y, a;
 } LWPTTLFULLSTATEOBJECT;
 
+// UDP
 typedef struct _LWPTTLFULLSTATE {
     unsigned char type;
     unsigned char padding0;
     unsigned char padding1;
     unsigned char padding2;
-    LWPTTLFULLSTATEOBJECT objects[64];
+    int count;
+    LWPTTLFULLSTATEOBJECT obj[64];
 } LWPTTLFULLSTATE;
+
+// PING
+typedef struct _LWPTTLPING {
+    unsigned char type;
+    unsigned char padding0;
+    unsigned char padding1;
+    unsigned char padding2;
+    float xc, yc, ex; // x center, y center, extent
+} LWPTTLPING;
 
 // should be 4-byte aligned...
 // (Cgo compatibility issue)

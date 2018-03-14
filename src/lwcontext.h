@@ -347,6 +347,8 @@ typedef struct _LWCONTEXT {
 	LWTCP* tcp;
     // TCP context (transport tycoon lee)
     LWTCP* tcp_ttl;
+    // Sea UDP context
+    LWUDP* udp_sea;
 	// Puck game remote(server) state
 	LWPSTATE puck_game_state;
 	// Puck game remote state last received time (sec)
@@ -366,6 +368,8 @@ typedef struct _LWCONTEXT {
 	LWHOSTADDR tcp_host_addr;
 	LWHOSTADDR udp_host_addr;
     LWHOSTADDR tcp_ttl_host_addr;
+    LWHOSTADDR sea_udp_host_addr;
+    LWHOSTADDR sea_tcp_host_addr;
 	int last_text_input_seq;
     LWDIRPAD left_dir_pad;
     LWDIRPAD right_dir_pad;
@@ -388,6 +392,7 @@ typedef struct _LWCONTEXT {
     float eye_x_offset;
 	void* htmlui; // LWHTMLUI
     LWPSCONTEXT* ps_context; // LWPSCONTEXT
+    LWPTTLFULLSTATE ttl_full_state;
 } LWCONTEXT;
 
 #ifdef __cplusplus

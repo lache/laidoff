@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.5)
-
+project(client)
 # CMake의 Visual Studio Solution Folders 기능 켬
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 

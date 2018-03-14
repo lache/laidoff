@@ -1381,6 +1381,20 @@ static void parse_conf(LWCONTEXT* pLwc) {
                 LOGI("TtlConnPort: %.*s", t[i + 1].end - t[i + 1].start, conf_str + t[i + 1].start);
                 strncpy(pLwc->tcp_ttl_host_addr.port_str, conf_str + t[i + 1].start, t[i + 1].end - t[i + 1].start);
                 pLwc->tcp_ttl_host_addr.port = atoi(pLwc->tcp_ttl_host_addr.port_str);
+            } else if (jsoneq(conf_str, &t[i], "SeaUdpHost") == 0) {
+                LOGI("SeaUdpHost: %.*s", t[i + 1].end - t[i + 1].start, conf_str + t[i + 1].start);
+                strncpy(pLwc->sea_udp_host_addr.host, conf_str + t[i + 1].start, t[i + 1].end - t[i + 1].start);
+            } else if (jsoneq(conf_str, &t[i], "SeaUdpPort") == 0) {
+                LOGI("SeaUdpPort: %.*s", t[i + 1].end - t[i + 1].start, conf_str + t[i + 1].start);
+                strncpy(pLwc->sea_udp_host_addr.port_str, conf_str + t[i + 1].start, t[i + 1].end - t[i + 1].start);
+                pLwc->sea_udp_host_addr.port = atoi(pLwc->sea_udp_host_addr.port_str);
+            } else if (jsoneq(conf_str, &t[i], "SeaTcpHost") == 0) {
+                LOGI("SeaTcpHost: %.*s", t[i + 1].end - t[i + 1].start, conf_str + t[i + 1].start);
+                strncpy(pLwc->sea_tcp_host_addr.host, conf_str + t[i + 1].start, t[i + 1].end - t[i + 1].start);
+            } else if (jsoneq(conf_str, &t[i], "SeaTcpPort") == 0) {
+                LOGI("SeaTcpPort: %.*s", t[i + 1].end - t[i + 1].start, conf_str + t[i + 1].start);
+                strncpy(pLwc->sea_tcp_host_addr.port_str, conf_str + t[i + 1].start, t[i + 1].end - t[i + 1].start);
+                pLwc->sea_tcp_host_addr.port = atoi(pLwc->sea_tcp_host_addr.port_str);
             }
         }
         release_string(conf_str);

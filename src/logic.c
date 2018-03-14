@@ -777,6 +777,10 @@ void lwc_update(LWCONTEXT* pLwc, double delta_time) {
         udp_update(pLwc, pLwc->udp);
     }
 
+    if (pLwc->udp_sea) {
+        udp_sea_update(pLwc, pLwc->udp_sea);
+    }
+
     if (pLwc->tcp) {
         tcp_update(pLwc->tcp);
     }
@@ -958,6 +962,10 @@ static void s_logic_worker(zsock_t *pipe, void *args) {
     // WSAStartup should be called within
     // a thread which opens sockets.
     pLwc->udp = 0;//new_udp();
+    pLwc->udp_sea = new_udp();
+    udp_update_addr_host(pLwc->udp_sea,
+                         pLwc->sea_udp_host_addr.host,
+                         pLwc->sea_udp_host_addr.port);
     pLwc->tcp = new_tcp(pLwc,
                         pLwc->user_data_path,
                         &pLwc->tcp_host_addr,

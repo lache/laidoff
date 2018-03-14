@@ -16,7 +16,7 @@
 #include "lwringbuffer.h"
 #include "numcomp_puck_game.h"
 
-#define LW_UDP_BUFLEN (512)
+#define LW_UDP_BUFLEN (2048)
 #define LW_STATE_RING_BUFFER_CAPACITY (16)
 
 typedef struct _LWUDP {
@@ -46,15 +46,18 @@ typedef struct _LWUDP {
     int state2_count;
     double state2_start_timepoint;
     LWNUMCOMPPUCKGAME numcomp;
+    float last_updated;
 } LWUDP;
 
 typedef struct _LWCONTEXT LWCONTEXT;
 
 LWUDP* new_udp(void);
+void udp_update_addr_host(LWUDP* udp, const char* host, unsigned short port);
 void udp_update_addr(LWUDP* udp, unsigned long ip, unsigned short port);
 void destroy_udp(LWUDP** udp);
 void udp_send(LWUDP* udp, const char* data, int size);
 void udp_update(LWCONTEXT* pLwc, LWUDP* udp);
+void udp_sea_update(LWCONTEXT* pLwc, LWUDP* udp);
 const char* lw_udp_addr(const LWCONTEXT* pLwc);
 unsigned long lw_udp_addr_resolved(const LWCONTEXT* pLwc);
 int lw_udp_port(const LWCONTEXT* pLwc);
