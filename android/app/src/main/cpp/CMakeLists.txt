@@ -60,6 +60,11 @@ include_directories(czmq/include)
 add_subdirectory(../../../../../litehtml litehtml)
 include_directories("../../../../../litehtml/include")
 
+# lz4
+add_subdirectory(../../../../../lz4/contrib/cmake_unofficial lz4)
+include_directories("../../../../../lz4/lib")
+
+
 
 file(GLOB LUA_LIB
     "../../../../../lua-5.3.4/*.h"
@@ -112,7 +117,8 @@ target_include_directories(native-activity PRIVATE
                            ../../../../../ode/ou/include
                            ../../../../../ode/ode/src
                            ../../../../../recastnavigation/Detour/Include
-						   ../../../../../litehtml/include)
+						   ../../../../../litehtml/include
+				../../../../../lz4/lib	)
 
 # add lib dependencies
 target_link_libraries(native-activity
@@ -123,5 +129,6 @@ target_link_libraries(native-activity
                       log
                       libzmq
                       czmq
-					  litehtml)
+					  litehtml
+			lz4_static)
 

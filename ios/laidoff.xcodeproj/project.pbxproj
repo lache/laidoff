@@ -451,6 +451,10 @@
 		6CA16DA41EA2110E00DB7AF0 /* lwios.m in Sources */ = {isa = PBXBuildFile; fileRef = 6CA16DA31EA2110E00DB7AF0 /* lwios.m */; };
 		6CDDC6A42045D12E00AE3394 /* gumboutil.c in Sources */ = {isa = PBXBuildFile; fileRef = 6CDDC6A22045D12D00AE3394 /* gumboutil.c */; };
 		6CEB73DF1FD3CF5500D92EED /* numcomp_puck_game.c in Sources */ = {isa = PBXBuildFile; fileRef = 6CEB73DE1FD3CF5500D92EED /* numcomp_puck_game.c */; };
+		6CF70E3820597A1D00F782C8 /* lz4hc.c in Sources */ = {isa = PBXBuildFile; fileRef = 6CF70E3420597A1D00F782C8 /* lz4hc.c */; };
+		6CF70E3920597A1D00F782C8 /* lz4.c in Sources */ = {isa = PBXBuildFile; fileRef = 6CF70E3520597A1D00F782C8 /* lz4.c */; };
+		6CF70E3A20597A1D00F782C8 /* lz4frame.c in Sources */ = {isa = PBXBuildFile; fileRef = 6CF70E3620597A1D00F782C8 /* lz4frame.c */; };
+		6CF70E3B20597A1D00F782C8 /* xxhash.c in Sources */ = {isa = PBXBuildFile; fileRef = 6CF70E3720597A1D00F782C8 /* xxhash.c */; };
 		6CFFC41F1FE82250005FBFDE /* lwatlasenum.c in Sources */ = {isa = PBXBuildFile; fileRef = 6CFFC41E1FE8224F005FBFDE /* lwatlasenum.c */; };
 /* End PBXBuildFile section */
 
@@ -1393,6 +1397,15 @@
 		6CDDC6A32045D12D00AE3394 /* gumboutil.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = gumboutil.h; sourceTree = "<group>"; };
 		6CEB73DD1FD3CF5500D92EED /* numcomp_puck_game.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = numcomp_puck_game.h; sourceTree = "<group>"; };
 		6CEB73DE1FD3CF5500D92EED /* numcomp_puck_game.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = numcomp_puck_game.c; sourceTree = "<group>"; };
+		6CF70E3420597A1D00F782C8 /* lz4hc.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = lz4hc.c; path = ../../../../lz4/lib/lz4hc.c; sourceTree = "<group>"; };
+		6CF70E3520597A1D00F782C8 /* lz4.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = lz4.c; path = ../../../../lz4/lib/lz4.c; sourceTree = "<group>"; };
+		6CF70E3620597A1D00F782C8 /* lz4frame.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = lz4frame.c; path = ../../../../lz4/lib/lz4frame.c; sourceTree = "<group>"; };
+		6CF70E3720597A1D00F782C8 /* xxhash.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = xxhash.c; path = ../../../../lz4/lib/xxhash.c; sourceTree = "<group>"; };
+		6CF70E3C20597A2B00F782C8 /* lz4frame_static.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = lz4frame_static.h; path = ../../../../lz4/lib/lz4frame_static.h; sourceTree = "<group>"; };
+		6CF70E3D20597A2B00F782C8 /* lz4hc.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = lz4hc.h; path = ../../../../lz4/lib/lz4hc.h; sourceTree = "<group>"; };
+		6CF70E3E20597A2B00F782C8 /* lz4.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = lz4.h; path = ../../../../lz4/lib/lz4.h; sourceTree = "<group>"; };
+		6CF70E3F20597A2B00F782C8 /* lz4frame.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = lz4frame.h; path = ../../../../lz4/lib/lz4frame.h; sourceTree = "<group>"; };
+		6CF70E4020597A2B00F782C8 /* xxhash.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = xxhash.h; path = ../../../../lz4/lib/xxhash.h; sourceTree = "<group>"; };
 		6CFFC41E1FE8224F005FBFDE /* lwatlasenum.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = lwatlasenum.c; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -2333,6 +2346,7 @@
 		6CA16CD51EA20B5600DB7AF0 /* laidoff */ = {
 			isa = PBXGroup;
 			children = (
+				6CF70E31205979E200F782C8 /* lz4 */,
 				6CA16CD91EA20B5600DB7AF0 /* AppDelegate.h */,
 				6CA16CDA1EA20B5600DB7AF0 /* AppDelegate.m */,
 				6CA16CE61EA20B5600DB7AF0 /* Assets.xcassets */,
@@ -2644,6 +2658,38 @@
 			path = "../../lua-5.3.4";
 			sourceTree = "<group>";
 		};
+		6CF70E31205979E200F782C8 /* lz4 */ = {
+			isa = PBXGroup;
+			children = (
+				6CF70E33205979F900F782C8 /* src */,
+				6CF70E32205979F300F782C8 /* include */,
+			);
+			path = lz4;
+			sourceTree = "<group>";
+		};
+		6CF70E32205979F300F782C8 /* include */ = {
+			isa = PBXGroup;
+			children = (
+				6CF70E3E20597A2B00F782C8 /* lz4.h */,
+				6CF70E3C20597A2B00F782C8 /* lz4frame_static.h */,
+				6CF70E3F20597A2B00F782C8 /* lz4frame.h */,
+				6CF70E3D20597A2B00F782C8 /* lz4hc.h */,
+				6CF70E4020597A2B00F782C8 /* xxhash.h */,
+			);
+			path = include;
+			sourceTree = "<group>";
+		};
+		6CF70E33205979F900F782C8 /* src */ = {
+			isa = PBXGroup;
+			children = (
+				6CF70E3520597A1D00F782C8 /* lz4.c */,
+				6CF70E3620597A1D00F782C8 /* lz4frame.c */,
+				6CF70E3420597A1D00F782C8 /* lz4hc.c */,
+				6CF70E3720597A1D00F782C8 /* xxhash.c */,
+			);
+			path = src;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -2760,6 +2806,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				6CF70E3920597A1D00F782C8 /* lz4.c in Sources */,
 				6C7739E61FB4B5AA001014DE /* rmsg.c in Sources */,
 				6C295ECF204310700052999C /* html_tag.cpp in Sources */,
 				566373641EBA52D4001DA3F4 /* mat.cpp in Sources */,
@@ -2801,6 +2848,7 @@
 				56F188AE1EC74DB60019312F /* devpoll.cpp in Sources */,
 				56F188FF1EC74DB60019312F /* udp_engine.cpp in Sources */,
 				6C7739F81FB4B5AA001014DE /* ktx.c in Sources */,
+				6CF70E3A20597A1D00F782C8 /* lz4frame.c in Sources */,
 				6CA16CDB1EA20B5600DB7AF0 /* AppDelegate.m in Sources */,
 				56F188D01EC74DB60019312F /* pgm_receiver.cpp in Sources */,
 				56F189AE1EC751950019312F /* zmonitor.c in Sources */,
@@ -3035,6 +3083,7 @@
 				2601224A1FDFDF03005941B7 /* lwatlassprite.c in Sources */,
 				56F188E31EC74DB60019312F /* reaper.cpp in Sources */,
 				56F189A91EC751950019312F /* ziflist.c in Sources */,
+				6CF70E3B20597A1D00F782C8 /* xxhash.c in Sources */,
 				56F188EF1EC74DB60019312F /* socks_connecter.cpp in Sources */,
 				56F189BA1EC751950019312F /* ztimerset.c in Sources */,
 				6C7739E51FB4B5AA001014DE /* physics.c in Sources */,
@@ -3059,6 +3108,7 @@
 				26457DBA1FBACEB900FFEE74 /* jsmn.c in Sources */,
 				6C295EE1204311030052999C /* text_container.cpp in Sources */,
 				56F188F11EC74DB60019312F /* stream_engine.cpp in Sources */,
+				6CF70E3820597A1D00F782C8 /* lz4hc.c in Sources */,
 				56F188E21EC74DB60019312F /* raw_encoder.cpp in Sources */,
 				56F189B11EC751950019312F /* zproc.c in Sources */,
 				566373571EBA52D4001DA3F4 /* joint.cpp in Sources */,

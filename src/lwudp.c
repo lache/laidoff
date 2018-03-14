@@ -279,25 +279,26 @@ void udp_sea_update(LWCONTEXT* pLwc, LWUDP* udp) {
             return;
 #endif
         }
-        const int packet_type = *(int*)udp->buf;
-        switch (packet_type) {
-        case LPGP_LWPTTLFULLSTATE:
-        {
-            if (udp->recv_len != sizeof(LWPTTLFULLSTATE)) {
-                LOGE("LWPTTLFULLSTATE: Size error %d (%zu expected)", udp->recv_len, sizeof(LWPSTATE));
+        
+        char decompressed[1500*255]; // maximum lz4 compression ratio is 255...
+        int decompressed_bytes = LZ4_decompress_safe(udp->buf, decompressed, udp->recv_len, ARRAY_SIZE(decompressed));
+        if (decompressed_bytes > 0) {
+            const int packet_type = *(int*)decompressed;
+            switch (packet_type) {
+                case LPGP_LWPTTLFULLSTATE:
+                {
+                    if (decompressed_bytes != sizeof(LWPTTLFULLSTATE)) {
+                        LOGE("LWPTTLFULLSTATE: Size error %d (%zu expected)", decompressed_bytes, sizeof(LWPTTLFULLSTATE));
+                    }
+                    
+                    LWPTTLFULLSTATE* p = (LWPTTLFULLSTATE*)decompressed;
+                    LOGIx("LWPTTLFULLSTATE: %d objects.", p->count);
+                    memcpy(&pLwc->ttl_full_state, p, sizeof(LWPTTLFULLSTATE));
+                    break;
+                }
             }
-
-            LWPTTLFULLSTATE* p = (LWPTTLFULLSTATE*)udp->buf;
-            LOGIx("LWPTTLFULLSTATE: %d objects.", p->count);
-            memcpy(&pLwc->ttl_full_state, p, sizeof(LWPTTLFULLSTATE));
-            
-            const char* orig = "hello my friend. can you compress this message?hello my friend. can you compress this message?hello my friend. can you compress this message?hello my friend. can you compress this message?hello my friend. can you compress this message?hello my friend. can you compress this message?hello my friend. can you compress this message?hello my friend. can you compress this message?hello my friend. can you compress this message?hello my friend. can you compress this message?hello my friend. can you compress this message?hello my friend. can you compress this message?hello my friend. can you compress this message?hello my friend. can you compress this message?hello my friend. can you compress this message?hello my friend. can you compress this message?hello my friend. can you compress this message?hello my friend. can you compress this message?hello my friend. can you compress this message?hello my friend. can you compress this message?hello my friend. can you compress this message?hello my friend. can you compress this message?hello my friend. can you compress this message?hello my friend. can you compress this message?";
-            char compressed[1024];
-            int orig_size = strlen(orig);
-            int compressed_size = LZ4_compress_default(orig, compressed, strlen(orig), 1024);
-            LOGIx("...");
-            break;
-        }
+        } else {
+            LOGE("lz4 decompression failed!");
         }
     }
 }
