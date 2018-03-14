@@ -238,8 +238,11 @@ void udp_sea_update(LWCONTEXT* pLwc, LWUDP* udp) {
     if (udp->ready == 0) {
         return;
     }
+    if (pLwc->game_scene != LGS_FONT_TEST) {
+        return;
+    }
     float app_time = (float)pLwc->app_time;
-    if (app_time < udp->last_updated + 1 / 10.0f) {
+    if (app_time < udp->last_updated + 1 / 1.0f) {
         return;
     }
     udp->last_updated = app_time;
@@ -286,6 +289,7 @@ void udp_sea_update(LWCONTEXT* pLwc, LWUDP* udp) {
             LWPTTLFULLSTATE* p = (LWPTTLFULLSTATE*)udp->buf;
             LOGIx("LWPTTLFULLSTATE: %d objects.", p->count);
             memcpy(&pLwc->ttl_full_state, p, sizeof(LWPTTLFULLSTATE));
+            
             break;
         }
         }
