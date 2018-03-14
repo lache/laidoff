@@ -7,7 +7,7 @@
 #include "htmlui.h"
 #include "linmath.h"
 #include "lwmath.h"
-
+#include <stdio.h>
 void lwc_render_font_test_fbo_body(const LWCONTEXT* pLwc, const char* html_body) {
     glBindFramebuffer(GL_FRAMEBUFFER, pLwc->font_fbo.fbo);
     glDisable(GL_DEPTH_TEST);
