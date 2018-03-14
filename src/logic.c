@@ -965,7 +965,8 @@ static void s_logic_worker(zsock_t *pipe, void *args) {
     pLwc->udp_sea = new_udp();
     udp_update_addr_host(pLwc->udp_sea,
                          pLwc->sea_udp_host_addr.host,
-                         pLwc->sea_udp_host_addr.port);
+                         pLwc->sea_udp_host_addr.port,
+                         pLwc->sea_udp_host_addr.port_str);
     pLwc->tcp = new_tcp(pLwc,
                         pLwc->user_data_path,
                         &pLwc->tcp_host_addr,

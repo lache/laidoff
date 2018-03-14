@@ -52,7 +52,7 @@ typedef struct _LWUDP {
 typedef struct _LWCONTEXT LWCONTEXT;
 
 LWUDP* new_udp(void);
-void udp_update_addr_host(LWUDP* udp, const char* host, unsigned short port);
+void udp_update_addr_host(LWUDP* udp, const char* host, unsigned short port, const char* port_str);
 void udp_update_addr(LWUDP* udp, unsigned long ip, unsigned short port);
 void destroy_udp(LWUDP** udp);
 void udp_send(LWUDP* udp, const char* data, int size);

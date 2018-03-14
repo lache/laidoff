@@ -65,7 +65,7 @@ LWUDP* new_udp() {
     return udp;
 }
 
-static unsigned long udp_hostname_to_ip(const char* hostname) {
+static unsigned long udp_hostname_to_ip(const char* hostname, const char* port_str) {
     struct addrinfo hints, *servinfo, *p;
     struct sockaddr_in *h;
     int rv;
@@ -74,7 +74,7 @@ static unsigned long udp_hostname_to_ip(const char* hostname) {
     hints.ai_family = AF_UNSPEC; // use AF_INET6 to force IPv6
     hints.ai_socktype = SOCK_STREAM;
 
-    if ((rv = getaddrinfo(hostname, "http", &hints, &servinfo)) != 0) {
+    if ((rv = getaddrinfo(hostname, port_str, &hints, &servinfo)) != 0) {
         fprintf(stderr, "getaddrinfo: %s\n", gai_strerror(rv));
         return 0;
     }
@@ -91,8 +91,8 @@ static unsigned long udp_hostname_to_ip(const char* hostname) {
     return ip;
 }
 
-void udp_update_addr_host(LWUDP* udp, const char* host, unsigned short port) {
-    udp_update_addr(udp, udp_hostname_to_ip(host), port);
+void udp_update_addr_host(LWUDP* udp, const char* host, unsigned short port, const char* port_str) {
+    udp_update_addr(udp, udp_hostname_to_ip(host, port_str), port);
 }
 
 void udp_update_addr(LWUDP* udp, unsigned long ip, unsigned short port) {
