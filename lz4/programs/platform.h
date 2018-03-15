@@ -30,7 +30,9 @@ extern "C" {
 *  Compiler Options
 ****************************************/
 #if defined(_MSC_VER)
+#if !defined(_CRT_SECURE_NO_WARNINGS) 
 #  define _CRT_SECURE_NO_WARNINGS    /* Disable Visual Studio warning messages for fopen, strncpy, strerror */
+#endif
 #  if (_MSC_VER <= 1800)             /* (1800 = Visual Studio 2013) */
 #    define _CRT_SECURE_NO_DEPRECATE /* VS2005 - must be declared before <io.h> and <windows.h> */
 #    define snprintf sprintf_s       /* snprintf unsupported by Visual <= 2013 */

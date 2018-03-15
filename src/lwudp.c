@@ -252,7 +252,7 @@ void udp_sea_update(LWCONTEXT* pLwc, LWUDP* udp) {
     memset(&ttl_ping, 0, sizeof(LWPTTLPING));
     ttl_ping.type = LPGP_LWPTTLPING;
     ttl_ping.xc = 0;
-    ttl_ping.yc = (float)pLwc->app_time;
+    ttl_ping.yc = 0;
     ttl_ping.ex = 100.0f;
     udp_send(udp, (const char*)&ttl_ping, sizeof(LWPTTLPING));
 

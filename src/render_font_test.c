@@ -320,11 +320,11 @@ static void render_sea_objects(const LWCONTEXT* pLwc, const mat4x4 view, const m
 }
 
 static void render_world(const LWCONTEXT* pLwc, const mat4x4 view, const mat4x4 proj, float ship_y) {
-    render_ship(pLwc, view, proj, 0, ship_y, 0);
+    //render_ship(pLwc, view, proj, 0, ship_y, 0);
     render_sea_objects(pLwc, view, proj);
     render_port(pLwc, view, proj, 0);
     render_port(pLwc, view, proj, 160);
-    render_waves(pLwc, view, proj, ship_y);
+    //render_waves(pLwc, view, proj, ship_y);
 }
 
 void lwc_render_font_test(const LWCONTEXT* pLwc) {
@@ -333,7 +333,7 @@ void lwc_render_font_test(const LWCONTEXT* pLwc) {
     //glClearColor(1, 1, 1, 1);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-    float ship_y = 0.0f + (float)pLwc->app_time;
+    float ship_y = 0.0f;//+(float)pLwc->app_time;
 
     float half_height = 20.0f;
     float near_z = 0.1f;
