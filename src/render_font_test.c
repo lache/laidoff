@@ -194,6 +194,41 @@ static void render_port(const LWCONTEXT* pLwc, const mat4x4 view, const mat4x4 p
     glDrawArrays(GL_TRIANGLES, 0, pLwc->vertex_buffer[lvt].vertex_count);
 }
 
+static void render_sea_city(const LWCONTEXT* pLwc, const mat4x4 view, const mat4x4 proj) {
+    int shader_index = LWST_DEFAULT_NORMAL_COLOR;
+    const LWSHADER* shader = &pLwc->shader[shader_index];
+    lazy_glUseProgram(pLwc, shader_index);
+    mat4x4 rot;
+    mat4x4_identity(rot);
+
+    float sx = 1, sy = 1, sz = 1;
+    float x = 0, y = 25, z = 0;
+    mat4x4 model;
+    mat4x4_identity(model);
+    mat4x4_mul(model, model, rot);
+    mat4x4_scale_aniso(model, model, sx, sy, sz);
+
+    mat4x4 model_translate;
+    mat4x4_translate(model_translate, x, y, z);
+
+    mat4x4_mul(model, model_translate, model);
+
+    mat4x4 view_model;
+    mat4x4_mul(view_model, view, model);
+
+    mat4x4 proj_view_model;
+    mat4x4_identity(proj_view_model);
+    mat4x4_mul(proj_view_model, proj, view_model);
+
+    const LW_VBO_TYPE lvt = LVT_SEA_CITY;
+    lazy_glBindBuffer(pLwc, lvt);
+    bind_all_color_vertex_attrib(pLwc, lvt);
+    glUniformMatrix4fv(shader->mvp_location, 1, GL_FALSE, (const GLfloat*)proj_view_model);
+    glUniformMatrix4fv(shader->m_location, 1, GL_FALSE, (const GLfloat*)model);
+    //glShadeModel(GL_FLAT);
+    glDrawArrays(GL_TRIANGLES, 0, pLwc->vertex_buffer[lvt].vertex_count);
+}
+
 static void render_ship(const LWCONTEXT* pLwc, const mat4x4 view, const mat4x4 proj, float x, float y, float z) {
     int shader_index = LWST_DEFAULT_NORMAL_COLOR;
     const LWSHADER* shader = &pLwc->shader[shader_index];
@@ -324,6 +359,7 @@ static void render_world(const LWCONTEXT* pLwc, const mat4x4 view, const mat4x4 
     render_sea_objects(pLwc, view, proj);
     render_port(pLwc, view, proj, 0);
     render_port(pLwc, view, proj, 160);
+    render_sea_city(pLwc, view, proj);
     //render_waves(pLwc, view, proj, ship_y);
 }
 
