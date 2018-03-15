@@ -363,6 +363,11 @@ static void render_world(const LWCONTEXT* pLwc, const mat4x4 view, const mat4x4 
     //render_waves(pLwc, view, proj, ship_y);
 }
 
+static void render_world_map(const LWCONTEXT* pLwc) {
+    lazy_tex_atlas_glBindTexture(pLwc, LAE_WORLD_MAP);
+    render_solid_box_ui_lvt_flip_y_uv(pLwc, 0, -1.0f, 1.0f, 0.5f, pLwc->tex_atlas[LAE_WORLD_MAP], LVT_CENTER_BOTTOM_ANCHORED_SQUARE, 0);
+}
+
 void lwc_render_font_test(const LWCONTEXT* pLwc) {
     LW_GL_VIEWPORT();
     glClearColor(0 / 255.f, 94 / 255.f, 190 / 255.f, 1);//lw_clear_color();
@@ -371,7 +376,7 @@ void lwc_render_font_test(const LWCONTEXT* pLwc) {
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     float ship_y = 0.0f;//+(float)pLwc->app_time;
 
-    float half_height = 20.0f;
+    float half_height = 35.0f;
     float near_z = 0.1f;
     float far_z = 1000.0f;
     float cam_r = sinf((float)pLwc->app_time / 4) / 4.0f;
@@ -405,6 +410,9 @@ void lwc_render_font_test(const LWCONTEXT* pLwc) {
     // UI
     glDisable(GL_DEPTH_TEST);
     render_sea_objects_nameplate(pLwc, view, proj);
+    lwc_enable_additive_blending();
+    render_world_map(pLwc);
+    lwc_disable_additive_blending();
     glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
     render_solid_box_ui_lvt_flip_y_uv(pLwc, 0, 0, 2 * pLwc->aspect_ratio, 2, pLwc->font_fbo.color_tex, LVT_CENTER_CENTER_ANCHORED_SQUARE, 1);
     glEnable(GL_DEPTH_TEST);

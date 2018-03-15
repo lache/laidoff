@@ -143,6 +143,7 @@ typedef enum _LW_ATLAS_ENUM {
         LAE_WAVE_ALPHA,
         LAE_TTL_TITLE,
         LAE_TTL_TITLE_ALPHA,
+    LAE_WORLD_MAP,
     LAE_COUNT,
 
     LAE_DONTCARE,
@@ -293,6 +294,7 @@ static const char *tex_atlas_filename[] = {
         ASSETS_BASE_PATH "ktx" PATH_SEPARATOR "wave-a_alpha.ktx",
         ASSETS_BASE_PATH "ktx" PATH_SEPARATOR "ttl-title-a.ktx",
         ASSETS_BASE_PATH "ktx" PATH_SEPARATOR "ttl-title-a_alpha.ktx",
+    ASSETS_BASE_PATH "ktx" PATH_SEPARATOR "world-map.ktx",
 };
 
 #define MAX_TEX_ATLAS LAE_COUNT
