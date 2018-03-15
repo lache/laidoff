@@ -242,6 +242,7 @@ typedef struct _LWPSTATE2 {
 typedef struct _LWPTTLFULLSTATEOBJECT {
     float x0, y0;
     float x1, y1;
+    float vx, vy;
     int id;
 } LWPTTLFULLSTATEOBJECT;
 
@@ -252,7 +253,7 @@ typedef struct _LWPTTLFULLSTATE {
     unsigned char padding1;
     unsigned char padding2;
     int count;
-    LWPTTLFULLSTATEOBJECT obj[64];
+    LWPTTLFULLSTATEOBJECT obj[32];
 } LWPTTLFULLSTATE;
 
 // PING
