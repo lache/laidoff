@@ -31,6 +31,7 @@ typedef struct _LWUDP {
 	struct timeval tv;
 	int recv_len;
 	int ready;
+    int reinit_next_update;
 	// State ring buffer
 	LWPSTATE state_buffer[LW_STATE_RING_BUFFER_CAPACITY];
 	LWRINGBUFFER state_ring_buffer;

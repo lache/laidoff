@@ -236,10 +236,19 @@ int lw_udp_port(const LWCONTEXT* pLwc) {
 }
 
 void udp_sea_update(LWCONTEXT* pLwc, LWUDP* udp) {
-    if (udp->ready == 0) {
+    if (pLwc->game_scene != LGS_FONT_TEST) {
         return;
     }
-    if (pLwc->game_scene != LGS_FONT_TEST) {
+    if (udp->reinit_next_update) {
+        destroy_udp(&pLwc->udp_sea);
+        pLwc->udp_sea = new_udp();
+        udp_update_addr_host(pLwc->udp_sea,
+                             pLwc->sea_udp_host_addr.host,
+                             pLwc->sea_udp_host_addr.port,
+                             pLwc->sea_udp_host_addr.port_str);
+        udp->reinit_next_update = 0;
+    }
+    if (udp->ready == 0) {
         return;
     }
     float app_time = (float)pLwc->app_time;
@@ -276,6 +285,7 @@ void udp_sea_update(LWCONTEXT* pLwc, LWUDP* udp) {
             // Socket recovery needed
             LOGEP("UDP socket error! Socket recovery needed...");
             udp->ready = 0;
+            udp->reinit_next_update = 1;
             return;
 #endif
         }
