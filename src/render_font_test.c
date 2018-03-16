@@ -366,11 +366,8 @@ static void render_world(const LWCONTEXT* pLwc, const mat4x4 view, const mat4x4 
     //render_waves(pLwc, view, proj, ship_y);
 }
 
-static void render_route_line(const LWCONTEXT* pLwc) {
+static void render_route_line(const LWCONTEXT* pLwc, float x, float y) {
     int shader_index = LWST_LINE;
-    float x = 0, y = 0;
-    float w = 2.0f;
-    float h = 2.0f;
     float rot = 0.0f;
     lazy_glUseProgram(pLwc, shader_index);
     
@@ -452,9 +449,17 @@ void lwc_render_font_test(const LWCONTEXT* pLwc) {
     lwc_enable_additive_blending();
     if (enable_render_world_map) {
         render_world_map(pLwc);
-        render_route_line(pLwc);
     }
     lwc_disable_additive_blending();
+    if (enable_render_world_map) {
+        float one_pixel = 2.0f / pLwc->height;
+        int thickness = 1;
+        for (int i = -thickness; i <= thickness; i++) {
+            for (int j = -thickness; j <= thickness; j++) {
+                render_route_line(pLwc, i * one_pixel, j * one_pixel);
+            }
+        }
+    }
     glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
     render_solid_box_ui_lvt_flip_y_uv(pLwc, 0, 0, 2 * pLwc->aspect_ratio, 2, pLwc->font_fbo.color_tex, LVT_CENTER_CENTER_ANCHORED_SQUARE, 1);
     glEnable(GL_DEPTH_TEST);
