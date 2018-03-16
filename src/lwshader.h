@@ -22,6 +22,7 @@ typedef enum _LW_SHADER_TYPE {
 	LWST_RADIALWAVE,
 	LWST_DEFAULT_NORMAL,
 	LWST_DEFAULT_NORMAL_COLOR,
+    LWST_LINE,
 
 	LWST_COUNT,
 } LW_SHADER_TYPE;
@@ -33,21 +34,22 @@ typedef struct _LWSHADERFILENAME {
 	LW_FRAG_SHADER lwfs;
 } LWSHADERFILENAME;
 static const LWSHADERFILENAME shader_filename[] = {
-		{ LWST_DEFAULT,              "Default Shader",              LWVS_DEFAULT,				LWFS_DEFAULT,},
-		{ LWST_FONT,                 "Font Shader",                 LWVS_DEFAULT,				LWFS_FONT,},
-		{ LWST_ETC1,                 "ETC1 with Alpha Shader",      LWVS_DEFAULT,				LWFS_ETC1,},
-		{ LWST_SKIN,                 "Skin Shader",                 LWVS_SKIN,					LWFS_DEFAULT,},
-		{ LWST_FAN,                  "Fan Shader",                  LWVS_FAN,					LWFS_FAN,},
-		{ LWST_EMITTER,              "Emitter Shader",              LWVS_EMITTER,				LWFS_EMITTER,},
-		{ LWST_EMITTER2,             "Emitter2 Shader",             LWVS_EMITTER2,				LWFS_EMITTER2,},
-		{ LWST_COLOR,                "Color Shader",                LWVS_DEFAULT,				LWFS_COLOR,},
-		{ LWST_PANEL,                "Panel Shader",                LWVS_DEFAULT,				LWFS_PANEL,},
-		{ LWST_SPHERE_REFLECT,       "Sphere Reflect Shader",       LWVS_SPHERE_REFLECT,		LWFS_SPHERE_REFLECT,},
-		{ LWST_SPHERE_REFLECT_FLOOR, "Sphere Reflect Floor Shader", LWVS_SPHERE_REFLECT,		LWFS_SPHERE_REFLECT_FLOOR,},
-		{ LWST_RINGGAUGE,            "Ringgauge Shader",            LWVS_DEFAULT,				LWFS_RINGGAUGE,},
-		{ LWST_RADIALWAVE,           "Radial wave Shader",          LWVS_DEFAULT,				LWFS_RADIALWAVE,},
-		{ LWST_DEFAULT_NORMAL,       "Default Normal Shader",       LWVS_DEFAULT_NORMAL,		LWFS_DEFAULT_NORMAL,},
-		{ LWST_DEFAULT_NORMAL_COLOR,"Default Normal Color Shader", LWVS_DEFAULT_NORMAL_COLOR,	LWFS_DEFAULT_NORMAL_COLOR, },
+		{ LWST_DEFAULT,                 "Default Shader",               LWVS_DEFAULT,				LWFS_DEFAULT,},
+		{ LWST_FONT,                    "Font Shader",                  LWVS_DEFAULT,				LWFS_FONT,},
+		{ LWST_ETC1,                    "ETC1 with Alpha Shader",       LWVS_DEFAULT,				LWFS_ETC1,},
+		{ LWST_SKIN,                    "Skin Shader",                  LWVS_SKIN,					LWFS_DEFAULT,},
+		{ LWST_FAN,                     "Fan Shader",                   LWVS_FAN,					LWFS_FAN,},
+		{ LWST_EMITTER,                 "Emitter Shader",               LWVS_EMITTER,				LWFS_EMITTER,},
+		{ LWST_EMITTER2,                "Emitter2 Shader",              LWVS_EMITTER2,				LWFS_EMITTER2,},
+		{ LWST_COLOR,                   "Color Shader",                 LWVS_DEFAULT,				LWFS_COLOR,},
+		{ LWST_PANEL,                   "Panel Shader",                 LWVS_DEFAULT,				LWFS_PANEL,},
+		{ LWST_SPHERE_REFLECT,          "Sphere Reflect Shader",        LWVS_SPHERE_REFLECT,		LWFS_SPHERE_REFLECT,},
+		{ LWST_SPHERE_REFLECT_FLOOR,    "Sphere Reflect Floor Shader",  LWVS_SPHERE_REFLECT,		LWFS_SPHERE_REFLECT_FLOOR,},
+		{ LWST_RINGGAUGE,               "Ringgauge Shader",             LWVS_DEFAULT,				LWFS_RINGGAUGE,},
+		{ LWST_RADIALWAVE,              "Radial wave Shader",           LWVS_DEFAULT,				LWFS_RADIALWAVE,},
+		{ LWST_DEFAULT_NORMAL,          "Default Normal Shader",        LWVS_DEFAULT_NORMAL,		LWFS_DEFAULT_NORMAL,},
+		{ LWST_DEFAULT_NORMAL_COLOR,    "Default Normal Color Shader",  LWVS_DEFAULT_NORMAL_COLOR,	LWFS_DEFAULT_NORMAL_COLOR, },
+        { LWST_LINE,                    "Line Shader",                  LWVS_LINE,                  LWFS_LINE, },
 };
 LwStaticAssert(ARRAY_SIZE(shader_filename) == LWST_COUNT, "LWST_COUNT error");
 

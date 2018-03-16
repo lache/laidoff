@@ -6,19 +6,20 @@
 #include "laidoff.h"
 
 void lw_load_vbo(LWCONTEXT* pLwc, const char* filename, LWVBO* pVbo, int stride_in_bytes) {
+    size_t mesh_file_size = 0;
+    char *mesh_vbo_data = create_binary_from_file(filename, &mesh_file_size);
+    lw_load_vbo_data(pLwc, mesh_vbo_data, mesh_file_size, pVbo, stride_in_bytes);
+    release_binary(mesh_vbo_data);
+}
+
+void lw_load_vbo_data(LWCONTEXT* pLwc, const char* mesh_vbo_data, size_t mesh_size, LWVBO* pVbo, int stride_in_bytes) {
     GLuint vbo = 0;
     glGenBuffers(1, &vbo);
     glBindBuffer(GL_ARRAY_BUFFER, vbo);
-
-    size_t mesh_file_size = 0;
-    char *mesh_vbo_data = create_binary_from_file(filename, &mesh_file_size);
-    glBufferData(GL_ARRAY_BUFFER, mesh_file_size, mesh_vbo_data, GL_STATIC_DRAW);
-    release_binary(mesh_vbo_data);
-
+    glBufferData(GL_ARRAY_BUFFER, mesh_size, mesh_vbo_data, GL_STATIC_DRAW);
     glBindBuffer(GL_ARRAY_BUFFER, 0);
-
     pVbo->vertex_buffer = vbo;
-    pVbo->vertex_count = (int)(mesh_file_size / stride_in_bytes);
+    pVbo->vertex_count = (int)(mesh_size / stride_in_bytes);
 }
 
 void lw_load_all_vbo(LWCONTEXT* pLwc) {

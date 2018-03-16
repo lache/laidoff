@@ -54,6 +54,8 @@
 #include "numcomp_puck_game.h"
 #include "lwvbo.h"
 #include "htmlui.h"
+#include "searoute.h"
+#include "searoute2.h"
 // SWIG output file
 #include "lo_wrap.inl"
 
@@ -201,6 +203,13 @@ static void init_fanim(LWCONTEXT* pLwc) {
                &pLwc->fanim[LFAT_TOWER_COLLAPSE]);
 }
 
+static void lwc_create_line_vbo(LWCONTEXT* pLwc) {
+    if (pLwc->sea_route_vbo.vertex_buffer) {
+        glDeleteBuffers(1, &pLwc->sea_route_vbo.vertex_buffer);
+    }
+    lw_load_vbo_data(pLwc, (const char*)sea_route_data_2, sizeof(sea_route_data_2), &pLwc->sea_route_vbo, sizeof(float) * 2);
+}
+
 static void init_vbo(LWCONTEXT* pLwc) {
     
     // === STATIC MESHES ===
@@ -272,6 +281,8 @@ static void init_vbo(LWCONTEXT* pLwc) {
     load_fan_vbo(pLwc);
     
     lwc_create_ui_vbo(pLwc);
+
+    lwc_create_line_vbo(pLwc);
 }
 
 void set_vertex_attrib_pointer(const LWCONTEXT* pLwc, int shader_index) {
@@ -408,6 +419,16 @@ void set_ps0_vertex_attrib_pointer(const LWCONTEXT* pLwc, int shader_index) {
 	}
 }
 
+void set_line_vertex_attrib_pointer(const LWCONTEXT* pLwc, int shader_index) {
+    lw_create_lazy_shader_program(pLwc, (LW_SHADER_TYPE)shader_index);
+    // vertex coordinates
+    if (pLwc->shader[shader_index].vpos_location >= 0) {
+        glEnableVertexAttribArray((GLuint)pLwc->shader[shader_index].vpos_location);
+        glVertexAttribPointer((GLuint)pLwc->shader[shader_index].vpos_location, 2 /* 2D points */, GL_FLOAT, GL_FALSE,
+                              line_stride_in_bytes, (void *)0);
+    }
+}
+
 static void gen_all_vao(LWCONTEXT* pLwc) {
     // Vertex Array Objects
 #if LW_SUPPORT_VAO
@@ -492,6 +513,22 @@ static void init_ps0_vao(LWCONTEXT* pLwc, int shader_index) {
 #endif
 }
 
+static void init_line_vao(LWCONTEXT* pLwc, int shader_index) {
+    // Particle System 0 (rose emitter) Vertex Array Objects
+#if LW_SUPPORT_VAO
+    assert(LINE_VERTEX_BUFFER_COUNT == 1);
+    glGenVertexArrays(1, pLwc->line_vao);
+    for (int i = 0; i < LINE_VERTEX_BUFFER_COUNT; i++) {
+        glBindVertexArray(pLwc->line_vao[i]);
+        glBindBuffer(GL_ARRAY_BUFFER, pLwc->sea_route_vbo.vertex_buffer);
+        set_line_vertex_attrib_pointer(pLwc, shader_index);
+    }
+
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+    glBindVertexArray(0);
+#endif
+}
+
 void lw_clear_color() {
     // Alpha component should be 1 in RPI platform.
     glClearColor(0x44 / 255.f, 0x4c / 255.f, 0x50 / 255.f, 1);
@@ -516,6 +553,7 @@ static void init_gl_context(LWCONTEXT* pLwc) {
     init_fan_vao(pLwc, LWST_FAN);
     init_ps_vao(pLwc, LWST_EMITTER2);
 	init_ps0_vao(pLwc, LWST_EMITTER);
+    init_line_vao(pLwc, LWST_LINE);
     // load all textures
     init_load_textures(pLwc);
     // load font metadata
@@ -1161,6 +1199,14 @@ static void bind_all_ps0_vertex_attrib_shader(const LWCONTEXT* pLwc, int shader_
 #endif
 }
 
+static void bind_all_line_vertex_attrib_shader(const LWCONTEXT* pLwc, int shader_index) {
+#if LW_PLATFORM_WIN32 || LW_PLATFORM_OSX
+    glBindVertexArray(pLwc->line_vao[0]);
+#else
+    set_line_vertex_attrib_pointer(pLwc, shader_index);
+#endif
+}
+
 void bind_all_fvertex_attrib(const LWCONTEXT* pLwc, int fvbo_index) {
     bind_all_fvertex_attrib_shader(pLwc, LWST_DEFAULT_NORMAL, fvbo_index);
 }
@@ -1195,6 +1241,10 @@ void bind_all_ps_vertex_attrib(const LWCONTEXT* pLwc, int vbo_index) {
 
 void bind_all_ps0_vertex_attrib(const LWCONTEXT* pLwc, int vbo_index) {
 	bind_all_ps0_vertex_attrib_shader(pLwc, LWST_EMITTER, vbo_index);
+}
+
+void bind_all_line_vertex_attrib(const LWCONTEXT* pLwc) {
+    bind_all_line_vertex_attrib_shader(pLwc, LWST_LINE);
 }
 
 void load_pkm_hw_decoding(const char *tex_atlas_filename) {
@@ -1644,6 +1694,10 @@ void lw_deinit(LWCONTEXT* pLwc) {
     for (int i = 0; i < LFVT_COUNT; i++) {
         glDeleteBuffers(1, &pLwc->fan_vertex_buffer[i].vertex_buffer);
     }
+
+    if (pLwc->sea_route_vbo.vertex_buffer) {
+        glDeleteBuffers(1, &pLwc->sea_route_vbo.vertex_buffer);
+    }
     
     glDeleteTextures(1, &pLwc->font_fbo.color_tex);
     glDeleteTextures(MAX_TEX_ATLAS, pLwc->tex_atlas);
@@ -1657,6 +1711,7 @@ void lw_deinit(LWCONTEXT* pLwc) {
     glDeleteVertexArrays(FAN_VERTEX_BUFFER_COUNT, pLwc->fan_vao);
     glDeleteVertexArrays(PS_VERTEX_BUFFER_COUNT, pLwc->ps_vao);
 	glDeleteVertexArrays(PS0_VERTEX_BUFFER_COUNT, pLwc->ps0_vao);
+    glDeleteVertexArrays(LINE_VERTEX_BUFFER_COUNT, pLwc->line_vao);
 #endif
     
     lw_delete_all_shader_program(pLwc);

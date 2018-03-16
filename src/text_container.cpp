@@ -227,10 +227,14 @@ void litehtml::text_container::link(const std::shared_ptr<litehtml::document>& d
     //printf("link\n");
 }
 
+extern "C" int enable_render_world_map;
+
 void litehtml::text_container::on_anchor_click(const litehtml::tchar_t * url, const litehtml::element::ptr & el) {
     LOGI("on_anchor_click: %s", url);
     if (strcmp(url, "script:go_online()") == 0) {
         tcp_request_landing_page(pLwc->tcp_ttl, pLwc->user_data_path);
+    } else if (strcmp(url, "script:toggle_world_map()") == 0) {
+        enable_render_world_map = !enable_render_world_map;
     } else {
         const char* path_prefix = ASSETS_BASE_PATH "html" PATH_SEPARATOR;
         char path[1024] = { 0, };
