@@ -96,6 +96,7 @@ int load_ktx_hw_or_sw(const char* tex_atlas_filename, int* width, int* height)
 
 			release_software_decode_etc1_rgb(decoded_rgb_data);
 #else
+			glGetError(); // clear previous errors
 			glCompressedTexImage2D(GL_TEXTURE_2D, i, GL_ETC1_RGB8_OES, mip_width, mip_height, 0, data_size, d);
 #endif
 			error_enum = glGetError();

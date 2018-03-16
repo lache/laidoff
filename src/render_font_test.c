@@ -395,10 +395,11 @@ static void render_route_line(const LWCONTEXT* pLwc) {
     mat4x4_identity(proj_view_model);
     mat4x4_mul(proj_view_model, pLwc->proj, view_model);
 
-    bind_all_line_vertex_attrib(pLwc);
     glBindBuffer(GL_ARRAY_BUFFER, pLwc->sea_route_vbo.vertex_buffer);
+    bind_all_line_vertex_attrib(pLwc);
     glUniformMatrix4fv(pLwc->shader[shader_index].mvp_location, 1, GL_FALSE, (const GLfloat*)proj_view_model);
-    glDrawArrays(GL_LINE_STRIP, 0, pLwc->sea_route_vbo.vertex_count);
+    int vc = pLwc->sea_route_vbo.vertex_count;
+    glDrawArrays(GL_LINE_STRIP, 0, vc);
 }
 
 static void render_world_map(const LWCONTEXT* pLwc) {

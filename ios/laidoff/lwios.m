@@ -77,8 +77,10 @@ char * create_string_from_file(const char * filename) {
     
     NSString *str = [NSString stringWithContentsOfFile:pathname encoding:NSUTF8StringEncoding error:nil];
     if (str) {
+        printf("create_string_from_file: %s loaded to memory.\n", filename);
         return strdup((char *)[str UTF8String]);
     } else {
+        printf("create_string_from_file: %s [ERROR] FILE NOT FOUND.\n", filename);
         return 0;
     }
 }
@@ -97,7 +99,7 @@ char* create_binary_from_file(const char* filename, size_t* size) {
     
     char* d = (char*)malloc(data.length);
     memcpy(d, [data bytes], data.length);
-
+    printf("create_binary_from_file: %s (%zu bytes) loaded to memory.\n", filename, data.length);
     return d;
 }
 
