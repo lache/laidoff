@@ -9,6 +9,7 @@
 #include "lwmath.h"
 #include <stdio.h>
 
+int enable_render_world = 1;
 int enable_render_world_map = 0;
 
 void lwc_render_font_test_fbo_body(const LWCONTEXT* pLwc, const char* html_body) {
@@ -399,9 +400,9 @@ static void render_route_line(const LWCONTEXT* pLwc, float x, float y) {
     glDrawArrays(GL_LINE_STRIP, 0, vc);
 }
 
-static void render_world_map(const LWCONTEXT* pLwc) {
+static void render_world_map(const LWCONTEXT* pLwc, float x, float y) {
     lazy_tex_atlas_glBindTexture(pLwc, LAE_WORLD_MAP);
-    render_solid_box_ui_lvt_flip_y_uv(pLwc, 0, 0, pLwc->aspect_ratio * 2, pLwc->aspect_ratio, pLwc->tex_atlas[LAE_WORLD_MAP], LVT_CENTER_CENTER_ANCHORED_SQUARE, 0);
+    render_solid_box_ui_lvt_flip_y_uv(pLwc, x, y, pLwc->aspect_ratio * 2, pLwc->aspect_ratio, pLwc->tex_atlas[LAE_WORLD_MAP], LVT_CENTER_CENTER_ANCHORED_SQUARE, 0);
 }
 
 void lwc_render_font_test(const LWCONTEXT* pLwc) {
@@ -442,13 +443,19 @@ void lwc_render_font_test(const LWCONTEXT* pLwc) {
     mat4x4_look_at(view, eye, center, up);
 
     // render world
-    render_world(pLwc, view, proj, ship_y);
+    if (enable_render_world) {
+        render_world(pLwc, view, proj, ship_y);
+    }
     // UI
     glDisable(GL_DEPTH_TEST);
-    render_sea_objects_nameplate(pLwc, view, proj);
+    if (enable_render_world) {
+        render_sea_objects_nameplate(pLwc, view, proj);
+    }
     lwc_enable_additive_blending();
+    float world_map_x = 0;
+    float world_map_y = -(2.0f - pLwc->aspect_ratio)/2;
     if (enable_render_world_map) {
-        render_world_map(pLwc);
+        render_world_map(pLwc, world_map_x, world_map_y);
     }
     lwc_disable_additive_blending();
     if (enable_render_world_map) {
@@ -456,7 +463,7 @@ void lwc_render_font_test(const LWCONTEXT* pLwc) {
         int thickness = 1;
         for (int i = -thickness; i <= thickness; i++) {
             for (int j = -thickness; j <= thickness; j++) {
-                render_route_line(pLwc, i * one_pixel, j * one_pixel);
+                render_route_line(pLwc, world_map_x + i * one_pixel, world_map_y + j * one_pixel);
             }
         }
     }
