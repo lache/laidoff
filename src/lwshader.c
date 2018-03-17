@@ -86,7 +86,9 @@ int lw_create_shader_program(const char* shader_name, LWSHADER* pShader, GLuint 
 
     // Set initial value...
     glUseProgram(pShader->program);
-    glUniform3f(pShader->multiply_color_location, 1.0f, 1.0f, 1.0f);
+    if (pShader->multiply_color_location >= 0) {
+        glUniform3f(pShader->multiply_color_location, 1.0f, 1.0f, 1.0f);
+    }
 
     // Attribs
     pShader->vpos_location = glGetAttribLocation(pShader->program, "vPos");

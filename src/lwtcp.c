@@ -109,7 +109,10 @@ int tcp_connect(LWTCP* tcp) {
     int set = 1;
     setsockopt (tcp->connect_socket, SOL_SOCKET, SO_NOSIGPIPE, &set, sizeof (int));
 #endif
+    // clear send fail flag
     tcp->send_fail = 0;
+    // clear http get pending flag
+    tcp->html_wait = 0;
     return 0;
 }
 

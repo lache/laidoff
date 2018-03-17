@@ -790,3 +790,13 @@ void script_on_target_attack(void* _script) {
         }
     }
 }
+
+void script_evaluate(void* L, const char* code) {
+    int result = luaL_dostring(L, code);
+    if (result) {
+        LOGE("Failed to run lua: %s", lua_tostring(L, -1));
+    } else {
+        LOGI("Lua result: %lld", lua_tointeger(L, -1));
+    }
+    lua_pop(L, 1);
+}

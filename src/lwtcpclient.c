@@ -333,11 +333,12 @@ int parse_recv_packets(LWTCP* tcp) {
             pLwc->puck_game->token = p->token;
             pLwc->puck_game->player_no = p->player_no;
             pLwc->tcp->state = LUS_MATCHED;
-            // create UDP socket for battle sync
-            pLwc->udp = new_udp();
             // make a copy of target nickname
             memcpy(pLwc->puck_game->target_nickname[0], p->target_nickname, sizeof(p->target_nickname));
             pLwc->puck_game->target_score[0] = p->target_score;
+            // create UDP socket for battle sync
+            pLwc->udp = new_udp();
+            // set UDP server address
             pLwc->udp_host_addr.host_resolved = *(unsigned long*)p->ipaddr;
             sprintf(pLwc->udp_host_addr.host, "%d.%d.%d.%d",
                     ((int)pLwc->udp_host_addr.host_resolved >> 0) & 0xff,

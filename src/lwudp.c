@@ -5,6 +5,11 @@
 #include "puckgameupdate.h"
 #include "lwtimepoint.h"
 #include "puckgame.h"
+#include "platform_detection.h" 
+#if LW_PLATFORM_WIN32
+#include <Ws2tcpip.h>
+#endif
+#include "lz4.h"
 
 static int make_socket_nonblocking(int sock) {
 #if defined(WIN32) || defined(_WIN32) || defined(IMN_PIM)
@@ -25,17 +30,15 @@ LWUDP* new_udp() {
     udp->slen = sizeof(udp->si_other);
 #if LW_PLATFORM_WIN32
     LOGI("Initialising Winsock...");
-    if (WSAStartup(MAKEWORD(2, 2), &udp->wsa) != 0)
-    {
+    if (WSAStartup(MAKEWORD(2, 2), &udp->wsa) != 0) {
         LOGE("Failed. Error Code : %d", WSAGetLastError());
         exit(EXIT_FAILURE);
     }
     LOGI("Initialised.\n");
 #endif
-    
+
     //create socket
-    if ((udp->s = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP)) == SOCKET_ERROR)
-    {
+    if ((udp->s = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP)) == SOCKET_ERROR) {
 #if LW_PLATFORM_WIN32
         LOGE("socket() failed with error code : %d", WSAGetLastError());
 #else
@@ -45,7 +48,7 @@ LWUDP* new_udp() {
     }
 #if LW_PLATFORM_IOS
     int set = 1;
-    setsockopt (udp->s, SOL_SOCKET, SO_NOSIGPIPE, &set, sizeof (int));
+    setsockopt(udp->s, SOL_SOCKET, SO_NOSIGPIPE, &set, sizeof(int));
 #endif
     //setup address structure
     memset((char *)&udp->si_other, 0, sizeof(udp->si_other));
@@ -61,6 +64,36 @@ LWUDP* new_udp() {
     ringbuffer_init(&udp->state2_ring_buffer, udp->state2_buffer, sizeof(LWPSTATE2), LW_STATE_RING_BUFFER_CAPACITY);
     numcomp_puck_game_init(&udp->numcomp);
     return udp;
+}
+
+static unsigned long udp_hostname_to_ip(const char* hostname, const char* port_str) {
+    struct addrinfo hints, *servinfo, *p;
+    struct sockaddr_in *h;
+    int rv;
+
+    memset(&hints, 0, sizeof hints);
+    hints.ai_family = AF_UNSPEC; // use AF_INET6 to force IPv6
+    hints.ai_socktype = SOCK_STREAM;
+
+    if ((rv = getaddrinfo(hostname, port_str, &hints, &servinfo)) != 0) {
+        fprintf(stderr, "getaddrinfo: %s\n", gai_strerror(rv));
+        return 0;
+    }
+
+    int ip = 0;
+    // loop through all the results and connect to the first we can
+    for (p = servinfo; p != NULL; p = p->ai_next) {
+        h = (struct sockaddr_in *) p->ai_addr;
+        ip = h->sin_addr.s_addr;
+        break;
+    }
+
+    freeaddrinfo(servinfo); // all done with this structure
+    return ip;
+}
+
+void udp_update_addr_host(LWUDP* udp, const char* host, unsigned short port, const char* port_str) {
+    udp_update_addr(udp, udp_hostname_to_ip(host, port_str), port);
 }
 
 void udp_update_addr(LWUDP* udp, unsigned long ip, unsigned short port) {
@@ -79,8 +112,7 @@ void udp_send(LWUDP* udp, const char* data, int size) {
         return;
     }
     //send the message
-    if (sendto(udp->s, data, size, 0, (struct sockaddr *) &udp->si_other, udp->slen) == SOCKET_ERROR)
-    {
+    if (sendto(udp->s, data, size, 0, (struct sockaddr *) &udp->si_other, udp->slen) == SOCKET_ERROR) {
 #if LW_PLATFORM_WIN32
         //LOGE("sendto() failed with error code : %d", WSAGetLastError());
 #else
@@ -105,8 +137,7 @@ void udp_update(LWCONTEXT* pLwc, LWUDP* udp) {
     FD_ZERO(&udp->readfds);
     FD_SET(udp->s, &udp->readfds);
     int rv = 0;
-    while ((rv = select(udp->s + 1, &udp->readfds, NULL, NULL, &udp->tv)) == 1)
-    {
+    while ((rv = select(udp->s + 1, &udp->readfds, NULL, NULL, &udp->tv)) == 1) {
         if ((udp->recv_len = recvfrom(udp->s, udp->buf, LW_UDP_BUFLEN, 0, (struct sockaddr*)&udp->si_other, (socklen_t*)&udp->slen)) == SOCKET_ERROR) {
 #if LW_PLATFORM_WIN32
             int wsa_error_code = WSAGetLastError();
@@ -115,8 +146,7 @@ void udp_update(LWCONTEXT* pLwc, LWUDP* udp) {
                 // Go back to single play mode
                 //udp->master = 1;
                 return;
-            }
-            else {
+            } else {
                 LOGI("recvfrom() failed with error code : %d", wsa_error_code);
                 exit(EXIT_FAILURE);
             }
@@ -129,65 +159,66 @@ void udp_update(LWCONTEXT* pLwc, LWUDP* udp) {
         }
         const int packet_type = *(int*)udp->buf;
         switch (packet_type) {
-            case LPGP_LWPSTATE:
+        case LPGP_LWPSTATE:
+        {
+            if (udp->recv_len != sizeof(LWPSTATE)) {
+                LOGE("LWPSTATE: Size error %d (%zu expected)", udp->recv_len, sizeof(LWPSTATE));
+            }
+            //int tick_diff = p->update_tick - pLwc->puck_game_state.update_tick;
+            /*if (tick_diff > 0)*/
             {
-                if (udp->recv_len != sizeof(LWPSTATE)) {
-                    LOGE("LWPSTATE: Size error %d (%zu expected)", udp->recv_len, sizeof(LWPSTATE));
+                /*if (tick_diff != 1) {
+                 LOGI("Packet jitter");
+                 }*/
+                 //memcpy(&pLwc->puck_game_state, p, sizeof(LWPSTATE));
+                double last_received = lwtimepoint_now_seconds();
+                double state_packet_interval = last_received - pLwc->puck_game_state_last_received;
+                pLwc->puck_game_state_last_received = last_received;
+                pLwc->puck_game_state_last_received_interval = state_packet_interval * 1000;
+                // IGNORE LWPSTATE packet
+                //queue_state(pLwc->udp, p);
+                int rb_size = ringbuffer_size(&pLwc->udp->state_ring_buffer);
+                if (pLwc->udp->state_count == 0) {
+                    pLwc->udp->state_start_timepoint = lwtimepoint_now_seconds();
                 }
-                //int tick_diff = p->update_tick - pLwc->puck_game_state.update_tick;
-                /*if (tick_diff > 0)*/ {
-                    /*if (tick_diff != 1) {
-                     LOGI("Packet jitter");
-                     }*/
-                    //memcpy(&pLwc->puck_game_state, p, sizeof(LWPSTATE));
-                    double last_received = lwtimepoint_now_seconds();
-                    double state_packet_interval = last_received - pLwc->puck_game_state_last_received;
-                    pLwc->puck_game_state_last_received = last_received;
-                    pLwc->puck_game_state_last_received_interval = state_packet_interval * 1000;
-                    // IGNORE LWPSTATE packet
-                    //queue_state(pLwc->udp, p);
-                    int rb_size = ringbuffer_size(&pLwc->udp->state_ring_buffer);
-                    if (pLwc->udp->state_count == 0) {
-                        pLwc->udp->state_start_timepoint = lwtimepoint_now_seconds();
-                    }
-                    pLwc->udp->state_count++;
-                    double elapsed_from_start = lwtimepoint_now_seconds() - pLwc->udp->state_start_timepoint;
-                    LOGIx("State packet interval: %.3f ms (rb size=%d) (%.2f pps)",
-                          pLwc->puck_game_state_last_received_interval,
-                          rb_size,
-                          (float)pLwc->udp->state_count / elapsed_from_start);
+                pLwc->udp->state_count++;
+                double elapsed_from_start = lwtimepoint_now_seconds() - pLwc->udp->state_start_timepoint;
+                LOGIx("State packet interval: %.3f ms (rb size=%d) (%.2f pps)",
+                      pLwc->puck_game_state_last_received_interval,
+                      rb_size,
+                      (float)pLwc->udp->state_count / elapsed_from_start);
+            }
+            break;
+        }
+        default:
+        {
+            const unsigned char packet_type_short = *(unsigned char*)udp->buf;
+            switch (packet_type_short) {
+            case LPGP_LWPSTATE2:
+            {
+                LWPSTATE2* p = (LWPSTATE2*)udp->buf;
+                if (udp->recv_len != sizeof(LWPSTATE2)) {
+                    LOGE("LWPSTATE2: Size error %d (%zu expected)", udp->recv_len, sizeof(LWPSTATE));
                 }
+                double last_received = lwtimepoint_now_seconds();
+                double state_packet_interval = last_received - pLwc->puck_game_state2_last_received;
+                pLwc->puck_game_state2_last_received = last_received;
+                pLwc->puck_game_state2_last_received_interval = state_packet_interval * 1000;
+                queue_state2(pLwc->udp, p);
+                if (pLwc->udp->state2_count == 0) {
+                    pLwc->udp->state2_start_timepoint = lwtimepoint_now_seconds();
+                }
+                pLwc->udp->state2_count++;
                 break;
             }
             default:
             {
-                const unsigned char packet_type_short = *(unsigned char*)udp->buf;
-                switch (packet_type_short) {
-                    case LPGP_LWPSTATE2:
-                    {
-                        LWPSTATE2* p = (LWPSTATE2*)udp->buf;
-                        if (udp->recv_len != sizeof(LWPSTATE2)) {
-                            LOGE("LWPSTATE2: Size error %d (%zu expected)", udp->recv_len, sizeof(LWPSTATE));
-                        }
-                        double last_received = lwtimepoint_now_seconds();
-                        double state_packet_interval = last_received - pLwc->puck_game_state2_last_received;
-                        pLwc->puck_game_state2_last_received = last_received;
-                        pLwc->puck_game_state2_last_received_interval = state_packet_interval * 1000;
-                        queue_state2(pLwc->udp, p);
-                        if (pLwc->udp->state2_count == 0) {
-                            pLwc->udp->state2_start_timepoint = lwtimepoint_now_seconds();
-                        }
-                        pLwc->udp->state2_count++;
-                        break;
-                    }
-                    default:
-                    {
-                        LOGE("Unknown datagram (UDP packet) received.");
-                        break;
-                    }
-                }
+                LOGE("Unknown datagram (UDP packet) received.");
                 break;
             }
+            }
+            break;
+        }
         }
     }
 }
@@ -204,3 +235,80 @@ int lw_udp_port(const LWCONTEXT* pLwc) {
     return pLwc->udp_host_addr.port;
 }
 
+void udp_sea_update(LWCONTEXT* pLwc, LWUDP* udp) {
+    if (pLwc->game_scene != LGS_FONT_TEST) {
+        return;
+    }
+    if (udp->reinit_next_update) {
+        destroy_udp(&pLwc->udp_sea);
+        pLwc->udp_sea = new_udp();
+        udp_update_addr_host(pLwc->udp_sea,
+                             pLwc->sea_udp_host_addr.host,
+                             pLwc->sea_udp_host_addr.port,
+                             pLwc->sea_udp_host_addr.port_str);
+        udp->reinit_next_update = 0;
+    }
+    if (udp->ready == 0) {
+        return;
+    }
+    float app_time = (float)pLwc->app_time;
+    if (app_time < udp->last_updated + 1 / 1.0f) {
+        return;
+    }
+    udp->last_updated = app_time;
+    
+    LWPTTLPING ttl_ping;
+    memset(&ttl_ping, 0, sizeof(LWPTTLPING));
+    ttl_ping.type = LPGP_LWPTTLPING;
+    ttl_ping.xc = 0;
+    ttl_ping.yc = 0;
+    ttl_ping.ex = 100.0f;
+    udp_send(udp, (const char*)&ttl_ping, sizeof(LWPTTLPING));
+
+    FD_ZERO(&udp->readfds);
+    FD_SET(udp->s, &udp->readfds);
+    int rv = 0;
+    while ((rv = select(udp->s + 1, &udp->readfds, NULL, NULL, &udp->tv)) == 1) {
+        if ((udp->recv_len = recvfrom(udp->s, udp->buf, LW_UDP_BUFLEN, 0, (struct sockaddr*)&udp->si_other, (socklen_t*)&udp->slen)) == SOCKET_ERROR) {
+#if LW_PLATFORM_WIN32
+            int wsa_error_code = WSAGetLastError();
+            if (wsa_error_code == WSAECONNRESET) {
+                // UDP server not ready?
+                // Go back to single play mode
+                //udp->master = 1;
+                return;
+            } else {
+                LOGI("recvfrom() failed with error code : %d", wsa_error_code);
+                exit(EXIT_FAILURE);
+            }
+#else
+            // Socket recovery needed
+            LOGEP("UDP socket error! Socket recovery needed...");
+            udp->ready = 0;
+            udp->reinit_next_update = 1;
+            return;
+#endif
+        }
+        
+        char decompressed[1500*255]; // maximum lz4 compression ratio is 255...
+        int decompressed_bytes = LZ4_decompress_safe(udp->buf, decompressed, udp->recv_len, ARRAY_SIZE(decompressed));
+        if (decompressed_bytes > 0) {
+            const int packet_type = *(int*)decompressed;
+            switch (packet_type) {
+                case LPGP_LWPTTLFULLSTATE:
+                {
+                    if (decompressed_bytes != sizeof(LWPTTLFULLSTATE)) {
+                        LOGE("LWPTTLFULLSTATE: Size error %d (%zu expected)", decompressed_bytes, sizeof(LWPTTLFULLSTATE));
+                    }
+                    
+                    LWPTTLFULLSTATE* p = (LWPTTLFULLSTATE*)decompressed;
+                    LOGIx("LWPTTLFULLSTATE: %d objects.", p->count);
+                    memcpy(&pLwc->ttl_full_state, p, sizeof(LWPTTLFULLSTATE));
+                    break;
+                }
+            }
+        } else {
+            LOGE("lz4 decompression failed!");
+        }
+    }
+}

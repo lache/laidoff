@@ -738,6 +738,17 @@ void lwc_update(LWCONTEXT* pLwc, double delta_time) {
         deltatime_tick_delta(pLwc->update_dt, delta_time);
     }
 
+    if (pLwc->game_scene == LGS_FONT_TEST) {
+        for (int i = 0; i < pLwc->ttl_full_state.count; i++) {
+            if (pLwc->ttl_full_state.obj[i].id >= 25000) {
+                pLwc->ttl_full_state.obj[i].x0 += (float)delta_time * pLwc->ttl_full_state.obj[i].vx;
+                pLwc->ttl_full_state.obj[i].y0 += (float)delta_time * pLwc->ttl_full_state.obj[i].vy;
+                pLwc->ttl_full_state.obj[i].x1 += (float)delta_time * pLwc->ttl_full_state.obj[i].vx;
+                pLwc->ttl_full_state.obj[i].y1 += (float)delta_time * pLwc->ttl_full_state.obj[i].vy;
+            }
+        }
+    }
+
     //const float delta_time = (float)deltatime_delta_time(pLwc->update_dt);
 
     if (pLwc->next_game_scene == LGS_INVALID && pLwc->game_scene == LGS_INVALID) {
@@ -775,6 +786,10 @@ void lwc_update(LWCONTEXT* pLwc, double delta_time) {
 
     if (pLwc->udp) {
         udp_update(pLwc, pLwc->udp);
+    }
+
+    if (pLwc->udp_sea) {
+        udp_sea_update(pLwc, pLwc->udp_sea);
     }
 
     if (pLwc->tcp) {
@@ -958,6 +973,11 @@ static void s_logic_worker(zsock_t *pipe, void *args) {
     // WSAStartup should be called within
     // a thread which opens sockets.
     pLwc->udp = 0;//new_udp();
+    pLwc->udp_sea = new_udp();
+    udp_update_addr_host(pLwc->udp_sea,
+                         pLwc->sea_udp_host_addr.host,
+                         pLwc->sea_udp_host_addr.port,
+                         pLwc->sea_udp_host_addr.port_str);
     pLwc->tcp = new_tcp(pLwc,
                         pLwc->user_data_path,
                         &pLwc->tcp_host_addr,
