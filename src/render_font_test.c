@@ -9,9 +9,9 @@
 #include "lwmath.h"
 #include <stdio.h>
 
-int enable_render_world = 1;
-int enable_render_world_map = 0;
-int enable_render_route_line = 0;
+static int enable_render_world = 1;
+static int enable_render_world_map = 0;
+static int enable_render_route_line = 0;
 
 void lwc_render_font_test_fbo_body(const LWCONTEXT* pLwc, const char* html_body) {
     glBindFramebuffer(GL_FRAMEBUFFER, pLwc->font_fbo.fbo);
@@ -495,4 +495,15 @@ void lwc_render_font_test(const LWCONTEXT* pLwc) {
     glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
     render_solid_box_ui_lvt_flip_y_uv(pLwc, 0, 0, 2 * pLwc->aspect_ratio, 2, pLwc->font_fbo.color_tex, LVT_CENTER_CENTER_ANCHORED_SQUARE, 1);
     glEnable(GL_DEPTH_TEST);
+}
+
+void lwc_render_font_test_enable_render_world(int v) {
+    enable_render_world = v;
+}
+
+void lwc_render_font_test_enable_render_world_map(int v) {
+    enable_render_world_map = v;
+}
+void lwc_render_font_test_enable_render_route_line(int v) {
+    enable_render_route_line = v;
 }

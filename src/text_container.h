@@ -16,7 +16,7 @@ namespace litehtml {
 		std::vector<int> font_sizes;
 
 	public:
-		text_container(const LWCONTEXT* pLwc, int w, int h);
+		text_container(LWCONTEXT* pLwc, int w, int h);
 		virtual ~text_container();
 
 		virtual litehtml::uint_ptr	create_font(const litehtml::tchar_t* faceName, int size, int weight, litehtml::font_style italic, unsigned int decoration, litehtml::font_metrics* fm);
@@ -50,7 +50,7 @@ namespace litehtml {
 		virtual void				get_language(litehtml::tstring& language, litehtml::tstring & culture) const;
 	private:
         void draw_border_rect(const litehtml::border& border, int x, int y, int w, int h, LW_VBO_TYPE lvt, const litehtml::web_color& color) const;
-		const LWCONTEXT * pLwc;
+		LWCONTEXT * pLwc;
 		int w;
 		int h;
 		int default_font_size;

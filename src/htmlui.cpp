@@ -13,7 +13,7 @@
 
 class LWHTMLUI {
 public:
-	LWHTMLUI(const LWCONTEXT* _pLwc, int w, int h)
+	LWHTMLUI(LWCONTEXT* _pLwc, int w, int h)
 		: pLwc(_pLwc)
         , container(_pLwc, w, h)
         , client_width(w)
@@ -99,7 +99,7 @@ private:
     int refresh_html_body;
 };
 
-void* htmlui_new(const LWCONTEXT* pLwc) {
+void* htmlui_new(LWCONTEXT* pLwc) {
 	return new LWHTMLUI(pLwc, pLwc->width, pLwc->height);
 }
 
@@ -138,7 +138,7 @@ void htmlui_on_over(void* c, float nx, float ny) {
 	htmlui->on_over(nx, ny);
 }
 
-int test_html_ui(const LWCONTEXT* pLwc) {
+int test_html_ui(LWCONTEXT* pLwc) {
 	litehtml::context browser_context;
 	//browser_context.load_master_stylesheet()
 

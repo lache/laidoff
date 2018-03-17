@@ -4,8 +4,8 @@
 extern "C" {
 #endif
 	typedef struct _LWCONTEXT LWCONTEXT;
-	int test_html_ui(const LWCONTEXT* pLwc);
-	void* htmlui_new(const LWCONTEXT* pLwc);
+	int test_html_ui(LWCONTEXT* pLwc);
+	void* htmlui_new(LWCONTEXT* pLwc);
 	void htmlui_destroy(void** c);
 	void htmlui_load_render_draw(void* c, const char* html_path);
     void htmlui_load_render_draw_body(void* c, const char* html_body);

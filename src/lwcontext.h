@@ -95,6 +95,9 @@ extern const char* tex_font_atlas_filename[2];
 #define MAX_DELTA_TIME_HISTORY (60)
 #define LW_MAX_CONF_TOKEN (1024)
 
+#ifdef __cplusplus
+extern "C" {;
+#endif
 typedef struct _LWPUCKGAME LWPUCKGAME;
 typedef struct _LWUDP LWUDP;
 typedef struct _LWTCP LWTCP;
@@ -405,9 +408,7 @@ typedef struct _LWCONTEXT {
     LWPTTLFULLSTATE ttl_full_state;
 } LWCONTEXT;
 
-#ifdef __cplusplus
-extern "C" {;
-#endif
+
 double lwcontext_delta_time(const LWCONTEXT* pLwc);
 int lwcontext_safe_to_start_render(const LWCONTEXT* pLwc);
 void lwcontext_set_safe_to_start_render(LWCONTEXT* pLwc, int v);

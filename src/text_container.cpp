@@ -9,9 +9,9 @@
 #include "lwlog.h"
 #include "htmlui.h"
 #include "lwtcpclient.h"
-using namespace litehtml;
+#include "el_luascript.h"
 
-litehtml::text_container::text_container(const LWCONTEXT* pLwc, int w, int h)
+litehtml::text_container::text_container(LWCONTEXT* pLwc, int w, int h)
     : pLwc(pLwc), w(w), h(h), default_font_size(36) {
 }
 
@@ -227,20 +227,16 @@ void litehtml::text_container::link(const std::shared_ptr<litehtml::document>& d
     //printf("link\n");
 }
 
-extern "C" int enable_render_world;
-extern "C" int enable_render_world_map;
-extern "C" int enable_render_route_line;
-
 void litehtml::text_container::on_anchor_click(const litehtml::tchar_t * url, const litehtml::element::ptr & el) {
     LOGI("on_anchor_click: %s", url);
     if (strcmp(url, "script:go_online()") == 0) {
         tcp_request_landing_page(pLwc->tcp_ttl, pLwc->user_data_path);
     } else if (strcmp(url, "script:toggle_world()") == 0) {
-        enable_render_world = !enable_render_world;
+        //enable_render_world = !enable_render_world;
     } else if (strcmp(url, "script:toggle_world_map()") == 0) {
-        enable_render_world_map = !enable_render_world_map;
+        //enable_render_world_map = !enable_render_world_map;
     } else if (strcmp(url, "script:toggle_route_line()") == 0) {
-        enable_render_route_line = !enable_render_route_line;
+        //enable_render_route_line = !enable_render_route_line;
     } else {
         const char* path_prefix = ASSETS_BASE_PATH "html" PATH_SEPARATOR;
         char path[1024] = { 0, };
@@ -280,6 +276,12 @@ void litehtml::text_container::get_client_rect(litehtml::position & client) cons
 }
 
 std::shared_ptr<litehtml::element> litehtml::text_container::create_element(const litehtml::tchar_t * tag_name, const litehtml::string_map & attributes, const std::shared_ptr<litehtml::document>& doc) {
+    if (strcmp(tag_name, "script") == 0) {
+        auto ait = attributes.find("type");
+        if (ait != attributes.cend() && ait->second == "text/x-lua") {
+            return std::make_shared<litehtml::el_luascript>(doc, pLwc);
+        }
+    }
     return std::shared_ptr<litehtml::element>();
 }
 
