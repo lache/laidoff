@@ -38,8 +38,8 @@ body {
 
 p {
 	display:block; 
-	margin-top:1em; 
-	margin-bottom:1em;
+	margin-top:0.1em; 
+	margin-bottom:0.1em;
 }
 
 b, strong {
@@ -71,42 +71,42 @@ h1, h2, h3, h4, h5, h6, div {
 
 h1 {
 	font-weight:bold; 
-	margin-top:0.67em; 
-	margin-bottom:0.67em; 
+	margin-top:0.1em; 
+	margin-bottom:0.1em; 
 	font-size: 2em;
 }
 
 h2 {
 	font-weight:bold; 
-	margin-top:0.83em; 
-	margin-bottom:0.83em; 
+	margin-top:0.1em; 
+	margin-bottom:0.1em; 
 	font-size: 1.5em;
 }
 
 h3 {
 	font-weight:bold; 
-	margin-top:1em; 
-	margin-bottom:1em; 
+	margin-top:0.1em; 
+	margin-bottom:0.1em; 
 	font-size:1.17em;
 }
 
 h4 {
 	font-weight:bold; 
-	margin-top:1.33em; 
-	margin-bottom:1.33em
+	margin-top:0.1em; 
+	margin-bottom:0.1em
 }
 
 h5 {
 	font-weight:bold; 
-	margin-top:1.67em; 
-	margin-bottom:1.67em;
+	margin-top:0.1em; 
+	margin-bottom:0.1em;
 	font-size:.83em;
 }
 
 h6 {
 	font-weight:bold; 
-	margin-top:2.33em; 
-	margin-bottom:2.33em;
+	margin-top:0.1em; 
+	margin-bottom:0.1em;
 	font-size:.67em;
 } 
 
@@ -149,8 +149,8 @@ img[align="left"]
 
 hr {
     display: block;
-    margin-top: 0.5em;
-    margin-bottom: 0.5em;
+    margin-top: 0.1em;
+    margin-bottom: 0.1em;
     margin-left: auto;
     margin-right: auto;
     border-style: inset;
@@ -236,8 +236,8 @@ pre, xmp, plaintext, listing {
 ul, menu, dir {
     display: block;
     list-style-type: disc;
-    margin-top: 1em;
-    margin-bottom: 1em;
+    margin-top: 0.1em;
+    margin-bottom: 0.1em;
     margin-left: 0;
     margin-right: 0;
     padding-left: 40px
@@ -246,8 +246,8 @@ ul, menu, dir {
 ol {
     display: block;
     list-style-type: decimal;
-    margin-top: 1em;
-    margin-bottom: 1em;
+    margin-top: 0.1em;
+    margin-bottom: 0.1em;
     margin-left: 0;
     margin-right: 0;
     padding-left: 40px
