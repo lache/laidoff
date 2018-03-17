@@ -105,8 +105,8 @@ void litehtml::text_container::load_image(const litehtml::tchar_t * src, const l
 
 void litehtml::text_container::get_image_size(const litehtml::tchar_t * src, const litehtml::tchar_t * baseurl, litehtml::size & sz) {
     LOGI("get_image_size: src=%s,baseurl=%s", src, baseurl);
-    sz.width = static_cast<int>(roundf(291 * pLwc->width / 640.0f));
-    sz.height = static_cast<int>(roundf(100 * pLwc->height / 360.0f));
+    sz.width = static_cast<int>(roundf(180 * pLwc->width / 640.0f));
+    sz.height = static_cast<int>(roundf(180 * pLwc->height / 360.0f));
 }
 
 void litehtml::text_container::draw_background(litehtml::uint_ptr hdc, const litehtml::background_paint & bg) {
@@ -229,6 +229,7 @@ void litehtml::text_container::link(const std::shared_ptr<litehtml::document>& d
 
 extern "C" int enable_render_world;
 extern "C" int enable_render_world_map;
+extern "C" int enable_render_route_line;
 
 void litehtml::text_container::on_anchor_click(const litehtml::tchar_t * url, const litehtml::element::ptr & el) {
     LOGI("on_anchor_click: %s", url);
@@ -238,6 +239,8 @@ void litehtml::text_container::on_anchor_click(const litehtml::tchar_t * url, co
         enable_render_world = !enable_render_world;
     } else if (strcmp(url, "script:toggle_world_map()") == 0) {
         enable_render_world_map = !enable_render_world_map;
+    } else if (strcmp(url, "script:toggle_route_line()") == 0) {
+        enable_render_route_line = !enable_render_route_line;
     } else {
         const char* path_prefix = ASSETS_BASE_PATH "html" PATH_SEPARATOR;
         char path[1024] = { 0, };

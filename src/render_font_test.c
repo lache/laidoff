@@ -11,6 +11,7 @@
 
 int enable_render_world = 1;
 int enable_render_world_map = 0;
+int enable_render_route_line = 0;
 
 void lwc_render_font_test_fbo_body(const LWCONTEXT* pLwc, const char* html_body) {
     glBindFramebuffer(GL_FRAMEBUFFER, pLwc->font_fbo.fbo);
@@ -402,7 +403,31 @@ static void render_route_line(const LWCONTEXT* pLwc, float x, float y) {
 
 static void render_world_map(const LWCONTEXT* pLwc, float x, float y) {
     lazy_tex_atlas_glBindTexture(pLwc, LAE_WORLD_MAP);
-    render_solid_box_ui_lvt_flip_y_uv(pLwc, x, y, pLwc->aspect_ratio * 2, pLwc->aspect_ratio, pLwc->tex_atlas[LAE_WORLD_MAP], LVT_CENTER_CENTER_ANCHORED_SQUARE, 0);
+    const float uv_offset[2] = { (float)pLwc->app_time/40.0f, 0 };
+    render_solid_vb_ui_uv_shader_rot(pLwc,
+                                     x,
+                                     y,
+                                     pLwc->aspect_ratio * 2,
+                                     pLwc->aspect_ratio,
+                                     pLwc->tex_atlas[LAE_WORLD_MAP],
+                                     LVT_CENTER_CENTER_ANCHORED_SQUARE,
+                                     1.0f,
+                                     0.0f,
+                                     0.0f,
+                                     0.0f,
+                                     0.0f,
+                                     uv_offset,
+                                     default_uv_scale,
+                                     LWST_DEFAULT,
+                                     0);/*
+    render_solid_box_ui_lvt_flip_y_uv(pLwc,
+                                      x,
+                                      y,
+                                      pLwc->aspect_ratio * 2,
+                                      pLwc->aspect_ratio,
+                                      pLwc->tex_atlas[LAE_WORLD_MAP],
+                                      LVT_CENTER_CENTER_ANCHORED_SQUARE,
+                                      0);*/
 }
 
 void lwc_render_font_test(const LWCONTEXT* pLwc) {
@@ -458,7 +483,7 @@ void lwc_render_font_test(const LWCONTEXT* pLwc) {
         render_world_map(pLwc, world_map_x, world_map_y);
     }
     lwc_disable_additive_blending();
-    if (enable_render_world_map) {
+    if (enable_render_route_line) {
         float one_pixel = 2.0f / pLwc->height;
         int thickness = 1;
         for (int i = -thickness; i <= thickness; i++) {

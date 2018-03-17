@@ -145,9 +145,43 @@ void render_solid_vb_ui_flip_y_uv_shader_rot(const LWCONTEXT* pLwc,
                                              int flip_y_uv,
                                              int shader_index,
                                              float rot) {
+    render_solid_vb_ui_uv_shader_rot(pLwc,
+                                     x,
+                                     y,
+                                     w,
+                                     h,
+                                     tex_index,
+                                     lvt,
+                                     alpha_multiplier,
+                                     over_r,
+                                     over_g,
+                                     over_b,
+                                     oratio,
+                                     default_uv_offset,
+                                     flip_y_uv ? default_flip_y_uv_scale : default_uv_scale,
+                                     shader_index,
+                                     rot);
+}
+
+void render_solid_vb_ui_uv_shader_rot(const LWCONTEXT* pLwc,
+                                      float x,
+                                      float y,
+                                      float w,
+                                      float h,
+                                      GLuint tex_index,
+                                      enum _LW_VBO_TYPE lvt,
+                                      float alpha_multiplier,
+                                      float over_r,
+                                      float over_g,
+                                      float over_b,
+                                      float oratio,
+                                      const float* uv_offset,
+                                      const float* uv_scale,
+                                      int shader_index,
+                                      float rot) {
     lazy_glUseProgram(pLwc, shader_index);
-    glUniform2fv(pLwc->shader[shader_index].vuvoffset_location, 1, default_uv_offset);
-    glUniform2fv(pLwc->shader[shader_index].vuvscale_location, 1, flip_y_uv ? default_flip_y_uv_scale : default_uv_scale);
+    glUniform2fv(pLwc->shader[shader_index].vuvoffset_location, 1, uv_offset);
+    glUniform2fv(pLwc->shader[shader_index].vuvscale_location, 1, uv_scale);
     glUniform1f(pLwc->shader[shader_index].alpha_multiplier_location, alpha_multiplier);
     glUniform1i(pLwc->shader[shader_index].diffuse_location, 0); // 0 means GL_TEXTURE0
     glUniform1i(pLwc->shader[shader_index].alpha_only_location, 1); // 1 means GL_TEXTURE1
