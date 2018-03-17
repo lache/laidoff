@@ -7,17 +7,6 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		2601224A1FDFDF03005941B7 /* lwatlassprite.c in Sources */ = {isa = PBXBuildFile; fileRef = 260122491FDFDF03005941B7 /* lwatlassprite.c */; };
-		2640E1741FE7E22200504A37 /* lwfragshader.c in Sources */ = {isa = PBXBuildFile; fileRef = 2640E16F1FE7E22200504A37 /* lwfragshader.c */; };
-		2640E1751FE7E22200504A37 /* lwgl.c in Sources */ = {isa = PBXBuildFile; fileRef = 2640E1711FE7E22200504A37 /* lwgl.c */; };
-		2640E1761FE7E22200504A37 /* lwvertexshader.c in Sources */ = {isa = PBXBuildFile; fileRef = 2640E1721FE7E22200504A37 /* lwvertexshader.c */; };
-		2640E1781FE7E25800504A37 /* lwshader.c in Sources */ = {isa = PBXBuildFile; fileRef = 2640E1771FE7E25800504A37 /* lwshader.c */; };
-		2640E17C1FE7F9A900504A37 /* lwvbo.c in Sources */ = {isa = PBXBuildFile; fileRef = 2640E17B1FE7F9A900504A37 /* lwvbo.c */; };
-		2641822E1FB6FD0300BF2D42 /* lwdamagetext.c in Sources */ = {isa = PBXBuildFile; fileRef = 2641822D1FB6FD0300BF2D42 /* lwdamagetext.c */; };
-		264182301FB6FD0900BF2D42 /* lwmath.c in Sources */ = {isa = PBXBuildFile; fileRef = 2641822F1FB6FD0900BF2D42 /* lwmath.c */; };
-		26457DB71FBACE6600FFEE74 /* lwime.c in Sources */ = {isa = PBXBuildFile; fileRef = 26457DB51FBACE6600FFEE74 /* lwime.c */; };
-		26457DBA1FBACEB900FFEE74 /* jsmn.c in Sources */ = {isa = PBXBuildFile; fileRef = 26457DB81FBACEB900FFEE74 /* jsmn.c */; };
-		26457DBD1FBC1C5B00FFEE74 /* lwdirpad.c in Sources */ = {isa = PBXBuildFile; fileRef = 26457DBB1FBC1C5B00FFEE74 /* lwdirpad.c */; };
 		5633AC321EADDF98003F1549 /* net.c in Sources */ = {isa = PBXBuildFile; fileRef = 5633AC311EADDF98003F1549 /* net.c */; };
 		5663732C1EBA52D3001DA3F4 /* array.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 566372811EBA52D3001DA3F4 /* array.cpp */; };
 		5663732D1EBA52D3001DA3F4 /* box.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 566372831EBA52D3001DA3F4 /* box.cpp */; };
@@ -278,12 +267,7 @@
 		56F189BA1EC751950019312F /* ztimerset.c in Sources */ = {isa = PBXBuildFile; fileRef = 56F1897D1EC751950019312F /* ztimerset.c */; };
 		56F189BB1EC751950019312F /* ztrie.c in Sources */ = {isa = PBXBuildFile; fileRef = 56F1897E1EC751950019312F /* ztrie.c */; };
 		56F189BC1EC751950019312F /* zuuid.c in Sources */ = {isa = PBXBuildFile; fileRef = 56F1897F1EC751950019312F /* zuuid.c */; };
-		6C0CB2461FC45AB6006BEDCD /* lwtcpclient.c in Sources */ = {isa = PBXBuildFile; fileRef = 6C0CB2441FC45AB6006BEDCD /* lwtcpclient.c */; };
-		6C0CB6201FC30FC800DA4E51 /* render_leaderboard.c in Sources */ = {isa = PBXBuildFile; fileRef = 6C0CB61F1FC30FC800DA4E51 /* render_leaderboard.c */; };
 		6C20CE8E1FE6C2E500A85583 /* UIDeviceHardware.m in Sources */ = {isa = PBXBuildFile; fileRef = 6C20CE8C1FE6C2E500A85583 /* UIDeviceHardware.m */; };
-		6C2751CC1FDAC8D000D1266A /* stb_vorbis.c in Sources */ = {isa = PBXBuildFile; fileRef = 6C2751CB1FDAC8CF00D1266A /* stb_vorbis.c */; };
-		6C2751D11FDAC8E100D1266A /* lwfanim.c in Sources */ = {isa = PBXBuildFile; fileRef = 6C2751CE1FDAC8E100D1266A /* lwfanim.c */; };
-		6C2751D21FDAC8E100D1266A /* lwfvbo.c in Sources */ = {isa = PBXBuildFile; fileRef = 6C2751CF1FDAC8E100D1266A /* lwfvbo.c */; };
 		6C295E9F204310700052999C /* CMakeLists.txt in Resources */ = {isa = PBXBuildFile; fileRef = 6C295E18204310700052999C /* CMakeLists.txt */; };
 		6C295EA0204310700052999C /* LICENSE in Resources */ = {isa = PBXBuildFile; fileRef = 6C295E19204310700052999C /* LICENSE */; };
 		6C295EA1204310700052999C /* master.css in Resources */ = {isa = PBXBuildFile; fileRef = 6C295E1B204310700052999C /* master.css */; };
@@ -340,71 +324,6 @@
 		6C295ED9204310700052999C /* el_text.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6C295E97204310700052999C /* el_text.cpp */; };
 		6C295EDA204310700052999C /* el_para.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6C295E9A204310700052999C /* el_para.cpp */; };
 		6C295EDB204310700052999C /* el_break.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6C295E9E204310700052999C /* el_break.cpp */; };
-		6C295EDE204310D60052999C /* htmlui.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6C295EDC204310D60052999C /* htmlui.cpp */; };
-		6C295EE1204311030052999C /* text_container.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6C295EDF204311020052999C /* text_container.cpp */; };
-		6C7739BC1FB4B5AA001014DE /* font.c in Sources */ = {isa = PBXBuildFile; fileRef = 6C7739191FB4B59D001014DE /* font.c */; };
-		6C7739BD1FB4B5AA001014DE /* unicode.c in Sources */ = {isa = PBXBuildFile; fileRef = 6C77391D1FB4B59D001014DE /* unicode.c */; };
-		6C7739BE1FB4B5AA001014DE /* lwcontext.c in Sources */ = {isa = PBXBuildFile; fileRef = 6C77391E1FB4B59D001014DE /* lwcontext.c */; };
-		6C7739BF1FB4B5AA001014DE /* extrapolator.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6C7739201FB4B59D001014DE /* extrapolator.cpp */; };
-		6C7739C01FB4B5AA001014DE /* ui.c in Sources */ = {isa = PBXBuildFile; fileRef = 6C7739211FB4B59D001014DE /* ui.c */; };
-		6C7739C11FB4B5AA001014DE /* filecompat.c in Sources */ = {isa = PBXBuildFile; fileRef = 6C7739231FB4B59D001014DE /* filecompat.c */; };
-		6C7739C21FB4B5AA001014DE /* lwparabola.c in Sources */ = {isa = PBXBuildFile; fileRef = 6C7739271FB4B59E001014DE /* lwparabola.c */; };
-		6C7739C31FB4B5AA001014DE /* lwringbuffer.c in Sources */ = {isa = PBXBuildFile; fileRef = 6C7739281FB4B59E001014DE /* lwringbuffer.c */; };
-		6C7739C41FB4B5AA001014DE /* lwtcp.c in Sources */ = {isa = PBXBuildFile; fileRef = 6C77392D1FB4B59E001014DE /* lwtcp.c */; };
-		6C7739C51FB4B5AA001014DE /* kvmsg.c in Sources */ = {isa = PBXBuildFile; fileRef = 6C77392F1FB4B59E001014DE /* kvmsg.c */; };
-		6C7739C61FB4B5AA001014DE /* render_field.c in Sources */ = {isa = PBXBuildFile; fileRef = 6C7739311FB4B59E001014DE /* render_field.c */; };
-		6C7739C71FB4B5AA001014DE /* render_physics.c in Sources */ = {isa = PBXBuildFile; fileRef = 6C7739321FB4B59E001014DE /* render_physics.c */; };
-		6C7739C81FB4B5AA001014DE /* lwudp.c in Sources */ = {isa = PBXBuildFile; fileRef = 6C7739351FB4B59F001014DE /* lwudp.c */; };
-		6C7739C91FB4B5AA001014DE /* render_battle_result.c in Sources */ = {isa = PBXBuildFile; fileRef = 6C7739361FB4B59F001014DE /* render_battle_result.c */; };
-		6C7739CA1FB4B5AA001014DE /* lwdeltatime.c in Sources */ = {isa = PBXBuildFile; fileRef = 6C77393A1FB4B59F001014DE /* lwdeltatime.c */; };
-		6C7739CB1FB4B5AA001014DE /* field.c in Sources */ = {isa = PBXBuildFile; fileRef = 6C77393B1FB4B59F001014DE /* field.c */; };
-		6C7739CC1FB4B5AA001014DE /* dialog.c in Sources */ = {isa = PBXBuildFile; fileRef = 6C7739421FB4B5A0001014DE /* dialog.c */; };
-		6C7739CD1FB4B5AA001014DE /* render_solid.c in Sources */ = {isa = PBXBuildFile; fileRef = 6C7739451FB4B5A0001014DE /* render_solid.c */; };
-		6C7739CE1FB4B5AA001014DE /* mq.c in Sources */ = {isa = PBXBuildFile; fileRef = 6C7739461FB4B5A0001014DE /* mq.c */; };
-		6C7739CF1FB4B5AA001014DE /* render_dialog.c in Sources */ = {isa = PBXBuildFile; fileRef = 6C7739481FB4B5A0001014DE /* render_dialog.c */; };
-		6C7739D01FB4B5AA001014DE /* render_skin.c in Sources */ = {isa = PBXBuildFile; fileRef = 6C77394A1FB4B5A0001014DE /* render_skin.c */; };
-		6C7739D11FB4B5AA001014DE /* battle.c in Sources */ = {isa = PBXBuildFile; fileRef = 6C77394B1FB4B5A0001014DE /* battle.c */; };
-		6C7739D21FB4B5AA001014DE /* battlelogic.c in Sources */ = {isa = PBXBuildFile; fileRef = 6C77394C1FB4B5A0001014DE /* battlelogic.c */; };
-		6C7739D31FB4B5AA001014DE /* numcomp.c in Sources */ = {isa = PBXBuildFile; fileRef = 6C77394F1FB4B5A1001014DE /* numcomp.c */; };
-		6C7739D41FB4B5AA001014DE /* lwbutton.c in Sources */ = {isa = PBXBuildFile; fileRef = 6C7739511FB4B5A1001014DE /* lwbutton.c */; };
-		6C7739D51FB4B5AA001014DE /* logic.c in Sources */ = {isa = PBXBuildFile; fileRef = 6C7739551FB4B5A1001014DE /* logic.c */; };
-		6C7739D61FB4B5AA001014DE /* lwanim.c in Sources */ = {isa = PBXBuildFile; fileRef = 6C7739571FB4B5A1001014DE /* lwanim.c */; };
-		6C7739D71FB4B5AA001014DE /* render_battle.c in Sources */ = {isa = PBXBuildFile; fileRef = 6C77395F1FB4B5A2001014DE /* render_battle.c */; };
-		6C7739D81FB4B5AA001014DE /* render_text_block.c in Sources */ = {isa = PBXBuildFile; fileRef = 6C7739631FB4B5A2001014DE /* render_text_block.c */; };
-		6C7739D91FB4B5AA001014DE /* render_ui.c in Sources */ = {isa = PBXBuildFile; fileRef = 6C7739641FB4B5A2001014DE /* render_ui.c */; };
-		6C7739DA1FB4B5AA001014DE /* input.c in Sources */ = {isa = PBXBuildFile; fileRef = 6C7739661FB4B5A3001014DE /* input.c */; };
-		6C7739DB1FB4B5AA001014DE /* lwskill.c in Sources */ = {isa = PBXBuildFile; fileRef = 6C7739671FB4B5A3001014DE /* lwskill.c */; };
-		6C7739DC1FB4B5AA001014DE /* puckgame.c in Sources */ = {isa = PBXBuildFile; fileRef = 6C7739691FB4B5A3001014DE /* puckgame.c */; };
-		6C7739DD1FB4B5AA001014DE /* render_fan.c in Sources */ = {isa = PBXBuildFile; fileRef = 6C77396A1FB4B5A3001014DE /* render_fan.c */; };
-		6C7739DE1FB4B5AA001014DE /* loadobj.c in Sources */ = {isa = PBXBuildFile; fileRef = 6C77396F1FB4B5A3001014DE /* loadobj.c */; };
-		6C7739DF1FB4B5AA001014DE /* pcg_basic.c in Sources */ = {isa = PBXBuildFile; fileRef = 6C7739711FB4B5A3001014DE /* pcg_basic.c */; };
-		6C7739E01FB4B5AA001014DE /* laidoff.c in Sources */ = {isa = PBXBuildFile; fileRef = 6C7739731FB4B5A4001014DE /* laidoff.c */; };
-		6C7739E11FB4B5AA001014DE /* lwtimepoint.c in Sources */ = {isa = PBXBuildFile; fileRef = 6C7739751FB4B5A4001014DE /* lwtimepoint.c */; };
-		6C7739E21FB4B5AA001014DE /* playersm.c in Sources */ = {isa = PBXBuildFile; fileRef = 6C7739761FB4B5A4001014DE /* playersm.c */; };
-		6C7739E31FB4B5AA001014DE /* render_admin.c in Sources */ = {isa = PBXBuildFile; fileRef = 6C7739781FB4B5A4001014DE /* render_admin.c */; };
-		6C7739E41FB4B5AA001014DE /* puckgameupdate.c in Sources */ = {isa = PBXBuildFile; fileRef = 6C77397A1FB4B5A4001014DE /* puckgameupdate.c */; };
-		6C7739E51FB4B5AA001014DE /* physics.c in Sources */ = {isa = PBXBuildFile; fileRef = 6C77397D1FB4B5A4001014DE /* physics.c */; };
-		6C7739E61FB4B5AA001014DE /* rmsg.c in Sources */ = {isa = PBXBuildFile; fileRef = 6C77397E1FB4B5A4001014DE /* rmsg.c */; };
-		6C7739E71FB4B5AA001014DE /* tex.c in Sources */ = {isa = PBXBuildFile; fileRef = 6C77397F1FB4B5A5001014DE /* tex.c */; };
-		6C7739E81FB4B5AA001014DE /* lwfieldrendercommand.c in Sources */ = {isa = PBXBuildFile; fileRef = 6C7739811FB4B5A5001014DE /* lwfieldrendercommand.c */; };
-		6C7739E91FB4B5AA001014DE /* render_ps.c in Sources */ = {isa = PBXBuildFile; fileRef = 6C7739821FB4B5A5001014DE /* render_ps.c */; };
-		6C7739EA1FB4B5AA001014DE /* lwuialign.c in Sources */ = {isa = PBXBuildFile; fileRef = 6C7739841FB4B5A5001014DE /* lwuialign.c */; };
-		6C7739EB1FB4B5AA001014DE /* ps.c in Sources */ = {isa = PBXBuildFile; fileRef = 6C7739871FB4B5A5001014DE /* ps.c */; };
-		6C7739EC1FB4B5AA001014DE /* armature.c in Sources */ = {isa = PBXBuildFile; fileRef = 6C7739891FB4B5A5001014DE /* armature.c */; };
-		6C7739ED1FB4B5AA001014DE /* lwsimpleanim.c in Sources */ = {isa = PBXBuildFile; fileRef = 6C77398E1FB4B5A6001014DE /* lwsimpleanim.c */; };
-		6C7739EE1FB4B5AA001014DE /* render_font_test.c in Sources */ = {isa = PBXBuildFile; fileRef = 6C77398F1FB4B5A6001014DE /* render_font_test.c */; };
-		6C7739EF1FB4B5AA001014DE /* lwbattlecreature.c in Sources */ = {isa = PBXBuildFile; fileRef = 6C7739931FB4B5A6001014DE /* lwbattlecreature.c */; };
-		6C7739F01FB4B5AA001014DE /* render_splash.c in Sources */ = {isa = PBXBuildFile; fileRef = 6C77399A1FB4B5A7001014DE /* render_splash.c */; };
-		6C7739F11FB4B5AA001014DE /* skill.c in Sources */ = {isa = PBXBuildFile; fileRef = 6C77399B1FB4B5A7001014DE /* skill.c */; };
-		6C7739F21FB4B5AA001014DE /* sysmsg.c in Sources */ = {isa = PBXBuildFile; fileRef = 6C77399E1FB4B5A7001014DE /* sysmsg.c */; };
-		6C7739F31FB4B5AA001014DE /* battle_result.c in Sources */ = {isa = PBXBuildFile; fileRef = 6C7739A21FB4B5A7001014DE /* battle_result.c */; };
-		6C7739F41FB4B5AA001014DE /* lwuidim.c in Sources */ = {isa = PBXBuildFile; fileRef = 6C7739A71FB4B5A8001014DE /* lwuidim.c */; };
-		6C7739F51FB4B5AA001014DE /* nav.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6C7739A81FB4B5A8001014DE /* nav.cpp */; };
-		6C7739F61FB4B5AA001014DE /* construct.c in Sources */ = {isa = PBXBuildFile; fileRef = 6C7739AD1FB4B5A8001014DE /* construct.c */; };
-		6C7739F71FB4B5AA001014DE /* lwenemy.c in Sources */ = {isa = PBXBuildFile; fileRef = 6C7739B51FB4B5A9001014DE /* lwenemy.c */; };
-		6C7739F81FB4B5AA001014DE /* ktx.c in Sources */ = {isa = PBXBuildFile; fileRef = 6C7739B71FB4B5A9001014DE /* ktx.c */; };
-		6C7739F91FB4B5AA001014DE /* splash.c in Sources */ = {isa = PBXBuildFile; fileRef = 6C7739B81FB4B5A9001014DE /* splash.c */; };
-		6C7739FA1FB4B5AA001014DE /* script.c in Sources */ = {isa = PBXBuildFile; fileRef = 6C7739BA1FB4B5A9001014DE /* script.c */; };
 		6CA16CD81EA20B5600DB7AF0 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 6CA16CD71EA20B5600DB7AF0 /* main.m */; };
 		6CA16CDB1EA20B5600DB7AF0 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 6CA16CDA1EA20B5600DB7AF0 /* AppDelegate.m */; };
 		6CA16CDD1EA20B5600DB7AF0 /* Shader.fsh in Resources */ = {isa = PBXBuildFile; fileRef = 6CA16CDC1EA20B5600DB7AF0 /* Shader.fsh */; };
@@ -449,33 +368,101 @@
 		6CA16DA11EA210BB00DB7AF0 /* lvm.c in Sources */ = {isa = PBXBuildFile; fileRef = 6CA16D7C1EA210BB00DB7AF0 /* lvm.c */; };
 		6CA16DA21EA210BB00DB7AF0 /* lzio.c in Sources */ = {isa = PBXBuildFile; fileRef = 6CA16D7E1EA210BB00DB7AF0 /* lzio.c */; };
 		6CA16DA41EA2110E00DB7AF0 /* lwios.m in Sources */ = {isa = PBXBuildFile; fileRef = 6CA16DA31EA2110E00DB7AF0 /* lwios.m */; };
+		6CC83337205D50DA0031523A /* battle_result.c in Sources */ = {isa = PBXBuildFile; fileRef = 6CC83269205D50DA0031523A /* battle_result.c */; };
+		6CC83338205D50DA0031523A /* lwparabola.c in Sources */ = {isa = PBXBuildFile; fileRef = 6CC8326A205D50DA0031523A /* lwparabola.c */; };
+		6CC83339205D50DA0031523A /* lwuialign.c in Sources */ = {isa = PBXBuildFile; fileRef = 6CC8326C205D50DA0031523A /* lwuialign.c */; };
+		6CC8333A205D50DA0031523A /* armature.c in Sources */ = {isa = PBXBuildFile; fileRef = 6CC8326D205D50DA0031523A /* armature.c */; };
+		6CC8333B205D50DA0031523A /* render_fan.c in Sources */ = {isa = PBXBuildFile; fileRef = 6CC83272205D50DA0031523A /* render_fan.c */; };
+		6CC8333C205D50DA0031523A /* lwfvbo.c in Sources */ = {isa = PBXBuildFile; fileRef = 6CC83274205D50DA0031523A /* lwfvbo.c */; };
+		6CC8333D205D50DA0031523A /* splash.c in Sources */ = {isa = PBXBuildFile; fileRef = 6CC83275205D50DA0031523A /* splash.c */; };
+		6CC8333E205D50DA0031523A /* el_luascript.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6CC83276205D50DA0031523A /* el_luascript.cpp */; };
+		6CC8333F205D50DA0031523A /* unicode.c in Sources */ = {isa = PBXBuildFile; fileRef = 6CC83277205D50DA0031523A /* unicode.c */; };
+		6CC83341205D50DA0031523A /* htmlui.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6CC8327E205D50DA0031523A /* htmlui.cpp */; };
+		6CC83342205D50DA0031523A /* lwsimpleanim.c in Sources */ = {isa = PBXBuildFile; fileRef = 6CC83281205D50DA0031523A /* lwsimpleanim.c */; };
+		6CC83343205D50DA0031523A /* lwfanim.c in Sources */ = {isa = PBXBuildFile; fileRef = 6CC83284205D50DA0031523A /* lwfanim.c */; };
+		6CC83344205D50DA0031523A /* render_text_block.c in Sources */ = {isa = PBXBuildFile; fileRef = 6CC83286205D50DA0031523A /* render_text_block.c */; };
+		6CC83345205D50DA0031523A /* render_solid.c in Sources */ = {isa = PBXBuildFile; fileRef = 6CC83289205D50DA0031523A /* render_solid.c */; };
+		6CC83346205D50DA0031523A /* puckgame.c in Sources */ = {isa = PBXBuildFile; fileRef = 6CC8328E205D50DA0031523A /* puckgame.c */; };
+		6CC83347205D50DA0031523A /* logic.c in Sources */ = {isa = PBXBuildFile; fileRef = 6CC83290205D50DA0031523A /* logic.c */; };
+		6CC83348205D50DA0031523A /* ps.c in Sources */ = {isa = PBXBuildFile; fileRef = 6CC83293205D50DA0031523A /* ps.c */; };
+		6CC83349205D50DA0031523A /* lo_wrap.inl in Resources */ = {isa = PBXBuildFile; fileRef = 6CC83295205D50DA0031523A /* lo_wrap.inl */; };
+		6CC8334A205D50DA0031523A /* lwcontext.c in Sources */ = {isa = PBXBuildFile; fileRef = 6CC83296205D50DA0031523A /* lwcontext.c */; };
+		6CC8334B205D50DA0031523A /* render_splash.c in Sources */ = {isa = PBXBuildFile; fileRef = 6CC8329A205D50DA0031523A /* render_splash.c */; };
+		6CC8334C205D50DA0031523A /* lwtimepoint.c in Sources */ = {isa = PBXBuildFile; fileRef = 6CC832A0205D50DA0031523A /* lwtimepoint.c */; };
+		6CC8334D205D50DA0031523A /* kvmsg.c in Sources */ = {isa = PBXBuildFile; fileRef = 6CC832A7205D50DA0031523A /* kvmsg.c */; };
+		6CC8334E205D50DA0031523A /* lwskill.c in Sources */ = {isa = PBXBuildFile; fileRef = 6CC832A9205D50DA0031523A /* lwskill.c */; };
+		6CC8334F205D50DA0031523A /* render_physics.c in Sources */ = {isa = PBXBuildFile; fileRef = 6CC832AA205D50DA0031523A /* render_physics.c */; };
+		6CC83350205D50DA0031523A /* text_container.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6CC832AF205D50DA0031523A /* text_container.cpp */; };
+		6CC83351205D50DA0031523A /* font.c in Sources */ = {isa = PBXBuildFile; fileRef = 6CC832B2205D50DA0031523A /* font.c */; };
+		6CC83352205D50DA0031523A /* render_battle_result.c in Sources */ = {isa = PBXBuildFile; fileRef = 6CC832B3205D50DA0031523A /* render_battle_result.c */; };
+		6CC83353205D50DA0031523A /* lwmath.c in Sources */ = {isa = PBXBuildFile; fileRef = 6CC832B5205D50DA0031523A /* lwmath.c */; };
+		6CC83354205D50DA0031523A /* render_ui.c in Sources */ = {isa = PBXBuildFile; fileRef = 6CC832B7205D50DA0031523A /* render_ui.c */; };
+		6CC83355205D50DA0031523A /* numcomp_puck_game.c in Sources */ = {isa = PBXBuildFile; fileRef = 6CC832B8205D50DA0031523A /* numcomp_puck_game.c */; };
+		6CC83356205D50DA0031523A /* lwanim.c in Sources */ = {isa = PBXBuildFile; fileRef = 6CC832BB205D50DA0031523A /* lwanim.c */; };
+		6CC83357205D50DA0031523A /* lwfragshader.c in Sources */ = {isa = PBXBuildFile; fileRef = 6CC832BE205D50DA0031523A /* lwfragshader.c */; };
+		6CC83358205D50DA0031523A /* lwdirpad.c in Sources */ = {isa = PBXBuildFile; fileRef = 6CC832C5205D50DA0031523A /* lwdirpad.c */; };
+		6CC83359205D50DA0031523A /* lwgl.c in Sources */ = {isa = PBXBuildFile; fileRef = 6CC832C6205D50DA0031523A /* lwgl.c */; };
+		6CC8335A205D50DA0031523A /* render_skin.c in Sources */ = {isa = PBXBuildFile; fileRef = 6CC832C7205D50DA0031523A /* render_skin.c */; };
+		6CC8335B205D50DA0031523A /* physics.c in Sources */ = {isa = PBXBuildFile; fileRef = 6CC832C8205D50DA0031523A /* physics.c */; };
+		6CC8335C205D50DA0031523A /* stb_vorbis.c in Sources */ = {isa = PBXBuildFile; fileRef = 6CC832C9205D50DA0031523A /* stb_vorbis.c */; };
+		6CC8335D205D50DA0031523A /* lwbutton.c in Sources */ = {isa = PBXBuildFile; fileRef = 6CC832CA205D50DA0031523A /* lwbutton.c */; };
+		6CC8335E205D50DA0031523A /* render_field.c in Sources */ = {isa = PBXBuildFile; fileRef = 6CC832CC205D50DA0031523A /* render_field.c */; };
+		6CC8335F205D50DA0031523A /* lwudp.c in Sources */ = {isa = PBXBuildFile; fileRef = 6CC832CD205D50DA0031523A /* lwudp.c */; };
+		6CC83360205D50DA0031523A /* render_leaderboard.c in Sources */ = {isa = PBXBuildFile; fileRef = 6CC832CF205D50DA0031523A /* render_leaderboard.c */; };
+		6CC83361205D50DA0031523A /* lwime.c in Sources */ = {isa = PBXBuildFile; fileRef = 6CC832D0205D50DA0031523A /* lwime.c */; };
+		6CC83362205D50DA0031523A /* construct.c in Sources */ = {isa = PBXBuildFile; fileRef = 6CC832D2205D50DA0031523A /* construct.c */; };
+		6CC83363205D50DA0031523A /* lwtcp.c in Sources */ = {isa = PBXBuildFile; fileRef = 6CC832D4205D50DA0031523A /* lwtcp.c */; };
+		6CC83364205D50DA0031523A /* lwatlassprite.c in Sources */ = {isa = PBXBuildFile; fileRef = 6CC832D5205D50DA0031523A /* lwatlassprite.c */; };
+		6CC83365205D50DA0031523A /* skill.c in Sources */ = {isa = PBXBuildFile; fileRef = 6CC832D6205D50DA0031523A /* skill.c */; };
+		6CC83366205D50DA0031523A /* render_battle.c in Sources */ = {isa = PBXBuildFile; fileRef = 6CC832D7205D50DA0031523A /* render_battle.c */; };
+		6CC83367205D50DA0031523A /* input.c in Sources */ = {isa = PBXBuildFile; fileRef = 6CC832DD205D50DA0031523A /* input.c */; };
+		6CC83368205D50DA0031523A /* lwvertexshader.c in Sources */ = {isa = PBXBuildFile; fileRef = 6CC832DE205D50DA0031523A /* lwvertexshader.c */; };
+		6CC83369205D50DA0031523A /* mq.c in Sources */ = {isa = PBXBuildFile; fileRef = 6CC832E3205D50DA0031523A /* mq.c */; };
+		6CC8336B205D50DA0031523A /* render_font_test.c in Sources */ = {isa = PBXBuildFile; fileRef = 6CC832E7205D50DA0031523A /* render_font_test.c */; };
+		6CC8336C205D50DA0031523A /* render_dialog.c in Sources */ = {isa = PBXBuildFile; fileRef = 6CC832E8205D50DA0031523A /* render_dialog.c */; };
+		6CC8336D205D50DA0031523A /* lwdeltatime.c in Sources */ = {isa = PBXBuildFile; fileRef = 6CC832E9205D50DA0031523A /* lwdeltatime.c */; };
+		6CC8336E205D50DA0031523A /* laidoff.c in Sources */ = {isa = PBXBuildFile; fileRef = 6CC832EE205D50DA0031523A /* laidoff.c */; };
+		6CC8336F205D50DA0031523A /* battle.c in Sources */ = {isa = PBXBuildFile; fileRef = 6CC832EF205D50DA0031523A /* battle.c */; };
+		6CC83370205D50DA0031523A /* puckgameupdate.c in Sources */ = {isa = PBXBuildFile; fileRef = 6CC832F1205D50DA0031523A /* puckgameupdate.c */; };
+		6CC83371205D50DA0031523A /* battlelogic.c in Sources */ = {isa = PBXBuildFile; fileRef = 6CC832F6205D50DA0031523A /* battlelogic.c */; };
+		6CC83372205D50DA0031523A /* ui.c in Sources */ = {isa = PBXBuildFile; fileRef = 6CC832F9205D50DA0031523A /* ui.c */; };
+		6CC83373205D50DA0031523A /* rmsg.c in Sources */ = {isa = PBXBuildFile; fileRef = 6CC832FA205D50DA0031523A /* rmsg.c */; };
+		6CC83374205D50DA0031523A /* lwringbuffer.c in Sources */ = {isa = PBXBuildFile; fileRef = 6CC832FC205D50DA0031523A /* lwringbuffer.c */; };
+		6CC83375205D50DA0031523A /* script.c in Sources */ = {isa = PBXBuildFile; fileRef = 6CC832FD205D50DA0031523A /* script.c */; };
+		6CC83376205D50DA0031523A /* dialog.c in Sources */ = {isa = PBXBuildFile; fileRef = 6CC832FE205D50DA0031523A /* dialog.c */; };
+		6CC83377205D50DA0031523A /* lwbattlecreature.c in Sources */ = {isa = PBXBuildFile; fileRef = 6CC832FF205D50DA0031523A /* lwbattlecreature.c */; };
+		6CC83378205D50DA0031523A /* lwatlasenum.c in Sources */ = {isa = PBXBuildFile; fileRef = 6CC83301205D50DA0031523A /* lwatlasenum.c */; };
+		6CC83379205D50DA0031523A /* lwuidim.c in Sources */ = {isa = PBXBuildFile; fileRef = 6CC83302205D50DA0031523A /* lwuidim.c */; };
+		6CC8337A205D50DA0031523A /* ktx.c in Sources */ = {isa = PBXBuildFile; fileRef = 6CC83304205D50DA0031523A /* ktx.c */; };
+		6CC8337B205D50DA0031523A /* lwdamagetext.c in Sources */ = {isa = PBXBuildFile; fileRef = 6CC83308205D50DA0031523A /* lwdamagetext.c */; };
+		6CC8337C205D50DA0031523A /* playersm.c in Sources */ = {isa = PBXBuildFile; fileRef = 6CC83309205D50DA0031523A /* playersm.c */; };
+		6CC8337D205D50DA0031523A /* render_admin.c in Sources */ = {isa = PBXBuildFile; fileRef = 6CC8330B205D50DA0031523A /* render_admin.c */; };
+		6CC8337E205D50DA0031523A /* field.c in Sources */ = {isa = PBXBuildFile; fileRef = 6CC8330C205D50DA0031523A /* field.c */; };
+		6CC8337F205D50DA0031523A /* lwvbo.c in Sources */ = {isa = PBXBuildFile; fileRef = 6CC8330E205D50DA0031523A /* lwvbo.c */; };
+		6CC83380205D50DA0031523A /* loadobj.c in Sources */ = {isa = PBXBuildFile; fileRef = 6CC83310205D50DA0031523A /* loadobj.c */; };
+		6CC83381205D50DA0031523A /* jsmn.c in Sources */ = {isa = PBXBuildFile; fileRef = 6CC83311205D50DA0031523A /* jsmn.c */; };
+		6CC83382205D50DA0031523A /* lwfieldrendercommand.c in Sources */ = {isa = PBXBuildFile; fileRef = 6CC83314205D50DA0031523A /* lwfieldrendercommand.c */; };
+		6CC83383205D50DA0031523A /* extrapolator.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6CC83315205D50DA0031523A /* extrapolator.cpp */; };
+		6CC83384205D50DA0031523A /* pcg_basic.c in Sources */ = {isa = PBXBuildFile; fileRef = 6CC83316205D50DA0031523A /* pcg_basic.c */; };
+		6CC83385205D50DA0031523A /* tex.c in Sources */ = {isa = PBXBuildFile; fileRef = 6CC83317205D50DA0031523A /* tex.c */; };
+		6CC83386205D50DA0031523A /* lwvbotype.c in Sources */ = {isa = PBXBuildFile; fileRef = 6CC83318205D50DA0031523A /* lwvbotype.c */; };
+		6CC83387205D50DA0031523A /* numcomp.c in Sources */ = {isa = PBXBuildFile; fileRef = 6CC83319205D50DA0031523A /* numcomp.c */; };
+		6CC83388205D50DA0031523A /* render_ps.c in Sources */ = {isa = PBXBuildFile; fileRef = 6CC8331C205D50DA0031523A /* render_ps.c */; };
+		6CC83389205D50DA0031523A /* sysmsg.c in Sources */ = {isa = PBXBuildFile; fileRef = 6CC8331E205D50DA0031523A /* sysmsg.c */; };
+		6CC8338A205D50DA0031523A /* filecompat.c in Sources */ = {isa = PBXBuildFile; fileRef = 6CC83322205D50DA0031523A /* filecompat.c */; };
+		6CC8338B205D50DA0031523A /* lwshader.c in Sources */ = {isa = PBXBuildFile; fileRef = 6CC8332D205D50DA0031523A /* lwshader.c */; };
+		6CC8338C205D50DA0031523A /* lwtcpclient.c in Sources */ = {isa = PBXBuildFile; fileRef = 6CC8332E205D50DA0031523A /* lwtcpclient.c */; };
+		6CC8338D205D50DA0031523A /* lwenemy.c in Sources */ = {isa = PBXBuildFile; fileRef = 6CC83333205D50DA0031523A /* lwenemy.c */; };
+		6CC8338E205D50DA0031523A /* nav.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6CC83335205D50DA0031523A /* nav.cpp */; };
 		6CDDC6A42045D12E00AE3394 /* gumboutil.c in Sources */ = {isa = PBXBuildFile; fileRef = 6CDDC6A22045D12D00AE3394 /* gumboutil.c */; };
-		6CEB73DF1FD3CF5500D92EED /* numcomp_puck_game.c in Sources */ = {isa = PBXBuildFile; fileRef = 6CEB73DE1FD3CF5500D92EED /* numcomp_puck_game.c */; };
 		6CF70E3820597A1D00F782C8 /* lz4hc.c in Sources */ = {isa = PBXBuildFile; fileRef = 6CF70E3420597A1D00F782C8 /* lz4hc.c */; };
 		6CF70E3920597A1D00F782C8 /* lz4.c in Sources */ = {isa = PBXBuildFile; fileRef = 6CF70E3520597A1D00F782C8 /* lz4.c */; };
 		6CF70E3A20597A1D00F782C8 /* lz4frame.c in Sources */ = {isa = PBXBuildFile; fileRef = 6CF70E3620597A1D00F782C8 /* lz4frame.c */; };
 		6CF70E3B20597A1D00F782C8 /* xxhash.c in Sources */ = {isa = PBXBuildFile; fileRef = 6CF70E3720597A1D00F782C8 /* xxhash.c */; };
-		6CFFC41F1FE82250005FBFDE /* lwatlasenum.c in Sources */ = {isa = PBXBuildFile; fileRef = 6CFFC41E1FE8224F005FBFDE /* lwatlasenum.c */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		260122491FDFDF03005941B7 /* lwatlassprite.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = lwatlassprite.c; sourceTree = "<group>"; };
 		2601AFFC1EE1549700989AA6 /* platform.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = platform.h; path = ../build/include/platform.h; sourceTree = "<group>"; };
-		2640E16F1FE7E22200504A37 /* lwfragshader.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = lwfragshader.c; sourceTree = "<group>"; };
-		2640E1701FE7E22200504A37 /* lwfragshader.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = lwfragshader.h; sourceTree = "<group>"; };
-		2640E1711FE7E22200504A37 /* lwgl.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = lwgl.c; sourceTree = "<group>"; };
-		2640E1721FE7E22200504A37 /* lwvertexshader.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = lwvertexshader.c; sourceTree = "<group>"; };
-		2640E1731FE7E22200504A37 /* lwvertexshader.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = lwvertexshader.h; sourceTree = "<group>"; };
-		2640E1771FE7E25800504A37 /* lwshader.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = lwshader.c; sourceTree = "<group>"; };
-		2640E17B1FE7F9A900504A37 /* lwvbo.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = lwvbo.c; sourceTree = "<group>"; };
-		2641822D1FB6FD0300BF2D42 /* lwdamagetext.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = lwdamagetext.c; sourceTree = "<group>"; };
-		2641822F1FB6FD0900BF2D42 /* lwmath.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = lwmath.c; sourceTree = "<group>"; };
-		26457DB51FBACE6600FFEE74 /* lwime.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = lwime.c; sourceTree = "<group>"; };
-		26457DB61FBACE6600FFEE74 /* lwime.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = lwime.h; sourceTree = "<group>"; };
-		26457DB81FBACEB900FFEE74 /* jsmn.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = jsmn.c; sourceTree = "<group>"; };
-		26457DB91FBACEB900FFEE74 /* jsmn.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = jsmn.h; sourceTree = "<group>"; };
-		26457DBB1FBC1C5B00FFEE74 /* lwdirpad.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = lwdirpad.c; sourceTree = "<group>"; };
-		26457DBC1FBC1C5B00FFEE74 /* lwdirpad.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = lwdirpad.h; sourceTree = "<group>"; };
 		5633AC311EADDF98003F1549 /* net.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = net.c; sourceTree = "<group>"; };
 		566372651EBA52D3001DA3F4 /* collision.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = collision.h; sourceTree = "<group>"; };
 		566372661EBA52D3001DA3F4 /* collision_space.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = collision_space.h; sourceTree = "<group>"; };
@@ -1020,17 +1007,8 @@
 		56F1897D1EC751950019312F /* ztimerset.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = ztimerset.c; sourceTree = "<group>"; };
 		56F1897E1EC751950019312F /* ztrie.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = ztrie.c; sourceTree = "<group>"; };
 		56F1897F1EC751950019312F /* zuuid.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = zuuid.c; sourceTree = "<group>"; };
-		6C0CB2441FC45AB6006BEDCD /* lwtcpclient.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = lwtcpclient.c; sourceTree = "<group>"; };
-		6C0CB2451FC45AB6006BEDCD /* lwtcpclient.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = lwtcpclient.h; sourceTree = "<group>"; };
-		6C0CB61E1FC30FC800DA4E51 /* render_leaderboard.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = render_leaderboard.h; sourceTree = "<group>"; };
-		6C0CB61F1FC30FC800DA4E51 /* render_leaderboard.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = render_leaderboard.c; sourceTree = "<group>"; };
 		6C20CE8C1FE6C2E500A85583 /* UIDeviceHardware.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = UIDeviceHardware.m; sourceTree = "<group>"; };
 		6C20CE8D1FE6C2E500A85583 /* UIDeviceHardware.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = UIDeviceHardware.h; sourceTree = "<group>"; };
-		6C2751CB1FDAC8CF00D1266A /* stb_vorbis.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = stb_vorbis.c; sourceTree = "<group>"; };
-		6C2751CD1FDAC8E100D1266A /* lwfanim.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = lwfanim.h; sourceTree = "<group>"; };
-		6C2751CE1FDAC8E100D1266A /* lwfanim.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = lwfanim.c; sourceTree = "<group>"; };
-		6C2751CF1FDAC8E100D1266A /* lwfvbo.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = lwfvbo.c; sourceTree = "<group>"; };
-		6C2751D01FDAC8E100D1266A /* lwfvbo.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = lwfvbo.h; sourceTree = "<group>"; };
 		6C295E18204310700052999C /* CMakeLists.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = CMakeLists.txt; sourceTree = "<group>"; };
 		6C295E19204310700052999C /* LICENSE */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = LICENSE; sourceTree = "<group>"; };
 		6C295E1B204310700052999C /* master.css */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.css; path = master.css; sourceTree = "<group>"; };
@@ -1149,176 +1127,7 @@
 		6C295E9C204310700052999C /* el_body.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = el_body.h; sourceTree = "<group>"; };
 		6C295E9D204310700052999C /* stylesheet.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = stylesheet.h; sourceTree = "<group>"; };
 		6C295E9E204310700052999C /* el_break.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = el_break.cpp; sourceTree = "<group>"; };
-		6C295EDC204310D60052999C /* htmlui.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = htmlui.cpp; sourceTree = "<group>"; };
-		6C295EDD204310D60052999C /* htmlui.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = htmlui.h; sourceTree = "<group>"; };
-		6C295EDF204311020052999C /* text_container.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = text_container.cpp; sourceTree = "<group>"; };
-		6C295EE0204311030052999C /* text_container.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = text_container.h; sourceTree = "<group>"; };
 		6C2A5FED1FC03260005B3DF2 /* laidoff.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = laidoff.entitlements; sourceTree = "<group>"; };
-		6C7739171FB4B59D001014DE /* battlelogic.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = battlelogic.h; sourceTree = "<group>"; };
-		6C7739181FB4B59D001014DE /* etc1.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = etc1.h; sourceTree = "<group>"; };
-		6C7739191FB4B59D001014DE /* font.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = font.c; sourceTree = "<group>"; };
-		6C77391A1FB4B59D001014DE /* tex.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = tex.h; sourceTree = "<group>"; };
-		6C77391B1FB4B59D001014DE /* lwatlassprite.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = lwatlassprite.h; sourceTree = "<group>"; };
-		6C77391C1FB4B59D001014DE /* file.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = file.h; sourceTree = "<group>"; };
-		6C77391D1FB4B59D001014DE /* unicode.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = unicode.c; sourceTree = "<group>"; };
-		6C77391E1FB4B59D001014DE /* lwcontext.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = lwcontext.c; sourceTree = "<group>"; };
-		6C77391F1FB4B59D001014DE /* lwskinmesh.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = lwskinmesh.h; sourceTree = "<group>"; };
-		6C7739201FB4B59D001014DE /* extrapolator.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = extrapolator.cpp; sourceTree = "<group>"; };
-		6C7739211FB4B59D001014DE /* ui.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = ui.c; sourceTree = "<group>"; };
-		6C7739221FB4B59D001014DE /* constants.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = constants.h; sourceTree = "<group>"; };
-		6C7739231FB4B59D001014DE /* filecompat.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = filecompat.c; sourceTree = "<group>"; };
-		6C7739241FB4B59E001014DE /* lwbattlestate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = lwbattlestate.h; sourceTree = "<group>"; };
-		6C7739251FB4B59E001014DE /* lwbutton.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = lwbutton.h; sourceTree = "<group>"; };
-		6C7739261FB4B59E001014DE /* lwmacro.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = lwmacro.h; sourceTree = "<group>"; };
-		6C7739271FB4B59E001014DE /* lwparabola.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = lwparabola.c; sourceTree = "<group>"; };
-		6C7739281FB4B59E001014DE /* lwringbuffer.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = lwringbuffer.c; sourceTree = "<group>"; };
-		6C7739291FB4B59E001014DE /* battle.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = battle.h; sourceTree = "<group>"; };
-		6C77392A1FB4B59E001014DE /* field.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = field.h; sourceTree = "<group>"; };
-		6C77392B1FB4B59E001014DE /* lwuidim.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = lwuidim.h; sourceTree = "<group>"; };
-		6C77392C1FB4B59E001014DE /* lwfieldrendercommand.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = lwfieldrendercommand.h; sourceTree = "<group>"; };
-		6C77392D1FB4B59E001014DE /* lwtcp.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = lwtcp.c; sourceTree = "<group>"; };
-		6C77392E1FB4B59E001014DE /* render_battle_result.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = render_battle_result.h; sourceTree = "<group>"; };
-		6C77392F1FB4B59E001014DE /* kvmsg.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = kvmsg.c; sourceTree = "<group>"; };
-		6C7739301FB4B59E001014DE /* lwtouchproc.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = lwtouchproc.h; sourceTree = "<group>"; };
-		6C7739311FB4B59E001014DE /* render_field.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = render_field.c; sourceTree = "<group>"; };
-		6C7739321FB4B59E001014DE /* render_physics.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = render_physics.c; sourceTree = "<group>"; };
-		6C7739331FB4B59E001014DE /* lwparabola.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = lwparabola.h; sourceTree = "<group>"; };
-		6C7739341FB4B59E001014DE /* lwlog.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = lwlog.h; sourceTree = "<group>"; };
-		6C7739351FB4B59F001014DE /* lwudp.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = lwudp.c; sourceTree = "<group>"; };
-		6C7739361FB4B59F001014DE /* render_battle_result.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = render_battle_result.c; sourceTree = "<group>"; };
-		6C7739371FB4B59F001014DE /* lwtimepoint.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = lwtimepoint.h; sourceTree = "<group>"; };
-		6C7739381FB4B59F001014DE /* lwatlasenum.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = lwatlasenum.h; sourceTree = "<group>"; };
-		6C7739391FB4B59F001014DE /* lwtextblock.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = lwtextblock.h; sourceTree = "<group>"; };
-		6C77393A1FB4B59F001014DE /* lwdeltatime.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = lwdeltatime.c; sourceTree = "<group>"; };
-		6C77393B1FB4B59F001014DE /* field.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = field.c; sourceTree = "<group>"; };
-		6C77393C1FB4B59F001014DE /* lwfbo.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = lwfbo.h; sourceTree = "<group>"; };
-		6C77393D1FB4B59F001014DE /* lwsimpleanim.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = lwsimpleanim.h; sourceTree = "<group>"; };
-		6C77393E1FB4B59F001014DE /* lwanim.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = lwanim.h; sourceTree = "<group>"; };
-		6C77393F1FB4B59F001014DE /* lwattrib.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = lwattrib.h; sourceTree = "<group>"; };
-		6C7739401FB4B59F001014DE /* render_splash.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = render_splash.h; sourceTree = "<group>"; };
-		6C7739411FB4B59F001014DE /* sprite_data.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = sprite_data.h; sourceTree = "<group>"; };
-		6C7739421FB4B5A0001014DE /* dialog.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = dialog.c; sourceTree = "<group>"; };
-		6C7739431FB4B5A0001014DE /* nav.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = nav.h; sourceTree = "<group>"; };
-		6C7739441FB4B5A0001014DE /* lwuialign.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = lwuialign.h; sourceTree = "<group>"; };
-		6C7739451FB4B5A0001014DE /* render_solid.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = render_solid.c; sourceTree = "<group>"; };
-		6C7739461FB4B5A0001014DE /* mq.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = mq.c; sourceTree = "<group>"; };
-		6C7739471FB4B5A0001014DE /* lwbattlecreature.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = lwbattlecreature.h; sourceTree = "<group>"; };
-		6C7739481FB4B5A0001014DE /* render_dialog.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = render_dialog.c; sourceTree = "<group>"; };
-		6C7739491FB4B5A0001014DE /* render_physics.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = render_physics.h; sourceTree = "<group>"; };
-		6C77394A1FB4B5A0001014DE /* render_skin.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = render_skin.c; sourceTree = "<group>"; };
-		6C77394B1FB4B5A0001014DE /* battle.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = battle.c; sourceTree = "<group>"; };
-		6C77394C1FB4B5A0001014DE /* battlelogic.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = battlelogic.c; sourceTree = "<group>"; };
-		6C77394D1FB4B5A0001014DE /* render_skin.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = render_skin.h; sourceTree = "<group>"; };
-		6C77394E1FB4B5A1001014DE /* playersm.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = playersm.h; sourceTree = "<group>"; };
-		6C77394F1FB4B5A1001014DE /* numcomp.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = numcomp.c; sourceTree = "<group>"; };
-		6C7739501FB4B5A1001014DE /* render_admin.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = render_admin.h; sourceTree = "<group>"; };
-		6C7739511FB4B5A1001014DE /* lwbutton.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = lwbutton.c; sourceTree = "<group>"; };
-		6C7739521FB4B5A1001014DE /* lwringbuffer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = lwringbuffer.h; sourceTree = "<group>"; };
-		6C7739531FB4B5A1001014DE /* mq.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = mq.h; sourceTree = "<group>"; };
-		6C7739541FB4B5A1001014DE /* dialog.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = dialog.h; sourceTree = "<group>"; };
-		6C7739551FB4B5A1001014DE /* logic.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = logic.c; sourceTree = "<group>"; };
-		6C7739561FB4B5A1001014DE /* armature.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = armature.h; sourceTree = "<group>"; };
-		6C7739571FB4B5A1001014DE /* lwanim.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = lwanim.c; sourceTree = "<group>"; };
-		6C7739581FB4B5A1001014DE /* render_field.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = render_field.h; sourceTree = "<group>"; };
-		6C7739591FB4B5A1001014DE /* laidoff.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = laidoff.h; sourceTree = "<group>"; };
-		6C77395A1FB4B5A2001014DE /* lwbuttoncommand.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = lwbuttoncommand.h; sourceTree = "<group>"; };
-		6C77395B1FB4B5A2001014DE /* numcomp.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = numcomp.h; sourceTree = "<group>"; };
-		6C77395C1FB4B5A2001014DE /* sound.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = sound.h; sourceTree = "<group>"; };
-		6C77395D1FB4B5A2001014DE /* battle_result.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = battle_result.h; sourceTree = "<group>"; };
-		6C77395E1FB4B5A2001014DE /* lwbattlecommandresult.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = lwbattlecommandresult.h; sourceTree = "<group>"; };
-		6C77395F1FB4B5A2001014DE /* render_battle.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = render_battle.c; sourceTree = "<group>"; };
-		6C7739601FB4B5A2001014DE /* zhelpers.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = zhelpers.h; sourceTree = "<group>"; };
-		6C7739611FB4B5A2001014DE /* lwshader.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = lwshader.h; sourceTree = "<group>"; };
-		6C7739621FB4B5A2001014DE /* ktx.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ktx.h; sourceTree = "<group>"; };
-		6C7739631FB4B5A2001014DE /* render_text_block.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = render_text_block.c; sourceTree = "<group>"; };
-		6C7739641FB4B5A2001014DE /* render_ui.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = render_ui.c; sourceTree = "<group>"; };
-		6C7739651FB4B5A2001014DE /* logic.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = logic.h; sourceTree = "<group>"; };
-		6C7739661FB4B5A3001014DE /* input.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = input.c; sourceTree = "<group>"; };
-		6C7739671FB4B5A3001014DE /* lwskill.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = lwskill.c; sourceTree = "<group>"; };
-		6C7739681FB4B5A3001014DE /* lwcontext.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = lwcontext.h; sourceTree = "<group>"; };
-		6C7739691FB4B5A3001014DE /* puckgame.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = puckgame.c; sourceTree = "<group>"; };
-		6C77396A1FB4B5A3001014DE /* render_fan.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = render_fan.c; sourceTree = "<group>"; };
-		6C77396B1FB4B5A3001014DE /* render_text_block.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = render_text_block.h; sourceTree = "<group>"; };
-		6C77396C1FB4B5A3001014DE /* lwskill.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = lwskill.h; sourceTree = "<group>"; };
-		6C77396D1FB4B5A3001014DE /* puckgameupdate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = puckgameupdate.h; sourceTree = "<group>"; };
-		6C77396E1FB4B5A3001014DE /* sysmsg.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = sysmsg.h; sourceTree = "<group>"; };
-		6C77396F1FB4B5A3001014DE /* loadobj.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = loadobj.c; sourceTree = "<group>"; };
-		6C7739701FB4B5A3001014DE /* sprite.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = sprite.h; sourceTree = "<group>"; };
-		6C7739711FB4B5A3001014DE /* pcg_basic.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = pcg_basic.c; sourceTree = "<group>"; };
-		6C7739721FB4B5A4001014DE /* lwuniqueid.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = lwuniqueid.h; sourceTree = "<group>"; };
-		6C7739731FB4B5A4001014DE /* laidoff.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = laidoff.c; sourceTree = "<group>"; };
-		6C7739741FB4B5A4001014DE /* lwfieldobject.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = lwfieldobject.h; sourceTree = "<group>"; };
-		6C7739751FB4B5A4001014DE /* lwtimepoint.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = lwtimepoint.c; sourceTree = "<group>"; };
-		6C7739761FB4B5A4001014DE /* playersm.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = playersm.c; sourceTree = "<group>"; };
-		6C7739771FB4B5A4001014DE /* lwbattlecommand.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = lwbattlecommand.h; sourceTree = "<group>"; };
-		6C7739781FB4B5A4001014DE /* render_admin.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = render_admin.c; sourceTree = "<group>"; };
-		6C7739791FB4B5A4001014DE /* construct.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = construct.h; sourceTree = "<group>"; };
-		6C77397A1FB4B5A4001014DE /* puckgameupdate.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = puckgameupdate.c; sourceTree = "<group>"; };
-		6C77397B1FB4B5A4001014DE /* render_fan.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = render_fan.h; sourceTree = "<group>"; };
-		6C77397C1FB4B5A4001014DE /* lwkeyframe.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = lwkeyframe.h; sourceTree = "<group>"; };
-		6C77397D1FB4B5A4001014DE /* physics.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = physics.c; sourceTree = "<group>"; };
-		6C77397E1FB4B5A4001014DE /* rmsg.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = rmsg.c; sourceTree = "<group>"; };
-		6C77397F1FB4B5A5001014DE /* tex.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = tex.c; sourceTree = "<group>"; };
-		6C7739801FB4B5A5001014DE /* lwbox2dcollider.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = lwbox2dcollider.h; sourceTree = "<group>"; };
-		6C7739811FB4B5A5001014DE /* lwfieldrendercommand.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = lwfieldrendercommand.c; sourceTree = "<group>"; };
-		6C7739821FB4B5A5001014DE /* render_ps.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = render_ps.c; sourceTree = "<group>"; };
-		6C7739831FB4B5A5001014DE /* lwskilleffect.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = lwskilleffect.h; sourceTree = "<group>"; };
-		6C7739841FB4B5A5001014DE /* lwuialign.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = lwuialign.c; sourceTree = "<group>"; };
-		6C7739851FB4B5A5001014DE /* lwpkm.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = lwpkm.h; sourceTree = "<group>"; };
-		6C7739861FB4B5A5001014DE /* tinyobj_loader_c.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = tinyobj_loader_c.h; sourceTree = "<group>"; };
-		6C7739871FB4B5A5001014DE /* ps.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = ps.c; sourceTree = "<group>"; };
-		6C7739881FB4B5A5001014DE /* script.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = script.h; sourceTree = "<group>"; };
-		6C7739891FB4B5A5001014DE /* armature.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = armature.c; sourceTree = "<group>"; };
-		6C77398A1FB4B5A5001014DE /* render_ui.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = render_ui.h; sourceTree = "<group>"; };
-		6C77398B1FB4B5A6001014DE /* splash.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = splash.h; sourceTree = "<group>"; };
-		6C77398C1FB4B5A6001014DE /* vertices.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = vertices.h; sourceTree = "<group>"; };
-		6C77398D1FB4B5A6001014DE /* lwtcp.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = lwtcp.h; sourceTree = "<group>"; };
-		6C77398E1FB4B5A6001014DE /* lwsimpleanim.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = lwsimpleanim.c; sourceTree = "<group>"; };
-		6C77398F1FB4B5A6001014DE /* render_font_test.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = render_font_test.c; sourceTree = "<group>"; };
-		6C7739901FB4B5A6001014DE /* font.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = font.h; sourceTree = "<group>"; };
-		6C7739911FB4B5A6001014DE /* image.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = image.h; sourceTree = "<group>"; };
-		6C7739921FB4B5A6001014DE /* lwgl.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = lwgl.h; sourceTree = "<group>"; };
-		6C7739931FB4B5A6001014DE /* lwbattlecreature.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = lwbattlecreature.c; sourceTree = "<group>"; };
-		6C7739941FB4B5A6001014DE /* puckgame.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = puckgame.h; sourceTree = "<group>"; };
-		6C7739951FB4B5A6001014DE /* render_battle.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = render_battle.h; sourceTree = "<group>"; };
-		6C7739961FB4B5A6001014DE /* render_solid.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = render_solid.h; sourceTree = "<group>"; };
-		6C7739971FB4B5A7001014DE /* platform_detection.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = platform_detection.h; sourceTree = "<group>"; };
-		6C7739981FB4B5A7001014DE /* lwudp.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = lwudp.h; sourceTree = "<group>"; };
-		6C7739991FB4B5A7001014DE /* net.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = net.h; sourceTree = "<group>"; };
-		6C77399A1FB4B5A7001014DE /* render_splash.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = render_splash.c; sourceTree = "<group>"; };
-		6C77399B1FB4B5A7001014DE /* skill.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = skill.c; sourceTree = "<group>"; };
-		6C77399C1FB4B5A7001014DE /* lwvbo.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = lwvbo.h; sourceTree = "<group>"; };
-		6C77399D1FB4B5A7001014DE /* render_dialog.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = render_dialog.h; sourceTree = "<group>"; };
-		6C77399E1FB4B5A7001014DE /* sysmsg.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = sysmsg.c; sourceTree = "<group>"; };
-		6C77399F1FB4B5A7001014DE /* pcg_basic.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = pcg_basic.h; sourceTree = "<group>"; };
-		6C7739A01FB4B5A7001014DE /* render_font_test.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = render_font_test.h; sourceTree = "<group>"; };
-		6C7739A11FB4B5A7001014DE /* rmsg.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = rmsg.h; sourceTree = "<group>"; };
-		6C7739A21FB4B5A7001014DE /* battle_result.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = battle_result.c; sourceTree = "<group>"; };
-		6C7739A31FB4B5A8001014DE /* extrapolator.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = extrapolator.h; sourceTree = "<group>"; };
-		6C7739A41FB4B5A8001014DE /* lwtrail.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = lwtrail.h; sourceTree = "<group>"; };
-		6C7739A51FB4B5A8001014DE /* lwprogrammedtex.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = lwprogrammedtex.h; sourceTree = "<group>"; };
-		6C7739A61FB4B5A8001014DE /* lwvbotype.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = lwvbotype.h; sourceTree = "<group>"; };
-		6C7739A71FB4B5A8001014DE /* lwuidim.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = lwuidim.c; sourceTree = "<group>"; };
-		6C7739A81FB4B5A8001014DE /* nav.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = nav.cpp; sourceTree = "<group>"; };
-		6C7739A91FB4B5A8001014DE /* key.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = key.h; sourceTree = "<group>"; };
-		6C7739AA1FB4B5A8001014DE /* unicode.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = unicode.h; sourceTree = "<group>"; };
-		6C7739AB1FB4B5A8001014DE /* ps.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ps.h; sourceTree = "<group>"; };
-		6C7739AC1FB4B5A8001014DE /* render_ps.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = render_ps.h; sourceTree = "<group>"; };
-		6C7739AD1FB4B5A8001014DE /* construct.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = construct.c; sourceTree = "<group>"; };
-		6C7739AE1FB4B5A8001014DE /* physics.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = physics.h; sourceTree = "<group>"; };
-		6C7739AF1FB4B5A9001014DE /* lwenemy.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = lwenemy.h; sourceTree = "<group>"; };
-		6C7739B01FB4B5A9001014DE /* ui.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ui.h; sourceTree = "<group>"; };
-		6C7739B11FB4B5A9001014DE /* lwdamagetext.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = lwdamagetext.h; sourceTree = "<group>"; };
-		6C7739B21FB4B5A9001014DE /* lwdeltatime.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = lwdeltatime.h; sourceTree = "<group>"; };
-		6C7739B31FB4B5A9001014DE /* puckgamepacket.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = puckgamepacket.h; sourceTree = "<group>"; };
-		6C7739B41FB4B5A9001014DE /* lwbitmapcontext.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = lwbitmapcontext.h; sourceTree = "<group>"; };
-		6C7739B51FB4B5A9001014DE /* lwenemy.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = lwenemy.c; sourceTree = "<group>"; };
-		6C7739B61FB4B5A9001014DE /* input.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = input.h; sourceTree = "<group>"; };
-		6C7739B71FB4B5A9001014DE /* ktx.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = ktx.c; sourceTree = "<group>"; };
-		6C7739B81FB4B5A9001014DE /* splash.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = splash.c; sourceTree = "<group>"; };
-		6C7739B91FB4B5A9001014DE /* kvmsg.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = kvmsg.h; sourceTree = "<group>"; };
-		6C7739BA1FB4B5A9001014DE /* script.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = script.c; sourceTree = "<group>"; };
-		6C7739BB1FB4B5AA001014DE /* lwgamescene.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = lwgamescene.h; sourceTree = "<group>"; };
 		6CA16CD31EA20B5600DB7AF0 /* laidoff.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = laidoff.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		6CA16CD71EA20B5600DB7AF0 /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
 		6CA16CD91EA20B5600DB7AF0 /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
@@ -1393,10 +1202,213 @@
 		6CA16D7E1EA210BB00DB7AF0 /* lzio.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = lzio.c; sourceTree = "<group>"; };
 		6CA16D7F1EA210BB00DB7AF0 /* lzio.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = lzio.h; sourceTree = "<group>"; };
 		6CA16DA31EA2110E00DB7AF0 /* lwios.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = lwios.m; sourceTree = "<group>"; };
+		6CC83268205D50DA0031523A /* lwdeltatime.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = lwdeltatime.h; sourceTree = "<group>"; };
+		6CC83269205D50DA0031523A /* battle_result.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = battle_result.c; sourceTree = "<group>"; };
+		6CC8326A205D50DA0031523A /* lwparabola.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = lwparabola.c; sourceTree = "<group>"; };
+		6CC8326B205D50DA0031523A /* sound.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = sound.h; sourceTree = "<group>"; };
+		6CC8326C205D50DA0031523A /* lwuialign.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = lwuialign.c; sourceTree = "<group>"; };
+		6CC8326D205D50DA0031523A /* armature.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = armature.c; sourceTree = "<group>"; };
+		6CC8326E205D50DA0031523A /* lwtouchproc.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = lwtouchproc.h; sourceTree = "<group>"; };
+		6CC8326F205D50DA0031523A /* lwvertexshader.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = lwvertexshader.h; sourceTree = "<group>"; };
+		6CC83270205D50DA0031523A /* render_font_test.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = render_font_test.h; sourceTree = "<group>"; };
+		6CC83271205D50DA0031523A /* render_dialog.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = render_dialog.h; sourceTree = "<group>"; };
+		6CC83272205D50DA0031523A /* render_fan.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = render_fan.c; sourceTree = "<group>"; };
+		6CC83273205D50DA0031523A /* mq.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = mq.h; sourceTree = "<group>"; };
+		6CC83274205D50DA0031523A /* lwfvbo.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = lwfvbo.c; sourceTree = "<group>"; };
+		6CC83275205D50DA0031523A /* splash.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = splash.c; sourceTree = "<group>"; };
+		6CC83276205D50DA0031523A /* el_luascript.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = el_luascript.cpp; sourceTree = "<group>"; };
+		6CC83277205D50DA0031523A /* unicode.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = unicode.c; sourceTree = "<group>"; };
+		6CC83279205D50DA0031523A /* render_battle.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = render_battle.h; sourceTree = "<group>"; };
+		6CC8327A205D50DA0031523A /* input.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = input.h; sourceTree = "<group>"; };
+		6CC8327B205D50DA0031523A /* construct.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = construct.h; sourceTree = "<group>"; };
+		6CC8327C205D50DA0031523A /* lwatlassprite.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = lwatlassprite.h; sourceTree = "<group>"; };
+		6CC8327D205D50DA0031523A /* lwtcp.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = lwtcp.h; sourceTree = "<group>"; };
+		6CC8327E205D50DA0031523A /* htmlui.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = htmlui.cpp; sourceTree = "<group>"; };
+		6CC8327F205D50DA0031523A /* lwatlasenum.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = lwatlasenum.h; sourceTree = "<group>"; };
+		6CC83280205D50DA0031523A /* lwbattlecreature.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = lwbattlecreature.h; sourceTree = "<group>"; };
+		6CC83281205D50DA0031523A /* lwsimpleanim.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = lwsimpleanim.c; sourceTree = "<group>"; };
+		6CC83282205D50DA0031523A /* dialog.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = dialog.h; sourceTree = "<group>"; };
+		6CC83283205D50DA0031523A /* script.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = script.h; sourceTree = "<group>"; };
+		6CC83284205D50DA0031523A /* lwfanim.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = lwfanim.c; sourceTree = "<group>"; };
+		6CC83285205D50DA0031523A /* lwuidim.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = lwuidim.h; sourceTree = "<group>"; };
+		6CC83286205D50DA0031523A /* render_text_block.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = render_text_block.c; sourceTree = "<group>"; };
+		6CC83287205D50DA0031523A /* ktx.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ktx.h; sourceTree = "<group>"; };
+		6CC83288205D50DA0031523A /* net.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = net.h; sourceTree = "<group>"; };
+		6CC83289205D50DA0031523A /* render_solid.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = render_solid.c; sourceTree = "<group>"; };
+		6CC8328A205D50DA0031523A /* lwbitmapcontext.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = lwbitmapcontext.h; sourceTree = "<group>"; };
+		6CC8328B205D50DA0031523A /* lwringbuffer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = lwringbuffer.h; sourceTree = "<group>"; };
+		6CC8328C205D50DA0031523A /* rmsg.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = rmsg.h; sourceTree = "<group>"; };
+		6CC8328D205D50DA0031523A /* ui.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ui.h; sourceTree = "<group>"; };
+		6CC8328E205D50DA0031523A /* puckgame.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = puckgame.c; sourceTree = "<group>"; };
+		6CC8328F205D50DA0031523A /* etc1.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = etc1.h; sourceTree = "<group>"; };
+		6CC83290205D50DA0031523A /* logic.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = logic.c; sourceTree = "<group>"; };
+		6CC83291205D50DA0031523A /* puckgameupdate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = puckgameupdate.h; sourceTree = "<group>"; };
+		6CC83292205D50DA0031523A /* lwuniqueid.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = lwuniqueid.h; sourceTree = "<group>"; };
+		6CC83293205D50DA0031523A /* ps.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = ps.c; sourceTree = "<group>"; };
+		6CC83294205D50DA0031523A /* battlelogic.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = battlelogic.h; sourceTree = "<group>"; };
+		6CC83295205D50DA0031523A /* lo_wrap.inl */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = lo_wrap.inl; sourceTree = "<group>"; };
+		6CC83296205D50DA0031523A /* lwcontext.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = lwcontext.c; sourceTree = "<group>"; };
+		6CC83297205D50DA0031523A /* lwbattlestate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = lwbattlestate.h; sourceTree = "<group>"; };
+		6CC83298205D50DA0031523A /* laidoff.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = laidoff.h; sourceTree = "<group>"; };
+		6CC83299205D50DA0031523A /* battle.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = battle.h; sourceTree = "<group>"; };
+		6CC8329A205D50DA0031523A /* render_splash.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = render_splash.c; sourceTree = "<group>"; };
+		6CC8329B205D50DA0031523A /* tex.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = tex.h; sourceTree = "<group>"; };
+		6CC8329C205D50DA0031523A /* pcg_basic.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = pcg_basic.h; sourceTree = "<group>"; };
+		6CC8329D205D50DA0031523A /* lwfieldrendercommand.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = lwfieldrendercommand.h; sourceTree = "<group>"; };
+		6CC8329E205D50DA0031523A /* lwbox2dcollider.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = lwbox2dcollider.h; sourceTree = "<group>"; };
+		6CC8329F205D50DA0031523A /* lwpkm.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = lwpkm.h; sourceTree = "<group>"; };
+		6CC832A0205D50DA0031523A /* lwtimepoint.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = lwtimepoint.c; sourceTree = "<group>"; };
+		6CC832A1205D50DA0031523A /* numcomp.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = numcomp.h; sourceTree = "<group>"; };
+		6CC832A2205D50DA0031523A /* lwvbotype.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = lwvbotype.h; sourceTree = "<group>"; };
+		6CC832A3205D50DA0031523A /* key.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = key.h; sourceTree = "<group>"; };
+		6CC832A4205D50DA0031523A /* lwvbo.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = lwvbo.h; sourceTree = "<group>"; };
+		6CC832A5205D50DA0031523A /* field.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = field.h; sourceTree = "<group>"; };
+		6CC832A6205D50DA0031523A /* tinyobj_loader_c.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = tinyobj_loader_c.h; sourceTree = "<group>"; };
+		6CC832A7205D50DA0031523A /* kvmsg.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = kvmsg.c; sourceTree = "<group>"; };
+		6CC832A8205D50DA0031523A /* jsmn.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = jsmn.h; sourceTree = "<group>"; };
+		6CC832A9205D50DA0031523A /* lwskill.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = lwskill.c; sourceTree = "<group>"; };
+		6CC832AA205D50DA0031523A /* render_physics.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = render_physics.c; sourceTree = "<group>"; };
+		6CC832AB205D50DA0031523A /* file.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = file.h; sourceTree = "<group>"; };
+		6CC832AC205D50DA0031523A /* playersm.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = playersm.h; sourceTree = "<group>"; };
+		6CC832AD205D50DA0031523A /* render_admin.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = render_admin.h; sourceTree = "<group>"; };
+		6CC832AE205D50DA0031523A /* lwtrail.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = lwtrail.h; sourceTree = "<group>"; };
+		6CC832AF205D50DA0031523A /* text_container.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = text_container.cpp; sourceTree = "<group>"; };
+		6CC832B0205D50DA0031523A /* text_container.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = text_container.h; sourceTree = "<group>"; };
+		6CC832B1205D50DA0031523A /* el_luascript.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = el_luascript.h; sourceTree = "<group>"; };
+		6CC832B2205D50DA0031523A /* font.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = font.c; sourceTree = "<group>"; };
+		6CC832B3205D50DA0031523A /* render_battle_result.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = render_battle_result.c; sourceTree = "<group>"; };
+		6CC832B4205D50DA0031523A /* lwdamagetext.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = lwdamagetext.h; sourceTree = "<group>"; };
+		6CC832B5205D50DA0031523A /* lwmath.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = lwmath.c; sourceTree = "<group>"; };
+		6CC832B6205D50DA0031523A /* lwenemy.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = lwenemy.h; sourceTree = "<group>"; };
+		6CC832B7205D50DA0031523A /* render_ui.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = render_ui.c; sourceTree = "<group>"; };
+		6CC832B8205D50DA0031523A /* numcomp_puck_game.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = numcomp_puck_game.c; sourceTree = "<group>"; };
+		6CC832B9205D50DA0031523A /* lwhostaddr.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = lwhostaddr.h; sourceTree = "<group>"; };
+		6CC832BA205D50DA0031523A /* lwtcpclient.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = lwtcpclient.h; sourceTree = "<group>"; };
+		6CC832BB205D50DA0031523A /* lwanim.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = lwanim.c; sourceTree = "<group>"; };
+		6CC832BC205D50DA0031523A /* lwfbo.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = lwfbo.h; sourceTree = "<group>"; };
+		6CC832BD205D50DA0031523A /* lwkeyframe.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = lwkeyframe.h; sourceTree = "<group>"; };
+		6CC832BE205D50DA0031523A /* lwfragshader.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = lwfragshader.c; sourceTree = "<group>"; };
+		6CC832BF205D50DA0031523A /* puckgamepacket.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = puckgamepacket.h; sourceTree = "<group>"; };
+		6CC832C0205D50DA0031523A /* searoute2.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = searoute2.h; sourceTree = "<group>"; };
+		6CC832C1205D50DA0031523A /* lwshader.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = lwshader.h; sourceTree = "<group>"; };
+		6CC832C2205D50DA0031523A /* searoute.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = searoute.h; sourceTree = "<group>"; };
+		6CC832C3205D50DA0031523A /* lwbattlecommand.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = lwbattlecommand.h; sourceTree = "<group>"; };
+		6CC832C4205D50DA0031523A /* lwattrib.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = lwattrib.h; sourceTree = "<group>"; };
+		6CC832C5205D50DA0031523A /* lwdirpad.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = lwdirpad.c; sourceTree = "<group>"; };
+		6CC832C6205D50DA0031523A /* lwgl.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = lwgl.c; sourceTree = "<group>"; };
+		6CC832C7205D50DA0031523A /* render_skin.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = render_skin.c; sourceTree = "<group>"; };
+		6CC832C8205D50DA0031523A /* physics.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = physics.c; sourceTree = "<group>"; };
+		6CC832C9205D50DA0031523A /* stb_vorbis.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = stb_vorbis.c; sourceTree = "<group>"; };
+		6CC832CA205D50DA0031523A /* lwbutton.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = lwbutton.c; sourceTree = "<group>"; };
+		6CC832CB205D50DA0031523A /* sysmsg.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = sysmsg.h; sourceTree = "<group>"; };
+		6CC832CC205D50DA0031523A /* render_field.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = render_field.c; sourceTree = "<group>"; };
+		6CC832CD205D50DA0031523A /* lwudp.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = lwudp.c; sourceTree = "<group>"; };
+		6CC832CE205D50DA0031523A /* render_ps.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = render_ps.h; sourceTree = "<group>"; };
+		6CC832CF205D50DA0031523A /* render_leaderboard.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = render_leaderboard.c; sourceTree = "<group>"; };
+		6CC832D0205D50DA0031523A /* lwime.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = lwime.c; sourceTree = "<group>"; };
+		6CC832D1205D50DA0031523A /* lwfieldobject.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = lwfieldobject.h; sourceTree = "<group>"; };
+		6CC832D2205D50DA0031523A /* construct.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = construct.c; sourceTree = "<group>"; };
+		6CC832D3205D50DA0031523A /* zhelpers.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = zhelpers.h; sourceTree = "<group>"; };
+		6CC832D4205D50DA0031523A /* lwtcp.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = lwtcp.c; sourceTree = "<group>"; };
+		6CC832D5205D50DA0031523A /* lwatlassprite.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = lwatlassprite.c; sourceTree = "<group>"; };
+		6CC832D6205D50DA0031523A /* skill.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = skill.c; sourceTree = "<group>"; };
+		6CC832D7205D50DA0031523A /* render_battle.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = render_battle.c; sourceTree = "<group>"; };
+		6CC832D8205D50DA0031523A /* unicode.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = unicode.h; sourceTree = "<group>"; };
+		6CC832D9205D50DA0031523A /* lwfvbo.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = lwfvbo.h; sourceTree = "<group>"; };
+		6CC832DA205D50DA0031523A /* splash.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = splash.h; sourceTree = "<group>"; };
+		6CC832DB205D50DA0031523A /* constants.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = constants.h; sourceTree = "<group>"; };
+		6CC832DC205D50DA0031523A /* lwlog.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = lwlog.h; sourceTree = "<group>"; };
+		6CC832DD205D50DA0031523A /* input.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = input.c; sourceTree = "<group>"; };
+		6CC832DE205D50DA0031523A /* lwvertexshader.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = lwvertexshader.c; sourceTree = "<group>"; };
+		6CC832DF205D50DA0031523A /* vertices.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = vertices.h; sourceTree = "<group>"; };
+		6CC832E0205D50DA0031523A /* armature.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = armature.h; sourceTree = "<group>"; };
+		6CC832E1205D50DA0031523A /* lwuialign.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = lwuialign.h; sourceTree = "<group>"; };
+		6CC832E2205D50DA0031523A /* lwgamescene.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = lwgamescene.h; sourceTree = "<group>"; };
+		6CC832E3205D50DA0031523A /* mq.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = mq.c; sourceTree = "<group>"; };
+		6CC832E4205D50DA0031523A /* sprite.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = sprite.h; sourceTree = "<group>"; };
+		6CC832E6205D50DA0031523A /* render_fan.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = render_fan.h; sourceTree = "<group>"; };
+		6CC832E7205D50DA0031523A /* render_font_test.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = render_font_test.c; sourceTree = "<group>"; };
+		6CC832E8205D50DA0031523A /* render_dialog.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = render_dialog.c; sourceTree = "<group>"; };
+		6CC832E9205D50DA0031523A /* lwdeltatime.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = lwdeltatime.c; sourceTree = "<group>"; };
+		6CC832EA205D50DA0031523A /* battle_result.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = battle_result.h; sourceTree = "<group>"; };
+		6CC832EB205D50DA0031523A /* lwparabola.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = lwparabola.h; sourceTree = "<group>"; };
+		6CC832EC205D50DA0031523A /* lwcontext.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = lwcontext.h; sourceTree = "<group>"; };
+		6CC832ED205D50DA0031523A /* render_splash.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = render_splash.h; sourceTree = "<group>"; };
+		6CC832EE205D50DA0031523A /* laidoff.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = laidoff.c; sourceTree = "<group>"; };
+		6CC832EF205D50DA0031523A /* battle.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = battle.c; sourceTree = "<group>"; };
+		6CC832F0205D50DA0031523A /* logic.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = logic.h; sourceTree = "<group>"; };
+		6CC832F1205D50DA0031523A /* puckgameupdate.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = puckgameupdate.c; sourceTree = "<group>"; };
+		6CC832F2205D50DA0031523A /* platform_detection.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = platform_detection.h; sourceTree = "<group>"; };
+		6CC832F3205D50DA0031523A /* puckgame.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = puckgame.h; sourceTree = "<group>"; };
+		6CC832F4205D50DA0031523A /* lwskilleffect.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = lwskilleffect.h; sourceTree = "<group>"; };
+		6CC832F5205D50DA0031523A /* lwmacro.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = lwmacro.h; sourceTree = "<group>"; };
+		6CC832F6205D50DA0031523A /* battlelogic.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = battlelogic.c; sourceTree = "<group>"; };
+		6CC832F7205D50DA0031523A /* ps.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ps.h; sourceTree = "<group>"; };
+		6CC832F8205D50DA0031523A /* render_solid.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = render_solid.h; sourceTree = "<group>"; };
+		6CC832F9205D50DA0031523A /* ui.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = ui.c; sourceTree = "<group>"; };
+		6CC832FA205D50DA0031523A /* rmsg.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = rmsg.c; sourceTree = "<group>"; };
+		6CC832FB205D50DA0031523A /* nav.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = nav.h; sourceTree = "<group>"; };
+		6CC832FC205D50DA0031523A /* lwringbuffer.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = lwringbuffer.c; sourceTree = "<group>"; };
+		6CC832FD205D50DA0031523A /* script.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = script.c; sourceTree = "<group>"; };
+		6CC832FE205D50DA0031523A /* dialog.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = dialog.c; sourceTree = "<group>"; };
+		6CC832FF205D50DA0031523A /* lwbattlecreature.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = lwbattlecreature.c; sourceTree = "<group>"; };
+		6CC83300205D50DA0031523A /* lwsimpleanim.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = lwsimpleanim.h; sourceTree = "<group>"; };
+		6CC83301205D50DA0031523A /* lwatlasenum.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = lwatlasenum.c; sourceTree = "<group>"; };
+		6CC83302205D50DA0031523A /* lwuidim.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = lwuidim.c; sourceTree = "<group>"; };
+		6CC83303205D50DA0031523A /* render_text_block.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = render_text_block.h; sourceTree = "<group>"; };
+		6CC83304205D50DA0031523A /* ktx.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = ktx.c; sourceTree = "<group>"; };
+		6CC83305205D50DA0031523A /* lwfanim.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = lwfanim.h; sourceTree = "<group>"; };
+		6CC83306205D50DA0031523A /* render_battle_result.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = render_battle_result.h; sourceTree = "<group>"; };
+		6CC83307205D50DA0031523A /* font.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = font.h; sourceTree = "<group>"; };
+		6CC83308205D50DA0031523A /* lwdamagetext.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = lwdamagetext.c; sourceTree = "<group>"; };
+		6CC83309205D50DA0031523A /* playersm.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = playersm.c; sourceTree = "<group>"; };
+		6CC8330A205D50DA0031523A /* render_physics.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = render_physics.h; sourceTree = "<group>"; };
+		6CC8330B205D50DA0031523A /* render_admin.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = render_admin.c; sourceTree = "<group>"; };
+		6CC8330C205D50DA0031523A /* field.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = field.c; sourceTree = "<group>"; };
+		6CC8330D205D50DA0031523A /* sprite_data.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = sprite_data.h; sourceTree = "<group>"; };
+		6CC8330E205D50DA0031523A /* lwvbo.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = lwvbo.c; sourceTree = "<group>"; };
+		6CC8330F205D50DA0031523A /* lwskill.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = lwskill.h; sourceTree = "<group>"; };
+		6CC83310205D50DA0031523A /* loadobj.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = loadobj.c; sourceTree = "<group>"; };
+		6CC83311205D50DA0031523A /* jsmn.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = jsmn.c; sourceTree = "<group>"; };
+		6CC83312205D50DA0031523A /* htmlui.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = htmlui.h; sourceTree = "<group>"; };
+		6CC83313205D50DA0031523A /* kvmsg.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = kvmsg.h; sourceTree = "<group>"; };
+		6CC83314205D50DA0031523A /* lwfieldrendercommand.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = lwfieldrendercommand.c; sourceTree = "<group>"; };
+		6CC83315205D50DA0031523A /* extrapolator.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = extrapolator.cpp; sourceTree = "<group>"; };
+		6CC83316205D50DA0031523A /* pcg_basic.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = pcg_basic.c; sourceTree = "<group>"; };
+		6CC83317205D50DA0031523A /* tex.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = tex.c; sourceTree = "<group>"; };
+		6CC83318205D50DA0031523A /* lwvbotype.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = lwvbotype.c; sourceTree = "<group>"; };
+		6CC83319205D50DA0031523A /* numcomp.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = numcomp.c; sourceTree = "<group>"; };
+		6CC8331A205D50DA0031523A /* lwtextblock.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = lwtextblock.h; sourceTree = "<group>"; };
+		6CC8331B205D50DA0031523A /* lwtimepoint.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = lwtimepoint.h; sourceTree = "<group>"; };
+		6CC8331C205D50DA0031523A /* render_ps.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = render_ps.c; sourceTree = "<group>"; };
+		6CC8331D205D50DA0031523A /* render_field.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = render_field.h; sourceTree = "<group>"; };
+		6CC8331E205D50DA0031523A /* sysmsg.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = sysmsg.c; sourceTree = "<group>"; };
+		6CC8331F205D50DA0031523A /* lwudp.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = lwudp.h; sourceTree = "<group>"; };
+		6CC83320205D50DA0031523A /* lwbutton.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = lwbutton.h; sourceTree = "<group>"; };
+		6CC83321205D50DA0031523A /* lwime.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = lwime.h; sourceTree = "<group>"; };
+		6CC83322205D50DA0031523A /* filecompat.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = filecompat.c; sourceTree = "<group>"; };
+		6CC83323205D50DA0031523A /* lwprogrammedtex.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = lwprogrammedtex.h; sourceTree = "<group>"; };
+		6CC83324205D50DA0031523A /* render_leaderboard.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = render_leaderboard.h; sourceTree = "<group>"; };
+		6CC83325205D50DA0031523A /* lwgl.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = lwgl.h; sourceTree = "<group>"; };
+		6CC83326205D50DA0031523A /* image.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = image.h; sourceTree = "<group>"; };
+		6CC83327205D50DA0031523A /* physics.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = physics.h; sourceTree = "<group>"; };
+		6CC83328205D50DA0031523A /* render_skin.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = render_skin.h; sourceTree = "<group>"; };
+		6CC83329205D50DA0031523A /* lwfragshader.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = lwfragshader.h; sourceTree = "<group>"; };
+		6CC8332A205D50DA0031523A /* extrapolator.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = extrapolator.h; sourceTree = "<group>"; };
+		6CC8332B205D50DA0031523A /* lwbuttoncommand.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = lwbuttoncommand.h; sourceTree = "<group>"; };
+		6CC8332C205D50DA0031523A /* lwdirpad.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = lwdirpad.h; sourceTree = "<group>"; };
+		6CC8332D205D50DA0031523A /* lwshader.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = lwshader.c; sourceTree = "<group>"; };
+		6CC8332E205D50DA0031523A /* lwtcpclient.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = lwtcpclient.c; sourceTree = "<group>"; };
+		6CC8332F205D50DA0031523A /* lwskinmesh.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = lwskinmesh.h; sourceTree = "<group>"; };
+		6CC83330205D50DA0031523A /* lwbattlecommandresult.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = lwbattlecommandresult.h; sourceTree = "<group>"; };
+		6CC83331205D50DA0031523A /* render_ui.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = render_ui.h; sourceTree = "<group>"; };
+		6CC83332205D50DA0031523A /* numcomp_puck_game.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = numcomp_puck_game.h; sourceTree = "<group>"; };
+		6CC83333205D50DA0031523A /* lwenemy.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = lwenemy.c; sourceTree = "<group>"; };
+		6CC83334205D50DA0031523A /* lwmath.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = lwmath.h; sourceTree = "<group>"; };
+		6CC83335205D50DA0031523A /* nav.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = nav.cpp; sourceTree = "<group>"; };
+		6CC83336205D50DA0031523A /* lwanim.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = lwanim.h; sourceTree = "<group>"; };
 		6CDDC6A22045D12D00AE3394 /* gumboutil.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = gumboutil.c; sourceTree = "<group>"; };
 		6CDDC6A32045D12D00AE3394 /* gumboutil.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = gumboutil.h; sourceTree = "<group>"; };
-		6CEB73DD1FD3CF5500D92EED /* numcomp_puck_game.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = numcomp_puck_game.h; sourceTree = "<group>"; };
-		6CEB73DE1FD3CF5500D92EED /* numcomp_puck_game.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = numcomp_puck_game.c; sourceTree = "<group>"; };
 		6CF70E3420597A1D00F782C8 /* lz4hc.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = lz4hc.c; path = ../../../../lz4/lib/lz4hc.c; sourceTree = "<group>"; };
 		6CF70E3520597A1D00F782C8 /* lz4.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = lz4.c; path = ../../../../lz4/lib/lz4.c; sourceTree = "<group>"; };
 		6CF70E3620597A1D00F782C8 /* lz4frame.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = lz4frame.c; path = ../../../../lz4/lib/lz4frame.c; sourceTree = "<group>"; };
@@ -1406,7 +1418,6 @@
 		6CF70E3E20597A2B00F782C8 /* lz4.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = lz4.h; path = ../../../../lz4/lib/lz4.h; sourceTree = "<group>"; };
 		6CF70E3F20597A2B00F782C8 /* lz4frame.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = lz4frame.h; path = ../../../../lz4/lib/lz4frame.h; sourceTree = "<group>"; };
 		6CF70E4020597A2B00F782C8 /* xxhash.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = xxhash.h; path = ../../../../lz4/lib/xxhash.h; sourceTree = "<group>"; };
-		6CFFC41E1FE8224F005FBFDE /* lwatlasenum.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = lwatlasenum.c; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -2346,6 +2357,7 @@
 		6CA16CD51EA20B5600DB7AF0 /* laidoff */ = {
 			isa = PBXGroup;
 			children = (
+				6CC83267205D50DA0031523A /* src */,
 				6CF70E31205979E200F782C8 /* lz4 */,
 				6CA16CD91EA20B5600DB7AF0 /* AppDelegate.h */,
 				6CA16CDA1EA20B5600DB7AF0 /* AppDelegate.m */,
@@ -2368,7 +2380,6 @@
 				56ED77A21EBB9C1C00FABA64 /* recastnavigation */,
 				6CA16CDC1EA20B5600DB7AF0 /* Shader.fsh */,
 				6CA16CDE1EA20B5600DB7AF0 /* Shader.vsh */,
-				6CA16CF41EA20CA700DB7AF0 /* src */,
 				6CA16CD61EA20B5600DB7AF0 /* Supporting Files */,
 				6C20CE8D1FE6C2E500A85583 /* UIDeviceHardware.h */,
 				6C20CE8C1FE6C2E500A85583 /* UIDeviceHardware.m */,
@@ -2382,211 +2393,6 @@
 				6CA16CD71EA20B5600DB7AF0 /* main.m */,
 			);
 			name = "Supporting Files";
-			sourceTree = "<group>";
-		};
-		6CA16CF41EA20CA700DB7AF0 /* src */ = {
-			isa = PBXGroup;
-			children = (
-				6C295EDF204311020052999C /* text_container.cpp */,
-				6C295EE0204311030052999C /* text_container.h */,
-				6C295EDC204310D60052999C /* htmlui.cpp */,
-				6C295EDD204310D60052999C /* htmlui.h */,
-				6C7739891FB4B5A5001014DE /* armature.c */,
-				6C7739561FB4B5A1001014DE /* armature.h */,
-				6C7739A21FB4B5A7001014DE /* battle_result.c */,
-				6C77395D1FB4B5A2001014DE /* battle_result.h */,
-				6C77394B1FB4B5A0001014DE /* battle.c */,
-				6C7739291FB4B59E001014DE /* battle.h */,
-				6C77394C1FB4B5A0001014DE /* battlelogic.c */,
-				6C7739171FB4B59D001014DE /* battlelogic.h */,
-				6C7739221FB4B59D001014DE /* constants.h */,
-				6C7739AD1FB4B5A8001014DE /* construct.c */,
-				6C7739791FB4B5A4001014DE /* construct.h */,
-				6C7739421FB4B5A0001014DE /* dialog.c */,
-				6C7739541FB4B5A1001014DE /* dialog.h */,
-				6C7739181FB4B59D001014DE /* etc1.h */,
-				6C7739201FB4B59D001014DE /* extrapolator.cpp */,
-				6C7739A31FB4B5A8001014DE /* extrapolator.h */,
-				6C77393B1FB4B59F001014DE /* field.c */,
-				6C77392A1FB4B59E001014DE /* field.h */,
-				6C77391C1FB4B59D001014DE /* file.h */,
-				6C7739231FB4B59D001014DE /* filecompat.c */,
-				6C7739191FB4B59D001014DE /* font.c */,
-				6C7739901FB4B5A6001014DE /* font.h */,
-				6C7739911FB4B5A6001014DE /* image.h */,
-				6C7739661FB4B5A3001014DE /* input.c */,
-				6C7739B61FB4B5A9001014DE /* input.h */,
-				26457DB81FBACEB900FFEE74 /* jsmn.c */,
-				26457DB91FBACEB900FFEE74 /* jsmn.h */,
-				6C7739A91FB4B5A8001014DE /* key.h */,
-				6C7739B71FB4B5A9001014DE /* ktx.c */,
-				6C7739621FB4B5A2001014DE /* ktx.h */,
-				6C77392F1FB4B59E001014DE /* kvmsg.c */,
-				6C7739B91FB4B5A9001014DE /* kvmsg.h */,
-				6C7739731FB4B5A4001014DE /* laidoff.c */,
-				6C7739591FB4B5A1001014DE /* laidoff.h */,
-				6C77396F1FB4B5A3001014DE /* loadobj.c */,
-				6C7739551FB4B5A1001014DE /* logic.c */,
-				6C7739651FB4B5A2001014DE /* logic.h */,
-				6C7739571FB4B5A1001014DE /* lwanim.c */,
-				6C77393E1FB4B59F001014DE /* lwanim.h */,
-				6CFFC41E1FE8224F005FBFDE /* lwatlasenum.c */,
-				6C7739381FB4B59F001014DE /* lwatlasenum.h */,
-				260122491FDFDF03005941B7 /* lwatlassprite.c */,
-				6C77391B1FB4B59D001014DE /* lwatlassprite.h */,
-				6C77393F1FB4B59F001014DE /* lwattrib.h */,
-				6C7739771FB4B5A4001014DE /* lwbattlecommand.h */,
-				6C77395E1FB4B5A2001014DE /* lwbattlecommandresult.h */,
-				6C7739931FB4B5A6001014DE /* lwbattlecreature.c */,
-				6C7739471FB4B5A0001014DE /* lwbattlecreature.h */,
-				6C7739241FB4B59E001014DE /* lwbattlestate.h */,
-				6C7739B41FB4B5A9001014DE /* lwbitmapcontext.h */,
-				6C7739801FB4B5A5001014DE /* lwbox2dcollider.h */,
-				6C7739511FB4B5A1001014DE /* lwbutton.c */,
-				6C7739251FB4B59E001014DE /* lwbutton.h */,
-				6C77395A1FB4B5A2001014DE /* lwbuttoncommand.h */,
-				6C77391E1FB4B59D001014DE /* lwcontext.c */,
-				6C7739681FB4B5A3001014DE /* lwcontext.h */,
-				2641822D1FB6FD0300BF2D42 /* lwdamagetext.c */,
-				6C7739B11FB4B5A9001014DE /* lwdamagetext.h */,
-				6C77393A1FB4B59F001014DE /* lwdeltatime.c */,
-				6C7739B21FB4B5A9001014DE /* lwdeltatime.h */,
-				26457DBB1FBC1C5B00FFEE74 /* lwdirpad.c */,
-				26457DBC1FBC1C5B00FFEE74 /* lwdirpad.h */,
-				6C7739B51FB4B5A9001014DE /* lwenemy.c */,
-				6C7739AF1FB4B5A9001014DE /* lwenemy.h */,
-				6C2751CE1FDAC8E100D1266A /* lwfanim.c */,
-				6C2751CD1FDAC8E100D1266A /* lwfanim.h */,
-				6C77393C1FB4B59F001014DE /* lwfbo.h */,
-				6C7739741FB4B5A4001014DE /* lwfieldobject.h */,
-				6C7739811FB4B5A5001014DE /* lwfieldrendercommand.c */,
-				6C77392C1FB4B59E001014DE /* lwfieldrendercommand.h */,
-				2640E16F1FE7E22200504A37 /* lwfragshader.c */,
-				2640E1701FE7E22200504A37 /* lwfragshader.h */,
-				6C2751CF1FDAC8E100D1266A /* lwfvbo.c */,
-				6C2751D01FDAC8E100D1266A /* lwfvbo.h */,
-				6C7739BB1FB4B5AA001014DE /* lwgamescene.h */,
-				2640E1711FE7E22200504A37 /* lwgl.c */,
-				6C7739921FB4B5A6001014DE /* lwgl.h */,
-				26457DB51FBACE6600FFEE74 /* lwime.c */,
-				26457DB61FBACE6600FFEE74 /* lwime.h */,
-				6C77397C1FB4B5A4001014DE /* lwkeyframe.h */,
-				6C7739341FB4B59E001014DE /* lwlog.h */,
-				6C7739261FB4B59E001014DE /* lwmacro.h */,
-				2641822F1FB6FD0900BF2D42 /* lwmath.c */,
-				6C7739271FB4B59E001014DE /* lwparabola.c */,
-				6C7739331FB4B59E001014DE /* lwparabola.h */,
-				6C7739851FB4B5A5001014DE /* lwpkm.h */,
-				6C7739A51FB4B5A8001014DE /* lwprogrammedtex.h */,
-				6C7739281FB4B59E001014DE /* lwringbuffer.c */,
-				6C7739521FB4B5A1001014DE /* lwringbuffer.h */,
-				2640E1771FE7E25800504A37 /* lwshader.c */,
-				6C7739611FB4B5A2001014DE /* lwshader.h */,
-				6C77398E1FB4B5A6001014DE /* lwsimpleanim.c */,
-				6C77393D1FB4B59F001014DE /* lwsimpleanim.h */,
-				6C7739671FB4B5A3001014DE /* lwskill.c */,
-				6C77396C1FB4B5A3001014DE /* lwskill.h */,
-				6C7739831FB4B5A5001014DE /* lwskilleffect.h */,
-				6C77391F1FB4B59D001014DE /* lwskinmesh.h */,
-				6C77392D1FB4B59E001014DE /* lwtcp.c */,
-				6C77398D1FB4B5A6001014DE /* lwtcp.h */,
-				6C0CB2441FC45AB6006BEDCD /* lwtcpclient.c */,
-				6C0CB2451FC45AB6006BEDCD /* lwtcpclient.h */,
-				6C7739391FB4B59F001014DE /* lwtextblock.h */,
-				6C7739751FB4B5A4001014DE /* lwtimepoint.c */,
-				6C7739371FB4B59F001014DE /* lwtimepoint.h */,
-				6C7739301FB4B59E001014DE /* lwtouchproc.h */,
-				6C7739A41FB4B5A8001014DE /* lwtrail.h */,
-				6C7739351FB4B59F001014DE /* lwudp.c */,
-				6C7739981FB4B5A7001014DE /* lwudp.h */,
-				6C7739841FB4B5A5001014DE /* lwuialign.c */,
-				6C7739441FB4B5A0001014DE /* lwuialign.h */,
-				6C7739A71FB4B5A8001014DE /* lwuidim.c */,
-				6C77392B1FB4B59E001014DE /* lwuidim.h */,
-				6C7739721FB4B5A4001014DE /* lwuniqueid.h */,
-				2640E17B1FE7F9A900504A37 /* lwvbo.c */,
-				6C77399C1FB4B5A7001014DE /* lwvbo.h */,
-				6C7739A61FB4B5A8001014DE /* lwvbotype.h */,
-				2640E1721FE7E22200504A37 /* lwvertexshader.c */,
-				2640E1731FE7E22200504A37 /* lwvertexshader.h */,
-				6C7739461FB4B5A0001014DE /* mq.c */,
-				6C7739531FB4B5A1001014DE /* mq.h */,
-				6C7739A81FB4B5A8001014DE /* nav.cpp */,
-				6C7739431FB4B5A0001014DE /* nav.h */,
-				6C7739991FB4B5A7001014DE /* net.h */,
-				6CEB73DE1FD3CF5500D92EED /* numcomp_puck_game.c */,
-				6CEB73DD1FD3CF5500D92EED /* numcomp_puck_game.h */,
-				6C77394F1FB4B5A1001014DE /* numcomp.c */,
-				6C77395B1FB4B5A2001014DE /* numcomp.h */,
-				6C7739711FB4B5A3001014DE /* pcg_basic.c */,
-				6C77399F1FB4B5A7001014DE /* pcg_basic.h */,
-				6C77397D1FB4B5A4001014DE /* physics.c */,
-				6C7739AE1FB4B5A8001014DE /* physics.h */,
-				6C7739971FB4B5A7001014DE /* platform_detection.h */,
-				6C7739761FB4B5A4001014DE /* playersm.c */,
-				6C77394E1FB4B5A1001014DE /* playersm.h */,
-				6C7739871FB4B5A5001014DE /* ps.c */,
-				6C7739AB1FB4B5A8001014DE /* ps.h */,
-				6C7739691FB4B5A3001014DE /* puckgame.c */,
-				6C7739941FB4B5A6001014DE /* puckgame.h */,
-				6C7739B31FB4B5A9001014DE /* puckgamepacket.h */,
-				6C77397A1FB4B5A4001014DE /* puckgameupdate.c */,
-				6C77396D1FB4B5A3001014DE /* puckgameupdate.h */,
-				6C7739781FB4B5A4001014DE /* render_admin.c */,
-				6C7739501FB4B5A1001014DE /* render_admin.h */,
-				6C7739361FB4B59F001014DE /* render_battle_result.c */,
-				6C77392E1FB4B59E001014DE /* render_battle_result.h */,
-				6C77395F1FB4B5A2001014DE /* render_battle.c */,
-				6C7739951FB4B5A6001014DE /* render_battle.h */,
-				6C7739481FB4B5A0001014DE /* render_dialog.c */,
-				6C77399D1FB4B5A7001014DE /* render_dialog.h */,
-				6C77396A1FB4B5A3001014DE /* render_fan.c */,
-				6C77397B1FB4B5A4001014DE /* render_fan.h */,
-				6C7739311FB4B59E001014DE /* render_field.c */,
-				6C7739581FB4B5A1001014DE /* render_field.h */,
-				6C77398F1FB4B5A6001014DE /* render_font_test.c */,
-				6C7739A01FB4B5A7001014DE /* render_font_test.h */,
-				6C0CB61F1FC30FC800DA4E51 /* render_leaderboard.c */,
-				6C0CB61E1FC30FC800DA4E51 /* render_leaderboard.h */,
-				6C7739321FB4B59E001014DE /* render_physics.c */,
-				6C7739491FB4B5A0001014DE /* render_physics.h */,
-				6C7739821FB4B5A5001014DE /* render_ps.c */,
-				6C7739AC1FB4B5A8001014DE /* render_ps.h */,
-				6C77394A1FB4B5A0001014DE /* render_skin.c */,
-				6C77394D1FB4B5A0001014DE /* render_skin.h */,
-				6C7739451FB4B5A0001014DE /* render_solid.c */,
-				6C7739961FB4B5A6001014DE /* render_solid.h */,
-				6C77399A1FB4B5A7001014DE /* render_splash.c */,
-				6C7739401FB4B59F001014DE /* render_splash.h */,
-				6C7739631FB4B5A2001014DE /* render_text_block.c */,
-				6C77396B1FB4B5A3001014DE /* render_text_block.h */,
-				6C7739641FB4B5A2001014DE /* render_ui.c */,
-				6C77398A1FB4B5A5001014DE /* render_ui.h */,
-				6C77397E1FB4B5A4001014DE /* rmsg.c */,
-				6C7739A11FB4B5A7001014DE /* rmsg.h */,
-				6C7739BA1FB4B5A9001014DE /* script.c */,
-				6C7739881FB4B5A5001014DE /* script.h */,
-				6C77399B1FB4B5A7001014DE /* skill.c */,
-				6C77395C1FB4B5A2001014DE /* sound.h */,
-				6C7739B81FB4B5A9001014DE /* splash.c */,
-				6C77398B1FB4B5A6001014DE /* splash.h */,
-				6C7739411FB4B59F001014DE /* sprite_data.h */,
-				6C7739701FB4B5A3001014DE /* sprite.h */,
-				6C2751CB1FDAC8CF00D1266A /* stb_vorbis.c */,
-				6C77399E1FB4B5A7001014DE /* sysmsg.c */,
-				6C77396E1FB4B5A3001014DE /* sysmsg.h */,
-				6C77397F1FB4B5A5001014DE /* tex.c */,
-				6C77391A1FB4B59D001014DE /* tex.h */,
-				6C7739861FB4B5A5001014DE /* tinyobj_loader_c.h */,
-				6C7739211FB4B59D001014DE /* ui.c */,
-				6C7739B01FB4B5A9001014DE /* ui.h */,
-				6C77391D1FB4B59D001014DE /* unicode.c */,
-				6C7739AA1FB4B5A8001014DE /* unicode.h */,
-				6C77398C1FB4B5A6001014DE /* vertices.h */,
-				6C7739601FB4B5A2001014DE /* zhelpers.h */,
-			);
-			name = src;
-			path = ../../src;
 			sourceTree = "<group>";
 		};
 		6CA16D421EA210BB00DB7AF0 /* lua-5.3.4 */ = {
@@ -2656,6 +2462,219 @@
 			);
 			name = "lua-5.3.4";
 			path = "../../lua-5.3.4";
+			sourceTree = "<group>";
+		};
+		6CC83267205D50DA0031523A /* src */ = {
+			isa = PBXGroup;
+			children = (
+				6CC83268205D50DA0031523A /* lwdeltatime.h */,
+				6CC83269205D50DA0031523A /* battle_result.c */,
+				6CC8326A205D50DA0031523A /* lwparabola.c */,
+				6CC8326B205D50DA0031523A /* sound.h */,
+				6CC8326C205D50DA0031523A /* lwuialign.c */,
+				6CC8326D205D50DA0031523A /* armature.c */,
+				6CC8326E205D50DA0031523A /* lwtouchproc.h */,
+				6CC8326F205D50DA0031523A /* lwvertexshader.h */,
+				6CC83270205D50DA0031523A /* render_font_test.h */,
+				6CC83271205D50DA0031523A /* render_dialog.h */,
+				6CC83272205D50DA0031523A /* render_fan.c */,
+				6CC83273205D50DA0031523A /* mq.h */,
+				6CC83274205D50DA0031523A /* lwfvbo.c */,
+				6CC83275205D50DA0031523A /* splash.c */,
+				6CC83276205D50DA0031523A /* el_luascript.cpp */,
+				6CC83277205D50DA0031523A /* unicode.c */,
+				6CC83279205D50DA0031523A /* render_battle.h */,
+				6CC8327A205D50DA0031523A /* input.h */,
+				6CC8327B205D50DA0031523A /* construct.h */,
+				6CC8327C205D50DA0031523A /* lwatlassprite.h */,
+				6CC8327D205D50DA0031523A /* lwtcp.h */,
+				6CC8327E205D50DA0031523A /* htmlui.cpp */,
+				6CC8327F205D50DA0031523A /* lwatlasenum.h */,
+				6CC83280205D50DA0031523A /* lwbattlecreature.h */,
+				6CC83281205D50DA0031523A /* lwsimpleanim.c */,
+				6CC83282205D50DA0031523A /* dialog.h */,
+				6CC83283205D50DA0031523A /* script.h */,
+				6CC83284205D50DA0031523A /* lwfanim.c */,
+				6CC83285205D50DA0031523A /* lwuidim.h */,
+				6CC83286205D50DA0031523A /* render_text_block.c */,
+				6CC83287205D50DA0031523A /* ktx.h */,
+				6CC83288205D50DA0031523A /* net.h */,
+				6CC83289205D50DA0031523A /* render_solid.c */,
+				6CC8328A205D50DA0031523A /* lwbitmapcontext.h */,
+				6CC8328B205D50DA0031523A /* lwringbuffer.h */,
+				6CC8328C205D50DA0031523A /* rmsg.h */,
+				6CC8328D205D50DA0031523A /* ui.h */,
+				6CC8328E205D50DA0031523A /* puckgame.c */,
+				6CC8328F205D50DA0031523A /* etc1.h */,
+				6CC83290205D50DA0031523A /* logic.c */,
+				6CC83291205D50DA0031523A /* puckgameupdate.h */,
+				6CC83292205D50DA0031523A /* lwuniqueid.h */,
+				6CC83293205D50DA0031523A /* ps.c */,
+				6CC83294205D50DA0031523A /* battlelogic.h */,
+				6CC83295205D50DA0031523A /* lo_wrap.inl */,
+				6CC83296205D50DA0031523A /* lwcontext.c */,
+				6CC83297205D50DA0031523A /* lwbattlestate.h */,
+				6CC83298205D50DA0031523A /* laidoff.h */,
+				6CC83299205D50DA0031523A /* battle.h */,
+				6CC8329A205D50DA0031523A /* render_splash.c */,
+				6CC8329B205D50DA0031523A /* tex.h */,
+				6CC8329C205D50DA0031523A /* pcg_basic.h */,
+				6CC8329D205D50DA0031523A /* lwfieldrendercommand.h */,
+				6CC8329E205D50DA0031523A /* lwbox2dcollider.h */,
+				6CC8329F205D50DA0031523A /* lwpkm.h */,
+				6CC832A0205D50DA0031523A /* lwtimepoint.c */,
+				6CC832A1205D50DA0031523A /* numcomp.h */,
+				6CC832A2205D50DA0031523A /* lwvbotype.h */,
+				6CC832A3205D50DA0031523A /* key.h */,
+				6CC832A4205D50DA0031523A /* lwvbo.h */,
+				6CC832A5205D50DA0031523A /* field.h */,
+				6CC832A6205D50DA0031523A /* tinyobj_loader_c.h */,
+				6CC832A7205D50DA0031523A /* kvmsg.c */,
+				6CC832A8205D50DA0031523A /* jsmn.h */,
+				6CC832A9205D50DA0031523A /* lwskill.c */,
+				6CC832AA205D50DA0031523A /* render_physics.c */,
+				6CC832AB205D50DA0031523A /* file.h */,
+				6CC832AC205D50DA0031523A /* playersm.h */,
+				6CC832AD205D50DA0031523A /* render_admin.h */,
+				6CC832AE205D50DA0031523A /* lwtrail.h */,
+				6CC832AF205D50DA0031523A /* text_container.cpp */,
+				6CC832B0205D50DA0031523A /* text_container.h */,
+				6CC832B1205D50DA0031523A /* el_luascript.h */,
+				6CC832B2205D50DA0031523A /* font.c */,
+				6CC832B3205D50DA0031523A /* render_battle_result.c */,
+				6CC832B4205D50DA0031523A /* lwdamagetext.h */,
+				6CC832B5205D50DA0031523A /* lwmath.c */,
+				6CC832B6205D50DA0031523A /* lwenemy.h */,
+				6CC832B7205D50DA0031523A /* render_ui.c */,
+				6CC832B8205D50DA0031523A /* numcomp_puck_game.c */,
+				6CC832B9205D50DA0031523A /* lwhostaddr.h */,
+				6CC832BA205D50DA0031523A /* lwtcpclient.h */,
+				6CC832BB205D50DA0031523A /* lwanim.c */,
+				6CC832BC205D50DA0031523A /* lwfbo.h */,
+				6CC832BD205D50DA0031523A /* lwkeyframe.h */,
+				6CC832BE205D50DA0031523A /* lwfragshader.c */,
+				6CC832BF205D50DA0031523A /* puckgamepacket.h */,
+				6CC832C0205D50DA0031523A /* searoute2.h */,
+				6CC832C1205D50DA0031523A /* lwshader.h */,
+				6CC832C2205D50DA0031523A /* searoute.h */,
+				6CC832C3205D50DA0031523A /* lwbattlecommand.h */,
+				6CC832C4205D50DA0031523A /* lwattrib.h */,
+				6CC832C5205D50DA0031523A /* lwdirpad.c */,
+				6CC832C6205D50DA0031523A /* lwgl.c */,
+				6CC832C7205D50DA0031523A /* render_skin.c */,
+				6CC832C8205D50DA0031523A /* physics.c */,
+				6CC832C9205D50DA0031523A /* stb_vorbis.c */,
+				6CC832CA205D50DA0031523A /* lwbutton.c */,
+				6CC832CB205D50DA0031523A /* sysmsg.h */,
+				6CC832CC205D50DA0031523A /* render_field.c */,
+				6CC832CD205D50DA0031523A /* lwudp.c */,
+				6CC832CE205D50DA0031523A /* render_ps.h */,
+				6CC832CF205D50DA0031523A /* render_leaderboard.c */,
+				6CC832D0205D50DA0031523A /* lwime.c */,
+				6CC832D1205D50DA0031523A /* lwfieldobject.h */,
+				6CC832D2205D50DA0031523A /* construct.c */,
+				6CC832D3205D50DA0031523A /* zhelpers.h */,
+				6CC832D4205D50DA0031523A /* lwtcp.c */,
+				6CC832D5205D50DA0031523A /* lwatlassprite.c */,
+				6CC832D6205D50DA0031523A /* skill.c */,
+				6CC832D7205D50DA0031523A /* render_battle.c */,
+				6CC832D8205D50DA0031523A /* unicode.h */,
+				6CC832D9205D50DA0031523A /* lwfvbo.h */,
+				6CC832DA205D50DA0031523A /* splash.h */,
+				6CC832DB205D50DA0031523A /* constants.h */,
+				6CC832DC205D50DA0031523A /* lwlog.h */,
+				6CC832DD205D50DA0031523A /* input.c */,
+				6CC832DE205D50DA0031523A /* lwvertexshader.c */,
+				6CC832DF205D50DA0031523A /* vertices.h */,
+				6CC832E0205D50DA0031523A /* armature.h */,
+				6CC832E1205D50DA0031523A /* lwuialign.h */,
+				6CC832E2205D50DA0031523A /* lwgamescene.h */,
+				6CC832E3205D50DA0031523A /* mq.c */,
+				6CC832E4205D50DA0031523A /* sprite.h */,
+				6CC832E6205D50DA0031523A /* render_fan.h */,
+				6CC832E7205D50DA0031523A /* render_font_test.c */,
+				6CC832E8205D50DA0031523A /* render_dialog.c */,
+				6CC832E9205D50DA0031523A /* lwdeltatime.c */,
+				6CC832EA205D50DA0031523A /* battle_result.h */,
+				6CC832EB205D50DA0031523A /* lwparabola.h */,
+				6CC832EC205D50DA0031523A /* lwcontext.h */,
+				6CC832ED205D50DA0031523A /* render_splash.h */,
+				6CC832EE205D50DA0031523A /* laidoff.c */,
+				6CC832EF205D50DA0031523A /* battle.c */,
+				6CC832F0205D50DA0031523A /* logic.h */,
+				6CC832F1205D50DA0031523A /* puckgameupdate.c */,
+				6CC832F2205D50DA0031523A /* platform_detection.h */,
+				6CC832F3205D50DA0031523A /* puckgame.h */,
+				6CC832F4205D50DA0031523A /* lwskilleffect.h */,
+				6CC832F5205D50DA0031523A /* lwmacro.h */,
+				6CC832F6205D50DA0031523A /* battlelogic.c */,
+				6CC832F7205D50DA0031523A /* ps.h */,
+				6CC832F8205D50DA0031523A /* render_solid.h */,
+				6CC832F9205D50DA0031523A /* ui.c */,
+				6CC832FA205D50DA0031523A /* rmsg.c */,
+				6CC832FB205D50DA0031523A /* nav.h */,
+				6CC832FC205D50DA0031523A /* lwringbuffer.c */,
+				6CC832FD205D50DA0031523A /* script.c */,
+				6CC832FE205D50DA0031523A /* dialog.c */,
+				6CC832FF205D50DA0031523A /* lwbattlecreature.c */,
+				6CC83300205D50DA0031523A /* lwsimpleanim.h */,
+				6CC83301205D50DA0031523A /* lwatlasenum.c */,
+				6CC83302205D50DA0031523A /* lwuidim.c */,
+				6CC83303205D50DA0031523A /* render_text_block.h */,
+				6CC83304205D50DA0031523A /* ktx.c */,
+				6CC83305205D50DA0031523A /* lwfanim.h */,
+				6CC83306205D50DA0031523A /* render_battle_result.h */,
+				6CC83307205D50DA0031523A /* font.h */,
+				6CC83308205D50DA0031523A /* lwdamagetext.c */,
+				6CC83309205D50DA0031523A /* playersm.c */,
+				6CC8330A205D50DA0031523A /* render_physics.h */,
+				6CC8330B205D50DA0031523A /* render_admin.c */,
+				6CC8330C205D50DA0031523A /* field.c */,
+				6CC8330D205D50DA0031523A /* sprite_data.h */,
+				6CC8330E205D50DA0031523A /* lwvbo.c */,
+				6CC8330F205D50DA0031523A /* lwskill.h */,
+				6CC83310205D50DA0031523A /* loadobj.c */,
+				6CC83311205D50DA0031523A /* jsmn.c */,
+				6CC83312205D50DA0031523A /* htmlui.h */,
+				6CC83313205D50DA0031523A /* kvmsg.h */,
+				6CC83314205D50DA0031523A /* lwfieldrendercommand.c */,
+				6CC83315205D50DA0031523A /* extrapolator.cpp */,
+				6CC83316205D50DA0031523A /* pcg_basic.c */,
+				6CC83317205D50DA0031523A /* tex.c */,
+				6CC83318205D50DA0031523A /* lwvbotype.c */,
+				6CC83319205D50DA0031523A /* numcomp.c */,
+				6CC8331A205D50DA0031523A /* lwtextblock.h */,
+				6CC8331B205D50DA0031523A /* lwtimepoint.h */,
+				6CC8331C205D50DA0031523A /* render_ps.c */,
+				6CC8331D205D50DA0031523A /* render_field.h */,
+				6CC8331E205D50DA0031523A /* sysmsg.c */,
+				6CC8331F205D50DA0031523A /* lwudp.h */,
+				6CC83320205D50DA0031523A /* lwbutton.h */,
+				6CC83321205D50DA0031523A /* lwime.h */,
+				6CC83322205D50DA0031523A /* filecompat.c */,
+				6CC83323205D50DA0031523A /* lwprogrammedtex.h */,
+				6CC83324205D50DA0031523A /* render_leaderboard.h */,
+				6CC83325205D50DA0031523A /* lwgl.h */,
+				6CC83326205D50DA0031523A /* image.h */,
+				6CC83327205D50DA0031523A /* physics.h */,
+				6CC83328205D50DA0031523A /* render_skin.h */,
+				6CC83329205D50DA0031523A /* lwfragshader.h */,
+				6CC8332A205D50DA0031523A /* extrapolator.h */,
+				6CC8332B205D50DA0031523A /* lwbuttoncommand.h */,
+				6CC8332C205D50DA0031523A /* lwdirpad.h */,
+				6CC8332D205D50DA0031523A /* lwshader.c */,
+				6CC8332E205D50DA0031523A /* lwtcpclient.c */,
+				6CC8332F205D50DA0031523A /* lwskinmesh.h */,
+				6CC83330205D50DA0031523A /* lwbattlecommandresult.h */,
+				6CC83331205D50DA0031523A /* render_ui.h */,
+				6CC83332205D50DA0031523A /* numcomp_puck_game.h */,
+				6CC83333205D50DA0031523A /* lwenemy.c */,
+				6CC83334205D50DA0031523A /* lwmath.h */,
+				6CC83335205D50DA0031523A /* nav.cpp */,
+				6CC83336205D50DA0031523A /* lwanim.h */,
+			);
+			name = src;
+			path = ../../src;
 			sourceTree = "<group>";
 		};
 		6CF70E31205979E200F782C8 /* lz4 */ = {
@@ -2758,6 +2777,7 @@
 				56F1898A1EC751950019312F /* Makemodule.am in Resources */,
 				56F1898F1EC751950019312F /* sockopts.xml in Resources */,
 				56F1898D1EC751950019312F /* selftest.cfg in Resources */,
+				6CC83349205D50DA0031523A /* lo_wrap.inl in Resources */,
 				56F189891EC751950019312F /* Makemodule-local.am in Resources */,
 				6C295E9F204310700052999C /* CMakeLists.txt in Resources */,
 				6C295EA2204310700052999C /* README.md in Resources */,
@@ -2807,47 +2827,46 @@
 			buildActionMask = 2147483647;
 			files = (
 				6CF70E3920597A1D00F782C8 /* lz4.c in Sources */,
-				6C7739E61FB4B5AA001014DE /* rmsg.c in Sources */,
+				6CC83379205D50DA0031523A /* lwuidim.c in Sources */,
 				6C295ECF204310700052999C /* html_tag.cpp in Sources */,
+				6CC83363205D50DA0031523A /* lwtcp.c in Sources */,
+				6CC83353205D50DA0031523A /* lwmath.c in Sources */,
 				566373641EBA52D4001DA3F4 /* mat.cpp in Sources */,
-				6C7739E91FB4B5AA001014DE /* render_ps.c in Sources */,
+				6CC83350205D50DA0031523A /* text_container.cpp in Sources */,
 				56F189961EC751950019312F /* zcert.c in Sources */,
 				56F188BD1EC74DB60019312F /* ipc_connecter.cpp in Sources */,
-				6C7739F91FB4B5AA001014DE /* splash.c in Sources */,
 				566373441EBA52D4001DA3F4 /* collision_util.cpp in Sources */,
 				56F1898B1EC751950019312F /* python_cffi.inc in Sources */,
+				6CC83376205D50DA0031523A /* dialog.c in Sources */,
 				6C295EC7204310700052999C /* html.cpp in Sources */,
 				56F188A81EC74DB60019312F /* clock.cpp in Sources */,
 				5663734B1EBA52D4001DA3F4 /* fastlsolve.cpp in Sources */,
 				566373451EBA52D4001DA3F4 /* convex.cpp in Sources */,
+				6CC83380205D50DA0031523A /* loadobj.c in Sources */,
 				56F188F41EC74DB60019312F /* tcp_address.cpp in Sources */,
 				6CA16D8C1EA210BB00DB7AF0 /* lgc.c in Sources */,
-				6C7739BC1FB4B5AA001014DE /* font.c in Sources */,
+				6CC8337E205D50DA0031523A /* field.c in Sources */,
 				5663734D1EBA52D4001DA3F4 /* gimpact_contact_export_helper.cpp in Sources */,
+				6CC8338B205D50DA0031523A /* lwshader.c in Sources */,
+				6CC8336C205D50DA0031523A /* render_dialog.c in Sources */,
 				6CA16D941EA210BB00DB7AF0 /* lopcodes.c in Sources */,
 				566373781EBA52D4001DA3F4 /* threading_pool_posix.cpp in Sources */,
 				566373501EBA52D4001DA3F4 /* ball.cpp in Sources */,
 				56F188D51EC74DB60019312F /* plain_server.cpp in Sources */,
 				566373771EBA52D4001DA3F4 /* threading_impl.cpp in Sources */,
 				5663736E1EBA52D4001DA3F4 /* odeou.cpp in Sources */,
-				6C7739CA1FB4B5AA001014DE /* lwdeltatime.c in Sources */,
-				6C7739C71FB4B5AA001014DE /* render_physics.c in Sources */,
 				6C295EBD204310700052999C /* el_div.cpp in Sources */,
 				56F188F21EC74DB60019312F /* sub.cpp in Sources */,
-				6C7739CB1FB4B5AA001014DE /* field.c in Sources */,
 				6C295ED2204310700052999C /* el_image.cpp in Sources */,
-				6C7739C91FB4B5AA001014DE /* render_battle_result.c in Sources */,
 				56F189091EC74DB60019312F /* xpub.cpp in Sources */,
-				6C7739DD1FB4B5AA001014DE /* render_fan.c in Sources */,
 				6C295EB9204310700052999C /* el_space.cpp in Sources */,
 				566373751EBA52D4001DA3F4 /* step.cpp in Sources */,
-				6C7739C51FB4B5AA001014DE /* kvmsg.c in Sources */,
-				6C7739CD1FB4B5AA001014DE /* render_solid.c in Sources */,
 				6C295ECD204310700052999C /* el_comment.cpp in Sources */,
 				56F189B01EC751950019312F /* zpoller.c in Sources */,
+				6CC83355205D50DA0031523A /* numcomp_puck_game.c in Sources */,
 				56F188AE1EC74DB60019312F /* devpoll.cpp in Sources */,
+				6CC8333B205D50DA0031523A /* render_fan.c in Sources */,
 				56F188FF1EC74DB60019312F /* udp_engine.cpp in Sources */,
-				6C7739F81FB4B5AA001014DE /* ktx.c in Sources */,
 				6CF70E3A20597A1D00F782C8 /* lz4frame.c in Sources */,
 				6CA16CDB1EA20B5600DB7AF0 /* AppDelegate.m in Sources */,
 				56F188D01EC74DB60019312F /* pgm_receiver.cpp in Sources */,
@@ -2856,61 +2875,67 @@
 				5663737E1EBA52D4001DA3F4 /* customization.cpp in Sources */,
 				6C295EC5204310700052999C /* el_td.cpp in Sources */,
 				6C295EAF204310700052999C /* tokenizer.c in Sources */,
+				6CC8333F205D50DA0031523A /* unicode.c in Sources */,
 				56F188BA1EC74DB60019312F /* io_thread.cpp in Sources */,
 				6CA16D9D1EA210BB00DB7AF0 /* lua.c in Sources */,
-				6C7739C11FB4B5AA001014DE /* filecompat.c in Sources */,
 				56F188F51EC74DB60019312F /* tcp_connecter.cpp in Sources */,
 				5663736B1EBA52D4001DA3F4 /* ode.cpp in Sources */,
 				56F189A81EC751950019312F /* zhashx.c in Sources */,
-				6C295EDE204310D60052999C /* htmlui.cpp in Sources */,
-				2641822E1FB6FD0300BF2D42 /* lwdamagetext.c in Sources */,
 				56F188D71EC74DB60019312F /* poll.cpp in Sources */,
 				566373721EBA52D4001DA3F4 /* ray.cpp in Sources */,
 				56F188DF1EC74DB60019312F /* radio.cpp in Sources */,
-				6CEB73DF1FD3CF5500D92EED /* numcomp_puck_game.c in Sources */,
-				6C7739DC1FB4B5AA001014DE /* puckgame.c in Sources */,
 				5663736C1EBA52D4001DA3F4 /* odeinit.cpp in Sources */,
 				56F188CD1EC74DB60019312F /* options.cpp in Sources */,
 				6C295EC2204310700052999C /* context.cpp in Sources */,
+				6CC8337B205D50DA0031523A /* lwdamagetext.c in Sources */,
 				56F188B51EC74DB60019312F /* gather.cpp in Sources */,
 				6CA16D9B1EA210BB00DB7AF0 /* ltablib.c in Sources */,
 				6CA16DA41EA2110E00DB7AF0 /* lwios.m in Sources */,
+				6CC83358205D50DA0031523A /* lwdirpad.c in Sources */,
 				566373491EBA52D4001DA3F4 /* fastdot.cpp in Sources */,
 				56F188AF1EC74DB60019312F /* dgram.cpp in Sources */,
 				566373761EBA52D4001DA3F4 /* threading_base.cpp in Sources */,
 				6CA16D881EA210BB00DB7AF0 /* ldebug.c in Sources */,
 				56F189941EC751950019312F /* zauth.c in Sources */,
+				6CC8334F205D50DA0031523A /* render_physics.c in Sources */,
+				6CC83352205D50DA0031523A /* render_battle_result.c in Sources */,
 				56F188F61EC74DB60019312F /* tcp_listener.cpp in Sources */,
+				6CC83388205D50DA0031523A /* render_ps.c in Sources */,
 				56F188C01EC74DB60019312F /* lb.cpp in Sources */,
 				566373421EBA52D4001DA3F4 /* collision_trimesh_trimesh.cpp in Sources */,
+				6CC83375205D50DA0031523A /* script.c in Sources */,
 				56F189971EC751950019312F /* zcertstore.c in Sources */,
 				56F188BC1EC74DB60019312F /* ipc_address.cpp in Sources */,
 				56F189AF1EC751950019312F /* zmsg.c in Sources */,
-				6C7739E31FB4B5AA001014DE /* render_admin.c in Sources */,
+				6CC83385205D50DA0031523A /* tex.c in Sources */,
 				566373341EBA52D3001DA3F4 /* collision_kernel.cpp in Sources */,
+				6CC8338E205D50DA0031523A /* nav.cpp in Sources */,
 				6C295EAB204310700052999C /* error.c in Sources */,
 				6CA16D9C1EA210BB00DB7AF0 /* ltm.c in Sources */,
 				566373461EBA52D4001DA3F4 /* cylinder.cpp in Sources */,
-				6C7739E01FB4B5AA001014DE /* laidoff.c in Sources */,
 				56F188DE1EC74DB60019312F /* push.cpp in Sources */,
+				6CC83337205D50DA0031523A /* battle_result.c in Sources */,
 				56F188EA1EC74DB60019312F /* session_base.cpp in Sources */,
 				566373331EBA52D3001DA3F4 /* collision_cylinder_trimesh.cpp in Sources */,
 				566373741EBA52D4001DA3F4 /* sphere.cpp in Sources */,
-				6C0CB2461FC45AB6006BEDCD /* lwtcpclient.c in Sources */,
+				6CC83387205D50DA0031523A /* numcomp.c in Sources */,
 				5663733B1EBA52D3001DA3F4 /* collision_trimesh_disabled.cpp in Sources */,
 				6C295EB0204310700052999C /* string_piece.c in Sources */,
+				6CC83382205D50DA0031523A /* lwfieldrendercommand.c in Sources */,
 				5663734A1EBA52D4001DA3F4 /* fastldlt.cpp in Sources */,
 				566373311EBA52D3001DA3F4 /* collision_cylinder_plane.cpp in Sources */,
+				6CC83372205D50DA0031523A /* ui.c in Sources */,
+				6CC8333A205D50DA0031523A /* armature.c in Sources */,
 				6CA16D871EA210BB00DB7AF0 /* ldblib.c in Sources */,
+				6CC83378205D50DA0031523A /* lwatlasenum.c in Sources */,
 				56F189001EC74DB60019312F /* v1_decoder.cpp in Sources */,
-				6C7739DA1FB4B5AA001014DE /* input.c in Sources */,
 				566373711EBA52D4001DA3F4 /* quickstep.cpp in Sources */,
+				6CC83377205D50DA0031523A /* lwbattlecreature.c in Sources */,
 				6C295EC0204310700052999C /* table.cpp in Sources */,
-				6C7739EA1FB4B5AA001014DE /* lwuialign.c in Sources */,
 				56F1890C1EC74DB60019312F /* zmq_utils.cpp in Sources */,
+				6CC83374205D50DA0031523A /* lwringbuffer.c in Sources */,
 				56F189B31EC751950019312F /* zrex.c in Sources */,
 				56F188DB1EC74DB60019312F /* proxy.cpp in Sources */,
-				6C7739CF1FB4B5AA001014DE /* render_dialog.c in Sources */,
 				56F188E11EC74DB60019312F /* raw_decoder.cpp in Sources */,
 				56F1899E1EC751950019312F /* zfile.c in Sources */,
 				5633AC321EADDF98003F1549 /* net.c in Sources */,
@@ -2918,75 +2943,80 @@
 				56F189B41EC751950019312F /* zsock.c in Sources */,
 				6CA16D9A1EA210BB00DB7AF0 /* ltable.c in Sources */,
 				56F188C91EC74DB60019312F /* mtrie.cpp in Sources */,
+				6CC83359205D50DA0031523A /* lwgl.c in Sources */,
 				566373411EBA52D4001DA3F4 /* collision_trimesh_sphere.cpp in Sources */,
 				6CA16D8A1EA210BB00DB7AF0 /* ldump.c in Sources */,
+				6CC8333C205D50DA0031523A /* lwfvbo.c in Sources */,
 				5663734C1EBA52D4001DA3F4 /* fastltsolve.cpp in Sources */,
-				6C7739DB1FB4B5AA001014DE /* lwskill.c in Sources */,
+				6CC83361205D50DA0031523A /* lwime.c in Sources */,
 				56F1899D1EC751950019312F /* zdir_patch.c in Sources */,
 				6CA16D891EA210BB00DB7AF0 /* ldo.c in Sources */,
-				6C7739D61FB4B5AA001014DE /* lwanim.c in Sources */,
 				56F188B31EC74DB60019312F /* err.cpp in Sources */,
+				6CC8338A205D50DA0031523A /* filecompat.c in Sources */,
 				6C295EB6204310700052999C /* web_color.cpp in Sources */,
 				56F189A01EC751950019312F /* zgossip.c in Sources */,
+				6CC8334D205D50DA0031523A /* kvmsg.c in Sources */,
 				6C295ED9204310700052999C /* el_text.cpp in Sources */,
+				6CC8338C205D50DA0031523A /* lwtcpclient.c in Sources */,
 				56F188F91EC74DB60019312F /* tipc_address.cpp in Sources */,
 				56F188D11EC74DB60019312F /* pgm_sender.cpp in Sources */,
-				6C7739D81FB4B5AA001014DE /* render_text_block.c in Sources */,
-				6C7739BF1FB4B5AA001014DE /* extrapolator.cpp in Sources */,
 				6C295EA7204310700052999C /* vector.c in Sources */,
 				56F189B21EC751950019312F /* zproxy.c in Sources */,
-				6C7739DE1FB4B5AA001014DE /* loadobj.c in Sources */,
 				566373361EBA52D3001DA3F4 /* collision_sapspace.cpp in Sources */,
 				56F189951EC751950019312F /* zbeacon.c in Sources */,
 				56F189BC1EC751950019312F /* zuuid.c in Sources */,
-				26457DB71FBACE6600FFEE74 /* lwime.c in Sources */,
 				566373661EBA52D4001DA3F4 /* memory.cpp in Sources */,
 				6C295EC1204310700052999C /* el_body.cpp in Sources */,
 				56F189831EC751950019312F /* czmq_private_selftest.c in Sources */,
 				6CA16D981EA210BB00DB7AF0 /* lstring.c in Sources */,
 				56F188BE1EC74DB60019312F /* ipc_listener.cpp in Sources */,
 				566373691EBA52D4001DA3F4 /* objects.cpp in Sources */,
-				6C7739DF1FB4B5AA001014DE /* pcg_basic.c in Sources */,
 				5663735C1EBA52D4001DA3F4 /* pr.cpp in Sources */,
 				5663736D1EBA52D4001DA3F4 /* odemath.cpp in Sources */,
 				566373321EBA52D3001DA3F4 /* collision_cylinder_sphere.cpp in Sources */,
 				6CA16D8F1EA210BB00DB7AF0 /* llex.c in Sources */,
-				6C2751CC1FDAC8D000D1266A /* stb_vorbis.c in Sources */,
 				566373631EBA52D4001DA3F4 /* mass.cpp in Sources */,
 				56F189021EC74DB60019312F /* v2_decoder.cpp in Sources */,
 				56F189921EC751950019312F /* zactor.c in Sources */,
 				5663732E1EBA52D3001DA3F4 /* capsule.cpp in Sources */,
-				6C7739CC1FB4B5AA001014DE /* dialog.c in Sources */,
+				6CC8335A205D50DA0031523A /* render_skin.c in Sources */,
+				6CC83370205D50DA0031523A /* puckgameupdate.c in Sources */,
 				5663734F1EBA52D4001DA3F4 /* amotor.cpp in Sources */,
 				56F188E01EC74DB60019312F /* random.cpp in Sources */,
+				6CC8335C205D50DA0031523A /* stb_vorbis.c in Sources */,
+				6CC8337A205D50DA0031523A /* ktx.c in Sources */,
 				56F188AB1EC74DB60019312F /* curve_server.cpp in Sources */,
+				6CC8333E205D50DA0031523A /* el_luascript.cpp in Sources */,
 				5663733C1EBA52D3001DA3F4 /* collision_trimesh_gimpact.cpp in Sources */,
 				6C295EA9204310700052999C /* char_ref.c in Sources */,
 				56F188B11EC74DB60019312F /* dist.cpp in Sources */,
 				56F188B01EC74DB60019312F /* dish.cpp in Sources */,
 				6C295EDA204310700052999C /* el_para.cpp in Sources */,
-				2640E17C1FE7F9A900504A37 /* lwvbo.c in Sources */,
 				566373301EBA52D3001DA3F4 /* collision_cylinder_box.cpp in Sources */,
 				566373701EBA52D4001DA3F4 /* plane.cpp in Sources */,
-				26457DBD1FBC1C5B00FFEE74 /* lwdirpad.c in Sources */,
-				6C7739F41FB4B5AA001014DE /* lwuidim.c in Sources */,
 				56F189BB1EC751950019312F /* ztrie.c in Sources */,
 				6C295ED6204310700052999C /* el_table.cpp in Sources */,
-				6C7739D51FB4B5AA001014DE /* logic.c in Sources */,
 				6CA16D931EA210BB00DB7AF0 /* lobject.c in Sources */,
+				6CC83348205D50DA0031523A /* ps.c in Sources */,
 				56F188D91EC74DB60019312F /* pollset.cpp in Sources */,
+				6CC83343205D50DA0031523A /* lwfanim.c in Sources */,
 				56F189031EC74DB60019312F /* v2_encoder.cpp in Sources */,
 				6CA16D861EA210BB00DB7AF0 /* lctype.c in Sources */,
+				6CC8334C205D50DA0031523A /* lwtimepoint.c in Sources */,
 				566373391EBA52D3001DA3F4 /* collision_trimesh_box.cpp in Sources */,
 				6CA16D9F1EA210BB00DB7AF0 /* lundump.c in Sources */,
 				56F189AB1EC751950019312F /* zlistx.c in Sources */,
 				566373651EBA52D4001DA3F4 /* matrix.cpp in Sources */,
+				6CC83368205D50DA0031523A /* lwvertexshader.c in Sources */,
+				6CC83341205D50DA0031523A /* htmlui.cpp in Sources */,
 				566373351EBA52D3001DA3F4 /* collision_quadtreespace.cpp in Sources */,
 				56F188B21EC74DB60019312F /* epoll.cpp in Sources */,
+				6CC83345205D50DA0031523A /* render_solid.c in Sources */,
 				6C295EC9204310700052999C /* el_font.cpp in Sources */,
 				5663732C1EBA52D3001DA3F4 /* array.cpp in Sources */,
 				566373581EBA52D4001DA3F4 /* lmotor.cpp in Sources */,
 				56F188EE1EC74DB60019312F /* socks.cpp in Sources */,
+				6CC8335E205D50DA0031523A /* render_field.c in Sources */,
 				56F188A61EC74DB60019312F /* address.cpp in Sources */,
 				5663733A1EBA52D3001DA3F4 /* collision_trimesh_ccylinder.cpp in Sources */,
 				56F189061EC74DB60019312F /* vmci_address.cpp in Sources */,
@@ -2995,67 +3025,70 @@
 				5663735A1EBA52D4001DA3F4 /* piston.cpp in Sources */,
 				56F189B91EC751950019312F /* zsys.c in Sources */,
 				6C295EAD204310700052999C /* tag.c in Sources */,
+				6CC83347205D50DA0031523A /* logic.c in Sources */,
 				6C295EBB204310700052999C /* el_link.cpp in Sources */,
 				6CA16D841EA210BB00DB7AF0 /* lcode.c in Sources */,
+				6CC8337F205D50DA0031523A /* lwvbo.c in Sources */,
 				56F188FB1EC74DB60019312F /* tipc_listener.cpp in Sources */,
-				2640E1751FE7E22200504A37 /* lwgl.c in Sources */,
 				56F189B81EC751950019312F /* zstr.c in Sources */,
+				6CC83360205D50DA0031523A /* render_leaderboard.c in Sources */,
 				6CA16D911EA210BB00DB7AF0 /* lmem.c in Sources */,
 				5663735F1EBA52D4001DA3F4 /* transmission.cpp in Sources */,
 				56F188BF1EC74DB60019312F /* kqueue.cpp in Sources */,
+				6CC83356205D50DA0031523A /* lwanim.c in Sources */,
 				56F188B71EC74DB60019312F /* gssapi_mechanism_base.cpp in Sources */,
 				56F188EB1EC74DB60019312F /* signaler.cpp in Sources */,
 				56F188C71EC74DB60019312F /* metadata.cpp in Sources */,
 				5663737A1EBA52D4001DA3F4 /* timer.cpp in Sources */,
 				56F188ED1EC74DB60019312F /* socket_poller.cpp in Sources */,
-				6C7739F31FB4B5AA001014DE /* battle_result.c in Sources */,
-				6C7739FA1FB4B5AA001014DE /* script.c in Sources */,
 				56F188E61EC74DB60019312F /* router.cpp in Sources */,
 				56F188A71EC74DB60019312F /* client.cpp in Sources */,
-				6C7739EF1FB4B5AA001014DE /* lwbattlecreature.c in Sources */,
-				2640E1761FE7E22200504A37 /* lwvertexshader.c in Sources */,
 				6CA16D8B1EA210BB00DB7AF0 /* lfunc.c in Sources */,
+				6CC83389205D50DA0031523A /* sysmsg.c in Sources */,
+				6CC8338D205D50DA0031523A /* lwenemy.c in Sources */,
 				5663733D1EBA52D3001DA3F4 /* collision_trimesh_internal.cpp in Sources */,
-				6C7739D21FB4B5AA001014DE /* battlelogic.c in Sources */,
-				264182301FB6FD0900BF2D42 /* lwmath.c in Sources */,
 				5663735B1EBA52D4001DA3F4 /* plane2d.cpp in Sources */,
 				6C295ED7204310700052999C /* el_style.cpp in Sources */,
 				56F189A21EC751950019312F /* zgossip_engine.inc in Sources */,
 				56F188EC1EC74DB60019312F /* socket_base.cpp in Sources */,
+				6CC8335D205D50DA0031523A /* lwbutton.c in Sources */,
 				6CA16D9E1EA210BB00DB7AF0 /* luac.c in Sources */,
+				6CC83371205D50DA0031523A /* battlelogic.c in Sources */,
 				6C295ED1204310700052999C /* el_base.cpp in Sources */,
+				6CC83346205D50DA0031523A /* puckgame.c in Sources */,
 				56F188F31EC74DB60019312F /* tcp.cpp in Sources */,
-				6C7739C61FB4B5AA001014DE /* render_field.c in Sources */,
 				567F39C01EA2A2F70081EB67 /* image.cpp in Sources */,
 				5663735D1EBA52D4001DA3F4 /* pu.cpp in Sources */,
 				56F188DC1EC74DB60019312F /* pub.cpp in Sources */,
 				56F188CE1EC74DB60019312F /* own.cpp in Sources */,
 				56ED77B81EBB9C1C00FABA64 /* DetourCommon.cpp in Sources */,
+				6CC8334A205D50DA0031523A /* lwcontext.c in Sources */,
 				56F188CF1EC74DB60019312F /* pair.cpp in Sources */,
 				6C295EBE204310700052999C /* box.cpp in Sources */,
 				56F188B81EC74DB60019312F /* gssapi_server.cpp in Sources */,
+				6CC83366205D50DA0031523A /* render_battle.c in Sources */,
 				6CA16D8D1EA210BB00DB7AF0 /* linit.c in Sources */,
 				56ED77B71EBB9C1C00FABA64 /* DetourAssert.cpp in Sources */,
-				6C7739E41FB4B5AA001014DE /* puckgameupdate.c in Sources */,
 				567F39C21EA2A4600081EB67 /* etc1.cpp in Sources */,
+				6CC83384205D50DA0031523A /* pcg_basic.c in Sources */,
 				6CA16D991EA210BB00DB7AF0 /* lstrlib.c in Sources */,
 				56F1890A1EC74DB60019312F /* xsub.cpp in Sources */,
 				6CA16DA01EA210BB00DB7AF0 /* lutf8lib.c in Sources */,
+				6CC8336D205D50DA0031523A /* lwdeltatime.c in Sources */,
 				56F188FD1EC74DB60019312F /* tweetnacl.c in Sources */,
 				56F188E41EC74DB60019312F /* rep.cpp in Sources */,
 				6C295ED0204310700052999C /* el_anchor.cpp in Sources */,
 				56F188D21EC74DB60019312F /* pgm_socket.cpp in Sources */,
 				56F1890B1EC74DB60019312F /* zmq.cpp in Sources */,
-				6C7739F51FB4B5AA001014DE /* nav.cpp in Sources */,
 				6C295EC3204310700052999C /* el_tr.cpp in Sources */,
+				6CC83386205D50DA0031523A /* lwvbotype.c in Sources */,
 				5663734E1EBA52D4001DA3F4 /* heightfield.cpp in Sources */,
 				56F188F71EC74DB60019312F /* thread.cpp in Sources */,
 				6C295EC6204310700052999C /* css_selector.cpp in Sources */,
 				6CA16D961EA210BB00DB7AF0 /* lparser.c in Sources */,
-				6C7739D01FB4B5AA001014DE /* render_skin.c in Sources */,
 				566373801EBA52D4001DA3F4 /* threadlocalstorage.cpp in Sources */,
 				56F188E51EC74DB60019312F /* req.cpp in Sources */,
-				6C7739F71FB4B5AA001014DE /* lwenemy.c in Sources */,
+				6CC83373205D50DA0031523A /* rmsg.c in Sources */,
 				56F189B61EC751950019312F /* zsock_option.inc in Sources */,
 				56F189051EC74DB60019312F /* vmci.cpp in Sources */,
 				56ED77B91EBB9C1C00FABA64 /* DetourNavMesh.cpp in Sources */,
@@ -3063,63 +3096,55 @@
 				5663736A1EBA52D4001DA3F4 /* obstack.cpp in Sources */,
 				56F188C51EC74DB60019312F /* mailbox_safe.cpp in Sources */,
 				56F189991EC751950019312F /* zclock.c in Sources */,
-				6C7739E11FB4B5AA001014DE /* lwtimepoint.c in Sources */,
 				56F188C81EC74DB60019312F /* msg.cpp in Sources */,
+				6CC8337C205D50DA0031523A /* playersm.c in Sources */,
 				566373611EBA52D4001DA3F4 /* lcp.cpp in Sources */,
-				6C7739C01FB4B5AA001014DE /* ui.c in Sources */,
-				6C7739D11FB4B5AA001014DE /* battle.c in Sources */,
-				6C7739F11FB4B5AA001014DE /* skill.c in Sources */,
-				6C7739F21FB4B5AA001014DE /* sysmsg.c in Sources */,
 				6C295EAE204310700052999C /* parser.c in Sources */,
 				566373681EBA52D4001DA3F4 /* nextafterf.c in Sources */,
 				56F188B91EC74DB60019312F /* io_object.cpp in Sources */,
-				6C7739CE1FB4B5AA001014DE /* mq.c in Sources */,
+				6CC83364205D50DA0031523A /* lwatlassprite.c in Sources */,
 				56F188E71EC74DB60019312F /* scatter.cpp in Sources */,
-				6C7739C31FB4B5AA001014DE /* lwringbuffer.c in Sources */,
 				56F189011EC74DB60019312F /* v1_encoder.cpp in Sources */,
-				6C7739F61FB4B5AA001014DE /* construct.c in Sources */,
-				6C7739D91FB4B5AA001014DE /* render_ui.c in Sources */,
 				56ED77B61EBB9C1C00FABA64 /* DetourAlloc.cpp in Sources */,
-				2601224A1FDFDF03005941B7 /* lwatlassprite.c in Sources */,
 				56F188E31EC74DB60019312F /* reaper.cpp in Sources */,
 				56F189A91EC751950019312F /* ziflist.c in Sources */,
 				6CF70E3B20597A1D00F782C8 /* xxhash.c in Sources */,
 				56F188EF1EC74DB60019312F /* socks_connecter.cpp in Sources */,
 				56F189BA1EC751950019312F /* ztimerset.c in Sources */,
-				6C7739E51FB4B5AA001014DE /* physics.c in Sources */,
-				6C7739E21FB4B5AA001014DE /* playersm.c in Sources */,
 				6C295ECB204310700052999C /* background.cpp in Sources */,
 				6C20CE8E1FE6C2E500A85583 /* UIDeviceHardware.m in Sources */,
 				56F189AA1EC751950019312F /* zlist.c in Sources */,
 				56F189981EC751950019312F /* zchunk.c in Sources */,
 				56F188CA1EC74DB60019312F /* norm_engine.cpp in Sources */,
+				6CC8336E205D50DA0031523A /* laidoff.c in Sources */,
 				56F188CB1EC74DB60019312F /* null_mechanism.cpp in Sources */,
+				6CC83344205D50DA0031523A /* render_text_block.c in Sources */,
 				6CA16DA11EA210BB00DB7AF0 /* lvm.c in Sources */,
-				6C7739BE1FB4B5AA001014DE /* lwcontext.c in Sources */,
 				566373561EBA52D4001DA3F4 /* hinge2.cpp in Sources */,
 				6C295EB5204310700052999C /* stylesheet.cpp in Sources */,
-				6C7739EB1FB4B5AA001014DE /* ps.c in Sources */,
+				6CC83367205D50DA0031523A /* input.c in Sources */,
+				6CC83362205D50DA0031523A /* construct.c in Sources */,
 				56F188C41EC74DB60019312F /* mailbox.cpp in Sources */,
 				6CA16D8E1EA210BB00DB7AF0 /* liolib.c in Sources */,
 				56F188FE1EC74DB60019312F /* udp_address.cpp in Sources */,
 				56ED77BA1EBB9C1C00FABA64 /* DetourNavMeshBuilder.cpp in Sources */,
 				6CA16D821EA210BB00DB7AF0 /* lbaselib.c in Sources */,
 				5663737F1EBA52D4001DA3F4 /* malloc.cpp in Sources */,
-				26457DBA1FBACEB900FFEE74 /* jsmn.c in Sources */,
-				6C295EE1204311030052999C /* text_container.cpp in Sources */,
 				56F188F11EC74DB60019312F /* stream_engine.cpp in Sources */,
+				6CC83351205D50DA0031523A /* font.c in Sources */,
+				6CC83354205D50DA0031523A /* render_ui.c in Sources */,
 				6CF70E3820597A1D00F782C8 /* lz4hc.c in Sources */,
 				56F188E21EC74DB60019312F /* raw_encoder.cpp in Sources */,
 				56F189B11EC751950019312F /* zproc.c in Sources */,
 				566373571EBA52D4001DA3F4 /* joint.cpp in Sources */,
 				56F188DA1EC74DB60019312F /* precompiled.cpp in Sources */,
 				6C295EBC204310700052999C /* el_before_after.cpp in Sources */,
+				6CC8337D205D50DA0031523A /* render_admin.c in Sources */,
 				566373471EBA52D4001DA3F4 /* error.cpp in Sources */,
 				6C295ED3204310700052999C /* element.cpp in Sources */,
 				56F188FC1EC74DB60019312F /* trie.cpp in Sources */,
 				6CA16D901EA210BB00DB7AF0 /* lmathlib.c in Sources */,
 				566373381EBA52D3001DA3F4 /* collision_transform.cpp in Sources */,
-				6C7739EC1FB4B5AA001014DE /* armature.c in Sources */,
 				56F188E91EC74DB60019312F /* server.cpp in Sources */,
 				56F188B61EC74DB60019312F /* gssapi_client.cpp in Sources */,
 				56F189A41EC751950019312F /* zgossip_msg.c in Sources */,
@@ -3127,82 +3152,79 @@
 				6C295ECC204310700052999C /* iterators.cpp in Sources */,
 				566373371EBA52D3001DA3F4 /* collision_space.cpp in Sources */,
 				6CA16D801EA210BB00DB7AF0 /* lapi.c in Sources */,
-				6C7739E81FB4B5AA001014DE /* lwfieldrendercommand.c in Sources */,
+				6CC8333D205D50DA0031523A /* splash.c in Sources */,
+				6CC8336B205D50DA0031523A /* render_font_test.c in Sources */,
+				6CC83357205D50DA0031523A /* lwfragshader.c in Sources */,
 				566373601EBA52D4001DA3F4 /* universal.cpp in Sources */,
 				566373431EBA52D4001DA3F4 /* collision_trimesh_trimesh_old.cpp in Sources */,
 				5663737D1EBA52D4001DA3F4 /* atomic.cpp in Sources */,
 				6CA16D921EA210BB00DB7AF0 /* loadlib.c in Sources */,
-				6CFFC41F1FE82250005FBFDE /* lwatlasenum.c in Sources */,
 				566373481EBA52D4001DA3F4 /* export-dif.cpp in Sources */,
 				56F188BB1EC74DB60019312F /* ip.cpp in Sources */,
 				5663733F1EBA52D4001DA3F4 /* collision_trimesh_plane.cpp in Sources */,
 				5663737B1EBA52D4001DA3F4 /* util.cpp in Sources */,
+				6CC8336F205D50DA0031523A /* battle.c in Sources */,
 				6C295EB7204310700052999C /* el_title.cpp in Sources */,
 				6C295EA8204310700052999C /* attribute.c in Sources */,
 				566373541EBA52D4001DA3F4 /* fixed.cpp in Sources */,
-				6C7739ED1FB4B5AA001014DE /* lwsimpleanim.c in Sources */,
 				6CA16D811EA210BB00DB7AF0 /* lauxlib.c in Sources */,
 				566373671EBA52D4001DA3F4 /* misc.cpp in Sources */,
 				56F188D81EC74DB60019312F /* poller_base.cpp in Sources */,
+				6CC83383205D50DA0031523A /* extrapolator.cpp in Sources */,
 				6CA16CE21EA20B5600DB7AF0 /* GameViewController.m in Sources */,
+				6CC83339205D50DA0031523A /* lwuialign.c in Sources */,
+				6CC83338205D50DA0031523A /* lwparabola.c in Sources */,
+				6CC83342205D50DA0031523A /* lwsimpleanim.c in Sources */,
 				56F188B41EC74DB60019312F /* fq.cpp in Sources */,
-				2640E1781FE7E25800504A37 /* lwshader.c in Sources */,
 				56F1899C1EC751950019312F /* zdir.c in Sources */,
 				56F188AC1EC74DB60019312F /* dealer.cpp in Sources */,
 				6C295ED4204310700052999C /* document.cpp in Sources */,
 				56F189931EC751950019312F /* zarmour.c in Sources */,
 				6C295EAA204310700052999C /* utf8.c in Sources */,
 				56F189071EC74DB60019312F /* vmci_connecter.cpp in Sources */,
+				6CC8334E205D50DA0031523A /* lwskill.c in Sources */,
 				5663736F1EBA52D4001DA3F4 /* odetls.cpp in Sources */,
 				6C295ED8204310700052999C /* el_script.cpp in Sources */,
+				6CC8334B205D50DA0031523A /* render_splash.c in Sources */,
+				6CC83369205D50DA0031523A /* mq.c in Sources */,
 				56F188D41EC74DB60019312F /* plain_client.cpp in Sources */,
 				6C295EBF204310700052999C /* style.cpp in Sources */,
 				56F189081EC74DB60019312F /* vmci_listener.cpp in Sources */,
-				6C7739EE1FB4B5AA001014DE /* render_font_test.c in Sources */,
-				6C0CB6201FC30FC800DA4E51 /* render_leaderboard.c in Sources */,
 				56F188F01EC74DB60019312F /* stream.cpp in Sources */,
 				56F189A61EC751950019312F /* zhash.c in Sources */,
-				2640E1741FE7E22200504A37 /* lwfragshader.c in Sources */,
 				6CA16D831EA210BB00DB7AF0 /* lbitlib.c in Sources */,
 				56F189AC1EC751950019312F /* zloop.c in Sources */,
-				6C2751D21FDAC8E100D1266A /* lwfvbo.c in Sources */,
+				6CC8335F205D50DA0031523A /* lwudp.c in Sources */,
 				6CDDC6A42045D12E00AE3394 /* gumboutil.c in Sources */,
 				56F188AA1EC74DB60019312F /* curve_client.cpp in Sources */,
-				6C7739D41FB4B5AA001014DE /* lwbutton.c in Sources */,
-				6C7739C81FB4B5AA001014DE /* lwudp.c in Sources */,
-				6C7739D71FB4B5AA001014DE /* render_battle.c in Sources */,
 				56ED77BB1EBB9C1C00FABA64 /* DetourNavMeshQuery.cpp in Sources */,
-				6C2751D11FDAC8E100D1266A /* lwfanim.c in Sources */,
+				6CC83365205D50DA0031523A /* skill.c in Sources */,
 				5663732D1EBA52D3001DA3F4 /* box.cpp in Sources */,
 				6C295ED5204310700052999C /* media_query.cpp in Sources */,
 				6CA16DA21EA210BB00DB7AF0 /* lzio.c in Sources */,
 				56F189A71EC751950019312F /* zhash_primes.inc in Sources */,
 				6CA16CD81EA20B5600DB7AF0 /* main.m in Sources */,
 				5663732F1EBA52D3001DA3F4 /* collision_convex_trimesh.cpp in Sources */,
-				6C7739C21FB4B5AA001014DE /* lwparabola.c in Sources */,
 				6C295EDB204310700052999C /* el_break.cpp in Sources */,
-				6C7739C41FB4B5AA001014DE /* lwtcp.c in Sources */,
 				56ED77BC1EBB9C1C00FABA64 /* DetourNode.cpp in Sources */,
 				56F188CC1EC74DB60019312F /* object.cpp in Sources */,
+				6CC8335B205D50DA0031523A /* physics.c in Sources */,
 				566373521EBA52D4001DA3F4 /* dball.cpp in Sources */,
 				566373511EBA52D4001DA3F4 /* contact.cpp in Sources */,
 				56F188DD1EC74DB60019312F /* pull.cpp in Sources */,
 				56F1899A1EC751950019312F /* zconfig.c in Sources */,
 				6C295EBA204310700052999C /* css_length.cpp in Sources */,
-				6C7739F01FB4B5AA001014DE /* render_splash.c in Sources */,
 				6CA16D851EA210BB00DB7AF0 /* lcorolib.c in Sources */,
+				6CC83381205D50DA0031523A /* jsmn.c in Sources */,
 				56F188F81EC74DB60019312F /* timers.cpp in Sources */,
 				6C295EA4204310700052999C /* string_buffer.c in Sources */,
-				6C7739E71FB4B5AA001014DE /* tex.c in Sources */,
 				566373591EBA52D4001DA3F4 /* null.cpp in Sources */,
 				6C295ECA204310700052999C /* utf8_strings.cpp in Sources */,
 				566373551EBA52D4001DA3F4 /* hinge.cpp in Sources */,
 				56F188AD1EC74DB60019312F /* decoder_allocators.cpp in Sources */,
 				56F1899B1EC751950019312F /* zdigest.c in Sources */,
 				56F188C61EC74DB60019312F /* mechanism.cpp in Sources */,
-				6C7739D31FB4B5AA001014DE /* numcomp.c in Sources */,
 				56F188D31EC74DB60019312F /* pipe.cpp in Sources */,
-				6C7739BD1FB4B5AA001014DE /* unicode.c in Sources */,
 				5663733E1EBA52D4001DA3F4 /* collision_trimesh_opcode.cpp in Sources */,
 				6C295EB8204310700052999C /* el_cdata.cpp in Sources */,
 				566373731EBA52D4001DA3F4 /* rotation.cpp in Sources */,
