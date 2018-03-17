@@ -139,11 +139,12 @@ typedef enum _LW_ATLAS_ENUM {
     LAE_UI_BUTTON_ATLAS,
     LAE_FOOTBALL_GROUND,
     LAE_PLAYER_CAPSULE,
-        LAE_WAVE,
-        LAE_WAVE_ALPHA,
-        LAE_TTL_TITLE,
-        LAE_TTL_TITLE_ALPHA,
+    LAE_WAVE,
+    LAE_WAVE_ALPHA,
+    LAE_TTL_TITLE,
+    LAE_TTL_TITLE_ALPHA,
     LAE_WORLD_MAP,
+    LAE_SLICE_TEST,
     LAE_COUNT,
 
     LAE_DONTCARE,
@@ -283,18 +284,19 @@ static const char *tex_atlas_filename[] = {
     ASSETS_BASE_PATH "ktx" PATH_SEPARATOR "puck-floor-cover.ktx",
     ASSETS_BASE_PATH "ktx" PATH_SEPARATOR "tower-base-2-player.ktx",
     ASSETS_BASE_PATH "ktx" PATH_SEPARATOR "tower-base-2-target.ktx",
-        ASSETS_BASE_PATH "ktx" PATH_SEPARATOR "exclamation-mark-a.ktx",
-        ASSETS_BASE_PATH "ktx" PATH_SEPARATOR "exclamation-mark-a_alpha.ktx",
-        ASSETS_BASE_PATH "ktx" PATH_SEPARATOR "stop-mark-a.ktx",
-        ASSETS_BASE_PATH "ktx" PATH_SEPARATOR "stop-mark-a_alpha.ktx",
-        ASSETS_BASE_PATH "ktx" PATH_SEPARATOR "ui-button-atlas.ktx",
+    ASSETS_BASE_PATH "ktx" PATH_SEPARATOR "exclamation-mark-a.ktx",
+    ASSETS_BASE_PATH "ktx" PATH_SEPARATOR "exclamation-mark-a_alpha.ktx",
+    ASSETS_BASE_PATH "ktx" PATH_SEPARATOR "stop-mark-a.ktx",
+    ASSETS_BASE_PATH "ktx" PATH_SEPARATOR "stop-mark-a_alpha.ktx",
+    ASSETS_BASE_PATH "ktx" PATH_SEPARATOR "ui-button-atlas.ktx",
     ASSETS_BASE_PATH "ktx" PATH_SEPARATOR "football-ground.ktx",
     ASSETS_BASE_PATH "ktx" PATH_SEPARATOR "player-capsule.ktx",
-        ASSETS_BASE_PATH "ktx" PATH_SEPARATOR "wave-a.ktx",
-        ASSETS_BASE_PATH "ktx" PATH_SEPARATOR "wave-a_alpha.ktx",
-        ASSETS_BASE_PATH "ktx" PATH_SEPARATOR "ttl-title-a.ktx",
-        ASSETS_BASE_PATH "ktx" PATH_SEPARATOR "ttl-title-a_alpha.ktx",
+    ASSETS_BASE_PATH "ktx" PATH_SEPARATOR "wave-a.ktx",
+    ASSETS_BASE_PATH "ktx" PATH_SEPARATOR "wave-a_alpha.ktx",
+    ASSETS_BASE_PATH "ktx" PATH_SEPARATOR "ttl-title-a.ktx",
+    ASSETS_BASE_PATH "ktx" PATH_SEPARATOR "ttl-title-a_alpha.ktx",
     ASSETS_BASE_PATH "ktx" PATH_SEPARATOR "world-map.ktx",
+    ASSETS_BASE_PATH "ktx" PATH_SEPARATOR "slice-test.ktx",
 };
 
 #define MAX_TEX_ATLAS LAE_COUNT
@@ -304,10 +306,10 @@ LwStaticAssert(ARRAY_SIZE(tex_atlas_filename) == LAE_COUNT, "LAE_COUNT error");
 #ifdef __cplusplus
 extern "C" {
 #endif
-void lw_load_tex(const LWCONTEXT* _pLwc, int lae);
-void lazy_tex_atlas_glBindTexture(const LWCONTEXT* _pLwc, int lae);
-void lw_load_tex_async(const LWCONTEXT* _pLwc, int lae);
-void lw_calculate_all_tex_atlas_hash(LWCONTEXT* pLwc);
+    void lw_load_tex(const LWCONTEXT* _pLwc, int lae);
+    void lazy_tex_atlas_glBindTexture(const LWCONTEXT* _pLwc, int lae);
+    void lw_load_tex_async(const LWCONTEXT* _pLwc, int lae);
+    void lw_calculate_all_tex_atlas_hash(LWCONTEXT* pLwc);
 #ifdef __cplusplus
 }
 #endif
