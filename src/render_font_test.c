@@ -9,6 +9,7 @@
 #include "lwmath.h"
 #include <stdio.h>
 
+int enable_render_world = 1;
 int enable_render_world_map = 0;
 
 void lwc_render_font_test_fbo_body(const LWCONTEXT* pLwc, const char* html_body) {
@@ -366,11 +367,8 @@ static void render_world(const LWCONTEXT* pLwc, const mat4x4 view, const mat4x4 
     //render_waves(pLwc, view, proj, ship_y);
 }
 
-static void render_route_line(const LWCONTEXT* pLwc) {
+static void render_route_line(const LWCONTEXT* pLwc, float x, float y) {
     int shader_index = LWST_LINE;
-    float x = 0, y = 0;
-    float w = 2.0f;
-    float h = 2.0f;
     float rot = 0.0f;
     lazy_glUseProgram(pLwc, shader_index);
     
@@ -395,15 +393,16 @@ static void render_route_line(const LWCONTEXT* pLwc) {
     mat4x4_identity(proj_view_model);
     mat4x4_mul(proj_view_model, pLwc->proj, view_model);
 
-    bind_all_line_vertex_attrib(pLwc);
     glBindBuffer(GL_ARRAY_BUFFER, pLwc->sea_route_vbo.vertex_buffer);
+    bind_all_line_vertex_attrib(pLwc);
     glUniformMatrix4fv(pLwc->shader[shader_index].mvp_location, 1, GL_FALSE, (const GLfloat*)proj_view_model);
-    glDrawArrays(GL_LINE_STRIP, 0, pLwc->sea_route_vbo.vertex_count);
+    int vc = pLwc->sea_route_vbo.vertex_count;
+    glDrawArrays(GL_LINE_STRIP, 0, vc);
 }
 
-static void render_world_map(const LWCONTEXT* pLwc) {
+static void render_world_map(const LWCONTEXT* pLwc, float x, float y) {
     lazy_tex_atlas_glBindTexture(pLwc, LAE_WORLD_MAP);
-    render_solid_box_ui_lvt_flip_y_uv(pLwc, 0, 0, pLwc->aspect_ratio * 2, pLwc->aspect_ratio, pLwc->tex_atlas[LAE_WORLD_MAP], LVT_CENTER_CENTER_ANCHORED_SQUARE, 0);
+    render_solid_box_ui_lvt_flip_y_uv(pLwc, x, y, pLwc->aspect_ratio * 2, pLwc->aspect_ratio, pLwc->tex_atlas[LAE_WORLD_MAP], LVT_CENTER_CENTER_ANCHORED_SQUARE, 0);
 }
 
 void lwc_render_font_test(const LWCONTEXT* pLwc) {
@@ -444,16 +443,30 @@ void lwc_render_font_test(const LWCONTEXT* pLwc) {
     mat4x4_look_at(view, eye, center, up);
 
     // render world
-    render_world(pLwc, view, proj, ship_y);
+    if (enable_render_world) {
+        render_world(pLwc, view, proj, ship_y);
+    }
     // UI
     glDisable(GL_DEPTH_TEST);
-    render_sea_objects_nameplate(pLwc, view, proj);
+    if (enable_render_world) {
+        render_sea_objects_nameplate(pLwc, view, proj);
+    }
     lwc_enable_additive_blending();
+    float world_map_x = 0;
+    float world_map_y = -(2.0f - pLwc->aspect_ratio)/2;
     if (enable_render_world_map) {
-        render_world_map(pLwc);
-        render_route_line(pLwc);
+        render_world_map(pLwc, world_map_x, world_map_y);
     }
     lwc_disable_additive_blending();
+    if (enable_render_world_map) {
+        float one_pixel = 2.0f / pLwc->height;
+        int thickness = 1;
+        for (int i = -thickness; i <= thickness; i++) {
+            for (int j = -thickness; j <= thickness; j++) {
+                render_route_line(pLwc, world_map_x + i * one_pixel, world_map_y + j * one_pixel);
+            }
+        }
+    }
     glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
     render_solid_box_ui_lvt_flip_y_uv(pLwc, 0, 0, 2 * pLwc->aspect_ratio, 2, pLwc->font_fbo.color_tex, LVT_CENTER_CENTER_ANCHORED_SQUARE, 1);
     glEnable(GL_DEPTH_TEST);
