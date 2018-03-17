@@ -37,17 +37,21 @@ public:
 		litehtml::position clip(0, 0, client_width, client_height);
 		doc->draw(0, 0, 0, &clip);
 	}
-	void on_lbutton_down(int x, int y) {
+	void on_lbutton_down(float nx, float ny) {
 		if (doc) {
+            int x = static_cast<int>(roundf(nx * client_width));
+            int y = static_cast<int>(roundf(ny * client_height));
 			litehtml::position::vector redraw_boxes;
 			doc->on_mouse_over(x, y, x, y, redraw_boxes);
 			doc->on_lbutton_down(x, y, x, y, redraw_boxes);
 			last_lbutton_down_element = doc->root()->get_element_by_point(x, y, x, y);
 		}
 	}
-	void on_lbutton_up(int x, int y) {
+	void on_lbutton_up(float nx, float ny) {
 		if (doc) {
 			litehtml::position::vector redraw_boxes;
+            int x = static_cast<int>(roundf(nx * client_width));
+            int y = static_cast<int>(roundf(ny * client_height));
 			if (last_lbutton_down_element == doc->root()->get_element_by_point(x, y, x, y)) {
 				doc->on_mouse_over(x, y, x, y, redraw_boxes);
 				doc->on_lbutton_up(x, y, x, y, redraw_boxes);
@@ -55,9 +59,11 @@ public:
 			last_lbutton_down_element.reset();
 		}
 	}
-	void on_over(int x, int y) {
+	void on_over(float nx, float ny) {
 		if (doc) {
 			litehtml::position::vector redraw_boxes;
+            int x = static_cast<int>(roundf(nx * client_width));
+            int y = static_cast<int>(roundf(ny * client_height));
 			doc->on_mouse_over(x, y, x, y, redraw_boxes);
 		}
 	}
@@ -117,19 +123,19 @@ void htmlui_load_render_draw_body(void* c, const char* html_body) {
     htmlui->draw();
 }
 
-void htmlui_on_lbutton_down(void* c, int x, int y) {
+void htmlui_on_lbutton_down(void* c, float nx, float ny) {
 	LWHTMLUI* htmlui = (LWHTMLUI*)c;
-	htmlui->on_lbutton_down(x, y);
+	htmlui->on_lbutton_down(nx, ny);
 }
 
-void htmlui_on_lbutton_up(void* c, int x, int y) {
+void htmlui_on_lbutton_up(void* c, float nx, float ny) {
 	LWHTMLUI* htmlui = (LWHTMLUI*)c;
-	htmlui->on_lbutton_up(x, y);
+	htmlui->on_lbutton_up(nx, ny);
 }
 
-void htmlui_on_over(void* c, int x, int y) {
+void htmlui_on_over(void* c, float nx, float ny) {
 	LWHTMLUI* htmlui = (LWHTMLUI*)c;
-	htmlui->on_over(x, y);
+	htmlui->on_over(nx, ny);
 }
 
 int test_html_ui(const LWCONTEXT* pLwc) {
