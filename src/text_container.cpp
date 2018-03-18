@@ -96,7 +96,7 @@ const litehtml::tchar_t * litehtml::text_container::get_default_font_name() cons
 }
 
 void litehtml::text_container::draw_list_marker(litehtml::uint_ptr hdc, const litehtml::list_marker & marker) {
-    LOGI("draw_list_marker");
+    LOGIx("draw_list_marker");
     int size = font_sizes[0];
     LWTEXTBLOCK text_block;
     fill_text_block(pLwc, &text_block, marker.pos.x + marker.pos.width, marker.pos.y + marker.pos.height, "*", size, marker.color);
