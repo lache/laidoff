@@ -47,12 +47,64 @@
 			display: block;
 			background-color: rgba(0,200,200,0.8);
 		}
+#red {
+    width: 200px;
+    height: 200px;
+    background: url(slice-test.png) 0 0;
+	background-size: 800px 800px;
+}
+#green {
+    height: 200px;
+    width: 200px;
+    background: url(slice-test.png) -200px 0;
+	background-size: 800px 800px;
+}
+
+#blue {
+    height: 200px;
+    width: 200px;
+    background: url(slice-test.png) 0 -200px;
+	background-size: 800px 800px;
+}
+
+#black {
+    height: 200px;
+    width: 200px;
+    background: url(slice-test.png) -200px -200px;
+	background-size: 800px 800px;
+}
+
+#cyan {
+    height: 200px;
+    width: 200px;
+    background: url(slice-test.png) -400px 0;
+	background-size: 800px 800px;
+}
+
+#yellow {
+    height: 200px;
+    width: 200px;
+    background: url(slice-test.png) 0 -400px;
+	background-size: 800px 800px;
+}
     </style>
 </head>
-<body style="margin:0px;color:white;font-size:1em">
+<body style="margin:0px;font-size:1em">
 	<center>
-		<h1>테스트 페이지에 온 것을 환영한다.</h1>
+		테스트 페이지에 온 것을 환영한다.
 		<a style="display:inline-block;background-color:rgba(255, 0, 0, 0.5);padding:5pt" href="script:go_online()">온라인 페이지 열기</a>
 	</center>
+	이전 글씨는? <img id="red" src="img_trans.gif"> 그 다음 글씨는...? <img id="black" src="img_trans.gif">
+	<br/>
+	이전 글씨는? <img id="green" src="img_trans.gif"> 그 다음 글씨는...? <img id="cyan" src="img_trans.gif">
+	<br/>
+	이전 글씨는? <img id="blue" src="img_trans.gif"> 그 다음 글씨는...? <img id="yellow" src="img_trans.gif">
+	<script type="text/x-lua">
+		local c = lo.script_context()
+		lo.lwc_render_font_test_enable_render_world(0)
+		lo.lwc_render_font_test_enable_render_world_map(1)
+		lo.lwc_render_font_test_enable_render_route_line(0)
+		return 1234
+	</script>
 </body>
 </html>
