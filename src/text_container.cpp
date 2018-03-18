@@ -118,15 +118,27 @@ void litehtml::text_container::draw_background(litehtml::uint_ptr hdc, const lit
     if (bg.is_root) {
         return;
     }
-    bool show_test_image = false;
+    if (bg.image == "img_trans.gif") {
+        // 1x1 transparent dummy image
+        return;
+    }
+    int show_test_image = 0;
     int lae = LAE_TTL_TITLE;
     int lae_alpha = LAE_TTL_TITLE_ALPHA;
     if (bg.image.length()) {
-        LOGI("draw_background [IMAGE]: x=%d,y=%d,w=%d,h=%d,color=0x%02X%02X%02X|%02X,image=%s,baseurl=%s",
+        LOGI("draw_background [IMAGE]: x=%d,y=%d,w=%d,h=%d,clipbox=%d/%d/%d/%d,position_xy=%d/%d,image_size=%d/%d,color=0x%02X%02X%02X|%02X,image=%s,baseurl=%s",
              bg.border_box.x,
              bg.border_box.y,
              bg.border_box.width,
              bg.border_box.height,
+             bg.clip_box.x,
+             bg.clip_box.y,
+             bg.clip_box.width,
+             bg.clip_box.height,
+             bg.position_x,
+             bg.position_y,
+             bg.image_size.width,
+             bg.image_size.height,
              bg.color.red,
              bg.color.green,
              bg.color.blue,
@@ -134,10 +146,15 @@ void litehtml::text_container::draw_background(litehtml::uint_ptr hdc, const lit
              bg.image.c_str(),
              bg.baseurl.c_str());
         show_test_image = 1;
+
+        if (bg.image == "slice-test.png") {
+            show_test_image = 2;
+            lae = LAE_SLICE_TEST;
+        }
+    }
+    if (show_test_image == 1) {
         lazy_tex_atlas_glBindTexture(pLwc, lae);
         lazy_tex_atlas_glBindTexture(pLwc, lae_alpha);
-    }
-    if (show_test_image) {
         render_solid_vb_ui_alpha(
             pLwc,
             conv_coord_x(pLwc, bg.border_box.x),
@@ -152,6 +169,30 @@ void litehtml::text_container::draw_background(litehtml::uint_ptr hdc, const lit
             show_test_image ? 1.0f : bg.color.green / 255.0f,
             show_test_image ? 1.0f : bg.color.blue / 255.0f,
             show_test_image ? 0.0f : 1.0f
+        );
+    } else if (show_test_image == 2) {
+        float offset_x = (float)(bg.border_box.x - bg.position_x) / bg.image_size.width;
+        float offset_y = (float)(bg.border_box.y - bg.position_y) / bg.image_size.height;
+        float uv_offset[] = { offset_x, offset_y };
+        float uv_scale[] = { (float)bg.border_box.width / bg.image_size.width, (float)bg.border_box.height / bg.image_size.height };
+        lazy_tex_atlas_glBindTexture(pLwc, lae);
+        render_solid_vb_ui_uv_shader_rot(
+            pLwc,
+            conv_coord_x(pLwc, bg.border_box.x),
+            conv_coord_y(pLwc, bg.border_box.y),
+            conv_size_x(pLwc, bg.border_box.width),
+            conv_size_y(pLwc, bg.border_box.height),
+            show_test_image ? pLwc->tex_atlas[lae] : 0,
+            LVT_LEFT_TOP_ANCHORED_SQUARE,
+            bg.is_root ? 0.0f : show_test_image ? 1.0f : bg.color.alpha / 255.0f,
+            show_test_image ? 1.0f : bg.color.red / 255.0f,
+            show_test_image ? 1.0f : bg.color.green / 255.0f,
+            show_test_image ? 1.0f : bg.color.blue / 255.0f,
+            show_test_image ? 0.0f : 1.0f,
+            uv_offset,
+            uv_scale,
+            LWST_DEFAULT,
+            0
         );
     } else {
         render_solid_vb_ui_flip_y_uv_shader(
