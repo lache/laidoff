@@ -403,7 +403,7 @@ static void render_route_line(const LWCONTEXT* pLwc, float x, float y) {
 
 static void render_world_map(const LWCONTEXT* pLwc, float x, float y) {
     lazy_tex_atlas_glBindTexture(pLwc, LAE_WORLD_MAP);
-    const float uv_offset[2] = { (float)pLwc->app_time/40.0f, 0 };
+    const float uv_offset[2] = { (float)fmod(pLwc->app_time/40.0f, 1.0f), 0 };
     render_solid_vb_ui_uv_shader_rot(pLwc,
                                      x,
                                      y,
