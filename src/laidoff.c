@@ -595,8 +595,8 @@ void init_font_fbo(LWCONTEXT* pLwc) {
     
     // Start init
     
-    pLwc->font_fbo.width = 1024;
-    pLwc->font_fbo.height = 1024;
+    pLwc->font_fbo.width = pLwc->width;
+    pLwc->font_fbo.height = pLwc->height;
     
     glGenFramebuffers(1, &pLwc->font_fbo.fbo);
     glBindFramebuffer(GL_FRAMEBUFFER, pLwc->font_fbo.fbo);
