@@ -1,5 +1,6 @@
 #include "lwttl.h"
 #include <stdio.h>
+#include <stdlib.h>
 #include "file.h"
 #include "lwmacro.h"
 #include "lwgl.h"
@@ -35,7 +36,7 @@ void* lwttl_new(float aspect_ratio) {
 
 void lwttl_destroy(void** __ttl) {
     LWTTL* ttl = *(LWTTL**)__ttl;
-    free(ttl->seaport);
+    free(*__ttl);
     *__ttl = 0;
 }
 
