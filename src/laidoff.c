@@ -588,6 +588,19 @@ void delete_font_fbo(LWCONTEXT* pLwc) {
     }
 }
 
+// https://stackoverflow.com/questions/466204/rounding-up-to-next-power-of-2
+unsigned long upper_power_of_two(unsigned long v)
+{
+    v--;
+    v |= v >> 1;
+    v |= v >> 2;
+    v |= v >> 4;
+    v |= v >> 8;
+    v |= v >> 16;
+    v++;
+    return v;
+}
+
 void init_font_fbo(LWCONTEXT* pLwc) {
     
     // Delete GL resources before init
@@ -595,10 +608,13 @@ void init_font_fbo(LWCONTEXT* pLwc) {
     delete_font_fbo(pLwc);
     
     // Start init
-    
+#if LW_PLATFORM_IOS
+    pLwc->font_fbo.width = (int)upper_power_of_two((unsigned long)pLwc->width);
+    pLwc->font_fbo.height = (int)upper_power_of_two((unsigned long)pLwc->height);
+#else
     pLwc->font_fbo.width = pLwc->width;
     pLwc->font_fbo.height = pLwc->height;
-    
+#endif
     glGenFramebuffers(1, &pLwc->font_fbo.fbo);
     glBindFramebuffer(GL_FRAMEBUFFER, pLwc->font_fbo.fbo);
     
@@ -609,7 +625,9 @@ void init_font_fbo(LWCONTEXT* pLwc) {
     
     glGenTextures(1, &pLwc->font_fbo.color_tex);
     glBindTexture(GL_TEXTURE_2D, pLwc->font_fbo.color_tex);
+    glGetError();
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, pLwc->font_fbo.width, pLwc->font_fbo.height, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
+    GLenum render_texture_result = glGetError();
     glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, pLwc->font_fbo.color_tex, 0);
     
     GLenum status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
