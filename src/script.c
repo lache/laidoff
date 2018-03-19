@@ -805,6 +805,7 @@ void script_evaluate(void* L, const char* code, size_t code_len) {
             LOGI("Lua result: %lld", lua_tointeger(L, -1));
             nret--;
         }
+        lua_pop(L, nret);
     }
 }
 
