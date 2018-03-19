@@ -8,6 +8,7 @@
 #include "linmath.h"
 #include "lwmath.h"
 #include <stdio.h>
+#include "lwttl.h"
 
 static int enable_render_world = 1;
 static int enable_render_world_map = 0;
@@ -368,13 +369,13 @@ static void render_world(const LWCONTEXT* pLwc, const mat4x4 view, const mat4x4 
     //render_waves(pLwc, view, proj, ship_y);
 }
 
-static void render_route_line(const LWCONTEXT* pLwc, float x, float y) {
+static void render_route_line(const LWCONTEXT* pLwc, const LWTTLWORLDMAP* worldmap, float render_offset_x, float render_offset_y) {
     int shader_index = LWST_LINE;
     float rot = 0.0f;
     lazy_glUseProgram(pLwc, shader_index);
-    
-    float ui_scale_x = 1.0f / 180.0f * pLwc->aspect_ratio;
-    float ui_scale_y = 1.0f / 180.0f * pLwc->aspect_ratio;
+
+    float ui_scale_x = lnglat_to_xy(pLwc, 1.0f);
+    float ui_scale_y = lnglat_to_xy(pLwc, 1.0f);
 
     mat4x4 model_translate;
     mat4x4 model;
@@ -387,7 +388,7 @@ static void render_route_line(const LWCONTEXT* pLwc, float x, float y) {
     mat4x4_identity(model_scale);
     mat4x4_scale_aniso(model_scale, model_scale, ui_scale_x, ui_scale_y, 1.0f);
     mat4x4_rotate_Z(model_scale_rotate, model_scale, rot);
-    mat4x4_translate(model_translate, x, y, 0);
+    mat4x4_translate(model_translate, worldmap->render_org_x, worldmap->render_org_y, 0);
     mat4x4_identity(model);
     mat4x4_mul(model, model_translate, model_scale_rotate);
     mat4x4_mul(view_model, identity_view, model);
@@ -401,14 +402,23 @@ static void render_route_line(const LWCONTEXT* pLwc, float x, float y) {
     glDrawArrays(GL_LINE_STRIP, 0, vc);
 }
 
-static void render_world_map(const LWCONTEXT* pLwc, float x, float y) {
+static void render_world_map(const LWCONTEXT* pLwc, const LWTTLWORLDMAP* worldmap) {
     lazy_tex_atlas_glBindTexture(pLwc, LAE_WORLD_MAP);
-    const float uv_offset[2] = { (float)fmod(pLwc->app_time/40.0f, 1.0f), 0 };
+    //const float uv_offset[2] = { (float)fmod(pLwc->app_time/40.0f, 1.0f), 0 };
+    const float uv_scale[2] = {
+        1.0f,
+        1.0f,
+    };
+    const float uv_offset[2] = {
+        (+worldmap->center_lng / 360.0f),
+        (-worldmap->center_lat / 180.0f),
+    };
+
     render_solid_vb_ui_uv_shader_rot(pLwc,
-                                     x,
-                                     y,
-                                     pLwc->aspect_ratio * 2,
-                                     pLwc->aspect_ratio,
+                                     worldmap->render_org_x,
+                                     worldmap->render_org_y,
+                                     pLwc->aspect_ratio * 2 * worldmap->zoom_scale,
+                                     pLwc->aspect_ratio * worldmap->zoom_scale,
                                      pLwc->tex_atlas[LAE_WORLD_MAP],
                                      LVT_CENTER_CENTER_ANCHORED_SQUARE,
                                      1.0f,
@@ -417,17 +427,9 @@ static void render_world_map(const LWCONTEXT* pLwc, float x, float y) {
                                      0.0f,
                                      0.0f,
                                      uv_offset,
-                                     default_uv_scale,
+                                     uv_scale,
                                      LWST_DEFAULT,
-                                     0);/*
-    render_solid_box_ui_lvt_flip_y_uv(pLwc,
-                                      x,
-                                      y,
-                                      pLwc->aspect_ratio * 2,
-                                      pLwc->aspect_ratio,
-                                      pLwc->tex_atlas[LAE_WORLD_MAP],
-                                      LVT_CENTER_CENTER_ANCHORED_SQUARE,
-                                      0);*/
+                                     0);
 }
 
 void lwc_render_font_test(const LWCONTEXT* pLwc) {
@@ -477,10 +479,9 @@ void lwc_render_font_test(const LWCONTEXT* pLwc) {
         render_sea_objects_nameplate(pLwc, view, proj);
     }
     lwc_enable_additive_blending();
-    float world_map_x = 0;
-    float world_map_y = -(2.0f - pLwc->aspect_ratio)/2;
+    const LWTTLWORLDMAP* worldmap = lwttl_worldmap(pLwc->ttl);
     if (enable_render_world_map) {
-        render_world_map(pLwc, world_map_x, world_map_y);
+        render_world_map(pLwc, worldmap);
     }
     lwc_disable_additive_blending();
     if (enable_render_route_line) {
@@ -488,10 +489,11 @@ void lwc_render_font_test(const LWCONTEXT* pLwc) {
         int thickness = 1;
         for (int i = -thickness; i <= thickness; i++) {
             for (int j = -thickness; j <= thickness; j++) {
-                render_route_line(pLwc, world_map_x + i * one_pixel, world_map_y + j * one_pixel);
+                render_route_line(pLwc, worldmap, i * one_pixel, j * one_pixel);
             }
         }
     }
+    lwttl_render_all_seaports(pLwc, pLwc->ttl, worldmap);
     glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
     render_solid_box_ui_lvt_flip_y_uv(pLwc, 0, 0, 2 * pLwc->aspect_ratio, 2, pLwc->font_fbo.color_tex, LVT_CENTER_CENTER_ANCHORED_SQUARE, 1);
     glEnable(GL_DEPTH_TEST);

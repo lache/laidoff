@@ -17,7 +17,7 @@ void litehtml::el_luascript::parse_attributes()
 	get_text(text);
     LOGI("<script> tag: %s", text.c_str());
 
-    script_evaluate(pLwc->L, text.c_str());
+    script_evaluate_async(pLwc, text.c_str(), text.size());
 }
 
 const litehtml::tchar_t* litehtml::el_luascript::get_tagName() const {

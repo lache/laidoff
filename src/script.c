@@ -11,6 +11,7 @@
 #include <assert.h>
 #include "zmq.h"
 #include "mq.h"
+#include "logic.h"
 
 #define LW_SCRIPT_PREFIX_PATH ASSETS_BASE_PATH "l" PATH_SEPARATOR
 #define LW_MAX_CORO (32)
@@ -791,12 +792,22 @@ void script_on_target_attack(void* _script) {
     }
 }
 
-void script_evaluate(void* L, const char* code) {
-    int result = luaL_dostring(L, code);
+void script_evaluate(void* L, const char* code, size_t code_len) {
+    int top0 = lua_gettop(L);
+    int result = (luaL_loadbuffer(L, code, code_len, code) || lua_pcall(L, 0, LUA_MULTRET, 0));
     if (result) {
         LOGE("Failed to run lua: %s", lua_tostring(L, -1));
+        lua_pop(L, 1);
     } else {
-        LOGI("Lua result: %lld", lua_tointeger(L, -1));
+        int top1 = lua_gettop(L);
+        int nret = top1 - top0;
+        while (nret) {
+            LOGI("Lua result: %lld", lua_tointeger(L, -1));
+            nret--;
+        }
     }
-    lua_pop(L, 1);
+}
+
+void script_evaluate_async(LWCONTEXT* pLwc, const char* code, size_t code_len) {
+    logic_emit_evalute_async(pLwc, code, code_len);
 }

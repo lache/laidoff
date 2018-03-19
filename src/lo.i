@@ -98,6 +98,7 @@
 #include "lwtcpclient.h"
 #include "puckgamepacket.h"
 #include "htmlui.h"
+#include "lwttl.h"
 #ifdef WIN32
 #pragma warning(pop)
 #endif
@@ -198,6 +199,7 @@
 %include "lwtcpclient.h"
 %include "puckgamepacket.h"
 %include "htmlui.h"
+%include "lwttl.h"
 
 // using the C-array
 %include <carrays.i>

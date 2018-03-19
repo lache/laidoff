@@ -92,18 +92,31 @@
 <body style="margin:0px;font-size:1em">
 	<center>
 		테스트 페이지에 온 것을 환영한다.
-		<a style="display:inline-block;background-color:rgba(255, 0, 0, 0.5);padding:5pt" href="script:go_online()">온라인 페이지 열기</a>
+		<a style="display:inline-block;background-color:rgba(255, 0, 0, 0.5);padding:5pt" href="script:go_online()">온라인</a>
 	</center>
+	<center>
+		<a style="display:inline-block;background-color:rgba(255, 0, 0, 0.5);padding:5pt" href="script:worldmap_scroll(-10,  0, 0)">왼쪽</a>
+		<a style="display:inline-block;background-color:rgba(255, 0, 0, 0.5);padding:5pt" href="script:worldmap_scroll( 10,  0, 0)">오른쪽</a>
+		<a style="display:inline-block;background-color:rgba(255, 0, 0, 0.5);padding:5pt" href="script:worldmap_scroll(  0, 10, 0)">위</a>
+		<a style="display:inline-block;background-color:rgba(255, 0, 0, 0.5);padding:5pt" href="script:worldmap_scroll(  0,-10, 0)">아래</a>
+		<a style="display:inline-block;background-color:rgba(255, 0, 0, 0.5);padding:5pt" href="script:worldmap_scroll(  0,  0, 1)">줌인</a>
+		<a style="display:inline-block;background-color:rgba(255, 0, 0, 0.5);padding:5pt" href="script:worldmap_scroll(  0,  0,-1)">줌아웃</a>
+	</center>
+	<!--
 	이전 글씨는? <img id="red" src="img_trans.gif"> 그 다음 글씨는...? <img id="black" src="img_trans.gif">
 	<br/>
 	이전 글씨는? <img id="green" src="img_trans.gif"> 그 다음 글씨는...? <img id="cyan" src="img_trans.gif">
 	<br/>
 	이전 글씨는? <img id="blue" src="img_trans.gif"> 그 다음 글씨는...? <img id="yellow" src="img_trans.gif">
+	-->
 	<script type="text/x-lua">
 		local c = lo.script_context()
 		lo.lwc_render_font_test_enable_render_world(0)
 		lo.lwc_render_font_test_enable_render_world_map(1)
 		lo.lwc_render_font_test_enable_render_route_line(0)
+		function worldmap_scroll(dlng, dlat, dscale)
+			lo.lwttl_worldmap_scroll(c.ttl, dlng, dlat, dscale)
+		end
 		return 1234
 	</script>
 </body>

@@ -106,6 +106,7 @@ typedef enum _LW_MSG {
     LM_LWMSGSTOPLOGICLOOP,
     LM_LWMSGINITSCENE,
     LM_LWMSGUIEVENT,
+    LM_LWMSGEVALUATE,
 } LW_MSG;
 
 typedef struct _LWMSGINITFIELD {
@@ -144,6 +145,10 @@ typedef struct _LWMSGUIEVENT {
     float w_ratio;
     float h_ratio;
 } LWMSGUIEVENT;
+
+typedef struct _LWMSGEVALUATE {
+    LW_MSG type;
+} LWMSGEVALUATE;
 
 void logic_start_logic_update_job_async(LWCONTEXT* pLwc) {
     if (pLwc == 0 || pLwc->logic_actor == 0) {
@@ -380,6 +385,23 @@ void reset_runtime_context_async(LWCONTEXT* pLwc) {
     };
     zmsg_addmem(msg, &m, sizeof(LWMSGRESETRUNTIMECONTEXT));
     if (zactor_send(pLwc->logic_actor, &msg) < 0) {
+        zmsg_destroy(&msg);
+        LOGE("Send message to logic worker failed!");
+    }
+}
+
+void logic_emit_evalute_async(LWCONTEXT* pLwc, const char* code, size_t code_len) {
+    if (code == 0 || code_len <= 0) {
+        LOGE("Invalid script to evaluate");
+        return;
+    }
+    zmsg_t* msg = zmsg_new();
+    LWMSGEVALUATE m;
+    m.type = LM_LWMSGEVALUATE;
+    zmsg_addmem(msg, &m, sizeof(LWMSGEVALUATE));
+    zmsg_addmem(msg, code, code_len);
+    zactor_t* actor = pLwc->logic_actor;
+    if (zactor_send(actor, &msg) < 0) {
         zmsg_destroy(&msg);
         LOGE("Send message to logic worker failed!");
     }
@@ -953,6 +975,11 @@ static int loop_pipe_reader(zloop_t* loop, zsock_t* pipe, void* args) {
             } else {
                 LOGI("UI Event '%s' suppressed since state is dirty", m->id);
             }
+        } else if (d && s == sizeof(LWMSGEVALUATE) && *(int*)d == LM_LWMSGEVALUATE) {
+            // Lua script code in the next frame.
+            f = zmsg_next(msg);
+            byte* code = zframe_data(f);
+            script_evaluate(pLwc->L, code, zframe_size(f));
         } else {
             abort();
         }
@@ -988,6 +1015,7 @@ static void s_logic_worker(zsock_t *pipe, void *args) {
                             &pLwc->tcp_ttl_host_addr,
                             tcp_ttl_on_connect,
                             parse_recv_packets);
+    
     zloop_t* loop = zloop_new();
     pLwc->logic_loop = loop;
     logic_start_logic_update_job(pLwc);

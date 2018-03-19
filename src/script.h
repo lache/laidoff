@@ -19,7 +19,8 @@ void script_get_string(void* L, const char* id, char* ret, int ret_max_len);
 void script_on_near_puck_player(void* _script, int dashing);
 void script_on_player_attack(void* _script);
 void script_on_target_attack(void* _script);
-void script_evaluate(void* L, const char* code);
+void script_evaluate(void* L, const char* code, size_t code_len);
+void script_evaluate_async(LWCONTEXT* pLwc, const char* code, size_t code_len);
 #ifdef __cplusplus
 };
 #endif

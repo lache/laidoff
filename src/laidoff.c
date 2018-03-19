@@ -56,6 +56,7 @@
 #include "htmlui.h"
 #include "searoute.h"
 #include "searoute2.h"
+#include "lwttl.h"
 // SWIG output file
 #include "lo_wrap.inl"
 
@@ -1594,6 +1595,8 @@ LWCONTEXT* lw_init_initial_size(int width, int height) {
 
 	pLwc->htmlui = htmlui_new(pLwc);
 
+    pLwc->ttl = lwttl_new(pLwc->aspect_ratio);
+
     return pLwc;
 }
 
@@ -1643,6 +1646,8 @@ void lw_set_size(LWCONTEXT* pLwc, int w, int h) {
     reset_dir_pad_position(&pLwc->right_dir_pad);
     
     puck_game_reset_view_proj(pLwc, pLwc->puck_game);
+
+    lwttl_update_aspect_ratio(pLwc->ttl, pLwc->aspect_ratio);
 }
 
 void lw_set_window(LWCONTEXT* pLwc, struct GLFWwindow *window) {
@@ -1739,6 +1744,8 @@ void lw_deinit(LWCONTEXT* pLwc) {
 	htmlui_destroy(&pLwc->htmlui);
 
     ps_destroy_context(&pLwc->ps_context);
+
+    lwttl_destroy(&pLwc->ttl);
     
     free(pLwc);
 }

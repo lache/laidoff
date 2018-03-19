@@ -10,6 +10,7 @@
 #include "htmlui.h"
 #include "lwtcpclient.h"
 #include "el_luascript.h"
+#include "script.h"
 
 litehtml::text_container::text_container(LWCONTEXT* pLwc, int w, int h)
     : pLwc(pLwc), w(w), h(h), default_font_size(36) {
@@ -282,6 +283,8 @@ void litehtml::text_container::on_anchor_click(const litehtml::tchar_t * url, co
         //enable_render_world_map = !enable_render_world_map;
     } else if (strcmp(url, "script:toggle_route_line()") == 0) {
         //enable_render_route_line = !enable_render_route_line;
+    } else if (strncmp(url, "script:", strlen("script:")) == 0) {
+        script_evaluate_async(pLwc, url + strlen("script:"), strlen(url + strlen("script:")));
     } else {
         const char* path_prefix = ASSETS_BASE_PATH "html" PATH_SEPARATOR;
         char path[1024] = { 0, };
