@@ -56,7 +56,7 @@ void lw_trigger_mouse_press(LWCONTEXT* pLwc, float x, float y, int pointer_id) {
 		return;
 	}
 
-	if (pLwc->game_scene == LGS_FIELD || pLwc->game_scene == LGS_PHYSICS) {
+	if (pLwc->game_scene == LGS_FIELD || pLwc->game_scene == LGS_PHYSICS || pLwc->game_scene == LGS_FONT_TEST) {
 		const float sr = get_dir_pad_size_radius();
 
 		float left_dir_pad_center_x = 0;
@@ -156,7 +156,7 @@ void lw_trigger_mouse_move(LWCONTEXT* pLwc, float x, float y, int pointer_id) {
 	pLwc->last_mouse_move_x = x;
 	pLwc->last_mouse_move_y = y;
 
-	if (pLwc->game_scene == LGS_FIELD || pLwc->game_scene == LGS_PHYSICS) {
+	if (pLwc->game_scene == LGS_FIELD || pLwc->game_scene == LGS_PHYSICS || pLwc->game_scene == LGS_FONT_TEST) {
 		const float sr = get_dir_pad_size_radius();
 
 		float left_dir_pad_center_x = 0;

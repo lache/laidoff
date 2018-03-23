@@ -9,10 +9,11 @@
 #include "lwmath.h"
 #include <stdio.h>
 #include "lwttl.h"
+#include "lwlog.h"
 
-static int enable_render_world = 1;
-static int enable_render_world_map = 0;
-static int enable_render_route_line = 0;
+#define MAX_VISIBILITY_ENTRY_COUNT (32)
+#define MAX_VISIBILITY_ENTRY_NAME_LENGTH (32)
+static char visibility[MAX_VISIBILITY_ENTRY_COUNT][MAX_VISIBILITY_ENTRY_NAME_LENGTH];
 
 void lwc_render_font_test_fbo_body(const LWCONTEXT* pLwc, const char* html_body) {
     glBindFramebuffer(GL_FRAMEBUFFER, pLwc->font_fbo.fbo);
@@ -269,6 +270,80 @@ static void render_ship(const LWCONTEXT* pLwc, const mat4x4 view, const mat4x4 p
     glDrawArrays(GL_TRIANGLES, 0, pLwc->vertex_buffer[lvt].vertex_count);
 }
 
+static void render_seaport_icon(const LWCONTEXT* pLwc, const mat4x4 view, const mat4x4 proj, float x, float y, float z, float w, float h) {
+    int shader_index = LWST_DEFAULT_NORMAL_COLOR;
+    const LWSHADER* shader = &pLwc->shader[shader_index];
+    lazy_glUseProgram(pLwc, shader_index);
+    mat4x4 rot;
+    mat4x4_identity(rot);
+
+    mat4x4 model_normal_transform;
+    mat4x4_identity(model_normal_transform);
+
+    float sx = w, sy = h, sz = 1;
+    mat4x4 model;
+    mat4x4_identity(model);
+    mat4x4_mul(model, model, rot);
+    mat4x4_scale_aniso(model, model, sx, sy, sz);
+
+    mat4x4 model_translate;
+    mat4x4_translate(model_translate, x, y, z);
+
+    mat4x4_mul(model, model_translate, model);
+
+    mat4x4 view_model;
+    mat4x4_mul(view_model, view, model);
+
+    mat4x4 proj_view_model;
+    mat4x4_identity(proj_view_model);
+    mat4x4_mul(proj_view_model, proj, view_model);
+
+    const LW_VBO_TYPE lvt = LVT_SEAPORT_ICON;
+    lazy_glBindBuffer(pLwc, lvt);
+    bind_all_color_vertex_attrib(pLwc, lvt);
+    glUniformMatrix4fv(shader->mvp_location, 1, GL_FALSE, (const GLfloat*)proj_view_model);
+    glUniformMatrix4fv(shader->m_location, 1, GL_FALSE, (const GLfloat*)model_normal_transform);
+    //glShadeModel(GL_FLAT);
+    glDrawArrays(GL_TRIANGLES, 0, pLwc->vertex_buffer[lvt].vertex_count);
+}
+
+static void render_land_cell(const LWCONTEXT* pLwc, const mat4x4 view, const mat4x4 proj, float x, float y, float z, float w, float h) {
+    int shader_index = LWST_DEFAULT_NORMAL_COLOR;
+    const LWSHADER* shader = &pLwc->shader[shader_index];
+    lazy_glUseProgram(pLwc, shader_index);
+    mat4x4 rot;
+    mat4x4_identity(rot);
+
+    mat4x4 model_normal_transform;
+    mat4x4_identity(model_normal_transform);
+
+    float sx = w, sy = h, sz = 1;
+    mat4x4 model;
+    mat4x4_identity(model);
+    mat4x4_mul(model, model, rot);
+    mat4x4_scale_aniso(model, model, sx, sy, sz);
+
+    mat4x4 model_translate;
+    mat4x4_translate(model_translate, x, y, z);
+
+    mat4x4_mul(model, model_translate, model);
+
+    mat4x4 view_model;
+    mat4x4_mul(view_model, view, model);
+
+    mat4x4 proj_view_model;
+    mat4x4_identity(proj_view_model);
+    mat4x4_mul(proj_view_model, proj, view_model);
+
+    const LW_VBO_TYPE lvt = LVT_LAND_CELL;
+    lazy_glBindBuffer(pLwc, lvt);
+    bind_all_color_vertex_attrib(pLwc, lvt);
+    glUniformMatrix4fv(shader->mvp_location, 1, GL_FALSE, (const GLfloat*)proj_view_model);
+    glUniformMatrix4fv(shader->m_location, 1, GL_FALSE, (const GLfloat*)model_normal_transform);
+    //glShadeModel(GL_FLAT);
+    glDrawArrays(GL_TRIANGLES, 0, pLwc->vertex_buffer[lvt].vertex_count);
+}
+
 static void render_waves(const LWCONTEXT* pLwc, const mat4x4 view, const mat4x4 proj, float ship_y) {
     if (last_wave_spawn + 1.1f < (float)pLwc->app_time) {
         for (int i = 0; i < ARRAY_SIZE(wave); i++) {
@@ -360,6 +435,82 @@ static void render_sea_objects(const LWCONTEXT* pLwc, const mat4x4 view, const m
     }
 }
 
+const short res_width = (1 << 14); // 16384;
+const short res_height = (1 << 13); // 8192;
+
+static float cell_x_to_lng(short x) {
+    return -180.0f + x / (res_width / 2.0f) * 180.0f;
+}
+
+static float cell_y_to_lat(short x) {
+    return 90.0f - x / (res_height / 2.0f) * 90.0f;
+}
+
+static void render_sea_static_objects(const LWCONTEXT* pLwc, const mat4x4 view, const mat4x4 proj) {
+    float render_scale = 100.0f;
+    float cell_scale = 360.0f / res_width;
+    const LWTTLLNGLAT* center = lwttl_center(pLwc->ttl);
+    for (int i = 0; i < pLwc->ttl_static_state.count; i++) {
+        render_land_cell(pLwc,
+                         view,
+                         proj,
+                         (cell_x_to_lng(pLwc->ttl_static_state.obj[i].x0) - center->lng) * render_scale,
+                         (cell_y_to_lat(pLwc->ttl_static_state.obj[i].y0) - center->lat) * render_scale,
+                         0,
+                         (float)(pLwc->ttl_static_state.obj[i].x1 - pLwc->ttl_static_state.obj[i].x0) * cell_scale * render_scale,
+                         (float)(pLwc->ttl_static_state.obj[i].y1 - pLwc->ttl_static_state.obj[i].y0) * cell_scale * render_scale);
+    }
+    for (int i = 0; i < pLwc->ttl_seaport_state.count; i++) {
+        render_seaport_icon(pLwc,
+                         view,
+                         proj,
+                         (cell_x_to_lng(pLwc->ttl_seaport_state.obj[i].x0) - center->lng) * render_scale,
+                         (cell_y_to_lat(pLwc->ttl_seaport_state.obj[i].y0) - center->lat) * render_scale,
+                         0,
+                         cell_scale * render_scale,
+                         cell_scale * render_scale);
+    }
+}
+
+static void render_sea_static_objects_nameplate(const LWCONTEXT* pLwc, const mat4x4 view, const mat4x4 proj) {
+    float render_scale = 100.0f;
+    float cell_scale = 360.0f / res_width;
+    const LWTTLLNGLAT* center = lwttl_center(pLwc->ttl);
+    mat4x4 proj_view;
+    mat4x4_identity(proj_view);
+    mat4x4_mul(proj_view, proj, view);
+    for (int i = 0; i < pLwc->ttl_seaport_state.count; i++) {
+        float x = (cell_x_to_lng(pLwc->ttl_seaport_state.obj[i].x0) - center->lng) * render_scale;
+        float y = (cell_y_to_lat(pLwc->ttl_seaport_state.obj[i].y0) - center->lat) * render_scale;
+
+        vec4 obj_pos_vec4 = {
+            x,
+            y,
+            0,
+            1,
+        };
+        vec2 ui_point;
+        calculate_ui_point_from_world_point(pLwc->aspect_ratio, proj_view, obj_pos_vec4, ui_point);
+        LWTEXTBLOCK test_text_block;
+        test_text_block.text_block_width = 999.0f;// 2.00f * aspect_ratio;
+        test_text_block.text_block_line_height = DEFAULT_TEXT_BLOCK_LINE_HEIGHT_F;
+        test_text_block.size = DEFAULT_TEXT_BLOCK_SIZE_F;
+        SET_COLOR_RGBA_FLOAT(test_text_block.color_normal_glyph, 1, 1, 1, 1);
+        SET_COLOR_RGBA_FLOAT(test_text_block.color_normal_outline, 0, 0, 0, 1);
+        SET_COLOR_RGBA_FLOAT(test_text_block.color_emp_glyph, 1, 1, 0, 1);
+        SET_COLOR_RGBA_FLOAT(test_text_block.color_emp_outline, 0, 0, 0, 1);
+        test_text_block.text = pLwc->ttl_seaport_state.obj[i].name;
+        test_text_block.text_bytelen = (int)strlen(test_text_block.text);
+        test_text_block.begin_index = 0;
+        test_text_block.end_index = test_text_block.text_bytelen;
+        test_text_block.multiline = 1;
+        test_text_block.text_block_x = ui_point[0];
+        test_text_block.text_block_y = ui_point[1];
+        test_text_block.align = LTBA_LEFT_TOP;
+        render_text_block(pLwc, &test_text_block);
+    }
+}
+
 static void render_world(const LWCONTEXT* pLwc, const mat4x4 view, const mat4x4 proj, float ship_y) {
     //render_ship(pLwc, view, proj, 0, ship_y, 0);
     render_sea_objects(pLwc, view, proj);
@@ -410,8 +561,8 @@ static void render_world_map(const LWCONTEXT* pLwc, const LWTTLWORLDMAP* worldma
         1.0f,
     };
     const float uv_offset[2] = {
-        (+worldmap->center_lng / 360.0f),
-        (-worldmap->center_lat / 180.0f),
+        (+worldmap->center.lng / 360.0f),
+        (-worldmap->center.lat / 180.0f),
     };
 
     render_solid_vb_ui_uv_shader_rot(pLwc,
@@ -440,15 +591,16 @@ void lwc_render_font_test(const LWCONTEXT* pLwc) {
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     float ship_y = 0.0f;//+(float)pLwc->app_time;
 
-    float half_height = 35.0f;
+    float half_height = 10.0f;
     float near_z = 0.1f;
     float far_z = 1000.0f;
-    float cam_r = sinf((float)pLwc->app_time / 4) / 4.0f;
+    float cam_r = 0;// sinf((float)pLwc->app_time / 4) / 4.0f;
     float c_r = cosf(cam_r);
     float s_r = sinf(cam_r);
-    float eye_x = 50.0f;
+    float eye_x = 5.0f;
     float eye_y = -25.0f;
-    vec3 eye = { c_r * eye_x - s_r * eye_y, s_r * eye_x + c_r * eye_y, 50.0f }; // eye position
+    float eye_z = 15.0f;
+    vec3 eye = { c_r * eye_x - s_r * eye_y, s_r * eye_x + c_r * eye_y, eye_z }; // eye position
     eye[1] += ship_y;
     vec3 center = { 0, ship_y, 0 }; // look position
     vec3 center_to_eye;
@@ -470,21 +622,27 @@ void lwc_render_font_test(const LWCONTEXT* pLwc) {
     mat4x4_look_at(view, eye, center, up);
 
     // render world
-    if (enable_render_world) {
+    if (lwc_render_font_test_render("landcell")) {
+        render_sea_static_objects(pLwc, view, proj);
+    }
+    if (lwc_render_font_test_render("world")) {
         render_world(pLwc, view, proj, ship_y);
     }
     // UI
     glDisable(GL_DEPTH_TEST);
-    if (enable_render_world) {
+    if (lwc_render_font_test_render("world")) {
         render_sea_objects_nameplate(pLwc, view, proj);
+    }
+    if (lwc_render_font_test_render("landcell_nameplate")) {
+        render_sea_static_objects_nameplate(pLwc, view, proj);
     }
     lwc_enable_additive_blending();
     const LWTTLWORLDMAP* worldmap = lwttl_worldmap(pLwc->ttl);
-    if (enable_render_world_map) {
+    if (lwc_render_font_test_render("worldmap")) {
         render_world_map(pLwc, worldmap);
     }
     lwc_disable_additive_blending();
-    if (enable_render_route_line) {
+    if (lwc_render_font_test_render("routeline")) {
         float one_pixel = 2.0f / pLwc->height;
         int thickness = 1;
         for (int i = -thickness; i <= thickness; i++) {
@@ -493,19 +651,48 @@ void lwc_render_font_test(const LWCONTEXT* pLwc) {
             }
         }
     }
-    lwttl_render_all_seaports(pLwc, pLwc->ttl, worldmap);
+    if (lwc_render_font_test_render("seaport")) {
+        lwttl_render_all_seaports(pLwc, pLwc->ttl, worldmap);
+    }
     glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
+    // render FBO (HTML UI)
     render_solid_box_ui_lvt_flip_y_uv(pLwc, 0, 0, 2 * pLwc->aspect_ratio, 2, pLwc->font_fbo.color_tex, LVT_CENTER_CENTER_ANCHORED_SQUARE, 1);
+    // render joystick
+    render_dir_pad_with_start_joystick(pLwc, &pLwc->left_dir_pad, 1.0f);
     glEnable(GL_DEPTH_TEST);
 }
 
-void lwc_render_font_test_enable_render_world(int v) {
-    enable_render_world = v;
+int lwc_render_font_test_render(const char* name) {
+    size_t i;
+    for (i = 0; i < MAX_VISIBILITY_ENTRY_COUNT; i++) {
+        if (strcmp(visibility[i], name) == 0) {
+            return 1;
+        }
+    }
+    return 0;
 }
 
-void lwc_render_font_test_enable_render_world_map(int v) {
-    enable_render_world_map = v;
-}
-void lwc_render_font_test_enable_render_route_line(int v) {
-    enable_render_route_line = v;
+void lwc_render_font_test_enable_render(const char* name, int v) {
+    size_t i;
+    for (i = 0; i < MAX_VISIBILITY_ENTRY_COUNT; i++) {
+        if (strcmp(visibility[i], name) == 0) {
+            if (v) {
+                // already visible...
+                return;
+            } else {
+                // clear
+                visibility[i][0] = 0;
+                return;
+            }
+        }
+    }
+    if (v) {
+        for (i = 0; i < MAX_VISIBILITY_ENTRY_COUNT; i++) {
+            if (visibility[i][0] == 0) {
+                strcpy(visibility[i], name);
+                return;
+            }
+        }
+        LOGE("visibility_hash capacity exceeded.");
+    }
 }

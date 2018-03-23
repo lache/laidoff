@@ -406,6 +406,8 @@ typedef struct _LWCONTEXT {
 	void* htmlui; // LWHTMLUI
     LWPSCONTEXT* ps_context; // LWPSCONTEXT
     LWPTTLFULLSTATE ttl_full_state;
+    LWPTTLSTATICSTATE ttl_static_state;
+    LWPTTLSEAPORTSTATE ttl_seaport_state;
     void* ttl;
 } LWCONTEXT;
 

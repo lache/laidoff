@@ -17,8 +17,10 @@ typedef enum _LW_PUCK_GAME_PACKET {
     LPGP_LWPJUMP = 106,
     LPGP_LWPFIRE = 107,
     LPGP_LWPSTATE2 = 108,
-    LPGP_LWPTTLFULLSTATE = 109,
-    LPGP_LWPTTLPING = 110,
+    LPGP_LWPTTLFULLSTATE = 109, // server -> client
+    LPGP_LWPTTLPING = 110, // client -> server
+    LPGP_LWPTTLSTATICSTATE = 111, // server -> client
+    LPGP_LWPTTLSEAPORTSTATE = 112, // server -> client
 	// tcp
 	LPGP_LWPQUEUE2 = 200,
 	LPGP_LWPMAYBEMATCHED = 201,
@@ -255,6 +257,41 @@ typedef struct _LWPTTLFULLSTATE {
     int count;
     LWPTTLFULLSTATEOBJECT obj[32];
 } LWPTTLFULLSTATE;
+
+// UDP
+typedef struct _LWPTTLSTATICOBJECT {
+    short x0;
+    short y0;
+    short x1;
+    short y1;
+} LWPTTLSTATICOBJECT;
+
+// UDP
+typedef struct _LWPTTLSTATICSTATE {
+    unsigned char type;
+    unsigned char padding0;
+    unsigned char padding1;
+    unsigned char padding2;
+    int count;
+    LWPTTLSTATICOBJECT obj[200];
+} LWPTTLSTATICSTATE;
+
+// UDP
+typedef struct _LWPTTLSEAPORTOBJECT {
+    short x0;
+    short y0;
+    char name[64];
+} LWPTTLSEAPORTOBJECT;
+
+// UDP
+typedef struct _LWPTTLSEAPORTSTATE {
+    unsigned char type;
+    unsigned char padding0;
+    unsigned char padding1;
+    unsigned char padding2;
+    int count;
+    LWPTTLSEAPORTOBJECT obj[200];
+} LWPTTLSEAPORTSTATE;
 
 // PING
 typedef struct _LWPTTLPING {

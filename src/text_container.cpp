@@ -277,12 +277,6 @@ void litehtml::text_container::on_anchor_click(const litehtml::tchar_t * url, co
     LOGI("on_anchor_click: %s", url);
     if (strcmp(url, "script:go_online()") == 0) {
         tcp_request_landing_page(pLwc->tcp_ttl, pLwc->user_data_path);
-    } else if (strcmp(url, "script:toggle_world()") == 0) {
-        //enable_render_world = !enable_render_world;
-    } else if (strcmp(url, "script:toggle_world_map()") == 0) {
-        //enable_render_world_map = !enable_render_world_map;
-    } else if (strcmp(url, "script:toggle_route_line()") == 0) {
-        //enable_render_route_line = !enable_render_route_line;
     } else if (strncmp(url, "script:", strlen("script:")) == 0) {
         script_evaluate_async(pLwc, url + strlen("script:"), strlen(url + strlen("script:")));
     } else {

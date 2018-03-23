@@ -6,6 +6,7 @@
 #include "lwtimepoint.h"
 #include "puckgame.h"
 #include "platform_detection.h" 
+#include "lwttl.h"
 #if LW_PLATFORM_WIN32
 #include <Ws2tcpip.h>
 #endif
@@ -259,10 +260,11 @@ void udp_sea_update(LWCONTEXT* pLwc, LWUDP* udp) {
     
     LWPTTLPING ttl_ping;
     memset(&ttl_ping, 0, sizeof(LWPTTLPING));
+    const LWTTLLNGLAT* center = lwttl_center(pLwc->ttl);
     ttl_ping.type = LPGP_LWPTTLPING;
-    ttl_ping.xc = 0;
-    ttl_ping.yc = 0;
-    ttl_ping.ex = 100.0f;
+    ttl_ping.xc = center->lng;
+    ttl_ping.yc = center->lat;
+    ttl_ping.ex = 64;
     udp_send(udp, (const char*)&ttl_ping, sizeof(LWPTTLPING));
 
     FD_ZERO(&udp->readfds);
@@ -298,7 +300,9 @@ void udp_sea_update(LWCONTEXT* pLwc, LWUDP* udp) {
                 case LPGP_LWPTTLFULLSTATE:
                 {
                     if (decompressed_bytes != sizeof(LWPTTLFULLSTATE)) {
-                        LOGE("LWPTTLFULLSTATE: Size error %d (%zu expected)", decompressed_bytes, sizeof(LWPTTLFULLSTATE));
+                        LOGE("LWPTTLFULLSTATE: Size error %d (%zu expected)",
+                             decompressed_bytes,
+                             sizeof(LWPTTLFULLSTATE));
                     }
                     
                     LWPTTLFULLSTATE* p = (LWPTTLFULLSTATE*)decompressed;
@@ -306,9 +310,40 @@ void udp_sea_update(LWCONTEXT* pLwc, LWUDP* udp) {
                     memcpy(&pLwc->ttl_full_state, p, sizeof(LWPTTLFULLSTATE));
                     break;
                 }
+                case LPGP_LWPTTLSTATICSTATE:
+                {
+                    if (decompressed_bytes != sizeof(LWPTTLSTATICSTATE)) {
+                        LOGE("LWPTTLSTATICSTATE: Size error %d (%zu expected)",
+                             decompressed_bytes,
+                             sizeof(LWPTTLSTATICSTATE));
+                    }
+
+                    LWPTTLSTATICSTATE* p = (LWPTTLSTATICSTATE*)decompressed;
+                    LOGIx("LWPTTLSTATICSTATE: %d objects.", p->count);
+                    memcpy(&pLwc->ttl_static_state, p, sizeof(LWPTTLSTATICSTATE));
+                    break;
+                }
+                case LPGP_LWPTTLSEAPORTSTATE:
+                {
+                    if (decompressed_bytes != sizeof(LWPTTLSEAPORTSTATE)) {
+                        LOGE("LWPTTLSEAPORTSTATE: Size error %d (%zu expected)",
+                             decompressed_bytes,
+                             sizeof(LWPTTLSEAPORTSTATE));
+                    }
+
+                    LWPTTLSEAPORTSTATE* p = (LWPTTLSEAPORTSTATE*)decompressed;
+                    LOGIx("LWPTTLSEAPORTSTATE: %d objects.", p->count);
+                    memcpy(&pLwc->ttl_seaport_state, p, sizeof(LWPTTLSEAPORTSTATE));
+                    break;
+                }
+                default:
+                {
+                    LOGEP("Unknown UDP packet");
+                    break;
+                }
             }
         } else {
-            LOGE("lz4 decompression failed!");
+            LOGEP("lz4 decompression failed!");
         }
     }
 }

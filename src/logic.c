@@ -25,6 +25,7 @@
 #include "lwime.h"
 #include "puckgame.h"
 #include "sound.h"
+#include "lwttl.h"
 
 void toggle_font_texture_test_mode(LWCONTEXT* pLwc);
 void lw_request_remote_notification_device_token(LWCONTEXT* pLwc);
@@ -864,6 +865,10 @@ void lwc_update(LWCONTEXT* pLwc, double delta_time) {
 
     if (pLwc->game_scene == LGS_PHYSICS) {
         update_physics(pLwc);
+    }
+
+    if (pLwc->game_scene == LGS_FONT_TEST) {
+        lwttl_update(pLwc, pLwc->ttl, (float)delta_time);
     }
 
     // Touch start point will follow if the distance
