@@ -446,10 +446,9 @@ static float cell_y_to_lat(short x) {
     return 90.0f - x / (res_height / 2.0f) * 90.0f;
 }
 
-static void render_sea_static_objects(const LWCONTEXT* pLwc, const mat4x4 view, const mat4x4 proj) {
+static void render_sea_static_objects(const LWCONTEXT* pLwc, const mat4x4 view, const mat4x4 proj, const LWTTLLNGLAT* center) {
     float render_scale = 100.0f;
     float cell_scale = 360.0f / res_width;
-    const LWTTLLNGLAT* center = lwttl_center(pLwc->ttl);
     for (int i = 0; i < pLwc->ttl_static_state.count; i++) {
         render_land_cell(pLwc,
                          view,
@@ -472,10 +471,8 @@ static void render_sea_static_objects(const LWCONTEXT* pLwc, const mat4x4 view, 
     }
 }
 
-static void render_sea_static_objects_nameplate(const LWCONTEXT* pLwc, const mat4x4 view, const mat4x4 proj) {
+static void render_sea_static_objects_nameplate(const LWCONTEXT* pLwc, const mat4x4 view, const mat4x4 proj, const LWTTLLNGLAT* center) {
     float render_scale = 100.0f;
-    float cell_scale = 360.0f / res_width;
-    const LWTTLLNGLAT* center = lwttl_center(pLwc->ttl);
     mat4x4 proj_view;
     mat4x4_identity(proj_view);
     mat4x4_mul(proj_view, proj, view);
@@ -597,8 +594,8 @@ void lwc_render_font_test(const LWCONTEXT* pLwc) {
     float cam_r = 0;// sinf((float)pLwc->app_time / 4) / 4.0f;
     float c_r = cosf(cam_r);
     float s_r = sinf(cam_r);
-    float eye_x = 5.0f;
-    float eye_y = -25.0f;
+    float eye_x = 0;//5.0f;
+    float eye_y = 0;//-25.0f;
     float eye_z = 15.0f;
     vec3 eye = { c_r * eye_x - s_r * eye_y, s_r * eye_x + c_r * eye_y, eye_z }; // eye position
     eye[1] += ship_y;
@@ -606,7 +603,8 @@ void lwc_render_font_test(const LWCONTEXT* pLwc) {
     vec3 center_to_eye;
     vec3_sub(center_to_eye, eye, center);
     float cam_a = atan2f(center_to_eye[1], center_to_eye[0]);
-    vec3 right = { -sinf(cam_a),cosf(cam_a),0 };
+    //vec3 right = { -sinf(cam_a),cosf(cam_a),0 };
+    vec3 right = { cosf(cam_a), -sinf(cam_a), 0 };
     vec3 eye_right;
     vec3_mul_cross(eye_right, center_to_eye, right);
     vec3 up;
@@ -621,9 +619,10 @@ void lwc_render_font_test(const LWCONTEXT* pLwc) {
                  far_z);
     mat4x4_look_at(view, eye, center, up);
 
+    LWTTLLNGLAT lng_lat_center = *lwttl_center(pLwc->ttl);
     // render world
     if (lwc_render_font_test_render("landcell")) {
-        render_sea_static_objects(pLwc, view, proj);
+        render_sea_static_objects(pLwc, view, proj, &lng_lat_center);
     }
     if (lwc_render_font_test_render("world")) {
         render_world(pLwc, view, proj, ship_y);
@@ -634,7 +633,7 @@ void lwc_render_font_test(const LWCONTEXT* pLwc) {
         render_sea_objects_nameplate(pLwc, view, proj);
     }
     if (lwc_render_font_test_render("landcell_nameplate")) {
-        render_sea_static_objects_nameplate(pLwc, view, proj);
+        render_sea_static_objects_nameplate(pLwc, view, proj, &lng_lat_center);
     }
     lwc_enable_additive_blending();
     const LWTTLWORLDMAP* worldmap = lwttl_worldmap(pLwc->ttl);
