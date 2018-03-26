@@ -264,7 +264,7 @@ void udp_sea_update(LWCONTEXT* pLwc, LWUDP* udp) {
     ttl_ping.type = LPGP_LWPTTLPING;
     ttl_ping.xc = center->lng;
     ttl_ping.yc = center->lat;
-    ttl_ping.ex = 64;
+    ttl_ping.ex = 32;
     udp_send(udp, (const char*)&ttl_ping, sizeof(LWPTTLPING));
 
     FD_ZERO(&udp->readfds);

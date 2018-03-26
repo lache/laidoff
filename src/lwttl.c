@@ -106,3 +106,10 @@ void lwttl_update(LWCONTEXT* pLwc, void* _ttl, float delta_time) {
         ttl->worldmap.center.lat += dy / 10.0f * delta_time;
     }
 }
+
+void lwttl_center_offset(void* _ttl, float* lng, float* lat) {
+    LWTTL* ttl = (LWTTL*)_ttl;
+    float render_scale = 100.0f;
+    *lng = (*lng - ttl->worldmap.center.lng) * render_scale;
+    *lat = (*lat - ttl->worldmap.center.lat) * render_scale;
+}

@@ -243,7 +243,7 @@ static void render_ship(const LWCONTEXT* pLwc, const mat4x4 view, const mat4x4 p
     mat4x4 rot;
     mat4x4_identity(rot);
 
-    float sx = 1, sy = 1, sz = 1;
+    float sx = 0.1f, sy = 0.1f, sz = 0.1f;
     mat4x4 model;
     mat4x4_identity(model);
     mat4x4_mul(model, model, rot);
@@ -261,11 +261,14 @@ static void render_ship(const LWCONTEXT* pLwc, const mat4x4 view, const mat4x4 p
     mat4x4_identity(proj_view_model);
     mat4x4_mul(proj_view_model, proj, view_model);
 
+    mat4x4 model_normal_transform;
+    mat4x4_identity(model_normal_transform);
+
     const LW_VBO_TYPE lvt = LVT_SHIP;
     lazy_glBindBuffer(pLwc, lvt);
     bind_all_color_vertex_attrib(pLwc, lvt);
     glUniformMatrix4fv(shader->mvp_location, 1, GL_FALSE, (const GLfloat*)proj_view_model);
-    glUniformMatrix4fv(shader->m_location, 1, GL_FALSE, (const GLfloat*)model);
+    glUniformMatrix4fv(shader->m_location, 1, GL_FALSE, (const GLfloat*)model_normal_transform);
     //glShadeModel(GL_FLAT);
     glDrawArrays(GL_TRIANGLES, 0, pLwc->vertex_buffer[lvt].vertex_count);
 }
@@ -424,13 +427,16 @@ static void render_sea_objects_nameplate(const LWCONTEXT* pLwc, const mat4x4 vie
     }
 }
 
-static void render_sea_objects(const LWCONTEXT* pLwc, const mat4x4 view, const mat4x4 proj) {
+static void render_sea_objects(const LWCONTEXT* pLwc, const mat4x4 view, const mat4x4 proj, void* ttl) {
     for (int i = 0; i < pLwc->ttl_full_state.count; i++) {
+        float x = pLwc->ttl_full_state.obj[i].x0;
+        float y = pLwc->ttl_full_state.obj[i].y0;
+        lwttl_center_offset(ttl, &x, &y);
         render_ship(pLwc,
                     view,
                     proj,
-                    pLwc->ttl_full_state.obj[i].x0,
-                    pLwc->ttl_full_state.obj[i].y0,
+                    x,
+                    y,
                     0);
     }
 }
@@ -508,12 +514,12 @@ static void render_sea_static_objects_nameplate(const LWCONTEXT* pLwc, const mat
     }
 }
 
-static void render_world(const LWCONTEXT* pLwc, const mat4x4 view, const mat4x4 proj, float ship_y) {
+static void render_world(const LWCONTEXT* pLwc, const mat4x4 view, const mat4x4 proj, float ship_y, void* ttl) {
     //render_ship(pLwc, view, proj, 0, ship_y, 0);
-    render_sea_objects(pLwc, view, proj);
-    render_port(pLwc, view, proj, 0);
-    render_port(pLwc, view, proj, 160);
-    render_sea_city(pLwc, view, proj);
+    render_sea_objects(pLwc, view, proj, ttl);
+    //render_port(pLwc, view, proj, 0);
+    //render_port(pLwc, view, proj, 160);
+    //render_sea_city(pLwc, view, proj);
     //render_waves(pLwc, view, proj, ship_y);
 }
 
@@ -625,7 +631,7 @@ void lwc_render_font_test(const LWCONTEXT* pLwc) {
         render_sea_static_objects(pLwc, view, proj, &lng_lat_center);
     }
     if (lwc_render_font_test_render("world")) {
-        render_world(pLwc, view, proj, ship_y);
+        render_world(pLwc, view, proj, ship_y, pLwc->ttl);
     }
     // UI
     glDisable(GL_DEPTH_TEST);
