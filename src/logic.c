@@ -763,12 +763,10 @@ void lwc_update(LWCONTEXT* pLwc, double delta_time) {
 
     if (pLwc->game_scene == LGS_FONT_TEST) {
         for (int i = 0; i < pLwc->ttl_full_state.count; i++) {
-            if (pLwc->ttl_full_state.obj[i].id >= 25000) {
-                pLwc->ttl_full_state.obj[i].x0 += (float)delta_time * pLwc->ttl_full_state.obj[i].vx;
-                pLwc->ttl_full_state.obj[i].y0 += (float)delta_time * pLwc->ttl_full_state.obj[i].vy;
-                pLwc->ttl_full_state.obj[i].x1 += (float)delta_time * pLwc->ttl_full_state.obj[i].vx;
-                pLwc->ttl_full_state.obj[i].y1 += (float)delta_time * pLwc->ttl_full_state.obj[i].vy;
-            }
+            pLwc->ttl_full_state.obj[i].x0 += (float)delta_time * pLwc->ttl_full_state.obj[i].vx;
+            pLwc->ttl_full_state.obj[i].y0 += (float)delta_time * pLwc->ttl_full_state.obj[i].vy;
+            pLwc->ttl_full_state.obj[i].x1 += (float)delta_time * pLwc->ttl_full_state.obj[i].vx;
+            pLwc->ttl_full_state.obj[i].y1 += (float)delta_time * pLwc->ttl_full_state.obj[i].vy;
         }
     }
 

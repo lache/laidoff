@@ -15,6 +15,43 @@
 #define MAX_VISIBILITY_ENTRY_NAME_LENGTH (32)
 static char visibility[MAX_VISIBILITY_ENTRY_COUNT][MAX_VISIBILITY_ENTRY_NAME_LENGTH];
 
+const short res_width = (1 << 14); // 16384;
+const short res_height = (1 << 13); // 8192;
+
+static float cell_x_to_lng(short x) {
+    return -180.0f + x / (res_width / 2.0f) * 180.0f;
+}
+
+static float cell_y_to_lat(short x) {
+    return 90.0f - x / (res_height / 2.0f) * 90.0f;
+}
+
+static float cell_fx_to_lng(float fx) {
+    return -180.0f + fx / (res_width / 2.0f) * 180.0f;
+}
+
+static float cell_fy_to_lat(float fx) {
+    return 90.0f - fx / (res_height / 2.0f) * 90.0f;
+}
+
+static const float render_scale = 100.0f;
+
+static float cell_x_to_render_coords(short x, const LWTTLLNGLAT* center) {
+    return (cell_x_to_lng(x) - center->lng) * render_scale;
+}
+
+static float cell_y_to_render_coords(short y, const LWTTLLNGLAT* center) {
+    return (cell_y_to_lat(y) - center->lat) * render_scale;
+}
+
+static float cell_fx_to_render_coords(float fx, const LWTTLLNGLAT* center) {
+    return (cell_fx_to_lng(fx) - center->lng) * render_scale;
+}
+
+static float cell_fy_to_render_coords(float fy, const LWTTLLNGLAT* center) {
+    return (cell_fy_to_lat(fy) - center->lat) * render_scale;
+}
+
 void lwc_render_font_test_fbo_body(const LWCONTEXT* pLwc, const char* html_body) {
     glBindFramebuffer(GL_FRAMEBUFFER, pLwc->font_fbo.fbo);
     glDisable(GL_DEPTH_TEST);
@@ -427,11 +464,10 @@ static void render_sea_objects_nameplate(const LWCONTEXT* pLwc, const mat4x4 vie
     }
 }
 
-static void render_sea_objects(const LWCONTEXT* pLwc, const mat4x4 view, const mat4x4 proj, void* ttl) {
+static void render_sea_objects(const LWCONTEXT* pLwc, const mat4x4 view, const mat4x4 proj, const LWTTLLNGLAT* center) {
     for (int i = 0; i < pLwc->ttl_full_state.count; i++) {
-        float x = pLwc->ttl_full_state.obj[i].x0;
-        float y = pLwc->ttl_full_state.obj[i].y0;
-        lwttl_center_offset(ttl, &x, &y);
+        float x = cell_fx_to_render_coords(pLwc->ttl_full_state.obj[i].x0, center);
+        float y = cell_fy_to_render_coords(pLwc->ttl_full_state.obj[i].y0, center);
         render_ship(pLwc,
                     view,
                     proj,
@@ -441,26 +477,17 @@ static void render_sea_objects(const LWCONTEXT* pLwc, const mat4x4 view, const m
     }
 }
 
-const short res_width = (1 << 14); // 16384;
-const short res_height = (1 << 13); // 8192;
-
-static float cell_x_to_lng(short x) {
-    return -180.0f + x / (res_width / 2.0f) * 180.0f;
-}
-
-static float cell_y_to_lat(short x) {
-    return 90.0f - x / (res_height / 2.0f) * 90.0f;
-}
-
-static void render_sea_static_objects(const LWCONTEXT* pLwc, const mat4x4 view, const mat4x4 proj, const LWTTLLNGLAT* center) {
-    float render_scale = 100.0f;
+static void render_sea_static_objects(const LWCONTEXT* pLwc,
+                                      const mat4x4 view,
+                                      const mat4x4 proj,
+                                      const LWTTLLNGLAT* center) {
     float cell_scale = 360.0f / res_width;
     for (int i = 0; i < pLwc->ttl_static_state.count; i++) {
         render_land_cell(pLwc,
                          view,
                          proj,
-                         (cell_x_to_lng(pLwc->ttl_static_state.obj[i].x0) - center->lng) * render_scale,
-                         (cell_y_to_lat(pLwc->ttl_static_state.obj[i].y0) - center->lat) * render_scale,
+                         cell_x_to_render_coords(pLwc->ttl_static_state.obj[i].x0, center),
+                         cell_y_to_render_coords(pLwc->ttl_static_state.obj[i].y0, center),
                          0,
                          (float)(pLwc->ttl_static_state.obj[i].x1 - pLwc->ttl_static_state.obj[i].x0) * cell_scale * render_scale,
                          (float)(pLwc->ttl_static_state.obj[i].y1 - pLwc->ttl_static_state.obj[i].y0) * cell_scale * render_scale);
@@ -514,9 +541,9 @@ static void render_sea_static_objects_nameplate(const LWCONTEXT* pLwc, const mat
     }
 }
 
-static void render_world(const LWCONTEXT* pLwc, const mat4x4 view, const mat4x4 proj, float ship_y, void* ttl) {
+static void render_world(const LWCONTEXT* pLwc, const mat4x4 view, const mat4x4 proj, float ship_y, const LWTTLLNGLAT* center) {
     //render_ship(pLwc, view, proj, 0, ship_y, 0);
-    render_sea_objects(pLwc, view, proj, ttl);
+    render_sea_objects(pLwc, view, proj, center);
     //render_port(pLwc, view, proj, 0);
     //render_port(pLwc, view, proj, 160);
     //render_sea_city(pLwc, view, proj);
@@ -631,7 +658,7 @@ void lwc_render_font_test(const LWCONTEXT* pLwc) {
         render_sea_static_objects(pLwc, view, proj, &lng_lat_center);
     }
     if (lwc_render_font_test_render("world")) {
-        render_world(pLwc, view, proj, ship_y, pLwc->ttl);
+        render_world(pLwc, view, proj, ship_y, &lng_lat_center);
     }
     // UI
     glDisable(GL_DEPTH_TEST);

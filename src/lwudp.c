@@ -73,8 +73,8 @@ static unsigned long udp_hostname_to_ip(const char* hostname, const char* port_s
     int rv;
 
     memset(&hints, 0, sizeof hints);
-    hints.ai_family = AF_UNSPEC; // use AF_INET6 to force IPv6
-    hints.ai_socktype = SOCK_STREAM;
+    hints.ai_family = AF_INET; // use AF_INET6 to force IPv6
+    hints.ai_socktype = SOCK_DGRAM;
 
     if ((rv = getaddrinfo(hostname, port_str, &hints, &servinfo)) != 0) {
         fprintf(stderr, "getaddrinfo: %s\n", gai_strerror(rv));
