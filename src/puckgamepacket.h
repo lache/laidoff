@@ -246,6 +246,8 @@ typedef struct _LWPTTLFULLSTATEOBJECT {
     float x1, y1;
     float vx, vy;
     int id;
+    char guid[64];
+    float route_left;
 } LWPTTLFULLSTATEOBJECT;
 
 // UDP
