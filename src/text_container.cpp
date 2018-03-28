@@ -276,7 +276,11 @@ void litehtml::text_container::link(const std::shared_ptr<litehtml::document>& d
 void litehtml::text_container::on_anchor_click(const litehtml::tchar_t * url, const litehtml::element::ptr & el) {
     LOGI("on_anchor_click: %s", url);
     if (strcmp(url, "script:go_online()") == 0) {
-        tcp_request_landing_page(pLwc->tcp_ttl, pLwc->user_data_path);
+        if (pLwc->tcp_ttl) {
+            tcp_request_landing_page(pLwc->tcp_ttl, pLwc->user_data_path);
+        } else {
+            LOGE("tcp_ttl null");
+        }
     } else if (strncmp(url, "script:", strlen("script:")) == 0) {
         script_evaluate_async(pLwc, url + strlen("script:"), strlen(url + strlen("script:")));
     } else {
@@ -285,7 +289,11 @@ void litehtml::text_container::on_anchor_click(const litehtml::tchar_t * url, co
         strcat(path, path_prefix);
         strcat(path, url);
         //htmlui_set_next_html_path(pLwc->htmlui, path);
-        tcp_send_httpget(pLwc->tcp_ttl, url);
+        if (pLwc->tcp_ttl) {
+            tcp_send_httpget(pLwc->tcp_ttl, url);
+        } else {
+            LOGE("tcp_ttl null");
+        }
     }
 }
 
