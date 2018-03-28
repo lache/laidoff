@@ -14,7 +14,7 @@ namespace litehtml
 		
         litehtml::css&	master_css() { return m_master_css; }
 
-        context::context() : m_loop_began(false) {}
+        context() : m_loop_began(false) {}
         int begin_loop(const tchar_t* loop_name);
         void end_loop(const tchar_t* loop_name);
         void next_loop_element(const tchar_t* loop_name);
