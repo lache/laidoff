@@ -7,6 +7,7 @@
 #include "lwcontext.h"
 #include "laidoff.h"
 #include "render_solid.h"
+#include "lwudp.h"
 
 typedef struct _LWTTLDATA_SEAPORT {
     char locode[8];
@@ -80,6 +81,15 @@ void lwttl_worldmap_scroll(void* _ttl, float dlng, float dlat, float dzoom) {
         ttl->worldmap.center.lat = fmodf(ttl->worldmap.center.lat + dlat / ttl->worldmap.zoom_scale, 180.0f);
     }
     ttl->worldmap.center.lng = fmodf(ttl->worldmap.center.lng + dlng / ttl->worldmap.zoom_scale, 360.0f);
+}
+
+void lwttl_worldmap_scroll_to(void* _ttl, float lng, float lat, LWUDP* udp_sea) {
+    LWTTL* ttl = (LWTTL*)_ttl;
+    ttl->worldmap.center.lat = lat;
+    ttl->worldmap.center.lng = lng;
+    if (udp_sea) {
+        udp_send_ttlping(udp_sea, ttl);
+    }
 }
 
 const LWTTLWORLDMAP* lwttl_worldmap(void* _ttl) {

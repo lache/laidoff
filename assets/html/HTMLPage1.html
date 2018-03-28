@@ -1,7 +1,7 @@
 <!DOCTYPE html>
-<html>
+<html xmlns:lw="http://www.w3.org/1999/xhtml">
 <head>
-<meta charset="utf-8">
+    <meta charset="utf-8">
     <title>Min Browser</title>
     <style>
         .bottom {
@@ -10,6 +10,7 @@
             width: 70%;
             left: 15%;
         }
+
         .centertop {
             position: absolute;
             top: 0;
@@ -18,98 +19,122 @@
             text-align: center;
             background-color: rgba(255, 0, 0, 0.7);
         }
+
         .righttop {
             position: absolute;
             top: 0;
             right: 0;
-            text-align:right;
+            text-align: right;
         }
-        #parent{
-		    /*margin: 0 auto;*/
-		    width: 70%;
-		    background-color: rgba(255, 0, 0, 0.7);
-		}
-		#child-left{
-		    float: left;
-		    display:block;
-		    width: 80%;
-		    background-color: rgba(255, 0, 0, 0.7);
-		}
-		#child-right{
-		    float: right;
-		    display:block;
-		    width: 20%;
-		    background-color: rgba(0, 0, 0, 0.7);
-		}
-		.select-button {
-			padding: 5pt;
-			text-align: center;
-			display: block;
-			background-color: rgba(0,200,200,0.8);
-		}
-#red {
-    width: 200px;
-    height: 200px;
-    background: url(slice-test.png) 0 0;
-	background-size: 800px 800px;
-}
-#green {
-    height: 200px;
-    width: 200px;
-    background: url(slice-test.png) -200px 0;
-	background-size: 800px 800px;
-}
 
-#blue {
-    height: 200px;
-    width: 200px;
-    background: url(slice-test.png) 0 -200px;
-	background-size: 800px 800px;
-}
+        #parent {
+            /*margin: 0 auto;*/
+            width: 70%;
+            background-color: rgba(255, 0, 0, 0.7);
+        }
 
-#black {
-    height: 200px;
-    width: 200px;
-    background: url(slice-test.png) -200px -200px;
-	background-size: 800px 800px;
-}
+        #child-left {
+            float: left;
+            display: block;
+            width: 80%;
+            background-color: rgba(255, 0, 0, 0.7);
+        }
 
-#cyan {
-    height: 200px;
-    width: 200px;
-    background: url(slice-test.png) -400px 0;
-	background-size: 800px 800px;
-}
+        #child-right {
+            float: right;
+            display: block;
+            width: 20%;
+            background-color: rgba(0, 0, 0, 0.7);
+        }
 
-#yellow {
-    height: 200px;
-    width: 200px;
-    background: url(slice-test.png) 0 -400px;
-	background-size: 800px 800px;
-}
+        .select-button {
+            padding: 5pt;
+            text-align: center;
+            display: block;
+            background-color: rgba(0, 200, 200, 0.8);
+        }
+
+        #red {
+            width: 200px;
+            height: 200px;
+            background: url(slice-test.png) 0 0;
+            background-size: 800px 800px;
+        }
+
+        #green {
+            height: 200px;
+            width: 200px;
+            background: url(slice-test.png) -200px 0;
+            background-size: 800px 800px;
+        }
+
+        #blue {
+            height: 200px;
+            width: 200px;
+            background: url(slice-test.png) 0 -200px;
+            background-size: 800px 800px;
+        }
+
+        #black {
+            height: 200px;
+            width: 200px;
+            background: url(slice-test.png) -200px -200px;
+            background-size: 800px 800px;
+        }
+
+        #cyan {
+            height: 200px;
+            width: 200px;
+            background: url(slice-test.png) -400px 0;
+            background-size: 800px 800px;
+        }
+
+        #yellow {
+            height: 200px;
+            width: 200px;
+            background: url(slice-test.png) 0 -400px;
+            background-size: 800px 800px;
+        }
     </style>
 </head>
 <body style="margin:0px;font-size:1em">
-	<center>
-		테스트 페이지에 온 것을 환영한다.
-		<a style="display:inline-block;background-color:rgba(255, 0, 0, 0.5);padding:5pt" href="script:go_online()">온라인</a>
-	</center>
-	<center>
-		<a style="display:inline-block;background-color:rgba(255, 0, 0, 0.5);padding:5pt" href="script:worldmap_scroll(-10,  0, 0)">왼쪽</a>
-		<a style="display:inline-block;background-color:rgba(255, 0, 0, 0.5);padding:5pt" href="script:worldmap_scroll( 10,  0, 0)">오른쪽</a>
-		<a style="display:inline-block;background-color:rgba(255, 0, 0, 0.5);padding:5pt" href="script:worldmap_scroll(  0, 10, 0)">위</a>
-		<a style="display:inline-block;background-color:rgba(255, 0, 0, 0.5);padding:5pt" href="script:worldmap_scroll(  0,-10, 0)">아래</a>
-		<a style="display:inline-block;background-color:rgba(255, 0, 0, 0.5);padding:5pt" href="script:worldmap_scroll(  0,  0, 1)">줌인</a>
-		<a style="display:inline-block;background-color:rgba(255, 0, 0, 0.5);padding:5pt" href="script:worldmap_scroll(  0,  0,-1)">줌아웃</a>
-	</center>
-	<!--
-	이전 글씨는? <img id="red" src="img_trans.gif"> 그 다음 글씨는...? <img id="black" src="img_trans.gif">
-	<br/>
-	이전 글씨는? <img id="green" src="img_trans.gif"> 그 다음 글씨는...? <img id="cyan" src="img_trans.gif">
-	<br/>
-	이전 글씨는? <img id="blue" src="img_trans.gif"> 그 다음 글씨는...? <img id="yellow" src="img_trans.gif">
-	-->
-	<script type="text/x-lua">
+<a style="position:absolute;right:0px;bottom:0px;display:inline-block;background-color:rgba(255, 0, 0, 0.5);padding:5pt" href="script:go_online()">온라인으로</a>
+<h3>가까운 항구</h3>
+<div lw:loop="seaport">
+    <a style="display:inline-block;background-color:rgba(255, 0, 0, 0.5);padding:5pt;"
+       href="{{script}}">{{name}}</a>
+</div>
+<h3>세계 항구</h3>
+<div lw:loop="world-seaport">
+    <a style="display:inline-block;background-color:rgba(255, 0, 0, 0.5);padding:5pt;"
+       href="{{script}}">{{name}}</a>
+</div>
+
+<!--
+<div style="text-align: center;">
+    <a style="display:inline-block;background-color:rgba(255, 0, 0, 0.5);padding:5pt"
+       href="script:worldmap_scroll(-10,  0, 0)">왼쪽</a>
+    <a style="display:inline-block;background-color:rgba(255, 0, 0, 0.5);padding:5pt"
+       href="script:worldmap_scroll( 10,  0, 0)">오른쪽</a>
+    <a style="display:inline-block;background-color:rgba(255, 0, 0, 0.5);padding:5pt"
+       href="script:worldmap_scroll(  0, 10, 0)">위</a>
+    <a style="display:inline-block;background-color:rgba(255, 0, 0, 0.5);padding:5pt"
+       href="script:worldmap_scroll(  0,-10, 0)">아래</a>
+    <a style="display:inline-block;background-color:rgba(255, 0, 0, 0.5);padding:5pt"
+       href="script:worldmap_scroll(  0,  0, 1)">줌인</a>
+    <a style="display:inline-block;background-color:rgba(255, 0, 0, 0.5);padding:5pt"
+       href="script:worldmap_scroll(  0,  0,-1)">줌아웃</a>
+</div>
+-->
+
+<!--
+이전 글씨는? <img id="red" src="img_trans.gif"> 그 다음 글씨는...? <img id="black" src="img_trans.gif">
+<br/>
+이전 글씨는? <img id="green" src="img_trans.gif"> 그 다음 글씨는...? <img id="cyan" src="img_trans.gif">
+<br/>
+이전 글씨는? <img id="blue" src="img_trans.gif"> 그 다음 글씨는...? <img id="yellow" src="img_trans.gif">
+-->
+<script type="text/x-lua">
 		local c = lo.script_context()
 		lo.lwc_render_font_test_enable_render('world', 1)
 		lo.lwc_render_font_test_enable_render('landcell', 1)
@@ -118,6 +143,6 @@
 			lo.lwttl_worldmap_scroll(c.ttl, dlng/100, dlat/100, dscale)
 		end
 		return 1234
-	</script>
+</script>
 </body>
 </html>
