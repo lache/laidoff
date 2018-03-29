@@ -93,7 +93,6 @@ extern const char* tex_font_atlas_filename[2];
 #define PS0_VERTEX_BUFFER_COUNT LP0VT_COUNT
 #define LINE_VERTEX_BUFFER_COUNT (1)
 #define MAX_DELTA_TIME_HISTORY (60)
-#define LW_MAX_CONF_TOKEN (1024)
 
 #ifdef __cplusplus
 extern "C" {;

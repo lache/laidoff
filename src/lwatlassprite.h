@@ -31,6 +31,7 @@ typedef enum _LW_ATLAS_CONF {
     LAC_RESULT_TITLE,
     LAC_PREPARE_TITLE,
     LAC_UI_BUTTON,
+    LAC_FLAGS_MINI,
     
     LAC_COUNT,
 } LW_ATLAS_CONF;
@@ -39,6 +40,7 @@ static const char *atlas_conf_filename[] = {
     ASSETS_BASE_PATH "atlas" PATH_SEPARATOR "result-title-atlas-a.json",
     ASSETS_BASE_PATH "atlas" PATH_SEPARATOR "prepare-title-atlas-a.json",
     ASSETS_BASE_PATH "atlas" PATH_SEPARATOR "ui-button-atlas.json",
+    ASSETS_BASE_PATH "atlas" PATH_SEPARATOR "flags-mini.json",
 };
 
 typedef struct _LWATLASSPRITE {
@@ -47,6 +49,7 @@ typedef struct _LWATLASSPRITE {
     int y;
     int width;
     int height;
+    int atlas_index;
 } LWATLASSPRITE;
 
 typedef struct _LWATLASSPRITEARRAY {

@@ -60,6 +60,8 @@
 // SWIG output file
 #include "lo_wrap.inl"
 
+#define LW_MAX_CONF_TOKEN (1024*512)
+
 const float default_uv_offset[2] = { 0, 0 };
 const float default_uv_scale[2] = { 1, 1 };
 const float default_flip_y_uv_scale[2] = { 1, -1 };
@@ -1423,11 +1425,11 @@ static void parse_conf(LWCONTEXT* pLwc) {
     const char *conf_path = ASSETS_BASE_PATH "conf" PATH_SEPARATOR LW_CONF_FILE_NAME;
     jsmn_parser conf_parser;
     jsmn_init(&conf_parser);
-    jsmntok_t conf_token[LW_MAX_CONF_TOKEN];
+    jsmntok_t* conf_token = malloc(sizeof(jsmntok_t) * LW_MAX_CONF_TOKEN);
     LOGI("sizeof(char) == %zu", sizeof(char));
     char *conf_str = create_string_from_file(conf_path);
     if (conf_str) {
-        int token_count = jsmn_parse(&conf_parser, conf_str, strlen(conf_str), conf_token, ARRAY_SIZE(conf_token));
+        int token_count = jsmn_parse(&conf_parser, conf_str, strlen(conf_str), conf_token, LW_MAX_CONF_TOKEN);
         jsmntok_t* t = conf_token;
         if (token_count < 1 || t[0].type != JSMN_OBJECT) {
             LOGE("Conf file broken...");
@@ -1473,6 +1475,7 @@ static void parse_conf(LWCONTEXT* pLwc) {
         fflush(stdout);
         exit(-2);
     }
+    free(conf_token);
 }
 
 static int str2int(const char* str, int len) {
@@ -1487,11 +1490,11 @@ static int str2int(const char* str, int len) {
 static void parse_atlas_conf(LWCONTEXT* pLwc, LWATLASSPRITEARRAY* atlas_array, const char* conf_path) {
     jsmn_parser conf_parser;
     jsmn_init(&conf_parser);
-    jsmntok_t conf_token[LW_MAX_CONF_TOKEN];
+    jsmntok_t* conf_token = malloc(sizeof(jsmntok_t) * LW_MAX_CONF_TOKEN);
     LOGI("sizeof(char) == %zu", sizeof(char));
     char *conf_str = create_string_from_file(conf_path);
     if (conf_str) {
-        int token_count = jsmn_parse(&conf_parser, conf_str, strlen(conf_str), conf_token, ARRAY_SIZE(conf_token));
+        int token_count = jsmn_parse(&conf_parser, conf_str, strlen(conf_str), conf_token, LW_MAX_CONF_TOKEN);
         jsmntok_t* t = conf_token;
         if (token_count < 1 || t[0].type != JSMN_OBJECT) {
             LOGE("Conf file broken...");
@@ -1499,38 +1502,83 @@ static void parse_atlas_conf(LWCONTEXT* pLwc, LWATLASSPRITEARRAY* atlas_array, c
             exit(-1);
         }
         LOGI("atlas file: %s", conf_path);
-        int entry_count = 0;
-        for (int i = 1; i < token_count; i++) {
-            if (jsoneq(conf_str, &t[i], "name") == 0) {
-                entry_count++;
+        if (jsoneq(conf_str, &t[1], "textures") == 0) {
+            // 'crunch' generated output json
+            if (token_count < 2 || t[2].type != JSMN_ARRAY) {
+                LOGE("Conf file broken...");
+                fflush(stdout);
+                exit(-1);
             }
-        }
-        LWATLASSPRITE* atlas_sprite = (LWATLASSPRITE*)calloc(entry_count, sizeof(LWATLASSPRITE));
-        int entry_index = -1;
-        for (int i = 1; i < token_count; i++) {
-            if (jsoneq(conf_str, &t[i], "name") == 0) {
-                LOGI("name: %.*s", t[i + 1].end - t[i + 1].start, conf_str + t[i + 1].start);
-                entry_index++;
-                strncpy(atlas_sprite[entry_index].name, conf_str + t[i + 1].start, t[i + 1].end - t[i + 1].start);
-            } else if (jsoneq(conf_str, &t[i], "x") == 0) {
-                LOGI("x: %.*s", t[i + 1].end - t[i + 1].start, conf_str + t[i + 1].start);
-                atlas_sprite[entry_index].x = str2int(conf_str + t[i + 1].start, t[i + 1].end - t[i + 1].start);
-            } else if (jsoneq(conf_str, &t[i], "y") == 0) {
-                LOGI("y: %.*s", t[i + 1].end - t[i + 1].start, conf_str + t[i + 1].start);
-                atlas_sprite[entry_index].y = str2int(conf_str + t[i + 1].start, t[i + 1].end - t[i + 1].start);
-            } else if (jsoneq(conf_str, &t[i], "width") == 0) {
-                LOGI("width: %.*s", t[i + 1].end - t[i + 1].start, conf_str + t[i + 1].start);
-                atlas_sprite[entry_index].width = str2int(conf_str + t[i + 1].start, t[i + 1].end - t[i + 1].start);
-            } else if (jsoneq(conf_str, &t[i], "height") == 0) {
-                LOGI("height: %.*s", t[i + 1].end - t[i + 1].start, conf_str + t[i + 1].start);
-                atlas_sprite[entry_index].height = str2int(conf_str + t[i + 1].start, t[i + 1].end - t[i + 1].start);
+            int entry_count = 0;
+            for (int i = 1; i < token_count; i++) {
+                if (jsoneq(conf_str, &t[i], "images") == 0 && t[i + 1].type == JSMN_ARRAY) {
+                    entry_count += t[i + 1].size;
+                }
             }
+            LWATLASSPRITE* atlas_sprite = (LWATLASSPRITE*)calloc(entry_count, sizeof(LWATLASSPRITE));
+            int entry_index = -1;
+            int atlas_index = -1;
+            for (int i = 1; i < token_count; i++) {
+                if (jsoneq(conf_str, &t[i], "name") == 0) {
+                    atlas_index++;
+                } else if (jsoneq(conf_str, &t[i], "n") == 0) {
+                    LOGI("n: %.*s", t[i + 1].end - t[i + 1].start, conf_str + t[i + 1].start);
+                    entry_index++;
+                    strncpy(atlas_sprite[entry_index].name, conf_str + t[i + 1].start, t[i + 1].end - t[i + 1].start);
+                    atlas_sprite[entry_index].atlas_index = atlas_index;
+                } else if (jsoneq(conf_str, &t[i], "x") == 0) {
+                    LOGI("x: %.*s", t[i + 1].end - t[i + 1].start, conf_str + t[i + 1].start);
+                    atlas_sprite[entry_index].x = str2int(conf_str + t[i + 1].start, t[i + 1].end - t[i + 1].start);
+                } else if (jsoneq(conf_str, &t[i], "y") == 0) {
+                    LOGI("y: %.*s", t[i + 1].end - t[i + 1].start, conf_str + t[i + 1].start);
+                    atlas_sprite[entry_index].y = str2int(conf_str + t[i + 1].start, t[i + 1].end - t[i + 1].start);
+                } else if (jsoneq(conf_str, &t[i], "w") == 0) {
+                    LOGI("w: %.*s", t[i + 1].end - t[i + 1].start, conf_str + t[i + 1].start);
+                    atlas_sprite[entry_index].width = str2int(conf_str + t[i + 1].start, t[i + 1].end - t[i + 1].start);
+                } else if (jsoneq(conf_str, &t[i], "h") == 0) {
+                    LOGI("h: %.*s", t[i + 1].end - t[i + 1].start, conf_str + t[i + 1].start);
+                    atlas_sprite[entry_index].height = str2int(conf_str + t[i + 1].start, t[i + 1].end - t[i + 1].start);
+                }
+            }
+            atlas_array->count = entry_count;
+            atlas_array->first = atlas_sprite;
+            //free(atlas_sprite);
+            conf_str = 0;
+        } else {
+            // 'simple (legacy)' output json
+            int entry_count = 0;
+            for (int i = 1; i < token_count; i++) {
+                if (jsoneq(conf_str, &t[i], "name") == 0) {
+                    entry_count++;
+                }
+            }
+            LWATLASSPRITE* atlas_sprite = (LWATLASSPRITE*)calloc(entry_count, sizeof(LWATLASSPRITE));
+            int entry_index = -1;
+            for (int i = 1; i < token_count; i++) {
+                if (jsoneq(conf_str, &t[i], "name") == 0) {
+                    LOGI("name: %.*s", t[i + 1].end - t[i + 1].start, conf_str + t[i + 1].start);
+                    entry_index++;
+                    strncpy(atlas_sprite[entry_index].name, conf_str + t[i + 1].start, t[i + 1].end - t[i + 1].start);
+                } else if (jsoneq(conf_str, &t[i], "x") == 0) {
+                    LOGI("x: %.*s", t[i + 1].end - t[i + 1].start, conf_str + t[i + 1].start);
+                    atlas_sprite[entry_index].x = str2int(conf_str + t[i + 1].start, t[i + 1].end - t[i + 1].start);
+                } else if (jsoneq(conf_str, &t[i], "y") == 0) {
+                    LOGI("y: %.*s", t[i + 1].end - t[i + 1].start, conf_str + t[i + 1].start);
+                    atlas_sprite[entry_index].y = str2int(conf_str + t[i + 1].start, t[i + 1].end - t[i + 1].start);
+                } else if (jsoneq(conf_str, &t[i], "width") == 0) {
+                    LOGI("width: %.*s", t[i + 1].end - t[i + 1].start, conf_str + t[i + 1].start);
+                    atlas_sprite[entry_index].width = str2int(conf_str + t[i + 1].start, t[i + 1].end - t[i + 1].start);
+                } else if (jsoneq(conf_str, &t[i], "height") == 0) {
+                    LOGI("height: %.*s", t[i + 1].end - t[i + 1].start, conf_str + t[i + 1].start);
+                    atlas_sprite[entry_index].height = str2int(conf_str + t[i + 1].start, t[i + 1].end - t[i + 1].start);
+                }
+            }
+            atlas_array->count = entry_count;
+            atlas_array->first = atlas_sprite;
+            //free(atlas_sprite);
+            conf_str = 0;
         }
-        atlas_array->count = entry_count;
-        atlas_array->first = atlas_sprite;
-        //free(atlas_sprite);
         release_string(conf_str);
-        conf_str = 0;
     } else {
         LOGE("Atlas conf file %s not found!", conf_path);
         fflush(stdout);
@@ -1538,6 +1586,7 @@ static void parse_atlas_conf(LWCONTEXT* pLwc, LWATLASSPRITEARRAY* atlas_array, c
         atlas_array->first = 0;
         exit(-2);
     }
+    free(conf_token);
 }
 
 static void parse_atlas(LWCONTEXT* pLwc) {
