@@ -141,87 +141,15 @@
 </head>
 <body style="margin:0px;font-size:1em">
 <a style="position:absolute;right:0px;bottom:0px;display:inline-block;background-color:rgba(255, 0, 0, 0.5);padding:5pt" href="script:go_online()">온라인으로</a>
-<div class="ship-button-header">
-    메인 메뉴
+<h3>가까운 항구</h3>
+<div lw:loop="seaport">
+    <a style="display:inline-block;background-color:rgba(255, 0, 0, 0.5);padding:5pt;"
+       href="{{script}}">{{name}}</a>
 </div>
-
-<div class="ship-button-group">
-    <div class="ship-button">
-        <h3>회사</h3>
-        <hr class="ship-button-hr"/>
-        <a class="touch-button" href="purchase-vessel.html">이동하기</a>
-    </div>
-
-    <div class="ship-button">
-        <h3>선박</h3>
-        <hr class="ship-button-hr"/>
-        <a class="touch-button" href="vessels.html">이동하기</a>
-    </div>
-
-    <div class="ship-button">
-        <h3>항구</h3>
-        <hr class="ship-button-hr"/>
-        <a class="touch-button" href="nearest-seaports.html">이동하기</a>
-    </div>
-
+<h3>세계 항구</h3>
+<div lw:loop="world-seaport">
+    <a style="display:inline-block;background-color:rgba(255, 0, 0, 0.5);padding:5pt;"
+       href="{{script}}">{{name}}</a>
 </div>
-
-
-<div class="ship-button-group">
-    <div class="ship-button">
-        <h3>항로</h3>
-        <hr class="ship-button-hr"/>
-        <a class="touch-button" href="script:hehehe()">이동하기</a>
-    </div>
-
-    <div class="ship-button">
-        <h3>계약</h3>
-        <hr class="ship-button-hr"/>
-        <a class="touch-button" href="script:hehehe()">이동하기</a>
-    </div>
-
-    <div class="ship-button">
-        <h3>재무</h3>
-        <hr class="ship-button-hr"/>
-        <a class="touch-button" href="script:hehehe()">이동하기</a>
-    </div>
-
-</div>
-
-<!--
-<div style="text-align: center;">
-    <a style="display:inline-block;background-color:rgba(255, 0, 0, 0.5);padding:5pt"
-       href="script:worldmap_scroll(-10,  0, 0)">왼쪽</a>
-    <a style="display:inline-block;background-color:rgba(255, 0, 0, 0.5);padding:5pt"
-       href="script:worldmap_scroll( 10,  0, 0)">오른쪽</a>
-    <a style="display:inline-block;background-color:rgba(255, 0, 0, 0.5);padding:5pt"
-       href="script:worldmap_scroll(  0, 10, 0)">위</a>
-    <a style="display:inline-block;background-color:rgba(255, 0, 0, 0.5);padding:5pt"
-       href="script:worldmap_scroll(  0,-10, 0)">아래</a>
-    <a style="display:inline-block;background-color:rgba(255, 0, 0, 0.5);padding:5pt"
-       href="script:worldmap_scroll(  0,  0, 1)">줌인</a>
-    <a style="display:inline-block;background-color:rgba(255, 0, 0, 0.5);padding:5pt"
-       href="script:worldmap_scroll(  0,  0,-1)">줌아웃</a>
-</div>
--->
-
-<!--
-이전 글씨는? <img id="red" src="img_trans.gif"> 그 다음 글씨는...? <img id="black" src="img_trans.gif">
-<br/>
-이전 글씨는? <img id="green" src="img_trans.gif"> 그 다음 글씨는...? <img id="cyan" src="img_trans.gif">
-<br/>
-이전 글씨는? <img id="blue" src="img_trans.gif"> 그 다음 글씨는...? <img id="yellow" src="img_trans.gif">
--->
-<script type="text/x-lua">
-		local c = lo.script_context()
-		lo.htmlui_set_online(c.htmlui, 0)
-		lo.lwc_render_font_test_enable_render('world', 1)
-		lo.lwc_render_font_test_enable_render('landcell', 1)
-		lo.lwc_render_font_test_enable_render('landcell_nameplate', 1)
-		function worldmap_scroll(dlng, dlat, dscale)
-			lo.lwttl_worldmap_scroll(c.ttl, dlng/100, dlat/100, dscale)
-		end
-		return 1234
-</script>
 </body>
 </html>

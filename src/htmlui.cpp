@@ -10,6 +10,7 @@
 #include "file.h"
 #include "render_font_test.h"
 #include "lwtcp.h"
+#include "lwmutex.h"
 
 class LWHTMLUI {
 public:
@@ -19,6 +20,7 @@ public:
         , client_width(w)
         , client_height(h)
         , refresh_html_body(0) {
+        LWMUTEX_INIT(parsing_mutex);
         std::shared_ptr<char> master_css_str(create_string_from_file(ASSETS_BASE_PATH "css" PATH_SEPARATOR "master.css"), free);
         browser_context.load_master_stylesheet(master_css_str.get());
 
@@ -34,21 +36,38 @@ public:
                     "script",{ "script:call_me(1)", "script:call_me(2)" }
                 }, } }, });
     }
+    ~LWHTMLUI() {
+        LWMUTEX_DESTROY(parsing_mutex);
+    }
     void set_loop_var_map_entry(const std::string& loop_name, const std::map<std::string, std::vector<std::string> >& var_map) {
         browser_context.set_loop_var_map_entry(loop_name, var_map);
     }
     void set_loop_key_value(const std::string& loop_name, const std::string& key, const std::string& value) {
+        lock();
         browser_context.set_loop_key_value(loop_name, key, value);
+        unlock();
     }
     void clear_loop(const std::string& loop_name) {
+        lock();
         browser_context.clear_loop(loop_name);
+        unlock();
     }
     void load_page(const char* html_path) {
         std::shared_ptr<char> html_str(create_string_from_file(html_path), free);
+        lock();
         doc = litehtml::document::createFromString(html_str.get(), &container, &browser_context);
+        unlock();
     }
     void load_body(const char* html_body) {
+        lock();
         doc = litehtml::document::createFromString(html_body, &container, &browser_context);
+        unlock();
+    }
+    void lock() {
+        LWMUTEX_LOCK(parsing_mutex);
+    }
+    void unlock() {
+        LWMUTEX_UNLOCK(parsing_mutex);
     }
     void render_page() {
         doc->render(client_width);
@@ -105,6 +124,9 @@ public:
             refresh_html_body = 0;
         }
     }
+    void set_online(bool b) {
+        container.set_online(b);
+    }
 private:
     LWHTMLUI();
     LWHTMLUI(const LWHTMLUI&);
@@ -117,6 +139,7 @@ private:
     litehtml::element::ptr last_lbutton_down_element;
     std::string next_html_path;
     int refresh_html_body;
+    LWMUTEX parsing_mutex;
 };
 
 void* htmlui_new(LWCONTEXT* pLwc) {
@@ -220,4 +243,9 @@ void htmlui_clear_loop(void* c, const char* loop_name) {
 void htmlui_set_loop_key_value(void* c, const char* loop_name, const char* key, const char* value) {
     LWHTMLUI* htmlui = (LWHTMLUI*)c;
     htmlui->set_loop_key_value(loop_name, key, value);
+}
+
+void htmlui_set_online(void* c, int b) {
+    LWHTMLUI* htmlui = (LWHTMLUI*)c;
+    htmlui->set_online(b ? true : false);
 }

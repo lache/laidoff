@@ -18,6 +18,7 @@ extern "C" {
     void htmlui_load_next_html_body(void* c);
     void htmlui_clear_loop(void* c, const char* loop_name);
     void htmlui_set_loop_key_value(void* c, const char* loop_name, const char* key, const char* value);
+    void htmlui_set_online(void* c, int b);
 #ifdef __cplusplus
 }
 #endif

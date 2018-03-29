@@ -88852,6 +88852,28 @@ fail:
 }
 
 
+static int _wrap_htmlui_set_online(lua_State* L) {
+  int SWIG_arg = 0;
+  void *arg1 = (void *) 0 ;
+  int arg2 ;
+  
+  SWIG_check_num_args("htmlui_set_online",2,2)
+  if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("htmlui_set_online",1,"void *");
+  if(!lua_isnumber(L,2)) SWIG_fail_arg("htmlui_set_online",2,"int");
+  arg1=(void *)SWIG_MustGetPtr(L,1,0,0,1,"htmlui_set_online");
+  arg2 = (int)lua_tonumber(L, 2);
+  htmlui_set_online(arg1,arg2);
+  
+  return SWIG_arg;
+  
+  if(0) SWIG_fail;
+  
+fail:
+  lua_error(L);
+  return SWIG_arg;
+}
+
+
 static int _wrap_LWTTLLNGLAT_lng_set(lua_State* L) {
   int SWIG_arg = 0;
   struct _LWTTLLNGLAT *arg1 = (struct _LWTTLLNGLAT *) 0 ;
@@ -91201,6 +91223,7 @@ static swig_lua_method swig_SwigModule_methods[]= {
     { "htmlui_load_next_html_body", _wrap_htmlui_load_next_html_body},
     { "htmlui_clear_loop", _wrap_htmlui_clear_loop},
     { "htmlui_set_loop_key_value", _wrap_htmlui_set_loop_key_value},
+    { "htmlui_set_online", _wrap_htmlui_set_online},
     { "lwttl_new", _wrap_lwttl_new},
     { "lwttl_destroy", _wrap_lwttl_destroy},
     { "lwttl_render_all_seaports", _wrap_lwttl_render_all_seaports},

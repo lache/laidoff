@@ -281,6 +281,7 @@ void litehtml::text_container::on_anchor_click(const litehtml::tchar_t * url, co
         } else {
             LOGE("tcp_ttl null");
         }
+        online = true;
     } else if (strncmp(url, "script:", strlen("script:")) == 0) {
         script_evaluate_async(pLwc, url + strlen("script:"), strlen(url + strlen("script:")));
     } else {
@@ -288,11 +289,14 @@ void litehtml::text_container::on_anchor_click(const litehtml::tchar_t * url, co
         char path[1024] = { 0, };
         strcat(path, path_prefix);
         strcat(path, url);
-        //htmlui_set_next_html_path(pLwc->htmlui, path);
-        if (pLwc->tcp_ttl) {
-            tcp_send_httpget(pLwc->tcp_ttl, url);
+        if (online) {
+            if (pLwc->tcp_ttl) {
+                tcp_send_httpget(pLwc->tcp_ttl, url);
+            } else {
+                LOGE("tcp_ttl null");
+            }
         } else {
-            LOGE("tcp_ttl null");
+            htmlui_set_next_html_path(pLwc->htmlui, path);
         }
     }
 }

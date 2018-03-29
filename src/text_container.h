@@ -48,11 +48,14 @@ namespace litehtml {
 
 		virtual void				get_media_features(litehtml::media_features& media) const;
 		virtual void				get_language(litehtml::tstring& language, litehtml::tstring & culture) const;
+
+        void set_online(bool b) { online = b; }
 	private:
         void draw_border_rect(const litehtml::border& border, int x, int y, int w, int h, LW_VBO_TYPE lvt, const litehtml::web_color& color) const;
 		LWCONTEXT * pLwc;
 		int w;
 		int h;
 		int default_font_size;
+        bool online;
 	};
 }
