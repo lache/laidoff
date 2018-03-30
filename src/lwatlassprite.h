@@ -4,6 +4,10 @@
 #include "lwmacro.h"
 #include "lwatlasenum.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 typedef struct _LWCONTEXT LWCONTEXT;
 
 typedef enum _LW_VBO_TYPE LW_VBO_TYPE;
@@ -81,9 +85,6 @@ LwStaticAssert(ARRAY_SIZE(atlas_conf_filename) == LAC_COUNT, "LAC_COUNT error");
 LwStaticAssert(ARRAY_SIZE(atlas_first_lae) == LAC_COUNT, "LAC_COUNT error");
 LwStaticAssert(ARRAY_SIZE(atlas_first_alpha_lae) == LAC_COUNT, "LAC_COUNT error");
 
-#ifdef __cplusplus
-extern "C" {
-#endif
     const LWATLASSPRITE* atlas_sprite_name(const LWCONTEXT* pLwc, LW_ATLAS_CONF lac, const char* name);
     LWATLASSPRITEPTR atlas_name_sprite_name(const LWCONTEXT* pLwc, const char* atlas_name, const char* sprite_name);
     LW_ATLAS_ENUM atlas_sprite_lae(const LWATLASSPRITEPTR* ptr);
