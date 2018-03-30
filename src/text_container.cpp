@@ -129,7 +129,7 @@ static LWATLASSPRITEPTR atlas_sprite_ptr_from_url(const LWCONTEXT* pLwc, const s
 }
 
 void litehtml::text_container::get_image_size(const litehtml::tchar_t * src, const litehtml::tchar_t * baseurl, litehtml::size & sz) {
-    LOGI("get_image_size: src=%s,baseurl=%s", src, baseurl);
+    LOGIx("get_image_size: src=%s,baseurl=%s", src, baseurl);
     LWATLASSPRITEPTR atlas_sprite_ptr = atlas_sprite_ptr_from_url(pLwc, src);
     if (atlas_sprite_ptr.sprite) {
         sz.width = atlas_sprite_ptr.sprite->width;
@@ -156,7 +156,7 @@ void litehtml::text_container::draw_background(litehtml::uint_ptr hdc, const lit
     int show_test_image = 0;
     
     if (bg.image.length()) {
-        LOGI("draw_background [IMAGE]: x=%d,y=%d,w=%d,h=%d,clipbox=%d/%d/%d/%d,position_xy=%d/%d,image_size=%d/%d,color=0x%02X%02X%02X|%02X,image=%s,baseurl=%s",
+        LOGIx("draw_background [IMAGE]: x=%d,y=%d,w=%d,h=%d,clipbox=%d/%d/%d/%d,position_xy=%d/%d,image_size=%d/%d,color=0x%02X%02X%02X|%02X,image=%s,baseurl=%s",
              bg.border_box.x,
              bg.border_box.y,
              bg.border_box.width,

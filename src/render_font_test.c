@@ -26,15 +26,24 @@ void lwc_render_font_test_fbo_body(const LWCONTEXT* pLwc, const char* html_body)
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
-void lwc_render_font_test_fbo(const LWCONTEXT* pLwc, const char* html_path) {
+void lwc_prerender_font_test_fbo(const LWCONTEXT* pLwc) {
     glBindFramebuffer(GL_FRAMEBUFFER, pLwc->font_fbo.fbo);
     glDisable(GL_DEPTH_TEST);
 
     glViewport(0, 0, pLwc->font_fbo.width, pLwc->font_fbo.height);
     glClearColor(0, 0, 0, 0); // alpha should be cleared to zero
-    //lw_clear_color();
+                              //lw_clear_color();
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glBlendFuncSeparate(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA, GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
+}
+
+void lwc_postrender_font_test_fbo(const LWCONTEXT* pLwc) {
+    glEnable(GL_DEPTH_TEST);
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+}
+
+void lwc_render_font_test_fbo(const LWCONTEXT* pLwc, const char* html_path) {
+    lwc_prerender_font_test_fbo(pLwc);
 
     //LWTEXTBLOCK test_text_block;
     //test_text_block.text_block_width = 999.0f;// 2.00f * aspect_ratio;
@@ -151,8 +160,7 @@ void lwc_render_font_test_fbo(const LWCONTEXT* pLwc, const char* html_path) {
 
     htmlui_load_render_draw(pLwc->htmlui, html_path);
 
-    glEnable(GL_DEPTH_TEST);
-    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    lwc_postrender_font_test_fbo(pLwc);
 }
 
 typedef struct _LWWAVE {
@@ -655,7 +663,9 @@ void lwc_render_font_test(const LWCONTEXT* pLwc) {
     // render FBO (HTML UI)
     render_solid_box_ui_lvt_flip_y_uv(pLwc, 0, 0, 2 * pLwc->aspect_ratio, 2, pLwc->font_fbo.color_tex, LVT_CENTER_CENTER_ANCHORED_SQUARE, 1);
     // render joystick
-    render_dir_pad_with_start_joystick(pLwc, &pLwc->left_dir_pad, 1.0f);
+    if (0) {
+        render_dir_pad_with_start_joystick(pLwc, &pLwc->left_dir_pad, 1.0f);
+    }
     glEnable(GL_DEPTH_TEST);
 }
 

@@ -15,7 +15,7 @@ void litehtml::el_luascript::parse_attributes()
 {
 	tstring text;
 	get_text(text);
-    LOGI("<script> tag: %s", text.c_str());
+    LOGIx("<script> tag: %s", text.c_str());
 
     script_evaluate_async(pLwc, text.c_str(), text.size());
 }

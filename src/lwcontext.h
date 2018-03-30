@@ -33,6 +33,7 @@
 #include "lwhostaddr.h"
 #include "lwfvbo.h"
 #include "lwfanim.h"
+#include "lwcountry.h"
 #define MAX_RENDER_QUEUE_CAPACITY (512)
 
 // Vertex attributes: Coordinates (3xf) + Normal (3xf) + UV (2xf) + S9 (2xf)
@@ -408,6 +409,8 @@ typedef struct _LWCONTEXT {
     LWPTTLSTATICSTATE ttl_static_state;
     LWPTTLSEAPORTSTATE ttl_seaport_state;
     void* ttl;
+    LWCOUNTRYARRAY country_array;
+    int country_page;
 } LWCONTEXT;
 
 
@@ -421,6 +424,10 @@ LWFIELD* lwcontext_field(LWCONTEXT* pLwc);
 void lwcontext_inc_rmsg_send(LWCONTEXT* pLwc);
 void lwcontext_inc_rmsg_recv(LWCONTEXT* pLwc);
 void lwcontext_set_custom_puck_game_stage(LWCONTEXT* pLwc, LW_VBO_TYPE lvt, LW_ATLAS_ENUM lae);
+void lw_first_page(LWCONTEXT* pLwc);
+void lw_prev_page(LWCONTEXT* pLwc);
+void lw_next_page(LWCONTEXT* pLwc);
+void lw_last_page(LWCONTEXT* pLwc);
 #ifdef __cplusplus
 };
 #endif

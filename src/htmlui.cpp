@@ -35,6 +35,8 @@ public:
                 },{
                     "script",{ "script:call_me(1)", "script:call_me(2)" }
                 }, } }, });
+
+        htmlui_update_country_data(pLwc, this);
     }
     ~LWHTMLUI() {
         LWMUTEX_DESTROY(parsing_mutex);
@@ -56,11 +58,13 @@ public:
         std::shared_ptr<char> html_str(create_string_from_file(html_path), free);
         lock();
         doc = litehtml::document::createFromString(html_str.get(), &container, &browser_context);
+        last_html_str = html_str.get();
         unlock();
     }
     void load_body(const char* html_body) {
         lock();
         doc = litehtml::document::createFromString(html_body, &container, &browser_context);
+        last_html_str = html_body;
         unlock();
     }
     void lock() {
@@ -75,6 +79,15 @@ public:
     void draw() {
         litehtml::position clip(0, 0, client_width, client_height);
         doc->draw(0, 0, 0, &clip);
+    }
+    void redraw_fbo() {
+        lock();
+        doc = litehtml::document::createFromString(last_html_str.c_str(), &container, &browser_context);
+        render_page();
+        lwc_prerender_font_test_fbo(pLwc);
+        draw();
+        lwc_postrender_font_test_fbo(pLwc);
+        unlock();
     }
     void on_lbutton_down(float nx, float ny) {
         if (doc) {
@@ -140,6 +153,7 @@ private:
     std::string next_html_path;
     int refresh_html_body;
     LWMUTEX parsing_mutex;
+    std::string last_html_str;
 };
 
 void* htmlui_new(LWCONTEXT* pLwc) {
@@ -157,6 +171,11 @@ void htmlui_load_render_draw(void* c, const char* html_path) {
     htmlui->load_page(html_path);
     htmlui->render_page();
     htmlui->draw();
+}
+
+void htmlui_load_redraw_fbo(void* c) {
+    LWHTMLUI* htmlui = (LWHTMLUI*)c;
+    htmlui->redraw_fbo();
 }
 
 void htmlui_load_render_draw_body(void* c, const char* html_body) {
@@ -248,4 +267,22 @@ void htmlui_set_loop_key_value(void* c, const char* loop_name, const char* key, 
 void htmlui_set_online(void* c, int b) {
     LWHTMLUI* htmlui = (LWHTMLUI*)c;
     htmlui->set_online(b ? true : false);
+}
+
+void htmlui_update_country_data(const LWCONTEXT* pLwc, void* c) {
+    LWHTMLUI* htmlui = (LWHTMLUI*)c;
+    htmlui_clear_loop(htmlui, "country");
+    int items_per_page = 20;
+    for (int i = pLwc->country_page * items_per_page;
+         i < LWMIN((pLwc->country_page + 1) * items_per_page, pLwc->country_array.count);
+         i++) {
+        char img_src[64];
+        sprintf(img_src, "atlas/flags-mini/%s.png", pLwc->country_array.first[i].code);
+        char* p = img_src;
+        for (; *p; ++p) {
+            *p = tolower(*p);
+        }
+        htmlui_set_loop_key_value(htmlui, "country", "name", pLwc->country_array.first[i].name);
+        htmlui_set_loop_key_value(htmlui, "country", "img_src", img_src);
+    }
 }

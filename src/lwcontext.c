@@ -1,4 +1,5 @@
 #include "lwcontext.h"
+#include "htmlui.h"
 
 const vec4 EXP_COLOR = { 90 / 255.0f, 173 / 255.0f, 255 / 255.0f, 1 };
 
@@ -44,4 +45,28 @@ void lwcontext_inc_rmsg_recv(LWCONTEXT* pLwc) {
 void lwcontext_set_custom_puck_game_stage(LWCONTEXT* pLwc, LW_VBO_TYPE lvt, LW_ATLAS_ENUM lae) {
     pLwc->puck_game_stage_lvt = lvt;
     pLwc->puck_game_stage_lae = lae;
+}
+
+void lw_first_page(LWCONTEXT* pLwc) {
+    pLwc->country_page = 0;
+    htmlui_update_country_data(pLwc, pLwc->htmlui);
+    htmlui_load_redraw_fbo(pLwc->htmlui);
+}
+
+void lw_prev_page(LWCONTEXT* pLwc) {
+    pLwc->country_page = LWMAX(0, pLwc->country_page - 1);
+    htmlui_update_country_data(pLwc, pLwc->htmlui);
+    htmlui_load_redraw_fbo(pLwc->htmlui);
+}
+
+void lw_next_page(LWCONTEXT* pLwc) {
+    pLwc->country_page = LWMIN(pLwc->country_page + 1, (pLwc->country_array.count - 1) / 20);
+    htmlui_update_country_data(pLwc, pLwc->htmlui);
+    htmlui_load_redraw_fbo(pLwc->htmlui);
+}
+
+void lw_last_page(LWCONTEXT* pLwc) {
+    pLwc->country_page = (pLwc->country_array.count - 1) / 20;
+    htmlui_update_country_data(pLwc, pLwc->htmlui);
+    htmlui_load_redraw_fbo(pLwc->htmlui);
 }

@@ -57,6 +57,7 @@
 #include "searoute.h"
 #include "searoute2.h"
 #include "lwttl.h"
+#include "lwcountry.h"
 // SWIG output file
 #include "lo_wrap.inl"
 
@@ -1487,6 +1488,58 @@ static int str2int(const char* str, int len) {
     return ret;
 }
 
+static void parse_countries(LWCONTEXT* pLwc, LWCOUNTRYARRAY* country_array, const char* conf_path) {
+    jsmn_parser conf_parser;
+    jsmn_init(&conf_parser);
+    jsmntok_t* conf_token = malloc(sizeof(jsmntok_t) * LW_MAX_CONF_TOKEN);
+    LOGI("sizeof(char) == %zu", sizeof(char));
+    char *conf_str = create_string_from_file(conf_path);
+    if (conf_str) {
+        int token_count = jsmn_parse(&conf_parser, conf_str, strlen(conf_str), conf_token, LW_MAX_CONF_TOKEN);
+        jsmntok_t* t = conf_token;
+        if (token_count < 1 || t[0].type != JSMN_ARRAY) {
+            LOGE("Conf file broken...");
+            fflush(stdout);
+            exit(-1);
+        }
+        LOGI("countries file: %s", conf_path);
+        
+        int entry_count = t[0].size;
+        LWCOUNTRY* country = (LWCOUNTRY*)calloc(entry_count, sizeof(LWCOUNTRY));
+        
+        int string_count = 0;
+        int entry_index = -1;
+        for (int i = 1; i < token_count; i++) {
+            if (t[i].type == JSMN_STRING) {
+                LOGI("countries: %.*s", t[i].end - t[i].start, conf_str + t[i].start);
+                int string_mod = string_count % 3;
+                if (string_mod == 0) {
+                    entry_index++;
+                    strncpy(country[entry_index].code, conf_str + t[i].start, t[i].end - t[i].start);
+                    country[entry_index].code[t[i].end - t[i].start] = 0;
+                } else if (string_mod == 1) {
+                    // korean
+                    strncpy(country[entry_index].name, conf_str + t[i].start, t[i].end - t[i].start);
+                    country[entry_index].name[t[i].end - t[i].start] = 0;
+                } else if (string_mod == 2) {
+                    // english
+                }
+                string_count++;
+            }
+        }
+        country_array->count = entry_count;
+        country_array->first = country;
+        //free(atlas_sprite);
+        conf_str = 0;
+        release_string(conf_str);
+    } else {
+        LOGE("Atlas conf file %s not found!", conf_path);
+        fflush(stdout);
+        exit(-2);
+    }
+    free(conf_token);
+}
+
 static void parse_atlas_conf(LWCONTEXT* pLwc, LWATLASSPRITEARRAY* atlas_array, const char* conf_path, LW_ATLAS_ENUM first_lae, LW_ATLAS_ENUM first_alpha_lae) {
     jsmn_parser conf_parser;
     jsmn_init(&conf_parser);
@@ -1628,6 +1681,7 @@ LWCONTEXT* lw_init_initial_size(int width, int height) {
     
     parse_conf(pLwc);
     parse_atlas(pLwc);
+    parse_countries(pLwc, &pLwc->country_array, ASSETS_BASE_PATH "ttldata" PATH_SEPARATOR "countries.json");
     
     pLwc->width = width;
     pLwc->height = height;
@@ -1831,6 +1885,8 @@ void lw_deinit(LWCONTEXT* pLwc) {
     ps_destroy_context(&pLwc->ps_context);
 
     lwttl_destroy(&pLwc->ttl);
+
+    free(pLwc->country_array.first);
     
     free(pLwc);
 }

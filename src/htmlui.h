@@ -19,6 +19,8 @@ extern "C" {
     void htmlui_clear_loop(void* c, const char* loop_name);
     void htmlui_set_loop_key_value(void* c, const char* loop_name, const char* key, const char* value);
     void htmlui_set_online(void* c, int b);
+    void htmlui_update_country_data(const LWCONTEXT* pLwc, void* c);
+    void htmlui_load_redraw_fbo(void* c);
 #ifdef __cplusplus
 }
 #endif

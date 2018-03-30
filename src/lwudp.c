@@ -363,6 +363,9 @@ void udp_sea_update(LWCONTEXT* pLwc, LWUDP* udp) {
                             129.0f + 3.0f / 60.0f,
                             35.0f + 8.0f / 60.0f);
                     htmlui_set_loop_key_value(pLwc->htmlui, "world-seaport", "script", script);
+
+                    
+                    
                     break;
                 }
                 default:
