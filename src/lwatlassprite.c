@@ -56,7 +56,7 @@ void render_atlas_sprite_ptr(const LWCONTEXT* pLwc,
                              float x,
                              float y,
                              float ui_alpha,
-                             LW_VBO_TYPE lvt) {
+                             int lvt) {
     float uv_offset[2];
     float uv_scale[2];
     // pLwc->tex_atlas_width[lae], pLwc->tex_atlas_height[lae] should be filled
@@ -114,7 +114,7 @@ void render_atlas_sprite(const LWCONTEXT* pLwc,
                          float x,
                          float y,
                          float ui_alpha,
-                         LW_VBO_TYPE lvt) {
+                         int lvt) {
     const LWATLASSPRITE* sprite = atlas_sprite_name(pLwc, atlas_conf, sprite_name);
     render_atlas_sprite_ptr(pLwc, sprite, lae, lae_alpha, sprite_width, x, y, ui_alpha, lvt);
 }

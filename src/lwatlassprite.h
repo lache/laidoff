@@ -10,8 +10,6 @@ extern "C" {
 
 typedef struct _LWCONTEXT LWCONTEXT;
 
-typedef enum _LW_VBO_TYPE LW_VBO_TYPE;
-
 typedef enum _LW_ATLAS_SPRITE
 {
     LAS_COMMAND_SELECTED_BG,
@@ -98,7 +96,7 @@ LwStaticAssert(ARRAY_SIZE(atlas_first_alpha_lae) == LAC_COUNT, "LAC_COUNT error"
                                  float x,
                                  float y,
                                  float ui_alpha,
-                                 LW_VBO_TYPE lvt);
+                                 int lvt);
     void render_atlas_sprite(const LWCONTEXT* pLwc,
                              LW_ATLAS_CONF atlas_conf,
                              const char* sprite_name,
@@ -108,7 +106,7 @@ LwStaticAssert(ARRAY_SIZE(atlas_first_alpha_lae) == LAC_COUNT, "LAC_COUNT error"
                              float x,
                              float y,
                              float ui_alpha,
-                             LW_VBO_TYPE lvt);
+                             int lvt);
 #ifdef __cplusplus
 }
 #endif
