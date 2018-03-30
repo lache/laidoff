@@ -2,14 +2,11 @@
 
 #include "sprite_data.h"
 #include "lwmacro.h"
+#include "lwatlasenum.h"
 
 typedef struct _LWCONTEXT LWCONTEXT;
 
-#ifndef __cplusplus
 typedef enum _LW_VBO_TYPE LW_VBO_TYPE;
-typedef enum _LW_ATLAS_ENUM LW_ATLAS_ENUM;
-#endif
-
 
 typedef enum _LW_ATLAS_SPRITE
 {
@@ -43,6 +40,20 @@ static const char *atlas_conf_filename[] = {
     ASSETS_BASE_PATH "atlas" PATH_SEPARATOR "flags-mini.json",
 };
 
+static LW_ATLAS_ENUM atlas_first_lae[] = {
+    LAE_RESULT_TITLE_ATLAS,
+    LAE_PREPARE_TITLE_ATLAS,
+    LAE_UI_BUTTON_ATLAS,
+    LAE_FLAGS_MINI0,
+};
+
+static LW_ATLAS_ENUM atlas_first_alpha_lae[] = {
+    LAE_RESULT_TITLE_ATLAS_ALPHA,
+    LAE_PREPARE_TITLE_ATLAS_ALPHA,
+    LAE_DONTCARE,
+    LAE_FLAGS_MINI0_ALPHA,
+};
+
 typedef struct _LWATLASSPRITE {
     char name[64];
     int x;
@@ -53,24 +64,52 @@ typedef struct _LWATLASSPRITE {
 } LWATLASSPRITE;
 
 typedef struct _LWATLASSPRITEARRAY {
+    char atlas_name[64];
     int count;
     LWATLASSPRITE* first;
+    LW_ATLAS_ENUM first_lae;
+    LW_ATLAS_ENUM first_alpha_lae;
 } LWATLASSPRITEARRAY;
+
+typedef struct _LWATLASSPRITEPTR {
+    const LWATLASSPRITEARRAY* atlas;
+    const LWATLASSPRITE* sprite;
+} LWATLASSPRITEPTR;
 
 LwStaticAssert(ARRAY_SIZE(SPRITE_DATA[0]) == LAS_COUNT, "LAS_COUNT error");
 LwStaticAssert(ARRAY_SIZE(atlas_conf_filename) == LAC_COUNT, "LAC_COUNT error");
+LwStaticAssert(ARRAY_SIZE(atlas_first_lae) == LAC_COUNT, "LAC_COUNT error");
+LwStaticAssert(ARRAY_SIZE(atlas_first_alpha_lae) == LAC_COUNT, "LAC_COUNT error");
 
-const LWATLASSPRITE* atlas_sprite_name(const LWCONTEXT* pLwc, LW_ATLAS_CONF lac, const char* name);
-void atlas_sprite_uv(const LWATLASSPRITE* sprite, int width, int height, float uv_offset[2], float uv_scale[2]);
-#ifndef __cplusplus
-void render_atlas_sprite(const LWCONTEXT* pLwc,
-                         LW_ATLAS_CONF atlas_conf,
-                         const char* sprite_name,
-                         LW_ATLAS_ENUM lae,
-                         LW_ATLAS_ENUM lae_alpha,
-                         float sprite_width,
-                         float x,
-                         float y,
-                         float ui_alpha,
-                         LW_VBO_TYPE lvt);
+#ifdef __cplusplus
+extern "C" {
 #endif
+    const LWATLASSPRITE* atlas_sprite_name(const LWCONTEXT* pLwc, LW_ATLAS_CONF lac, const char* name);
+    LWATLASSPRITEPTR atlas_name_sprite_name(const LWCONTEXT* pLwc, const char* atlas_name, const char* sprite_name);
+    LW_ATLAS_ENUM atlas_sprite_lae(const LWATLASSPRITEPTR* ptr);
+    LW_ATLAS_ENUM atlas_sprite_alpha_lae(const LWATLASSPRITEPTR* ptr);
+    void atlas_sprite_uv(const LWATLASSPRITE* sprite, int width, int height, float uv_offset[2], float uv_scale[2]);
+    void render_atlas_sprite_ptr(const LWCONTEXT* pLwc,
+                                 const LWATLASSPRITE* sprite,
+                                 LW_ATLAS_ENUM lae,
+                                 LW_ATLAS_ENUM lae_alpha,
+                                 float sprite_width,
+                                 float x,
+                                 float y,
+                                 float ui_alpha,
+                                 LW_VBO_TYPE lvt);
+    void render_atlas_sprite(const LWCONTEXT* pLwc,
+                             LW_ATLAS_CONF atlas_conf,
+                             const char* sprite_name,
+                             LW_ATLAS_ENUM lae,
+                             LW_ATLAS_ENUM lae_alpha,
+                             float sprite_width,
+                             float x,
+                             float y,
+                             float ui_alpha,
+                             LW_VBO_TYPE lvt);
+#ifdef __cplusplus
+}
+#endif
+
+

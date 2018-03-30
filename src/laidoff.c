@@ -1487,7 +1487,7 @@ static int str2int(const char* str, int len) {
     return ret;
 }
 
-static void parse_atlas_conf(LWCONTEXT* pLwc, LWATLASSPRITEARRAY* atlas_array, const char* conf_path) {
+static void parse_atlas_conf(LWCONTEXT* pLwc, LWATLASSPRITEARRAY* atlas_array, const char* conf_path, LW_ATLAS_ENUM first_lae, LW_ATLAS_ENUM first_alpha_lae) {
     jsmn_parser conf_parser;
     jsmn_init(&conf_parser);
     jsmntok_t* conf_token = malloc(sizeof(jsmntok_t) * LW_MAX_CONF_TOKEN);
@@ -1522,26 +1522,33 @@ static void parse_atlas_conf(LWCONTEXT* pLwc, LWATLASSPRITEARRAY* atlas_array, c
                 if (jsoneq(conf_str, &t[i], "name") == 0) {
                     atlas_index++;
                 } else if (jsoneq(conf_str, &t[i], "n") == 0) {
-                    LOGI("n: %.*s", t[i + 1].end - t[i + 1].start, conf_str + t[i + 1].start);
+                    LOGIx("n: %.*s", t[i + 1].end - t[i + 1].start, conf_str + t[i + 1].start);
                     entry_index++;
                     strncpy(atlas_sprite[entry_index].name, conf_str + t[i + 1].start, t[i + 1].end - t[i + 1].start);
                     atlas_sprite[entry_index].atlas_index = atlas_index;
                 } else if (jsoneq(conf_str, &t[i], "x") == 0) {
-                    LOGI("x: %.*s", t[i + 1].end - t[i + 1].start, conf_str + t[i + 1].start);
+                    LOGIx("x: %.*s", t[i + 1].end - t[i + 1].start, conf_str + t[i + 1].start);
                     atlas_sprite[entry_index].x = str2int(conf_str + t[i + 1].start, t[i + 1].end - t[i + 1].start);
                 } else if (jsoneq(conf_str, &t[i], "y") == 0) {
-                    LOGI("y: %.*s", t[i + 1].end - t[i + 1].start, conf_str + t[i + 1].start);
+                    LOGIx("y: %.*s", t[i + 1].end - t[i + 1].start, conf_str + t[i + 1].start);
                     atlas_sprite[entry_index].y = str2int(conf_str + t[i + 1].start, t[i + 1].end - t[i + 1].start);
                 } else if (jsoneq(conf_str, &t[i], "w") == 0) {
-                    LOGI("w: %.*s", t[i + 1].end - t[i + 1].start, conf_str + t[i + 1].start);
+                    LOGIx("w: %.*s", t[i + 1].end - t[i + 1].start, conf_str + t[i + 1].start);
                     atlas_sprite[entry_index].width = str2int(conf_str + t[i + 1].start, t[i + 1].end - t[i + 1].start);
                 } else if (jsoneq(conf_str, &t[i], "h") == 0) {
-                    LOGI("h: %.*s", t[i + 1].end - t[i + 1].start, conf_str + t[i + 1].start);
+                    LOGIx("h: %.*s", t[i + 1].end - t[i + 1].start, conf_str + t[i + 1].start);
                     atlas_sprite[entry_index].height = str2int(conf_str + t[i + 1].start, t[i + 1].end - t[i + 1].start);
                 }
             }
+            char* period = strrchr(conf_path, '.');
+            char* separator = strrchr(conf_path, PATH_SEPARATOR[0]);
+            size_t atlas_name_len = period - (separator + 1);
+            strncpy(atlas_array->atlas_name, separator + 1, atlas_name_len);
+            atlas_array->atlas_name[atlas_name_len] = 0;
             atlas_array->count = entry_count;
             atlas_array->first = atlas_sprite;
+            atlas_array->first_lae = first_lae;
+            atlas_array->first_alpha_lae = first_alpha_lae;
             //free(atlas_sprite);
             conf_str = 0;
         } else {
@@ -1556,25 +1563,32 @@ static void parse_atlas_conf(LWCONTEXT* pLwc, LWATLASSPRITEARRAY* atlas_array, c
             int entry_index = -1;
             for (int i = 1; i < token_count; i++) {
                 if (jsoneq(conf_str, &t[i], "name") == 0) {
-                    LOGI("name: %.*s", t[i + 1].end - t[i + 1].start, conf_str + t[i + 1].start);
+                    LOGIx("name: %.*s", t[i + 1].end - t[i + 1].start, conf_str + t[i + 1].start);
                     entry_index++;
                     strncpy(atlas_sprite[entry_index].name, conf_str + t[i + 1].start, t[i + 1].end - t[i + 1].start);
                 } else if (jsoneq(conf_str, &t[i], "x") == 0) {
-                    LOGI("x: %.*s", t[i + 1].end - t[i + 1].start, conf_str + t[i + 1].start);
+                    LOGIx("x: %.*s", t[i + 1].end - t[i + 1].start, conf_str + t[i + 1].start);
                     atlas_sprite[entry_index].x = str2int(conf_str + t[i + 1].start, t[i + 1].end - t[i + 1].start);
                 } else if (jsoneq(conf_str, &t[i], "y") == 0) {
-                    LOGI("y: %.*s", t[i + 1].end - t[i + 1].start, conf_str + t[i + 1].start);
+                    LOGIx("y: %.*s", t[i + 1].end - t[i + 1].start, conf_str + t[i + 1].start);
                     atlas_sprite[entry_index].y = str2int(conf_str + t[i + 1].start, t[i + 1].end - t[i + 1].start);
                 } else if (jsoneq(conf_str, &t[i], "width") == 0) {
-                    LOGI("width: %.*s", t[i + 1].end - t[i + 1].start, conf_str + t[i + 1].start);
+                    LOGIx("width: %.*s", t[i + 1].end - t[i + 1].start, conf_str + t[i + 1].start);
                     atlas_sprite[entry_index].width = str2int(conf_str + t[i + 1].start, t[i + 1].end - t[i + 1].start);
                 } else if (jsoneq(conf_str, &t[i], "height") == 0) {
-                    LOGI("height: %.*s", t[i + 1].end - t[i + 1].start, conf_str + t[i + 1].start);
+                    LOGIx("height: %.*s", t[i + 1].end - t[i + 1].start, conf_str + t[i + 1].start);
                     atlas_sprite[entry_index].height = str2int(conf_str + t[i + 1].start, t[i + 1].end - t[i + 1].start);
                 }
             }
+            char* period = strrchr(conf_path, '.');
+            char* separator = strrchr(conf_path, PATH_SEPARATOR[0]);
+            size_t atlas_name_len = period - (separator + 1);
+            strncpy(atlas_array->atlas_name, separator + 1, atlas_name_len);
+            atlas_array->atlas_name[atlas_name_len] = 0;
             atlas_array->count = entry_count;
             atlas_array->first = atlas_sprite;
+            atlas_array->first_lae = first_lae;
+            atlas_array->first_alpha_lae = first_alpha_lae;
             //free(atlas_sprite);
             conf_str = 0;
         }
@@ -1591,7 +1605,11 @@ static void parse_atlas_conf(LWCONTEXT* pLwc, LWATLASSPRITEARRAY* atlas_array, c
 
 static void parse_atlas(LWCONTEXT* pLwc) {
     for (int i = 0; i < LAC_COUNT; i++) {
-        parse_atlas_conf(pLwc, &pLwc->atlas_conf[i], atlas_conf_filename[i]);
+        parse_atlas_conf(pLwc,
+                         &pLwc->atlas_conf[i],
+                         atlas_conf_filename[i],
+                         atlas_first_lae[i],
+                         atlas_first_alpha_lae[i]);
     }
 }
 

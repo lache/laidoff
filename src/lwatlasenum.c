@@ -29,7 +29,9 @@ void lw_load_tex(const LWCONTEXT* _pLwc, int lae) {
     if (pLwc->tex_atlas_ready[lae]) {
         return;
     }
+    GLenum last_gl_error = glGetError(); // ignore this result
     glBindTexture(GL_TEXTURE_2D, pLwc->tex_atlas[lae]);
+    last_gl_error = glGetError();
     size_t tex_atlas_filename_len = (int)strlen(tex_atlas_filename[lae]);
     size_t filename_index = tex_atlas_filename_len;
     // take only filename
@@ -57,6 +59,7 @@ void lw_load_tex(const LWCONTEXT* _pLwc, int lae) {
     } else {
         LOGE("load_tex_files: unknown tex file extension - %s", tex_atlas_filename[lae]);
     }
+    last_gl_error = glGetError();
     pLwc->tex_atlas_ready[lae] = 1;
 }
 

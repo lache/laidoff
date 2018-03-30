@@ -11,6 +11,7 @@
 #include "lwtcpclient.h"
 #include "el_luascript.h"
 #include "script.h"
+#include "lwatlassprite.h"
 
 litehtml::text_container::text_container(LWCONTEXT* pLwc, int w, int h)
     : pLwc(pLwc), w(w), h(h), default_font_size(36) {
@@ -108,24 +109,52 @@ void litehtml::text_container::load_image(const litehtml::tchar_t * src, const l
     //wprintf(_t("load_image: src=%s,baseurl=%s,redraw_on_ready=%d\n"), src, baseurl, redraw_on_ready);
 }
 
+static LWATLASSPRITEPTR atlas_sprite_ptr_from_url(const LWCONTEXT* pLwc, const std::string& src) {
+    LWATLASSPRITEPTR atlas_sprite_ptr = { 0, 0 };
+    const static char* atlas_prefix = "atlas/";
+    const static size_t atlas_prefix_len = strlen(atlas_prefix);
+    if (strncmp(src.c_str(), atlas_prefix, atlas_prefix_len) == 0) {
+        const char* atlas_name_beg = src.c_str() + atlas_prefix_len;
+        const char* atlas_name_end = strchr(src.c_str() + atlas_prefix_len, '/');
+        const char* sprite_name_end = strrchr(src.c_str(), '.');
+        char atlas_name[64];
+        strncpy(atlas_name, atlas_name_beg, atlas_name_end - atlas_name_beg);
+        atlas_name[atlas_name_end - atlas_name_beg] = 0;
+        char sprite_name[64];
+        strncpy(sprite_name, atlas_name_end + 1, sprite_name_end - (atlas_name_end + 1));
+        sprite_name[sprite_name_end - (atlas_name_end + 1)] = 0;
+        atlas_sprite_ptr = atlas_name_sprite_name(pLwc, atlas_name, sprite_name);
+    }
+    return atlas_sprite_ptr;
+}
+
 void litehtml::text_container::get_image_size(const litehtml::tchar_t * src, const litehtml::tchar_t * baseurl, litehtml::size & sz) {
     LOGI("get_image_size: src=%s,baseurl=%s", src, baseurl);
-    sz.width = static_cast<int>(roundf(180 * pLwc->width / 640.0f));
-    sz.height = static_cast<int>(roundf(180 * pLwc->height / 360.0f));
+    LWATLASSPRITEPTR atlas_sprite_ptr = atlas_sprite_ptr_from_url(pLwc, src);
+    if (atlas_sprite_ptr.sprite) {
+        sz.width = atlas_sprite_ptr.sprite->width;
+        sz.height = atlas_sprite_ptr.sprite->height;
+    } else {
+        sz.width = static_cast<int>(roundf(180 * pLwc->width / 640.0f));
+        sz.height = static_cast<int>(roundf(180 * pLwc->height / 360.0f));
+    }
 }
 
 void litehtml::text_container::draw_background(litehtml::uint_ptr hdc, const litehtml::background_paint & bg) {
-    // ignore body background-color
+    // ignore body background-color (only applied on browser-testing phase)
     if (bg.is_root) {
         return;
     }
     if (bg.image == "img_trans.gif") {
-        // 1x1 transparent dummy image
+        // 1x1 transparent dummy image used for CSS image slicing method
         return;
     }
-    int show_test_image = 0;
+    
     int lae = LAE_TTL_TITLE;
     int lae_alpha = LAE_TTL_TITLE_ALPHA;
+
+    int show_test_image = 0;
+    
     if (bg.image.length()) {
         LOGI("draw_background [IMAGE]: x=%d,y=%d,w=%d,h=%d,clipbox=%d/%d/%d/%d,position_xy=%d/%d,image_size=%d/%d,color=0x%02X%02X%02X|%02X,image=%s,baseurl=%s",
              bg.border_box.x,
@@ -153,6 +182,15 @@ void litehtml::text_container::draw_background(litehtml::uint_ptr hdc, const lit
             lae = LAE_SLICE_TEST;
         }
     }
+
+    // check 'bg.image' is atlas sprite
+    LWATLASSPRITEPTR atlas_sprite_ptr = atlas_sprite_ptr_from_url(pLwc, bg.image);
+    if (atlas_sprite_ptr.sprite != 0) {
+        lae = atlas_sprite_lae(&atlas_sprite_ptr);
+        lae_alpha = atlas_sprite_alpha_lae(&atlas_sprite_ptr);
+        show_test_image = 3;
+    }
+
     if (show_test_image == 1) {
         lazy_tex_atlas_glBindTexture(pLwc, lae);
         lazy_tex_atlas_glBindTexture(pLwc, lae_alpha);
@@ -195,6 +233,16 @@ void litehtml::text_container::draw_background(litehtml::uint_ptr hdc, const lit
             LWST_DEFAULT,
             0
         );
+    } else if (show_test_image == 3) {
+        render_atlas_sprite_ptr(pLwc,
+                                atlas_sprite_ptr.sprite,
+                                (LW_ATLAS_ENUM)lae,
+                                (LW_ATLAS_ENUM)lae_alpha,
+                                conv_size_x(pLwc, bg.border_box.width),
+                                conv_coord_x(pLwc, bg.border_box.x),
+                                conv_coord_y(pLwc, bg.border_box.y),
+                                1.0f,
+                                LVT_LEFT_TOP_ANCHORED_SQUARE);
     } else {
         render_solid_vb_ui_flip_y_uv_shader(
             pLwc,
