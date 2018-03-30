@@ -11,3 +11,4 @@ void rmsg_rparams(LWCONTEXT* pLwc, int key, int atlas, int skin_vbo, int armatur
 void rmsg_quitapp(LWCONTEXT* pLwc, void* native_context);
 void rmsg_loadtex(LWCONTEXT* pLwc, int lae);
 void rmsg_start_text_input_activity(LWCONTEXT* pLwc, int tag);
+void rmsg_redraw_ui_fbo(LWCONTEXT* pLwc);

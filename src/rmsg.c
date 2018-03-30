@@ -111,3 +111,11 @@ void rmsg_start_text_input_activity(LWCONTEXT* pLwc, int tag) {
     cmd->tag = tag;
     s_send_and_close_rmsg(pLwc, &rmsg);
 }
+
+void rmsg_redraw_ui_fbo(LWCONTEXT* pLwc) {
+    zmq_msg_t rmsg;
+    zmq_msg_init_size(&rmsg, sizeof(LWFIELDRENDERCOMMAND));
+    LWFIELDRENDERCOMMAND* cmd = zmq_msg_data(&rmsg);
+    cmd->cmdtype = LRCT_REDRAWUIFBO;
+    s_send_and_close_rmsg(pLwc, &rmsg);
+}

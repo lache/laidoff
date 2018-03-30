@@ -11,91 +11,6 @@
             left: 15%;
         }
 
-        .centertop {
-            position: absolute;
-            top: 0;
-            width: 50%;
-            left: 25%;
-            text-align: center;
-            background-color: rgba(255, 0, 0, 0.7);
-        }
-
-        .righttop {
-            position: absolute;
-            top: 0;
-            right: 0;
-            text-align: right;
-        }
-
-        #parent {
-            /*margin: 0 auto;*/
-            width: 70%;
-            background-color: rgba(255, 0, 0, 0.7);
-        }
-
-        #child-left {
-            float: left;
-            display: block;
-            width: 80%;
-            background-color: rgba(255, 0, 0, 0.7);
-        }
-
-        #child-right {
-            float: right;
-            display: block;
-            width: 20%;
-            background-color: rgba(0, 0, 0, 0.7);
-        }
-
-        .select-button {
-            padding: 5pt;
-            text-align: center;
-            display: block;
-            background-color: rgba(0, 200, 200, 0.8);
-        }
-
-        #red {
-            width: 200px;
-            height: 200px;
-            background: url(slice-test.png) 0 0;
-            background-size: 800px 800px;
-        }
-
-        #green {
-            height: 200px;
-            width: 200px;
-            background: url(slice-test.png) -200px 0;
-            background-size: 800px 800px;
-        }
-
-        #blue {
-            height: 200px;
-            width: 200px;
-            background: url(slice-test.png) 0 -200px;
-            background-size: 800px 800px;
-        }
-
-        #black {
-            height: 200px;
-            width: 200px;
-            background: url(slice-test.png) -200px -200px;
-            background-size: 800px 800px;
-        }
-
-        #cyan {
-            height: 200px;
-            width: 200px;
-            background: url(slice-test.png) -400px 0;
-            background-size: 800px 800px;
-        }
-
-        #yellow {
-            height: 200px;
-            width: 200px;
-            background: url(slice-test.png) 0 -400px;
-            background-size: 800px 800px;
-        }
-
         .ship-button-header {
             text-align: center;
             font-size: 1.25em;
@@ -113,6 +28,7 @@
 
         .ship-button {
             width: 25%;
+            height: 11pt;
             display: inline-block;
             color: white;
             text-align: center;
@@ -160,7 +76,7 @@
     {{name}}
 </a></div>
 
-<div style="text-align: center;">
+<div style="text-align: center;" class="bottom">
     <a style="display:inline-block;background-color:rgba(255, 0, 0, 0.5);padding:5pt"
        href="script:first_page()">처음</a>
     <a style="display:inline-block;background-color:rgba(255, 0, 0, 0.5);padding:5pt"

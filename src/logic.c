@@ -26,6 +26,8 @@
 #include "puckgame.h"
 #include "sound.h"
 #include "lwttl.h"
+#include "rmsg.h"
+#include "htmlui.h"
 
 void toggle_font_texture_test_mode(LWCONTEXT* pLwc);
 void lw_request_remote_notification_device_token(LWCONTEXT* pLwc);
@@ -108,6 +110,7 @@ typedef enum _LW_MSG {
     LM_LWMSGINITSCENE,
     LM_LWMSGUIEVENT,
     LM_LWMSGEVALUATE,
+    LM_LWMSGREDRAWUIFBO,
 } LW_MSG;
 
 typedef struct _LWMSGINITFIELD {
@@ -150,6 +153,10 @@ typedef struct _LWMSGUIEVENT {
 typedef struct _LWMSGEVALUATE {
     LW_MSG type;
 } LWMSGEVALUATE;
+
+typedef struct _LWMSGREDRAWUIFBO {
+    LW_MSG type;
+} LWMSGREDRAWUIFBO;
 
 void logic_start_logic_update_job_async(LWCONTEXT* pLwc) {
     if (pLwc == 0 || pLwc->logic_actor == 0) {
@@ -1069,4 +1076,32 @@ const char* logic_server_addr(int idx) {
 
 void toggle_font_texture_test_mode(LWCONTEXT* pLwc) {
     pLwc->font_texture_texture_mode = !pLwc->font_texture_texture_mode;
+}
+
+static void lw_htmlui_redraw_ui_fbo_async(LWCONTEXT* pLwc) {
+    rmsg_redraw_ui_fbo(pLwc);
+}
+
+void lw_first_page(LWCONTEXT* pLwc) {
+    pLwc->country_page = 0;
+    htmlui_update_country_data(pLwc, pLwc->htmlui);
+    lw_htmlui_redraw_ui_fbo_async(pLwc);
+}
+
+void lw_prev_page(LWCONTEXT* pLwc) {
+    pLwc->country_page = LWMAX(0, pLwc->country_page - 1);
+    htmlui_update_country_data(pLwc, pLwc->htmlui);
+    lw_htmlui_redraw_ui_fbo_async(pLwc);
+}
+
+void lw_next_page(LWCONTEXT* pLwc) {
+    pLwc->country_page = LWMIN(pLwc->country_page + 1, (pLwc->country_array.count - 1) / 20);
+    htmlui_update_country_data(pLwc, pLwc->htmlui);
+    lw_htmlui_redraw_ui_fbo_async(pLwc);
+}
+
+void lw_last_page(LWCONTEXT* pLwc) {
+    pLwc->country_page = (pLwc->country_array.count - 1) / 20;
+    htmlui_update_country_data(pLwc, pLwc->htmlui);
+    lw_htmlui_redraw_ui_fbo_async(pLwc);
 }

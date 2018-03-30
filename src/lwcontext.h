@@ -424,10 +424,6 @@ LWFIELD* lwcontext_field(LWCONTEXT* pLwc);
 void lwcontext_inc_rmsg_send(LWCONTEXT* pLwc);
 void lwcontext_inc_rmsg_recv(LWCONTEXT* pLwc);
 void lwcontext_set_custom_puck_game_stage(LWCONTEXT* pLwc, LW_VBO_TYPE lvt, LW_ATLAS_ENUM lae);
-void lw_first_page(LWCONTEXT* pLwc);
-void lw_prev_page(LWCONTEXT* pLwc);
-void lw_next_page(LWCONTEXT* pLwc);
-void lw_last_page(LWCONTEXT* pLwc);
 #ifdef __cplusplus
 };
 #endif

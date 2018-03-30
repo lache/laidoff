@@ -843,6 +843,10 @@ void handle_rmsg_starttextinputactivity(LWCONTEXT* pLwc, const LWFIELDRENDERCOMM
 #endif
 }
 
+void handle_rmsg_redrawuifbo(LWCONTEXT* pLwc, const LWFIELDRENDERCOMMAND* cmd) {
+    htmlui_load_redraw_fbo(pLwc->htmlui);
+}
+
 void delete_all_rmsgs(LWCONTEXT* pLwc) {
     zmq_msg_t rmsg;
     while (1) {
@@ -899,6 +903,9 @@ static void read_all_rmsgs(LWCONTEXT* pLwc) {
                 break;
             case LRCT_STARTTEXTINPUTACTIVITY:
                 handle_rmsg_starttextinputactivity(pLwc, cmd);
+                break;
+            case LRCT_REDRAWUIFBO:
+                handle_rmsg_redrawuifbo(pLwc, cmd);
                 break;
         }
         zmq_msg_close(&rmsg);

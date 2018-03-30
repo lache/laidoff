@@ -46,27 +46,3 @@ void lwcontext_set_custom_puck_game_stage(LWCONTEXT* pLwc, LW_VBO_TYPE lvt, LW_A
     pLwc->puck_game_stage_lvt = lvt;
     pLwc->puck_game_stage_lae = lae;
 }
-
-void lw_first_page(LWCONTEXT* pLwc) {
-    pLwc->country_page = 0;
-    htmlui_update_country_data(pLwc, pLwc->htmlui);
-    htmlui_load_redraw_fbo(pLwc->htmlui);
-}
-
-void lw_prev_page(LWCONTEXT* pLwc) {
-    pLwc->country_page = LWMAX(0, pLwc->country_page - 1);
-    htmlui_update_country_data(pLwc, pLwc->htmlui);
-    htmlui_load_redraw_fbo(pLwc->htmlui);
-}
-
-void lw_next_page(LWCONTEXT* pLwc) {
-    pLwc->country_page = LWMIN(pLwc->country_page + 1, (pLwc->country_array.count - 1) / 20);
-    htmlui_update_country_data(pLwc, pLwc->htmlui);
-    htmlui_load_redraw_fbo(pLwc->htmlui);
-}
-
-void lw_last_page(LWCONTEXT* pLwc) {
-    pLwc->country_page = (pLwc->country_array.count - 1) / 20;
-    htmlui_update_country_data(pLwc, pLwc->htmlui);
-    htmlui_load_redraw_fbo(pLwc->htmlui);
-}
