@@ -492,7 +492,7 @@ void init_lua(LWCONTEXT* pLwc)
 		}
 		else
 		{
-			printf("Lua result: %lld\n", lua_tointeger(L, -1));
+            LOGIx("Lua result: %lld", lua_tointeger(L, -1));
 		}
 		lua_pop(L, 1);
 	}
@@ -530,7 +530,7 @@ int script_run_file_ex(LWCONTEXT* pLwc, const char* filename, int pop_result) {
 			//luaL_traceback(pLwc->L, pLwc->L, NULL, 1);
 			//LOGE(lua_tostring(pLwc->L, -1));
 		} else {
-			printf("Lua result: %lld\n", lua_tointeger(pLwc->L, -1));
+            LOGIx("Lua result: %lld", lua_tointeger(pLwc->L, -1));
 		}
 		if (pop_result) {
 			lua_pop(pLwc->L, 1);
@@ -802,7 +802,7 @@ void script_evaluate(void* L, const char* code, size_t code_len) {
         int top1 = lua_gettop(L);
         int nret = top1 - top0;
         while (nret) {
-            LOGI("Lua result: %lld", lua_tointeger(L, -1));
+            LOGIx("Lua result: %lld", lua_tointeger(L, -1));
             nret--;
         }
         lua_pop(L, nret);

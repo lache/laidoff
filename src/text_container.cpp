@@ -322,7 +322,7 @@ void litehtml::text_container::link(const std::shared_ptr<litehtml::document>& d
 }
 
 void litehtml::text_container::on_anchor_click(const litehtml::tchar_t * url, const litehtml::element::ptr & el) {
-    LOGI("on_anchor_click: %s", url);
+    LOGIx("on_anchor_click: %s", url);
     if (strcmp(url, "script:go_online()") == 0) {
         if (pLwc->tcp_ttl) {
             tcp_request_landing_page(pLwc->tcp_ttl, pLwc->user_data_path);
