@@ -12,6 +12,7 @@
 #include "puckgameupdate.h"
 #include "logic.h"
 #include "htmlui.h"
+#include "lwttl.h"
 
 void tcp_on_connect(LWTCP* tcp, const char* path_prefix) {
     if (get_cached_user_id(path_prefix, &tcp->user_id) == 0) {
@@ -25,7 +26,7 @@ void tcp_on_connect(LWTCP* tcp, const char* path_prefix) {
     request_player_reveal_leaderboard(tcp);
 }
 
-void tcp_request_landing_page(LWTCP* tcp, const char* path_prefix) {
+void tcp_request_landing_page(LWTCP* tcp, const char* path_prefix, const LWTTL* ttl) {
     // Transport Tycoon Lee
     char landing_page_url[512] = { 0, };
     char user_id_str[512] = { 0, };
@@ -42,11 +43,11 @@ void tcp_request_landing_page(LWTCP* tcp, const char* path_prefix) {
         read_file_string(tcp->pLwc->user_data_path, "ttl-user-id.dat", sizeof(user_id_str), user_id_str);
     }
     sprintf(landing_page_url, "/?u=%s", user_id_str);
-    tcp_send_httpget(tcp, landing_page_url);
+    tcp_send_httpget(tcp, landing_page_url, ttl_http_header(ttl));
 }
 
 void tcp_ttl_on_connect(LWTCP* tcp, const char* path_prefix) {
-    tcp_request_landing_page(tcp, path_prefix);
+    //tcp_request_landing_page(tcp, path_prefix);
 }
 
 int tcp_send_newuser(LWTCP* tcp) {
@@ -200,7 +201,7 @@ int tcp_send_setnickname(LWTCP* tcp, const LWUNIQUEID* id, const char* nickname)
     return tcp_send_sendbuf(tcp, sizeof(p));
 }
 
-int tcp_send_httpget(LWTCP* tcp, const char* url) {
+int tcp_send_httpget(LWTCP* tcp, const char* url, const char* headers) {
     LOGI("Sending HTTP GET request: %s", url);
     if (tcp->html_wait) {
         // preventing overlapped requests
@@ -210,10 +211,16 @@ int tcp_send_httpget(LWTCP* tcp, const char* url) {
     tcp->html_wait = 1;
     memset(tcp->send_buf, 0, sizeof(tcp->send_buf));
     const char* url_prefix = url[0] != '/' ? "/" : "";
-    sprintf(tcp->send_buf, "GET %s%s HTTP/1.1\r\nHost: %s\r\nConnection: Keep-Alive\r\n\r\n",
+    sprintf(tcp->send_buf,
+            "GET %s%s HTTP/1.1\r\n"
+            "Host: %s\r\n"
+            "Connection: Keep-Alive\r\n"
+            "%s"
+            "\r\n",
             url_prefix,
             url,
-            tcp->host_addr.host);
+            tcp->host_addr.host,
+            headers);
     return tcp_send_sendbuf(tcp, strlen(tcp->send_buf));
 }
 

@@ -12,6 +12,7 @@
 #include "el_luascript.h"
 #include "script.h"
 #include "lwatlassprite.h"
+#include "lwttl.h"
 
 litehtml::text_container::text_container(LWCONTEXT* pLwc, int w, int h)
     : pLwc(pLwc), w(w), h(h), default_font_size(36) {
@@ -326,7 +327,7 @@ void litehtml::text_container::on_anchor_click(const litehtml::tchar_t * url, co
     LOGIx("on_anchor_click: %s", url);
     if (strcmp(url, "script:go_online()") == 0) {
         if (pLwc->tcp_ttl) {
-            tcp_request_landing_page(pLwc->tcp_ttl, pLwc->user_data_path);
+            tcp_request_landing_page(pLwc->tcp_ttl, pLwc->user_data_path, reinterpret_cast<LWTTL*>(pLwc->ttl));
         } else {
             LOGE("tcp_ttl null");
         }
@@ -340,7 +341,7 @@ void litehtml::text_container::on_anchor_click(const litehtml::tchar_t * url, co
         strcat(path, url);
         if (online) {
             if (pLwc->tcp_ttl) {
-                tcp_send_httpget(pLwc->tcp_ttl, url);
+                tcp_send_httpget(pLwc->tcp_ttl, url, ttl_http_header(pLwc->ttl));
             } else {
                 LOGE("tcp_ttl null");
             }

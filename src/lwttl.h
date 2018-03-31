@@ -1,5 +1,8 @@
 #pragma once
 
+#ifdef __cplusplus
+extern "C" {;
+#endif
 typedef struct _LWCONTEXT LWCONTEXT;
 typedef struct _LWUDP LWUDP;
 
@@ -25,3 +28,7 @@ const LWTTLWORLDMAP* lwttl_worldmap(void* _ttl);
 void lwttl_update_aspect_ratio(void* _ttl, float aspect_ratio);
 const LWTTLLNGLAT* lwttl_center(void* _ttl);
 void lwttl_update(LWCONTEXT* pLwc, void* _ttl, float delta_time);
+const char* ttl_http_header(const void* _ttl);
+#ifdef __cplusplus
+}
+#endif

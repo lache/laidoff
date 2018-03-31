@@ -116,3 +116,24 @@ void lwttl_update(LWCONTEXT* pLwc, void* _ttl, float delta_time) {
         ttl->worldmap.center.lat += dy / 10.0f * delta_time;
     }
 }
+
+short lwttl_lng_to_short(float lng) {
+    static const int half = (1 << 14) / 2;
+    return (short)(half + (lng / 180.0f) * half);
+}
+
+short lwttl_lat_to_short(float lat) {
+    static const int half = (1 << 13) / 2;
+    return (short)(half - (lat / 90.0f) * half);
+}
+
+const char* ttl_http_header(const void* _ttl) {
+    static char http_header[1024];
+    LWTTL* ttl = (LWTTL*)_ttl;
+    const LWTTLLNGLAT* lnglat = lwttl_center(ttl);
+
+    sprintf(http_header, "X-Lng: %d\r\nX-Lat: %d\r\n",
+            lwttl_lng_to_short(lnglat->lng),
+            lwttl_lat_to_short(lnglat->lat));
+    return http_header;
+}

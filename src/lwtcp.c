@@ -189,7 +189,7 @@ void tcp_update(LWTCP* tcp) {
     }
     // try to reconnect & resend if send_fail flag set
     double now = lwtimepoint_now_seconds();
-    const double retry_interval = 1;
+    const double retry_interval = 0.1;
     if (tcp->send_fail && now - tcp->send_fail_time > retry_interval) {
         LOGI("send_fail flag detected. Trying to reconnect to %s", tcp->host_addr.host);
         if (tcp_connect(tcp) == 0) {
