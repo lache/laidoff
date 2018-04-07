@@ -1,6 +1,6 @@
 ### Prerequisite ###
 
-Copy Android FCM key and iOS push certificate at <git root>/push-server/cert
+Copy Android FCM key and iOS push certificate at `<git root>/push-server/cert`
 
 ### How to build docker image ###
 
