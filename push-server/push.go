@@ -359,10 +359,11 @@ func main() {
 	// Create db directory to save user database
 	os.MkdirAll("db", os.ModePerm)
 	os.MkdirAll("pages", os.ModePerm)
+	cert_root := os.Getenv("CERT_ROOT")
 	// Load Firebase Cloud Messaging (FCM) server key
-	fcmServerKeyBuf, err := ioutil.ReadFile(ANDROIDKEYPATH)
+	fcmServerKeyBuf, err := ioutil.ReadFile(cert_root + ANDROIDKEYPATH)
 	if err != nil {
-		log.Fatalf("fcm server key load failed: %v", err.Error())
+		log.Fatalf("FCM server key load failed: %v", err.Error())
 	}
 	fcmServerKey := string(fcmServerKeyBuf)
 	//Creating an instance of struct which implement Arith interface
@@ -415,15 +416,16 @@ func main() {
 }
 
 func PostIosMessage(pushToken string, body string) {
+	cert_root := os.Getenv("CERT_ROOT")
 	var appleKeyPath string
 	if prod {
-		appleKeyPath = APPLEPRODKEYPATH
+		appleKeyPath = cert_root + APPLEPRODKEYPATH
 	} else {
-		appleKeyPath = APPLEKEYPATH
+		appleKeyPath = cert_root + APPLEKEYPATH
 	}
 	cert, err := certificate.FromP12File(appleKeyPath, "")
 	if err != nil {
-		log.Fatal("Cert Error:", err)
+		log.Fatalf("Apple Push Cert Error: %v", err)
 	}
 
 	notification := &apns2.Notification{}
