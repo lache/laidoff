@@ -1,6 +1,7 @@
 ### Prerequisite ###
 
-Copy Android FCM key and iOS push certificate at `<git root>/push-server/cert`
+1. Copy Android FCM key and iOS push certificate at `<git root>/push-server/cert`.
+2. Run `./batch-build-go-servers.sh` to build all server executables.
 
 ### How to build docker image ###
 
