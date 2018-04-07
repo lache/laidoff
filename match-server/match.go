@@ -47,6 +47,19 @@ func main() {
 	if err != nil {
 		log.Fatalf("conf.json parse error:%v", err.Error())
 	}
+	// override values from conf.json if env is set
+	if os.Getenv("BATTLE_HOST") != "" {
+		log.Printf("BattlePublicServiceHost changed from %v to %v by environment variable BATTLE_HOST", conf.BattlePublicServiceHost, os.Getenv("BATTLE_HOST"))
+		conf.BattlePublicServiceHost = os.Getenv("BATTLE_HOST")
+	}
+	if os.Getenv("BATTLE_PORT") != "" {
+		log.Printf("BattlePublicServicePort changed from %v to %v by environment variable BATTLE_PORT", conf.BattlePublicServicePort, os.Getenv("BATTLE_PORT"))
+		conf.BattlePublicServicePort = os.Getenv("BATTLE_PORT")
+	}
+	if os.Getenv("LOBBY_PORT") != "" {
+		log.Printf("ConnPort changed from %v to %v by environment variable LOBBY_PORT", conf.ConnPort, os.Getenv("LOBBY_PORT"))
+		conf.ConnPort = os.Getenv("LOBBY_PORT")
+	}
 	// Test RPC
 	//testRpc(serviceList)
 	// Create 1 vs. 1 match waiting queue
