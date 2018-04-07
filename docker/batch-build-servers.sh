@@ -40,5 +40,4 @@ CC=/usr/local/musl/bin/musl-gcc go build --ldflags '-w -linkmode external -extld
 rm -rf push
 CC=/usr/local/musl/bin/musl-gcc go build --ldflags '-w -linkmode external -extldflags "-static"' -o ./push/push-server ../push-server/push.go
 # push-server resources
-cp -r ../push-server/cert push
 cp ../push-server/*.html push
