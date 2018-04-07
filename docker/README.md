@@ -1,4 +1,4 @@
-### Prerequisites ###
+### Prerequisite ###
 
 Copy Android FCM key and iOS push certificate at <git root>/push-server/cert
 
