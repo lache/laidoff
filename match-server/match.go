@@ -221,6 +221,7 @@ func handleRequest(req *HandleRequestRequest) {
 
 			if readLen != int(packetSize) {
 				// Unknown packet should be ignored
+				log.Printf("readLen and packetSize mismatch! (%v != %v)", readLen, int(packetSize))
 				break
 			}
 
