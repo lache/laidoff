@@ -92,7 +92,13 @@ int tcp_connect(LWTCP* tcp) {
             if (optval == 0) {
                 // Connection ok.
             } else {
-                LOGE("Connection error, optval=%d (%s)", optval, strerror(optval));
+                LOGE("Connection error, optval=%d (%s), host:%s, host_resolved:%lu, port:%d, port_str:%s",
+                     optval,
+                     strerror(optval),
+                     tcp->host_addr.host,
+                     tcp->host_addr.host_resolved,
+                     tcp->host_addr.port,
+                     tcp->host_addr.port_str);
                 closesocket(tcp->connect_socket);
                 tcp->connect_socket = INVALID_SOCKET;
                 continue;
