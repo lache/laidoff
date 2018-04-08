@@ -21,6 +21,7 @@ import android.view.View;
 import android.view.WindowManager;
 import android.view.inputmethod.EditorInfo;
 import android.widget.EditText;
+
 import com.google.firebase.iid.FirebaseInstanceId;
 
 import java.io.File;
@@ -100,6 +101,7 @@ public class LaidoffNativeActivity extends NativeActivity {
         assetsLoader.registerAllAssetsOfType("css");
         assetsLoader.registerAllAssetsOfType("html");
         assetsLoader.registerAllAssetsOfType("cvbo");
+        assetsLoader.registerAllAssetsOfType("ttldata");
         sendApkPath(assetsLoader.GetAPKPath(), getApplicationContext().getFilesDir().getAbsolutePath(), getPackageVersion());
 
         //noinspection deprecation
