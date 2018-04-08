@@ -753,8 +753,14 @@ int lw_write_tcp_addr(LWCONTEXT* pLwc, const char* tcp_addr) {
     char conf[1024] = { 0, };
     sprintf(conf, "{\n"
             "  \"ClientTcpHost\": \"%s\",\n"
-            "  \"ConnPort\": \"19856\"\n"
-            "}", tcp_addr);
+            "  \"ConnPort\": \"19856\",\n"
+            "  \"ClientTcpTtlHost\": \"%s\",\n"
+            "  \"TtlConnPort\": \"3000\",\n"
+            "  \"SeaUdpHost\": \"%s\",\n"
+            "  \"SeaUdpPort\": \"3100\",\n"
+            "  \"SeaTcpHost\": \"%s\",\n"
+            "  \"SeaTcpPort\": \"3200\"\n"
+            "}\n", tcp_addr, tcp_addr, tcp_addr, tcp_addr);
     fputs(conf, f);
     fclose(f);
 #else
@@ -885,7 +891,7 @@ void lwc_update(LWCONTEXT* pLwc, double delta_time) {
 
     // Check for a new native user text input
     if (pLwc->last_text_input_seq != lw_get_text_input_seq()) {
-        switch (lw_text_input_tag()) {
+       switch (lw_text_input_tag()) {
         case LITI_NICKNAME:
         {
             //char nicknameMsg[256];
