@@ -7,37 +7,42 @@ rm -rf build-server
 mkdir build-server
 cd build-server
 CXXFLAGS=-static cmake ../.. -DSERVER_ONLY=1
-make laidoff-server
+make -j8 laidoff-server
 cp bin/laidoff-server ../battle
 cd ..
 
+# br-server (all-in-one server binary)
+rm -rf br
+CC=/usr/local/musl/bin/musl-gcc go build --ldflags '-w -linkmode external -extldflags "-static"' -o ./br/br-server ../br-server/br.go
+
 # db-server
 rm -rf db
-CC=/usr/local/musl/bin/musl-gcc go build --ldflags '-w -linkmode external -extldflags "-static"' -o ./db/db-server ../db-server/db.go
+mkdir db
 # db-server resources
 cp ../db-server/*.txt db
 cp ../db-server/*.html db
 
 # match-server
 rm -rf match
-CC=/usr/local/musl/bin/musl-gcc go build --ldflags '-w -linkmode external -extldflags "-static"' -o ./match/match-server ../match-server/match.go
+mkdir match
 # match-server resources
 cp ../match-server/conf.json.template match/conf.json
 
 # rank-server
 rm -rf rank
-CC=/usr/local/musl/bin/musl-gcc go build --ldflags '-w -linkmode external -extldflags "-static"' -o ./rank/rank-server ../rank-server/rank.go
+mkdir rank
 # rank-server resources
 # ---
 
 # reward-server
 rm -rf reward
-CC=/usr/local/musl/bin/musl-gcc go build --ldflags '-w -linkmode external -extldflags "-static"' -o ./reward/reward-server ../reward-server/reward.go
+mkdir reward
 # reward-server resources
 # ---
 
 # push-server
 rm -rf push
-CC=/usr/local/musl/bin/musl-gcc go build --ldflags '-w -linkmode external -extldflags "-static"' -o ./push/push-server ../push-server/push.go
+mkdir push
 # push-server resources
 cp ../push-server/*.html push
+
