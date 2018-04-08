@@ -134,6 +134,11 @@ char* create_string_from_file(const char* filename) {
     if (lw_download_assets()) {
         return create_asset_file_from_downloaded(filename, &size, 0);
     } else {
+        // check if downloaded one exists
+        char* downloaded = create_asset_file_from_downloaded(filename, &size, 0);
+        if (downloaded) {
+            return downloaded;
+        }
         return create_asset_file(filename, &size, 0);
     }
 }
