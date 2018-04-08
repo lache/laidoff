@@ -21,6 +21,16 @@ import (
 
 type UserId [16]byte
 
+var templates *template.Template
+var validPath *regexp.Regexp
+var validPushTokenPath *regexp.Regexp
+
+func initTemplates() {
+	templates = template.Must(template.ParseFiles("editPushToken.html", "edit.html", "view.html", "push.html", "writePush.html"))
+	validPath = regexp.MustCompile("^/(edit|save|view)/([a-zA-Z0-9]+)$")
+	validPushTokenPath = regexp.MustCompile("^/(savePushToken|editPushToken|deletePushToken|sendTestPush|writePush|sendPush)/([a-zA-Z0-9-:_]+)$")
+}
+
 func registerArith(server *rpc.Server, arith shared_server.Arith, pushService shared_server.PushService) {
 	// registers Arith interface by name of `Arithmetic`.
 	// If you want this name to be same as the type name, you
@@ -151,10 +161,6 @@ type Page struct {
 	Title string
 	Body  []byte
 }
-
-var templates = template.Must(template.ParseFiles("editPushToken.html", "edit.html", "view.html", "push.html", "writePush.html"))
-var validPath = regexp.MustCompile("^/(edit|save|view)/([a-zA-Z0-9]+)$")
-var validPushTokenPath = regexp.MustCompile("^/(savePushToken|editPushToken|deletePushToken|sendTestPush|writePush|sendPush)/([a-zA-Z0-9-:_]+)$")
 
 func getTitle(w http.ResponseWriter, r *http.Request) (string, error) {
 	m := validPath.FindStringSubmatch(r.URL.Path)
@@ -356,6 +362,7 @@ func Entry() {
 	} else {
 		prod = false
 	}
+	initTemplates()
 	// Create db directory to save user database
 	os.MkdirAll("db", os.ModePerm)
 	os.MkdirAll("pages", os.ModePerm)

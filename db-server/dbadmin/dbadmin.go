@@ -18,9 +18,17 @@ type Page struct {
 	Body  []byte
 }
 
-var templates = template.Must(template.ParseFiles("edit.html", "view.html", "list.html"))
-var validPath = regexp.MustCompile("^/(edit|save|view)/([a-f0-9\\-]+)$")
+var templates *template.Template
+var validPath *regexp.Regexp
 //var validPushTokenPath = regexp.MustCompile("^/(savePushToken|editPushToken|deletePushToken|sendTestPush|writePush|sendPush)/([a-zA-Z0-9-:_]+)$")
+
+func initTemplates() {
+	templates = template.Must(template.ParseFiles("edit.html", "view.html", "list.html"))
+}
+
+func initValidPath() {
+	validPath = regexp.MustCompile("^/(edit|save|view)/([a-f0-9\\-]+)$")
+}
 
 func getUuidStr(w http.ResponseWriter, r *http.Request) (string, error) {
 	m := validPath.FindStringSubmatch(r.URL.Path)
@@ -189,6 +197,8 @@ func listHandler(w http.ResponseWriter, _ *http.Request) {
 }
 
 func StartService() {
+	initTemplates()
+	initValidPath()
 	http.HandleFunc("/", listHandler)
 	http.HandleFunc("/list/", listHandler)
 	http.HandleFunc("/view/", makeHandler(viewHandler))
