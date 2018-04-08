@@ -7,7 +7,6 @@ mkdir bin
 mkdir services
 
 # laidoff-server (battle-server)
-rm -rf build-server
 mkdir build-server
 cd build-server
 CXXFLAGS=-static cmake ../.. -DSERVER_ONLY=1
