@@ -1,5 +1,5 @@
 FROM alpine:3.7
-RUN apk add --no-cache bash
+#RUN apk add --no-cache bash
 WORKDIR /app
 ADD ./scripts /app/scripts
 ADD ./bin /app/bin
