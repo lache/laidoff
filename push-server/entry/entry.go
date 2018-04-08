@@ -17,17 +17,23 @@ import (
 	"regexp"
 	"fmt"
 	"github.com/gasbank/laidoff/db-server/user"
+	"io"
 )
 
 type UserId [16]byte
 
 var templates *template.Template
-var validPath *regexp.Regexp
 var validPushTokenPath *regexp.Regexp
 
+const (
+	ANDROIDKEYPATH     = "cert/dev/fcmserverkey"
+	APPLEKEYPATH       = "cert/dev/cert.p12"
+	ANDROIDPRODKEYPATH = "cert/prod/fcmserverkey"
+	APPLEPRODKEYPATH   = "cert/prod/cert.p12"
+)
+
 func initTemplates() {
-	templates = template.Must(template.ParseFiles("editPushToken.html", "edit.html", "view.html", "push.html", "writePush.html"))
-	validPath = regexp.MustCompile("^/(edit|save|view)/([a-zA-Z0-9]+)$")
+	templates = template.Must(template.ParseFiles("editPushToken.html", "edit.html", "view.html", "push.html", "writePush.html", "certs.html"))
 	validPushTokenPath = regexp.MustCompile("^/(savePushToken|editPushToken|deletePushToken|sendTestPush|writePush|sendPush)/([a-zA-Z0-9-:_]+)$")
 }
 
@@ -56,42 +62,50 @@ func (t *Arith) Divide(args *shared_server.Args, quo *shared_server.Quotient) er
 }
 
 type PushUserData struct {
-	UserId [16]byte
-	Domain int
-	Memo string
+	UserId    [16]byte
+	Domain    int
+	Memo      string
 	PushToken string
+}
+
+type Cert struct {
+	FcmServerKey       string // Firebase Cloud Messaging server key
+	FcmServerKeyPath   string // Firebase Cloud Messaging server key file path
+	AppleServerKeyPath string // Apple Push Cert key path
 }
 
 type PushServiceData struct {
 	PushTokenMap map[string]PushUserData // Push Token --> Push User Data
-	UserIdMap    map[UserId]string // User ID --> Push Token
+	UserIdMap    map[UserId]string       // User ID --> Push Token
+	DevCert      Cert
+	ProdCert     Cert
+	Prod         bool // true if Production environment, false if not
 }
 
-func (t *PushServiceData) Add(id user.Id, pushToken string, domain int) {
+func (pushServiceData *PushServiceData) Add(id user.Id, pushToken string, domain int) {
 	var idFixed [16]byte
 	copy(idFixed[:], id[:])
-	t.PushTokenMap[pushToken] = PushUserData{idFixed, domain, "", pushToken}
-	t.UserIdMap[idFixed] = pushToken
+	pushServiceData.PushTokenMap[pushToken] = PushUserData{idFixed, domain, "", pushToken}
+	pushServiceData.UserIdMap[idFixed] = pushToken
 }
 
-func (t *PushServiceData) DeletePushToken(pushToken string) {
-	pushUserData := t.PushTokenMap[pushToken]
-	delete(t.PushTokenMap, pushToken)
-	delete(t.UserIdMap, pushUserData.UserId)
+func (pushServiceData *PushServiceData) DeletePushToken(pushToken string) {
+	pushUserData := pushServiceData.PushTokenMap[pushToken]
+	delete(pushServiceData.PushTokenMap, pushToken)
+	delete(pushServiceData.UserIdMap, pushUserData.UserId)
 }
 
 type PushService struct {
-	data         PushServiceData
-	fcmServerKey string
+	data PushServiceData
 }
 
-func (t *PushService) RegisterPushToken(args *shared_server.PushToken, reply *int) error {
+func (service *PushService) RegisterPushToken(args *shared_server.PushToken, reply *int) error {
 	log.Printf("Register push token: %v, %v", args.Domain, args.PushToken)
-	t.data.Add(args.UserId, args.PushToken, args.Domain)
-	log.Printf("pushTokenMap len: %v", len(t.data.PushTokenMap))
-	writePushServiceData(&t.data)
+	service.data.Add(args.UserId, args.PushToken, args.Domain)
+	log.Printf("pushTokenMap len: %v", len(service.data.PushTokenMap))
+	writePushServiceData(&service.data)
 	//if args.Domain == 2 { // Android (FCM)
-	//	PostAndroidMessage(t.fcmServerKey, args.PushToken)
+	//	PostAndroidMessage(t.FcmServerKey, args.PushToken)
 	//} else if args.Domain == 1 {
 	//	PostIosMessage(args.PushToken)
 	//}
@@ -99,15 +113,15 @@ func (t *PushService) RegisterPushToken(args *shared_server.PushToken, reply *in
 	return nil
 }
 
-func (t *PushService) Broadcast(args *shared_server.BroadcastPush, reply *int) error {
+func (service *PushService) Broadcast(args *shared_server.BroadcastPush, reply *int) error {
 	log.Printf("Broadcast: %v", args)
-	log.Printf("Broadcasting message to the entire push pool (len=%v)", len(t.data.PushTokenMap))
-	for pushToken, pushUserData := range t.data.PushTokenMap {
+	log.Printf("Broadcasting message to the entire push pool (len=%v)", len(service.data.PushTokenMap))
+	for pushToken, pushUserData := range service.data.PushTokenMap {
 		domain := pushUserData.Domain
 		if domain == 2 {
-			go PostAndroidMessage(t.fcmServerKey, pushToken, args.Title, args.Body)
+			go PostAndroidMessage(service.data.DevCert.FcmServerKey, pushToken, args.Title, args.Body)
 		} else if domain == 1 {
-			go PostIosMessage(pushToken, args.Body)
+			go PostIosMessage(pushToken, args.Body, service.data.Prod)
 		} else {
 			log.Printf("Unknown domain: %v", domain)
 			*reply = 0
@@ -116,6 +130,45 @@ func (t *PushService) Broadcast(args *shared_server.BroadcastPush, reply *int) e
 	}
 	*reply = 1
 	return nil
+}
+
+func (pushServiceData *PushServiceData) loadAllCerts() {
+	pushServiceData.loadAllFcmCerts()
+	pushServiceData.loadAllAppleCerts()
+}
+
+func (pushServiceData *PushServiceData) loadAllFcmCerts() {
+	pushServiceData.DevCert.loadFcmCert(ANDROIDKEYPATH)
+	pushServiceData.ProdCert.loadFcmCert(ANDROIDPRODKEYPATH)
+}
+
+func (cert *Cert) loadFcmCert(keyPath string) {
+	// Load Firebase Cloud Messaging (FCM) server key
+	fcmServerKeyBuf, err := ioutil.ReadFile(keyPath)
+	if err != nil {
+		log.Printf("FCM server key load failed: %v", err.Error())
+		cert.FcmServerKey = ""
+		cert.FcmServerKeyPath = ""
+	} else {
+		cert.FcmServerKey = string(fcmServerKeyBuf)
+		cert.FcmServerKeyPath = keyPath
+	}
+}
+
+func (pushServiceData *PushServiceData) loadAllAppleCerts() {
+	pushServiceData.DevCert.loadAppleCert(APPLEKEYPATH)
+	pushServiceData.ProdCert.loadAppleCert(APPLEPRODKEYPATH)
+}
+
+func (cert *Cert) loadAppleCert(keyPath string) {
+	// Check Apple push key cert
+	_, err := ioutil.ReadFile(keyPath)
+	if err != nil {
+		log.Printf("Apple server key load failed: %v", err.Error())
+		cert.AppleServerKeyPath = ""
+	} else {
+		cert.AppleServerKeyPath = keyPath
+	}
 }
 
 func writePushServiceData(pushServiceData *PushServiceData) {
@@ -143,9 +196,9 @@ func PostAndroidMessage(fcmServerKey string, pushToken string, title string, bod
 	c.NewFcmRegIdsMsg(ids, data)
 	noti := &fcm.NotificationPayload{
 		Title: title,
-		Body: body,
+		Body:  body,
 		Sound: "default",
-		Icon: "ic_stat_name",
+		Icon:  "ic_stat_name",
 	}
 	c.SetNotificationPayload(noti)
 	//c.AppendDevices(xds)
@@ -162,91 +215,103 @@ type Page struct {
 	Body  []byte
 }
 
-func getTitle(w http.ResponseWriter, r *http.Request) (string, error) {
-	m := validPath.FindStringSubmatch(r.URL.Path)
-	if m == nil {
-		http.NotFound(w, r)
-		return "", errors.New("invalid page title")
-	}
-	return  m[2], nil
-}
-
 func (p *Page) save() error {
 	filename := "pages/" + p.Title + ".txt"
 	return ioutil.WriteFile(filename, p.Body, 0600)
-}
-
-func loadPage(title string) (*Page, error) {
-	filename := "pages/" + title + ".txt"
-	body, err := ioutil.ReadFile(filename)
-	if err != nil {
-		return nil, err
-	}
-	return &Page{Title: title, Body: body}, nil
-}
-
-func renderTemplate(w http.ResponseWriter, tmpl string, p *Page) {
-	err := templates.ExecuteTemplate(w, tmpl+".html", p)
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-	}
-}
-
-func viewHandler(w http.ResponseWriter, r *http.Request, title string) {
-	title, err := getTitle(w, r)
-	if err != nil {
-		return
-	}
-	p, err := loadPage(title)
-	if err != nil {
-		http.Redirect(w, r, "/edit/" + title, http.StatusFound)
-		return
-	}
-	renderTemplate(w, "view", p)
-}
-
-func editHandler(w http.ResponseWriter, r *http.Request, title string) {
-	title, err := getTitle(w, r)
-	if err != nil {
-		return
-	}
-	p, err := loadPage(title)
-	if err != nil {
-		p = &Page{Title: title}
-	}
-	renderTemplate(w, "edit", p)
-}
-
-func saveHandler(w http.ResponseWriter, r *http.Request, title string) {
-	title, err := getTitle(w, r)
-	if err != nil {
-		return
-	}
-	body := r.FormValue("body")
-	p := &Page{Title: title, Body: []byte(body)}
-	err = p.save()
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
-	http.Redirect(w, r, "/view/"+title, http.StatusFound)
-}
-
-func makeHandler(fn func (http.ResponseWriter, *http.Request, string)) http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
-		m := validPath.FindStringSubmatch(r.URL.Path)
-		if m == nil {
-			http.NotFound(w, r)
-			return
-		}
-		fn(w, r, m[2])
-	}
 }
 
 func pushHandler(w http.ResponseWriter, _ *http.Request, pushService *PushService) {
 	err := templates.ExecuteTemplate(w, "push.html", pushService.data)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
+	}
+}
+
+func certsHandler(w http.ResponseWriter, _ *http.Request, pushService *PushService) {
+	err := templates.ExecuteTemplate(w, "certs.html", pushService.data)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+	}
+}
+
+func uploadCertsHandler(w http.ResponseWriter, r *http.Request, pushService *PushService) {
+	switch r.Method {
+	case "GET":
+		http.Redirect(w, r, "/certs/", http.StatusFound)
+	case "POST":
+		os.MkdirAll("cert/dev", os.ModePerm)
+		os.MkdirAll("cert/prod", os.ModePerm)
+		pushService.data.DevCert.FcmServerKeyPath = ""
+		pushService.data.DevCert.AppleServerKeyPath = ""
+		pushService.data.ProdCert.FcmServerKeyPath = ""
+		pushService.data.ProdCert.AppleServerKeyPath = ""
+		err := r.ParseMultipartForm(16 * 1024)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+		m := r.MultipartForm
+		files := m.File["file"]
+		for i := range files {
+			file, err := files[i].Open()
+			defer file.Close()
+			if err != nil {
+				http.Error(w, err.Error(), http.StatusInternalServerError)
+				return
+			}
+			log.Printf("Upload filename: %v", files[i].Filename)
+			var dst *os.File
+			switch files[i].Filename {
+			case "dev-fcmserverkey":
+				dst, err = os.Create(ANDROIDKEYPATH)
+			case "dev-cert.p12":
+				dst, err = os.Create(APPLEKEYPATH)
+			case "prod-fcmserverkey":
+				dst, err = os.Create(ANDROIDPRODKEYPATH)
+			case "prod-cert.p12":
+				dst, err = os.Create(APPLEPRODKEYPATH)
+			}
+			defer dst.Close()
+			if err != nil {
+				http.Error(w, err.Error(), http.StatusInternalServerError)
+				return
+			}
+			if _, err := io.Copy(dst, file); err != nil {
+				http.Error(w, err.Error(), http.StatusInternalServerError)
+				return
+			}
+			switch files[i].Filename {
+			case "dev-fcmserverkey":
+				pushService.data.DevCert.FcmServerKeyPath = dst.Name()
+			case "dev-cert.p12":
+				pushService.data.DevCert.AppleServerKeyPath = dst.Name()
+			case "prod-fcmserverkey":
+				pushService.data.ProdCert.FcmServerKeyPath = dst.Name()
+			case "prod-cert.p12":
+				pushService.data.ProdCert.AppleServerKeyPath = dst.Name()
+			}
+		}
+		pushService.data.loadAllCerts()
+		http.Redirect(w, r, "/certs/", http.StatusFound)
+	default:
+		w.WriteHeader(http.StatusMethodNotAllowed)
+	}
+}
+
+func setEnvHandler(w http.ResponseWriter, r *http.Request, pushService *PushService) {
+	switch r.Method {
+	case "GET":
+		http.Redirect(w, r, "/certs/", http.StatusFound)
+	case "POST":
+		switch r.FormValue("env") {
+		case "prod":
+			pushService.data.Prod = true
+		case "dev":
+			pushService.data.Prod = false
+		}
+		http.Redirect(w, r, "/certs/", http.StatusFound)
+	default:
+		w.WriteHeader(http.StatusMethodNotAllowed)
 	}
 }
 
@@ -259,9 +324,9 @@ func deletePushTokenHandler(w http.ResponseWriter, r *http.Request, pushService 
 func sendTestPushHandler(w http.ResponseWriter, r *http.Request, pushService *PushService, pushToken string) {
 	domain := pushService.data.PushTokenMap[pushToken].Domain
 	if domain == 2 {
-		PostAndroidMessage(pushService.fcmServerKey, pushToken, "용사는 실직중", "어서와.. 테스트 푸시는 처음이지...?")
+		PostAndroidMessage(pushService.data.DevCert.FcmServerKey, pushToken, "용사는 실직중", "어서와.. 테스트 푸시는 처음이지...?")
 	} else if domain == 1 {
-		PostIosMessage(pushToken, "어서와... 테스트 푸시는 처음이지?")
+		PostIosMessage(pushToken, "어서와... 테스트 푸시는 처음이지?", false)
 	} else {
 		http.NotFound(w, r)
 		return
@@ -282,9 +347,9 @@ func sendPushHandler(w http.ResponseWriter, r *http.Request, pushService *PushSe
 	body := r.FormValue("body")
 	domain := pushService.data.PushTokenMap[pushToken].Domain
 	if domain == 2 {
-		PostAndroidMessage(pushService.fcmServerKey, pushToken, "용사는 실직중", body)
+		PostAndroidMessage(pushService.data.DevCert.FcmServerKey, pushToken, "용사는 실직중", body)
 	} else if domain == 1 {
-		PostIosMessage(pushToken, body)
+		PostIosMessage(pushToken, body, pushService.data.Prod)
 	} else {
 		http.NotFound(w, r)
 		return
@@ -310,13 +375,13 @@ func writePushHandler(w http.ResponseWriter, _ *http.Request, _ *PushService, pu
 	}
 }
 
-func makePushHandler(fn func (http.ResponseWriter, *http.Request, *PushService), pushServiceData *PushService) http.HandlerFunc {
+func makePushHandler(fn func(http.ResponseWriter, *http.Request, *PushService), pushServiceData *PushService) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		fn(w, r, pushServiceData)
 	}
 }
 
-func makePushTokenHandler(fn func (http.ResponseWriter, *http.Request, *PushService, string), pushService *PushService) http.HandlerFunc {
+func makePushTokenHandler(fn func(http.ResponseWriter, *http.Request, *PushService, string), pushService *PushService) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		m := validPushTokenPath.FindStringSubmatch(r.URL.Path)
 		if m == nil {
@@ -328,9 +393,7 @@ func makePushTokenHandler(fn func (http.ResponseWriter, *http.Request, *PushServ
 }
 
 func startAdminService(pushService *PushService) {
-	http.HandleFunc("/view/", makeHandler(viewHandler))
-	http.HandleFunc("/edit/", makeHandler(editHandler))
-	http.HandleFunc("/save/", makeHandler(saveHandler))
+	http.HandleFunc("/", makePushHandler(pushHandler, pushService))
 	http.HandleFunc("/push/", makePushHandler(pushHandler, pushService))
 	http.HandleFunc("/deletePushToken/", makePushTokenHandler(deletePushTokenHandler, pushService))
 	http.HandleFunc("/sendTestPush/", makePushTokenHandler(sendTestPushHandler, pushService))
@@ -338,50 +401,36 @@ func startAdminService(pushService *PushService) {
 	http.HandleFunc("/sendPush/", makePushTokenHandler(sendPushHandler, pushService))
 	http.HandleFunc("/editPushToken/", makePushTokenHandler(editPushTokenHandler, pushService))
 	http.HandleFunc("/savePushToken/", makePushTokenHandler(savePushTokenHandler, pushService))
+	http.HandleFunc("/certs/", makePushHandler(certsHandler, pushService))
+	http.HandleFunc("/uploadCerts/", makePushHandler(uploadCertsHandler, pushService))
+	http.HandleFunc("/setEnv/", makePushHandler(setEnvHandler, pushService))
 	addr := "0.0.0.0:18080"
 	log.Printf("Listening %v for admin service...", addr)
 	http.ListenAndServe(addr, nil)
 }
-
-const (
-	ANDROIDKEYPATH   = "cert/dev/fcmserverkey"
-	APPLEKEYPATH     = "cert/dev/cert.p12"
-	APPLEPRODKEYPATH = "cert/prod/cert.p12"
-)
-
-var prod bool
 
 func Entry() {
 	// Set default log format
 	log.SetFlags(log.LstdFlags | log.Lshortfile)
 	log.SetOutput(os.Stdout)
 	log.Println("Greetings from push server")
-	if len(os.Args) >= 2 && os.Args[1] == "prod" {
-		log.Println("PRODUCTION MODE")
-		prod = true
-	} else {
-		prod = false
-	}
 	initTemplates()
 	// Create db directory to save user database
 	os.MkdirAll("db", os.ModePerm)
 	os.MkdirAll("pages", os.ModePerm)
-	cert_root := os.Getenv("CERT_ROOT")
-	// Load Firebase Cloud Messaging (FCM) server key
-	fcmServerKeyBuf, err := ioutil.ReadFile(cert_root + ANDROIDKEYPATH)
-	if err != nil {
-		log.Fatalf("FCM server key load failed: %v", err.Error())
-	}
-	fcmServerKey := string(fcmServerKeyBuf)
-	//Creating an instance of struct which implement Arith interface
-	arith := new(Arith)
 	pushService := &PushService{
-		PushServiceData{
-			make(map[string]PushUserData),
-			make(map[UserId]string),
+		data: PushServiceData{
+			PushTokenMap: make(map[string]PushUserData),
+			UserIdMap:    make(map[UserId]string),
 		},
-		fcmServerKey,
 	}
+	if len(os.Args) >= 2 && os.Args[1] == "prod" {
+		log.Println("PRODUCTION MODE")
+		pushService.data.Prod = true
+	} else {
+		pushService.data.Prod = false
+	}
+	pushService.data.loadAllCerts()
 	pushKeyDbFile, err := os.Open("db/pushkeydb")
 	if err != nil {
 		if os.IsNotExist(err) {
@@ -400,13 +449,13 @@ func Entry() {
 	}
 	go startAdminService(pushService)
 
-	//rpc.Register(arith)
-
 	// Register a new rpc server (In most cases, you will use default server only)
 	// And register struct we created above by name "Arith"
 	// The wrapper method here ensures that only structs which implement Arith interface
 	// are allowed to register themselves.
 	server := rpc.NewServer()
+	//Creating an instance of struct which implement Arith interface
+	arith := new(Arith)
 	registerArith(server, arith, pushService)
 
 	addr := ":20171"
@@ -422,13 +471,12 @@ func Entry() {
 	server.Accept(l)
 }
 
-func PostIosMessage(pushToken string, body string) {
-	cert_root := os.Getenv("CERT_ROOT")
+func PostIosMessage(pushToken string, body string, prod bool) {
 	var appleKeyPath string
 	if prod {
-		appleKeyPath = cert_root + APPLEPRODKEYPATH
+		appleKeyPath = APPLEPRODKEYPATH
 	} else {
-		appleKeyPath = cert_root + APPLEKEYPATH
+		appleKeyPath = APPLEKEYPATH
 	}
 	cert, err := certificate.FromP12File(appleKeyPath, "")
 	if err != nil {
