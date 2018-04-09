@@ -217,7 +217,7 @@ static void send_udp_frame_sync(LWCONTEXT* pLwc, LWPUCKGAME* puck_game, int remo
 }
 
 void update_puck_game(LWCONTEXT* pLwc, LWPUCKGAME* puck_game, double delta_time) {
-    if (!puck_game->world) {
+    if (!puck_game || !puck_game->world) {
         return;
     }
     const int remote = puck_game_remote(pLwc, puck_game);
