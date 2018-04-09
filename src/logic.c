@@ -28,6 +28,7 @@
 #include "lwttl.h"
 #include "rmsg.h"
 #include "htmlui.h"
+#include "remtex.h"
 
 void toggle_font_texture_test_mode(LWCONTEXT* pLwc);
 void lw_request_remote_notification_device_token(LWCONTEXT* pLwc);
@@ -825,6 +826,9 @@ void lwc_update(LWCONTEXT* pLwc, double delta_time) {
     if (pLwc->udp_sea) {
         udp_sea_update(pLwc, pLwc->udp_sea);
     }
+
+    remtex_update(pLwc->remtex);
+    remtex_udp_update(pLwc->remtex);
 
     if (pLwc->tcp) {
         tcp_update(pLwc->tcp);

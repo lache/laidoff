@@ -13,6 +13,7 @@
 #include <Ws2tcpip.h>
 #endif
 #include "lz4.h"
+#include "remtex.h"
 
 static int make_socket_nonblocking(int sock) {
 #if defined(WIN32) || defined(_WIN32) || defined(IMN_PIM)
