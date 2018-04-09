@@ -59,6 +59,7 @@
 #include "lwttl.h"
 #include "lwcountry.h"
 #include "remtex.h"
+#include "render_remtex.h"
 // SWIG output file
 #include "lo_wrap.inl"
 
@@ -1173,6 +1174,8 @@ void lwc_render(const LWCONTEXT* pLwc) {
         lwc_render_splash(pLwc);
     } else if (pLwc->game_scene == LGS_LEADERBOARD) {
         lwc_render_leaderboard(pLwc);
+    } else if (pLwc->game_scene == LGS_REMTEX) {
+        lwc_render_remtex(pLwc);
     }
     // Rendering a system message
     render_sys_msg(pLwc, pLwc->def_sys_msg);
@@ -1181,6 +1184,7 @@ void lwc_render(const LWCONTEXT* pLwc) {
     render_addr(pLwc);
     htmlui_load_next_html_path(pLwc->htmlui);
     htmlui_load_next_html_body(pLwc->htmlui);
+    remtex_render(pLwc->remtex);
     // Set rendering flag to 0 (ignoring const-ness......)
     lwcontext_set_rendering((LWCONTEXT*)pLwc, 0);
 }
@@ -1771,9 +1775,9 @@ LWCONTEXT* lw_init_initial_size(int width, int height) {
 
     pLwc->ttl = lwttl_new(pLwc->aspect_ratio);
 
-    pLwc->remtex = remtex_new();
+    pLwc->remtex = remtex_new(pLwc->tcp_host_addr.host);
 
-    remtex_load(pLwc->remtex, "circle-shadow");
+    remtex_preload(pLwc->remtex, "circle-shadow");
 
     return pLwc;
 }

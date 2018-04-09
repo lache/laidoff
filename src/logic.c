@@ -101,6 +101,10 @@ void change_to_leaderboard(LWCONTEXT* pLwc) {
     pLwc->next_game_scene = LGS_LEADERBOARD;
 }
 
+void change_to_remtex(LWCONTEXT* pLwc) {
+    pLwc->next_game_scene = LGS_REMTEX;
+}
+
 typedef enum _LW_MSG {
     LM_ZERO,
     LM_LWMSGINITFIELD,
@@ -676,37 +680,39 @@ void reset_runtime_context(LWCONTEXT* pLwc) {
     pLwc->font_fbo.dirty = 1;
     // Register admin button commands
     const LWBUTTONCOMMAND handler_array[] = {
-            { LWU("Field"), change_to_field },
-            { LWU("Dialog"), change_to_dialog },
-            { LWU("Battle"), change_to_battle },
-            { LWU("Font"), change_to_font_test },
-            { LWU("Runtime Reset"), reset_runtime_context_async },
-            { LWU("Font Debug"), toggle_font_texture_test_mode },
-            { LWU("UDP"), net_rtt_test },
-            { LWU("Skin"), change_to_skin },
-            { LWU("Physics"), change_to_physics },
-            { LWU("Particles"), change_to_particle_system },
-            { LWU("Field 1"), load_field_1_init_runtime_data },
-            { LWU("Field 2"), load_field_2_init_runtime_data },
-            { LWU("Field 3"), load_field_3_init_runtime_data },
-            { LWU("Field 4"), load_field_4_init_runtime_data },
-            { LWU("Field 5"), load_field_5_init_runtime_data },
-            { LWU("Field 6"), load_field_6_init_runtime_data },
-            { LWU("UI"), change_to_ui },
-            { LWU("Splash"), change_to_splash },
-            { LWU("Server #0"), connect_to_server_0 },
-            { LWU("Server #1"), connect_to_server_1 },
-            { LWU("Ray Test Toggle"), toggle_ray_test },
-            { LWU("Network Toggle"), toggle_network_poll },
-            { LWU("Nickname"), start_nickname_text_input_activity },
-            { LWU("Push Token"), start_request_push_token },
-            { LWU("TCP Address"), start_tcp_addr_text_input_activity },
-            { LWU("Leaderboard"), show_leaderboard },
-            { LWU("Stat Toggle"), toggle_stat },
-            { LWU("Reward Video"), start_reward_video },
-            { LWU("Sign In"), start_sign_in },
-            { LWU("Sign Out"), start_sign_out },
+        { LWU("Field"), change_to_field },
+        { LWU("Dialog"), change_to_dialog },
+        { LWU("Battle"), change_to_battle },
+        { LWU("Font"), change_to_font_test },
+        { LWU("Runtime Reset"), reset_runtime_context_async },
+        { LWU("Font Debug"), toggle_font_texture_test_mode },
+        { LWU("UDP"), net_rtt_test },
+        { LWU("Skin"), change_to_skin },
+        { LWU("Physics"), change_to_physics },
+        { LWU("Particles"), change_to_particle_system },
+        { LWU("Field 1"), load_field_1_init_runtime_data },
+        { LWU("Field 2"), load_field_2_init_runtime_data },
+        { LWU("Field 3"), load_field_3_init_runtime_data },
+        { LWU("Field 4"), load_field_4_init_runtime_data },
+        { LWU("Field 5"), load_field_5_init_runtime_data },
+        { LWU("Field 6"), load_field_6_init_runtime_data },
+        { LWU("UI"), change_to_ui },
+        { LWU("Splash"), change_to_splash },
+        { LWU("Server #0"), connect_to_server_0 },
+        { LWU("Server #1"), connect_to_server_1 },
+        { LWU("Ray Test Toggle"), toggle_ray_test },
+        { LWU("Network Toggle"), toggle_network_poll },
+        { LWU("Nickname"), start_nickname_text_input_activity },
+        { LWU("Push Token"), start_request_push_token },
+        { LWU("TCP Address"), start_tcp_addr_text_input_activity },
+        { LWU("Leaderboard"), show_leaderboard },
+        { LWU("Stat Toggle"), toggle_stat },
+        { LWU("Reward Video"), start_reward_video },
+        { LWU("Sign In"), start_sign_in },
+        { LWU("Sign Out"), start_sign_out },
+        { LWU("Remtex"), change_to_remtex },
     };
+    assert(ARRAY_SIZE(handler_array) <= ARRAY_SIZE(pLwc->admin_button_command));
     for (int i = 0; i < ARRAY_SIZE(handler_array); i++) {
         pLwc->admin_button_command[i].name = handler_array[i].name;
         pLwc->admin_button_command[i].command_handler = handler_array[i].command_handler;
@@ -895,7 +901,7 @@ void lwc_update(LWCONTEXT* pLwc, double delta_time) {
 
     // Check for a new native user text input
     if (pLwc->last_text_input_seq != lw_get_text_input_seq()) {
-       switch (lw_text_input_tag()) {
+        switch (lw_text_input_tag()) {
         case LITI_NICKNAME:
         {
             //char nicknameMsg[256];
@@ -1035,7 +1041,7 @@ static void s_logic_worker(zsock_t *pipe, void *args) {
                             &pLwc->tcp_ttl_host_addr,
                             tcp_ttl_on_connect,
                             parse_recv_packets);
-    
+
     zloop_t* loop = zloop_new();
     pLwc->logic_loop = loop;
     logic_start_logic_update_job(pLwc);

@@ -16,11 +16,8 @@ import (
 #include <stdio.h>
 #include <stdlib.h>
 typedef struct _LWREMTEXTEXPART {
-    unsigned int namehash;
-    unsigned short w;
-    unsigned short h;
-    unsigned short len;
-    unsigned short padding;
+    unsigned int name_hash;
+    unsigned int total_size;
     unsigned int offset;
     unsigned char data[1024];
 } LWREMTEXTEXPART;
@@ -56,6 +53,10 @@ func hash(s string) uint32 {
 }
 
 func main() {
+	if len(os.Args) < 2 {
+		log.Printf("Should provide resource glob as first argument. (i.e. c:/laidoff/assets/ktx/*.ktx)")
+		return
+	}
 	/* Lets prepare a address at any address at port 10001*/
 	serverAddr, err := net.ResolveUDPAddr("udp", ":19876")
 	checkError(err)
@@ -67,13 +68,9 @@ func main() {
 
 	buf := make([]byte, 1024)
 
-	cstr := C.CString("tex1")
-	texhash := C.hash(cstr)
-	C.free(unsafe.Pointer(cstr))
-	log.Printf("Hash: %v", texhash)
-
-	files, _ := filepath.Glob("C:/laidoff/assets/ktx/*.ktx")
+	files, _ := filepath.Glob(os.Args[1])
 	fileMap := make(map[uint32]string)
+	fileCacheMap := make(map[uint32][]byte)
 	for _, f := range files {
 		filename := filepath.Base(f)
 		name := filename[:len(filename)-len(filepath.Ext(filename))]
@@ -92,38 +89,50 @@ func main() {
 		if n == 8 {
 			nameHash := binary.LittleEndian.Uint32(buf[0:4])
 			offset := binary.LittleEndian.Uint32(buf[4:8])
-			log.Printf("Received %v bytes from %v: nameHash %v, offset %v", n, addr, nameHash, offset)
+			//log.Printf("Received %v bytes from %v: nameHash %v, offset %v", n, addr, nameHash, offset)
 
-
-			file, err := os.Open(fileMap[nameHash]) // For read access.
-			if err != nil {
-				log.Fatalf(err.Error())
-			}
-			data := make([]byte, 12 + (4 * 8))
-			_, err = file.Read(data)
-			w := binary.LittleEndian.Uint32(data[12 + (4 * 6):12 + (4 * 7)])
-			h := binary.LittleEndian.Uint32(data[12 + (4 * 7):12 + (4 * 8)])
-			totalLen := uint32(w * h * 3)
-			length := uint32(0)
-			remained := totalLen - offset
-			if remained < 1024 {
-				length = remained
+			// check cache
+			filename := fileMap[nameHash]
+			if _, ok := fileCacheMap[nameHash]; ok {
 			} else {
-				length = 1024
+				log.Printf("%v: Not cached file.", filename)
+				filename := fileMap[nameHash]
+				file, err := os.Open(filename) // For read access.
+				if err != nil {
+					log.Fatalf(err.Error())
+				}
+				fileStat, err := file.Stat()
+				if err != nil {
+					log.Fatalf(err.Error())
+				}
+				totalSize := fileStat.Size()
+				fileCacheMap[nameHash] = make([]byte, totalSize)
+				_, err = file.Read(fileCacheMap[nameHash])
+				if err != nil {
+					log.Fatalf(err.Error())
+				}
+				log.Printf("%v: Saved. Total size %v bytes.", filename, len(fileCacheMap[nameHash]))
+			}
+			fileData := fileCacheMap[nameHash]
+			totalSize := len(fileData)
+			payloadSize := uint32(0)
+			remained := uint32(totalSize) - offset
+			if remained < 1024 {
+				payloadSize = remained
+			} else {
+				payloadSize = 1024
 			}
 
 			texPart := C.LWREMTEXTEXPART{}
-			texPart.namehash = C.uint(nameHash)
-			texPart.w = C.ushort(w)
-			texPart.h = C.ushort(h)
-			texPart.len = C.ushort(length)
+			texPart.name_hash = C.uint(nameHash)
+			texPart.total_size = C.uint(totalSize)
 			texPart.offset = C.uint(offset)
-			for i := uint32(0); i < length; i++ {
-				texPart.data[i] = C.uchar(i)
+			for i := uint32(0); i < payloadSize; i++ {
+				texPart.data[i] = C.uchar(fileData[offset + i])
 			}
 
 			replyBuf := convert.Packet2Buf(texPart)
-			log.Printf("Replying %v bytes to %v: offset %v, length %v", len(replyBuf), addr, offset, length)
+			//log.Printf("Replying %v bytes to %v: file %v total %v offset %v, payloadSize %v", len(replyBuf), addr, filename, totalSize, offset, payloadSize)
 			serverConn.WriteToUDP(replyBuf, addr)
 		} else {
 			log.Printf("Unknown size: %v", n)

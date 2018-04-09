@@ -4,6 +4,8 @@
 #include "lwlog.h"
 #include "lwhostaddr.h"
 #include "lwmacro.h"
+#include "ktx.h"
+#include "lwtimepoint.h"
 
 unsigned long hash(const unsigned char *str);
 
@@ -16,16 +18,18 @@ typedef enum _LW_REM_TEX_STATE {
 
 typedef struct _LWREMTEXTEX {
     char name[64];
-    unsigned int namehash;
-    int state;
+    unsigned int name_hash;
+    LW_REM_TEX_STATE state;
     //GLint level; // mip level
     //GLint internalformat; // GL_RGB
     GLsizei width;
     GLsizei height;
     //GLenum format; // GL_RGB
     //GLenum type; // GL_UNSIGNED_BYTE
-    unsigned char* pixels;
-    size_t pixels_len;
+    unsigned char* data;
+    size_t data_size;
+    size_t total_size;
+    GLuint tex;
 } LWREMTEXTEX;
 
 #define MAX_TEX_COUNT (512)
@@ -34,27 +38,25 @@ typedef struct _LWREMTEX {
     LWREMTEXTEX tex[MAX_TEX_COUNT];
     LWHOSTADDR host_addr;
     LWUDP* udp;
+    double last_request;
 } LWREMTEX;
 
 typedef struct _LWREMTEXREQUEST {
-    unsigned int namehash;
+    unsigned int name_hash;
     unsigned int offset;
 } LWREMTEXREQUEST;
 
 typedef struct _LWREMTEXTEXPART {
-    unsigned int namehash;
-    unsigned short w;
-    unsigned short h;
-    unsigned short len;
-    unsigned short padding;
+    unsigned int name_hash;
+    unsigned int total_size;
     unsigned int offset;
     unsigned char data[1024];
 } LWREMTEXTEXPART;
 
-void* remtex_new() {
+void* remtex_new(const char* host) {
     LWREMTEX* remtex = calloc(1, sizeof(LWREMTEX));
     remtex->udp = new_udp();
-    strcpy(remtex->host_addr.host, "localhost");
+    strcpy(remtex->host_addr.host, host);
     remtex->host_addr.port = 19876;
     strcpy(remtex->host_addr.port_str, "19876");
     udp_update_addr_host(remtex->udp,
@@ -69,7 +71,7 @@ void remtex_destroy(void** r) {
     *r = 0;
 }
 
-void remtex_load(void* r, const char* name) {
+void remtex_preload(void* r, const char* name) {
     LWREMTEX* remtex = (LWREMTEX*)r;
     for (int i = 0; i < MAX_TEX_COUNT; i++) {
         if (remtex->tex[i].state == LRTS_EMPTY) {
@@ -77,21 +79,59 @@ void remtex_load(void* r, const char* name) {
             memset(&remtex->tex[i], 0, sizeof(LWREMTEXTEX));
             remtex->tex[i].state = LRTS_DOWNLOADING;
             strcpy(remtex->tex[i].name, name);
-            remtex->tex[i].namehash = hash(name);
+            remtex->tex[i].name_hash = hash(name);
             return;
         }
     }
     LOGEP("remtex load capacity exceeded: %s", name);
 }
 
-void remtex_update(void* r) {
+GLuint remtex_load_tex(void* r, const char* name) {
     LWREMTEX* remtex = (LWREMTEX*)r;
+    unsigned int name_hash = hash(name);
+    for (int i = 0; i < MAX_TEX_COUNT; i++) {
+        if (remtex->tex[i].name_hash == name_hash) {
+            glBindTexture(GL_TEXTURE_2D, remtex->tex[i].tex);
+            return remtex->tex[i].tex;
+        }
+    }
+    // preload it
+    remtex_preload(r, name);
+    return 0;
+}
+
+void remtex_update(void* r) {
+    if (!r) {
+        return;
+    }
+    LWREMTEX* remtex = (LWREMTEX*)r;
+    double now = lwtimepoint_now_seconds();
+    if (now - remtex->last_request < 1.0 / 120) {
+        return;
+    }
+    remtex->last_request = lwtimepoint_now_seconds();
     for (int i = 0; i < MAX_TEX_COUNT; i++) {
         if (remtex->tex[i].state == LRTS_DOWNLOADING) {
             LWREMTEXREQUEST req;
-            req.namehash = remtex->tex[i].namehash;
-            req.offset = remtex->tex[i].pixels_len;
+            req.name_hash = remtex->tex[i].name_hash;
+            req.offset = remtex->tex[i].data_size;
             udp_send(remtex->udp, (const char*)&req, sizeof(LWREMTEXREQUEST));
+        }
+    }
+}
+
+void remtex_render(void* r) {
+    if (!r) {
+        return;
+    }
+    LWREMTEX* remtex = (LWREMTEX*)r;
+    for (int i = 0; i < MAX_TEX_COUNT; i++) {
+        if (remtex->tex[i].state == LRTS_DOWNLOADED) {
+            glGenTextures(1, &remtex->tex[i].tex);
+            glBindTexture(GL_TEXTURE_2D, remtex->tex[i].tex);
+            load_ktx_hw_or_sw_memory(remtex->tex[i].data, &remtex->tex[i].width, &remtex->tex[i].height, remtex->tex[i].name);
+            glBindTexture(GL_TEXTURE_2D, 0);
+            remtex->tex[i].state = LRTS_GPU_LOADED;
         }
     }
 }
@@ -101,29 +141,34 @@ void remtex_on_receive(void* r, void* t) {
     LWREMTEXTEXPART* texpart = (LWREMTEXTEXPART*)t;
     for (int i = 0; i < MAX_TEX_COUNT; i++) {
         if (remtex->tex[i].state == LRTS_DOWNLOADING) {
-            if (texpart->len == 0) {
-                remtex->tex[i].state = LRTS_DOWNLOADED;
-            }
-            if (remtex->tex[i].pixels_len >= texpart->offset + texpart->len) {
+            if (remtex->tex[i].name_hash == texpart->name_hash) {
+                // current part payload size
+                size_t payload_size = LWMIN(texpart->total_size - texpart->offset, 1024);
+                // check for duplicated part
+                if (remtex->tex[i].data_size >= texpart->offset + payload_size) {
+                    // just ignore it
+                    return;
+                }
+                // allocate memory if first chunk of part received
+                if (remtex->tex[i].data == 0) {
+                    remtex->tex[i].data = malloc(texpart->total_size);
+                    remtex->tex[i].total_size = texpart->total_size;
+                }
+                memcpy(remtex->tex[i].data + texpart->offset, texpart->data, payload_size);
+                remtex->tex[i].data_size += payload_size;
+                if (remtex->tex[i].data_size == texpart->total_size) {
+                    remtex->tex[i].state = LRTS_DOWNLOADED;
+                }
                 return;
             }
-            remtex->tex[i].width = texpart->w;
-            remtex->tex[i].height = texpart->h;
-            size_t total_size = remtex->tex[i].width * remtex->tex[i].height * 3; // 3 for RGB
-            if (remtex->tex[i].pixels == 0) {
-                remtex->tex[i].pixels = malloc(total_size);
-            }
-            if (texpart->offset >= total_size) {
-                abort();
-            }
-            memcpy(remtex->tex[i].pixels + texpart->offset, texpart->data, texpart->len);
-            remtex->tex[i].pixels_len += texpart->len;
-            return;
         }
     }
 }
 
 void remtex_udp_update(void* r) {
+    if (!r) {
+        return;
+    }
     LWREMTEX* remtex = (LWREMTEX*)r;
     LWUDP* udp = remtex->udp;
     if (udp->reinit_next_update) {
@@ -169,5 +214,42 @@ void remtex_udp_update(void* r) {
         } else {
             LOGEP("Unknown size of UDP packet received. (%d bytes)", udp->recv_len);
         }
+    }
+}
+
+void remtex_loading_str(void* r, char* str, size_t max_len) {
+    if (!r) {
+        return;
+    }
+    LWREMTEX* remtex = (LWREMTEX*)r;
+    int downloading_count = 0;
+    int downloaded_bytes = 0;
+    int total_bytes = 0;
+    for (int i = 0; i < MAX_TEX_COUNT; i++) {
+        if (remtex->tex[i].state == LRTS_DOWNLOADING) {
+            downloading_count++;
+            downloaded_bytes += remtex->tex[i].data_size;
+            total_bytes += remtex->tex[i].total_size;
+        }
+    }
+    if (downloading_count) {
+        if (total_bytes) {
+            snprintf(str,
+                     max_len,
+                     "Queue Count: %d, Current: %d bytes, Total:%d bytes (%.1f %%)",
+                     downloading_count,
+                     downloaded_bytes,
+                     total_bytes,
+                     100.0f * downloaded_bytes / total_bytes);
+        } else {
+            snprintf(str,
+                     max_len,
+                     "Queue Count: %d, Current: %d bytes, Total: --unknown--",
+                     downloading_count,
+                     downloaded_bytes);
+        }
+        
+    } else {
+        strcpy(str, "Texture downloading completed.");
     }
 }
