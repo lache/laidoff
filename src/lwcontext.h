@@ -411,8 +411,8 @@ typedef struct _LWCONTEXT {
     void* ttl;
     LWCOUNTRYARRAY country_array;
     int country_page;
+    void* remtex;
 } LWCONTEXT;
-
 
 double lwcontext_delta_time(const LWCONTEXT* pLwc);
 int lwcontext_safe_to_start_render(const LWCONTEXT* pLwc);

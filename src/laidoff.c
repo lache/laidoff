@@ -58,6 +58,7 @@
 #include "searoute2.h"
 #include "lwttl.h"
 #include "lwcountry.h"
+#include "remtex.h"
 // SWIG output file
 #include "lo_wrap.inl"
 
@@ -629,7 +630,15 @@ void init_font_fbo(LWCONTEXT* pLwc) {
     glGenTextures(1, &pLwc->font_fbo.color_tex);
     glBindTexture(GL_TEXTURE_2D, pLwc->font_fbo.color_tex);
     glGetError();
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, pLwc->font_fbo.width, pLwc->font_fbo.height, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
+    glTexImage2D(GL_TEXTURE_2D,
+                 0,
+                 GL_RGBA,
+                 pLwc->font_fbo.width,
+                 pLwc->font_fbo.height,
+                 0,
+                 GL_RGBA,
+                 GL_UNSIGNED_BYTE,
+                 NULL);
     GLenum render_texture_result = glGetError();
     glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, pLwc->font_fbo.color_tex, 0);
     
@@ -1301,8 +1310,15 @@ void load_pkm_hw_decoding(const char *tex_atlas_filename) {
     LWBITMAPCONTEXT bitmap_context;
     create_image(tex_atlas_filename, &bitmap_context, 0);
     
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, bitmap_context.width, bitmap_context.height, 0,
-                 GL_RGBA, GL_UNSIGNED_BYTE, bitmap_context.data);
+    glTexImage2D(GL_TEXTURE_2D,
+                 0,
+                 GL_RGBA,
+                 bitmap_context.width,
+                 bitmap_context.height,
+                 0,
+                 GL_RGBA,
+                 GL_UNSIGNED_BYTE,
+                 bitmap_context.data);
     error_enum = glGetError();
     LOGI("glTexImage2D (ETC1 software decompression) result (%dx%d): %d", bitmap_context.width, bitmap_context.height,
          error_enum);
@@ -1323,9 +1339,15 @@ void load_png_pkm_sw_decoding(LWCONTEXT* pLwc, int i) {
     create_image(tex_atlas_filename[i], &bitmap_context, i);
     
     if (bitmap_context.width > 0 && bitmap_context.height > 0) {
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, bitmap_context.width, bitmap_context.height,
+        glTexImage2D(GL_TEXTURE_2D,
                      0,
-                     GL_RGBA, GL_UNSIGNED_BYTE, bitmap_context.data);
+                     GL_RGBA,
+                     bitmap_context.width,
+                     bitmap_context.height,
+                     0,
+                     GL_RGBA,
+                     GL_UNSIGNED_BYTE,
+                     bitmap_context.data);
         GLenum error_enum = glGetError();
         LOGI("glTexImage2D result (%dx%d): %d", bitmap_context.width, bitmap_context.height,
              error_enum);
@@ -1387,9 +1409,15 @@ void load_test_font(LWCONTEXT* pLwc) {
             tex_data[4 * j + 3] = v;
         }
         
-        //glTexImage2D(GL_TEXTURE_2D, 0, GL_R8, tga_header->width, tga_header->height, 0, GL_RED, GL_UNSIGNED_BYTE, b + sizeof(TGAHEADER));
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, tga_header->width, tga_header->height, 0, GL_RGBA,
-                     GL_UNSIGNED_BYTE, tex_data);
+        glTexImage2D(GL_TEXTURE_2D,
+                     0,
+                     GL_RGBA,
+                     tga_header->width,
+                     tga_header->height,
+                     0,
+                     GL_RGBA,
+                     GL_UNSIGNED_BYTE,
+                     tex_data);
         
         free(tex_data);
         
@@ -1743,6 +1771,10 @@ LWCONTEXT* lw_init_initial_size(int width, int height) {
 
     pLwc->ttl = lwttl_new(pLwc->aspect_ratio);
 
+    pLwc->remtex = remtex_new();
+
+    remtex_load(pLwc->remtex, "circle-shadow");
+
     return pLwc;
 }
 
@@ -1892,6 +1924,8 @@ void lw_deinit(LWCONTEXT* pLwc) {
     ps_destroy_context(&pLwc->ps_context);
 
     lwttl_destroy(&pLwc->ttl);
+
+    remtex_destroy(&pLwc->remtex);
 
     free(pLwc->country_array.first);
     
