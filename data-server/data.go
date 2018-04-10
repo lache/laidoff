@@ -105,13 +105,15 @@ func main() {
 		clientMap[addr] = time.Now()
 		clientMutex.Unlock()
 
-		if n == 8 {
-			fileCacheMutex.Lock()
-			handleDataRequest(readBuf, fileMap, fileCacheMap, jobMap, addr, serverConn)
-			fileCacheMutex.Unlock()
-		} else {
-			log.Printf("Unknown size: %v", n)
-		}
+		go func() {
+			if n == 8 {
+				fileCacheMutex.Lock()
+				handleDataRequest(readBuf, fileMap, fileCacheMap, jobMap, addr, serverConn)
+				fileCacheMutex.Unlock()
+			} else {
+				log.Printf("Unknown size: %v", n)
+			}
+		}()
 	}
 }
 
