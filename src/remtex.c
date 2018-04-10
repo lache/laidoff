@@ -67,7 +67,24 @@ void* remtex_new(const char* host) {
     return remtex;
 }
 
+void remtex_destroy_render(void* r) {
+    LWREMTEX* remtex = (LWREMTEX*)r;
+    for (int i = 0; i < MAX_TEX_COUNT; i++) {
+        if (remtex->tex[i].state == LRTS_GPU_LOADED) {
+            glDeleteTextures(1, &remtex->tex[i].tex);
+        }
+    }
+}
+
 void remtex_destroy(void** r) {
+    LWREMTEX* remtex = *(LWREMTEX**)r;
+    for (int i = 0; i < MAX_TEX_COUNT; i++) {
+        if (remtex->tex[i].state != LRTS_EMPTY) {
+            if (remtex->tex[i].data) {
+                free(remtex->tex[i].data);
+            }
+        }
+    }
     free(*r);
     *r = 0;
 }
@@ -133,6 +150,9 @@ void remtex_render(void* r) {
             load_ktx_hw_or_sw_memory(remtex->tex[i].data, &remtex->tex[i].width, &remtex->tex[i].height, remtex->tex[i].name);
             glBindTexture(GL_TEXTURE_2D, 0);
             remtex->tex[i].state = LRTS_GPU_LOADED;
+            // release download buffer
+            free(remtex->tex[i].data);
+            remtex->tex[i].data = 0;
         }
     }
 }
