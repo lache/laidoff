@@ -145,7 +145,9 @@ void remtex_render(void* r) {
     LWREMTEX* remtex = (LWREMTEX*)r;
     for (int i = 0; i < MAX_TEX_COUNT; i++) {
         if (remtex->tex[i].state == LRTS_DOWNLOADED) {
-            glGenTextures(1, &remtex->tex[i].tex);
+            if (remtex->tex[i].tex == 0) {
+                glGenTextures(1, &remtex->tex[i].tex);
+            }
             glBindTexture(GL_TEXTURE_2D, remtex->tex[i].tex);
             load_ktx_hw_or_sw_memory(remtex->tex[i].data, &remtex->tex[i].width, &remtex->tex[i].height, remtex->tex[i].name);
             glBindTexture(GL_TEXTURE_2D, 0);
@@ -161,26 +163,35 @@ void remtex_on_receive(void* r, void* t) {
     LWREMTEX* remtex = (LWREMTEX*)r;
     LWREMTEXTEXPART* texpart = (LWREMTEXTEXPART*)t;
     for (int i = 0; i < MAX_TEX_COUNT; i++) {
-        if (remtex->tex[i].state == LRTS_DOWNLOADING) {
-            if (remtex->tex[i].name_hash == texpart->name_hash) {
-                // allocate memory if first chunk of part received
-                if (remtex->tex[i].data == 0) {
-                    remtex->tex[i].data = calloc(texpart->total_size, 1);
-                    remtex->tex[i].total_size = texpart->total_size;
-                }
-                if (remtex->tex[i].total_size < texpart->offset + texpart->payload_size) {
-                    // just ignore it
-                    return;
-                }
-                memcpy(remtex->tex[i].data + texpart->offset, texpart->data, texpart->payload_size);
-                if (texpart->offset == remtex->tex[i].data_size) {
-                    remtex->tex[i].data_size += texpart->payload_size;
-                }
-                if (remtex->tex[i].data_size == texpart->total_size) {
-                    remtex->tex[i].state = LRTS_DOWNLOADED;
-                }
+        if (remtex->tex[i].state == LRTS_DOWNLOADING
+            && remtex->tex[i].name_hash == texpart->name_hash
+            && texpart->total_size != 0) {
+            // allocate memory if first chunk of part received
+            if (remtex->tex[i].data == 0) {
+                remtex->tex[i].data = calloc(texpart->total_size, 1);
+                remtex->tex[i].total_size = texpart->total_size;
+            }
+            if (remtex->tex[i].total_size < texpart->offset + texpart->payload_size) {
+                // just ignore it
                 return;
             }
+            memcpy(remtex->tex[i].data + texpart->offset, texpart->data, texpart->payload_size);
+            if (texpart->offset == remtex->tex[i].data_size) {
+                remtex->tex[i].data_size += texpart->payload_size;
+            }
+            if (remtex->tex[i].data_size == texpart->total_size) {
+                remtex->tex[i].state = LRTS_DOWNLOADED;
+            }
+            return;
+        } else if (remtex->tex[i].state == LRTS_GPU_LOADED
+                   && remtex->tex[i].name_hash == texpart->name_hash
+                   && texpart->offset == 0
+                   && texpart->payload_size == 0
+                   && texpart->total_size == 0) {
+            // download again
+            remtex->tex[i].state = LRTS_DOWNLOADING;
+            remtex->tex[i].data_size = 0;
+            return;
         }
     }
 }
@@ -227,15 +238,15 @@ void remtex_udp_update(void* r) {
             udp->reinit_next_update = 1;
             return;
 #endif
-        }
+            }
 
         if (udp->recv_len == sizeof(LWREMTEXTEXPART)) {
             remtex_on_receive(r, udp->buf);
         } else {
             LOGEP("Unknown size of UDP packet received. (%d bytes)", udp->recv_len);
         }
+        }
     }
-}
 
 void remtex_loading_str(void* r, char* str, size_t max_len) {
     if (!r) {
@@ -268,7 +279,7 @@ void remtex_loading_str(void* r, char* str, size_t max_len) {
                      downloading_count,
                      downloaded_bytes);
         }
-        
+
     } else {
         strcpy(str, "Texture downloading completed.");
     }
