@@ -7,9 +7,9 @@ import (
 	"os"
 	"encoding/binary"
 	"log"
-	"github.com/gasbank/laidoff/match-server/convert"
 	"unsafe"
 	"path/filepath"
+	"github.com/gasbank/laidoff/match-server/convert"
 )
 
 /*
@@ -19,6 +19,7 @@ typedef struct _LWREMTEXTEXPART {
     unsigned int name_hash;
     unsigned int total_size;
     unsigned int offset;
+    unsigned int payload_size;
     unsigned char data[1024];
 } LWREMTEXTEXPART;
 
@@ -71,6 +72,7 @@ func main() {
 	files, _ := filepath.Glob(os.Args[1])
 	fileMap := make(map[uint32]string)
 	fileCacheMap := make(map[uint32][]byte)
+	jobMap := make(map[*net.UDPAddr]int)
 	for _, f := range files {
 		filename := filepath.Base(f)
 		name := filename[:len(filename)-len(filepath.Ext(filename))]
@@ -88,7 +90,7 @@ func main() {
 
 		if n == 8 {
 			nameHash := binary.LittleEndian.Uint32(buf[0:4])
-			offset := binary.LittleEndian.Uint32(buf[4:8])
+			offset := int(binary.LittleEndian.Uint32(buf[4:8]))
 			//log.Printf("Received %v bytes from %v: nameHash %v, offset %v", n, addr, nameHash, offset)
 
 			// check cache
@@ -113,29 +115,59 @@ func main() {
 				}
 				log.Printf("%v: Saved. Total size %v bytes.", filename, len(fileCacheMap[nameHash]))
 			}
+
 			fileData := fileCacheMap[nameHash]
 			totalSize := len(fileData)
-			payloadSize := uint32(0)
-			remained := uint32(totalSize) - offset
-			if remained < 1024 {
-				payloadSize = remained
+
+			if _, ok := jobMap[addr]; ok {
+				log.Printf("Ongoing job exists... skip this request")
 			} else {
-				payloadSize = 1024
+				// burst send
+				currentOffset := offset
+				burstMaxCount := 100
+				burstCount := 0
+				for sendData(serverConn, addr, nameHash, fileData, totalSize, currentOffset) == false {
+					currentOffset = currentOffset + 1024
+					burstCount++
+					if burstCount >= burstMaxCount {
+						break
+					}
+				}
+				delete(jobMap, addr)
 			}
 
-			texPart := C.LWREMTEXTEXPART{}
-			texPart.name_hash = C.uint(nameHash)
-			texPart.total_size = C.uint(totalSize)
-			texPart.offset = C.uint(offset)
-			for i := uint32(0); i < payloadSize; i++ {
-				texPart.data[i] = C.uchar(fileData[offset + i])
-			}
-
-			replyBuf := convert.Packet2Buf(texPart)
-			//log.Printf("Replying %v bytes to %v: file %v total %v offset %v, payloadSize %v", len(replyBuf), addr, filename, totalSize, offset, payloadSize)
-			serverConn.WriteToUDP(replyBuf, addr)
 		} else {
 			log.Printf("Unknown size: %v", n)
 		}
 	}
+}
+
+func sendData(serverConn *net.UDPConn, addr *net.UDPAddr, nameHash uint32, fileData []byte, totalSize int, offset int) bool {
+	payloadSize := 0
+	remained := totalSize - offset
+	last := false
+	if remained < 0 {
+		payloadSize = 0
+		offset = totalSize
+		last = true
+	} else if remained <= 1024 {
+		payloadSize = remained
+		last = true
+	} else {
+		payloadSize = 1024
+	}
+
+	texPart := C.LWREMTEXTEXPART{}
+	texPart.name_hash = C.uint(nameHash)
+	texPart.total_size = C.uint(totalSize)
+	texPart.payload_size = C.uint(payloadSize)
+	texPart.offset = C.uint(offset)
+	for i := 0; i < payloadSize; i++ {
+		texPart.data[i] = C.uchar(fileData[offset + i])
+	}
+
+	replyBuf := convert.Packet2Buf(texPart)
+	//log.Printf("Replying %v bytes to %v: file %v total %v offset %v, payloadSize %v", len(replyBuf), addr, filename, totalSize, offset, payloadSize)
+	serverConn.WriteToUDP(replyBuf, addr)
+	return last
 }
