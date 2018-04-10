@@ -324,6 +324,8 @@
 		6C295ED9204310700052999C /* el_text.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6C295E97204310700052999C /* el_text.cpp */; };
 		6C295EDA204310700052999C /* el_para.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6C295E9A204310700052999C /* el_para.cpp */; };
 		6C295EDB204310700052999C /* el_break.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6C295E9E204310700052999C /* el_break.cpp */; };
+		6C59053E207C60C500A14685 /* remtex.c in Sources */ = {isa = PBXBuildFile; fileRef = 6C59053C207C60C400A14685 /* remtex.c */; };
+		6C59053F207C60C500A14685 /* render_remtex.c in Sources */ = {isa = PBXBuildFile; fileRef = 6C59053D207C60C500A14685 /* render_remtex.c */; };
 		6CA16CD81EA20B5600DB7AF0 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 6CA16CD71EA20B5600DB7AF0 /* main.m */; };
 		6CA16CDB1EA20B5600DB7AF0 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 6CA16CDA1EA20B5600DB7AF0 /* AppDelegate.m */; };
 		6CA16CDD1EA20B5600DB7AF0 /* Shader.fsh in Resources */ = {isa = PBXBuildFile; fileRef = 6CA16CDC1EA20B5600DB7AF0 /* Shader.fsh */; };
@@ -1129,6 +1131,10 @@
 		6C295E9D204310700052999C /* stylesheet.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = stylesheet.h; sourceTree = "<group>"; };
 		6C295E9E204310700052999C /* el_break.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = el_break.cpp; sourceTree = "<group>"; };
 		6C2A5FED1FC03260005B3DF2 /* laidoff.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = laidoff.entitlements; sourceTree = "<group>"; };
+		6C59053A207C60C400A14685 /* remtex.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = remtex.h; sourceTree = "<group>"; };
+		6C59053B207C60C400A14685 /* render_remtex.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = render_remtex.h; sourceTree = "<group>"; };
+		6C59053C207C60C400A14685 /* remtex.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = remtex.c; sourceTree = "<group>"; };
+		6C59053D207C60C500A14685 /* render_remtex.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = render_remtex.c; sourceTree = "<group>"; };
 		6CA16CD31EA20B5600DB7AF0 /* laidoff.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = laidoff.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		6CA16CD71EA20B5600DB7AF0 /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
 		6CA16CD91EA20B5600DB7AF0 /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
@@ -2470,6 +2476,10 @@
 		6CC83267205D50DA0031523A /* src */ = {
 			isa = PBXGroup;
 			children = (
+				6C59053C207C60C400A14685 /* remtex.c */,
+				6C59053A207C60C400A14685 /* remtex.h */,
+				6C59053D207C60C500A14685 /* render_remtex.c */,
+				6C59053B207C60C400A14685 /* render_remtex.h */,
 				6CC8326D205D50DA0031523A /* armature.c */,
 				6CC832E0205D50DA0031523A /* armature.h */,
 				6CC83269205D50DA0031523A /* battle_result.c */,
@@ -3093,6 +3103,7 @@
 				6C295EC6204310700052999C /* css_selector.cpp in Sources */,
 				6CA16D961EA210BB00DB7AF0 /* lparser.c in Sources */,
 				566373801EBA52D4001DA3F4 /* threadlocalstorage.cpp in Sources */,
+				6C59053E207C60C500A14685 /* remtex.c in Sources */,
 				56F188E51EC74DB60019312F /* req.cpp in Sources */,
 				6CC83373205D50DA0031523A /* rmsg.c in Sources */,
 				56F189B61EC751950019312F /* zsock_option.inc in Sources */,
@@ -3186,6 +3197,7 @@
 				56F188AC1EC74DB60019312F /* dealer.cpp in Sources */,
 				6C295ED4204310700052999C /* document.cpp in Sources */,
 				56F189931EC751950019312F /* zarmour.c in Sources */,
+				6C59053F207C60C500A14685 /* render_remtex.c in Sources */,
 				6C295EAA204310700052999C /* utf8.c in Sources */,
 				56F189071EC74DB60019312F /* vmci_connecter.cpp in Sources */,
 				6CC8334E205D50DA0031523A /* lwskill.c in Sources */,

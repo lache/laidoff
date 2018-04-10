@@ -6,6 +6,8 @@
 #include "render_text_block.h"
 #include "lwmacro.h"
 #include "remtex.h"
+#include <string.h>
+
 static void s_render_box(const LWCONTEXT* pLwc) {
     GLuint tex = remtex_load_tex(pLwc->remtex, "splash512512");
     render_solid_vb_ui(pLwc,
