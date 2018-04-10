@@ -1550,7 +1550,7 @@ static void parse_countries(LWCONTEXT* pLwc, LWCOUNTRYARRAY* country_array, cons
         int entry_index = -1;
         for (int i = 1; i < token_count; i++) {
             if (t[i].type == JSMN_STRING) {
-                LOGI("countries: %.*s", t[i].end - t[i].start, conf_str + t[i].start);
+                LOGIx("countries: %.*s", t[i].end - t[i].start, conf_str + t[i].start);
                 int string_mod = string_count % 3;
                 if (string_mod == 0) {
                     entry_index++;
