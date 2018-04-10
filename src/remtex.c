@@ -50,6 +50,7 @@ typedef struct _LWREMTEXTEXPART {
     unsigned int name_hash;
     unsigned int total_size;
     unsigned int offset;
+    unsigned int payload_size;
     unsigned char data[1024];
 } LWREMTEXTEXPART;
 
@@ -142,20 +143,19 @@ void remtex_on_receive(void* r, void* t) {
     for (int i = 0; i < MAX_TEX_COUNT; i++) {
         if (remtex->tex[i].state == LRTS_DOWNLOADING) {
             if (remtex->tex[i].name_hash == texpart->name_hash) {
-                // current part payload size
-                size_t payload_size = LWMIN(texpart->total_size - texpart->offset, 1024);
-                // check for duplicated part
-                if (remtex->tex[i].data_size >= texpart->offset + payload_size) {
+                // allocate memory if first chunk of part received
+                if (remtex->tex[i].data == 0) {
+                    remtex->tex[i].data = calloc(texpart->total_size, 1);
+                    remtex->tex[i].total_size = texpart->total_size;
+                }
+                if (remtex->tex[i].total_size < texpart->offset + texpart->payload_size) {
                     // just ignore it
                     return;
                 }
-                // allocate memory if first chunk of part received
-                if (remtex->tex[i].data == 0) {
-                    remtex->tex[i].data = malloc(texpart->total_size);
-                    remtex->tex[i].total_size = texpart->total_size;
+                memcpy(remtex->tex[i].data + texpart->offset, texpart->data, texpart->payload_size);
+                if (texpart->offset == remtex->tex[i].data_size) {
+                    remtex->tex[i].data_size += texpart->payload_size;
                 }
-                memcpy(remtex->tex[i].data + texpart->offset, texpart->data, payload_size);
-                remtex->tex[i].data_size += payload_size;
                 if (remtex->tex[i].data_size == texpart->total_size) {
                     remtex->tex[i].state = LRTS_DOWNLOADED;
                 }

@@ -87,6 +87,11 @@ public class LoginActivity extends Activity implements RewardedVideoAdListener {
         Toast.makeText(this, "onRewardedVideoAdFailedToLoad", Toast.LENGTH_SHORT).show();
     }
 
+    @Override
+    public void onRewardedVideoCompleted() {
+        
+    }
+
     public void onRewardedVideoAdLoaded() {
         Toast.makeText(this, "onRewardedVideoAdLoaded", Toast.LENGTH_SHORT).show();
         if (mRewardedVideoAd.isLoaded()) {
