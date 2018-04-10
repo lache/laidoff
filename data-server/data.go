@@ -71,6 +71,7 @@ func main() {
 	files, _ := filepath.Glob(os.Args[1])
 	fileMap := make(map[uint32]string)
 	fileCacheMap := make(map[uint32][]byte)
+	log.Printf("Total files: %v", len(files))
 	for _, f := range files {
 		filename := filepath.Base(f)
 		name := filename[:len(filename)-len(filepath.Ext(filename))]
