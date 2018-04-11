@@ -211,7 +211,7 @@ void litehtml::text_container::draw_background(litehtml::uint_ptr hdc, const lit
 
     // check 'bg.image' is atlas sprite
     LWATLASSPRITEPTR atlas_sprite_ptr = atlas_sprite_ptr_from_url(pLwc, bg.image);
-    GLuint tex_id = 0;
+    GLuint remtex_id = 0;
     if (atlas_sprite_ptr.sprite != 0) {
         lae = atlas_sprite_lae(&atlas_sprite_ptr);
         lae_alpha = atlas_sprite_alpha_lae(&atlas_sprite_ptr);
@@ -223,7 +223,7 @@ void litehtml::text_container::draw_background(litehtml::uint_ptr hdc, const lit
         unsigned long name_hash = remtex_name_hash_from_url(bg.image.c_str(), &valid_remtex, remtex_name, ARRAY_SIZE(remtex_name));
         if (valid_remtex) {
             show_test_image = 4;
-            tex_id = remtex_load_tex(pLwc->remtex, remtex_name);
+            remtex_id = remtex_load_tex(pLwc->remtex, remtex_name);
         }
     }
 
@@ -286,7 +286,7 @@ void litehtml::text_container::draw_background(litehtml::uint_ptr hdc, const lit
             conv_coord_y(pLwc, bg.border_box.y),
             conv_size_x(pLwc, bg.border_box.width),
             conv_size_y(pLwc, bg.border_box.height),
-            tex_id,
+            remtex_id,
             LVT_LEFT_TOP_ANCHORED_SQUARE,
             bg.is_root ? 0.0f : show_test_image ? 1.0f : bg.color.alpha / 255.0f,
             show_test_image ? 1.0f : bg.color.red / 255.0f,
