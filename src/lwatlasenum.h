@@ -180,12 +180,12 @@ static const char *tex_atlas_filename[] = {
 
     ASSETS_BASE_PATH "pkm" PATH_SEPARATOR "u-dialog-balloon.pkm",
 
-    ASSETS_BASE_PATH "ktx" PATH_SEPARATOR "bg-kitchen.ktx",
-    ASSETS_BASE_PATH "ktx" PATH_SEPARATOR "bg-mart-in.ktx",
-    ASSETS_BASE_PATH "ktx" PATH_SEPARATOR "bg-mart-out.ktx",
-    ASSETS_BASE_PATH "ktx" PATH_SEPARATOR "bg-road.ktx",
-    ASSETS_BASE_PATH "ktx" PATH_SEPARATOR "bg-room.ktx",
-    ASSETS_BASE_PATH "ktx" PATH_SEPARATOR "bg-room-ceiling.ktx",
+    ASSETS_BASE_PATH "ktx" PATH_SEPARATOR "bg-kitchen-mip.ktx",
+    ASSETS_BASE_PATH "ktx" PATH_SEPARATOR "bg-mart-in-mip.ktx",
+    ASSETS_BASE_PATH "ktx" PATH_SEPARATOR "bg-mart-out-mip.ktx",
+    ASSETS_BASE_PATH "ktx" PATH_SEPARATOR "bg-road-mip.ktx",
+    ASSETS_BASE_PATH "ktx" PATH_SEPARATOR "bg-room-mip.ktx",
+    ASSETS_BASE_PATH "ktx" PATH_SEPARATOR "bg-room-ceiling-mip.ktx",
 
     ASSETS_BASE_PATH "pkm" PATH_SEPARATOR "fx-trail.pkm",
     ASSETS_BASE_PATH "pkm" PATH_SEPARATOR "fx-trail_alpha.pkm",
