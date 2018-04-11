@@ -197,6 +197,12 @@ func dataRefreshWatcher(watcher *fsnotify.Watcher, fileCacheMutex *sync.Mutex, f
 func handleDataRequest(buf []byte, fileMap map[uint32]string, fileCacheMap map[uint32][]byte, jobMap map[*net.UDPAddr]int, addr *net.UDPAddr, serverConn *net.UDPConn) {
 	nameHash := binary.LittleEndian.Uint32(buf[0:4])
 	offset := int(binary.LittleEndian.Uint32(buf[4:8]))
+
+	if nameHash == ^uint32(0) && uint32(offset) == ^uint32(0) {
+		// heartbeat
+		return
+	}
+
 	//log.Printf("Received %v bytes from %v: nameHash %v, offset %v", n, addr, nameHash, offset)
 	// check cache
 	filename := fileMap[nameHash]

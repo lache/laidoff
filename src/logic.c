@@ -833,9 +833,10 @@ void lwc_update(LWCONTEXT* pLwc, double delta_time) {
         udp_sea_update(pLwc, pLwc->udp_sea);
     }
 
-    remtex_update(pLwc->remtex);
-    remtex_udp_update(pLwc->remtex);
-
+    if (pLwc->game_scene == LGS_REMTEX) {
+        remtex_update(pLwc->remtex, delta_time);
+    }
+    
     if (pLwc->tcp) {
         tcp_update(pLwc->tcp);
     }

@@ -6,6 +6,7 @@
 #include "lwmacro.h"
 #include "ktx.h"
 #include "lwtimepoint.h"
+#include <limits.h>
 
 unsigned long hash(const unsigned char *str);
 
@@ -39,6 +40,7 @@ typedef struct _LWREMTEX {
     LWHOSTADDR host_addr;
     LWUDP* udp;
     double last_request;
+    double last_heartbeat;
 } LWREMTEX;
 
 typedef struct _LWREMTEXREQUEST {
@@ -118,26 +120,6 @@ GLuint remtex_load_tex(void* r, const char* name) {
     return 0;
 }
 
-void remtex_update(void* r) {
-    if (!r) {
-        return;
-    }
-    LWREMTEX* remtex = (LWREMTEX*)r;
-    double now = lwtimepoint_now_seconds();
-    if (now - remtex->last_request < 1.0 / 120) {
-        return;
-    }
-    remtex->last_request = lwtimepoint_now_seconds();
-    for (int i = 0; i < MAX_TEX_COUNT; i++) {
-        if (remtex->tex[i].state == LRTS_DOWNLOADING) {
-            LWREMTEXREQUEST req;
-            req.name_hash = remtex->tex[i].name_hash;
-            req.offset = remtex->tex[i].data_size;
-            udp_send(remtex->udp, (const char*)&req, sizeof(LWREMTEXREQUEST));
-        }
-    }
-}
-
 void remtex_render(void* r) {
     if (!r) {
         return;
@@ -159,8 +141,7 @@ void remtex_render(void* r) {
     }
 }
 
-void remtex_on_receive(void* r, void* t) {
-    LWREMTEX* remtex = (LWREMTEX*)r;
+static void remtex_on_receive(LWREMTEX* remtex, void* t) {
     LWREMTEXTEXPART* texpart = (LWREMTEXTEXPART*)t;
     for (int i = 0; i < MAX_TEX_COUNT; i++) {
         if (remtex->tex[i].state == LRTS_DOWNLOADING
@@ -196,25 +177,20 @@ void remtex_on_receive(void* r, void* t) {
     }
 }
 
-void remtex_udp_update(void* r) {
-    if (!r) {
+static void send_heartbeat(LWREMTEX* remtex, double delta_time) {
+    double now = lwtimepoint_now_seconds();
+    if (now - remtex->last_heartbeat < 1.0) {
         return;
     }
-    LWREMTEX* remtex = (LWREMTEX*)r;
+    remtex->last_heartbeat = now;
+    LWREMTEXREQUEST req;
+    req.name_hash = UINT_MAX;
+    req.offset = UINT_MAX;
+    udp_send(remtex->udp, (const char*)&req, sizeof(LWREMTEXREQUEST));
+}
+
+static void process_receive(LWREMTEX* remtex) {
     LWUDP* udp = remtex->udp;
-    if (udp->reinit_next_update) {
-        destroy_udp(&remtex->udp);
-        remtex->udp = new_udp();
-        udp = remtex->udp;
-        udp_update_addr_host(udp,
-                             remtex->host_addr.host,
-                             remtex->host_addr.port,
-                             remtex->host_addr.port_str);
-        udp->reinit_next_update = 0;
-    }
-    if (udp->ready == 0) {
-        return;
-    }
     FD_ZERO(&udp->readfds);
     FD_SET(udp->s, &udp->readfds);
     int rv = 0;
@@ -238,15 +214,54 @@ void remtex_udp_update(void* r) {
             udp->reinit_next_update = 1;
             return;
 #endif
-            }
+        }
 
         if (udp->recv_len == sizeof(LWREMTEXTEXPART)) {
-            remtex_on_receive(r, udp->buf);
+            remtex_on_receive(remtex, udp->buf);
         } else {
             LOGEP("Unknown size of UDP packet received. (%d bytes)", udp->recv_len);
         }
+    }
+}
+
+static void send_request(LWREMTEX* remtex, double delta_time) {
+    double now = lwtimepoint_now_seconds();
+    if (now - remtex->last_request < 1.0 / 120) {
+        return;
+    }
+    remtex->last_request = lwtimepoint_now_seconds();
+    for (int i = 0; i < MAX_TEX_COUNT; i++) {
+        if (remtex->tex[i].state == LRTS_DOWNLOADING) {
+            LWREMTEXREQUEST req;
+            req.name_hash = remtex->tex[i].name_hash;
+            req.offset = remtex->tex[i].data_size;
+            udp_send(remtex->udp, (const char*)&req, sizeof(LWREMTEXREQUEST));
         }
     }
+}
+
+static void remtex_udp_update(LWREMTEX* remtex, double delta_time) {
+    LWUDP* udp = remtex->udp;
+    if (udp->reinit_next_update) {
+        destroy_udp(&remtex->udp);
+        remtex->udp = new_udp();
+        udp = remtex->udp;
+        udp_update_addr_host(udp,
+                             remtex->host_addr.host,
+                             remtex->host_addr.port,
+                             remtex->host_addr.port_str);
+        udp->reinit_next_update = 0;
+    }
+    if (udp->ready == 0) {
+        return;
+    }
+
+    send_request(remtex, delta_time);
+
+    send_heartbeat(remtex, delta_time);
+
+    process_receive(remtex);
+}
 
 void remtex_loading_str(void* r, char* str, size_t max_len) {
     if (!r) {
@@ -283,4 +298,12 @@ void remtex_loading_str(void* r, char* str, size_t max_len) {
     } else {
         strcpy(str, "Texture downloading completed.");
     }
+}
+
+void remtex_update(void* r, double delta_time) {
+    if (!r) {
+        return;
+    }
+    LWREMTEX* remtex = (LWREMTEX*)r;
+    remtex_udp_update(remtex, delta_time);
 }
