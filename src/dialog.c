@@ -12,6 +12,7 @@ static int parse_dialog_command(const char* dialog_instruction, const char* dial
 		const int arg_len = (int)(dialog_command_len - (dialog_instruction_len + 1));
 		if (arg_len < 0)
 		{
+            first_arg[0] = '\0';
 			return 0;
 		}
 		else
@@ -59,6 +60,7 @@ void update_dialog(LWCONTEXT* pLwc)
 		int dialog_command_length = command_end_index - command_begin_index;
 
 		char first_arg[128];
+        //first_arg[0] = 0;
 
 		if (parse_dialog_command("/bg", &pLwc->dialog[command_begin_index], dialog_command_length, first_arg) >= 0)
 		{

@@ -664,6 +664,9 @@ unsigned long hash(const unsigned char *str) {
 }
 
 int get_tex_index_by_hash_key(const LWCONTEXT* pLwc, const char *hash_key) {
+    if (hash_key[0] == 0) {
+        return 0;
+    }   
     unsigned long h = hash((const unsigned char *)hash_key);
     for (int i = 0; i < MAX_TEX_ATLAS; i++) {
         if (pLwc->tex_atlas_hash[i] == h) {
