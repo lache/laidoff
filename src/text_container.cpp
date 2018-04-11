@@ -13,6 +13,7 @@
 #include "script.h"
 #include "lwatlassprite.h"
 #include "lwttl.h"
+#include "remtex.h"
 
 litehtml::text_container::text_container(LWCONTEXT* pLwc, int w, int h)
     : pLwc(pLwc), w(w), h(h), default_font_size(36) {
@@ -131,14 +132,37 @@ static LWATLASSPRITEPTR atlas_sprite_ptr_from_url(const LWCONTEXT* pLwc, const s
 
 void litehtml::text_container::get_image_size(const litehtml::tchar_t * src, const litehtml::tchar_t * baseurl, litehtml::size & sz) {
     LOGIx("get_image_size: src=%s,baseurl=%s", src, baseurl);
+    // [1] check for 'atlas type' image
     LWATLASSPRITEPTR atlas_sprite_ptr = atlas_sprite_ptr_from_url(pLwc, src);
     float scale = pLwc->width / 640.0f;
     if (atlas_sprite_ptr.sprite) {
         sz.width = static_cast<int>(roundf(atlas_sprite_ptr.sprite->width * scale));
         sz.height = static_cast<int>(roundf(atlas_sprite_ptr.sprite->height * scale));
     } else {
-        sz.width = static_cast<int>(roundf(180 * scale));
-        sz.height = static_cast<int>(roundf(180 * scale));
+        // [2] check for 'remtex' type image
+        int valid_remtex = 0;
+        char remtex_name[64];
+        unsigned long name_hash = remtex_name_hash_from_url(src, &valid_remtex, remtex_name, ARRAY_SIZE(remtex_name));
+        if (valid_remtex) {
+            remtex_name_hash_set.insert(name_hash);
+            int remtex_id = remtex_preload(pLwc->remtex, remtex_name);
+            if (remtex_id >= 0) {
+                if (remtex_gpu_loaded(pLwc->remtex, remtex_id)) {
+                    // already loaded
+                    int w, h;
+                    if (remtex_width_height(pLwc->remtex, remtex_id, &w, &h)) {
+                        sz.width = static_cast<int>(roundf(w * scale));
+                        sz.height = static_cast<int>(roundf(h * scale));
+                    }
+                } else {
+                    // not loaded...
+                }
+            }
+        } else {
+            // [3] temporary test image
+            sz.width = static_cast<int>(roundf(180 * scale));
+            sz.height = static_cast<int>(roundf(180 * scale));
+        }
     }
 }
 
@@ -187,10 +211,20 @@ void litehtml::text_container::draw_background(litehtml::uint_ptr hdc, const lit
 
     // check 'bg.image' is atlas sprite
     LWATLASSPRITEPTR atlas_sprite_ptr = atlas_sprite_ptr_from_url(pLwc, bg.image);
+    GLuint tex_id = 0;
     if (atlas_sprite_ptr.sprite != 0) {
         lae = atlas_sprite_lae(&atlas_sprite_ptr);
         lae_alpha = atlas_sprite_alpha_lae(&atlas_sprite_ptr);
         show_test_image = 3;
+    } else {
+        // check 'bg.image' is remtex
+        int valid_remtex = 0;
+        char remtex_name[64];
+        unsigned long name_hash = remtex_name_hash_from_url(bg.image.c_str(), &valid_remtex, remtex_name, ARRAY_SIZE(remtex_name));
+        if (valid_remtex) {
+            show_test_image = 4;
+            tex_id = remtex_load_tex(pLwc->remtex, remtex_name);
+        }
     }
 
     if (show_test_image == 1) {
@@ -245,6 +279,23 @@ void litehtml::text_container::draw_background(litehtml::uint_ptr hdc, const lit
                                 conv_coord_y(pLwc, bg.border_box.y),
                                 1.0f,
                                 LVT_LEFT_TOP_ANCHORED_SQUARE);
+    } else if (show_test_image == 4) {
+        render_solid_vb_ui_flip_y_uv_shader(
+            pLwc,
+            conv_coord_x(pLwc, bg.border_box.x),
+            conv_coord_y(pLwc, bg.border_box.y),
+            conv_size_x(pLwc, bg.border_box.width),
+            conv_size_y(pLwc, bg.border_box.height),
+            tex_id,
+            LVT_LEFT_TOP_ANCHORED_SQUARE,
+            bg.is_root ? 0.0f : show_test_image ? 1.0f : bg.color.alpha / 255.0f,
+            show_test_image ? 1.0f : bg.color.red / 255.0f,
+            show_test_image ? 1.0f : bg.color.green / 255.0f,
+            show_test_image ? 1.0f : bg.color.blue / 255.0f,
+            show_test_image ? 0.0f : 1.0f,
+            0,
+            LWST_DEFAULT
+        );
     } else {
         render_solid_vb_ui_flip_y_uv_shader(
             pLwc,

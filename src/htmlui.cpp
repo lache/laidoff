@@ -57,12 +57,14 @@ public:
     void load_page(const char* html_path) {
         std::shared_ptr<char> html_str(create_string_from_file(html_path), free);
         lock();
+        container.clear_remtex_name_hash_set();
         doc = litehtml::document::createFromString(html_str.get(), &container, &browser_context);
         last_html_str = html_str.get();
         unlock();
     }
     void load_body(const char* html_body) {
         lock();
+        container.clear_remtex_name_hash_set();
         doc = litehtml::document::createFromString(html_body, &container, &browser_context);
         last_html_str = html_body;
         unlock();
@@ -82,6 +84,7 @@ public:
     }
     void redraw_fbo() {
         lock();
+        container.clear_remtex_name_hash_set();
         doc = litehtml::document::createFromString(last_html_str.c_str(), &container, &browser_context);
         render_page();
         lwc_prerender_font_test_fbo(pLwc);
@@ -139,6 +142,11 @@ public:
     }
     void set_online(bool b) {
         container.set_online(b);
+    }
+    void on_remtex_gpu_loaded(unsigned long name_hash) {
+        if (container.need_update_on_remtex_change(name_hash)) {
+            redraw_fbo();
+        }
     }
 private:
     LWHTMLUI();
@@ -285,4 +293,9 @@ void htmlui_update_country_data(const LWCONTEXT* pLwc, void* c) {
         htmlui_set_loop_key_value(htmlui, "country", "name", pLwc->country_array.first[i].name);
         htmlui_set_loop_key_value(htmlui, "country", "img_src", img_src);
     }
+}
+
+void htmlui_on_remtex_gpu_loaded(void* c, unsigned int name_hash) {
+    LWHTMLUI* htmlui = (LWHTMLUI*)c;
+    htmlui->on_remtex_gpu_loaded(name_hash);
 }

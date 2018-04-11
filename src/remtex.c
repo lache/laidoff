@@ -7,6 +7,7 @@
 #include "ktx.h"
 #include "lwtimepoint.h"
 #include <limits.h>
+#include "htmlui.h"
 
 unsigned long hash(const unsigned char *str);
 
@@ -91,26 +92,34 @@ void remtex_destroy(void** r) {
     *r = 0;
 }
 
-void remtex_preload(void* r, const char* name) {
+int remtex_preload(void* r, const char* name) {
     LWREMTEX* remtex = (LWREMTEX*)r;
+    unsigned long name_hash = hash(name);
+    // check for previous entry
+    for (int i = 0; i < MAX_TEX_COUNT; i++) {
+        if (remtex->tex[i].state != LRTS_EMPTY && remtex->tex[i].name_hash == name_hash) {
+            return i;
+        }
+    }
     for (int i = 0; i < MAX_TEX_COUNT; i++) {
         if (remtex->tex[i].state == LRTS_EMPTY) {
             // clear all
             memset(&remtex->tex[i], 0, sizeof(LWREMTEXTEX));
             remtex->tex[i].state = LRTS_DOWNLOADING;
             strcpy(remtex->tex[i].name, name);
-            remtex->tex[i].name_hash = hash(name);
-            return;
+            remtex->tex[i].name_hash = name_hash;
+            return i;
         }
     }
     LOGEP("remtex load capacity exceeded: %s", name);
+    return -1;
 }
 
 GLuint remtex_load_tex(void* r, const char* name) {
     LWREMTEX* remtex = (LWREMTEX*)r;
     unsigned int name_hash = hash(name);
     for (int i = 0; i < MAX_TEX_COUNT; i++) {
-        if (remtex->tex[i].name_hash == name_hash) {
+        if (remtex->tex[i].state != LRTS_EMPTY && remtex->tex[i].name_hash == name_hash) {
             glBindTexture(GL_TEXTURE_2D, remtex->tex[i].tex);
             return remtex->tex[i].tex;
         }
@@ -120,7 +129,7 @@ GLuint remtex_load_tex(void* r, const char* name) {
     return 0;
 }
 
-void remtex_render(void* r) {
+void remtex_render(void* r, void* htmlui) {
     if (!r) {
         return;
     }
@@ -137,6 +146,7 @@ void remtex_render(void* r) {
             // release download buffer
             free(remtex->tex[i].data);
             remtex->tex[i].data = 0;
+            htmlui_on_remtex_gpu_loaded(htmlui, remtex->tex[i].name_hash);
         }
     }
 }
@@ -306,4 +316,52 @@ void remtex_update(void* r, double delta_time) {
     }
     LWREMTEX* remtex = (LWREMTEX*)r;
     remtex_udp_update(remtex, delta_time);
+}
+
+unsigned long remtex_name_hash_from_url(const char* url, int* valid, char* name, int name_max_len) {
+    if (strncmp(url, "remtex/", 7) == 0) {
+        const char* begin = strrchr(url, '/') + 1;
+        const char* end = strrchr(url, '.');
+        if (begin && end) {
+            if (begin >= end) {
+                abort();
+            }
+            size_t copy_len = LWMIN(name_max_len - 1, end - begin);
+            strncpy(name, begin, copy_len);
+            name[copy_len] = 0;
+            *valid = 1;
+            return hash(name);
+        }
+    }
+    *valid = 0;
+    return 0;
+}
+
+int remtex_gpu_loaded(void* r, int id) {
+    if (!r) {
+        return 0;
+    }
+    LWREMTEX* remtex = (LWREMTEX*)r;
+    if (id < 0 || id >= MAX_TEX_COUNT) {
+        abort();
+        return 0;
+    }
+    return remtex->tex[id].state == LRTS_GPU_LOADED;
+}
+
+int remtex_width_height(void* r, int id, int* w, int* h) {
+    if (!r) {
+        return 0;
+    }
+    LWREMTEX* remtex = (LWREMTEX*)r;
+    if (id < 0 || id >= MAX_TEX_COUNT) {
+        abort();
+        return 0;
+    }
+    if (remtex->tex[id].state != LRTS_EMPTY) {
+        *w = remtex->tex[id].width;
+        *h = remtex->tex[id].height;
+        return 1;
+    }
+    return 0;
 }
