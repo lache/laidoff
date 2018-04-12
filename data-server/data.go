@@ -166,24 +166,7 @@ func dataRefreshWatcher(watcher *fsnotify.Watcher, fileCacheMutex *sync.Mutex, f
 					case <-abortCh:
 						// aborted; do nothing
 					case <-time.After(1 * time.Second):
-						name, hash := getNameHash(filename)
-						log.Printf("File modified (stable): %v", filename)
-						log.Printf("Invalidating cache for data 0x%08X %v...", hash, name)
-
-						waitMutex.Lock()
-						delete(waitMap, filename)
-						waitMutex.Unlock()
-
-						fileCacheMutex.Lock()
-						delete(fileCacheMap, hash)
-						fileCacheMutex.Unlock()
-
-						clientMutex.Lock()
-						for client := range clientMap {
-							sendData(serverConn, client, hash, nil, 0, 0)
-						}
-						clientMutex.Unlock()
-
+						removeFileCacheEntryAndBroadcast(filename, waitMutex, waitMap, fileCacheMutex, fileCacheMap, clientMutex, clientMap, serverConn)
 						close(abortCh)
 					}
 				}(abortCh, event.Name)
@@ -192,6 +175,28 @@ func dataRefreshWatcher(watcher *fsnotify.Watcher, fileCacheMutex *sync.Mutex, f
 			log.Println("error:", err)
 		}
 	}
+}
+
+func removeFileCacheEntryAndBroadcast(filename string, waitMutex *sync.Mutex, waitMap map[string]chan bool, fileCacheMutex *sync.Mutex, fileCacheMap map[uint32][]byte, clientMutex *sync.Mutex, clientMap map[*net.UDPAddr]time.Time, serverConn *net.UDPConn) {
+	hash := removeFileCacheEntry(filename, waitMutex, waitMap, fileCacheMutex, fileCacheMap)
+	clientMutex.Lock()
+	for client := range clientMap {
+		sendData(serverConn, client, hash, nil, 0, 0)
+	}
+	clientMutex.Unlock()
+}
+
+func removeFileCacheEntry(filename string, waitMutex *sync.Mutex, waitMap map[string]chan bool, fileCacheMutex *sync.Mutex, fileCacheMap map[uint32][]byte) uint32 {
+	name, hash := getNameHash(filename)
+	log.Printf("File modified (stable): %v", filename)
+	log.Printf("Invalidating cache for data 0x%08X %v...", hash, name)
+	waitMutex.Lock()
+	delete(waitMap, filename)
+	waitMutex.Unlock()
+	fileCacheMutex.Lock()
+	delete(fileCacheMap, hash)
+	fileCacheMutex.Unlock()
+	return hash
 }
 
 func handleDataRequest(buf []byte, fileMap map[uint32]string, fileCacheMap map[uint32][]byte, jobMap map[*net.UDPAddr]int, addr *net.UDPAddr, serverConn *net.UDPConn) {
