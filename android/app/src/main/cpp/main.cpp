@@ -688,7 +688,8 @@ static void engine_handle_cmd(struct android_app* app, int32_t cmd) {
             break;
         case APP_CMD_CONFIG_CHANGED:
             LOGI("APP_CMD_CONFIG_CHANGED");
-            recreate_surface(engine);
+            // Galaxy S6 issue!
+            //recreate_surface(engine);
             break;
         case APP_CMD_LOW_MEMORY:
             LOGI("APP_CMD_LOW_MEMORY");
