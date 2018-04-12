@@ -81,18 +81,10 @@ func main() {
 
 	readBuf := make([]byte, 1024)
 
-	files, _ := filepath.Glob(os.Args[1])
 	fileMap := make(map[uint32]string)
-	log.Printf("Total data files: %v", len(files))
 	jobMap := make(map[*net.UDPAddr]int)
-	for _, f := range files {
-		name, h := getNameHash(f)
-		if oldName, exist := fileMap[h]; exist {
-			log.Fatalf("Data name hash collision - old '%v' and new '%v'", oldName, name)
-		}
-		fileMap[h] = f
-		log.Printf("data 0x%08X %v", h, name)
-	}
+
+	constructFileMap(fileMap)
 
 	for {
 		n, addr, err := serverConn.ReadFromUDP(readBuf)
@@ -105,16 +97,39 @@ func main() {
 		clientMap[addr] = time.Now()
 		clientMutex.Unlock()
 
-		go func() {
-			if n == 8 {
-				fileCacheMutex.Lock()
-				handleDataRequest(readBuf, fileMap, fileCacheMap, jobMap, addr, serverConn)
-				fileCacheMutex.Unlock()
-			} else {
-				log.Printf("Unknown size: %v", n)
-			}
-		}()
+		if n == 8 {
+			fileCacheMutex.Lock()
+			handleDataRequest(readBuf, fileMap, fileCacheMap, jobMap, addr, serverConn)
+			fileCacheMutex.Unlock()
+		} else {
+			log.Printf("Unknown size: %v", n)
+		}
 	}
+}
+
+func constructFileMap(fileMap map[uint32]string) {
+	log.Printf("Constructing data file map...")
+	dataGlob := os.Args[1]
+	dataRoot := filepath.Dir(dataGlob)
+	log.Printf("Data root: %v", dataRoot)
+	files, _ := filepath.Glob(dataGlob)
+	log.Printf("Total data files: %v", len(files))
+	// delete all previous keys
+	for f := range fileMap {
+		delete(fileMap, f)
+	}
+	for _, f := range files {
+		addToFileMap(f, fileMap)
+	}
+}
+
+func addToFileMap(f string, fileMap map[uint32]string) {
+	name, h := getNameHash(f)
+	if oldName, exist := fileMap[h]; exist {
+		log.Fatalf("Data name hash collision - old '%v' and new '%v'", oldName, name)
+	}
+	fileMap[h] = f
+	log.Printf("data 0x%08X %v", h, name)
 }
 
 func setupWatcher(fileCacheMutex *sync.Mutex, fileCacheMap map[uint32][]byte,
@@ -166,24 +181,7 @@ func dataRefreshWatcher(watcher *fsnotify.Watcher, fileCacheMutex *sync.Mutex, f
 					case <-abortCh:
 						// aborted; do nothing
 					case <-time.After(1 * time.Second):
-						name, hash := getNameHash(filename)
-						log.Printf("File modified (stable): %v", filename)
-						log.Printf("Invalidating cache for data 0x%08X %v...", hash, name)
-
-						waitMutex.Lock()
-						delete(waitMap, filename)
-						waitMutex.Unlock()
-
-						fileCacheMutex.Lock()
-						delete(fileCacheMap, hash)
-						fileCacheMutex.Unlock()
-
-						clientMutex.Lock()
-						for client := range clientMap {
-							sendData(serverConn, client, hash, nil, 0, 0)
-						}
-						clientMutex.Unlock()
-
+						removeFileCacheEntryAndBroadcast(filename, waitMutex, waitMap, fileCacheMutex, fileCacheMap, clientMutex, clientMap, serverConn)
 						close(abortCh)
 					}
 				}(abortCh, event.Name)
@@ -192,6 +190,28 @@ func dataRefreshWatcher(watcher *fsnotify.Watcher, fileCacheMutex *sync.Mutex, f
 			log.Println("error:", err)
 		}
 	}
+}
+
+func removeFileCacheEntryAndBroadcast(filename string, waitMutex *sync.Mutex, waitMap map[string]chan bool, fileCacheMutex *sync.Mutex, fileCacheMap map[uint32][]byte, clientMutex *sync.Mutex, clientMap map[*net.UDPAddr]time.Time, serverConn *net.UDPConn) {
+	hash := removeFileCacheEntry(filename, waitMutex, waitMap, fileCacheMutex, fileCacheMap)
+	clientMutex.Lock()
+	for client := range clientMap {
+		sendData(serverConn, client, hash, nil, 0, 0)
+	}
+	clientMutex.Unlock()
+}
+
+func removeFileCacheEntry(filename string, waitMutex *sync.Mutex, waitMap map[string]chan bool, fileCacheMutex *sync.Mutex, fileCacheMap map[uint32][]byte) uint32 {
+	name, hash := getNameHash(filename)
+	log.Printf("File modified (stable): %v", filename)
+	log.Printf("Invalidating cache for data 0x%08X %v...", hash, name)
+	waitMutex.Lock()
+	delete(waitMap, filename)
+	waitMutex.Unlock()
+	fileCacheMutex.Lock()
+	delete(fileCacheMap, hash)
+	fileCacheMutex.Unlock()
+	return hash
 }
 
 func handleDataRequest(buf []byte, fileMap map[uint32]string, fileCacheMap map[uint32][]byte, jobMap map[*net.UDPAddr]int, addr *net.UDPAddr, serverConn *net.UDPConn) {
@@ -205,7 +225,14 @@ func handleDataRequest(buf []byte, fileMap map[uint32]string, fileCacheMap map[u
 
 	//log.Printf("Received %v bytes from %v: nameHash %v, offset %v", n, addr, nameHash, offset)
 	// check cache
-	filename := fileMap[nameHash]
+	filename, fileMapOk := fileMap[nameHash]
+	// if file not found on fileMap
+	// reconstruct fileMap and search again
+	if !fileMapOk {
+		constructFileMap(fileMap)
+		filename, fileMapOk = fileMap[nameHash]
+	}
+
 	if _, ok := fileCacheMap[nameHash]; ok {
 		// already cached
 	} else {
@@ -234,7 +261,7 @@ func handleDataRequest(buf []byte, fileMap map[uint32]string, fileCacheMap map[u
 	} else {
 		// burst send
 		currentOffset := offset
-		burstMaxCount := 100
+		burstMaxCount := 50
 		burstCount := 0
 		for sendData(serverConn, addr, nameHash, fileData, totalSize, currentOffset) == false {
 			currentOffset = currentOffset + 1024
