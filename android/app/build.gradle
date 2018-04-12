@@ -12,7 +12,7 @@ keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
 
 def versionProperties = new Properties()
 
-versionProperties['versionCode'] = "754"
+versionProperties['versionCode'] = "1030"
 versionProperties['versionName'] = "0.1.0"
 
 if (project.hasProperty('versionName')) {
@@ -36,10 +36,10 @@ android {
             storePassword keystoreProperties['storePassword']
         }
         debugSign {
-            keyAlias 'debugSign'
-            keyPassword 'debugSign'
-            storePassword 'debugSign'
-            storeFile file('debugSign.jks')
+            keyAlias keystoreProperties['keyAlias']
+            keyPassword keystoreProperties['keyPassword']
+            storeFile file(keystoreProperties['storeFile'])
+            storePassword keystoreProperties['storePassword']
         }
     }
 
