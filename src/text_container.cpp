@@ -130,6 +130,22 @@ static LWATLASSPRITEPTR atlas_sprite_ptr_from_url(const LWCONTEXT* pLwc, const s
     return atlas_sprite_ptr;
 }
 
+bool has_separate_alpha_texture(const char* remtex_name) {
+    return strncmp(remtex_name + strlen(remtex_name) - 2, "-a", 2) == 0
+        || strncmp(remtex_name + strlen(remtex_name) - 5, "-amip", 5) == 0;
+}
+
+void separate_alpha_texture(const char* src, char* alpha_src, size_t max_alpha_src_len) {
+    size_t copy_len = LWMIN(strlen(src) - 4, max_alpha_src_len - 1);
+    strncpy(alpha_src, src, copy_len);
+    alpha_src[copy_len] = 0;
+    if (copy_len + strlen("_alpha.png") <= max_alpha_src_len) {
+        strcat(alpha_src, "_alpha.png");
+    } else {
+        abort();
+    }
+}
+
 void litehtml::text_container::get_image_size(const litehtml::tchar_t * src, const litehtml::tchar_t * baseurl, litehtml::size & sz) {
     LOGIx("get_image_size: src=%s,baseurl=%s", src, baseurl);
     // [1] check for 'atlas type' image
@@ -156,6 +172,18 @@ void litehtml::text_container::get_image_size(const litehtml::tchar_t * src, con
                     }
                 } else {
                     // not loaded...
+                }
+            }
+            // check for separate alpha texture and load if exists
+            if (has_separate_alpha_texture(remtex_name)) {
+                int valid_alpha_remtex = 0;
+                char alpha_remtex_name[64];
+                char alpha_src[128];
+                separate_alpha_texture(src, alpha_src, ARRAY_SIZE(alpha_src));
+                unsigned long alpha_name_hash = remtex_name_hash_from_url(alpha_src, &valid_alpha_remtex, alpha_remtex_name, ARRAY_SIZE(alpha_remtex_name));
+                if (valid_alpha_remtex) {
+                    remtex_name_hash_set.insert(alpha_name_hash);
+                    remtex_preload(pLwc->remtex, alpha_remtex_name);
                 }
             }
         } else {
@@ -211,7 +239,7 @@ void litehtml::text_container::draw_background(litehtml::uint_ptr hdc, const lit
 
     // check 'bg.image' is atlas sprite
     LWATLASSPRITEPTR atlas_sprite_ptr = atlas_sprite_ptr_from_url(pLwc, bg.image);
-    GLuint remtex_id = 0;
+    GLuint remtex_id = 0, alpha_remtex_id = 0;
     if (atlas_sprite_ptr.sprite != 0) {
         lae = atlas_sprite_lae(&atlas_sprite_ptr);
         lae_alpha = atlas_sprite_alpha_lae(&atlas_sprite_ptr);
@@ -224,6 +252,18 @@ void litehtml::text_container::draw_background(litehtml::uint_ptr hdc, const lit
         if (valid_remtex) {
             show_test_image = 4;
             remtex_id = remtex_load_tex(pLwc->remtex, remtex_name);
+            // check for separate alpha texture and load if exists
+            if (has_separate_alpha_texture(remtex_name)) {
+                char alpha_src[128];
+                separate_alpha_texture(bg.image.c_str(), alpha_src, ARRAY_SIZE(alpha_src));
+
+                int valid_alpha_remtex = 0;
+                char alpha_remtex_name[64];
+                unsigned long alpha_name_hash = remtex_name_hash_from_url(alpha_src, &valid_alpha_remtex, alpha_remtex_name, ARRAY_SIZE(alpha_remtex_name));
+                if (valid_alpha_remtex) {
+                    alpha_remtex_id = remtex_load_tex(pLwc->remtex, alpha_remtex_name);
+                }
+            }
         }
     }
 
@@ -279,23 +319,41 @@ void litehtml::text_container::draw_background(litehtml::uint_ptr hdc, const lit
                                 conv_coord_y(pLwc, bg.border_box.y),
                                 1.0f,
                                 LVT_LEFT_TOP_ANCHORED_SQUARE);
-    } else if (show_test_image == 4) {
-        render_solid_vb_ui_flip_y_uv_shader(
-            pLwc,
-            conv_coord_x(pLwc, bg.border_box.x),
-            conv_coord_y(pLwc, bg.border_box.y),
-            conv_size_x(pLwc, bg.border_box.width),
-            conv_size_y(pLwc, bg.border_box.height),
-            remtex_id,
-            LVT_LEFT_TOP_ANCHORED_SQUARE,
-            bg.is_root ? 0.0f : show_test_image ? 1.0f : bg.color.alpha / 255.0f,
-            show_test_image ? 1.0f : bg.color.red / 255.0f,
-            show_test_image ? 1.0f : bg.color.green / 255.0f,
-            show_test_image ? 1.0f : bg.color.blue / 255.0f,
-            show_test_image ? 0.0f : 1.0f,
-            0,
-            LWST_DEFAULT
-        );
+    } else if (show_test_image == 4 && remtex_id) {
+        if (alpha_remtex_id == 0) {
+            render_solid_vb_ui_flip_y_uv_shader(
+                pLwc,
+                conv_coord_x(pLwc, bg.border_box.x),
+                conv_coord_y(pLwc, bg.border_box.y),
+                conv_size_x(pLwc, bg.border_box.width),
+                conv_size_y(pLwc, bg.border_box.height),
+                remtex_id,
+                LVT_LEFT_TOP_ANCHORED_SQUARE,
+                bg.is_root ? 0.0f : show_test_image ? 1.0f : bg.color.alpha / 255.0f,
+                show_test_image ? 1.0f : bg.color.red / 255.0f,
+                show_test_image ? 1.0f : bg.color.green / 255.0f,
+                show_test_image ? 1.0f : bg.color.blue / 255.0f,
+                show_test_image ? 0.0f : 1.0f,
+                0,
+                LWST_DEFAULT
+            );
+        } else {
+            render_solid_vb_ui_alpha(
+                pLwc,
+                conv_coord_x(pLwc, bg.border_box.x),
+                conv_coord_y(pLwc, bg.border_box.y),
+                conv_size_x(pLwc, bg.border_box.width),
+                conv_size_y(pLwc, bg.border_box.height),
+                remtex_id,
+                alpha_remtex_id,
+                LVT_LEFT_TOP_ANCHORED_SQUARE,
+                bg.is_root ? 0.0f : show_test_image ? 1.0f : bg.color.alpha / 255.0f,
+                show_test_image ? 1.0f : bg.color.red / 255.0f,
+                show_test_image ? 1.0f : bg.color.green / 255.0f,
+                show_test_image ? 1.0f : bg.color.blue / 255.0f,
+                show_test_image ? 0.0f : 1.0f
+            );
+        }
     } else {
         render_solid_vb_ui_flip_y_uv_shader(
             pLwc,
