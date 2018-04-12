@@ -49,3 +49,5 @@ ios/build-appstore
 /go-bin
 
 /android/.idea/caches
+/*-server/*-server
+
