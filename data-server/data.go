@@ -81,18 +81,10 @@ func main() {
 
 	readBuf := make([]byte, 1024)
 
-	files, _ := filepath.Glob(os.Args[1])
 	fileMap := make(map[uint32]string)
-	log.Printf("Total data files: %v", len(files))
 	jobMap := make(map[*net.UDPAddr]int)
-	for _, f := range files {
-		name, h := getNameHash(f)
-		if oldName, exist := fileMap[h]; exist {
-			log.Fatalf("Data name hash collision - old '%v' and new '%v'", oldName, name)
-		}
-		fileMap[h] = f
-		log.Printf("data 0x%08X %v", h, name)
-	}
+
+	constructFileMap(fileMap)
 
 	for {
 		n, addr, err := serverConn.ReadFromUDP(readBuf)
@@ -105,16 +97,39 @@ func main() {
 		clientMap[addr] = time.Now()
 		clientMutex.Unlock()
 
-		go func() {
-			if n == 8 {
-				fileCacheMutex.Lock()
-				handleDataRequest(readBuf, fileMap, fileCacheMap, jobMap, addr, serverConn)
-				fileCacheMutex.Unlock()
-			} else {
-				log.Printf("Unknown size: %v", n)
-			}
-		}()
+		if n == 8 {
+			fileCacheMutex.Lock()
+			handleDataRequest(readBuf, fileMap, fileCacheMap, jobMap, addr, serverConn)
+			fileCacheMutex.Unlock()
+		} else {
+			log.Printf("Unknown size: %v", n)
+		}
 	}
+}
+
+func constructFileMap(fileMap map[uint32]string) {
+	log.Printf("Constructing data file map...")
+	dataGlob := os.Args[1]
+	dataRoot := filepath.Dir(dataGlob)
+	log.Printf("Data root: %v", dataRoot)
+	files, _ := filepath.Glob(dataGlob)
+	log.Printf("Total data files: %v", len(files))
+	// delete all previous keys
+	for f := range fileMap {
+		delete(fileMap, f)
+	}
+	for _, f := range files {
+		addToFileMap(f, fileMap)
+	}
+}
+
+func addToFileMap(f string, fileMap map[uint32]string) {
+	name, h := getNameHash(f)
+	if oldName, exist := fileMap[h]; exist {
+		log.Fatalf("Data name hash collision - old '%v' and new '%v'", oldName, name)
+	}
+	fileMap[h] = f
+	log.Printf("data 0x%08X %v", h, name)
 }
 
 func setupWatcher(fileCacheMutex *sync.Mutex, fileCacheMap map[uint32][]byte,
@@ -210,7 +225,14 @@ func handleDataRequest(buf []byte, fileMap map[uint32]string, fileCacheMap map[u
 
 	//log.Printf("Received %v bytes from %v: nameHash %v, offset %v", n, addr, nameHash, offset)
 	// check cache
-	filename := fileMap[nameHash]
+	filename, fileMapOk := fileMap[nameHash]
+	// if file not found on fileMap
+	// reconstruct fileMap and search again
+	if !fileMapOk {
+		constructFileMap(fileMap)
+		filename, fileMapOk = fileMap[nameHash]
+	}
+
 	if _, ok := fileCacheMap[nameHash]; ok {
 		// already cached
 	} else {
@@ -239,7 +261,7 @@ func handleDataRequest(buf []byte, fileMap map[uint32]string, fileCacheMap map[u
 	} else {
 		// burst send
 		currentOffset := offset
-		burstMaxCount := 100
+		burstMaxCount := 50
 		burstCount := 0
 		for sendData(serverConn, addr, nameHash, fileData, totalSize, currentOffset) == false {
 			currentOffset = currentOffset + 1024
