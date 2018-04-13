@@ -46,3 +46,20 @@ void lwcontext_set_custom_puck_game_stage(LWCONTEXT* pLwc, LW_VBO_TYPE lvt, LW_A
     pLwc->puck_game_stage_lvt = lvt;
     pLwc->puck_game_stage_lae = lae;
 }
+
+void lwcontext_set_update_frequency(LWCONTEXT* pLwc, int hz) {
+    if (hz > 0) {
+        pLwc->update_frequency = hz;
+        pLwc->update_interval = 1.0 / pLwc->update_frequency;
+    } else {
+        abort();
+    }
+}
+
+float lwcontext_update_interval(LWCONTEXT* pLwc) {
+    return 1.0f / pLwc->update_frequency;
+}
+
+int lwcontext_update_frequency(LWCONTEXT* pLwc) {
+    return pLwc->update_frequency;
+}

@@ -48,6 +48,7 @@ typedef struct _LWUDP {
     double state2_start_timepoint;
     LWNUMCOMPPUCKGAME numcomp;
     float last_updated;
+    int ping_seq;
 } LWUDP;
 
 typedef struct _LWCONTEXT LWCONTEXT;
@@ -62,4 +63,4 @@ void udp_sea_update(LWCONTEXT* pLwc, LWUDP* udp);
 const char* lw_udp_addr(const LWCONTEXT* pLwc);
 unsigned long lw_udp_addr_resolved(const LWCONTEXT* pLwc);
 int lw_udp_port(const LWCONTEXT* pLwc);
-void udp_send_ttlping(LWUDP* udp, void* ttl);
+void udp_send_ttlping(LWUDP* udp, void* ttl, int ping_seq);

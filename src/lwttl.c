@@ -88,7 +88,7 @@ void lwttl_worldmap_scroll_to(void* _ttl, float lng, float lat, LWUDP* udp_sea) 
     ttl->worldmap.center.lat = lat;
     ttl->worldmap.center.lng = lng;
     if (udp_sea) {
-        udp_send_ttlping(udp_sea, ttl);
+        udp_send_ttlping(udp_sea, ttl, 0);
     }
 }
 

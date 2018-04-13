@@ -7987,6 +7987,43 @@ fail:
 }
 
 
+static int _wrap_load_ktx_hw_or_sw_memory(lua_State* L) {
+  int SWIG_arg = 0;
+  char *arg1 = (char *) 0 ;
+  int *arg2 = (int *) 0 ;
+  int *arg3 = (int *) 0 ;
+  char *arg4 = (char *) 0 ;
+  int result;
+  
+  SWIG_check_num_args("load_ktx_hw_or_sw_memory",4,4)
+  if(!SWIG_lua_isnilstring(L,1)) SWIG_fail_arg("load_ktx_hw_or_sw_memory",1,"char const *");
+  if(!SWIG_isptrtype(L,2)) SWIG_fail_arg("load_ktx_hw_or_sw_memory",2,"int *");
+  if(!SWIG_isptrtype(L,3)) SWIG_fail_arg("load_ktx_hw_or_sw_memory",3,"int *");
+  if(!SWIG_lua_isnilstring(L,4)) SWIG_fail_arg("load_ktx_hw_or_sw_memory",4,"char const *");
+  arg1 = (char *)lua_tostring(L, 1);
+  
+  if (!SWIG_IsOK(SWIG_ConvertPtr(L,2,(void**)&arg2,SWIGTYPE_p_int,0))){
+    SWIG_fail_ptr("load_ktx_hw_or_sw_memory",2,SWIGTYPE_p_int);
+  }
+  
+  
+  if (!SWIG_IsOK(SWIG_ConvertPtr(L,3,(void**)&arg3,SWIGTYPE_p_int,0))){
+    SWIG_fail_ptr("load_ktx_hw_or_sw_memory",3,SWIGTYPE_p_int);
+  }
+  
+  arg4 = (char *)lua_tostring(L, 4);
+  result = (int)load_ktx_hw_or_sw_memory((char const *)arg1,arg2,arg3,(char const *)arg4);
+  lua_pushnumber(L, (lua_Number) result); SWIG_arg++;
+  return SWIG_arg;
+  
+  if(0) SWIG_fail;
+  
+fail:
+  lua_error(L);
+  return SWIG_arg;
+}
+
+
 static int _wrap_load_ktx_hw_or_sw(lua_State* L) {
   int SWIG_arg = 0;
   char *arg1 = (char *) 0 ;
@@ -23350,7 +23387,7 @@ static int _wrap_LWCONTEXT_admin_button_command_set(lua_State* L) {
   
   SWIG_check_num_args("_LWCONTEXT::admin_button_command",2,2)
   if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("_LWCONTEXT::admin_button_command",1,"struct _LWCONTEXT *");
-  if(!SWIG_isptrtype(L,2)) SWIG_fail_arg("_LWCONTEXT::admin_button_command",2,"LWBUTTONCOMMAND [6*5]");
+  if(!SWIG_isptrtype(L,2)) SWIG_fail_arg("_LWCONTEXT::admin_button_command",2,"LWBUTTONCOMMAND [6*6]");
   
   if (!SWIG_IsOK(SWIG_ConvertPtr(L,1,(void**)&arg1,SWIGTYPE_p__LWCONTEXT,0))){
     SWIG_fail_ptr("LWCONTEXT_admin_button_command_set",1,SWIGTYPE_p__LWCONTEXT);
@@ -23364,7 +23401,7 @@ static int _wrap_LWCONTEXT_admin_button_command_set(lua_State* L) {
   {
     size_t ii;
     LWBUTTONCOMMAND *b = (LWBUTTONCOMMAND *) arg1->admin_button_command;
-    for (ii = 0; ii < (size_t)6*5; ii++) b[ii] = *((LWBUTTONCOMMAND *) arg2 + ii);
+    for (ii = 0; ii < (size_t)6*6; ii++) b[ii] = *((LWBUTTONCOMMAND *) arg2 + ii);
   }
   
   return SWIG_arg;
@@ -27583,6 +27620,56 @@ fail:
 }
 
 
+static int _wrap_LWCONTEXT_remtex_set(lua_State* L) {
+  int SWIG_arg = 0;
+  struct _LWCONTEXT *arg1 = (struct _LWCONTEXT *) 0 ;
+  void *arg2 = (void *) 0 ;
+  
+  SWIG_check_num_args("_LWCONTEXT::remtex",2,2)
+  if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("_LWCONTEXT::remtex",1,"struct _LWCONTEXT *");
+  if(!SWIG_isptrtype(L,2)) SWIG_fail_arg("_LWCONTEXT::remtex",2,"void *");
+  
+  if (!SWIG_IsOK(SWIG_ConvertPtr(L,1,(void**)&arg1,SWIGTYPE_p__LWCONTEXT,0))){
+    SWIG_fail_ptr("LWCONTEXT_remtex_set",1,SWIGTYPE_p__LWCONTEXT);
+  }
+  
+  arg2=(void *)SWIG_MustGetPtr(L,2,0,0,2,"LWCONTEXT_remtex_set");
+  if (arg1) (arg1)->remtex = arg2;
+  
+  return SWIG_arg;
+  
+  if(0) SWIG_fail;
+  
+fail:
+  lua_error(L);
+  return SWIG_arg;
+}
+
+
+static int _wrap_LWCONTEXT_remtex_get(lua_State* L) {
+  int SWIG_arg = 0;
+  struct _LWCONTEXT *arg1 = (struct _LWCONTEXT *) 0 ;
+  void *result = 0 ;
+  
+  SWIG_check_num_args("_LWCONTEXT::remtex",1,1)
+  if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("_LWCONTEXT::remtex",1,"struct _LWCONTEXT *");
+  
+  if (!SWIG_IsOK(SWIG_ConvertPtr(L,1,(void**)&arg1,SWIGTYPE_p__LWCONTEXT,0))){
+    SWIG_fail_ptr("LWCONTEXT_remtex_get",1,SWIGTYPE_p__LWCONTEXT);
+  }
+  
+  result = (void *) ((arg1)->remtex);
+  SWIG_NewPointerObj(L,result,SWIGTYPE_p_void,0); SWIG_arg++; 
+  return SWIG_arg;
+  
+  if(0) SWIG_fail;
+  
+fail:
+  lua_error(L);
+  return SWIG_arg;
+}
+
+
 static int _wrap_new_LWCONTEXT(lua_State* L) {
   int SWIG_arg = 0;
   struct _LWCONTEXT *result = 0 ;
@@ -27782,6 +27869,7 @@ static swig_lua_attribute swig_LWCONTEXT_attributes[] = {
     { "ttl", _wrap_LWCONTEXT_ttl_get, _wrap_LWCONTEXT_ttl_set },
     { "country_array", _wrap_LWCONTEXT_country_array_get, _wrap_LWCONTEXT_country_array_set },
     { "country_page", _wrap_LWCONTEXT_country_page_get, _wrap_LWCONTEXT_country_page_set },
+    { "remtex", _wrap_LWCONTEXT_remtex_get, _wrap_LWCONTEXT_remtex_set },
     {0,0,0}
 };
 static swig_lua_method swig_LWCONTEXT_methods[]= {
@@ -28053,6 +28141,80 @@ static int _wrap_lwcontext_set_custom_puck_game_stage(lua_State* L) {
   arg3 = (LW_ATLAS_ENUM)(int)lua_tonumber(L, 3);
   lwcontext_set_custom_puck_game_stage(arg1,arg2,arg3);
   
+  return SWIG_arg;
+  
+  if(0) SWIG_fail;
+  
+fail:
+  lua_error(L);
+  return SWIG_arg;
+}
+
+
+static int _wrap_lwcontext_set_update_frequency(lua_State* L) {
+  int SWIG_arg = 0;
+  LWCONTEXT *arg1 = (LWCONTEXT *) 0 ;
+  int arg2 ;
+  
+  SWIG_check_num_args("lwcontext_set_update_frequency",2,2)
+  if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("lwcontext_set_update_frequency",1,"LWCONTEXT *");
+  if(!lua_isnumber(L,2)) SWIG_fail_arg("lwcontext_set_update_frequency",2,"int");
+  
+  if (!SWIG_IsOK(SWIG_ConvertPtr(L,1,(void**)&arg1,SWIGTYPE_p__LWCONTEXT,0))){
+    SWIG_fail_ptr("lwcontext_set_update_frequency",1,SWIGTYPE_p__LWCONTEXT);
+  }
+  
+  arg2 = (int)lua_tonumber(L, 2);
+  lwcontext_set_update_frequency(arg1,arg2);
+  
+  return SWIG_arg;
+  
+  if(0) SWIG_fail;
+  
+fail:
+  lua_error(L);
+  return SWIG_arg;
+}
+
+
+static int _wrap_lwcontext_update_interval(lua_State* L) {
+  int SWIG_arg = 0;
+  LWCONTEXT *arg1 = (LWCONTEXT *) 0 ;
+  float result;
+  
+  SWIG_check_num_args("lwcontext_update_interval",1,1)
+  if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("lwcontext_update_interval",1,"LWCONTEXT *");
+  
+  if (!SWIG_IsOK(SWIG_ConvertPtr(L,1,(void**)&arg1,SWIGTYPE_p__LWCONTEXT,0))){
+    SWIG_fail_ptr("lwcontext_update_interval",1,SWIGTYPE_p__LWCONTEXT);
+  }
+  
+  result = (float)lwcontext_update_interval(arg1);
+  lua_pushnumber(L, (lua_Number) result); SWIG_arg++;
+  return SWIG_arg;
+  
+  if(0) SWIG_fail;
+  
+fail:
+  lua_error(L);
+  return SWIG_arg;
+}
+
+
+static int _wrap_lwcontext_update_frequency(lua_State* L) {
+  int SWIG_arg = 0;
+  LWCONTEXT *arg1 = (LWCONTEXT *) 0 ;
+  int result;
+  
+  SWIG_check_num_args("lwcontext_update_frequency",1,1)
+  if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("lwcontext_update_frequency",1,"LWCONTEXT *");
+  
+  if (!SWIG_IsOK(SWIG_ConvertPtr(L,1,(void**)&arg1,SWIGTYPE_p__LWCONTEXT,0))){
+    SWIG_fail_ptr("lwcontext_update_frequency",1,SWIGTYPE_p__LWCONTEXT);
+  }
+  
+  result = (int)lwcontext_update_frequency(arg1);
+  lua_pushnumber(L, (lua_Number) result); SWIG_arg++;
   return SWIG_arg;
   
   if(0) SWIG_fail;
@@ -79069,6 +79231,56 @@ fail:
 }
 
 
+static int _wrap_LWPTTLPING_ping_seq_set(lua_State* L) {
+  int SWIG_arg = 0;
+  struct _LWPTTLPING *arg1 = (struct _LWPTTLPING *) 0 ;
+  int arg2 ;
+  
+  SWIG_check_num_args("_LWPTTLPING::ping_seq",2,2)
+  if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("_LWPTTLPING::ping_seq",1,"struct _LWPTTLPING *");
+  if(!lua_isnumber(L,2)) SWIG_fail_arg("_LWPTTLPING::ping_seq",2,"int");
+  
+  if (!SWIG_IsOK(SWIG_ConvertPtr(L,1,(void**)&arg1,SWIGTYPE_p__LWPTTLPING,0))){
+    SWIG_fail_ptr("LWPTTLPING_ping_seq_set",1,SWIGTYPE_p__LWPTTLPING);
+  }
+  
+  arg2 = (int)lua_tonumber(L, 2);
+  if (arg1) (arg1)->ping_seq = arg2;
+  
+  return SWIG_arg;
+  
+  if(0) SWIG_fail;
+  
+fail:
+  lua_error(L);
+  return SWIG_arg;
+}
+
+
+static int _wrap_LWPTTLPING_ping_seq_get(lua_State* L) {
+  int SWIG_arg = 0;
+  struct _LWPTTLPING *arg1 = (struct _LWPTTLPING *) 0 ;
+  int result;
+  
+  SWIG_check_num_args("_LWPTTLPING::ping_seq",1,1)
+  if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("_LWPTTLPING::ping_seq",1,"struct _LWPTTLPING *");
+  
+  if (!SWIG_IsOK(SWIG_ConvertPtr(L,1,(void**)&arg1,SWIGTYPE_p__LWPTTLPING,0))){
+    SWIG_fail_ptr("LWPTTLPING_ping_seq_get",1,SWIGTYPE_p__LWPTTLPING);
+  }
+  
+  result = (int) ((arg1)->ping_seq);
+  lua_pushnumber(L, (lua_Number) result); SWIG_arg++;
+  return SWIG_arg;
+  
+  if(0) SWIG_fail;
+  
+fail:
+  lua_error(L);
+  return SWIG_arg;
+}
+
+
 static int _wrap_new_LWPTTLPING(lua_State* L) {
   int SWIG_arg = 0;
   struct _LWPTTLPING *result = 0 ;
@@ -79106,6 +79318,7 @@ static swig_lua_attribute swig_LWPTTLPING_attributes[] = {
     { "xc", _wrap_LWPTTLPING_xc_get, _wrap_LWPTTLPING_xc_set },
     { "yc", _wrap_LWPTTLPING_yc_get, _wrap_LWPTTLPING_yc_set },
     { "ex", _wrap_LWPTTLPING_ex_get, _wrap_LWPTTLPING_ex_set },
+    { "ping_seq", _wrap_LWPTTLPING_ping_seq_get, _wrap_LWPTTLPING_ping_seq_set },
     {0,0,0}
 };
 static swig_lua_method swig_LWPTTLPING_methods[]= {
@@ -89759,6 +89972,29 @@ fail:
 }
 
 
+static int _wrap_htmlui_on_remtex_gpu_loaded(lua_State* L) {
+  int SWIG_arg = 0;
+  void *arg1 = (void *) 0 ;
+  unsigned int arg2 ;
+  
+  SWIG_check_num_args("htmlui_on_remtex_gpu_loaded",2,2)
+  if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("htmlui_on_remtex_gpu_loaded",1,"void *");
+  if(!lua_isnumber(L,2)) SWIG_fail_arg("htmlui_on_remtex_gpu_loaded",2,"unsigned int");
+  arg1=(void *)SWIG_MustGetPtr(L,1,0,0,1,"htmlui_on_remtex_gpu_loaded");
+  SWIG_contract_assert((lua_tonumber(L,2)>=0),"number must not be negative")
+  arg2 = (unsigned int)lua_tonumber(L, 2);
+  htmlui_on_remtex_gpu_loaded(arg1,arg2);
+  
+  return SWIG_arg;
+  
+  if(0) SWIG_fail;
+  
+fail:
+  lua_error(L);
+  return SWIG_arg;
+}
+
+
 static int _wrap_LWTTLLNGLAT_lng_set(lua_State* L) {
   int SWIG_arg = 0;
   struct _LWTTLLNGLAT *arg1 = (struct _LWTTLLNGLAT *) 0 ;
@@ -90457,9 +90693,9 @@ static int _wrap_ttl_http_header(lua_State* L) {
   char *result = 0 ;
   
   SWIG_check_num_args("ttl_http_header",1,1)
-  if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("ttl_http_header",1,"void *");
+  if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("ttl_http_header",1,"void const *");
   arg1=(void *)SWIG_MustGetPtr(L,1,0,0,1,"ttl_http_header");
-  result = (char *)ttl_http_header(arg1);
+  result = (char *)ttl_http_header((void const *)arg1);
   lua_pushstring(L,(const char *)result); SWIG_arg++;
   return SWIG_arg;
   
@@ -91200,6 +91436,7 @@ static swig_lua_const_info swig_SwigModule_constants[]= {
     {SWIG_LUA_CONSTTAB_INT("LGS_UI", LGS_UI)},
     {SWIG_LUA_CONSTTAB_INT("LGS_SPLASH", LGS_SPLASH)},
     {SWIG_LUA_CONSTTAB_INT("LGS_LEADERBOARD", LGS_LEADERBOARD)},
+    {SWIG_LUA_CONSTTAB_INT("LGS_REMTEX", LGS_REMTEX)},
     {SWIG_LUA_CONSTTAB_STRING("__LW_STRING_LINE__", "61")},
     {SWIG_LUA_CONSTTAB_STRING("LWLOGPOS", "src\\lwlog.h(62): ")},
     {SWIG_LUA_CONSTTAB_INT("LPT_GRID", LPT_GRID)},
@@ -91676,6 +91913,7 @@ static swig_lua_method swig_SwigModule_methods[]= {
     { "lw_release_key_x", _wrap_lw_release_key_x},
     { "lw_release_key_q", _wrap_lw_release_key_q},
     { "lw_go_back", _wrap_lw_go_back},
+    { "load_ktx_hw_or_sw_memory", _wrap_load_ktx_hw_or_sw_memory},
     { "load_ktx_hw_or_sw", _wrap_load_ktx_hw_or_sw},
     { "kvmsg_new", _wrap_kvmsg_new},
     { "kvmsg_destroy", _wrap_kvmsg_destroy},
@@ -91811,6 +92049,9 @@ static swig_lua_method swig_SwigModule_methods[]= {
     { "lwcontext_inc_rmsg_send", _wrap_lwcontext_inc_rmsg_send},
     { "lwcontext_inc_rmsg_recv", _wrap_lwcontext_inc_rmsg_recv},
     { "lwcontext_set_custom_puck_game_stage", _wrap_lwcontext_set_custom_puck_game_stage},
+    { "lwcontext_set_update_frequency", _wrap_lwcontext_set_update_frequency},
+    { "lwcontext_update_interval", _wrap_lwcontext_update_interval},
+    { "lwcontext_update_frequency", _wrap_lwcontext_update_frequency},
     { "spawn_damage_text", _wrap_spawn_damage_text},
     { "spawn_exp_text", _wrap_spawn_exp_text},
     { "update_damage_text", _wrap_update_damage_text},
@@ -92150,6 +92391,7 @@ static swig_lua_method swig_SwigModule_methods[]= {
     { "htmlui_set_online", _wrap_htmlui_set_online},
     { "htmlui_update_country_data", _wrap_htmlui_update_country_data},
     { "htmlui_load_redraw_fbo", _wrap_htmlui_load_redraw_fbo},
+    { "htmlui_on_remtex_gpu_loaded", _wrap_htmlui_on_remtex_gpu_loaded},
     { "lwttl_new", _wrap_lwttl_new},
     { "lwttl_destroy", _wrap_lwttl_destroy},
     { "lwttl_render_all_seaports", _wrap_lwttl_render_all_seaports},

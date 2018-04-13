@@ -102,7 +102,6 @@ extern const float default_uv_offset[2];
 extern const float default_uv_scale[2];
 extern const float default_flip_y_uv_scale[2];
 
-
 #ifdef __cplusplus
 };
 #endif

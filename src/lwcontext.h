@@ -424,6 +424,9 @@ LWFIELD* lwcontext_field(LWCONTEXT* pLwc);
 void lwcontext_inc_rmsg_send(LWCONTEXT* pLwc);
 void lwcontext_inc_rmsg_recv(LWCONTEXT* pLwc);
 void lwcontext_set_custom_puck_game_stage(LWCONTEXT* pLwc, LW_VBO_TYPE lvt, LW_ATLAS_ENUM lae);
+void lwcontext_set_update_frequency(LWCONTEXT* pLwc, int hz);
+float lwcontext_update_interval(LWCONTEXT* pLwc);
+int lwcontext_update_frequency(LWCONTEXT* pLwc);
 #ifdef __cplusplus
 };
 #endif

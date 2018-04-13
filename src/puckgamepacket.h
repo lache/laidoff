@@ -302,6 +302,7 @@ typedef struct _LWPTTLPING {
     unsigned char padding1;
     unsigned char padding2;
     float xc, yc, ex; // x center, y center, extent
+    int ping_seq;
 } LWPTTLPING;
 
 // should be 4-byte aligned...

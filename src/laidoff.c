@@ -1753,10 +1753,9 @@ LWCONTEXT* lw_init_initial_size(int width, int height) {
     
     lwparabola_test();
     
-    pLwc->update_frequency = 125;
-    pLwc->update_interval = 1.0 / pLwc->update_frequency;// 1 / 120.0;// 0.02; // seconds
+    lwcontext_set_update_frequency(pLwc, 125);
     
-    pLwc->puck_game = new_puck_game(pLwc->update_frequency);
+    pLwc->puck_game = new_puck_game(lwcontext_update_frequency(pLwc));
     puck_game_set_static_default_values_client(pLwc->puck_game);
     pLwc->puck_game->pLwc = pLwc;
     
@@ -1967,4 +1966,3 @@ void set_package_version(const char* package_version) {
 const char* package_version() {
     return packageVersion;
 }
-

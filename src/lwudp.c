@@ -14,6 +14,7 @@
 #endif
 #include "lz4.h"
 #include "remtex.h"
+#include "lwcontext.h"
 
 static int make_socket_nonblocking(int sock) {
 #if defined(WIN32) || defined(_WIN32) || defined(IMN_PIM)
@@ -256,9 +257,10 @@ void udp_sea_update(LWCONTEXT* pLwc, LWUDP* udp) {
         return;
     }
     float app_time = (float)pLwc->app_time;
-    float ping_send_interval = 1.0f; // seconds
-    if (udp->last_updated == 0 || app_time > udp->last_updated + 1.0f / ping_send_interval) {
-        udp_send_ttlping(udp, pLwc->ttl);
+    float ping_send_interval = lwcontext_update_interval(pLwc) * 2;
+    if (udp->last_updated == 0 || app_time > udp->last_updated + ping_send_interval) {
+        udp_send_ttlping(udp, pLwc->ttl, udp->ping_seq);
+        udp->ping_seq++;
         udp->last_updated = app_time;
     }
 
@@ -381,7 +383,7 @@ void udp_sea_update(LWCONTEXT* pLwc, LWUDP* udp) {
     }
 }
 
-void udp_send_ttlping(LWUDP* udp, void* ttl) {
+void udp_send_ttlping(LWUDP* udp, void* ttl, int ping_seq) {
     LWPTTLPING ttl_ping;
     memset(&ttl_ping, 0, sizeof(LWPTTLPING));
     const LWTTLLNGLAT* center = lwttl_center(ttl);
@@ -389,5 +391,6 @@ void udp_send_ttlping(LWUDP* udp, void* ttl) {
     ttl_ping.xc = center->lng;
     ttl_ping.yc = center->lat;
     ttl_ping.ex = 32;
+    ttl_ping.ping_seq = ping_seq;
     udp_send(udp, (const char*)&ttl_ping, sizeof(LWPTTLPING));
 }
