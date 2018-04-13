@@ -1,5 +1,6 @@
 #include "lwcontext.h"
 #include "htmlui.h"
+#include <stdlib.h>
 
 const vec4 EXP_COLOR = { 90 / 255.0f, 173 / 255.0f, 255 / 255.0f, 1 };
 
