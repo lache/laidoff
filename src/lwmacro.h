@@ -29,7 +29,7 @@
 #   define ARRAY_SIZE(arr) (sizeof(arr) / sizeof((arr)[0]))
 #elif LW_PLATFORM_LINUX
 #   define PATH_SEPARATOR "/"
-#   define ASSETS_BASE_PATH PATH_SEPARATOR "home" PATH_SEPARATOR "gasbank" PATH_SEPARATOR "laidoff" PATH_SEPARATOR "assets" PATH_SEPARATOR
+#   define ASSETS_BASE_PATH PATH_SEPARATOR "home" PATH_SEPARATOR "lacti" PATH_SEPARATOR "git" PATH_SEPARATOR "laidoff" PATH_SEPARATOR "assets" PATH_SEPARATOR
 #   define LwStaticAssert(x,y) //_STATIC_ASSERT(x) // diabled...
 #   define ARRAY_SIZE(arr) (sizeof(arr) / sizeof((arr)[0]))
 #elif LW_PLATFORM_ANDROID || LW_PLATFORM_IOS || LW_PLATFORM_IOS_SIMULATOR
@@ -98,6 +98,9 @@ typedef int socklen_t;
 
 #define LW_SUPPORT_VAO (LW_PLATFORM_WIN32 || LW_PLATFORM_OSX || LW_PLATFORM_LINUX)
 
+#if !LW_PLATFORM_LINUX
 #ifndef MSG_DONTWAIT
 #define MSG_DONTWAIT 0
 #endif
+#endif
+
