@@ -14,10 +14,15 @@ set(CMAKE_C_STANDARD 11)
 add_subdirectory(tinycthread)
 if (NOT SERVER_ONLY)
     add_subdirectory(glfw-3.2.1)
-	add_subdirectory(litehtml)
+    add_subdirectory(litehtml)
 else (NOT SERVER_ONLY)
 
 endif (NOT SERVER_ONLY)
+
+if (CMAKE_BUILD_TYPE STREQUAL "Debug")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g")
+    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -g")
+endif()
 
 include_directories(${glfw_INCLUDE_DIRS})
 include_directories("glfw-3.2.1/deps")
