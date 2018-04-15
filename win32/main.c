@@ -69,10 +69,11 @@ void window_size_callback(GLFWwindow* window, int width, int height) {
 }
 
 static GLFWwindow* create_glfw_window() {
-    GLFWwindow* window = glfwCreateWindow(
-        INITIAL_SCREEN_RESOLUTION_X,
-        INITIAL_SCREEN_RESOLUTION_Y,
-        "LAID OFF", NULL, NULL);
+    GLFWwindow* window = glfwCreateWindow(INITIAL_SCREEN_RESOLUTION_X,
+                                          INITIAL_SCREEN_RESOLUTION_Y,
+                                          "LAID OFF",
+                                          NULL,
+                                          NULL);
 #if LW_PLATFORM_WIN32
     HWND hwnd = glfwGetWin32Window(window);
     int scaling_factor = GetDpiForWindow(hwnd) / 96;
@@ -124,7 +125,7 @@ int main(int argc, char* argv[]) {
 
     while (!directory_exists("assets") && LwChangeDirectory("..")) {
     }
-    
+
 #if LW_PLATFORM_OSX
     char cwd[2048];
     getcwd(cwd, 2048);
@@ -235,7 +236,7 @@ int main(int argc, char* argv[]) {
     int client_instance_id = 0;
     if (argc >= 2) {
         client_instance_id = atoi(argv[1]);
-    }
+}
 #endif
     LWCONTEXT* pLwc = lw_init_initial_size(width, height);
     pLwc->argc = argc;
@@ -320,7 +321,7 @@ INT_PTR CALLBACK TextInputProc(HWND hDlg, UINT message, WPARAM wParam, LPARAM lP
                     DM_SETDEFID,
                     (WPARAM)IDCANCEL,
                     (LPARAM)0);*/
-        
+
         return TRUE;
 
     case WM_COMMAND:
@@ -396,9 +397,9 @@ INT_PTR CALLBACK TextInputProc(HWND hDlg, UINT message, WPARAM wParam, LPARAM lP
             return TRUE;
         }
         return 0;
-    //default:
-    //    return DefWindowProc(hDlg, message, wParam, lParam);
-    //    break;
+        //default:
+        //    return DefWindowProc(hDlg, message, wParam, lParam);
+        //    break;
     }
     return FALSE;
 }
