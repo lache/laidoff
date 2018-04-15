@@ -148,6 +148,11 @@ public:
             redraw_fbo();
         }
     }
+    void set_client_size(int client_width, int client_height) {
+        this->client_width = client_width;
+        this->client_height = client_height;
+        container.set_client_size(client_width, client_height);
+    }
 private:
     LWHTMLUI();
     LWHTMLUI(const LWHTMLUI&);
@@ -298,4 +303,9 @@ void htmlui_update_country_data(const LWCONTEXT* pLwc, void* c) {
 void htmlui_on_remtex_gpu_loaded(void* c, unsigned int name_hash) {
     LWHTMLUI* htmlui = (LWHTMLUI*)c;
     htmlui->on_remtex_gpu_loaded(name_hash);
+}
+
+void htmlui_set_client_size(void* c, int client_width, int client_height) {
+    LWHTMLUI* htmlui = (LWHTMLUI*)c;
+    htmlui->set_client_size(client_width, client_height);
 }

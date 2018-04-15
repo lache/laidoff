@@ -1832,6 +1832,13 @@ void lw_set_size(LWCONTEXT* pLwc, int w, int h) {
     puck_game_reset_view_proj(pLwc, pLwc->puck_game);
 
     lwttl_update_aspect_ratio(pLwc->ttl, pLwc->aspect_ratio);
+
+    // Resize FBO
+    init_font_fbo(pLwc);
+
+    // Rerender HTML UI
+    htmlui_set_client_size(pLwc->htmlui, pLwc->width, pLwc->height);
+    htmlui_load_redraw_fbo(pLwc->htmlui);
 }
 
 void lw_set_window(LWCONTEXT* pLwc, struct GLFWwindow *window) {

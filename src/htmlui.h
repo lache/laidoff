@@ -22,6 +22,7 @@ extern "C" {
     void htmlui_update_country_data(const LWCONTEXT* pLwc, void* c);
     void htmlui_load_redraw_fbo(void* c);
     void htmlui_on_remtex_gpu_loaded(void* c, unsigned int name_hash);
+    void htmlui_set_client_size(void* c, int client_width, int client_height);
 #ifdef __cplusplus
 }
 #endif

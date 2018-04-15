@@ -16,7 +16,7 @@
 #include "remtex.h"
 
 litehtml::text_container::text_container(LWCONTEXT* pLwc, int w, int h)
-    : pLwc(pLwc), w(w), h(h), default_font_size(36) {
+    : pLwc(pLwc), client_width(w), client_height(h), default_font_size(36) {
 }
 
 litehtml::text_container::~text_container() {
@@ -165,10 +165,10 @@ void litehtml::text_container::get_image_size(const litehtml::tchar_t * src, con
             if (remtex_id >= 0) {
                 if (remtex_gpu_loaded(pLwc->remtex, remtex_id)) {
                     // already loaded
-                    int w, h;
-                    if (remtex_width_height(pLwc->remtex, remtex_id, &w, &h)) {
-                        sz.width = static_cast<int>(roundf(w * scale));
-                        sz.height = static_cast<int>(roundf(h * scale));
+                    int remtex_w, remtex_h;
+                    if (remtex_width_height(pLwc->remtex, remtex_id, &remtex_w, &remtex_h)) {
+                        sz.width = static_cast<int>(roundf(remtex_w * scale));
+                        sz.height = static_cast<int>(roundf(remtex_h * scale));
                     }
                 } else {
                     // not loaded...
@@ -483,8 +483,8 @@ void litehtml::text_container::del_clip() {
 void litehtml::text_container::get_client_rect(litehtml::position & client) const {
     client.x = 0;
     client.y = 0;
-    client.width = w;
-    client.height = h;
+    client.width = client_width;
+    client.height = client_height;
     //printf("get_client_rect\n");
 }
 
@@ -502,4 +502,9 @@ void litehtml::text_container::get_media_features(litehtml::media_features & med
 }
 
 void litehtml::text_container::get_language(litehtml::tstring & language, litehtml::tstring & culture) const {
+}
+
+void litehtml::text_container::set_client_size(int client_width, int client_height) {
+    this->client_width = client_width;
+    this->client_height = client_height;
 }

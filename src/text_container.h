@@ -56,11 +56,12 @@ namespace litehtml {
             return remtex_name_hash_set.find(name_hash) != remtex_name_hash_set
                 .end();
         }
+        void set_client_size(int client_width, int client_height);
 	private:
         void draw_border_rect(const litehtml::border& border, int x, int y, int w, int h, LW_VBO_TYPE lvt, const litehtml::web_color& color) const;
 		LWCONTEXT * pLwc;
-		int w;
-		int h;
+		int client_width;
+		int client_height;
 		int default_font_size;
         bool online;
         std::set<unsigned long> remtex_name_hash_set;
