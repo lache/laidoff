@@ -262,10 +262,10 @@ typedef struct _LWPTTLFULLSTATE {
 
 // UDP
 typedef struct _LWPTTLSTATICOBJECT {
-    short x0;
-    short y0;
-    short x1;
-    short y1;
+    int x0;
+    int y0;
+    int x1;
+    int y1;
 } LWPTTLSTATICOBJECT;
 
 // UDP
@@ -280,8 +280,8 @@ typedef struct _LWPTTLSTATICSTATE {
 
 // UDP
 typedef struct _LWPTTLSEAPORTOBJECT {
-    short x0;
-    short y0;
+    int x0;
+    int y0;
     char name[64];
 } LWPTTLSEAPORTOBJECT;
 

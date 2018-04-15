@@ -8,6 +8,7 @@
 #include "laidoff.h"
 #include "render_solid.h"
 #include "lwudp.h"
+#include "lwlnglat.h"
 
 typedef struct _LWTTLDATA_SEAPORT {
     char locode[8];
@@ -112,19 +113,17 @@ void lwttl_update(LWCONTEXT* pLwc, void* _ttl, float delta_time) {
     LWTTL* ttl = (LWTTL*)_ttl;
     float dx = 0, dy = 0, dlen = 0;
     if (lw_get_normalized_dir_pad_input(pLwc, &pLwc->left_dir_pad, &dx, &dy, &dlen) && (dx || dy)) {
-        ttl->worldmap.center.lng += dx / 10.0f * delta_time;
-        ttl->worldmap.center.lat += dy / 10.0f * delta_time;
+        ttl->worldmap.center.lng += dx / 50.0f * delta_time;
+        ttl->worldmap.center.lat += dy / 50.0f * delta_time;
     }
 }
 
-short lwttl_lng_to_short(float lng) {
-    static const int half = (1 << 14) / 2;
-    return (short)(half + (lng / 180.0f) * half);
+int lwttl_lng_to_int(float lng) {
+    return (int)(res_width / 2 + (lng / 180.0f) * res_width / 2);
 }
 
-short lwttl_lat_to_short(float lat) {
-    static const int half = (1 << 13) / 2;
-    return (short)(half - (lat / 90.0f) * half);
+int lwttl_lat_to_int(float lat) {
+    return (int)(res_height / 2 - (lat / 90.0f) * res_height / 2);
 }
 
 const char* ttl_http_header(const void* _ttl) {
@@ -133,7 +132,7 @@ const char* ttl_http_header(const void* _ttl) {
     const LWTTLLNGLAT* lnglat = lwttl_center(ttl);
 
     sprintf(http_header, "X-Lng: %d\r\nX-Lat: %d\r\n",
-            lwttl_lng_to_short(lnglat->lng),
-            lwttl_lat_to_short(lnglat->lat));
+            lwttl_lng_to_int(lnglat->lng),
+            lwttl_lat_to_int(lnglat->lat));
     return http_header;
 }

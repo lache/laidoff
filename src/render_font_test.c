@@ -461,30 +461,29 @@ static void render_sea_static_objects(const LWCONTEXT* pLwc,
                          cell_x_to_render_coords(pLwc->ttl_static_state.obj[i].x0, center),
                          cell_y_to_render_coords(pLwc->ttl_static_state.obj[i].y0, center),
                          0,
-                         (float)(pLwc->ttl_static_state.obj[i].x1 - pLwc->ttl_static_state.obj[i].x0) * cell_scale * render_scale,
-                         (float)(pLwc->ttl_static_state.obj[i].y1 - pLwc->ttl_static_state.obj[i].y0) * cell_scale * render_scale);
+                         (float)(pLwc->ttl_static_state.obj[i].x1 - pLwc->ttl_static_state.obj[i].x0) * cell_scale * sea_render_scale,
+                         (float)(pLwc->ttl_static_state.obj[i].y1 - pLwc->ttl_static_state.obj[i].y0) * cell_scale * sea_render_scale);
     }
     // seaport
     for (int i = 0; i < pLwc->ttl_seaport_state.count; i++) {
         render_seaport_icon(pLwc,
                          view,
                          proj,
-                         (cell_x_to_lng(pLwc->ttl_seaport_state.obj[i].x0) - center->lng) * render_scale,
-                         (cell_y_to_lat(pLwc->ttl_seaport_state.obj[i].y0) - center->lat) * render_scale,
+                         (cell_x_to_lng(pLwc->ttl_seaport_state.obj[i].x0) - center->lng) * sea_render_scale,
+                         (cell_y_to_lat(pLwc->ttl_seaport_state.obj[i].y0) - center->lat) * sea_render_scale,
                          0,
-                         cell_scale * render_scale,
-                         cell_scale * render_scale);
+                         cell_scale * sea_render_scale,
+                         cell_scale * sea_render_scale);
     }
 }
 
 static void render_sea_static_objects_nameplate(const LWCONTEXT* pLwc, const mat4x4 view, const mat4x4 proj, const LWTTLLNGLAT* center) {
-    float render_scale = 100.0f;
     mat4x4 proj_view;
     mat4x4_identity(proj_view);
     mat4x4_mul(proj_view, proj, view);
     for (int i = 0; i < pLwc->ttl_seaport_state.count; i++) {
-        float x = (cell_x_to_lng(pLwc->ttl_seaport_state.obj[i].x0) - center->lng) * render_scale;
-        float y = (cell_y_to_lat(pLwc->ttl_seaport_state.obj[i].y0) - center->lat) * render_scale;
+        float x = (cell_x_to_lng(pLwc->ttl_seaport_state.obj[i].x0) - center->lng) * sea_render_scale;
+        float y = (cell_y_to_lat(pLwc->ttl_seaport_state.obj[i].y0) - center->lat) * sea_render_scale;
 
         vec4 obj_pos_vec4 = {
             x,
