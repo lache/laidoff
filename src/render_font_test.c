@@ -452,17 +452,34 @@ static void render_sea_static_objects(const LWCONTEXT* pLwc,
                                       const mat4x4 view,
                                       const mat4x4 proj,
                                       const LWTTLLNGLAT* center) {
-    float cell_scale = 360.0f / res_width;
+    const float cell_scale = 360.0f / LNGLAT_RES_WIDTH;
+    const float half_extent_in_deg = LNGLAT_SEA_PING_EXTENT_IN_DEGREES / 2;
+    const float lng_min = center->lng - half_extent_in_deg;
+    const float lng_max = center->lng + half_extent_in_deg;
+    const float lat_min = center->lat - half_extent_in_deg;
+    const float lat_max = center->lat + half_extent_in_deg;
     // land
     for (int i = 0; i < pLwc->ttl_static_state.count; i++) {
+        float lng0 = LWCLAMP(cell_x_to_lng(pLwc->ttl_static_state.obj[i].x0), lng_min, lng_max);
+        float lat0 = LWCLAMP(cell_y_to_lat(pLwc->ttl_static_state.obj[i].y0), lat_min, lat_max);
+        float lng1 = LWCLAMP(cell_x_to_lng(pLwc->ttl_static_state.obj[i].x1), lng_min, lng_max);
+        float lat1 = LWCLAMP(cell_y_to_lat(pLwc->ttl_static_state.obj[i].y1), lat_min, lat_max);
+
+        float cell_x0 = lng_to_render_coords(lng0, center);
+        float cell_y0 = lat_to_render_coords(lat0, center);
+        float cell_x1 = lng_to_render_coords(lng1, center);
+        float cell_y1 = lat_to_render_coords(lat1, center);
+        float cell_w = cell_x1 - cell_x0;
+        float cell_h = cell_y0 - cell_y1; // cell_y0 and cell_y1 are in OpenGL rendering coordinates (always cell_y0 > cell_y1)
+        
         render_land_cell(pLwc,
                          view,
                          proj,
-                         cell_x_to_render_coords(pLwc->ttl_static_state.obj[i].x0, center),
-                         cell_y_to_render_coords(pLwc->ttl_static_state.obj[i].y0, center),
+                         cell_x0,
+                         cell_y0,
                          0,
-                         (float)(pLwc->ttl_static_state.obj[i].x1 - pLwc->ttl_static_state.obj[i].x0) * cell_scale * sea_render_scale,
-                         (float)(pLwc->ttl_static_state.obj[i].y1 - pLwc->ttl_static_state.obj[i].y0) * cell_scale * sea_render_scale);
+                         cell_w /*(float)(pLwc->ttl_static_state.obj[i].x1 - pLwc->ttl_static_state.obj[i].x0) * cell_scale * sea_render_scale*/,
+                         cell_h /*(float)(pLwc->ttl_static_state.obj[i].y1 - pLwc->ttl_static_state.obj[i].y0) * cell_scale * sea_render_scale*/);
     }
     // seaport
     for (int i = 0; i < pLwc->ttl_seaport_state.count; i++) {

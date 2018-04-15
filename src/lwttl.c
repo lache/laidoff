@@ -119,11 +119,11 @@ void lwttl_update(LWCONTEXT* pLwc, void* _ttl, float delta_time) {
 }
 
 int lwttl_lng_to_int(float lng) {
-    return (int)(res_width / 2 + (lng / 180.0f) * res_width / 2);
+    return (int)(LNGLAT_RES_WIDTH / 2 + (lng / 180.0f) * LNGLAT_RES_WIDTH / 2);
 }
 
 int lwttl_lat_to_int(float lat) {
-    return (int)(res_height / 2 - (lat / 90.0f) * res_height / 2);
+    return (int)(LNGLAT_RES_HEIGHT / 2 - (lat / 90.0f) * LNGLAT_RES_HEIGHT / 2);
 }
 
 const char* ttl_http_header(const void* _ttl) {

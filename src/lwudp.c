@@ -390,7 +390,7 @@ void udp_send_ttlping(LWUDP* udp, void* ttl, int ping_seq) {
     ttl_ping.type = LPGP_LWPTTLPING;
     ttl_ping.xc = center->lng;
     ttl_ping.yc = center->lat;
-    ttl_ping.ex = 32;
+    ttl_ping.ex = LNGLAT_SEA_PING_EXTENT_IN_CELL_PIXELS;
     ttl_ping.ping_seq = ping_seq;
     udp_send(udp, (const char*)&ttl_ping, sizeof(LWPTTLPING));
 }
