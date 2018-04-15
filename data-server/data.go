@@ -56,7 +56,15 @@ func hash(s string) uint32 {
 	return uint32(h)
 }
 
+const (
+	ServiceName = "data"
+)
+
 func main() {
+	// Set default log format
+	log.SetFlags(log.LstdFlags | log.Lshortfile)
+	log.SetOutput(os.Stdout)
+	log.Printf("Greetings from %v service", ServiceName)
 	if len(os.Args) < 2 {
 		log.Printf("Should provide resource glob as first argument. (i.e. \"c:/laidoff/assets/ktx/*.ktx\")")
 		return

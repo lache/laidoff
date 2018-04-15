@@ -69,7 +69,15 @@ func convertFile(filename string, targetDir string) {
 	}
 }
 
+const (
+	ServiceName = "art-watcher"
+)
+
 func main() {
+	// Set default log format
+	log.SetFlags(log.LstdFlags | log.Lshortfile)
+	log.SetOutput(os.Stdout)
+	log.Printf("Greetings from %v service", ServiceName)
 	if len(os.Args) < 3 {
 		log.Printf("Should provide resource source directory glob and target directory as first and second argument.")
 		return
