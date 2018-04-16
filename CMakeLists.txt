@@ -14,10 +14,15 @@ set(CMAKE_C_STANDARD 11)
 add_subdirectory(tinycthread)
 if (NOT SERVER_ONLY)
     add_subdirectory(glfw-3.2.1)
-	add_subdirectory(litehtml)
+    add_subdirectory(litehtml)
 else (NOT SERVER_ONLY)
 
 endif (NOT SERVER_ONLY)
+
+if (CMAKE_BUILD_TYPE STREQUAL "Debug")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g")
+    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -g")
+endif()
 
 include_directories(${glfw_INCLUDE_DIRS})
 include_directories("glfw-3.2.1/deps")
@@ -44,7 +49,7 @@ add_subdirectory(zeromq-4.2.1)
 
 # ZeroMQ 라이브러리 중 사용할 것만 제외하고는 빌드되지 않도록 한다.
 
-if (APPLE)
+if (APPLE OR UNIX)
     # ZeroMQ 프로젝트는 ZeroMQ 솔루션 디렉토리에 모은다.
     set_target_properties(libzmq libzmq-static PROPERTIES FOLDER "ZeroMQ")
     set_target_properties(libzmq-static PROPERTIES EXCLUDE_FROM_ALL 1 EXCLUDE_FROM_DEFAULT_BUILD 1)
