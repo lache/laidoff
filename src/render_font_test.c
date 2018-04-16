@@ -471,7 +471,10 @@ static void render_sea_static_objects(const LWCONTEXT* pLwc,
         float cell_y1 = lat_to_render_coords(lat1, center);
         float cell_w = cell_x1 - cell_x0;
         float cell_h = cell_y0 - cell_y1; // cell_y0 and cell_y1 are in OpenGL rendering coordinates (always cell_y0 > cell_y1)
-        
+        // skip degenerated cell
+        if (cell_w <= 0 || cell_h <= 0) {
+            continue;
+        }
         render_land_cell(pLwc,
                          view,
                          proj,
