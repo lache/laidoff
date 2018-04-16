@@ -297,6 +297,7 @@ LWPUCKGAME* new_puck_game(int update_frequency) {
     puck_game_reset(puck_game);
     // flag this instance is ready to run simulation
     puck_game->init_ready = 1;
+    puck_game->show_top_level_main_menu = 1;
     return puck_game;
 }
 
@@ -1081,4 +1082,12 @@ LWPUCKGAMEPLAYER* puck_game_player(LWPUCKGAME* puck_game, int index) {
 
 LWPUCKGAMEPLAYER* puck_game_target(LWPUCKGAME* puck_game, int index) {
     return &puck_game->pg_target[index];
+}
+
+void puck_game_set_show_top_level_main_menu(LWPUCKGAME* puck_game, int show) {
+    puck_game->show_top_level_main_menu = show;
+}
+
+void puck_game_set_show_htmlui(LWPUCKGAME* puck_game, int show) {
+    puck_game->show_html_ui = show;
 }

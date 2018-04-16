@@ -38,7 +38,8 @@ void lw_trigger_mouse_press(LWCONTEXT* pLwc, float x, float y, int pointer_id) {
 		mq_publish_now(pLwc, pLwc->mq, 0);
 	}
 
-    if (pLwc->game_scene == LGS_FONT_TEST) {
+    if (pLwc->game_scene == LGS_FONT_TEST
+        || (pLwc->game_scene == LGS_PHYSICS && pLwc->puck_game->show_html_ui)) {
         htmlui_on_lbutton_down(pLwc->htmlui,
                                (x + pLwc->aspect_ratio) / (2.0f * pLwc->aspect_ratio),
                                (1.0f - y) / 2.0f);
@@ -145,6 +146,8 @@ void lw_trigger_mouse_move(LWCONTEXT* pLwc, float x, float y, int pointer_id) {
 	convert_touch_coord_to_ui_coord(pLwc, &x, &y);
 
     if (pLwc->game_scene == LGS_FONT_TEST) {
+        // TOO SLOW ON MANY HTML TAGS
+
 	/*htmlui_on_over(pLwc->htmlui,
 		(x + pLwc->aspect_ratio) / (2.0f * pLwc->aspect_ratio),
 						 (1.0f - y) / 2.0f);*/
@@ -186,7 +189,8 @@ void lw_trigger_mouse_release(LWCONTEXT* pLwc, float x, float y, int pointer_id)
 		  fabsf(x - pLwc->last_mouse_press_x),
 		  fabsf(y - pLwc->last_mouse_press_y));
 
-    if (pLwc->game_scene == LGS_FONT_TEST) {
+    if (pLwc->game_scene == LGS_FONT_TEST
+        || (pLwc->game_scene == LGS_PHYSICS && pLwc->puck_game->show_html_ui)) {
         htmlui_on_lbutton_up(pLwc->htmlui,
                              (x + pLwc->aspect_ratio) / (2.0f * pLwc->aspect_ratio),
                              (1.0f - y) / 2.0f);

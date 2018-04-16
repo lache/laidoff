@@ -129,7 +129,9 @@ function on_ui_event(id, w_ratio, h_ratio)
 		end
 	elseif id == 'change_nickname_button' then
 		lo.start_nickname_text_input_activity(c)
-	elseif id == 'settings__disabled__for__now' then
+	elseif id == 'more_button' then
+		reload_require('more_button')()
+	elseif id == 'football_mod' then
 		lo.puck_game_reset_view_proj_ortho(c, c.puck_game, 1.9, 0.1, 100, 0, -8, 14, 0, 0.3, 0)
 		lo.lwcontext_set_custom_puck_game_stage(c, lo.LVT_FOOTBALL_GROUND, lo.LAE_FOOTBALL_GROUND)
 		c.puck_game.dash_by_direction = 1

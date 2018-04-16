@@ -1,7 +1,7 @@
 <component name="ProjectRunConfigurationManager">
   <configuration default="false" name="art-watcher" type="GoApplicationRunConfiguration" factoryName="Go Application" singleton="true">
     <module name="art-watcher" />
-    <working_directory value="$PROJECT_DIR$/" />
+    <working_directory value="C:\laidoff-art" />
     <go_parameters value="-i" />
     <parameters value="c:\laidoff-art\assets-png\* c:\laidoff\assets\ktx" />
     <kind value="DIRECTORY" />

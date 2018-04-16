@@ -1250,79 +1250,102 @@ static void render_main_menu_ui_layer(const LWCONTEXT* pLwc,
     ((LWCONTEXT*)pLwc)->viewport_x = viewport_x;
     ((LWCONTEXT*)pLwc)->viewport_y = viewport_y;
     LW_GL_VIEWPORT();
-    // render buttons as a single sprite
-    render_main_menu(pLwc, puck_game, view, proj, puck_game->main_menu_ui_alpha);
     float top_bar_x_cursor = 0;
     const float top_bar_x_cursor_margin = 0.05f;
     // nickname (background, icon, text)
     render_top_bar_nickname(pLwc, puck_game, &top_bar_x_cursor, top_bar_x_cursor_margin);
-    // buttons
-    float button_alpha = 0.0f; // alpha zeroed intentionally (nonzero only when debugging)
-    lwbutton_lae_append(pLwc,
-                        &(((LWCONTEXT*)pLwc)->button_list),
-                        "practice_button",
-                        -0.75f,
-                        +0.70f,
-                        +0.70f,
-                        +0.40f,
-                        0,
-                        0,
-                        puck_game->main_menu_ui_alpha * button_alpha,
-                        1.0f,
-                        1.0f,
-                        1.0f);
-    lwbutton_lae_append(pLwc,
-                        &(((LWCONTEXT*)pLwc)->button_list),
-                        "tutorial_button",
-                        +0.75f - 0.70f,
-                        +0.70f,
-                        +0.70f,
-                        +0.40f,
-                        0,
-                        0,
-                        puck_game->main_menu_ui_alpha * button_alpha,
-                        1.0f,
-                        1.0f,
-                        1.0f);
-    lwbutton_lae_append(pLwc,
-                        &(((LWCONTEXT*)pLwc)->button_list),
-                        "online_button",
-                        -0.75f,
-                        +0.25f,
-                        +0.75f * 2,
-                        +0.50f,
-                        0,
-                        0,
-                        puck_game->main_menu_ui_alpha * button_alpha,
-                        1.0f,
-                        1.0f,
-                        1.0f);
-    lwbutton_lae_append(pLwc,
-                        &(((LWCONTEXT*)pLwc)->button_list),
-                        "change_nickname_button",
-                        -0.75f,
-                        +0.25f - 0.50f - 0.05f,
-                        +0.70f,
-                        +0.40f,
-                        0,
-                        0,
-                        puck_game->main_menu_ui_alpha * button_alpha,
-                        1.0f,
-                        1.0f,
-                        1.0f);
-    lwbutton_lae_append(pLwc,
-                        &(((LWCONTEXT*)pLwc)->button_list),
-                        "settings",
-                        +0.75f - 0.70f,
-                        +0.25f - 0.50f - 0.05f,
-                        +0.70f,
-                        +0.40f,
-                        0,
-                        0,
-                        puck_game->main_menu_ui_alpha * button_alpha,
-                        1.0f,
-                        1.0f,
-                        1.0f);
+    if (puck_game->show_top_level_main_menu) {
+        // render buttons as a single sprite
+        render_main_menu(pLwc, puck_game, view, proj, puck_game->main_menu_ui_alpha);
+        // buttons
+        float button_alpha = 0.0f; // alpha zeroed intentionally (nonzero only when debugging)
+        lwbutton_lae_append(pLwc,
+                            &(((LWCONTEXT*)pLwc)->button_list),
+                            "practice_button",
+                            -0.75f,
+                            +0.70f,
+                            +0.70f,
+                            +0.40f,
+                            0,
+                            0,
+                            puck_game->main_menu_ui_alpha * button_alpha,
+                            1.0f,
+                            1.0f,
+                            1.0f);
+        lwbutton_lae_append(pLwc,
+                            &(((LWCONTEXT*)pLwc)->button_list),
+                            "tutorial_button",
+                            +0.75f - 0.70f,
+                            +0.70f,
+                            +0.70f,
+                            +0.40f,
+                            0,
+                            0,
+                            puck_game->main_menu_ui_alpha * button_alpha,
+                            1.0f,
+                            1.0f,
+                            1.0f);
+        lwbutton_lae_append(pLwc,
+                            &(((LWCONTEXT*)pLwc)->button_list),
+                            "online_button",
+                            -0.75f,
+                            +0.25f,
+                            +0.75f * 2,
+                            +0.50f,
+                            0,
+                            0,
+                            puck_game->main_menu_ui_alpha * button_alpha,
+                            1.0f,
+                            1.0f,
+                            1.0f);
+        lwbutton_lae_append(pLwc,
+                            &(((LWCONTEXT*)pLwc)->button_list),
+                            "change_nickname_button",
+                            -0.75f,
+                            +0.25f - 0.50f - 0.05f,
+                            +0.70f,
+                            +0.40f,
+                            0,
+                            0,
+                            puck_game->main_menu_ui_alpha * button_alpha,
+                            1.0f,
+                            1.0f,
+                            1.0f);
+        lwbutton_lae_append(pLwc,
+                            &(((LWCONTEXT*)pLwc)->button_list),
+                            "more_button",
+                            +0.75f - 0.70f,
+                            +0.25f - 0.50f - 0.05f,
+                            +0.70f,
+                            +0.40f,
+                            0,
+                            0,
+                            puck_game->main_menu_ui_alpha * button_alpha,
+                            1.0f,
+                            1.0f,
+                            1.0f);
+    }
+    if (puck_game->show_html_ui) {
+        // reset viewport temporarily
+        const int viewport_x = pLwc->viewport_x;
+        const int viewport_y = pLwc->viewport_y;
+        ((LWCONTEXT*)pLwc)->viewport_x = 0;
+        ((LWCONTEXT*)pLwc)->viewport_y = 0;
+        LW_GL_VIEWPORT();
+        // render FBO (HTML UI)
+        render_solid_box_ui_lvt_flip_y_uv(pLwc,
+                                          0,
+                                          0,
+                                          2 * pLwc->aspect_ratio,
+                                          2,
+                                          pLwc->font_fbo.color_tex,
+                                          LVT_CENTER_CENTER_ANCHORED_SQUARE,
+                                          1);
+        // revert to default viewport
+        ((LWCONTEXT*)pLwc)->viewport_x = viewport_x;
+        ((LWCONTEXT*)pLwc)->viewport_y = viewport_y;
+        LW_GL_VIEWPORT();
+    }
 }
 
 static void render_tower_invincible_mark(const LWCONTEXT* pLwc,

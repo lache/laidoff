@@ -812,3 +812,13 @@ void script_evaluate(void* L, const char* code, size_t code_len) {
 void script_evaluate_async(LWCONTEXT* pLwc, const char* code, size_t code_len) {
     logic_emit_evalute_async(pLwc, code, code_len);
 }
+
+const char* script_full_asset_path(const char* asset_type, const char* asset_name) {
+    static char full_asset_path[1024] = { 0, };
+    full_asset_path[0] = 0;
+    strcat(full_asset_path, ASSETS_BASE_PATH);
+    strcat(full_asset_path, asset_type);
+    strcat(full_asset_path, PATH_SEPARATOR);
+    strcat(full_asset_path, asset_name);
+    return full_asset_path;
+}

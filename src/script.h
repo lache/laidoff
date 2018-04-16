@@ -21,6 +21,7 @@ void script_on_player_attack(void* _script);
 void script_on_target_attack(void* _script);
 void script_evaluate(void* L, const char* code, size_t code_len);
 void script_evaluate_async(LWCONTEXT* pLwc, const char* code, size_t code_len);
+const char* script_full_asset_path(const char* asset_type, const char* asset_name);
 #ifdef __cplusplus
 };
 #endif

@@ -249,6 +249,8 @@ typedef struct _LWPUCKGAME {
     LWPMATCHED2 matched2;
     char score_message[64];
     float last_udp_frame_sync_sent;
+    int show_top_level_main_menu;
+    int show_html_ui;
 } LWPUCKGAME;
 
 LWPUCKGAME* new_puck_game(int update_frequency);
@@ -300,3 +302,5 @@ void puck_game_create_walls(LWPUCKGAME* puck_game);
 void puck_game_destroy_walls(LWPUCKGAME* puck_game);
 LWPUCKGAMEPLAYER* puck_game_player(LWPUCKGAME* puck_game, int index);
 LWPUCKGAMEPLAYER* puck_game_target(LWPUCKGAME* puck_game, int index);
+void puck_game_set_show_top_level_main_menu(LWPUCKGAME* puck_game, int show);
+void puck_game_set_show_htmlui(LWPUCKGAME* puck_game, int show);
