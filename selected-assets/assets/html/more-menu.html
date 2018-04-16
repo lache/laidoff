@@ -10,7 +10,7 @@
             background-color: rgba(255,255,255,127);
             color: white;
             margin: 4pt auto;
-            font-size: 1.5em;
+            font-size: 1.35em;
             text-align: center;
             width: 60%;
             border: 1pt white solid;
@@ -27,7 +27,6 @@
     <br/>
     <br/>
     <br/>
-    <a class="touch-button" href="script:create_room()">CREATE ROOM</a>
     <a class="touch-button" href="script:enter_room()">ENTER ROOM</a>
     <a class="touch-button" href="script:back_to_main_menu()">BACK TO MAIN MENU</a>
 </div>
@@ -37,6 +36,9 @@ local c = lo.script_context()
 function back_to_main_menu()
     lo.puck_game_set_show_top_level_main_menu(c.puck_game, 1)
     lo.puck_game_set_show_htmlui(c.puck_game, 0)
+end
+function enter_room()
+    reload_require('online_button')(lo.LW_PUCK_GAME_QUEUE_TYPE_FIFO)
 end
 return 1234
 </script>

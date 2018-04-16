@@ -28,7 +28,7 @@ func Entry() {
 	log.SetFlags(log.LstdFlags | log.Lshortfile)
 	log.SetOutput(os.Stdout)
 	log.Printf("Greetings from %v service", ServiceName)
-	// Test Db service
+	// Test Db serviceLW_PUCK_GAME_QUEUE_TYPE_NEAREST_SCORE
 	if len(os.Args) > 1 && os.Args[1] == "test" {
 		service.CreateNewUserDb()
 	}

@@ -34,7 +34,7 @@
 #   define ARRAY_SIZE(arr) (sizeof(arr) / sizeof((arr)[0]))
 #elif LW_PLATFORM_ANDROID || LW_PLATFORM_IOS || LW_PLATFORM_IOS_SIMULATOR
 #   define PATH_SEPARATOR "/"
-#   define ASSETS_BASE_PATH
+#   define ASSETS_BASE_PATH ""
 #   define LwStaticAssert(x,y) //static_assert((x),(y))
 #   define BUILD_BUG_ON_ZERO(e) (sizeof(struct { int:-!!(e); }))
 #   define __must_be_array(a) \
