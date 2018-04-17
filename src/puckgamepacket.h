@@ -21,6 +21,7 @@ typedef enum _LW_PUCK_GAME_PACKET {
     LPGP_LWPTTLPING = 110, // client -> server
     LPGP_LWPTTLSTATICSTATE = 111, // server -> client
     LPGP_LWPTTLSEAPORTSTATE = 112, // server -> client
+    LPGP_LWPTTLTRACKCOORDS = 113, // server -> client
 	// tcp
 	LPGP_LWPQUEUE2 = 200,
 	LPGP_LWPMAYBEMATCHED = 201,
@@ -295,6 +296,17 @@ typedef struct _LWPTTLSEAPORTSTATE {
     LWPTTLSEAPORTOBJECT obj[200];
 } LWPTTLSEAPORTSTATE;
 
+// UDP
+typedef struct _LWPTTLTRACKCOORDS {
+    unsigned char type;
+    unsigned char padding0;
+    unsigned char padding1;
+    unsigned char padding2;
+    int id;
+    float x;
+    float y;
+} LWPTTLTRACKCOORDS;
+
 // PING
 typedef struct _LWPTTLPING {
     unsigned char type;
@@ -303,6 +315,7 @@ typedef struct _LWPTTLPING {
     unsigned char padding2;
     float xc, yc, ex; // x center, y center, extent
     int ping_seq;
+    int track_object_id;
 } LWPTTLPING;
 
 // should be 4-byte aligned...

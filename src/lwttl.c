@@ -21,10 +21,11 @@ typedef struct _LWTTL {
     LWTTLDATA_SEAPORT* seaport;
     size_t seaport_len;
     LWTTLWORLDMAP worldmap;
+    int track_object_id;
 } LWTTL;
 
 void* lwttl_new(float aspect_ratio) {
-    LWTTL* ttl = (LWTTL*)malloc(sizeof(LWTTL));
+    LWTTL* ttl = (LWTTL*)calloc(1, sizeof(LWTTL));
     ttl->worldmap.render_org_x = 0;
     ttl->worldmap.render_org_y = -(2.0f - aspect_ratio) / 2;
     // Ulsan
@@ -109,6 +110,12 @@ const LWTTLLNGLAT* lwttl_center(void* _ttl) {
     return &ttl->worldmap.center;
 }
 
+void lwttl_set_center(void* _ttl, float lng, float lat) {
+    LWTTL* ttl = (LWTTL*)_ttl;
+    ttl->worldmap.center.lng = lng;
+    ttl->worldmap.center.lat = lat;
+}
+
 void lwttl_update(LWCONTEXT* pLwc, void* _ttl, float delta_time) {
     LWTTL* ttl = (LWTTL*)_ttl;
     float dx = 0, dy = 0, dlen = 0;
@@ -126,7 +133,7 @@ int lwttl_lat_to_int(float lat) {
     return (int)(LNGLAT_RES_HEIGHT / 2 - (lat / 90.0f) * LNGLAT_RES_HEIGHT / 2);
 }
 
-const char* ttl_http_header(const void* _ttl) {
+const char* lwttl_http_header(const void* _ttl) {
     static char http_header[1024];
     LWTTL* ttl = (LWTTL*)_ttl;
     const LWTTLLNGLAT* lnglat = lwttl_center(ttl);
@@ -135,4 +142,14 @@ const char* ttl_http_header(const void* _ttl) {
             lwttl_lng_to_int(lnglat->lng),
             lwttl_lat_to_int(lnglat->lat));
     return http_header;
+}
+
+int lwttl_track_object_id(const void* _ttl) {
+    LWTTL* ttl = (LWTTL*)_ttl;
+    return ttl->track_object_id;
+}
+
+void lwttl_set_track_object_id(const void* _ttl, int v) {
+    LWTTL* ttl = (LWTTL*)_ttl;
+    ttl->track_object_id = v;
 }

@@ -528,7 +528,7 @@ static void render_sea_static_objects_nameplate(const LWCONTEXT* pLwc, const mat
         test_text_block.multiline = 1;
         test_text_block.text_block_x = ui_point[0];
         test_text_block.text_block_y = ui_point[1];
-        test_text_block.align = LTBA_LEFT_TOP;
+        test_text_block.align = LTBA_LEFT_BOTTOM;
         render_text_block(pLwc, &test_text_block);
     }
 }
@@ -605,6 +605,28 @@ static void render_world_map(const LWCONTEXT* pLwc, const LWTTLWORLDMAP* worldma
                                      0);
 }
 
+static void render_coords(const LWCONTEXT* pLwc, const LWTTLLNGLAT* lng_lat_center) {
+    LWTEXTBLOCK test_text_block;
+    test_text_block.text_block_width = 999.0f;// 2.00f * aspect_ratio;
+    test_text_block.text_block_line_height = DEFAULT_TEXT_BLOCK_LINE_HEIGHT_F;
+    test_text_block.size = DEFAULT_TEXT_BLOCK_SIZE_E;
+    SET_COLOR_RGBA_FLOAT(test_text_block.color_normal_glyph, 1, 1, 1, 1);
+    SET_COLOR_RGBA_FLOAT(test_text_block.color_normal_outline, 0, 0, 0, 1);
+    SET_COLOR_RGBA_FLOAT(test_text_block.color_emp_glyph, 1, 1, 0, 1);
+    SET_COLOR_RGBA_FLOAT(test_text_block.color_emp_outline, 0, 0, 0, 1);
+    char coords[64];
+    sprintf(coords, "LNG %.3f LAT %.3f", lng_lat_center->lng, lng_lat_center->lat);
+    test_text_block.text = coords;
+    test_text_block.text_bytelen = (int)strlen(test_text_block.text);
+    test_text_block.begin_index = 0;
+    test_text_block.end_index = test_text_block.text_bytelen;
+    test_text_block.multiline = 1;
+    test_text_block.text_block_x = 0.0f;
+    test_text_block.text_block_y = 1.0f;
+    test_text_block.align = LTBA_CENTER_TOP;
+    render_text_block(pLwc, &test_text_block);
+}
+
 void lwc_render_font_test(const LWCONTEXT* pLwc) {
     LW_GL_VIEWPORT();
     glClearColor(0 / 255.f, 94 / 255.f, 190 / 255.f, 1);//lw_clear_color();
@@ -678,6 +700,7 @@ void lwc_render_font_test(const LWCONTEXT* pLwc) {
     if (lwc_render_font_test_render("seaport")) {
         lwttl_render_all_seaports(pLwc, pLwc->ttl, worldmap);
     }
+    render_coords(pLwc, &lng_lat_center);
     glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
     // render FBO (HTML UI)
     render_solid_box_ui_lvt_flip_y_uv(pLwc, 0, 0, 2 * pLwc->aspect_ratio, 2, pLwc->font_fbo.color_tex, LVT_CENTER_CENTER_ANCHORED_SQUARE, 1);

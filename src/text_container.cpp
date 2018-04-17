@@ -450,7 +450,7 @@ void litehtml::text_container::on_anchor_click(const litehtml::tchar_t * url, co
         strcat(path, url);
         if (online) {
             if (pLwc->tcp_ttl) {
-                tcp_send_httpget(pLwc->tcp_ttl, url, ttl_http_header(pLwc->ttl));
+                tcp_send_httpget(pLwc->tcp_ttl, url, lwttl_http_header(pLwc->ttl));
             } else {
                 LOGE("tcp_ttl null");
             }

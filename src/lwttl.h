@@ -28,7 +28,10 @@ const LWTTLWORLDMAP* lwttl_worldmap(void* _ttl);
 void lwttl_update_aspect_ratio(void* _ttl, float aspect_ratio);
 const LWTTLLNGLAT* lwttl_center(void* _ttl);
 void lwttl_update(LWCONTEXT* pLwc, void* _ttl, float delta_time);
-const char* ttl_http_header(const void* _ttl);
+const char* lwttl_http_header(const void* _ttl);
+int lwttl_track_object_id(const void* _ttl);
+void lwttl_set_track_object_id(const void* _ttl, int v);
+void lwttl_set_center(void* _ttl, float lng, float lat);
 #ifdef __cplusplus
 }
 #endif
