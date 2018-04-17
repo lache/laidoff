@@ -10,6 +10,7 @@ import (
 	"errors"
 	"log"
 	"encoding/gob"
+	"path/filepath"
 )
 
 type Id [16]byte
@@ -61,6 +62,16 @@ type Agent struct {
 	CancelQueue bool
 }
 
+var persistentDbPath string
+
+func SetPersistentDbPath(p string) {
+	persistentDbPath = p
+}
+
+func GetPersistentDbPath() string {
+	return persistentDbPath
+}
+
 func NewUuid() ([]byte, string, error) {
 	uuid := make([]byte, 16)
 
@@ -89,7 +100,7 @@ func LoadUserDb(id Id) (*Db, error) {
 }
 
 func LoadUserDbByUuidStr(uuidStr string) (*Db, error) {
-	userDbFile, err := os.Open("db/" + uuidStr)
+	userDbFile, err := os.Open(filepath.Join(persistentDbPath, uuidStr))
 	if err != nil {
 		if os.IsNotExist(err) {
 			// user db not exist
@@ -108,7 +119,7 @@ func LoadUserDbByUuidStr(uuidStr string) (*Db, error) {
 }
 
 func WriteUserDb(userDb *Db) error {
-	userDbFile, err := os.Create("db/" + IdByteArrayToString(userDb.Id))
+	userDbFile, err := os.Create(filepath.Join(persistentDbPath, IdByteArrayToString(userDb.Id)))
 	if err != nil {
 		log.Fatalf("User db file creation failed: %v", err.Error())
 		return err

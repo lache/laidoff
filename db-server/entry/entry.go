@@ -14,6 +14,8 @@ import (
 	"github.com/gasbank/laidoff/db-server/dbservice"
 	"io/ioutil"
 	"math/rand"
+	"strings"
+	"path/filepath"
 )
 
 type LeaseData struct {
@@ -61,7 +63,7 @@ func (t *DbService) Create(args int, reply *user.Db) error {
 	// Write to disk
 	var id user.Id
 	copy(id[:], uuid)
-	userDb, _, err := createNewUser(id, newNick, args != 0)
+	userDb, _, err := createNewUser(id, newNick, args != 0, user.GetPersistentDbPath())
 	if err != nil {
 		log.Printf("[Service] createNewUser failed: %v", err.Error())
 		return err
@@ -139,7 +141,7 @@ func (t *DbService) Write(args *user.LeaseDb, reply *int) error {
 }
 
 func (t *DbService) GetAllUserRatings(args *dbservice.GetAllUserRatingsRequest, reply *dbservice.GetAllUserRatingsReply) error {
-	files, err := ioutil.ReadDir("db")
+	files, err := ioutil.ReadDir(user.GetPersistentDbPath())
 	if err != nil {
 		return err
 	} else {
@@ -205,8 +207,21 @@ func Entry() {
 	log.Printf("Greetings from %v service", ServiceName)
 	// Seed random generator
 	rand.Seed(time.Now().UnixNano())
+	// Check for Docker environment
+	dir, err := os.Getwd()
+	if err != nil {
+		log.Fatal(err)
+	}
+	log.Printf("Working directory: %v", dir)
+	if strings.HasPrefix(dir, "/app/") {
+		log.Printf("Working directory starts with '/app/'. Assuming Docker container environment...")
+		user.SetPersistentDbPath("/data/db")
+	} else {
+		user.SetPersistentDbPath("db")
+	}
+	log.Printf("Persistent Db Path: %v", user.GetPersistentDbPath())
 	// Create db directory to save user database
-	os.MkdirAll("db", os.ModePerm)
+	os.MkdirAll(user.GetPersistentDbPath(), os.ModePerm)
 	//createTestUserDb()
 	server := rpc.NewServer()
 	dbService := new(DbService)
@@ -228,7 +243,7 @@ func Entry() {
 	server.Accept(l)
 }
 
-func createNewUser(uuid user.Id, nickname string, bot bool) (*user.Db, *os.File, error) {
+func createNewUser(uuid user.Id, nickname string, bot bool, persistentDbPath string) (*user.Db, *os.File, error) {
 	userDb := &user.Db{
 		Id:       uuid,
 		Created:  time.Now(),
@@ -237,7 +252,7 @@ func createNewUser(uuid user.Id, nickname string, bot bool) (*user.Db, *os.File,
 		Bot:      bot,
 	}
 	uuidStr := user.IdByteArrayToString(uuid)
-	userDbFile, err := os.Create("db/" + uuidStr)
+	userDbFile, err := os.Create(filepath.Join(persistentDbPath, uuidStr))
 	if err != nil {
 		log.Fatalf("User db file creation failed: %v", err.Error())
 		return nil, nil, err

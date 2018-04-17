@@ -171,7 +171,7 @@ type ListData struct {
 }
 
 func listHandler(w http.ResponseWriter, _ *http.Request) {
-	files, err := ioutil.ReadDir("db")
+	files, err := ioutil.ReadDir(user.GetPersistentDbPath())
 	if err != nil {
 		http.Error(w, "internal error", http.StatusInternalServerError)
 	} else {
