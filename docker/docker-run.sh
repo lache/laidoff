@@ -7,5 +7,6 @@ docker run -d \
 	-p 20182:20182 \
 	-e "BATTLE_HOST=`dig +short myip.opendns.com @resolver1.opendns.com`" \
 	-v '/etc/ssl/certs/ca-certificates.crt:/etc/ssl/certs/ca-certificates.crt' \
+	-v br:/data \
 	br
 

@@ -7,5 +7,7 @@ docker run -d \
 	-p 20182:20182 \
 	-e "BATTLE_HOST=127.0.0.1" \
 	-v '/etc/ssl/certs/ca-certificates.crt:/etc/ssl/certs/ca-certificates.crt' \
+	-v br:/data \
 	br
+
 
