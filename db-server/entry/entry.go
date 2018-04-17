@@ -13,6 +13,7 @@ import (
 	"github.com/gasbank/laidoff/db-server/dbadmin"
 	"github.com/gasbank/laidoff/db-server/dbservice"
 	"io/ioutil"
+	"math/rand"
 )
 
 type LeaseData struct {
@@ -202,6 +203,8 @@ func Entry() {
 	log.SetFlags(log.LstdFlags | log.Lshortfile)
 	log.SetOutput(os.Stdout)
 	log.Printf("Greetings from %v service", ServiceName)
+	// Seed random generator
+	rand.Seed(time.Now().UnixNano())
 	// Create db directory to save user database
 	os.MkdirAll("db", os.ModePerm)
 	//createTestUserDb()
