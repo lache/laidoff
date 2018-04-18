@@ -32,6 +32,8 @@ const char* lwttl_http_header(const void* _ttl);
 int lwttl_track_object_id(const void* _ttl);
 void lwttl_set_track_object_id(const void* _ttl, int v);
 void lwttl_set_center(void* _ttl, float lng, float lat);
+void lwttl_set_seaarea(void* _ttl, const char* name);
+const char* lwttl_seaarea(void* _ttl);
 #ifdef __cplusplus
 }
 #endif

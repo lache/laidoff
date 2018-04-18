@@ -615,7 +615,8 @@ static void render_coords(const LWCONTEXT* pLwc, const LWTTLLNGLAT* lng_lat_cent
     SET_COLOR_RGBA_FLOAT(test_text_block.color_emp_glyph, 1, 1, 0, 1);
     SET_COLOR_RGBA_FLOAT(test_text_block.color_emp_outline, 0, 0, 0, 1);
     char coords[64];
-    sprintf(coords, "LNG %.3f LAT %.3f", lng_lat_center->lng, lng_lat_center->lat);
+    snprintf(coords, ARRAY_SIZE(coords), "LNG %.3f LAT %.3f", lng_lat_center->lng, lng_lat_center->lat);
+    coords[ARRAY_SIZE(coords) - 1] = 0;
     test_text_block.text = coords;
     test_text_block.text_bytelen = (int)strlen(test_text_block.text);
     test_text_block.begin_index = 0;
@@ -623,6 +624,26 @@ static void render_coords(const LWCONTEXT* pLwc, const LWTTLLNGLAT* lng_lat_cent
     test_text_block.multiline = 1;
     test_text_block.text_block_x = 0.0f;
     test_text_block.text_block_y = 1.0f;
+    test_text_block.align = LTBA_CENTER_TOP;
+    render_text_block(pLwc, &test_text_block);
+}
+
+static void render_region_name(const LWCONTEXT* pLwc) {
+    LWTEXTBLOCK test_text_block;
+    test_text_block.text_block_width = 999.0f;// 2.00f * aspect_ratio;
+    test_text_block.text_block_line_height = DEFAULT_TEXT_BLOCK_LINE_HEIGHT_F;
+    test_text_block.size = DEFAULT_TEXT_BLOCK_SIZE_E;
+    SET_COLOR_RGBA_FLOAT(test_text_block.color_normal_glyph, 1, 1, 1, 1);
+    SET_COLOR_RGBA_FLOAT(test_text_block.color_normal_outline, 0, 0, 0, 1);
+    SET_COLOR_RGBA_FLOAT(test_text_block.color_emp_glyph, 1, 1, 0, 1);
+    SET_COLOR_RGBA_FLOAT(test_text_block.color_emp_outline, 0, 0, 0, 1);
+    test_text_block.text = lwttl_seaarea(pLwc->ttl);
+    test_text_block.text_bytelen = (int)strlen(test_text_block.text);
+    test_text_block.begin_index = 0;
+    test_text_block.end_index = test_text_block.text_bytelen;
+    test_text_block.multiline = 1;
+    test_text_block.text_block_x = 0.0f;
+    test_text_block.text_block_y = 0.9f;
     test_text_block.align = LTBA_CENTER_TOP;
     render_text_block(pLwc, &test_text_block);
 }
@@ -701,6 +722,7 @@ void lwc_render_font_test(const LWCONTEXT* pLwc) {
         lwttl_render_all_seaports(pLwc, pLwc->ttl, worldmap);
     }
     render_coords(pLwc, &lng_lat_center);
+    render_region_name(pLwc);
     glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
     // render FBO (HTML UI)
     render_solid_box_ui_lvt_flip_y_uv(pLwc, 0, 0, 2 * pLwc->aspect_ratio, 2, pLwc->font_fbo.color_tex, LVT_CENTER_CENTER_ANCHORED_SQUARE, 1);

@@ -294,6 +294,19 @@ void udp_sea_update(LWCONTEXT* pLwc, LWUDP* udp) {
         if (decompressed_bytes > 0) {
             const int packet_type = *(int*)decompressed;
             switch (packet_type) {
+                case LPGP_LWPTTLSEAAREA:
+                {
+                    if (decompressed_bytes != sizeof(LWPTTLSEAAREA)) {
+                        LOGE("LWPTTLSEAAREA: Size error %d (%zu expected)",
+                             decompressed_bytes,
+                             sizeof(LWPTTLSEAAREA));
+                    }
+
+                    LWPTTLSEAAREA* p = (LWPTTLSEAAREA*)decompressed;
+                    LOGIx("LWPTTLSEAAREA: name=%s", p->name);
+                    lwttl_set_seaarea(pLwc->ttl, p->name);
+                    break;
+                }
                 case LPGP_LWPTTLTRACKCOORDS:
                 {
                     if (decompressed_bytes != sizeof(LWPTTLTRACKCOORDS)) {
@@ -422,6 +435,12 @@ void udp_sea_update(LWCONTEXT* pLwc, LWUDP* udp) {
                     sprintf(script, "script:local c = lo.script_context();lo.lwttl_worldmap_scroll_to(c.ttl, %f, %f, c.udp_sea)",
                             151 + 12 / 60.0f,
                             -(33 + 51 / 60.0f));
+                    htmlui_set_loop_key_value(pLwc->htmlui, "world-seaport", "script", script);
+
+                    htmlui_set_loop_key_value(pLwc->htmlui, "world-seaport", "name", "Honolulu");
+                    sprintf(script, "script:local c = lo.script_context();lo.lwttl_worldmap_scroll_to(c.ttl, %f, %f, c.udp_sea)",
+                            -(157 + 51 / 60.0f),
+                            21 + 18 / 60.0f);
                     htmlui_set_loop_key_value(pLwc->htmlui, "world-seaport", "script", script);
                     
                     break;

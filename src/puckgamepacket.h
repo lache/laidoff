@@ -22,6 +22,7 @@ typedef enum _LW_PUCK_GAME_PACKET {
     LPGP_LWPTTLSTATICSTATE = 111, // server -> client
     LPGP_LWPTTLSEAPORTSTATE = 112, // server -> client
     LPGP_LWPTTLTRACKCOORDS = 113, // server -> client
+    LPGP_LWPTTLSEAAREA = 114, // server -> client
 	// tcp
 	LPGP_LWPQUEUE2 = 200,
 	LPGP_LWPMAYBEMATCHED = 201,
@@ -306,6 +307,14 @@ typedef struct _LWPTTLTRACKCOORDS {
     float x;
     float y;
 } LWPTTLTRACKCOORDS;
+
+typedef struct _LWPTTLSEAAREA {
+    unsigned char type;
+    unsigned char padding0;
+    unsigned char padding1;
+    unsigned char padding2;
+    char name[128];
+} LWPTTLSEAAREA;
 
 // PING
 typedef struct _LWPTTLPING {

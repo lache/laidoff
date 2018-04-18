@@ -22,6 +22,7 @@ typedef struct _LWTTL {
     size_t seaport_len;
     LWTTLWORLDMAP worldmap;
     int track_object_id;
+    char seaarea[64];
 } LWTTL;
 
 void* lwttl_new(float aspect_ratio) {
@@ -114,6 +115,16 @@ void lwttl_set_center(void* _ttl, float lng, float lat) {
     LWTTL* ttl = (LWTTL*)_ttl;
     ttl->worldmap.center.lng = lng;
     ttl->worldmap.center.lat = lat;
+}
+
+void lwttl_set_seaarea(void* _ttl, const char* name) {
+    LWTTL* ttl = (LWTTL*)_ttl;
+    strcpy(ttl->seaarea, name);
+}
+
+const char* lwttl_seaarea(void* _ttl) {
+    LWTTL* ttl = (LWTTL*)_ttl;
+    return ttl->seaarea;
 }
 
 void lwttl_update(LWCONTEXT* pLwc, void* _ttl, float delta_time) {
