@@ -276,7 +276,7 @@ typedef struct _LWPTTLSTATICSTATE {
     unsigned char padding1;
     unsigned char padding2;
     int count;
-    LWPTTLSTATICOBJECT obj[200];
+    LWPTTLSTATICOBJECT obj[128];
 } LWPTTLSTATICSTATE;
 
 // UDP
