@@ -62,7 +62,7 @@ Just playing around...
 2. Set `laidoff-server` as StartUp Project
 3. Run!
 
-### Run client with localhost server ###
+### Make client connect to localhost ###
 
 1. Open `c:\laidoff\assets\conf\conf.json`
 2. Find & Replace `p.popsongremix.com` to `localhost`
