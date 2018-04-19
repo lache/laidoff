@@ -19,7 +19,7 @@ Just playing around...
 3. Clone this repository on `C:\laidoff`
 4. Open command prompt
 5. Execute: `cd c:\laidoff && mkdir build && cd build && cmake ..`
-6. Open `Project.sln` generated at `C:\laidoff\build`
+6. Open `client.sln` generated at `C:\laidoff\build`
 7. Rebuild all
 8. Set `laidoff` as StartUp Project
 9. Run!
@@ -37,3 +37,7 @@ Just playing around...
 
 0. Setup GOPATH properly
 1. Execute: `./batch-build-go-servers.sh`
+
+### Diagrams ###
+
+![matchsequence](images/Ball Rumble Match Sequence.png)
