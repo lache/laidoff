@@ -40,4 +40,4 @@ Just playing around...
 
 ### Diagrams ###
 
-![matchsequence](images/Ball Rumble Match Sequence.png)
+![matchsequence](images/matchsequence.png)
