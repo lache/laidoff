@@ -102,6 +102,7 @@ typedef struct _LWPUCKGAME LWPUCKGAME;
 typedef struct _LWUDP LWUDP;
 typedef struct _LWTCP LWTCP;
 typedef struct _LWPSCONTEXT LWPSCONTEXT;
+typedef struct _LWTTL LWTTL;
 
 typedef enum _LW_CONTROL_FLAGS {
     LCF_PUCK_GAME_RIGHT_DIR_PAD = 1 << 0,
@@ -408,7 +409,7 @@ typedef struct _LWCONTEXT {
     LWPTTLFULLSTATE ttl_full_state;
     LWPTTLSTATICSTATE ttl_static_state;
     LWPTTLSEAPORTSTATE ttl_seaport_state;
-    void* ttl;
+    LWTTL* ttl;
     LWCOUNTRYARRAY country_array;
     int country_page;
     void* remtex;

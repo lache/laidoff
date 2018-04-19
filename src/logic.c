@@ -1035,12 +1035,7 @@ static void s_logic_worker(zsock_t *pipe, void *args) {
                         &pLwc->tcp_host_addr,
                         tcp_on_connect,
                         parse_recv_packets);
-    pLwc->tcp_ttl = new_tcp(pLwc,
-                            pLwc->user_data_path,
-                            &pLwc->tcp_ttl_host_addr,
-                            tcp_ttl_on_connect,
-                            parse_recv_packets);
-
+    
     zloop_t* loop = zloop_new();
     pLwc->logic_loop = loop;
     logic_start_logic_update_job(pLwc);
@@ -1119,4 +1114,16 @@ void lw_last_page(LWCONTEXT* pLwc) {
     pLwc->country_page = (pLwc->country_array.count - 1) / 20;
     htmlui_update_country_data(pLwc, pLwc->htmlui);
     lw_htmlui_redraw_ui_fbo_async(pLwc);
+}
+
+void lw_new_tcp_ttl(LWCONTEXT* pLwc) {
+    if (pLwc->tcp_ttl == 0) {
+        pLwc->tcp_ttl = new_tcp(pLwc,
+                                pLwc->user_data_path,
+                                &pLwc->tcp_ttl_host_addr,
+                                tcp_ttl_on_connect,
+                                parse_recv_packets);
+    } else {
+        LOGEP("tcp_ttl already set!");
+    }
 }

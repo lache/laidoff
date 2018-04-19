@@ -434,14 +434,7 @@ void litehtml::text_container::link(const std::shared_ptr<litehtml::document>& d
 
 void litehtml::text_container::on_anchor_click(const litehtml::tchar_t * url, const litehtml::element::ptr & el) {
     LOGIx("on_anchor_click: %s", url);
-    if (strcmp(url, "script:go_online()") == 0) {
-        if (pLwc->tcp_ttl) {
-            tcp_request_landing_page(pLwc->tcp_ttl, pLwc->user_data_path, reinterpret_cast<LWTTL*>(pLwc->ttl));
-        } else {
-            LOGE("tcp_ttl null");
-        }
-        online = true;
-    } else if (strncmp(url, "script:", strlen("script:")) == 0) {
+    if (strncmp(url, "script:", strlen("script:")) == 0) {
         script_evaluate_async(pLwc, url + strlen("script:"), strlen(url + strlen("script:")));
     } else {
         const char* path_prefix = ASSETS_BASE_PATH "html" PATH_SEPARATOR;

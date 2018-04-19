@@ -27,6 +27,10 @@ void tcp_on_connect(LWTCP* tcp, const char* path_prefix) {
 }
 
 void tcp_request_landing_page(LWTCP* tcp, const char* path_prefix, const LWTTL* ttl) {
+    if (!tcp) {
+        LOGEP("tcp null");
+        return;
+    }
     // Transport Tycoon Lee
     char landing_page_url[512] = { 0, };
     char user_id_str[512] = { 0, };

@@ -63,19 +63,25 @@ int tcp_connect(LWTCP* tcp) {
                 connect_timeout.tv_usec = 0;
                 int select_ret = select(tcp->connect_socket + 1, NULL, &fdset, NULL, &connect_timeout);
                 if (select_ret == 0) {
-                    LOGE("TCP connect timeout");
+                    LOGE("TCP connect timeout - %s:%s",
+                         tcp->host_addr.host,
+                         tcp->host_addr.port_str);
                     closesocket(tcp->connect_socket);
                     tcp->connect_socket = INVALID_SOCKET;
                     continue;
                 }
                 if (select_ret != 1) {
-                    LOGE("TCP connect select failed");
+                    LOGE("TCP connect select failed - %s:%s",
+                         tcp->host_addr.host,
+                         tcp->host_addr.port_str);
                     closesocket(tcp->connect_socket);
                     tcp->connect_socket = INVALID_SOCKET;
                     continue;
                 }
                 if (!FD_ISSET(tcp->connect_socket, &fdset)) {
-                    LOGE("TCP connect failed!");
+                    LOGE("TCP connect failed! - %s:%s",
+                         tcp->host_addr.host,
+                         tcp->host_addr.port_str);
                     closesocket(tcp->connect_socket);
                     tcp->connect_socket = INVALID_SOCKET;
                     continue;

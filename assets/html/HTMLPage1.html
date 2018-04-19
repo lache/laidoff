@@ -248,8 +248,14 @@
 		function worldmap_scroll(dlng, dlat, dscale)
 			lo.lwttl_worldmap_scroll(c.ttl, dlng/100, dlat/100, dscale)
 		end
+		function go_online()
+			if c.tcp_ttl == nil then
+				lo.lw_new_tcp_ttl(c)
+			end
+			lo.htmlui_set_online(c.htmlui, 1)
+			lo.tcp_request_landing_page(c.tcp_ttl, c.user_data_path, c.ttl);
+		end
 		return 1234
-
 </script>
 </body>
 </html>
