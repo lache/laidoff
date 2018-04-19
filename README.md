@@ -12,6 +12,8 @@ Private toy project
 
 Just playing around...
 
+# Build HOWTO #
+
 ## Windows ##
 
 ### Build and run client ###
