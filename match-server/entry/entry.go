@@ -17,11 +17,31 @@ import (
 	"github.com/gasbank/laidoff/shared-server"
 	"github.com/gasbank/laidoff/rank-server/rankservice"
 	"sync"
+	"io"
 )
 
 const (
 	ServiceName = "match"
 )
+
+func CopyFile(fromName, toName string) {
+	from, err := os.Open(fromName)
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer from.Close()
+
+	to, err := os.OpenFile(toName, os.O_RDWR|os.O_CREATE, 0666)
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer to.Close()
+
+	_, err = io.Copy(to, from)
+	if err != nil {
+		log.Fatal(err)
+	}
+}
 
 func Entry() {
 	// Set default log format
@@ -39,7 +59,12 @@ func Entry() {
 	// Load conf.json
 	confFile, err := os.Open("conf.json")
 	if err != nil {
-		log.Fatalf("conf.json open error:%v", err.Error())
+		log.Printf("trying to create conf.json from conf.json.template...")
+		CopyFile("conf.json.template", "conf.json")
+		confFile, err = os.Open("conf.json")
+		if err != nil {
+			log.Fatalf("conf.json open error:%v", err.Error())
+		}
 	}
 	confFileDecoder := json.NewDecoder(confFile)
 	conf := config.ServerConfig{}
