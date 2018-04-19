@@ -51,3 +51,5 @@ ios/build-appstore
 /android/.idea/caches
 /*-server/*-server
 
+/br-server/*.exe
+/br-server/*.exe~
