@@ -130,6 +130,11 @@
             padding-top:3pt;
             padding-bottom:3pt;
         }
+        .track-button {
+            display: inline-block;
+            background-color:rgba(255, 0, 0, 0.5);
+            padding:3pt;
+        }
         .desc {
             text-align: left;
         }
@@ -180,10 +185,17 @@
         </div>
         <a class="touch-button" href="HTMLPage2.html">선택하기</a>
     </div>
-
 </div>
 
-
+<a class="track-button" href="script:set_track_object_id(0)">Disable Track</a>
+<a class="track-button" href="script:set_track_object_id(1)">Track ID 1</a>
+<a class="track-button" href="script:set_track_object_id(2)">Track ID 2</a>
+<a class="track-button" href="script:set_track_object_id(3)">Track ID 3</a>
+<a class="track-button" href="script:set_track_object_id(4)">Track ID 4</a>
+<a class="track-button" href="script:set_track_object_id(5)">Track ID 5</a>
+<a class="track-button" href="script:set_track_object_id(6)">Track ID 6</a>
+<a class="track-button" href="script:set_track_object_id(7)">Track ID 7</a>
+<a class="track-button" href="script:set_track_object_id(8)">Track ID 8</a>
 <!--
 <div style="text-align: center;">
     <a style="display:inline-block;background-color:rgba(255, 0, 0, 0.5);padding:5pt"
@@ -216,6 +228,12 @@
 		lo.lwc_render_font_test_enable_render('landcell_nameplate', 1)
 		function worldmap_scroll(dlng, dlat, dscale)
 			lo.lwttl_worldmap_scroll(c.ttl, dlng/100, dlat/100, dscale)
+		end
+		function set_track_object_id(id)
+			lo.lwttl_set_track_object_id(c.ttl, id)
+		end
+		function set_track_object_ship_id(ship_id)
+		    lo.lwttl_set_track_object_ship_id(c.ttl, ship_id)
 		end
 		return 1234
 </script>
