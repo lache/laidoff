@@ -442,6 +442,36 @@ void udp_sea_update(LWCONTEXT* pLwc, LWUDP* udp) {
                             -(157 + 51 / 60.0f),
                             21 + 18 / 60.0f);
                     htmlui_set_loop_key_value(pLwc->htmlui, "world-seaport", "script", script);
+
+                    htmlui_set_loop_key_value(pLwc->htmlui, "world-seaport", "name", "Seoul");
+                    sprintf(script, "script:local c = lo.script_context();lo.lwttl_worldmap_scroll_to(c.ttl, %f, %f, c.udp_sea)",
+                            126 + 56 / 60.0f,
+                            37 + 31 / 60.0f);
+                    htmlui_set_loop_key_value(pLwc->htmlui, "world-seaport", "script", script);
+
+                    htmlui_set_loop_key_value(pLwc->htmlui, "world-seaport", "name", "Civitavecchia");
+                    sprintf(script, "script:local c = lo.script_context();lo.lwttl_worldmap_scroll_to(c.ttl, %f, %f, c.udp_sea)",
+                            11 + 48 / 60.0f,
+                            42 + 6 / 60.0f);
+                    htmlui_set_loop_key_value(pLwc->htmlui, "world-seaport", "script", script);
+
+                    htmlui_set_loop_key_value(pLwc->htmlui, "world-seaport", "name", "Rome (Roma)");
+                    sprintf(script, "script:local c = lo.script_context();lo.lwttl_worldmap_scroll_to(c.ttl, %f, %f, c.udp_sea)",
+                            12 + 29 / 60.0f,
+                            41 + 54 / 60.0f);
+                    htmlui_set_loop_key_value(pLwc->htmlui, "world-seaport", "script", script);
+
+                    htmlui_set_loop_key_value(pLwc->htmlui, "world-seaport", "name", "Sunderland");
+                    sprintf(script, "script:local c = lo.script_context();lo.lwttl_worldmap_scroll_to(c.ttl, %f, %f, c.udp_sea)",
+                            -(1 + 23 / 60.0f),
+                            54 + 54 / 60.0f);
+                    htmlui_set_loop_key_value(pLwc->htmlui, "world-seaport", "script", script);
+
+                    htmlui_set_loop_key_value(pLwc->htmlui, "world-seaport", "name", "Dokdo");
+                    sprintf(script, "script:local c = lo.script_context();lo.lwttl_worldmap_scroll_to(c.ttl, %f, %f, c.udp_sea)",
+                            131 + 51 / 60.0f,
+                            37 + 14 / 60.0f);
+                    htmlui_set_loop_key_value(pLwc->htmlui, "world-seaport", "script", script);
                     
                     break;
                 }
