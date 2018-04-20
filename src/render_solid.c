@@ -179,6 +179,46 @@ void render_solid_vb_ui_uv_shader_rot(const LWCONTEXT* pLwc,
                                       const float* uv_scale,
                                       int shader_index,
                                       float rot) {
+    mat4x4 identity_view;
+    mat4x4_identity(identity_view);
+    render_solid_vb_ui_uv_shader_rot_view_proj(pLwc,
+                                               x,
+                                               y,
+                                               w,
+                                               h,
+                                               tex_index,
+                                               lvt,
+                                               alpha_multiplier,
+                                               over_r,
+                                               over_g,
+                                               over_b,
+                                               oratio,
+                                               uv_offset,
+                                               uv_scale,
+                                               shader_index,
+                                               rot,
+                                               identity_view,
+                                               pLwc->proj);
+}
+
+void render_solid_vb_ui_uv_shader_rot_view_proj(const LWCONTEXT* pLwc,
+                                                float x,
+                                                float y,
+                                                float w,
+                                                float h,
+                                                GLuint tex_index,
+                                                enum _LW_VBO_TYPE lvt,
+                                                float alpha_multiplier,
+                                                float over_r,
+                                                float over_g,
+                                                float over_b,
+                                                float oratio,
+                                                const float* uv_offset,
+                                                const float* uv_scale,
+                                                int shader_index,
+                                                float rot,
+                                                const mat4x4 view,
+                                                const mat4x4 proj) {
     lazy_glUseProgram(pLwc, shader_index);
     glUniform2fv(pLwc->shader[shader_index].vuvoffset_location, 1, uv_offset);
     glUniform2fv(pLwc->shader[shader_index].vuvscale_location, 1, uv_scale);
@@ -194,7 +234,6 @@ void render_solid_vb_ui_uv_shader_rot(const LWCONTEXT* pLwc,
 
     mat4x4 model_translate;
     mat4x4 model;
-    mat4x4 identity_view; mat4x4_identity(identity_view);
     mat4x4 view_model;
     mat4x4 proj_view_model;
     mat4x4 model_scale;
@@ -206,9 +245,9 @@ void render_solid_vb_ui_uv_shader_rot(const LWCONTEXT* pLwc,
     mat4x4_translate(model_translate, x, y, 0);
     mat4x4_identity(model);
     mat4x4_mul(model, model_translate, model_scale_rotate);
-    mat4x4_mul(view_model, identity_view, model);
+    mat4x4_mul(view_model, view, model);
     mat4x4_identity(proj_view_model);
-    mat4x4_mul(proj_view_model, pLwc->proj, view_model);
+    mat4x4_mul(proj_view_model, proj, view_model);
 
     lazy_glBindBuffer(pLwc, lvt);
     bind_all_vertex_attrib(pLwc, lvt);

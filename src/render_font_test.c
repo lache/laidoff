@@ -12,6 +12,10 @@
 #include "lwlog.h"
 #include "lwlnglat.h"
 
+#define WATER_COLOR_R (0 / 255.f)
+#define WATER_COLOR_G (94 / 255.f)
+#define WATER_COLOR_B (190 / 255.f)
+
 void lwc_render_font_test_fbo_body(const LWCONTEXT* pLwc, const char* html_body) {
     glBindFramebuffer(GL_FRAMEBUFFER, pLwc->font_fbo.fbo);
     glDisable(GL_DEPTH_TEST);
@@ -463,6 +467,33 @@ static void render_sea_static_objects(const LWCONTEXT* pLwc,
     const float lng_max = center->lng + half_extent_in_deg;
     const float lat_min = center->lat - half_extent_in_deg;
     const float lat_max = center->lat + half_extent_in_deg;
+
+    float cell_x0 = lng_to_render_coords(lng_min, center);
+    float cell_y0 = lat_to_render_coords(lat_max, center);
+    float cell_x1 = lng_to_render_coords(lng_max, center);
+    float cell_y1 = lat_to_render_coords(lat_min, center);
+    float cell_w = cell_x1 - cell_x0;
+    float cell_h = cell_y0 - cell_y1;
+
+    render_solid_vb_ui_uv_shader_rot_view_proj(pLwc,
+                                               0,
+                                               0,
+                                               cell_w,
+                                               cell_h,
+                                               0,
+                                               LVT_CENTER_CENTER_ANCHORED_SQUARE,
+                                               1.0f,
+                                               WATER_COLOR_R,
+                                               WATER_COLOR_G,
+                                               WATER_COLOR_B,
+                                               1.0f,
+                                               default_uv_offset,
+                                               default_uv_scale,
+                                               LWST_DEFAULT,
+                                               0,
+                                               view,
+                                               proj);
+
     // land
     for (int i = 0; i < pLwc->ttl_static_state.count; i++) {
         float lng0 = LWCLAMP(cell_x_to_lng(pLwc->ttl_static_state.obj[i].x0), lng_min, lng_max);
@@ -655,8 +686,7 @@ static void render_region_name(const LWCONTEXT* pLwc) {
 
 void lwc_render_font_test(const LWCONTEXT* pLwc) {
     LW_GL_VIEWPORT();
-    glClearColor(0 / 255.f, 94 / 255.f, 190 / 255.f, 1);//lw_clear_color();
-    //glClearColor(1, 1, 1, 1);
+    lw_clear_color();
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     float ship_y = 0.0f;//+(float)pLwc->app_time;
