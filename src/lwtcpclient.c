@@ -276,9 +276,24 @@ void refresh_body(LWTCP* tcp, void* htmlui, const char* html_response) {
     LOGI("HTTP Packet Body: %zd bytes", strlen(body));
     memset(tcp->html_body, 0, sizeof(tcp->html_body));
     strcpy(tcp->html_body, body);
-    htmlui_set_refresh_html_body(htmlui, 1);
-    // overlapping prevent down
-    tcp->html_wait = 0;
+    if (strncmp(html_response + strlen("HTTP/1.1 "), "302", 3) == 0) {
+        // Redirect to location specified by server
+        const char* location_begin = strstr(html_response, "\r\nLocation: ") + strlen("\r\nLocation: ");
+        const char* location_end = strstr(location_begin, "\r\n");
+        char location[512];
+        size_t copy_len = LWMIN(location_end - location_begin, ARRAY_SIZE(location) - 1);
+        strncpy(location, location_begin, copy_len);
+        location[copy_len] = 0;
+        // overlapping prevent down
+        tcp->html_wait = 0;
+        // start a new request
+        tcp_send_httpget(tcp, location, lwttl_http_header(tcp->pLwc->ttl));
+    } else {
+        // Plain GET reply
+        htmlui_set_refresh_html_body(htmlui, 1);
+        // overlapping prevent down
+        tcp->html_wait = 0;
+    }
 }
 
 int append_and_refresh_body(LWTCP* tcp, void* htmlui, char* cursor) {
