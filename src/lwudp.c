@@ -316,10 +316,15 @@ void udp_sea_update(LWCONTEXT* pLwc, LWUDP* udp) {
                     }
 
                     LWPTTLTRACKCOORDS* p = (LWPTTLTRACKCOORDS*)decompressed;
-                    LOGIx("LWPTTLTRACKCOORDS: id=%d x=%f y=%f", p->id, p->x, p->y);
-                    const float lng = cell_fx_to_lng(p->x);
-                    const float lat = cell_fy_to_lat(p->y);
-                    lwttl_set_center(pLwc->ttl, lng, lat);
+                    if (p->id) {
+                        LOGIx("LWPTTLTRACKCOORDS: id=%d x=%f y=%f", p->id, p->x, p->y);
+                        const float lng = cell_fx_to_lng(p->x);
+                        const float lat = cell_fy_to_lat(p->y);
+                        lwttl_set_center(pLwc->ttl, lng, lat);
+                    } else {
+                        lwttl_set_track_object_id(pLwc->ttl, 0);
+                        lwttl_set_track_object_ship_id(pLwc->ttl, 0);
+                    }
                     break;
                 }
                 case LPGP_LWPTTLFULLSTATE:
@@ -497,5 +502,6 @@ void udp_send_ttlping(LWUDP* udp, void* ttl, int ping_seq) {
     ttl_ping.ex = LNGLAT_SEA_PING_EXTENT_IN_CELL_PIXELS;
     ttl_ping.ping_seq = ping_seq;
     ttl_ping.track_object_id = lwttl_track_object_id(ttl);
+    ttl_ping.track_object_ship_id = lwttl_track_object_ship_id(ttl);
     udp_send(udp, (const char*)&ttl_ping, sizeof(LWPTTLPING));
 }

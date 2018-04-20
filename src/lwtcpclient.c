@@ -46,7 +46,7 @@ void tcp_request_landing_page(LWTCP* tcp, const char* path_prefix, const LWTTL* 
     } else {
         read_file_string(tcp->pLwc->user_data_path, "ttl-user-id.dat", sizeof(user_id_str), user_id_str);
     }
-    sprintf(landing_page_url, "/?u=%s", user_id_str);
+    sprintf(landing_page_url, "/idle?u=%s", user_id_str);
     tcp_send_httpget(tcp, landing_page_url, lwttl_http_header(ttl));
 }
 

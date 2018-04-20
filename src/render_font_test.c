@@ -421,8 +421,13 @@ static void render_sea_objects_nameplate(const LWCONTEXT* pLwc, const mat4x4 vie
         SET_COLOR_RGBA_FLOAT(test_text_block.color_normal_outline, 0, 0, 0, 1);
         SET_COLOR_RGBA_FLOAT(test_text_block.color_emp_glyph, 1, 1, 0, 1);
         SET_COLOR_RGBA_FLOAT(test_text_block.color_emp_outline, 0, 0, 0, 1);
-        char obj_nameplate[64];
-        sprintf(obj_nameplate, "%d(%s) %.2f left", pLwc->ttl_full_state.obj[i].id, pLwc->ttl_full_state.obj[i].guid, pLwc->ttl_full_state.obj[i].route_left);
+        char obj_nameplate[256];
+        sprintf(obj_nameplate,
+                "[%d][%d](%s) %.2f left",
+                pLwc->ttl_full_state.obj[i].id,
+                pLwc->ttl_full_state.obj[i].type,
+                pLwc->ttl_full_state.obj[i].guid,
+                pLwc->ttl_full_state.obj[i].route_left);
         test_text_block.text = obj_nameplate;
         test_text_block.text_bytelen = (int)strlen(test_text_block.text);
         test_text_block.begin_index = 0;

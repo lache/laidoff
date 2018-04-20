@@ -77265,6 +77265,56 @@ fail:
 }
 
 
+static int _wrap_LWPTTLFULLSTATEOBJECT_type_set(lua_State* L) {
+  int SWIG_arg = 0;
+  struct _LWPTTLFULLSTATEOBJECT *arg1 = (struct _LWPTTLFULLSTATEOBJECT *) 0 ;
+  int arg2 ;
+  
+  SWIG_check_num_args("_LWPTTLFULLSTATEOBJECT::type",2,2)
+  if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("_LWPTTLFULLSTATEOBJECT::type",1,"struct _LWPTTLFULLSTATEOBJECT *");
+  if(!lua_isnumber(L,2)) SWIG_fail_arg("_LWPTTLFULLSTATEOBJECT::type",2,"int");
+  
+  if (!SWIG_IsOK(SWIG_ConvertPtr(L,1,(void**)&arg1,SWIGTYPE_p__LWPTTLFULLSTATEOBJECT,0))){
+    SWIG_fail_ptr("LWPTTLFULLSTATEOBJECT_type_set",1,SWIGTYPE_p__LWPTTLFULLSTATEOBJECT);
+  }
+  
+  arg2 = (int)lua_tonumber(L, 2);
+  if (arg1) (arg1)->type = arg2;
+  
+  return SWIG_arg;
+  
+  if(0) SWIG_fail;
+  
+fail:
+  lua_error(L);
+  return SWIG_arg;
+}
+
+
+static int _wrap_LWPTTLFULLSTATEOBJECT_type_get(lua_State* L) {
+  int SWIG_arg = 0;
+  struct _LWPTTLFULLSTATEOBJECT *arg1 = (struct _LWPTTLFULLSTATEOBJECT *) 0 ;
+  int result;
+  
+  SWIG_check_num_args("_LWPTTLFULLSTATEOBJECT::type",1,1)
+  if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("_LWPTTLFULLSTATEOBJECT::type",1,"struct _LWPTTLFULLSTATEOBJECT *");
+  
+  if (!SWIG_IsOK(SWIG_ConvertPtr(L,1,(void**)&arg1,SWIGTYPE_p__LWPTTLFULLSTATEOBJECT,0))){
+    SWIG_fail_ptr("LWPTTLFULLSTATEOBJECT_type_get",1,SWIGTYPE_p__LWPTTLFULLSTATEOBJECT);
+  }
+  
+  result = (int) ((arg1)->type);
+  lua_pushnumber(L, (lua_Number) result); SWIG_arg++;
+  return SWIG_arg;
+  
+  if(0) SWIG_fail;
+  
+fail:
+  lua_error(L);
+  return SWIG_arg;
+}
+
+
 static int _wrap_LWPTTLFULLSTATEOBJECT_guid_set(lua_State* L) {
   int SWIG_arg = 0;
   struct _LWPTTLFULLSTATEOBJECT *arg1 = (struct _LWPTTLFULLSTATEOBJECT *) 0 ;
@@ -77409,6 +77459,7 @@ static swig_lua_attribute swig_LWPTTLFULLSTATEOBJECT_attributes[] = {
     { "vx", _wrap_LWPTTLFULLSTATEOBJECT_vx_get, _wrap_LWPTTLFULLSTATEOBJECT_vx_set },
     { "vy", _wrap_LWPTTLFULLSTATEOBJECT_vy_get, _wrap_LWPTTLFULLSTATEOBJECT_vy_set },
     { "id", _wrap_LWPTTLFULLSTATEOBJECT_id_get, _wrap_LWPTTLFULLSTATEOBJECT_id_set },
+    { "type", _wrap_LWPTTLFULLSTATEOBJECT_type_get, _wrap_LWPTTLFULLSTATEOBJECT_type_set },
     { "guid", _wrap_LWPTTLFULLSTATEOBJECT_guid_get, _wrap_LWPTTLFULLSTATEOBJECT_guid_set },
     { "route_left", _wrap_LWPTTLFULLSTATEOBJECT_route_left_get, _wrap_LWPTTLFULLSTATEOBJECT_route_left_set },
     {0,0,0}
@@ -80292,6 +80343,56 @@ fail:
 }
 
 
+static int _wrap_LWPTTLPING_track_object_ship_id_set(lua_State* L) {
+  int SWIG_arg = 0;
+  struct _LWPTTLPING *arg1 = (struct _LWPTTLPING *) 0 ;
+  int arg2 ;
+  
+  SWIG_check_num_args("_LWPTTLPING::track_object_ship_id",2,2)
+  if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("_LWPTTLPING::track_object_ship_id",1,"struct _LWPTTLPING *");
+  if(!lua_isnumber(L,2)) SWIG_fail_arg("_LWPTTLPING::track_object_ship_id",2,"int");
+  
+  if (!SWIG_IsOK(SWIG_ConvertPtr(L,1,(void**)&arg1,SWIGTYPE_p__LWPTTLPING,0))){
+    SWIG_fail_ptr("LWPTTLPING_track_object_ship_id_set",1,SWIGTYPE_p__LWPTTLPING);
+  }
+  
+  arg2 = (int)lua_tonumber(L, 2);
+  if (arg1) (arg1)->track_object_ship_id = arg2;
+  
+  return SWIG_arg;
+  
+  if(0) SWIG_fail;
+  
+fail:
+  lua_error(L);
+  return SWIG_arg;
+}
+
+
+static int _wrap_LWPTTLPING_track_object_ship_id_get(lua_State* L) {
+  int SWIG_arg = 0;
+  struct _LWPTTLPING *arg1 = (struct _LWPTTLPING *) 0 ;
+  int result;
+  
+  SWIG_check_num_args("_LWPTTLPING::track_object_ship_id",1,1)
+  if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("_LWPTTLPING::track_object_ship_id",1,"struct _LWPTTLPING *");
+  
+  if (!SWIG_IsOK(SWIG_ConvertPtr(L,1,(void**)&arg1,SWIGTYPE_p__LWPTTLPING,0))){
+    SWIG_fail_ptr("LWPTTLPING_track_object_ship_id_get",1,SWIGTYPE_p__LWPTTLPING);
+  }
+  
+  result = (int) ((arg1)->track_object_ship_id);
+  lua_pushnumber(L, (lua_Number) result); SWIG_arg++;
+  return SWIG_arg;
+  
+  if(0) SWIG_fail;
+  
+fail:
+  lua_error(L);
+  return SWIG_arg;
+}
+
+
 static int _wrap_new_LWPTTLPING(lua_State* L) {
   int SWIG_arg = 0;
   struct _LWPTTLPING *result = 0 ;
@@ -80331,6 +80432,7 @@ static swig_lua_attribute swig_LWPTTLPING_attributes[] = {
     { "ex", _wrap_LWPTTLPING_ex_get, _wrap_LWPTTLPING_ex_set },
     { "ping_seq", _wrap_LWPTTLPING_ping_seq_get, _wrap_LWPTTLPING_ping_seq_set },
     { "track_object_id", _wrap_LWPTTLPING_track_object_id_get, _wrap_LWPTTLPING_track_object_id_set },
+    { "track_object_ship_id", _wrap_LWPTTLPING_track_object_ship_id_get, _wrap_LWPTTLPING_track_object_ship_id_set },
     {0,0,0}
 };
 static swig_lua_method swig_LWPTTLPING_methods[]= {
@@ -91786,6 +91888,48 @@ fail:
 }
 
 
+static int _wrap_lwttl_track_object_ship_id(lua_State* L) {
+  int SWIG_arg = 0;
+  void *arg1 = (void *) 0 ;
+  int result;
+  
+  SWIG_check_num_args("lwttl_track_object_ship_id",1,1)
+  if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("lwttl_track_object_ship_id",1,"void const *");
+  arg1=(void *)SWIG_MustGetPtr(L,1,0,0,1,"lwttl_track_object_ship_id");
+  result = (int)lwttl_track_object_ship_id((void const *)arg1);
+  lua_pushnumber(L, (lua_Number) result); SWIG_arg++;
+  return SWIG_arg;
+  
+  if(0) SWIG_fail;
+  
+fail:
+  lua_error(L);
+  return SWIG_arg;
+}
+
+
+static int _wrap_lwttl_set_track_object_ship_id(lua_State* L) {
+  int SWIG_arg = 0;
+  void *arg1 = (void *) 0 ;
+  int arg2 ;
+  
+  SWIG_check_num_args("lwttl_set_track_object_ship_id",2,2)
+  if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("lwttl_set_track_object_ship_id",1,"void const *");
+  if(!lua_isnumber(L,2)) SWIG_fail_arg("lwttl_set_track_object_ship_id",2,"int");
+  arg1=(void *)SWIG_MustGetPtr(L,1,0,0,1,"lwttl_set_track_object_ship_id");
+  arg2 = (int)lua_tonumber(L, 2);
+  lwttl_set_track_object_ship_id((void const *)arg1,arg2);
+  
+  return SWIG_arg;
+  
+  if(0) SWIG_fail;
+  
+fail:
+  lua_error(L);
+  return SWIG_arg;
+}
+
+
 static int _wrap_lwttl_set_center(lua_State* L) {
   int SWIG_arg = 0;
   void *arg1 = (void *) 0 ;
@@ -93558,6 +93702,8 @@ static swig_lua_method swig_SwigModule_methods[]= {
     { "lwttl_http_header", _wrap_lwttl_http_header},
     { "lwttl_track_object_id", _wrap_lwttl_track_object_id},
     { "lwttl_set_track_object_id", _wrap_lwttl_set_track_object_id},
+    { "lwttl_track_object_ship_id", _wrap_lwttl_track_object_ship_id},
+    { "lwttl_set_track_object_ship_id", _wrap_lwttl_set_track_object_ship_id},
     { "lwttl_set_center", _wrap_lwttl_set_center},
     { "lwttl_set_seaarea", _wrap_lwttl_set_seaarea},
     { "lwttl_seaarea", _wrap_lwttl_seaarea},

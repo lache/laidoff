@@ -22,6 +22,7 @@ typedef struct _LWTTL {
     size_t seaport_len;
     LWTTLWORLDMAP worldmap;
     int track_object_id;
+    int track_object_ship_id;
     char seaarea[64];
 } LWTTL;
 
@@ -30,8 +31,8 @@ void* lwttl_new(float aspect_ratio) {
     ttl->worldmap.render_org_x = 0;
     ttl->worldmap.render_org_y = -(2.0f - aspect_ratio) / 2;
     // Ulsan
-    ttl->worldmap.center.lat = 35.4739403188175f;
-    ttl->worldmap.center.lng = 129.393312911405f;
+    ttl->worldmap.center.lng = 129.436f;
+    ttl->worldmap.center.lat = 35.494f;
     ttl->worldmap.zoom_scale = 5.0f;
     size_t seaports_dat_size;
     ttl->seaport = (LWTTLDATA_SEAPORT*)create_binary_from_file(ASSETS_BASE_PATH "ttldata" PATH_SEPARATOR "seaports.dat", &seaports_dat_size);
@@ -163,4 +164,14 @@ int lwttl_track_object_id(const void* _ttl) {
 void lwttl_set_track_object_id(const void* _ttl, int v) {
     LWTTL* ttl = (LWTTL*)_ttl;
     ttl->track_object_id = v;
+}
+
+int lwttl_track_object_ship_id(const void* _ttl) {
+    LWTTL* ttl = (LWTTL*)_ttl;
+    return ttl->track_object_ship_id;
+}
+
+void lwttl_set_track_object_ship_id(const void* _ttl, int v) {
+    LWTTL* ttl = (LWTTL*)_ttl;
+    ttl->track_object_ship_id = v;
 }

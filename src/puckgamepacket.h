@@ -248,6 +248,7 @@ typedef struct _LWPTTLFULLSTATEOBJECT {
     float x1, y1;
     float vx, vy;
     int id;
+    int type;
     char guid[64];
     float route_left;
 } LWPTTLFULLSTATEOBJECT;
@@ -325,6 +326,7 @@ typedef struct _LWPTTLPING {
     float xc, yc, ex; // x center, y center, extent
     int ping_seq;
     int track_object_id;
+    int track_object_ship_id;
 } LWPTTLPING;
 
 // should be 4-byte aligned...
