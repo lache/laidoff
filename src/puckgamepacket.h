@@ -287,10 +287,10 @@ typedef struct _LWPTTLSTATICSTATE {
 
 // UDP
 typedef struct _LWPTTLSTATICOBJECT2 {
-    char x0;
-    char y0;
-    char x1;
-    char y1;
+    signed char x0;
+	signed char y0;
+	signed char x1;
+	signed char y1;
 } LWPTTLSTATICOBJECT2;
 
 // UDP
