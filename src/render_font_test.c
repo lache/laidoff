@@ -468,45 +468,52 @@ static void render_sea_static_objects(const LWCONTEXT* pLwc,
     const float lat_min = center->lat - half_extent_in_deg;
     const float lat_max = center->lat + half_extent_in_deg;
 
-    float cell_x0 = lng_to_render_coords(lng_min, center);
-    float cell_y0 = lat_to_render_coords(lat_max, center);
-    float cell_x1 = lng_to_render_coords(lng_max, center);
-    float cell_y1 = lat_to_render_coords(lat_min, center);
-    float cell_w = cell_x1 - cell_x0;
-    float cell_h = cell_y0 - cell_y1;
-
-    render_solid_vb_ui_uv_shader_rot_view_proj(pLwc,
-                                               0,
-                                               0,
-                                               cell_w,
-                                               cell_h,
-                                               0,
-                                               LVT_CENTER_CENTER_ANCHORED_SQUARE,
-                                               1.0f,
-                                               WATER_COLOR_R,
-                                               WATER_COLOR_G,
-                                               WATER_COLOR_B,
-                                               1.0f,
-                                               default_uv_offset,
-                                               default_uv_scale,
-                                               LWST_DEFAULT,
-                                               0,
-                                               view,
-                                               proj);
+    // background sea water
+    {
+        const float cell_x0 = lng_to_render_coords(lng_min, center);
+        const float cell_y0 = lat_to_render_coords(lat_max, center);
+        const float cell_x1 = lng_to_render_coords(lng_max, center);
+        const float cell_y1 = lat_to_render_coords(lat_min, center);
+        const float cell_w = cell_x1 - cell_x0;
+        const float cell_h = cell_y0 - cell_y1;
+        render_solid_vb_ui_uv_shader_rot_view_proj(pLwc,
+                                                   0,
+                                                   0,
+                                                   cell_w,
+                                                   cell_h,
+                                                   0,
+                                                   LVT_CENTER_CENTER_ANCHORED_SQUARE,
+                                                   1.0f,
+                                                   WATER_COLOR_R,
+                                                   WATER_COLOR_G,
+                                                   WATER_COLOR_B,
+                                                   1.0f,
+                                                   default_uv_offset,
+                                                   default_uv_scale,
+                                                   LWST_DEFAULT,
+                                                   0,
+                                                   view,
+                                                   proj);
+    }
 
     // land
     for (int i = 0; i < pLwc->ttl_static_state.count; i++) {
-        float lng0 = LWCLAMP(cell_x_to_lng(pLwc->ttl_static_state.obj[i].x0), lng_min, lng_max);
-        float lat0 = LWCLAMP(cell_y_to_lat(pLwc->ttl_static_state.obj[i].y0), lat_min, lat_max);
-        float lng1 = LWCLAMP(cell_x_to_lng(pLwc->ttl_static_state.obj[i].x1), lng_min, lng_max);
-        float lat1 = LWCLAMP(cell_y_to_lat(pLwc->ttl_static_state.obj[i].y1), lat_min, lat_max);
+        const float lng0_not_clamped = cell_x_to_lng(pLwc->ttl_static_state.obj[i].x0);
+        const float lat0_not_clamped = cell_y_to_lat(pLwc->ttl_static_state.obj[i].y0);
+        const float lng1_not_clamped = cell_x_to_lng(pLwc->ttl_static_state.obj[i].x1);
+        const float lat1_not_clamped = cell_y_to_lat(pLwc->ttl_static_state.obj[i].y1);
 
-        float cell_x0 = lng_to_render_coords(lng0, center);
-        float cell_y0 = lat_to_render_coords(lat0, center);
-        float cell_x1 = lng_to_render_coords(lng1, center);
-        float cell_y1 = lat_to_render_coords(lat1, center);
-        float cell_w = cell_x1 - cell_x0;
-        float cell_h = cell_y0 - cell_y1; // cell_y0 and cell_y1 are in OpenGL rendering coordinates (always cell_y0 > cell_y1)
+        const float lng0 = LWCLAMP(lng0_not_clamped, lng_min, lng_max);
+        const float lat0 = LWCLAMP(lat0_not_clamped, lat_min, lat_max);
+        const float lng1 = LWCLAMP(lng1_not_clamped, lng_min, lng_max);
+        const float lat1 = LWCLAMP(lat1_not_clamped, lat_min, lat_max);
+
+        const float cell_x0 = lng_to_render_coords(lng0, center);
+        const float cell_y0 = lat_to_render_coords(lat0, center);
+        const float cell_x1 = lng_to_render_coords(lng1, center);
+        const float cell_y1 = lat_to_render_coords(lat1, center);
+        const float cell_w = cell_x1 - cell_x0;
+        const float cell_h = cell_y0 - cell_y1; // cell_y0 and cell_y1 are in OpenGL rendering coordinates (always cell_y0 > cell_y1)
         // skip degenerated cell
         if (cell_w <= 0 || cell_h <= 0) {
             continue;
