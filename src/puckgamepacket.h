@@ -23,6 +23,7 @@ typedef enum _LW_PUCK_GAME_PACKET {
     LPGP_LWPTTLSEAPORTSTATE = 112, // server -> client
     LPGP_LWPTTLTRACKCOORDS = 113, // server -> client
     LPGP_LWPTTLSEAAREA = 114, // server -> client
+    LPGP_LWPTTLSTATICSTATE2 = 115, // server -> client
 	// tcp
 	LPGP_LWPQUEUE2 = 200,
 	LPGP_LWPMAYBEMATCHED = 201,
@@ -242,6 +243,9 @@ typedef struct _LWPSTATE2 {
     LWPSTATEBITFIELD bf; // bitfield
 } LWPSTATE2;
 
+/*
+ * BEGIN: should sync with packet.h in sea-server
+ */
 // UDP
 typedef struct _LWPTTLFULLSTATEOBJECT {
     float x0, y0;
@@ -278,8 +282,28 @@ typedef struct _LWPTTLSTATICSTATE {
     unsigned char padding1;
     unsigned char padding2;
     int count;
-    LWPTTLSTATICOBJECT obj[128];
+    LWPTTLSTATICOBJECT obj[256];
 } LWPTTLSTATICSTATE;
+
+// UDP
+typedef struct _LWPTTLSTATICOBJECT2 {
+    char x0;
+    char y0;
+    char x1;
+    char y1;
+} LWPTTLSTATICOBJECT2;
+
+// UDP
+typedef struct _LWPTTLSTATICSTATE2 {
+    unsigned char type;
+    unsigned char padding0;
+    unsigned char padding1;
+    unsigned char padding2;
+    int xc0;
+    int yc0;
+    int count;
+    LWPTTLSTATICOBJECT2 obj[256];
+} LWPTTLSTATICSTATE2;
 
 // UDP
 typedef struct _LWPTTLSEAPORTOBJECT {
@@ -309,6 +333,7 @@ typedef struct _LWPTTLTRACKCOORDS {
     float y;
 } LWPTTLTRACKCOORDS;
 
+// UDP
 typedef struct _LWPTTLSEAAREA {
     unsigned char type;
     unsigned char padding0;
@@ -323,11 +348,14 @@ typedef struct _LWPTTLPING {
     unsigned char padding0;
     unsigned char padding1;
     unsigned char padding2;
-    float xc, yc, ex; // x center, y center, extent
+    float lng, lat, ex; // x center, y center, extent
     int ping_seq;
     int track_object_id;
     int track_object_ship_id;
 } LWPTTLPING;
+/*
+* END: should sync with packet.h in sea-server
+*/
 
 // should be 4-byte aligned...
 // (Cgo compatibility issue)

@@ -240,6 +240,18 @@ int lw_udp_port(const LWCONTEXT* pLwc) {
     return pLwc->udp_host_addr.port;
 }
 
+static void convert_ttl_static_state2_to_1(const LWPTTLSTATICSTATE2* s2, LWPTTLSTATICSTATE* s) {
+    memset(s, 0, sizeof(LWPTTLSTATICSTATE));
+    s->count = s2->count;
+    s->type = LPGP_LWPTTLSTATICSTATE;
+    for (int i = 0; i < s2->count; i++) {
+        s->obj[i].x0 = s2->xc0 + s2->obj[i].x0;
+        s->obj[i].y0 = s2->yc0 + s2->obj[i].y0;
+        s->obj[i].x1 = s2->xc0 + s2->obj[i].x1;
+        s->obj[i].y1 = s2->yc0 + s2->obj[i].y1;
+    }
+}
+
 void udp_sea_update(LWCONTEXT* pLwc, LWUDP* udp) {
     if (pLwc->game_scene != LGS_FONT_TEST) {
         return;
@@ -351,6 +363,21 @@ void udp_sea_update(LWCONTEXT* pLwc, LWUDP* udp) {
                     LWPTTLSTATICSTATE* p = (LWPTTLSTATICSTATE*)decompressed;
                     LOGIx("LWPTTLSTATICSTATE: %d objects.", p->count);
                     memcpy(&pLwc->ttl_static_state, p, sizeof(LWPTTLSTATICSTATE));
+                    break;
+                }
+                case LPGP_LWPTTLSTATICSTATE2:
+                {
+                    if (decompressed_bytes != sizeof(LWPTTLSTATICSTATE2)) {
+                        LOGE("LWPTTLSTATICSTATE2: Size error %d (%zu expected)",
+                             decompressed_bytes,
+                             sizeof(LWPTTLSTATICSTATE2));
+                    }
+
+                    LWPTTLSTATICSTATE2* p = (LWPTTLSTATICSTATE2*)decompressed;
+                    LOGIx("LWPTTLSTATICSTATE2: %d objects.", p->count);
+                    LWPTTLSTATICSTATE pp;
+                    convert_ttl_static_state2_to_1(p, &pp);
+                    memcpy(&pLwc->ttl_static_state, &pp, sizeof(LWPTTLSTATICSTATE));
                     break;
                 }
                 case LPGP_LWPTTLSEAPORTSTATE:
@@ -497,8 +524,8 @@ void udp_send_ttlping(LWUDP* udp, void* ttl, int ping_seq) {
     memset(&ttl_ping, 0, sizeof(LWPTTLPING));
     const LWTTLLNGLAT* center = lwttl_center(ttl);
     ttl_ping.type = LPGP_LWPTTLPING;
-    ttl_ping.xc = center->lng;
-    ttl_ping.yc = center->lat;
+    ttl_ping.lng = center->lng;
+    ttl_ping.lat = center->lat;
     ttl_ping.ex = LNGLAT_SEA_PING_EXTENT_IN_CELL_PIXELS;
     ttl_ping.ping_seq = ping_seq;
     ttl_ping.track_object_id = lwttl_track_object_id(ttl);
