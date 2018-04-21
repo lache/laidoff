@@ -255,6 +255,12 @@
 			lo.htmlui_set_online(c.htmlui, 1)
 			lo.tcp_request_landing_page(c.tcp_ttl, c.user_data_path, c.ttl);
 		end
+		function set_track_object_id(id)
+			lo.lwttl_set_track_object_id(c.ttl, id)
+		end
+		function set_track_object_ship_id(ship_id)
+		    lo.lwttl_set_track_object_ship_id(c.ttl, ship_id)
+		end
 		return 1234
 </script>
 </body>
