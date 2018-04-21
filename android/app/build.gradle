@@ -12,7 +12,7 @@ keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
 
 def versionProperties = new Properties()
 
-versionProperties['versionCode'] = "1072"
+versionProperties['versionCode'] = "1078"
 versionProperties['versionName'] = "0.1.0"
 
 if (project.hasProperty('versionName')) {
