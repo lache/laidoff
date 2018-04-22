@@ -503,6 +503,7 @@ static void render_sea_static_objects(const LWCONTEXT* pLwc,
     // land
     const int xc0 = lwttl_xc0(pLwc->ttl);
     const int yc0 = lwttl_yc0(pLwc->ttl);
+    //lwttl_lock_rendering_mutex(pLwc->ttl);
     for (int i = 0; i < pLwc->ttl_static_state.count; i++) {
         const float lng0_not_clamped = cell_x_to_lng(xc0 + (pLwc->ttl_static_state.obj[i].x0 - xc0) * view_scale);
         const float lat0_not_clamped = cell_y_to_lat(yc0 + (pLwc->ttl_static_state.obj[i].y0 - yc0) * view_scale);
@@ -533,6 +534,7 @@ static void render_sea_static_objects(const LWCONTEXT* pLwc,
                          cell_w,
                          cell_h);
     }
+    //lwttl_unlock_rendering_mutex(pLwc->ttl);
     // seaport
     const float cell_scale = 360.0f / LNGLAT_RES_WIDTH;
     for (int i = 0; i < pLwc->ttl_seaport_state.count; i++) {

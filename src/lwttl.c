@@ -10,6 +10,7 @@
 #include "lwudp.h"
 #include "lwlnglat.h"
 #include "lwlog.h"
+#include "lwmutex.h"
 
 typedef struct _LWTTLDATA_SEAPORT {
     char locode[8];
@@ -28,6 +29,7 @@ typedef struct _LWTTL {
     int view_scale;
     int xc0;
     int yc0;
+    LWMUTEX rendering_mutex;
 } LWTTL;
 
 void* lwttl_new(float aspect_ratio) {
@@ -42,11 +44,13 @@ void* lwttl_new(float aspect_ratio) {
     ttl->seaport = (LWTTLDATA_SEAPORT*)create_binary_from_file(ASSETS_BASE_PATH "ttldata" PATH_SEPARATOR "seaports.dat", &seaports_dat_size);
     ttl->seaport_len = seaports_dat_size / sizeof(LWTTLDATA_SEAPORT);
     ttl->view_scale = 1;
+    LWMUTEX_INIT(ttl->rendering_mutex);
     return ttl;
 }
 
 void lwttl_destroy(void** __ttl) {
     LWTTL* ttl = *(LWTTL**)__ttl;
+    LWMUTEX_DESTROY(ttl->rendering_mutex);
     free(*__ttl);
     *__ttl = 0;
 }
@@ -226,4 +230,14 @@ void lwttl_set_yc0(void* _ttl, int v) {
 int lwttl_yc0(const void* _ttl) {
     LWTTL* ttl = (LWTTL*)_ttl;
     return ttl->yc0;
+}
+
+void lwttl_lock_rendering_mutex(void* _ttl) {
+    LWTTL* ttl = (LWTTL*)_ttl;
+    LWMUTEX_LOCK(ttl->rendering_mutex);
+}
+
+void lwttl_unlock_rendering_mutex(void* _ttl) {
+    LWTTL* ttl = (LWTTL*)_ttl;
+    LWMUTEX_UNLOCK(ttl->rendering_mutex);
 }

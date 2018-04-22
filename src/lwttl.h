@@ -43,6 +43,8 @@ void lwttl_set_xc0(void* _ttl, int v);
 int lwttl_xc0(const void* _ttl);
 void lwttl_set_yc0(void* _ttl, int v);
 int lwttl_yc0(const void* _ttl);
+void lwttl_lock_rendering_mutex(void* _ttl);
+void lwttl_unlock_rendering_mutex(void* _ttl);
 #ifdef __cplusplus
 }
 #endif

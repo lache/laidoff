@@ -379,7 +379,9 @@ void udp_sea_update(LWCONTEXT* pLwc, LWUDP* udp) {
                     convert_ttl_static_state2_to_1(p, &pp);
                     lwttl_set_xc0(pLwc->ttl, p->xc0);
                     lwttl_set_yc0(pLwc->ttl, p->yc0);
+                    //lwttl_lock_rendering_mutex(pLwc->ttl);
                     memcpy(&pLwc->ttl_static_state, &pp, sizeof(LWPTTLSTATICSTATE));
+                    //lwttl_unlock_rendering_mutex(pLwc->ttl);
                     break;
                 }
                 case LPGP_LWPTTLSEAPORTSTATE:
