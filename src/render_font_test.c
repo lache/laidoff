@@ -251,8 +251,10 @@ static void render_ship(const LWCONTEXT* pLwc, const mat4x4 view, const mat4x4 p
     lazy_glUseProgram(pLwc, shader_index);
     mat4x4 rot;
     mat4x4_identity(rot);
-
-    float sx = 0.1f, sy = 0.1f, sz = 0.1f;
+    const int view_scale = lwttl_view_scale(pLwc->ttl);
+    const float sx = 0.075f / view_scale;
+    const float sy = 0.075f / view_scale;
+    const float sz = 0.075f / view_scale;
     mat4x4 model;
     mat4x4_identity(model);
     mat4x4_mul(model, model, rot);
@@ -405,10 +407,11 @@ static void render_sea_objects_nameplate(const LWCONTEXT* pLwc, const mat4x4 vie
     mat4x4 proj_view;
     mat4x4_identity(proj_view);
     mat4x4_mul(proj_view, proj, view);
+    const int view_scale = lwttl_view_scale(pLwc->ttl);
 
     for (int i = 0; i < pLwc->ttl_full_state.count; i++) {
-        float x = cell_fx_to_render_coords(pLwc->ttl_full_state.obj[i].x0, center);
-        float y = cell_fy_to_render_coords(pLwc->ttl_full_state.obj[i].y0, center);
+        float x = cell_fx_to_render_coords(pLwc->ttl_full_state.obj[i].x0, center, view_scale);
+        float y = cell_fy_to_render_coords(pLwc->ttl_full_state.obj[i].y0, center, view_scale);
         vec4 obj_pos_vec4 = {
             x,
             y,
@@ -445,9 +448,10 @@ static void render_sea_objects_nameplate(const LWCONTEXT* pLwc, const mat4x4 vie
 }
 
 static void render_sea_objects(const LWCONTEXT* pLwc, const mat4x4 view, const mat4x4 proj, const LWTTLLNGLAT* center) {
+    const int view_scale = lwttl_view_scale(pLwc->ttl);
     for (int i = 0; i < pLwc->ttl_full_state.count; i++) {
-        float x = cell_fx_to_render_coords(pLwc->ttl_full_state.obj[i].x0, center);
-        float y = cell_fy_to_render_coords(pLwc->ttl_full_state.obj[i].y0, center);
+        float x = cell_fx_to_render_coords(pLwc->ttl_full_state.obj[i].x0, center, view_scale);
+        float y = cell_fy_to_render_coords(pLwc->ttl_full_state.obj[i].y0, center, view_scale);
         render_ship(pLwc,
                     view,
                     proj,
@@ -461,8 +465,8 @@ static void render_sea_static_objects(const LWCONTEXT* pLwc,
                                       const mat4x4 view,
                                       const mat4x4 proj,
                                       const LWTTLLNGLAT* center) {
-    const float cell_scale = 360.0f / LNGLAT_RES_WIDTH;
-    const float half_extent_in_deg = LNGLAT_SEA_PING_EXTENT_IN_DEGREES / 2;
+    const int view_scale = lwttl_view_scale(pLwc->ttl);
+    const float half_extent_in_deg = LNGLAT_SEA_PING_EXTENT_IN_DEGREES / 2 * view_scale;
     const float lng_min = center->lng - half_extent_in_deg;
     const float lng_max = center->lng + half_extent_in_deg;
     const float lat_min = center->lat - half_extent_in_deg;
@@ -470,10 +474,10 @@ static void render_sea_static_objects(const LWCONTEXT* pLwc,
 
     // background sea water
     {
-        const float cell_x0 = lng_to_render_coords(lng_min, center);
-        const float cell_y0 = lat_to_render_coords(lat_max, center);
-        const float cell_x1 = lng_to_render_coords(lng_max, center);
-        const float cell_y1 = lat_to_render_coords(lat_min, center);
+        const float cell_x0 = lng_to_render_coords(lng_min, center, view_scale);
+        const float cell_y0 = lat_to_render_coords(lat_max, center, view_scale);
+        const float cell_x1 = lng_to_render_coords(lng_max, center, view_scale);
+        const float cell_y1 = lat_to_render_coords(lat_min, center, view_scale);
         const float cell_w = cell_x1 - cell_x0;
         const float cell_h = cell_y0 - cell_y1;
         render_solid_vb_ui_uv_shader_rot_view_proj(pLwc,
@@ -497,21 +501,23 @@ static void render_sea_static_objects(const LWCONTEXT* pLwc,
     }
 
     // land
+    const int xc0 = lwttl_xc0(pLwc->ttl);
+    const int yc0 = lwttl_yc0(pLwc->ttl);
     for (int i = 0; i < pLwc->ttl_static_state.count; i++) {
-        const float lng0_not_clamped = cell_x_to_lng(pLwc->ttl_static_state.obj[i].x0);
-        const float lat0_not_clamped = cell_y_to_lat(pLwc->ttl_static_state.obj[i].y0);
-        const float lng1_not_clamped = cell_x_to_lng(pLwc->ttl_static_state.obj[i].x1);
-        const float lat1_not_clamped = cell_y_to_lat(pLwc->ttl_static_state.obj[i].y1);
+        const float lng0_not_clamped = cell_x_to_lng(xc0 + (pLwc->ttl_static_state.obj[i].x0 - xc0) * view_scale);
+        const float lat0_not_clamped = cell_y_to_lat(yc0 + (pLwc->ttl_static_state.obj[i].y0 - yc0) * view_scale);
+        const float lng1_not_clamped = cell_x_to_lng(xc0 + (pLwc->ttl_static_state.obj[i].x1 - xc0) * view_scale);
+        const float lat1_not_clamped = cell_y_to_lat(yc0 + (pLwc->ttl_static_state.obj[i].y1 - yc0) * view_scale);
 
         const float lng0 = LWCLAMP(lng0_not_clamped, lng_min, lng_max);
         const float lat0 = LWCLAMP(lat0_not_clamped, lat_min, lat_max);
         const float lng1 = LWCLAMP(lng1_not_clamped, lng_min, lng_max);
         const float lat1 = LWCLAMP(lat1_not_clamped, lat_min, lat_max);
 
-        const float cell_x0 = lng_to_render_coords(lng0, center);
-        const float cell_y0 = lat_to_render_coords(lat0, center);
-        const float cell_x1 = lng_to_render_coords(lng1, center);
-        const float cell_y1 = lat_to_render_coords(lat1, center);
+        const float cell_x0 = lng_to_render_coords(lng0, center, view_scale);
+        const float cell_y0 = lat_to_render_coords(lat0, center, view_scale);
+        const float cell_x1 = lng_to_render_coords(lng1, center, view_scale);
+        const float cell_y1 = lat_to_render_coords(lat1, center, view_scale);
         const float cell_w = cell_x1 - cell_x0;
         const float cell_h = cell_y0 - cell_y1; // cell_y0 and cell_y1 are in OpenGL rendering coordinates (always cell_y0 > cell_y1)
         // skip degenerated cell
@@ -524,16 +530,17 @@ static void render_sea_static_objects(const LWCONTEXT* pLwc,
                          cell_x0,
                          cell_y0,
                          0,
-                         cell_w /*(float)(pLwc->ttl_static_state.obj[i].x1 - pLwc->ttl_static_state.obj[i].x0) * cell_scale * sea_render_scale*/,
-                         cell_h /*(float)(pLwc->ttl_static_state.obj[i].y1 - pLwc->ttl_static_state.obj[i].y0) * cell_scale * sea_render_scale*/);
+                         cell_w,
+                         cell_h);
     }
     // seaport
+    const float cell_scale = 360.0f / LNGLAT_RES_WIDTH;
     for (int i = 0; i < pLwc->ttl_seaport_state.count; i++) {
         render_seaport_icon(pLwc,
                             view,
                             proj,
-                            cell_x_to_render_coords(pLwc->ttl_seaport_state.obj[i].x0, center),
-                            cell_y_to_render_coords(pLwc->ttl_seaport_state.obj[i].y0, center),
+                            cell_x_to_render_coords(pLwc->ttl_seaport_state.obj[i].x0, center, view_scale),
+                            cell_y_to_render_coords(pLwc->ttl_seaport_state.obj[i].y0, center, view_scale),
                             0,
                             cell_scale * sea_render_scale,
                             cell_scale * sea_render_scale);
@@ -544,10 +551,10 @@ static void render_sea_static_objects_nameplate(const LWCONTEXT* pLwc, const mat
     mat4x4 proj_view;
     mat4x4_identity(proj_view);
     mat4x4_mul(proj_view, proj, view);
+    const int view_scale = lwttl_view_scale(pLwc->ttl);
     for (int i = 0; i < pLwc->ttl_seaport_state.count; i++) {
-        float x = (cell_x_to_lng(pLwc->ttl_seaport_state.obj[i].x0) - center->lng) * sea_render_scale;
-        float y = (cell_y_to_lat(pLwc->ttl_seaport_state.obj[i].y0) - center->lat) * sea_render_scale;
-
+        const float x = cell_x_to_render_coords(pLwc->ttl_seaport_state.obj[i].x0, center, view_scale);
+        const float y = cell_y_to_render_coords(pLwc->ttl_seaport_state.obj[i].y0, center, view_scale);
         vec4 obj_pos_vec4 = {
             x,
             y,
@@ -720,6 +727,7 @@ void lwc_render_font_test(const LWCONTEXT* pLwc) {
     vec3 up;
     vec3_norm(up, eye_right);
     mat4x4 proj, view;
+    const int view_scale = lwttl_view_scale(pLwc->ttl);
     mat4x4_ortho(proj,
                  -half_height * pLwc->aspect_ratio,
                  +half_height * pLwc->aspect_ratio,

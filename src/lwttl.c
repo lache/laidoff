@@ -9,6 +9,7 @@
 #include "render_solid.h"
 #include "lwudp.h"
 #include "lwlnglat.h"
+#include "lwlog.h"
 
 typedef struct _LWTTLDATA_SEAPORT {
     char locode[8];
@@ -23,7 +24,10 @@ typedef struct _LWTTL {
     LWTTLWORLDMAP worldmap;
     int track_object_id;
     int track_object_ship_id;
-    char seaarea[64];
+    char seaarea[128]; // should match with LWPTTLSEAAREA.name size
+    int view_scale;
+    int xc0;
+    int yc0;
 } LWTTL;
 
 void* lwttl_new(float aspect_ratio) {
@@ -37,6 +41,7 @@ void* lwttl_new(float aspect_ratio) {
     size_t seaports_dat_size;
     ttl->seaport = (LWTTLDATA_SEAPORT*)create_binary_from_file(ASSETS_BASE_PATH "ttldata" PATH_SEPARATOR "seaports.dat", &seaports_dat_size);
     ttl->seaport_len = seaports_dat_size / sizeof(LWTTLDATA_SEAPORT);
+    ttl->view_scale = 1;
     return ttl;
 }
 
@@ -92,7 +97,7 @@ void lwttl_worldmap_scroll_to(void* _ttl, float lng, float lat, LWUDP* udp_sea) 
     ttl->worldmap.center.lat = lat;
     ttl->worldmap.center.lng = lng;
     if (udp_sea) {
-        udp_send_ttlping(udp_sea, ttl, 0);
+        lwttl_udp_send_ttlping(ttl, udp_sea, 0);
     }
 }
 
@@ -107,7 +112,7 @@ void lwttl_update_aspect_ratio(void* _ttl, float aspect_ratio) {
     ttl->worldmap.render_org_y = -(2.0f - aspect_ratio) / 2;
 }
 
-const LWTTLLNGLAT* lwttl_center(void* _ttl) {
+const LWTTLLNGLAT* lwttl_center(const void* _ttl) {
     LWTTL* ttl = (LWTTL*)_ttl;
     return &ttl->worldmap.center;
 }
@@ -120,7 +125,8 @@ void lwttl_set_center(void* _ttl, float lng, float lat) {
 
 void lwttl_set_seaarea(void* _ttl, const char* name) {
     LWTTL* ttl = (LWTTL*)_ttl;
-    strcpy(ttl->seaarea, name);
+    strncpy(ttl->seaarea, name, ARRAY_SIZE(ttl->seaarea) - 1);
+    ttl->seaarea[ARRAY_SIZE(ttl->seaarea) - 1] = 0;
 }
 
 const char* lwttl_seaarea(void* _ttl) {
@@ -132,8 +138,8 @@ void lwttl_update(LWCONTEXT* pLwc, void* _ttl, float delta_time) {
     LWTTL* ttl = (LWTTL*)_ttl;
     float dx = 0, dy = 0, dlen = 0;
     if (lw_get_normalized_dir_pad_input(pLwc, &pLwc->left_dir_pad, &dx, &dy, &dlen) && (dx || dy)) {
-        ttl->worldmap.center.lng += dx / 50.0f * delta_time;
-        ttl->worldmap.center.lat += dy / 50.0f * delta_time;
+        ttl->worldmap.center.lng += dx / 50.0f * delta_time * ttl->view_scale;
+        ttl->worldmap.center.lat += dy / 50.0f * delta_time * ttl->view_scale;
     }
 }
 
@@ -174,4 +180,50 @@ int lwttl_track_object_ship_id(const void* _ttl) {
 void lwttl_set_track_object_ship_id(const void* _ttl, int v) {
     LWTTL* ttl = (LWTTL*)_ttl;
     ttl->track_object_ship_id = v;
+}
+
+void lwttl_set_view_scale(const void* _ttl, int v) {
+    LWTTL* ttl = (LWTTL*)_ttl;
+    LOGI("ttl->view_scale %d -> %d", ttl->view_scale, v);
+    ttl->view_scale = v;
+}
+
+int lwttl_view_scale(const void* _ttl) {
+    LWTTL* ttl = (LWTTL*)_ttl;
+    return ttl->view_scale;
+}
+
+void lwttl_udp_send_ttlping(const void* ttl, LWUDP* udp, int ping_seq) {
+    LWPTTLPING ttl_ping;
+    memset(&ttl_ping, 0, sizeof(LWPTTLPING));
+    const LWTTLLNGLAT* center = lwttl_center(ttl);
+    ttl_ping.type = LPGP_LWPTTLPING;
+    ttl_ping.lng = center->lng;
+    ttl_ping.lat = center->lat;
+    ttl_ping.ex = LNGLAT_SEA_PING_EXTENT_IN_CELL_PIXELS;
+    ttl_ping.ping_seq = ping_seq;
+    ttl_ping.track_object_id = lwttl_track_object_id(ttl);
+    ttl_ping.track_object_ship_id = lwttl_track_object_ship_id(ttl);
+    ttl_ping.view_scale = lwttl_view_scale(ttl);
+    udp_send(udp, (const char*)&ttl_ping, sizeof(LWPTTLPING));
+}
+
+void lwttl_set_xc0(void* _ttl, int v) {
+    LWTTL* ttl = (LWTTL*)_ttl;
+    ttl->xc0 = v;
+}
+
+int lwttl_xc0(const void* _ttl) {
+    LWTTL* ttl = (LWTTL*)_ttl;
+    return ttl->xc0;
+}
+
+void lwttl_set_yc0(void* _ttl, int v) {
+    LWTTL* ttl = (LWTTL*)_ttl;
+    ttl->yc0 = v;
+}
+
+int lwttl_yc0(const void* _ttl) {
+    LWTTL* ttl = (LWTTL*)_ttl;
+    return ttl->yc0;
 }

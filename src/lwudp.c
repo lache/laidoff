@@ -271,7 +271,7 @@ void udp_sea_update(LWCONTEXT* pLwc, LWUDP* udp) {
     float app_time = (float)pLwc->app_time;
     float ping_send_interval = lwcontext_update_interval(pLwc) * 2;
     if (udp->last_updated == 0 || app_time > udp->last_updated + ping_send_interval) {
-        udp_send_ttlping(udp, pLwc->ttl, udp->ping_seq);
+        lwttl_udp_send_ttlping(pLwc->ttl, udp, udp->ping_seq);
         udp->ping_seq++;
         udp->last_updated = app_time;
     }
@@ -377,6 +377,8 @@ void udp_sea_update(LWCONTEXT* pLwc, LWUDP* udp) {
                     LOGIx("LWPTTLSTATICSTATE2: %d objects.", p->count);
                     LWPTTLSTATICSTATE pp;
                     convert_ttl_static_state2_to_1(p, &pp);
+                    lwttl_set_xc0(pLwc->ttl, p->xc0);
+                    lwttl_set_yc0(pLwc->ttl, p->yc0);
                     memcpy(&pLwc->ttl_static_state, &pp, sizeof(LWPTTLSTATICSTATE));
                     break;
                 }
@@ -391,7 +393,8 @@ void udp_sea_update(LWCONTEXT* pLwc, LWUDP* udp) {
                     LWPTTLSEAPORTSTATE* p = (LWPTTLSEAPORTSTATE*)decompressed;
                     LOGIx("LWPTTLSEAPORTSTATE: %d objects.", p->count);
                     memcpy(&pLwc->ttl_seaport_state, p, sizeof(LWPTTLSEAPORTSTATE));
-                    htmlui_clear_loop(pLwc->htmlui, "seaport");
+                    // fill nearest seaports
+                    /*htmlui_clear_loop(pLwc->htmlui, "seaport");
                     for (int i = 0; i < p->count; i++) {
                         htmlui_set_loop_key_value(pLwc->htmlui, "seaport", "name", pLwc->ttl_seaport_state.obj[i].name);
                         char script[128];
@@ -399,7 +402,8 @@ void udp_sea_update(LWCONTEXT* pLwc, LWUDP* udp) {
                                 cell_x_to_lng(pLwc->ttl_seaport_state.obj[i].x0),
                                 cell_y_to_lat(pLwc->ttl_seaport_state.obj[i].y0));
                         htmlui_set_loop_key_value(pLwc->htmlui, "seaport", "script", script);
-                    }
+                    }*/
+                    // fill world seaports
                     char script[128];
                     htmlui_clear_loop(pLwc->htmlui, "world-seaport");
 
@@ -517,18 +521,4 @@ void udp_sea_update(LWCONTEXT* pLwc, LWUDP* udp) {
             LOGEP("lz4 decompression failed!");
         }
     }
-}
-
-void udp_send_ttlping(LWUDP* udp, void* ttl, int ping_seq) {
-    LWPTTLPING ttl_ping;
-    memset(&ttl_ping, 0, sizeof(LWPTTLPING));
-    const LWTTLLNGLAT* center = lwttl_center(ttl);
-    ttl_ping.type = LPGP_LWPTTLPING;
-    ttl_ping.lng = center->lng;
-    ttl_ping.lat = center->lat;
-    ttl_ping.ex = LNGLAT_SEA_PING_EXTENT_IN_CELL_PIXELS;
-    ttl_ping.ping_seq = ping_seq;
-    ttl_ping.track_object_id = lwttl_track_object_id(ttl);
-    ttl_ping.track_object_ship_id = lwttl_track_object_ship_id(ttl);
-    udp_send(udp, (const char*)&ttl_ping, sizeof(LWPTTLPING));
 }
