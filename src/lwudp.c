@@ -253,7 +253,7 @@ static void convert_ttl_static_state2_to_1(const LWPTTLSTATICSTATE2* s2, LWPTTLS
 }
 
 void udp_sea_update(LWCONTEXT* pLwc, LWUDP* udp) {
-    if (pLwc->game_scene != LGS_FONT_TEST) {
+    if (pLwc->game_scene != LGS_TTL) {
         return;
     }
     if (udp->reinit_next_update) {

@@ -43,6 +43,7 @@ void change_to_field(LWCONTEXT* pLwc);
 void change_to_dialog(LWCONTEXT* pLwc);
 void change_to_battle(LWCONTEXT* pLwc);
 void change_to_font_test(LWCONTEXT* pLwc);
+void change_to_ttl(LWCONTEXT* pLwc);
 void change_to_admin(LWCONTEXT* pLwc);
 void change_to_battle_result(LWCONTEXT* pLwc);
 void change_to_skin(LWCONTEXT* pLwc);

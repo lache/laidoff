@@ -18,7 +18,7 @@
 #include "tex.h"
 #include "lwmacro.h"
 //#include "lwenemy.h"
-#include "render_font_test.h"
+#include "render_ttl.h"
 #include "render_admin.h"
 #include "input.h"
 #include "field.h"
@@ -60,6 +60,7 @@
 #include "lwcountry.h"
 #include "remtex.h"
 #include "render_remtex.h"
+#include "render_font_test.h"
 // SWIG output file
 #include "lo_wrap.inl"
 
@@ -1161,6 +1162,8 @@ void lwc_render(const LWCONTEXT* pLwc) {
         }
     } else if (pLwc->game_scene == LGS_FONT_TEST) {
         lwc_render_font_test(pLwc);
+    } else if (pLwc->game_scene == LGS_TTL) {
+        lwc_render_ttl(pLwc);
     } else if (pLwc->game_scene == LGS_ADMIN) {
         lwc_render_admin(pLwc);
     } else if (pLwc->game_scene == LGS_BATTLE_RESULT) {
@@ -1833,12 +1836,19 @@ void lw_set_size(LWCONTEXT* pLwc, int w, int h) {
 
     lwttl_update_aspect_ratio(pLwc->ttl, pLwc->aspect_ratio);
 
-    // Resize FBO
-    init_font_fbo(pLwc);
+    if (pLwc->game_scene == LGS_PHYSICS || pLwc->game_scene == LGS_FONT_TEST || pLwc->game_scene == LGS_TTL) {
+        // Resize FBO
+        init_font_fbo(pLwc);
 
-    // Rerender HTML UI
-    htmlui_set_client_size(pLwc->htmlui, pLwc->width, pLwc->height);
-    htmlui_load_redraw_fbo(pLwc->htmlui);
+        if (pLwc->game_scene == LGS_PHYSICS || pLwc->game_scene == LGS_TTL) {
+            // Rerender HTML UI
+            htmlui_set_client_size(pLwc->htmlui, pLwc->width, pLwc->height);
+            htmlui_load_redraw_fbo(pLwc->htmlui);
+        } else {
+            // Render font FBO using render-to-texture
+            lwc_render_font_test_fbo(pLwc);
+        }
+    }
 }
 
 void lw_set_window(LWCONTEXT* pLwc, struct GLFWwindow *window) {

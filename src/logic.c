@@ -10,6 +10,7 @@
 #include "battle.h"
 #include "sysmsg.h"
 #include "render_font_test.h"
+#include "render_ttl.h"
 #include "battle_result.h"
 #include "file.h"
 #include "ps.h"
@@ -66,7 +67,15 @@ void change_to_font_test(LWCONTEXT* pLwc) {
     // Initialize test font FBO
     init_font_fbo(pLwc);
     // Render font FBO using render-to-texture
-    lwc_render_font_test_fbo(pLwc, ASSETS_BASE_PATH "html" PATH_SEPARATOR "HTMLPage1.html");
+    lwc_render_font_test_fbo(pLwc);
+}
+
+void change_to_ttl(LWCONTEXT* pLwc) {
+    pLwc->next_game_scene = LGS_TTL;
+    // Initialize test font FBO
+    init_font_fbo(pLwc);
+    // Render font FBO using render-to-texture
+    lwc_render_ttl_fbo(pLwc, ASSETS_BASE_PATH "html" PATH_SEPARATOR "HTMLPage1.html");
 }
 
 void change_to_admin(LWCONTEXT* pLwc) {
@@ -684,6 +693,7 @@ void reset_runtime_context(LWCONTEXT* pLwc) {
         { LWU("Dialog"), change_to_dialog },
         { LWU("Battle"), change_to_battle },
         { LWU("Font"), change_to_font_test },
+        { LWU("TTL"), change_to_ttl },
         { LWU("Runtime Reset"), reset_runtime_context_async },
         { LWU("Font Debug"), toggle_font_texture_test_mode },
         { LWU("UDP"), net_rtt_test },
@@ -781,7 +791,7 @@ void lwc_update(LWCONTEXT* pLwc, double delta_time) {
         deltatime_tick_delta(pLwc->update_dt, delta_time);
     }
 
-    if (pLwc->game_scene == LGS_FONT_TEST) {
+    if (pLwc->game_scene == LGS_TTL) {
         for (int i = 0; i < pLwc->ttl_full_state.count; i++) {
             pLwc->ttl_full_state.obj[i].x0 += (float)delta_time * pLwc->ttl_full_state.obj[i].vx;
             pLwc->ttl_full_state.obj[i].y0 += (float)delta_time * pLwc->ttl_full_state.obj[i].vy;
@@ -887,7 +897,7 @@ void lwc_update(LWCONTEXT* pLwc, double delta_time) {
         update_physics(pLwc);
     }
 
-    if (pLwc->game_scene == LGS_FONT_TEST) {
+    if (pLwc->game_scene == LGS_TTL) {
         lwttl_update(pLwc, pLwc->ttl, (float)delta_time);
     }
 
@@ -1072,10 +1082,6 @@ void lwc_start_logic_thread(LWCONTEXT* pLwc) {
     // Load initial stage
     //load_field_2_init_runtime_data_async(pLwc, pLwc->logic_actor);
 
-    // Initialize test font FBO
-    init_font_fbo(pLwc);
-    // Render font FBO using render-to-texture
-    //lwc_render_font_test_fbo(pLwc, ASSETS_BASE_PATH "html" PATH_SEPARATOR "HTMLPage1.html");
     //load_scene_async(pLwc, pLwc->logic_actor, LGS_FONT_TEST);
     load_scene_async(pLwc, pLwc->logic_actor, LGS_PHYSICS);
 }

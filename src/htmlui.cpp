@@ -8,7 +8,7 @@
 #include "lwmacro.h"
 #include "lwcontext.h"
 #include "file.h"
-#include "render_font_test.h"
+#include "render_ttl.h"
 #include "lwtcp.h"
 #include "lwmutex.h"
 
@@ -87,9 +87,9 @@ public:
         container.clear_remtex_name_hash_set();
         doc = litehtml::document::createFromString(last_html_str.c_str(), &container, &browser_context);
         render_page();
-        lwc_prerender_font_test_fbo(pLwc);
+        lwc_prerender_ttl_fbo(pLwc);
         draw();
-        lwc_postrender_font_test_fbo(pLwc);
+        lwc_postrender_ttl_fbo(pLwc);
         unlock();
     }
     void on_lbutton_down(float nx, float ny) {
@@ -130,13 +130,13 @@ public:
     }
     void load_next_html_path() {
         if (next_html_path.empty() == false) {
-            lwc_render_font_test_fbo(pLwc, next_html_path.c_str());
+            lwc_render_ttl_fbo(pLwc, next_html_path.c_str());
             next_html_path.clear();
         }
     }
     void load_next_html_body() {
         if (refresh_html_body) {
-            lwc_render_font_test_fbo_body(pLwc, pLwc->tcp_ttl->html_body);
+            lwc_render_ttl_fbo_body(pLwc, pLwc->tcp_ttl->html_body);
             refresh_html_body = 0;
         }
     }
