@@ -276,8 +276,8 @@ typedef struct _LWCONTEXT {
 	LW_ATLAS_ENUM center_image;
 	// Font: Render font debug UI
 	int font_texture_texture_mode;
-	// Test font FBO
-	LWFBO font_fbo;
+	// Shared full screen FBO
+	LWFBO shared_fbo;
 	// Input: Last mouse press x coordinate
 	float last_mouse_press_x;
 	// Input: Last mouse press y coordinate

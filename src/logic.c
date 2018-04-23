@@ -65,7 +65,7 @@ void change_to_battle(LWCONTEXT* pLwc) {
 void change_to_font_test(LWCONTEXT* pLwc) {
     pLwc->next_game_scene = LGS_FONT_TEST;
     // Initialize test font FBO
-    init_font_fbo(pLwc);
+    init_shared_fbo(pLwc);
     // Render font FBO using render-to-texture
     lwc_render_font_test_fbo(pLwc);
 }
@@ -73,7 +73,7 @@ void change_to_font_test(LWCONTEXT* pLwc) {
 void change_to_ttl(LWCONTEXT* pLwc) {
     pLwc->next_game_scene = LGS_TTL;
     // Initialize test font FBO
-    init_font_fbo(pLwc);
+    init_shared_fbo(pLwc);
     // Render font FBO using render-to-texture
     lwc_render_ttl_fbo(pLwc, ASSETS_BASE_PATH "html" PATH_SEPARATOR "HTMLPage1.html");
 }
@@ -92,6 +92,8 @@ void change_to_skin(LWCONTEXT* pLwc) {
 
 void change_to_physics(LWCONTEXT* pLwc) {
     pLwc->next_game_scene = LGS_PHYSICS;
+    // Initialize test font FBO
+    init_shared_fbo(pLwc);
 }
 
 void change_to_particle_system(LWCONTEXT* pLwc) {
@@ -367,8 +369,8 @@ void load_field_6_init_runtime_data(LWCONTEXT* pLwc) {
     load_field_6_init_runtime_data_async(pLwc, pLwc->logic_actor);
 }
 
-void load_scene_async(LWCONTEXT* pLwc, zactor_t* actor, LW_GAME_SCENE next_game_scene) {
-    pLwc->next_game_scene = next_game_scene;
+void load_scene_async(LWCONTEXT* pLwc, zactor_t* actor, void next_game_scene_changer(LWCONTEXT*)) {
+    next_game_scene_changer(pLwc);
     // should load stage texture here
     zmsg_t* msg = zmsg_new();
     LWMSGINITSCENE m = {
@@ -686,7 +688,7 @@ void reset_runtime_context(LWCONTEXT* pLwc) {
         reset_field_context(pLwc);
     }
     // Make render-to-texture flag dirty
-    pLwc->font_fbo.dirty = 1;
+    pLwc->shared_fbo.dirty = 1;
     // Register admin button commands
     const LWBUTTONCOMMAND handler_array[] = {
         { LWU("Field"), change_to_field },
@@ -1081,9 +1083,7 @@ void lwc_start_logic_thread(LWCONTEXT* pLwc) {
     pLwc->logic_actor = zactor_new(s_logic_worker, pLwc);
     // Load initial stage
     //load_field_2_init_runtime_data_async(pLwc, pLwc->logic_actor);
-
-    //load_scene_async(pLwc, pLwc->logic_actor, LGS_FONT_TEST);
-    load_scene_async(pLwc, pLwc->logic_actor, LGS_PHYSICS);
+    load_scene_async(pLwc, pLwc->logic_actor, change_to_physics);
 }
 
 const char* logic_server_addr(int idx) {

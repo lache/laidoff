@@ -578,19 +578,19 @@ static void init_gl_context(LWCONTEXT* pLwc) {
 }
 
 void delete_font_fbo(LWCONTEXT* pLwc) {
-    if (pLwc->font_fbo.fbo) {
-        glDeleteFramebuffers(1, &pLwc->font_fbo.fbo);
-        pLwc->font_fbo.fbo = 0;
+    if (pLwc->shared_fbo.fbo) {
+        glDeleteFramebuffers(1, &pLwc->shared_fbo.fbo);
+        pLwc->shared_fbo.fbo = 0;
     }
     
-    if (pLwc->font_fbo.depth_render_buffer) {
-        glDeleteRenderbuffers(1, &pLwc->font_fbo.depth_render_buffer);
-        pLwc->font_fbo.depth_render_buffer = 0;
+    if (pLwc->shared_fbo.depth_render_buffer) {
+        glDeleteRenderbuffers(1, &pLwc->shared_fbo.depth_render_buffer);
+        pLwc->shared_fbo.depth_render_buffer = 0;
     }
     
-    if (pLwc->font_fbo.color_tex) {
-        glDeleteTextures(1, &pLwc->font_fbo.color_tex);
-        pLwc->font_fbo.color_tex = 0;
+    if (pLwc->shared_fbo.color_tex) {
+        glDeleteTextures(1, &pLwc->shared_fbo.color_tex);
+        pLwc->shared_fbo.color_tex = 0;
     }
 }
 
@@ -607,7 +607,7 @@ unsigned long upper_power_of_two(unsigned long v)
     return v;
 }
 
-void init_font_fbo(LWCONTEXT* pLwc) {
+void init_shared_fbo(LWCONTEXT* pLwc) {
     
     // Delete GL resources before init
     
@@ -615,38 +615,38 @@ void init_font_fbo(LWCONTEXT* pLwc) {
     
     // Start init
 #if LW_PLATFORM_IOS
-    pLwc->font_fbo.width = (int)upper_power_of_two((unsigned long)pLwc->width);
-    pLwc->font_fbo.height = (int)upper_power_of_two((unsigned long)pLwc->height);
+    pLwc->shared_fbo.width = (int)upper_power_of_two((unsigned long)pLwc->width);
+    pLwc->shared_fbo.height = (int)upper_power_of_two((unsigned long)pLwc->height);
 #else
-    pLwc->font_fbo.width = pLwc->width;
-    pLwc->font_fbo.height = pLwc->height;
+    pLwc->shared_fbo.width = pLwc->width;
+    pLwc->shared_fbo.height = pLwc->height;
 #endif
-    glGenFramebuffers(1, &pLwc->font_fbo.fbo);
-    glBindFramebuffer(GL_FRAMEBUFFER, pLwc->font_fbo.fbo);
+    glGenFramebuffers(1, &pLwc->shared_fbo.fbo);
+    glBindFramebuffer(GL_FRAMEBUFFER, pLwc->shared_fbo.fbo);
     
-    glGenRenderbuffers(1, &pLwc->font_fbo.depth_render_buffer);
-    glBindRenderbuffer(GL_RENDERBUFFER, pLwc->font_fbo.depth_render_buffer);
+    glGenRenderbuffers(1, &pLwc->shared_fbo.depth_render_buffer);
+    glBindRenderbuffer(GL_RENDERBUFFER, pLwc->shared_fbo.depth_render_buffer);
     glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT, pLwc->width, pLwc->height);
-    glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_COMPONENT, GL_RENDERBUFFER, pLwc->font_fbo.depth_render_buffer);
+    glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_COMPONENT, GL_RENDERBUFFER, pLwc->shared_fbo.depth_render_buffer);
     
-    glGenTextures(1, &pLwc->font_fbo.color_tex);
-    glBindTexture(GL_TEXTURE_2D, pLwc->font_fbo.color_tex);
+    glGenTextures(1, &pLwc->shared_fbo.color_tex);
+    glBindTexture(GL_TEXTURE_2D, pLwc->shared_fbo.color_tex);
     glGetError();
     glTexImage2D(GL_TEXTURE_2D,
                  0,
                  GL_RGBA,
-                 pLwc->font_fbo.width,
-                 pLwc->font_fbo.height,
+                 pLwc->shared_fbo.width,
+                 pLwc->shared_fbo.height,
                  0,
                  GL_RGBA,
                  GL_UNSIGNED_BYTE,
                  NULL);
     GLenum render_texture_result = glGetError();
-    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, pLwc->font_fbo.color_tex, 0);
+    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, pLwc->shared_fbo.color_tex, 0);
     
     GLenum status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
     if (status != GL_FRAMEBUFFER_COMPLETE) {
-        LOGE("init_font_fbo: glCheckFramebufferStatus failed. return = %d", status);
+        LOGE("init_shared_fbo: glCheckFramebufferStatus failed. return = %d", status);
         delete_font_fbo(pLwc);
     }
     
@@ -1838,7 +1838,7 @@ void lw_set_size(LWCONTEXT* pLwc, int w, int h) {
 
     if (pLwc->game_scene == LGS_PHYSICS || pLwc->game_scene == LGS_FONT_TEST || pLwc->game_scene == LGS_TTL) {
         // Resize FBO
-        init_font_fbo(pLwc);
+        init_shared_fbo(pLwc);
 
         if (pLwc->game_scene == LGS_PHYSICS || pLwc->game_scene == LGS_TTL) {
             // Rerender HTML UI
@@ -1905,7 +1905,7 @@ void lw_deinit(LWCONTEXT* pLwc) {
         glDeleteBuffers(1, &pLwc->sea_route_vbo.vertex_buffer);
     }
     
-    glDeleteTextures(1, &pLwc->font_fbo.color_tex);
+    glDeleteTextures(1, &pLwc->shared_fbo.color_tex);
     glDeleteTextures(MAX_TEX_ATLAS, pLwc->tex_atlas);
     glDeleteTextures(MAX_TEX_FONT_ATLAS, pLwc->tex_font_atlas);
     glDeleteTextures(MAX_TEX_PROGRAMMED, pLwc->tex_programmed);

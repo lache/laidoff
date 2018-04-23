@@ -1338,7 +1338,7 @@ static void render_main_menu_ui_layer(const LWCONTEXT* pLwc,
                                           0,
                                           2 * pLwc->aspect_ratio,
                                           2,
-                                          pLwc->font_fbo.color_tex,
+                                          pLwc->shared_fbo.color_tex,
                                           LVT_CENTER_CENTER_ANCHORED_SQUARE,
                                           1);
         // revert to default viewport

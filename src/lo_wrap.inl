@@ -10172,18 +10172,18 @@ fail:
 }
 
 
-static int _wrap_init_font_fbo(lua_State* L) {
+static int _wrap_init_shared_fbo(lua_State* L) {
   int SWIG_arg = 0;
   LWCONTEXT *arg1 = (LWCONTEXT *) 0 ;
   
-  SWIG_check_num_args("init_font_fbo",1,1)
-  if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("init_font_fbo",1,"LWCONTEXT *");
+  SWIG_check_num_args("init_shared_fbo",1,1)
+  if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("init_shared_fbo",1,"LWCONTEXT *");
   
   if (!SWIG_IsOK(SWIG_ConvertPtr(L,1,(void**)&arg1,SWIGTYPE_p__LWCONTEXT,0))){
-    SWIG_fail_ptr("init_font_fbo",1,SWIGTYPE_p__LWCONTEXT);
+    SWIG_fail_ptr("init_shared_fbo",1,SWIGTYPE_p__LWCONTEXT);
   }
   
-  init_font_fbo(arg1);
+  init_shared_fbo(arg1);
   
   return SWIG_arg;
   
@@ -23077,25 +23077,25 @@ fail:
 }
 
 
-static int _wrap_LWCONTEXT_font_fbo_set(lua_State* L) {
+static int _wrap_LWCONTEXT_shared_fbo_set(lua_State* L) {
   int SWIG_arg = 0;
   struct _LWCONTEXT *arg1 = (struct _LWCONTEXT *) 0 ;
   LWFBO *arg2 = (LWFBO *) 0 ;
   
-  SWIG_check_num_args("_LWCONTEXT::font_fbo",2,2)
-  if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("_LWCONTEXT::font_fbo",1,"struct _LWCONTEXT *");
-  if(!SWIG_isptrtype(L,2)) SWIG_fail_arg("_LWCONTEXT::font_fbo",2,"LWFBO *");
+  SWIG_check_num_args("_LWCONTEXT::shared_fbo",2,2)
+  if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("_LWCONTEXT::shared_fbo",1,"struct _LWCONTEXT *");
+  if(!SWIG_isptrtype(L,2)) SWIG_fail_arg("_LWCONTEXT::shared_fbo",2,"LWFBO *");
   
   if (!SWIG_IsOK(SWIG_ConvertPtr(L,1,(void**)&arg1,SWIGTYPE_p__LWCONTEXT,0))){
-    SWIG_fail_ptr("LWCONTEXT_font_fbo_set",1,SWIGTYPE_p__LWCONTEXT);
+    SWIG_fail_ptr("LWCONTEXT_shared_fbo_set",1,SWIGTYPE_p__LWCONTEXT);
   }
   
   
   if (!SWIG_IsOK(SWIG_ConvertPtr(L,2,(void**)&arg2,SWIGTYPE_p__LWFBO,0))){
-    SWIG_fail_ptr("LWCONTEXT_font_fbo_set",2,SWIGTYPE_p__LWFBO);
+    SWIG_fail_ptr("LWCONTEXT_shared_fbo_set",2,SWIGTYPE_p__LWFBO);
   }
   
-  if (arg1) (arg1)->font_fbo = *arg2;
+  if (arg1) (arg1)->shared_fbo = *arg2;
   
   return SWIG_arg;
   
@@ -23107,19 +23107,19 @@ fail:
 }
 
 
-static int _wrap_LWCONTEXT_font_fbo_get(lua_State* L) {
+static int _wrap_LWCONTEXT_shared_fbo_get(lua_State* L) {
   int SWIG_arg = 0;
   struct _LWCONTEXT *arg1 = (struct _LWCONTEXT *) 0 ;
   LWFBO *result = 0 ;
   
-  SWIG_check_num_args("_LWCONTEXT::font_fbo",1,1)
-  if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("_LWCONTEXT::font_fbo",1,"struct _LWCONTEXT *");
+  SWIG_check_num_args("_LWCONTEXT::shared_fbo",1,1)
+  if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("_LWCONTEXT::shared_fbo",1,"struct _LWCONTEXT *");
   
   if (!SWIG_IsOK(SWIG_ConvertPtr(L,1,(void**)&arg1,SWIGTYPE_p__LWCONTEXT,0))){
-    SWIG_fail_ptr("LWCONTEXT_font_fbo_get",1,SWIGTYPE_p__LWCONTEXT);
+    SWIG_fail_ptr("LWCONTEXT_shared_fbo_get",1,SWIGTYPE_p__LWCONTEXT);
   }
   
-  result = (LWFBO *)& ((arg1)->font_fbo);
+  result = (LWFBO *)& ((arg1)->shared_fbo);
   SWIG_NewPointerObj(L,result,SWIGTYPE_p__LWFBO,0); SWIG_arg++; 
   return SWIG_arg;
   
@@ -27838,7 +27838,7 @@ static swig_lua_attribute swig_LWCONTEXT_attributes[] = {
     { "center_image_anim", _wrap_LWCONTEXT_center_image_anim_get, _wrap_LWCONTEXT_center_image_anim_set },
     { "center_image", _wrap_LWCONTEXT_center_image_get, _wrap_LWCONTEXT_center_image_set },
     { "font_texture_texture_mode", _wrap_LWCONTEXT_font_texture_texture_mode_get, _wrap_LWCONTEXT_font_texture_texture_mode_set },
-    { "font_fbo", _wrap_LWCONTEXT_font_fbo_get, _wrap_LWCONTEXT_font_fbo_set },
+    { "shared_fbo", _wrap_LWCONTEXT_shared_fbo_get, _wrap_LWCONTEXT_shared_fbo_set },
     { "last_mouse_press_x", _wrap_LWCONTEXT_last_mouse_press_x_get, _wrap_LWCONTEXT_last_mouse_press_x_set },
     { "last_mouse_press_y", _wrap_LWCONTEXT_last_mouse_press_y_get, _wrap_LWCONTEXT_last_mouse_press_y_set },
     { "last_mouse_move_x", _wrap_LWCONTEXT_last_mouse_move_x_get, _wrap_LWCONTEXT_last_mouse_move_x_set },
@@ -93883,6 +93883,7 @@ static swig_lua_const_info swig_SwigModule_constants[]= {
     {SWIG_LUA_CONSTTAB_INT("LGS_FIELD", LGS_FIELD)},
     {SWIG_LUA_CONSTTAB_INT("LGS_DIALOG", LGS_DIALOG)},
     {SWIG_LUA_CONSTTAB_INT("LGS_FONT_TEST", LGS_FONT_TEST)},
+    {SWIG_LUA_CONSTTAB_INT("LGS_TTL", LGS_TTL)},
     {SWIG_LUA_CONSTTAB_INT("LGS_ADMIN", LGS_ADMIN)},
     {SWIG_LUA_CONSTTAB_INT("LGS_BATTLE_RESULT", LGS_BATTLE_RESULT)},
     {SWIG_LUA_CONSTTAB_INT("LGS_SKIN", LGS_SKIN)},
@@ -93892,7 +93893,6 @@ static swig_lua_const_info swig_SwigModule_constants[]= {
     {SWIG_LUA_CONSTTAB_INT("LGS_SPLASH", LGS_SPLASH)},
     {SWIG_LUA_CONSTTAB_INT("LGS_LEADERBOARD", LGS_LEADERBOARD)},
     {SWIG_LUA_CONSTTAB_INT("LGS_REMTEX", LGS_REMTEX)},
-    {SWIG_LUA_CONSTTAB_INT("LGS_TTL", LGS_TTL)},
     {SWIG_LUA_CONSTTAB_STRING("__LW_STRING_LINE__", "61")},
     {SWIG_LUA_CONSTTAB_STRING("LWLOGPOS", "src\\lwlog.h(62): ")},
     {SWIG_LUA_CONSTTAB_INT("LPT_GRID", LPT_GRID)},
@@ -94459,7 +94459,7 @@ static swig_lua_method swig_SwigModule_methods[]= {
     { "set_color_vertex_attrib_pointer", _wrap_set_color_vertex_attrib_pointer},
     { "load_png_pkm_sw_decoding", _wrap_load_png_pkm_sw_decoding},
     { "set_package_version", _wrap_set_package_version},
-    { "init_font_fbo", _wrap_init_font_fbo},
+    { "init_shared_fbo", _wrap_init_shared_fbo},
     { "load_pkm_hw_decoding", _wrap_load_pkm_hw_decoding},
     { "logic_server_addr", _wrap_logic_server_addr},
     { "logic_update_default_projection", _wrap_logic_update_default_projection},

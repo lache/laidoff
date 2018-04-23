@@ -17,10 +17,10 @@
 #define WATER_COLOR_B (190 / 255.f)
 
 static void lwc_prerender_font_test_fbo(const LWCONTEXT* pLwc) {
-    glBindFramebuffer(GL_FRAMEBUFFER, pLwc->font_fbo.fbo);
+    glBindFramebuffer(GL_FRAMEBUFFER, pLwc->shared_fbo.fbo);
     glDisable(GL_DEPTH_TEST);
 
-    glViewport(0, 0, pLwc->font_fbo.width, pLwc->font_fbo.height);
+    glViewport(0, 0, pLwc->shared_fbo.width, pLwc->shared_fbo.height);
     glClearColor(0, 0, 0, 0); // alpha should be cleared to zero
                               //lw_clear_color();
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -155,5 +155,5 @@ void lwc_render_font_test(const LWCONTEXT* pLwc) {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     // render FBO
-    render_solid_box_ui_lvt_flip_y_uv(pLwc, 0, 0, 2 * pLwc->aspect_ratio, 2, pLwc->font_fbo.color_tex, LVT_CENTER_CENTER_ANCHORED_SQUARE, 1);
+    render_solid_box_ui_lvt_flip_y_uv(pLwc, 0, 0, 2 * pLwc->aspect_ratio, 2, pLwc->shared_fbo.color_tex, LVT_CENTER_CENTER_ANCHORED_SQUARE, 1);
 }
