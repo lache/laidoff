@@ -43,7 +43,7 @@ void* lwttl_new(float aspect_ratio) {
     size_t seaports_dat_size;
     ttl->seaport = (LWTTLDATA_SEAPORT*)create_binary_from_file(ASSETS_BASE_PATH "ttldata" PATH_SEPARATOR "seaports.dat", &seaports_dat_size);
     ttl->seaport_len = seaports_dat_size / sizeof(LWTTLDATA_SEAPORT);
-    ttl->view_scale = 1;
+    ttl->view_scale = 64;
     LWMUTEX_INIT(ttl->rendering_mutex);
     return ttl;
 }
