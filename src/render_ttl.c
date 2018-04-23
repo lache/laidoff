@@ -292,7 +292,7 @@ static void render_waves(const LWCONTEXT* pLwc, const mat4x4 view, const mat4x4 
 
 static void render_earth(const LWCONTEXT* pLwc, const LWTTLLNGLAT* center, int view_scale) {
     const LW_VBO_TYPE lvt = LVT_EARTH;
-    const LW_ATLAS_ENUM lae = LAE_WATER_2048_2048;
+    const LW_ATLAS_ENUM lae = LAE_WATER_2048_1024_AA;
     const float scale = 2.5f;
     const float x = pLwc->aspect_ratio - 0.5f;
     const float y = 0.5f;
@@ -347,7 +347,7 @@ static void render_earth(const LWCONTEXT* pLwc, const LWTTLLNGLAT* center, int v
     //                                  0.5f,
     //                                  1.0f,
     //                                  1.0f,
-    //                                  pLwc->tex_atlas[LAE_WATER_2048_2048],
+    //                                  pLwc->tex_atlas[LAE_WATER_2048_1024_AA],
     //                                  LVT_EARTH,
     //                                  0);
 
