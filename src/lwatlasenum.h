@@ -151,6 +151,7 @@ typedef enum _LW_ATLAS_ENUM {
     LAE_FLAGS_MINI1_ALPHA,
     LAE_FLAGS_MINI2,
     LAE_FLAGS_MINI2_ALPHA,
+    LAE_WATER_2048_2048,
     LAE_COUNT,
 
     LAE_DONTCARE,
@@ -309,6 +310,7 @@ static const char *tex_atlas_filename[] = {
     ASSETS_BASE_PATH "ktx" PATH_SEPARATOR "flags-mini1-a_alpha.ktx",
     ASSETS_BASE_PATH "ktx" PATH_SEPARATOR "flags-mini2-a.ktx",
     ASSETS_BASE_PATH "ktx" PATH_SEPARATOR "flags-mini2-a_alpha.ktx",
+    ASSETS_BASE_PATH "ktx" PATH_SEPARATOR "water_2048x2048.ktx",
 };
 
 #define MAX_TEX_ATLAS LAE_COUNT

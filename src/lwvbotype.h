@@ -56,6 +56,7 @@ typedef enum _LW_VBO_TYPE
     LVT_SEA_CITY,
     LVT_LAND_CELL,
     LVT_SEAPORT_ICON,
+    LVT_EARTH,
 
 	LVT_COUNT,
     LVT_DONTCARE,
@@ -123,6 +124,7 @@ static const LWVBOFILENAME vbo_filename[] = {
     { LVT_SEA_CITY, ASSETS_BASE_PATH "cvbo" PATH_SEPARATOR "sea-city.cvbo", LWST_DEFAULT_NORMAL_COLOR, },
     { LVT_LAND_CELL, ASSETS_BASE_PATH "cvbo" PATH_SEPARATOR "land-cell.cvbo", LWST_DEFAULT_NORMAL_COLOR, },
     { LVT_SEAPORT_ICON, ASSETS_BASE_PATH "cvbo" PATH_SEPARATOR "seaport-icon.cvbo", LWST_DEFAULT_NORMAL_COLOR, },
+    { LVT_EARTH, ASSETS_BASE_PATH "vbo" PATH_SEPARATOR "earth.vbo", LWST_DEFAULT, },
 };
 LwStaticAssert(ARRAY_SIZE(vbo_filename) == LVT_COUNT, "LVT_COUNT error");
 

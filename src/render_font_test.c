@@ -403,6 +403,90 @@ static void render_waves(const LWCONTEXT* pLwc, const mat4x4 view, const mat4x4 
     }
 }
 
+static void render_earth(const LWCONTEXT* pLwc, const LWTTLLNGLAT* center, int view_scale) {
+    const LW_VBO_TYPE lvt = LVT_EARTH;
+    const LW_ATLAS_ENUM lae = LAE_WATER_2048_2048;
+    const float scale = 2.5f;
+    const float x = pLwc->aspect_ratio - 0.5f;
+    const float y = 0.5f;
+    const float alpha_multiplier = 0.5f;
+    lazy_glBindBuffer(pLwc, lvt);
+    lazy_tex_atlas_glBindTexture(pLwc, lae);
+
+    const int shader_index = LWST_DEFAULT;
+    lazy_glUseProgram(pLwc, shader_index);
+    glUniform2fv(pLwc->shader[shader_index].vuvoffset_location, 1, default_uv_offset);
+    glUniform2fv(pLwc->shader[shader_index].vuvscale_location, 1, default_uv_scale);
+    glUniform1f(pLwc->shader[shader_index].alpha_multiplier_location, alpha_multiplier);
+    glUniform1i(pLwc->shader[shader_index].diffuse_location, 0); // 0 means GL_TEXTURE0
+    glUniform1i(pLwc->shader[shader_index].alpha_only_location, 1); // 1 means GL_TEXTURE1
+    glUniform3f(pLwc->shader[shader_index].overlay_color_location, 0, 0, 0);
+    glUniform1f(pLwc->shader[shader_index].overlay_color_ratio_location, 0);
+    glUniformMatrix4fv(pLwc->shader[shader_index].mvp_location, 1, GL_FALSE, (const GLfloat*)pLwc->proj);
+
+    const int tex_index = pLwc->tex_atlas[lae];
+    mat4x4 model_translate;
+    mat4x4 model;
+    mat4x4 view_model;
+    mat4x4 proj_view_model;
+    mat4x4 model_scale;
+    mat4x4 model_scale_rotate_1;
+    mat4x4 model_scale_rotate;
+    mat4x4 view_identity;
+    mat4x4_identity(view_identity);
+    mat4x4_identity(model_scale);
+    mat4x4_scale_aniso(model_scale, model_scale, scale, scale, 0.0f);
+    mat4x4_rotate_X(model_scale_rotate_1, model_scale, (float)LWDEG2RAD(center->lat));
+    mat4x4_rotate_Y(model_scale_rotate, model_scale_rotate_1, (float)LWDEG2RAD(center->lng));
+    mat4x4_translate(model_translate, x, y, 0);
+    mat4x4_identity(model);
+    mat4x4_mul(model, model_translate, model_scale_rotate);
+    mat4x4_mul(view_model, view_identity, model);
+    mat4x4_identity(proj_view_model);
+    mat4x4_mul(proj_view_model, pLwc->proj, view_model);
+
+    lazy_glBindBuffer(pLwc, lvt);
+    bind_all_vertex_attrib(pLwc, lvt);
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D, tex_index);
+    //assert(tex_index);
+    set_tex_filter(GL_LINEAR, GL_LINEAR);
+    //set_tex_filter(GL_NEAREST, GL_NEAREST);
+    glUniformMatrix4fv(pLwc->shader[shader_index].mvp_location, 1, GL_FALSE, (const GLfloat*)proj_view_model);
+    glDrawArrays(GL_TRIANGLES, 0, pLwc->vertex_buffer[lvt].vertex_count);
+
+    //render_solid_box_ui_lvt_flip_y_uv(pLwc,
+    //                                  pLwc->aspect_ratio - 0.5f,
+    //                                  0.5f,
+    //                                  1.0f,
+    //                                  1.0f,
+    //                                  pLwc->tex_atlas[LAE_WATER_2048_2048],
+    //                                  LVT_EARTH,
+    //                                  0);
+
+    const float half_extent_in_deg = LNGLAT_SEA_PING_EXTENT_IN_DEGREES / 2 * view_scale;
+    const float lng_min = center->lng - half_extent_in_deg;
+    const float lng_max = center->lng + half_extent_in_deg;
+    const float lat_min = center->lat - half_extent_in_deg;
+    const float lat_max = center->lat + half_extent_in_deg;
+    const float lng_extent = lng_max - lng_min;
+    const float lat_extent = lat_max - lat_min;
+    // current view window indicator
+    render_solid_vb_ui_flip_y_uv(pLwc,
+                                 x,
+                                 y,
+                                 scale * 2 * sinf((float)LWDEG2RAD(lng_extent) / 2),
+                                 scale * 2 * sinf((float)LWDEG2RAD(lat_extent) / 2),
+                                 pLwc->tex_atlas[LAE_ZERO_FOR_BLACK],
+                                 LVT_CENTER_CENTER_ANCHORED_SQUARE,
+                                 0.5f,
+                                 0.0f,
+                                 1.0f,
+                                 0.2f,
+                                 1.0f,
+                                 0);
+}
+
 static void render_sea_objects_nameplate(const LWCONTEXT* pLwc, const mat4x4 view, const mat4x4 proj, const LWTTLLNGLAT* center) {
     mat4x4 proj_view;
     mat4x4_identity(proj_view);
@@ -740,6 +824,8 @@ void lwc_render_font_test(const LWCONTEXT* pLwc) {
     mat4x4_look_at(view, eye, center, up);
 
     LWTTLLNGLAT lng_lat_center = *lwttl_center(pLwc->ttl);
+    // render earth minimap
+    render_earth(pLwc, &lng_lat_center, view_scale);
     // render world
     if (lwc_render_font_test_render("landcell")) {
         render_sea_static_objects(pLwc, view, proj, &lng_lat_center);
