@@ -216,7 +216,7 @@ void render_solid_vb_ui_uv_shader_rot_view_proj(const LWCONTEXT* pLwc,
                                                 const float* uv_offset,
                                                 const float* uv_scale,
                                                 int shader_index,
-                                                float rot,
+                                                float rot_z,
                                                 const mat4x4 view,
                                                 const mat4x4 proj) {
     lazy_glUseProgram(pLwc, shader_index);
@@ -241,7 +241,7 @@ void render_solid_vb_ui_uv_shader_rot_view_proj(const LWCONTEXT* pLwc,
 
     mat4x4_identity(model_scale);
     mat4x4_scale_aniso(model_scale, model_scale, ui_scale_x, ui_scale_y, 1.0f);
-    mat4x4_rotate_Z(model_scale_rotate, model_scale, rot);
+    mat4x4_rotate_Z(model_scale_rotate, model_scale, rot_z);
     mat4x4_translate(model_translate, x, y, 0);
     mat4x4_identity(model);
     mat4x4_mul(model, model_translate, model_scale_rotate);

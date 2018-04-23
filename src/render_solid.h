@@ -170,7 +170,7 @@ void render_solid_vb_ui_uv_shader_rot_view_proj(const LWCONTEXT* pLwc,
                                                 const float* uv_offset,
                                                 const float* uv_scale,
                                                 int shader_index,
-                                                float rot,
+                                                float rot_z,
                                                 const mat4x4 view,
                                                 const mat4x4 proj);
 void lwc_enable_additive_blending();
