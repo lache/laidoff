@@ -188,7 +188,7 @@ void lwttl_set_track_object_ship_id(const void* _ttl, int v) {
 
 void lwttl_set_view_scale(const void* _ttl, int v) {
     LWTTL* ttl = (LWTTL*)_ttl;
-    LOGI("ttl->view_scale %d -> %d", ttl->view_scale, v);
+    LOGIx("ttl->view_scale %d -> %d", ttl->view_scale, v);
     ttl->view_scale = v;
 }
 
