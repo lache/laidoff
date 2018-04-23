@@ -108,6 +108,21 @@
 %ignore s_set_id;
 %ignore _LWTIMEPOINT;
 %ignore BMF_CHAR;
+%immutable tex_atlas_filename;
+%immutable atlas_conf_filename;
+%immutable atlas_first_lae;
+%immutable atlas_first_alpha_lae;
+%immutable _LWBUTTONCOMMAND::name;
+%immutable _LWCONTEXT::internal_data_path;
+%immutable _LWCONTEXT::user_data_path;
+%immutable _LWSHADERFILENAME::debug_shader_name;
+%immutable _LWSKILL::name;
+%immutable _LWSKILL::desc;
+%immutable _LWTEXTBLOCK::text;
+%immutable _LWVBOFILENAME::filename;
+%immutable SOUND_FILE;
+%immutable SPRITE_DATA;
+%immutable armature_filename;
 
 %include "../glfw-3.2.1/deps/linmath.h"
 %include "lwmacro.h"

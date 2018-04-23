@@ -18277,39 +18277,6 @@ static swig_lua_class *swig_LWBOX2DCOLLIDER_bases[] = {0};
 static const char *swig_LWBOX2DCOLLIDER_base_names[] = {0};
 static swig_lua_class _wrap_class_LWBOX2DCOLLIDER = { "LWBOX2DCOLLIDER", "LWBOX2DCOLLIDER", &SWIGTYPE_p_LWBOX2DCOLLIDER,_proxy__wrap_new_LWBOX2DCOLLIDER, swig_delete_LWBOX2DCOLLIDER, swig_LWBOX2DCOLLIDER_methods, swig_LWBOX2DCOLLIDER_attributes, &swig_LWBOX2DCOLLIDER_Sf_SwigStatic, swig_LWBOX2DCOLLIDER_meta, swig_LWBOX2DCOLLIDER_bases, swig_LWBOX2DCOLLIDER_base_names };
 
-static int _wrap_LWBUTTONCOMMAND_name_set(lua_State* L) {
-  int SWIG_arg = 0;
-  struct _LWBUTTONCOMMAND *arg1 = (struct _LWBUTTONCOMMAND *) 0 ;
-  char *arg2 = (char *) 0 ;
-  
-  SWIG_check_num_args("_LWBUTTONCOMMAND::name",2,2)
-  if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("_LWBUTTONCOMMAND::name",1,"struct _LWBUTTONCOMMAND *");
-  if(!SWIG_lua_isnilstring(L,2)) SWIG_fail_arg("_LWBUTTONCOMMAND::name",2,"char const *");
-  
-  if (!SWIG_IsOK(SWIG_ConvertPtr(L,1,(void**)&arg1,SWIGTYPE_p__LWBUTTONCOMMAND,0))){
-    SWIG_fail_ptr("LWBUTTONCOMMAND_name_set",1,SWIGTYPE_p__LWBUTTONCOMMAND);
-  }
-  
-  arg2 = (char *)lua_tostring(L, 2);
-  {
-    if (arg2) {
-      arg1->name = (char const *) malloc(strlen((const char *)arg2)+1);
-      strcpy((char *)arg1->name, (const char *)arg2);
-    } else {
-      arg1->name = 0;
-    }
-  }
-  
-  return SWIG_arg;
-  
-  if(0) SWIG_fail;
-  
-fail:
-  lua_error(L);
-  return SWIG_arg;
-}
-
-
 static int _wrap_LWBUTTONCOMMAND_name_get(lua_State* L) {
   int SWIG_arg = 0;
   struct _LWBUTTONCOMMAND *arg1 = (struct _LWBUTTONCOMMAND *) 0 ;
@@ -18418,7 +18385,7 @@ static int _proxy__wrap_new_LWBUTTONCOMMAND(lua_State *L) {
     return 1;
 }
 static swig_lua_attribute swig_LWBUTTONCOMMAND_attributes[] = {
-    { "name", _wrap_LWBUTTONCOMMAND_name_get, _wrap_LWBUTTONCOMMAND_name_set },
+    { "name", _wrap_LWBUTTONCOMMAND_name_get, SWIG_Lua_set_immutable },
     { "command_handler", _wrap_LWBUTTONCOMMAND_command_handler_get, _wrap_LWBUTTONCOMMAND_command_handler_set },
     {0,0,0}
 };
@@ -25628,39 +25595,6 @@ fail:
 }
 
 
-static int _wrap_LWCONTEXT_internal_data_path_set(lua_State* L) {
-  int SWIG_arg = 0;
-  struct _LWCONTEXT *arg1 = (struct _LWCONTEXT *) 0 ;
-  char *arg2 = (char *) 0 ;
-  
-  SWIG_check_num_args("_LWCONTEXT::internal_data_path",2,2)
-  if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("_LWCONTEXT::internal_data_path",1,"struct _LWCONTEXT *");
-  if(!SWIG_lua_isnilstring(L,2)) SWIG_fail_arg("_LWCONTEXT::internal_data_path",2,"char const *");
-  
-  if (!SWIG_IsOK(SWIG_ConvertPtr(L,1,(void**)&arg1,SWIGTYPE_p__LWCONTEXT,0))){
-    SWIG_fail_ptr("LWCONTEXT_internal_data_path_set",1,SWIGTYPE_p__LWCONTEXT);
-  }
-  
-  arg2 = (char *)lua_tostring(L, 2);
-  {
-    if (arg2) {
-      arg1->internal_data_path = (char const *) malloc(strlen((const char *)arg2)+1);
-      strcpy((char *)arg1->internal_data_path, (const char *)arg2);
-    } else {
-      arg1->internal_data_path = 0;
-    }
-  }
-  
-  return SWIG_arg;
-  
-  if(0) SWIG_fail;
-  
-fail:
-  lua_error(L);
-  return SWIG_arg;
-}
-
-
 static int _wrap_LWCONTEXT_internal_data_path_get(lua_State* L) {
   int SWIG_arg = 0;
   struct _LWCONTEXT *arg1 = (struct _LWCONTEXT *) 0 ;
@@ -25675,39 +25609,6 @@ static int _wrap_LWCONTEXT_internal_data_path_get(lua_State* L) {
   
   result = (char *) ((arg1)->internal_data_path);
   lua_pushstring(L,(const char *)result); SWIG_arg++;
-  return SWIG_arg;
-  
-  if(0) SWIG_fail;
-  
-fail:
-  lua_error(L);
-  return SWIG_arg;
-}
-
-
-static int _wrap_LWCONTEXT_user_data_path_set(lua_State* L) {
-  int SWIG_arg = 0;
-  struct _LWCONTEXT *arg1 = (struct _LWCONTEXT *) 0 ;
-  char *arg2 = (char *) 0 ;
-  
-  SWIG_check_num_args("_LWCONTEXT::user_data_path",2,2)
-  if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("_LWCONTEXT::user_data_path",1,"struct _LWCONTEXT *");
-  if(!SWIG_lua_isnilstring(L,2)) SWIG_fail_arg("_LWCONTEXT::user_data_path",2,"char const *");
-  
-  if (!SWIG_IsOK(SWIG_ConvertPtr(L,1,(void**)&arg1,SWIGTYPE_p__LWCONTEXT,0))){
-    SWIG_fail_ptr("LWCONTEXT_user_data_path_set",1,SWIGTYPE_p__LWCONTEXT);
-  }
-  
-  arg2 = (char *)lua_tostring(L, 2);
-  {
-    if (arg2) {
-      arg1->user_data_path = (char const *) malloc(strlen((const char *)arg2)+1);
-      strcpy((char *)arg1->user_data_path, (const char *)arg2);
-    } else {
-      arg1->user_data_path = 0;
-    }
-  }
-  
   return SWIG_arg;
   
   if(0) SWIG_fail;
@@ -27887,8 +27788,8 @@ static swig_lua_attribute swig_LWCONTEXT_attributes[] = {
     { "puck_game_state_last_received_interval", _wrap_LWCONTEXT_puck_game_state_last_received_interval_get, _wrap_LWCONTEXT_puck_game_state_last_received_interval_set },
     { "puck_game_state2_last_received", _wrap_LWCONTEXT_puck_game_state2_last_received_get, _wrap_LWCONTEXT_puck_game_state2_last_received_set },
     { "puck_game_state2_last_received_interval", _wrap_LWCONTEXT_puck_game_state2_last_received_interval_get, _wrap_LWCONTEXT_puck_game_state2_last_received_interval_set },
-    { "internal_data_path", _wrap_LWCONTEXT_internal_data_path_get, _wrap_LWCONTEXT_internal_data_path_set },
-    { "user_data_path", _wrap_LWCONTEXT_user_data_path_get, _wrap_LWCONTEXT_user_data_path_set },
+    { "internal_data_path", _wrap_LWCONTEXT_internal_data_path_get, SWIG_Lua_set_immutable },
+    { "user_data_path", _wrap_LWCONTEXT_user_data_path_get, SWIG_Lua_set_immutable },
     { "puck_game_view", _wrap_LWCONTEXT_puck_game_view_get, _wrap_LWCONTEXT_puck_game_view_set },
     { "puck_game_proj", _wrap_LWCONTEXT_puck_game_proj_get, _wrap_LWCONTEXT_puck_game_proj_set },
     { "tcp_host_addr", _wrap_LWCONTEXT_tcp_host_addr_get, _wrap_LWCONTEXT_tcp_host_addr_set },
@@ -31779,39 +31680,6 @@ fail:
 }
 
 
-static int _wrap_LWSHADERFILENAME_debug_shader_name_set(lua_State* L) {
-  int SWIG_arg = 0;
-  struct _LWSHADERFILENAME *arg1 = (struct _LWSHADERFILENAME *) 0 ;
-  char *arg2 = (char *) 0 ;
-  
-  SWIG_check_num_args("_LWSHADERFILENAME::debug_shader_name",2,2)
-  if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("_LWSHADERFILENAME::debug_shader_name",1,"struct _LWSHADERFILENAME *");
-  if(!SWIG_lua_isnilstring(L,2)) SWIG_fail_arg("_LWSHADERFILENAME::debug_shader_name",2,"char const *");
-  
-  if (!SWIG_IsOK(SWIG_ConvertPtr(L,1,(void**)&arg1,SWIGTYPE_p__LWSHADERFILENAME,0))){
-    SWIG_fail_ptr("LWSHADERFILENAME_debug_shader_name_set",1,SWIGTYPE_p__LWSHADERFILENAME);
-  }
-  
-  arg2 = (char *)lua_tostring(L, 2);
-  {
-    if (arg2) {
-      arg1->debug_shader_name = (char const *) malloc(strlen((const char *)arg2)+1);
-      strcpy((char *)arg1->debug_shader_name, (const char *)arg2);
-    } else {
-      arg1->debug_shader_name = 0;
-    }
-  }
-  
-  return SWIG_arg;
-  
-  if(0) SWIG_fail;
-  
-fail:
-  lua_error(L);
-  return SWIG_arg;
-}
-
-
 static int _wrap_LWSHADERFILENAME_debug_shader_name_get(lua_State* L) {
   int SWIG_arg = 0;
   struct _LWSHADERFILENAME *arg1 = (struct _LWSHADERFILENAME *) 0 ;
@@ -31989,7 +31857,7 @@ static int _proxy__wrap_new_LWSHADERFILENAME(lua_State *L) {
 }
 static swig_lua_attribute swig_LWSHADERFILENAME_attributes[] = {
     { "shader_type", _wrap_LWSHADERFILENAME_shader_type_get, _wrap_LWSHADERFILENAME_shader_type_set },
-    { "debug_shader_name", _wrap_LWSHADERFILENAME_debug_shader_name_get, _wrap_LWSHADERFILENAME_debug_shader_name_set },
+    { "debug_shader_name", _wrap_LWSHADERFILENAME_debug_shader_name_get, SWIG_Lua_set_immutable },
     { "lwvs", _wrap_LWSHADERFILENAME_lwvs_get, _wrap_LWSHADERFILENAME_lwvs_set },
     { "lwfs", _wrap_LWSHADERFILENAME_lwfs_get, _wrap_LWSHADERFILENAME_lwfs_set },
     {0,0,0}
@@ -37232,39 +37100,6 @@ fail:
 }
 
 
-static int _wrap_LWSKILL_name_set(lua_State* L) {
-  int SWIG_arg = 0;
-  struct _LWSKILL *arg1 = (struct _LWSKILL *) 0 ;
-  char *arg2 = (char *) 0 ;
-  
-  SWIG_check_num_args("_LWSKILL::name",2,2)
-  if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("_LWSKILL::name",1,"struct _LWSKILL *");
-  if(!SWIG_lua_isnilstring(L,2)) SWIG_fail_arg("_LWSKILL::name",2,"char const *");
-  
-  if (!SWIG_IsOK(SWIG_ConvertPtr(L,1,(void**)&arg1,SWIGTYPE_p__LWSKILL,0))){
-    SWIG_fail_ptr("LWSKILL_name_set",1,SWIGTYPE_p__LWSKILL);
-  }
-  
-  arg2 = (char *)lua_tostring(L, 2);
-  {
-    if (arg2) {
-      arg1->name = (char const *) malloc(strlen((const char *)arg2)+1);
-      strcpy((char *)arg1->name, (const char *)arg2);
-    } else {
-      arg1->name = 0;
-    }
-  }
-  
-  return SWIG_arg;
-  
-  if(0) SWIG_fail;
-  
-fail:
-  lua_error(L);
-  return SWIG_arg;
-}
-
-
 static int _wrap_LWSKILL_name_get(lua_State* L) {
   int SWIG_arg = 0;
   struct _LWSKILL *arg1 = (struct _LWSKILL *) 0 ;
@@ -37279,39 +37114,6 @@ static int _wrap_LWSKILL_name_get(lua_State* L) {
   
   result = (char *) ((arg1)->name);
   lua_pushstring(L,(const char *)result); SWIG_arg++;
-  return SWIG_arg;
-  
-  if(0) SWIG_fail;
-  
-fail:
-  lua_error(L);
-  return SWIG_arg;
-}
-
-
-static int _wrap_LWSKILL_desc_set(lua_State* L) {
-  int SWIG_arg = 0;
-  struct _LWSKILL *arg1 = (struct _LWSKILL *) 0 ;
-  char *arg2 = (char *) 0 ;
-  
-  SWIG_check_num_args("_LWSKILL::desc",2,2)
-  if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("_LWSKILL::desc",1,"struct _LWSKILL *");
-  if(!SWIG_lua_isnilstring(L,2)) SWIG_fail_arg("_LWSKILL::desc",2,"char const *");
-  
-  if (!SWIG_IsOK(SWIG_ConvertPtr(L,1,(void**)&arg1,SWIGTYPE_p__LWSKILL,0))){
-    SWIG_fail_ptr("LWSKILL_desc_set",1,SWIGTYPE_p__LWSKILL);
-  }
-  
-  arg2 = (char *)lua_tostring(L, 2);
-  {
-    if (arg2) {
-      arg1->desc = (char const *) malloc(strlen((const char *)arg2)+1);
-      strcpy((char *)arg1->desc, (const char *)arg2);
-    } else {
-      arg1->desc = 0;
-    }
-  }
-  
   return SWIG_arg;
   
   if(0) SWIG_fail;
@@ -37831,8 +37633,8 @@ static int _proxy__wrap_new_LWSKILL(lua_State *L) {
 }
 static swig_lua_attribute swig_LWSKILL_attributes[] = {
     { "valid", _wrap_LWSKILL_valid_get, _wrap_LWSKILL_valid_set },
-    { "name", _wrap_LWSKILL_name_get, _wrap_LWSKILL_name_set },
-    { "desc", _wrap_LWSKILL_desc_get, _wrap_LWSKILL_desc_set },
+    { "name", _wrap_LWSKILL_name_get, SWIG_Lua_set_immutable },
+    { "desc", _wrap_LWSKILL_desc_get, SWIG_Lua_set_immutable },
     { "lv", _wrap_LWSKILL_lv_get, _wrap_LWSKILL_lv_set },
     { "attrib", _wrap_LWSKILL_attrib_get, _wrap_LWSKILL_attrib_set },
     { "pow", _wrap_LWSKILL_pow_get, _wrap_LWSKILL_pow_set },
@@ -37883,39 +37685,6 @@ static int _wrap_SKILL_DATA_LIST_get(lua_State* L) {
   SWIG_check_num_args("SKILL_DATA_LIST",0,0)
   result = (LWSKILL *)(LWSKILL *)SKILL_DATA_LIST;
   SWIG_NewPointerObj(L,result,SWIGTYPE_p__LWSKILL,0); SWIG_arg++; 
-  return SWIG_arg;
-  
-  if(0) SWIG_fail;
-  
-fail:
-  lua_error(L);
-  return SWIG_arg;
-}
-
-
-static int _wrap_LWTEXTBLOCK_text_set(lua_State* L) {
-  int SWIG_arg = 0;
-  struct _LWTEXTBLOCK *arg1 = (struct _LWTEXTBLOCK *) 0 ;
-  char *arg2 = (char *) 0 ;
-  
-  SWIG_check_num_args("_LWTEXTBLOCK::text",2,2)
-  if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("_LWTEXTBLOCK::text",1,"struct _LWTEXTBLOCK *");
-  if(!SWIG_lua_isnilstring(L,2)) SWIG_fail_arg("_LWTEXTBLOCK::text",2,"char const *");
-  
-  if (!SWIG_IsOK(SWIG_ConvertPtr(L,1,(void**)&arg1,SWIGTYPE_p__LWTEXTBLOCK,0))){
-    SWIG_fail_ptr("LWTEXTBLOCK_text_set",1,SWIGTYPE_p__LWTEXTBLOCK);
-  }
-  
-  arg2 = (char *)lua_tostring(L, 2);
-  {
-    if (arg2) {
-      arg1->text = (char const *) malloc(strlen((const char *)arg2)+1);
-      strcpy((char *)arg1->text, (const char *)arg2);
-    } else {
-      arg1->text = 0;
-    }
-  }
-  
   return SWIG_arg;
   
   if(0) SWIG_fail;
@@ -38712,7 +38481,7 @@ static int _proxy__wrap_new_LWTEXTBLOCK(lua_State *L) {
     return 1;
 }
 static swig_lua_attribute swig_LWTEXTBLOCK_attributes[] = {
-    { "text", _wrap_LWTEXTBLOCK_text_get, _wrap_LWTEXTBLOCK_text_set },
+    { "text", _wrap_LWTEXTBLOCK_text_get, SWIG_Lua_set_immutable },
     { "text_bytelen", _wrap_LWTEXTBLOCK_text_bytelen_get, _wrap_LWTEXTBLOCK_text_bytelen_set },
     { "begin_index", _wrap_LWTEXTBLOCK_begin_index_get, _wrap_LWTEXTBLOCK_begin_index_set },
     { "end_index", _wrap_LWTEXTBLOCK_end_index_get, _wrap_LWTEXTBLOCK_end_index_set },
@@ -40278,39 +40047,6 @@ fail:
 }
 
 
-static int _wrap_LWVBOFILENAME_filename_set(lua_State* L) {
-  int SWIG_arg = 0;
-  struct _LWVBOFILENAME *arg1 = (struct _LWVBOFILENAME *) 0 ;
-  char *arg2 = (char *) 0 ;
-  
-  SWIG_check_num_args("_LWVBOFILENAME::filename",2,2)
-  if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("_LWVBOFILENAME::filename",1,"struct _LWVBOFILENAME *");
-  if(!SWIG_lua_isnilstring(L,2)) SWIG_fail_arg("_LWVBOFILENAME::filename",2,"char const *");
-  
-  if (!SWIG_IsOK(SWIG_ConvertPtr(L,1,(void**)&arg1,SWIGTYPE_p__LWVBOFILENAME,0))){
-    SWIG_fail_ptr("LWVBOFILENAME_filename_set",1,SWIGTYPE_p__LWVBOFILENAME);
-  }
-  
-  arg2 = (char *)lua_tostring(L, 2);
-  {
-    if (arg2) {
-      arg1->filename = (char const *) malloc(strlen((const char *)arg2)+1);
-      strcpy((char *)arg1->filename, (const char *)arg2);
-    } else {
-      arg1->filename = 0;
-    }
-  }
-  
-  return SWIG_arg;
-  
-  if(0) SWIG_fail;
-  
-fail:
-  lua_error(L);
-  return SWIG_arg;
-}
-
-
 static int _wrap_LWVBOFILENAME_filename_get(lua_State* L) {
   int SWIG_arg = 0;
   struct _LWVBOFILENAME *arg1 = (struct _LWVBOFILENAME *) 0 ;
@@ -40416,7 +40152,7 @@ static int _proxy__wrap_new_LWVBOFILENAME(lua_State *L) {
 }
 static swig_lua_attribute swig_LWVBOFILENAME_attributes[] = {
     { "lvt", _wrap_LWVBOFILENAME_lvt_get, _wrap_LWVBOFILENAME_lvt_set },
-    { "filename", _wrap_LWVBOFILENAME_filename_get, _wrap_LWVBOFILENAME_filename_set },
+    { "filename", _wrap_LWVBOFILENAME_filename_get, SWIG_Lua_set_immutable },
     { "shader_index", _wrap_LWVBOFILENAME_shader_index_get, _wrap_LWVBOFILENAME_shader_index_set },
     {0,0,0}
 };
