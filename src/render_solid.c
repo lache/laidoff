@@ -227,7 +227,7 @@ void render_solid_vb_ui_uv_shader_rot_view_proj(const LWCONTEXT* pLwc,
     glUniform1i(pLwc->shader[shader_index].alpha_only_location, 1); // 1 means GL_TEXTURE1
     glUniform3f(pLwc->shader[shader_index].overlay_color_location, over_r, over_g, over_b);
     glUniform1f(pLwc->shader[shader_index].overlay_color_ratio_location, oratio);
-    glUniformMatrix4fv(pLwc->shader[shader_index].mvp_location, 1, GL_FALSE, (const GLfloat*)pLwc->proj);
+    glUniformMatrix4fv(pLwc->shader[shader_index].mvp_location, 1, GL_FALSE, (const GLfloat*)proj);
 
     float ui_scale_x = w / 2;
     float ui_scale_y = h / 2;
@@ -237,11 +237,14 @@ void render_solid_vb_ui_uv_shader_rot_view_proj(const LWCONTEXT* pLwc,
     mat4x4 view_model;
     mat4x4 proj_view_model;
     mat4x4 model_scale;
+    mat4x4 model_rotate;
     mat4x4 model_scale_rotate;
 
     mat4x4_identity(model_scale);
+    mat4x4_identity(model_rotate);
     mat4x4_scale_aniso(model_scale, model_scale, ui_scale_x, ui_scale_y, 1.0f);
-    mat4x4_rotate_Z(model_scale_rotate, model_scale, rot_z);
+    mat4x4_rotate_Z(model_rotate, model_rotate, rot_z);
+    mat4x4_mul(model_scale_rotate, model_rotate, model_scale);
     mat4x4_translate(model_translate, x, y, 0);
     mat4x4_identity(model);
     mat4x4_mul(model, model_translate, model_scale_rotate);
@@ -354,7 +357,7 @@ void render_solid_vb_ui_alpha_uv_shader_view_proj(const LWCONTEXT* pLwc,
     glUniform1i(shader->alpha_only_location, 1); // 1 means GL_TEXTURE1
     glUniform3f(shader->overlay_color_location, over_r, over_g, over_b);
     glUniform1f(shader->overlay_color_ratio_location, oratio);
-    glUniformMatrix4fv(shader->mvp_location, 1, GL_FALSE, (const GLfloat*)pLwc->proj);
+    glUniformMatrix4fv(shader->mvp_location, 1, GL_FALSE, (const GLfloat*)proj);
 
     float ui_scale_x = w / 2;
     float ui_scale_y = h / 2;

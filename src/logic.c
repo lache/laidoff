@@ -841,10 +841,6 @@ void lwc_update(LWCONTEXT* pLwc, double delta_time) {
         udp_update(pLwc, pLwc->udp);
     }
 
-    if (pLwc->udp_sea) {
-        udp_sea_update(pLwc, pLwc->udp_sea);
-    }
-
     remtex_update(pLwc->remtex, delta_time);
     
     if (pLwc->tcp) {
@@ -900,7 +896,7 @@ void lwc_update(LWCONTEXT* pLwc, double delta_time) {
     }
 
     if (pLwc->game_scene == LGS_TTL) {
-        lwttl_update(pLwc, pLwc->ttl, (float)delta_time);
+        lwttl_update(pLwc->ttl, pLwc, (float)delta_time);
     }
 
     // Touch start point will follow if the distance
@@ -1037,8 +1033,9 @@ static void s_logic_worker(zsock_t *pipe, void *args) {
     // WSAStartup should be called within
     // a thread which opens sockets.
     pLwc->udp = 0;//new_udp();
-    pLwc->udp_sea = new_udp();
-    udp_update_addr_host(pLwc->udp_sea,
+    LWUDP* sea_udp = new_udp();
+    lwttl_set_sea_udp(pLwc->ttl, sea_udp);
+    udp_update_addr_host(sea_udp,
                          pLwc->sea_udp_host_addr.host,
                          pLwc->sea_udp_host_addr.port,
                          pLwc->sea_udp_host_addr.port_str);

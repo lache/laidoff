@@ -24,6 +24,8 @@ typedef enum _LW_PUCK_GAME_PACKET {
     LPGP_LWPTTLTRACKCOORDS = 113, // server -> client
     LPGP_LWPTTLSEAAREA = 114, // server -> client
     LPGP_LWPTTLSTATICSTATE2 = 115, // server -> client
+    LPGP_LWPTTLREQUESTWAYPOINTS = 116, // client -> server
+    LPGP_LWPTTLWAYPOINTS = 117, // server -> client
 	// tcp
 	LPGP_LWPQUEUE2 = 200,
 	LPGP_LWPMAYBEMATCHED = 201,
@@ -342,7 +344,7 @@ typedef struct _LWPTTLSEAAREA {
     char name[128];
 } LWPTTLSEAAREA;
 
-// PING
+// UDP
 typedef struct _LWPTTLPING {
     unsigned char type;
     unsigned char padding0;
@@ -354,6 +356,29 @@ typedef struct _LWPTTLPING {
     int track_object_ship_id;
     int view_scale;
 } LWPTTLPING;
+
+// UDP
+typedef struct _LWPTTLREQUESTWAYPOINTS {
+    unsigned char type;
+    unsigned char padding0;
+    unsigned char padding1;
+    unsigned char padding2;
+    int ship_id;
+} LWPTTLREQUESTWAYPOINTS;
+
+// UDP
+typedef struct _LWPTTLWAYPOINTS {
+    unsigned char type;
+    unsigned char padding0;
+    unsigned char padding1;
+    unsigned char padding2;
+    int ship_id;
+    int count;
+    struct {
+        int x;
+        int y;
+    } waypoints[128];
+} LWPTTLWAYPOINTS;
 /*
 * END: should sync with packet.h in sea-server
 */

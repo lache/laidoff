@@ -1803,52 +1803,56 @@ void lw_set_device_model(LWCONTEXT* pLwc, const char* model) {
 }
 
 void lw_set_size(LWCONTEXT* pLwc, int w, int h) {
-    LOGIP("window size old (%d, %d) --> new (%d, %d)", pLwc->width, pLwc->height, w, h);
+    LOGIP("trying to set window size old (%d, %d) --> new (%d, %d)", pLwc->width, pLwc->height, w, h);
     pLwc->width = w;
     pLwc->height = h;
     if (pLwc->width > 0 && pLwc->height > 0) {
         pLwc->aspect_ratio = (float)pLwc->width / pLwc->height;
+
+        get_left_dir_pad_original_center(pLwc->aspect_ratio,
+                                         &pLwc->left_dir_pad.origin_x,
+                                         &pLwc->left_dir_pad.origin_y);
+        get_right_dir_pad_original_center(pLwc->aspect_ratio,
+                                          &pLwc->right_dir_pad.origin_x,
+                                          &pLwc->right_dir_pad.origin_y);
+
+        // Update default projection matrix (pLwc->proj)
+        logic_update_default_projection(pLwc);
+
+        // Reset dir pad input state
+        reset_dir_pad_position(&pLwc->left_dir_pad);
+        reset_dir_pad_position(&pLwc->right_dir_pad);
+
+        puck_game_reset_view_proj(pLwc, pLwc->puck_game);
+
+        lwttl_update_aspect_ratio(pLwc->ttl, pLwc->aspect_ratio);
+
+        if (pLwc->game_scene == LGS_PHYSICS || pLwc->game_scene == LGS_FONT_TEST || pLwc->game_scene == LGS_TTL) {
+            // Resize FBO
+            init_shared_fbo(pLwc);
+
+            if (pLwc->game_scene == LGS_PHYSICS || pLwc->game_scene == LGS_TTL) {
+                // Rerender HTML UI
+                htmlui_set_client_size(pLwc->htmlui, pLwc->width, pLwc->height);
+                htmlui_load_redraw_fbo(pLwc->htmlui);
+            } else {
+                // Render font FBO using render-to-texture
+                lwc_render_font_test_fbo(pLwc);
+            }
+        }
     } else {
+        LOGE("Invalid screen size detected!");
         if (pLwc->width <= 0) {
-            LOGE("Screen width is 0 or below! (%d) Aspect ratio set to 1.0f", pLwc->width);
+            LOGE("Screen width is 0 or below! (%d) Width set to 1.0f", pLwc->width);
+            pLwc->width = 1;
         }
         if (pLwc->height <= 0) {
-            LOGE("Screen height is 0 or below! (%d) Aspect ratio set to 1.0f", pLwc->height);
+            LOGE("Screen height is 0 or below! (%d) Height set to 1.0f", pLwc->height);
+            pLwc->height = 1;
         }
-        pLwc->aspect_ratio = 1.0f;
+        pLwc->aspect_ratio = (float)pLwc->width / pLwc->height;
     }
-    
-    get_left_dir_pad_original_center(pLwc->aspect_ratio,
-                                     &pLwc->left_dir_pad.origin_x,
-                                     &pLwc->left_dir_pad.origin_y);
-    get_right_dir_pad_original_center(pLwc->aspect_ratio,
-                                      &pLwc->right_dir_pad.origin_x,
-                                      &pLwc->right_dir_pad.origin_y);
-    
-    // Update default projection matrix (pLwc->proj)
-    logic_update_default_projection(pLwc);
-
-    // Reset dir pad input state
-    reset_dir_pad_position(&pLwc->left_dir_pad);
-    reset_dir_pad_position(&pLwc->right_dir_pad);
-    
-    puck_game_reset_view_proj(pLwc, pLwc->puck_game);
-
-    lwttl_update_aspect_ratio(pLwc->ttl, pLwc->aspect_ratio);
-
-    if (pLwc->game_scene == LGS_PHYSICS || pLwc->game_scene == LGS_FONT_TEST || pLwc->game_scene == LGS_TTL) {
-        // Resize FBO
-        init_shared_fbo(pLwc);
-
-        if (pLwc->game_scene == LGS_PHYSICS || pLwc->game_scene == LGS_TTL) {
-            // Rerender HTML UI
-            htmlui_set_client_size(pLwc->htmlui, pLwc->width, pLwc->height);
-            htmlui_load_redraw_fbo(pLwc->htmlui);
-        } else {
-            // Render font FBO using render-to-texture
-            lwc_render_font_test_fbo(pLwc);
-        }
-    }
+    LOGIP("new window size (%d, %d) [aspect ratio %f]", pLwc->width, pLwc->height, pLwc->aspect_ratio);
 }
 
 void lw_set_window(LWCONTEXT* pLwc, struct GLFWwindow *window) {

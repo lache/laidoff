@@ -361,8 +361,6 @@ typedef struct _LWCONTEXT {
 	LWTCP* tcp;
     // TCP context (transport tycoon lee)
     LWTCP* tcp_ttl;
-    // Sea UDP context
-    LWUDP* udp_sea;
 	// Puck game remote(server) state
 	LWPSTATE puck_game_state;
 	// Puck game remote state last received time (sec)

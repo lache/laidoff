@@ -261,6 +261,9 @@
 		function set_track_object_ship_id(ship_id)
 		    lo.lwttl_set_track_object_ship_id(c.ttl, ship_id)
 		end
+		function request_waypoints(ship_id)
+			lo.lwttl_request_waypoints(c.ttl, ship_id)
+		end
 		function map_zoom_in()
 		    local vs = lo.lwttl_view_scale(c.ttl)
 		    vs = vs / 2
