@@ -188,8 +188,10 @@ void lwttl_request_waypoints(const LWTTL* ttl, int v) {
 }
 
 void lwttl_set_view_scale(LWTTL* ttl, int v) {
-    LOGIx("ttl->view_scale %d -> %d", ttl->view_scale, v);
-    ttl->view_scale = v;
+    if (ttl->view_scale != v) {
+        LOGI("ttl->view_scale %d -> %d", ttl->view_scale, v);
+        ttl->view_scale = v;
+    }
 }
 
 int lwttl_view_scale(const LWTTL* _ttl) {
@@ -254,10 +256,10 @@ static void convert_ttl_static_state2_to_1(const LWPTTLSTATICSTATE2* s2, LWPTTLS
     s->count = s2->count;
     s->type = LPGP_LWPTTLSTATICSTATE;
     for (int i = 0; i < s2->count; i++) {
-        s->obj[i].x0 = s2->xc0 + s2->obj[i].x0;
-        s->obj[i].y0 = s2->yc0 + s2->obj[i].y0;
-        s->obj[i].x1 = s2->xc0 + s2->obj[i].x1;
-        s->obj[i].y1 = s2->yc0 + s2->obj[i].y1;
+        s->obj[i].x0 = s2->xc0 + s2->view_scale * s2->obj[i].x_scaled_offset_0;
+        s->obj[i].y0 = s2->yc0 + s2->view_scale * s2->obj[i].y_scaled_offset_0;
+        s->obj[i].x1 = s2->xc0 + s2->view_scale * s2->obj[i].x_scaled_offset_1;
+        s->obj[i].y1 = s2->yc0 + s2->view_scale * s2->obj[i].y_scaled_offset_1;
     }
 }
 
@@ -280,7 +282,7 @@ void lwttl_udp_update(LWTTL* ttl, LWUDP* udp, LWCONTEXT* pLwc) {
     float app_time = (float)pLwc->app_time;
     float ping_send_interval = lwcontext_update_interval(pLwc) * 2;
     if (udp->last_updated == 0 || app_time > udp->last_updated + ping_send_interval) {
-        lwttl_udp_send_ttlping(pLwc->ttl, udp, udp->ping_seq);
+        lwttl_udp_send_ttlping(ttl, udp, udp->ping_seq);
         udp->ping_seq++;
         udp->last_updated = app_time;
     }
@@ -391,6 +393,7 @@ void lwttl_udp_update(LWTTL* ttl, LWUDP* udp, LWCONTEXT* pLwc) {
                 //lwttl_lock_rendering_mutex(pLwc->ttl);
                 memcpy(&pLwc->ttl_static_state, &pp, sizeof(LWPTTLSTATICSTATE));
                 //lwttl_unlock_rendering_mutex(pLwc->ttl);
+                lwttl_set_view_scale(pLwc->ttl, p->view_scale);
                 break;
             }
             case LPGP_LWPTTLSEAPORTSTATE:
@@ -518,6 +521,12 @@ void lwttl_udp_update(LWTTL* ttl, LWUDP* udp, LWCONTEXT* pLwc) {
                 sprintf(script, "script:local c = lo.script_context();lo.lwttl_worldmap_scroll_to(c.ttl, %f, %f, c.sea_udp)",
                         131 + 51 / 60.0f,
                         37 + 14 / 60.0f);
+                htmlui_set_loop_key_value(pLwc->htmlui, "world-seaport", "script", script);
+
+                htmlui_set_loop_key_value(pLwc->htmlui, "world-seaport", "name", "[0,0] (LNG -180 LAT 90)");
+                sprintf(script, "script:local c = lo.script_context();lo.lwttl_worldmap_scroll_to(c.ttl, %f, %f, c.sea_udp)",
+                        -180 + 0 / 60.0f,
+                        90 + 0 / 60.0f);
                 htmlui_set_loop_key_value(pLwc->htmlui, "world-seaport", "script", script);
 
                 break;

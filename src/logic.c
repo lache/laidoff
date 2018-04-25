@@ -795,10 +795,10 @@ void lwc_update(LWCONTEXT* pLwc, double delta_time) {
 
     if (pLwc->game_scene == LGS_TTL) {
         for (int i = 0; i < pLwc->ttl_full_state.count; i++) {
-            pLwc->ttl_full_state.obj[i].x0 += (float)delta_time * pLwc->ttl_full_state.obj[i].vx;
-            pLwc->ttl_full_state.obj[i].y0 += (float)delta_time * pLwc->ttl_full_state.obj[i].vy;
-            pLwc->ttl_full_state.obj[i].x1 += (float)delta_time * pLwc->ttl_full_state.obj[i].vx;
-            pLwc->ttl_full_state.obj[i].y1 += (float)delta_time * pLwc->ttl_full_state.obj[i].vy;
+            pLwc->ttl_full_state.obj[i].fx0 += (float)delta_time * pLwc->ttl_full_state.obj[i].fvx;
+            pLwc->ttl_full_state.obj[i].fy0 += (float)delta_time * pLwc->ttl_full_state.obj[i].fvy;
+            pLwc->ttl_full_state.obj[i].fx1 += (float)delta_time * pLwc->ttl_full_state.obj[i].fvx;
+            pLwc->ttl_full_state.obj[i].fy1 += (float)delta_time * pLwc->ttl_full_state.obj[i].fvy;
         }
     }
 

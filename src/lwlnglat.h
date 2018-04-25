@@ -12,11 +12,11 @@ const static float sea_render_scale = 256.0f;
 #define LNGLAT_SEA_PING_EXTENT_IN_DEGREES ((180.0f/LNGLAT_RES_HEIGHT)*LNGLAT_SEA_PING_EXTENT_IN_CELL_PIXELS)
 
 static float cell_fx_to_lng(float fx) {
-    return -180.0f + fx / (LNGLAT_RES_WIDTH / 2.0f) * 180.0f;
+    return -180.0f + fx / LNGLAT_RES_WIDTH * 360.0f;
 }
 
 static float cell_fy_to_lat(float fy) {
-    return 90.0f - fy / (LNGLAT_RES_HEIGHT / 2.0f) * 90.0f;
+    return 90.0f - fy / LNGLAT_RES_HEIGHT * 180.0f;
 }
 
 static float cell_x_to_lng(int x) {
