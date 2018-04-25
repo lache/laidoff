@@ -525,6 +525,12 @@ void lwttl_udp_update(LWTTL* ttl, LWUDP* udp, LWCONTEXT* pLwc) {
                         37 + 14 / 60.0f);
                 htmlui_set_loop_key_value(pLwc->htmlui, "world-seaport", "script", script);
 
+                htmlui_set_loop_key_value(pLwc->htmlui, "world-seaport", "name", "Dokdo Precise");
+                sprintf(script, "script:local c = lo.script_context();lo.lwttl_worldmap_scroll_to(c.ttl, %f, %f, c.sea_udp)",
+                        131 + 52 / 60.0f + 8.045f / 3600.0f,
+                        37 + 14 / 60.0f + 21.786f / 3600.0f);
+                htmlui_set_loop_key_value(pLwc->htmlui, "world-seaport", "script", script);
+
                 htmlui_set_loop_key_value(pLwc->htmlui, "world-seaport", "name", "[0,0] (LNG -180 LAT 90)");
                 sprintf(script, "script:local c = lo.script_context();lo.lwttl_worldmap_scroll_to(c.ttl, %f, %f, c.sea_udp)",
                         -180 + 0 / 60.0f,
