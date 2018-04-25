@@ -388,10 +388,11 @@ static void render_sea_objects_nameplate(const LWCONTEXT* pLwc, const mat4x4 vie
     mat4x4_identity(proj_view);
     mat4x4_mul(proj_view, proj, view);
     const int view_scale = lwttl_view_scale(pLwc->ttl);
+    const LWPTTLFULLSTATE* ttl_full_state = lwttl_full_state(pLwc->ttl);
 
-    for (int i = 0; i < pLwc->ttl_full_state.count; i++) {
-        const float x = (pLwc->ttl_full_state.obj[i].fx1 + pLwc->ttl_full_state.obj[i].fx0) / 2;
-        const float y = (pLwc->ttl_full_state.obj[i].fy1 + pLwc->ttl_full_state.obj[i].fy0) / 2;
+    for (int i = 0; i < ttl_full_state->count; i++) {
+        const float x = (ttl_full_state->obj[i].fx1 + ttl_full_state->obj[i].fx0) / 2;
+        const float y = (ttl_full_state->obj[i].fy1 + ttl_full_state->obj[i].fy0) / 2;
         const float rx = cell_fx_to_render_coords(x, center, view_scale);
         const float ry = cell_fy_to_render_coords(y, center, view_scale);
         vec4 obj_pos_vec4 = {
@@ -413,10 +414,10 @@ static void render_sea_objects_nameplate(const LWCONTEXT* pLwc, const mat4x4 vie
         char obj_nameplate[256];
         sprintf(obj_nameplate,
                 "[%d][%d](%s) %.2f left",
-                pLwc->ttl_full_state.obj[i].id,
-                pLwc->ttl_full_state.obj[i].type,
-                pLwc->ttl_full_state.obj[i].guid,
-                pLwc->ttl_full_state.obj[i].route_left);
+                ttl_full_state->obj[i].id,
+                ttl_full_state->obj[i].type,
+                ttl_full_state->obj[i].guid,
+                ttl_full_state->obj[i].route_left);
         test_text_block.text = obj_nameplate;
         test_text_block.text_bytelen = (int)strlen(test_text_block.text);
         test_text_block.begin_index = 0;
@@ -431,9 +432,10 @@ static void render_sea_objects_nameplate(const LWCONTEXT* pLwc, const mat4x4 vie
 
 static void render_sea_objects(const LWCONTEXT* pLwc, const mat4x4 view, const mat4x4 proj, const LWTTLLNGLAT* center) {
     const int view_scale = lwttl_view_scale(pLwc->ttl);
-    for (int i = 0; i < pLwc->ttl_full_state.count; i++) {
-        const float x = (pLwc->ttl_full_state.obj[i].fx1 + pLwc->ttl_full_state.obj[i].fx0) / 2;
-        const float y = (pLwc->ttl_full_state.obj[i].fy1 + pLwc->ttl_full_state.obj[i].fy0) / 2;
+    const LWPTTLFULLSTATE* ttl_full_state = lwttl_full_state(pLwc->ttl);
+    for (int i = 0; i < ttl_full_state->count; i++) {
+        const float x = (ttl_full_state->obj[i].fx1 + ttl_full_state->obj[i].fx0) / 2;
+        const float y = (ttl_full_state->obj[i].fy1 + ttl_full_state->obj[i].fy0) / 2;
         const float rx = cell_fx_to_render_coords(x, center, view_scale);
         const float ry = cell_fy_to_render_coords(y, center, view_scale);
         render_ship(pLwc,
@@ -566,13 +568,14 @@ static void render_sea_static_objects(const LWCONTEXT* pLwc,
                                                    proj);
     }
 
+    const LWPTTLSTATICSTATE* ttl_static_state = lwttl_static_state(pLwc->ttl);
     // land
     //lwttl_lock_rendering_mutex(pLwc->ttl);
-    for (int i = 0; i < pLwc->ttl_static_state.count; i++) {
-        const float x0 = (float)pLwc->ttl_static_state.obj[i].x0;
-        const float y0 = (float)pLwc->ttl_static_state.obj[i].y0;
-        const float x1 = (float)pLwc->ttl_static_state.obj[i].x1;
-        const float y1 = (float)pLwc->ttl_static_state.obj[i].y1;
+    for (int i = 0; i < ttl_static_state->count; i++) {
+        const float x0 = (float)ttl_static_state->obj[i].x0;
+        const float y0 = (float)ttl_static_state->obj[i].y0;
+        const float x1 = (float)ttl_static_state->obj[i].x1;
+        const float y1 = (float)ttl_static_state->obj[i].y1;
 
         const float lng0_not_clamped = cell_fx_to_lng(x0);
         const float lat0_not_clamped = cell_fy_to_lat(y0);
@@ -614,12 +617,13 @@ static void render_sea_static_objects(const LWCONTEXT* pLwc,
         view_scale_msb >>= 1;
     }
     const float size_ratio = 1.0f / sqrtf((float)(view_scale_msb_index + 1));
-    for (int i = 0; i < pLwc->ttl_seaport_state.count; i++) {
+    const LWPTTLSEAPORTSTATE* ttl_seaport_state = lwttl_seaport_state(pLwc->ttl);
+    for (int i = 0; i < ttl_seaport_state->count; i++) {
         render_seaport_icon(pLwc,
                             view,
                             proj,
-                            cell_fx_to_render_coords(pLwc->ttl_seaport_state.obj[i].x0 + 0.5f, center, view_scale),
-                            cell_fy_to_render_coords(pLwc->ttl_seaport_state.obj[i].y0 + 0.5f, center, view_scale),
+                            cell_fx_to_render_coords(ttl_seaport_state->obj[i].x0 + 0.5f, center, view_scale),
+                            cell_fy_to_render_coords(ttl_seaport_state->obj[i].y0 + 0.5f, center, view_scale),
                             0,
                             cell_render_width * view_scale * size_ratio,
                             cell_render_height * view_scale * size_ratio);
@@ -657,9 +661,10 @@ static void render_sea_static_objects_nameplate(const LWCONTEXT* pLwc, const mat
     mat4x4_identity(proj_view);
     mat4x4_mul(proj_view, proj, view);
     const int view_scale = lwttl_view_scale(pLwc->ttl);
-    for (int i = 0; i < pLwc->ttl_seaport_state.count; i++) {
-        const float x = cell_fx_to_render_coords(pLwc->ttl_seaport_state.obj[i].x0 + 1.0f, center, view_scale);
-        const float y = cell_fy_to_render_coords(pLwc->ttl_seaport_state.obj[i].y0 + 0.5f, center, view_scale);
+    const LWPTTLSEAPORTSTATE* ttl_seaport_state = lwttl_seaport_state(pLwc->ttl);
+    for (int i = 0; i < ttl_seaport_state->count; i++) {
+        const float x = cell_fx_to_render_coords(ttl_seaport_state->obj[i].x0 + 1.0f, center, view_scale);
+        const float y = cell_fy_to_render_coords(ttl_seaport_state->obj[i].y0 + 0.5f, center, view_scale);
         vec4 obj_pos_vec4 = {
             x,
             y,
@@ -676,7 +681,7 @@ static void render_sea_static_objects_nameplate(const LWCONTEXT* pLwc, const mat
         SET_COLOR_RGBA_FLOAT(test_text_block.color_normal_outline, 0, 0, 0, 1);
         SET_COLOR_RGBA_FLOAT(test_text_block.color_emp_glyph, 1, 1, 0, 1);
         SET_COLOR_RGBA_FLOAT(test_text_block.color_emp_outline, 0, 0, 0, 1);
-        test_text_block.text = pLwc->ttl_seaport_state.obj[i].name;
+        test_text_block.text = ttl_seaport_state->obj[i].name;
         test_text_block.text_bytelen = (int)strlen(test_text_block.text);
         test_text_block.begin_index = 0;
         test_text_block.end_index = test_text_block.text_bytelen;

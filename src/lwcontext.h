@@ -404,9 +404,6 @@ typedef struct _LWCONTEXT {
     float eye_x_offset;
 	void* htmlui; // LWHTMLUI
     LWPSCONTEXT* ps_context; // LWPSCONTEXT
-    LWPTTLFULLSTATE ttl_full_state;
-    LWPTTLSTATICSTATE ttl_static_state;
-    LWPTTLSEAPORTSTATE ttl_seaport_state;
     LWTTL* ttl;
     LWCOUNTRYARRAY country_array;
     int country_page;

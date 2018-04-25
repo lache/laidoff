@@ -793,15 +793,6 @@ void lwc_update(LWCONTEXT* pLwc, double delta_time) {
         deltatime_tick_delta(pLwc->update_dt, delta_time);
     }
 
-    if (pLwc->game_scene == LGS_TTL) {
-        for (int i = 0; i < pLwc->ttl_full_state.count; i++) {
-            pLwc->ttl_full_state.obj[i].fx0 += (float)delta_time * pLwc->ttl_full_state.obj[i].fvx;
-            pLwc->ttl_full_state.obj[i].fy0 += (float)delta_time * pLwc->ttl_full_state.obj[i].fvy;
-            pLwc->ttl_full_state.obj[i].fx1 += (float)delta_time * pLwc->ttl_full_state.obj[i].fvx;
-            pLwc->ttl_full_state.obj[i].fy1 += (float)delta_time * pLwc->ttl_full_state.obj[i].fvy;
-        }
-    }
-
     //const float delta_time = (float)deltatime_delta_time(pLwc->update_dt);
 
     if (pLwc->next_game_scene == LGS_INVALID && pLwc->game_scene == LGS_INVALID) {

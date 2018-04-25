@@ -27326,168 +27326,6 @@ fail:
 }
 
 
-static int _wrap_LWCONTEXT_ttl_full_state_set(lua_State* L) {
-  int SWIG_arg = 0;
-  struct _LWCONTEXT *arg1 = (struct _LWCONTEXT *) 0 ;
-  LWPTTLFULLSTATE *arg2 = (LWPTTLFULLSTATE *) 0 ;
-  
-  SWIG_check_num_args("_LWCONTEXT::ttl_full_state",2,2)
-  if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("_LWCONTEXT::ttl_full_state",1,"struct _LWCONTEXT *");
-  if(!SWIG_isptrtype(L,2)) SWIG_fail_arg("_LWCONTEXT::ttl_full_state",2,"LWPTTLFULLSTATE *");
-  
-  if (!SWIG_IsOK(SWIG_ConvertPtr(L,1,(void**)&arg1,SWIGTYPE_p__LWCONTEXT,0))){
-    SWIG_fail_ptr("LWCONTEXT_ttl_full_state_set",1,SWIGTYPE_p__LWCONTEXT);
-  }
-  
-  
-  if (!SWIG_IsOK(SWIG_ConvertPtr(L,2,(void**)&arg2,SWIGTYPE_p__LWPTTLFULLSTATE,0))){
-    SWIG_fail_ptr("LWCONTEXT_ttl_full_state_set",2,SWIGTYPE_p__LWPTTLFULLSTATE);
-  }
-  
-  if (arg1) (arg1)->ttl_full_state = *arg2;
-  
-  return SWIG_arg;
-  
-  if(0) SWIG_fail;
-  
-fail:
-  lua_error(L);
-  return SWIG_arg;
-}
-
-
-static int _wrap_LWCONTEXT_ttl_full_state_get(lua_State* L) {
-  int SWIG_arg = 0;
-  struct _LWCONTEXT *arg1 = (struct _LWCONTEXT *) 0 ;
-  LWPTTLFULLSTATE *result = 0 ;
-  
-  SWIG_check_num_args("_LWCONTEXT::ttl_full_state",1,1)
-  if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("_LWCONTEXT::ttl_full_state",1,"struct _LWCONTEXT *");
-  
-  if (!SWIG_IsOK(SWIG_ConvertPtr(L,1,(void**)&arg1,SWIGTYPE_p__LWCONTEXT,0))){
-    SWIG_fail_ptr("LWCONTEXT_ttl_full_state_get",1,SWIGTYPE_p__LWCONTEXT);
-  }
-  
-  result = (LWPTTLFULLSTATE *)& ((arg1)->ttl_full_state);
-  SWIG_NewPointerObj(L,result,SWIGTYPE_p__LWPTTLFULLSTATE,0); SWIG_arg++; 
-  return SWIG_arg;
-  
-  if(0) SWIG_fail;
-  
-fail:
-  lua_error(L);
-  return SWIG_arg;
-}
-
-
-static int _wrap_LWCONTEXT_ttl_static_state_set(lua_State* L) {
-  int SWIG_arg = 0;
-  struct _LWCONTEXT *arg1 = (struct _LWCONTEXT *) 0 ;
-  LWPTTLSTATICSTATE *arg2 = (LWPTTLSTATICSTATE *) 0 ;
-  
-  SWIG_check_num_args("_LWCONTEXT::ttl_static_state",2,2)
-  if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("_LWCONTEXT::ttl_static_state",1,"struct _LWCONTEXT *");
-  if(!SWIG_isptrtype(L,2)) SWIG_fail_arg("_LWCONTEXT::ttl_static_state",2,"LWPTTLSTATICSTATE *");
-  
-  if (!SWIG_IsOK(SWIG_ConvertPtr(L,1,(void**)&arg1,SWIGTYPE_p__LWCONTEXT,0))){
-    SWIG_fail_ptr("LWCONTEXT_ttl_static_state_set",1,SWIGTYPE_p__LWCONTEXT);
-  }
-  
-  
-  if (!SWIG_IsOK(SWIG_ConvertPtr(L,2,(void**)&arg2,SWIGTYPE_p__LWPTTLSTATICSTATE,0))){
-    SWIG_fail_ptr("LWCONTEXT_ttl_static_state_set",2,SWIGTYPE_p__LWPTTLSTATICSTATE);
-  }
-  
-  if (arg1) (arg1)->ttl_static_state = *arg2;
-  
-  return SWIG_arg;
-  
-  if(0) SWIG_fail;
-  
-fail:
-  lua_error(L);
-  return SWIG_arg;
-}
-
-
-static int _wrap_LWCONTEXT_ttl_static_state_get(lua_State* L) {
-  int SWIG_arg = 0;
-  struct _LWCONTEXT *arg1 = (struct _LWCONTEXT *) 0 ;
-  LWPTTLSTATICSTATE *result = 0 ;
-  
-  SWIG_check_num_args("_LWCONTEXT::ttl_static_state",1,1)
-  if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("_LWCONTEXT::ttl_static_state",1,"struct _LWCONTEXT *");
-  
-  if (!SWIG_IsOK(SWIG_ConvertPtr(L,1,(void**)&arg1,SWIGTYPE_p__LWCONTEXT,0))){
-    SWIG_fail_ptr("LWCONTEXT_ttl_static_state_get",1,SWIGTYPE_p__LWCONTEXT);
-  }
-  
-  result = (LWPTTLSTATICSTATE *)& ((arg1)->ttl_static_state);
-  SWIG_NewPointerObj(L,result,SWIGTYPE_p__LWPTTLSTATICSTATE,0); SWIG_arg++; 
-  return SWIG_arg;
-  
-  if(0) SWIG_fail;
-  
-fail:
-  lua_error(L);
-  return SWIG_arg;
-}
-
-
-static int _wrap_LWCONTEXT_ttl_seaport_state_set(lua_State* L) {
-  int SWIG_arg = 0;
-  struct _LWCONTEXT *arg1 = (struct _LWCONTEXT *) 0 ;
-  LWPTTLSEAPORTSTATE *arg2 = (LWPTTLSEAPORTSTATE *) 0 ;
-  
-  SWIG_check_num_args("_LWCONTEXT::ttl_seaport_state",2,2)
-  if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("_LWCONTEXT::ttl_seaport_state",1,"struct _LWCONTEXT *");
-  if(!SWIG_isptrtype(L,2)) SWIG_fail_arg("_LWCONTEXT::ttl_seaport_state",2,"LWPTTLSEAPORTSTATE *");
-  
-  if (!SWIG_IsOK(SWIG_ConvertPtr(L,1,(void**)&arg1,SWIGTYPE_p__LWCONTEXT,0))){
-    SWIG_fail_ptr("LWCONTEXT_ttl_seaport_state_set",1,SWIGTYPE_p__LWCONTEXT);
-  }
-  
-  
-  if (!SWIG_IsOK(SWIG_ConvertPtr(L,2,(void**)&arg2,SWIGTYPE_p__LWPTTLSEAPORTSTATE,0))){
-    SWIG_fail_ptr("LWCONTEXT_ttl_seaport_state_set",2,SWIGTYPE_p__LWPTTLSEAPORTSTATE);
-  }
-  
-  if (arg1) (arg1)->ttl_seaport_state = *arg2;
-  
-  return SWIG_arg;
-  
-  if(0) SWIG_fail;
-  
-fail:
-  lua_error(L);
-  return SWIG_arg;
-}
-
-
-static int _wrap_LWCONTEXT_ttl_seaport_state_get(lua_State* L) {
-  int SWIG_arg = 0;
-  struct _LWCONTEXT *arg1 = (struct _LWCONTEXT *) 0 ;
-  LWPTTLSEAPORTSTATE *result = 0 ;
-  
-  SWIG_check_num_args("_LWCONTEXT::ttl_seaport_state",1,1)
-  if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("_LWCONTEXT::ttl_seaport_state",1,"struct _LWCONTEXT *");
-  
-  if (!SWIG_IsOK(SWIG_ConvertPtr(L,1,(void**)&arg1,SWIGTYPE_p__LWCONTEXT,0))){
-    SWIG_fail_ptr("LWCONTEXT_ttl_seaport_state_get",1,SWIGTYPE_p__LWCONTEXT);
-  }
-  
-  result = (LWPTTLSEAPORTSTATE *)& ((arg1)->ttl_seaport_state);
-  SWIG_NewPointerObj(L,result,SWIGTYPE_p__LWPTTLSEAPORTSTATE,0); SWIG_arg++; 
-  return SWIG_arg;
-  
-  if(0) SWIG_fail;
-  
-fail:
-  lua_error(L);
-  return SWIG_arg;
-}
-
-
 static int _wrap_LWCONTEXT_ttl_set(lua_State* L) {
   int SWIG_arg = 0;
   struct _LWCONTEXT *arg1 = (struct _LWCONTEXT *) 0 ;
@@ -27895,9 +27733,6 @@ static swig_lua_attribute swig_LWCONTEXT_attributes[] = {
     { "eye_x_offset", _wrap_LWCONTEXT_eye_x_offset_get, _wrap_LWCONTEXT_eye_x_offset_set },
     { "htmlui", _wrap_LWCONTEXT_htmlui_get, _wrap_LWCONTEXT_htmlui_set },
     { "ps_context", _wrap_LWCONTEXT_ps_context_get, _wrap_LWCONTEXT_ps_context_set },
-    { "ttl_full_state", _wrap_LWCONTEXT_ttl_full_state_get, _wrap_LWCONTEXT_ttl_full_state_set },
-    { "ttl_static_state", _wrap_LWCONTEXT_ttl_static_state_get, _wrap_LWCONTEXT_ttl_static_state_set },
-    { "ttl_seaport_state", _wrap_LWCONTEXT_ttl_seaport_state_get, _wrap_LWCONTEXT_ttl_seaport_state_set },
     { "ttl", _wrap_LWCONTEXT_ttl_get, _wrap_LWCONTEXT_ttl_set },
     { "country_array", _wrap_LWCONTEXT_country_array_get, _wrap_LWCONTEXT_country_array_set },
     { "country_page", _wrap_LWCONTEXT_country_page_get, _wrap_LWCONTEXT_country_page_set },
@@ -95093,6 +94928,7 @@ static swig_lua_const_info swig_SwigModule_constants[]= {
     {SWIG_LUA_CONSTTAB_INT("LVT_LAND_CELL", LVT_LAND_CELL)},
     {SWIG_LUA_CONSTTAB_INT("LVT_SEAPORT_ICON", LVT_SEAPORT_ICON)},
     {SWIG_LUA_CONSTTAB_INT("LVT_EARTH", LVT_EARTH)},
+    {SWIG_LUA_CONSTTAB_INT("LVT_SEA_CELL_DEBUG", LVT_SEA_CELL_DEBUG)},
     {SWIG_LUA_CONSTTAB_INT("LVT_COUNT", LVT_COUNT)},
     {SWIG_LUA_CONSTTAB_INT("LVT_DONTCARE", LVT_DONTCARE)},
     {SWIG_LUA_CONSTTAB_INT("LSVT_TRIANGLE", LSVT_TRIANGLE)},
@@ -96256,16 +96092,16 @@ static swig_type_info _swigt__p__LWPSUDDENDEATH = {"_p__LWPSUDDENDEATH", "struct
 static swig_type_info _swigt__p__LWPSYSMSG = {"_p__LWPSYSMSG", "struct _LWPSYSMSG *|_LWPSYSMSG *|LWPSYSMSG *", 0, 0, (void*)&_wrap_class_LWPSYSMSG, 0};
 static swig_type_info _swigt__p__LWPTARGETDAMAGED = {"_p__LWPTARGETDAMAGED", "struct _LWPTARGETDAMAGED *|_LWPTARGETDAMAGED *|LWPTARGETDAMAGED *", 0, 0, (void*)&_wrap_class_LWPTARGETDAMAGED, 0};
 static swig_type_info _swigt__p__LWPTOKEN = {"_p__LWPTOKEN", "struct _LWPTOKEN *|_LWPTOKEN *|LWPTOKEN *", 0, 0, (void*)&_wrap_class_LWPTOKEN, 0};
-static swig_type_info _swigt__p__LWPTTLFULLSTATE = {"_p__LWPTTLFULLSTATE", "struct _LWPTTLFULLSTATE *|LWPTTLFULLSTATE *|_LWPTTLFULLSTATE *", 0, 0, (void*)&_wrap_class_LWPTTLFULLSTATE, 0};
+static swig_type_info _swigt__p__LWPTTLFULLSTATE = {"_p__LWPTTLFULLSTATE", "struct _LWPTTLFULLSTATE *|_LWPTTLFULLSTATE *|LWPTTLFULLSTATE *", 0, 0, (void*)&_wrap_class_LWPTTLFULLSTATE, 0};
 static swig_type_info _swigt__p__LWPTTLFULLSTATEOBJECT = {"_p__LWPTTLFULLSTATEOBJECT", "struct _LWPTTLFULLSTATEOBJECT *|_LWPTTLFULLSTATEOBJECT *|LWPTTLFULLSTATEOBJECT *", 0, 0, (void*)&_wrap_class_LWPTTLFULLSTATEOBJECT, 0};
 static swig_type_info _swigt__p__LWPTTLPING = {"_p__LWPTTLPING", "struct _LWPTTLPING *|_LWPTTLPING *|LWPTTLPING *", 0, 0, (void*)&_wrap_class_LWPTTLPING, 0};
 static swig_type_info _swigt__p__LWPTTLREQUESTWAYPOINTS = {"_p__LWPTTLREQUESTWAYPOINTS", "struct _LWPTTLREQUESTWAYPOINTS *|_LWPTTLREQUESTWAYPOINTS *|LWPTTLREQUESTWAYPOINTS *", 0, 0, (void*)&_wrap_class_LWPTTLREQUESTWAYPOINTS, 0};
 static swig_type_info _swigt__p__LWPTTLSEAAREA = {"_p__LWPTTLSEAAREA", "struct _LWPTTLSEAAREA *|_LWPTTLSEAAREA *|LWPTTLSEAAREA *", 0, 0, (void*)&_wrap_class_LWPTTLSEAAREA, 0};
 static swig_type_info _swigt__p__LWPTTLSEAPORTOBJECT = {"_p__LWPTTLSEAPORTOBJECT", "struct _LWPTTLSEAPORTOBJECT *|_LWPTTLSEAPORTOBJECT *|LWPTTLSEAPORTOBJECT *", 0, 0, (void*)&_wrap_class_LWPTTLSEAPORTOBJECT, 0};
-static swig_type_info _swigt__p__LWPTTLSEAPORTSTATE = {"_p__LWPTTLSEAPORTSTATE", "struct _LWPTTLSEAPORTSTATE *|LWPTTLSEAPORTSTATE *|_LWPTTLSEAPORTSTATE *", 0, 0, (void*)&_wrap_class_LWPTTLSEAPORTSTATE, 0};
+static swig_type_info _swigt__p__LWPTTLSEAPORTSTATE = {"_p__LWPTTLSEAPORTSTATE", "struct _LWPTTLSEAPORTSTATE *|_LWPTTLSEAPORTSTATE *|LWPTTLSEAPORTSTATE *", 0, 0, (void*)&_wrap_class_LWPTTLSEAPORTSTATE, 0};
 static swig_type_info _swigt__p__LWPTTLSTATICOBJECT = {"_p__LWPTTLSTATICOBJECT", "struct _LWPTTLSTATICOBJECT *|_LWPTTLSTATICOBJECT *|LWPTTLSTATICOBJECT *", 0, 0, (void*)&_wrap_class_LWPTTLSTATICOBJECT, 0};
 static swig_type_info _swigt__p__LWPTTLSTATICOBJECT2 = {"_p__LWPTTLSTATICOBJECT2", "struct _LWPTTLSTATICOBJECT2 *|_LWPTTLSTATICOBJECT2 *|LWPTTLSTATICOBJECT2 *", 0, 0, (void*)&_wrap_class_LWPTTLSTATICOBJECT2, 0};
-static swig_type_info _swigt__p__LWPTTLSTATICSTATE = {"_p__LWPTTLSTATICSTATE", "struct _LWPTTLSTATICSTATE *|LWPTTLSTATICSTATE *|_LWPTTLSTATICSTATE *", 0, 0, (void*)&_wrap_class_LWPTTLSTATICSTATE, 0};
+static swig_type_info _swigt__p__LWPTTLSTATICSTATE = {"_p__LWPTTLSTATICSTATE", "struct _LWPTTLSTATICSTATE *|_LWPTTLSTATICSTATE *|LWPTTLSTATICSTATE *", 0, 0, (void*)&_wrap_class_LWPTTLSTATICSTATE, 0};
 static swig_type_info _swigt__p__LWPTTLSTATICSTATE2 = {"_p__LWPTTLSTATICSTATE2", "struct _LWPTTLSTATICSTATE2 *|_LWPTTLSTATICSTATE2 *|LWPTTLSTATICSTATE2 *", 0, 0, (void*)&_wrap_class_LWPTTLSTATICSTATE2, 0};
 static swig_type_info _swigt__p__LWPTTLTRACKCOORDS = {"_p__LWPTTLTRACKCOORDS", "struct _LWPTTLTRACKCOORDS *|_LWPTTLTRACKCOORDS *|LWPTTLTRACKCOORDS *", 0, 0, (void*)&_wrap_class_LWPTTLTRACKCOORDS, 0};
 static swig_type_info _swigt__p__LWPTTLWAYPOINTS = {"_p__LWPTTLWAYPOINTS", "struct _LWPTTLWAYPOINTS *|_LWPTTLWAYPOINTS *|LWPTTLWAYPOINTS *", 0, 0, (void*)&_wrap_class_LWPTTLWAYPOINTS, 0};

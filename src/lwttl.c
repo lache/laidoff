@@ -24,6 +24,8 @@ typedef struct _LWTTLDATA_SEAPORT {
 } LWTTLDATA_SEAPORT;
 
 typedef struct _LWTTL {
+    int magic;
+    int version;
     LWTTLDATA_SEAPORT* seaport;
     size_t seaport_len;
     LWTTLWORLDMAP worldmap;
@@ -36,10 +38,16 @@ typedef struct _LWTTL {
     LWMUTEX rendering_mutex;
     LWUDP* sea_udp;
     LWPTTLWAYPOINTS waypoints;
+    // packet cache
+    LWPTTLFULLSTATE ttl_full_state;
+    LWPTTLSTATICSTATE ttl_static_state;
+    LWPTTLSEAPORTSTATE ttl_seaport_state;
 } LWTTL;
 
 LWTTL* lwttl_new(float aspect_ratio) {
     LWTTL* ttl = (LWTTL*)calloc(1, sizeof(LWTTL));
+    ttl->magic = 0x19850506;
+    ttl->version = 1;
     ttl->worldmap.render_org_x = 0;
     ttl->worldmap.render_org_y = -(2.0f - aspect_ratio) / 2;
     // Ulsan
@@ -137,6 +145,13 @@ const char* lwttl_seaarea(LWTTL* ttl) {
 }
 
 void lwttl_update(LWTTL* ttl, LWCONTEXT* pLwc, float delta_time) {
+    for (int i = 0; i < ttl->ttl_full_state.count; i++) {
+        ttl->ttl_full_state.obj[i].fx0 += (float)delta_time * ttl->ttl_full_state.obj[i].fvx;
+        ttl->ttl_full_state.obj[i].fy0 += (float)delta_time * ttl->ttl_full_state.obj[i].fvy;
+        ttl->ttl_full_state.obj[i].fx1 += (float)delta_time * ttl->ttl_full_state.obj[i].fvx;
+        ttl->ttl_full_state.obj[i].fy1 += (float)delta_time * ttl->ttl_full_state.obj[i].fvy;
+    }
+
     if (ttl->sea_udp) {
         lwttl_udp_update(ttl, ttl->sea_udp, pLwc);
     }
@@ -362,7 +377,7 @@ void lwttl_udp_update(LWTTL* ttl, LWUDP* udp, LWCONTEXT* pLwc) {
 
                 LWPTTLFULLSTATE* p = (LWPTTLFULLSTATE*)decompressed;
                 LOGIx("LWPTTLFULLSTATE: %d objects.", p->count);
-                memcpy(&pLwc->ttl_full_state, p, sizeof(LWPTTLFULLSTATE));
+                memcpy(&ttl->ttl_full_state, p, sizeof(LWPTTLFULLSTATE));
                 break;
             }
             case LPGP_LWPTTLSTATICSTATE:
@@ -375,7 +390,7 @@ void lwttl_udp_update(LWTTL* ttl, LWUDP* udp, LWCONTEXT* pLwc) {
 
                 LWPTTLSTATICSTATE* p = (LWPTTLSTATICSTATE*)decompressed;
                 LOGIx("LWPTTLSTATICSTATE: %d objects.", p->count);
-                memcpy(&pLwc->ttl_static_state, p, sizeof(LWPTTLSTATICSTATE));
+                memcpy(&ttl->ttl_static_state, p, sizeof(LWPTTLSTATICSTATE));
                 break;
             }
             case LPGP_LWPTTLSTATICSTATE2:
@@ -393,7 +408,7 @@ void lwttl_udp_update(LWTTL* ttl, LWUDP* udp, LWCONTEXT* pLwc) {
                 lwttl_set_xc0(pLwc->ttl, p->xc0);
                 lwttl_set_yc0(pLwc->ttl, p->yc0);
                 //lwttl_lock_rendering_mutex(pLwc->ttl);
-                memcpy(&pLwc->ttl_static_state, &pp, sizeof(LWPTTLSTATICSTATE));
+                memcpy(&ttl->ttl_static_state, &pp, sizeof(LWPTTLSTATICSTATE));
                 //lwttl_unlock_rendering_mutex(pLwc->ttl);
                 lwttl_set_view_scale(pLwc->ttl, p->view_scale);
                 break;
@@ -408,15 +423,15 @@ void lwttl_udp_update(LWTTL* ttl, LWUDP* udp, LWCONTEXT* pLwc) {
 
                 LWPTTLSEAPORTSTATE* p = (LWPTTLSEAPORTSTATE*)decompressed;
                 LOGIx("LWPTTLSEAPORTSTATE: %d objects.", p->count);
-                memcpy(&pLwc->ttl_seaport_state, p, sizeof(LWPTTLSEAPORTSTATE));
+                memcpy(&ttl->ttl_seaport_state, p, sizeof(LWPTTLSEAPORTSTATE));
                 // fill nearest seaports
                 /*htmlui_clear_loop(pLwc->htmlui, "seaport");
                 for (int i = 0; i < p->count; i++) {
-                htmlui_set_loop_key_value(pLwc->htmlui, "seaport", "name", pLwc->ttl_seaport_state.obj[i].name);
+                htmlui_set_loop_key_value(pLwc->htmlui, "seaport", "name", ttl->ttl_seaport_state.obj[i].name);
                 char script[128];
                 sprintf(script, "script:local c = lo.script_context();lo.lwttl_worldmap_scroll_to(c.ttl, %f, %f, c.sea_udp)",
-                cell_x_to_lng(pLwc->ttl_seaport_state.obj[i].x0),
-                cell_y_to_lat(pLwc->ttl_seaport_state.obj[i].y0));
+                cell_x_to_lng(ttl->ttl_seaport_state.obj[i].x0),
+                cell_y_to_lat(ttl->ttl_seaport_state.obj[i].y0));
                 htmlui_set_loop_key_value(pLwc->htmlui, "seaport", "script", script);
                 }*/
                 // fill world seaports
@@ -575,7 +590,23 @@ void lwttl_read_last_state(LWTTL* ttl, const LWCONTEXT* pLwc) {
     if (is_file_exist(pLwc->user_data_path, "lwttl.dat")) {
         LWTTL last_ttl;
         read_file_binary(pLwc->user_data_path, "lwttl.dat", sizeof(LWTTL), (char*)&last_ttl);
-        ttl->worldmap.center = last_ttl.worldmap.center;
-        ttl->view_scale = last_ttl.view_scale;
+        if (last_ttl.magic != ttl->magic || last_ttl.version != ttl->version) {
+            LOGIP("Last state data outdated. Will be ignored and rewritten upon exit.");
+        } else {
+            ttl->worldmap.center = last_ttl.worldmap.center;
+            ttl->view_scale = last_ttl.view_scale;
+        }
     }
+}
+
+const LWPTTLFULLSTATE* lwttl_full_state(const LWTTL* ttl) {
+    return &ttl->ttl_full_state;
+}
+
+const LWPTTLSTATICSTATE* lwttl_static_state(const LWTTL* ttl) {
+    return &ttl->ttl_static_state;
+}
+
+const LWPTTLSEAPORTSTATE* lwttl_seaport_state(const LWTTL* ttl) {
+    return &ttl->ttl_seaport_state;
 }
