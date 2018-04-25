@@ -1779,6 +1779,7 @@ LWCONTEXT* lw_init_initial_size(int width, int height) {
 	pLwc->htmlui = htmlui_new(pLwc);
 
     pLwc->ttl = lwttl_new(pLwc->aspect_ratio);
+    lwttl_read_last_state(pLwc->ttl, pLwc);
 
     pLwc->remtex = remtex_new(pLwc->tcp_host_addr.host);
 
@@ -1960,6 +1961,7 @@ void lw_deinit(LWCONTEXT* pLwc) {
 }
 
 void lw_on_destroy(LWCONTEXT* pLwc) {
+    lwttl_write_last_state(pLwc->ttl, pLwc);
     release_font(pLwc->pFnt);
     release_string(pLwc->dialog);
     deinit_net(pLwc);

@@ -52,6 +52,8 @@ int lwttl_yc0(const LWTTL* ttl);
 void lwttl_lock_rendering_mutex(LWTTL* ttl);
 void lwttl_unlock_rendering_mutex(LWTTL* ttl);
 const LWPTTLWAYPOINTS* lwttl_get_waypoints(const LWTTL* ttl);
+void lwttl_write_last_state(const LWTTL* ttl, const LWCONTEXT* pLwc);
+void lwttl_read_last_state(LWTTL* ttl, const LWCONTEXT* pLwc);
 #ifdef __cplusplus
 }
 #endif

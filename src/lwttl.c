@@ -549,3 +549,16 @@ void lwttl_udp_update(LWTTL* ttl, LWUDP* udp, LWCONTEXT* pLwc) {
 const LWPTTLWAYPOINTS* lwttl_get_waypoints(const LWTTL* ttl) {
     return &ttl->waypoints;
 }
+
+void lwttl_write_last_state(const LWTTL* ttl, const LWCONTEXT* pLwc) {
+    write_file_binary(pLwc->user_data_path, "lwttl.dat", (const char*)ttl, sizeof(LWTTL));
+}
+
+void lwttl_read_last_state(LWTTL* ttl, const LWCONTEXT* pLwc) {
+    if (is_file_exist(pLwc->user_data_path, "lwttl.dat")) {
+        LWTTL last_ttl;
+        read_file_binary(pLwc->user_data_path, "lwttl.dat", sizeof(LWTTL), (char*)&last_ttl);
+        ttl->worldmap.center = last_ttl.worldmap.center;
+        ttl->view_scale = last_ttl.view_scale;
+    }
+}

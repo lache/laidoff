@@ -5,6 +5,7 @@
 #include "lwmacro.h"
 #include <string.h>
 #include <stdlib.h>
+#include "file.h"
 // needed for 'mkdir()' call
 #if !LW_PLATFORM_WIN32
 #include <sys/types.h>
@@ -99,29 +100,76 @@ void touch_file(const char* path_prefix, const char* filename) {
 }
 
 void write_file_string(const char* path_prefix, const char* filename, const char* str) {
+    write_file(path_prefix, filename, str, -1/*not used*/, "w");
+}
+
+void write_file_binary(const char* path_prefix, const char* filename, const char* dat, size_t dat_len) {
+    write_file(path_prefix, filename, dat, dat_len, "wb");
+}
+
+void write_file(const char* path_prefix, const char* filename, const char* dat, size_t dat_len, const char* mode) {
     char path[1024] = { 0, };
     concat_path(path, path_prefix, filename);
-    FILE* f = fopen(path, "w");
+    FILE* f = fopen(path, mode);
     if (f == 0) {
         // no cached user id exists
         LOGEP("CRITICAL ERROR: Cannot open file '%s' for writing...", path);
         exit(-99);
     }
-    fprintf(f, "%s", str);
+    if (strcmp(mode, "w") == 0) {
+        fprintf(f, "%s", dat);
+    } else {
+        fwrite(dat, dat_len, 1, f);
+    }
     fclose(f);
     LOGIP("File '%s' written.", path);
 }
 
 void read_file_string(const char* path_prefix, const char* filename, size_t str_out_len, char* str_out) {
+    read_file(path_prefix, filename, str_out_len, str_out, "r");
+}
+
+void read_file_binary(const char* path_prefix, const char* filename, size_t str_out_len, char* str_out) {
+    read_file(path_prefix, filename, str_out_len, str_out, "rb");
+}
+
+void read_file(const char* path_prefix, const char* filename, size_t dat_out_len, char* dat_out, const char* mode) {
     char path[1024] = { 0, };
     concat_path(path, path_prefix, filename);
-    FILE* f = fopen(path, "r");
+    FILE* f = fopen(path, mode);
     if (f == 0) {
         // no cached user id exists
         LOGEP("CRITICAL ERROR: Cannot open file '%s' for reading...", path);
         exit(-99);
     }
-    fscanf(f, "%s", str_out);
+    if (strcmp(mode, "r") == 0) {
+        char format[16];
+        snprintf(format, sizeof(format), "%%%zus", dat_out_len - 1);
+        int fscanf_result = fscanf(f, format, dat_out);
+        if (fscanf_result != 1) {
+            LOGEP("Cannot read all string of '%s'. fscanf returned %d",
+                  path,
+                  fscanf_result);
+        }
+    } else {
+        fseek(f, 0, SEEK_END);
+        long total_size = ftell(f);
+        if (total_size <= 0) {
+            LOGEP("Total size of '%s' is %d!",
+                  path,
+                  total_size);
+            abort();
+        }
+        fseek(f, 0, SEEK_SET);
+        size_t read_size = LWMIN((size_t)total_size, dat_out_len);
+        fread(dat_out, 1, read_size, f);
+        if (read_size != total_size) {
+            LOGEP("Cannot read all data of '%s'. Buffer size = %zud, Total size = %zu",
+                  path,
+                  dat_out_len,
+                  total_size);
+        }
+    }
     fclose(f);
     LOGIP("File '%s' read.", path);
 }
