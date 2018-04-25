@@ -390,11 +390,13 @@ static void render_sea_objects_nameplate(const LWCONTEXT* pLwc, const mat4x4 vie
     const int view_scale = lwttl_view_scale(pLwc->ttl);
 
     for (int i = 0; i < pLwc->ttl_full_state.count; i++) {
-        float x = cell_fx_to_render_coords(pLwc->ttl_full_state.obj[i].fx0, center, view_scale);
-        float y = cell_fy_to_render_coords(pLwc->ttl_full_state.obj[i].fy0, center, view_scale);
+        const float x = (pLwc->ttl_full_state.obj[i].fx1 + pLwc->ttl_full_state.obj[i].fx0) / 2;
+        const float y = (pLwc->ttl_full_state.obj[i].fy1 + pLwc->ttl_full_state.obj[i].fy0) / 2;
+        const float rx = cell_fx_to_render_coords(x, center, view_scale);
+        const float ry = cell_fy_to_render_coords(y, center, view_scale);
         vec4 obj_pos_vec4 = {
-            x,
-            y,
+            rx,
+            ry,
             0,
             1,
         };
@@ -758,6 +760,13 @@ static void render_world_map(const LWCONTEXT* pLwc, const LWTTLWORLDMAP* worldma
                                      0);
 }
 
+static void degrees_to_dms(int* d, int* m, float* s, const float degrees) {
+    *d = (int)degrees;
+    const float minutes = (degrees - *d) * 60;
+    *m = (int)minutes;
+    *s = (minutes - *m) * 60;
+}
+
 static void render_coords(const LWCONTEXT* pLwc, const LWTTLLNGLAT* lng_lat_center) {
     LWTEXTBLOCK test_text_block;
     test_text_block.text_block_width = 999.0f;// 2.00f * aspect_ratio;
@@ -767,8 +776,12 @@ static void render_coords(const LWCONTEXT* pLwc, const LWTTLLNGLAT* lng_lat_cent
     SET_COLOR_RGBA_FLOAT(test_text_block.color_normal_outline, 0, 0, 0, 1);
     SET_COLOR_RGBA_FLOAT(test_text_block.color_emp_glyph, 1, 1, 0, 1);
     SET_COLOR_RGBA_FLOAT(test_text_block.color_emp_outline, 0, 0, 0, 1);
-    char coords[64];
-    snprintf(coords, ARRAY_SIZE(coords), "LNG %.3f LAT %.3f", lng_lat_center->lng, lng_lat_center->lat);
+    char coords[256];
+    snprintf(coords,
+             ARRAY_SIZE(coords),
+             "LNG %.3f LAT %.3f",
+             lng_lat_center->lng,
+             lng_lat_center->lat);
     coords[ARRAY_SIZE(coords) - 1] = 0;
     test_text_block.text = coords;
     test_text_block.text_bytelen = (int)strlen(test_text_block.text);
@@ -778,6 +791,43 @@ static void render_coords(const LWCONTEXT* pLwc, const LWTTLLNGLAT* lng_lat_cent
     test_text_block.text_block_x = 0.0f;
     test_text_block.text_block_y = 1.0f;
     test_text_block.align = LTBA_CENTER_TOP;
+    render_text_block(pLwc, &test_text_block);
+}
+
+static void render_coords_dms(const LWCONTEXT* pLwc, const LWTTLLNGLAT* lng_lat_center) {
+    LWTEXTBLOCK test_text_block;
+    test_text_block.text_block_width = 999.0f;// 2.00f * aspect_ratio;
+    test_text_block.text_block_line_height = DEFAULT_TEXT_BLOCK_LINE_HEIGHT_F;
+    test_text_block.size = DEFAULT_TEXT_BLOCK_SIZE_E;
+    SET_COLOR_RGBA_FLOAT(test_text_block.color_normal_glyph, 1, 1, 1, 1);
+    SET_COLOR_RGBA_FLOAT(test_text_block.color_normal_outline, 0, 0, 0, 1);
+    SET_COLOR_RGBA_FLOAT(test_text_block.color_emp_glyph, 1, 1, 0, 1);
+    SET_COLOR_RGBA_FLOAT(test_text_block.color_emp_outline, 0, 0, 0, 1);
+    char coords[256];
+    int lng_d, lng_m;
+    float lng_s;
+    int lat_d, lat_m;
+    float lat_s;
+    degrees_to_dms(&lng_d, &lng_m, &lng_s, lng_lat_center->lng);
+    degrees_to_dms(&lat_d, &lat_m, &lat_s, lng_lat_center->lat);
+    snprintf(coords,
+             ARRAY_SIZE(coords),
+             "LNG\n%dD\n%dM\n%.3fS\nLAT\n%dD\n%dM\n%.3fS",
+             lng_d,
+             lng_m,
+             lng_s,
+             lat_d,
+             lat_m,
+             lat_s);
+    coords[ARRAY_SIZE(coords) - 1] = 0;
+    test_text_block.text = coords;
+    test_text_block.text_bytelen = (int)strlen(test_text_block.text);
+    test_text_block.begin_index = 0;
+    test_text_block.end_index = test_text_block.text_bytelen;
+    test_text_block.multiline = 1;
+    test_text_block.text_block_x = -pLwc->aspect_ratio + 0.3f;
+    test_text_block.text_block_y = 0;
+    test_text_block.align = LTBA_LEFT_TOP;
     render_text_block(pLwc, &test_text_block);
 }
 
@@ -880,6 +930,7 @@ void lwc_render_ttl(const LWCONTEXT* pLwc) {
     }
     render_coords(pLwc, &lng_lat_center);
     render_region_name(pLwc);
+    render_coords_dms(pLwc, &lng_lat_center);
     glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
     // render FBO (HTML UI)
     render_solid_box_ui_lvt_flip_y_uv(pLwc, 0, 0, 2 * pLwc->aspect_ratio, 2, pLwc->shared_fbo.color_tex, LVT_CENTER_CENTER_ANCHORED_SQUARE, 1);
