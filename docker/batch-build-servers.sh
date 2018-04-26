@@ -15,7 +15,26 @@ cp bin/laidoff-server ../bin/
 cd ..
 
 # br-server (all-in-one server binary)
-CC=/usr/local/musl/bin/musl-gcc go build --ldflags '-w -linkmode external -extldflags "-static"' -o ./bin/br-server ../br-server/br.go
+TMP_GOPATH="/tmp/gopath"
+GITHUB_PATH="$(git remote -v | grep "$(cat ../.author)" | head -n1 | cut -d"@" -f2 | cut -d"." -f1-2 | tr ":" "/")"
+TMP_PROJECT_PATH="${TMP_GOPATH}/src/${GITHUB_PATH}"
+TMP_USER_ROOT="$(dirname "${TMP_PROJECT_PATH}")"
+
+PROJECT_PATH="$(dirname $(pwd))"
+if [ ! -d "${TMP_PROJECT_PATH}" ]; then
+  mkdir -p "${TMP_USER_ROOT}"
+  ln -s "${PROJECT_PATH}" "${TMP_PROJECT_PATH}"
+fi
+
+cd "${TMP_PROJECT_PATH}"
+GOPATH="${TMP_GOPATH}" go get ./br-server
+if [ "$?" -ne 0 ]; then
+  echo "Your go is broken!"
+  exit 1
+fi
+
+GOPATH="${TMP_GOPATH}" CC="$(which musl-gcc)" go build --ldflags '-w -linkmode external -extldflags "-static"' -o ./bin/br-server ./br-server/br.go
+cd -
 
 cd services
 
