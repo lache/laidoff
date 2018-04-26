@@ -3,6 +3,8 @@ build:
 		docker build -t br .
 
 run-local:
+	(docker kill br-run-local || true) && \
+	(docker rm br-run-local || true) && \
 	docker run -d \
 		-p 10288:10288/udp \
 		-p 18080:18080 \
@@ -11,9 +13,12 @@ run-local:
 		-e "BATTLE_HOST=127.0.0.1" \
 		-v '/etc/ssl/certs/ca-certificates.crt:/etc/ssl/certs/ca-certificates.crt' \
 		-v br:/data \
+		--name br-run-local \
 		br
 
 run:
+	(docker kill br-run || true) && \
+	(docker rm br-run || true) && \
 	docker run -d \
 		-p 10288:10288/udp \
 		-p 18080:18080 \
@@ -22,5 +27,6 @@ run:
 		-e "BATTLE_HOST=`dig +short myip.opendns.com @resolver1.opendns.com`" \
 		-v '/etc/ssl/certs/ca-certificates.crt:/etc/ssl/certs/ca-certificates.crt' \
 		-v br:/data \
+		--name br-run \
 		br
 
