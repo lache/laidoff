@@ -1,23 +1,24 @@
 package entry
 
 import (
-	"log"
-	"net"
 	"encoding/binary"
-	"os"
 	"encoding/json"
-	"time"
-	"math/rand"
-	"github.com/gasbank/laidoff/match-server/convert"
-	"github.com/gasbank/laidoff/db-server/user"
-	"github.com/gasbank/laidoff/match-server/service"
-	"github.com/gasbank/laidoff/match-server/handler"
-	"github.com/gasbank/laidoff/match-server/config"
-	"github.com/gasbank/laidoff/match-server/battle"
-	"github.com/gasbank/laidoff/shared-server"
-	"github.com/gasbank/laidoff/rank-server/rankservice"
-	"sync"
 	"io"
+	"log"
+	"math/rand"
+	"net"
+	"os"
+	"sync"
+	"time"
+
+	"github.com/gasbank/laidoff/shared-server"
+	"github.com/gasbank/laidoff/db-server/user"
+	"github.com/gasbank/laidoff/match-server/battle"
+	"github.com/gasbank/laidoff/match-server/config"
+	"github.com/gasbank/laidoff/match-server/convert"
+	"github.com/gasbank/laidoff/match-server/handler"
+	"github.com/gasbank/laidoff/match-server/service"
+	"github.com/gasbank/laidoff/rank-server/rankservice"
 )
 
 const (
@@ -225,41 +226,47 @@ type HandleRequestRequest struct {
 
 func handleRequest(req *HandleRequestRequest) {
 	log.Printf("Accepting from %v", req.Conn.RemoteAddr())
+	previousBuf := make([]byte, 0)
 	for {
-		buf := make([]byte, 1024)
 		//conn.SetReadDeadline(time.Now().Add(10000 * time.Millisecond))
-		readLen, err := req.Conn.Read(buf)
-		if readLen == 0 {
-			log.Printf("%v: readLen is zero.", req.Conn.RemoteAddr())
+		currentBuf := make([]byte, 1024)
+		currentLen, err := req.Conn.Read(currentBuf)
+		if currentLen == 0 {
+			log.Printf("%v: currentLen is zero.", req.Conn.RemoteAddr())
 			break
 		}
 		if err != nil {
 			log.Printf("%v: Error reading: %v", req.Conn.RemoteAddr(), err.Error())
 		}
-		log.Printf("%v: Packet received (readLen=%v)", req.Conn.RemoteAddr(), readLen)
-		for readLen > 0 {
+		log.Printf("%v: Packet received (currentLen=%v)", req.Conn.RemoteAddr(), currentLen)
+		currentBuf = currentBuf[:currentLen]
+
+		buf := currentBuf
+		if len(previousBuf) > 0 {
+			buf = append(previousBuf, currentBuf...)
+		}
+		log.Printf("  bufLen %v", len(buf))
+		for len(buf) >= 4 {
 			packetSize := binary.LittleEndian.Uint16(buf)
-			packetType := binary.LittleEndian.Uint16(buf[2:])
-			log.Printf("  readLen %v", readLen)
+			if len(buf) < int(packetSize) {
+				break
+			}
+			msgBuf := buf[:packetSize]
+			packetType := binary.LittleEndian.Uint16(msgBuf[2:])
+			log.Printf("  readLen %v", len(msgBuf))
 			log.Printf("  Size %v", packetSize)
 			log.Printf("  Type %v", packetType)
 
-			if readLen != int(packetSize) {
-				// Unknown packet should be ignored
-				log.Printf("readLen and packetSize mismatch! (%v != %v)", readLen, int(packetSize))
-				break
-			}
-
 			switch packetType {
 			case convert.LPGPLWPQUEUE2:
-				handler.HandleQueue2(req.Conf, req.MatchQueue, buf, req.Conn, req.OngoingBattleMap, req.Battle, req.BattleOkQueue, req.ServiceList.Db)
+				handler.HandleQueue2(req.Conf, req.MatchQueue, msgBuf, req.Conn, req.OngoingBattleMap, req.Battle, req.BattleOkQueue, req.ServiceList.Db)
 			case convert.LPGPLWPQUEUE3:
 				req := &handler.HandleQueue3Request{
 					Conf:                req.Conf,
 					NearestMatchMap:     req.NearestMatchMap,
 					NearestMatchMapLock: req.NearestMatchMapLock,
 					MatchQueue:          req.MatchQueue,
-					Buf:                 buf,
+					Buf:                 msgBuf,
 					Conn:                req.Conn,
 					OngoingBattleMap:    req.OngoingBattleMap,
 					BattleService:       req.Battle,
@@ -271,7 +278,7 @@ func handleRequest(req *HandleRequestRequest) {
 			case convert.LPGPLWPCANCELQUEUE:
 				req := &handler.HandleCancelQueueRequest{
 					MatchQueue:          req.MatchQueue,
-					Buf:                 buf,
+					Buf:                 msgBuf,
 					Conn:                req.Conn,
 					OngoingBattleMap:    req.OngoingBattleMap,
 					Db:                  req.ServiceList.Db,
@@ -281,27 +288,26 @@ func handleRequest(req *HandleRequestRequest) {
 				}
 				handler.HandleCancelQueue(req)
 			case convert.LPGPLWPSUDDENDEATH:
-				handler.HandleSuddenDeath(req.Conf, buf) // relay 'buf' to battle service
+				handler.HandleSuddenDeath(req.Conf, msgBuf) // relay 'msgBuf' to battle service
 			case convert.LPGPLWPNEWUSER:
 				handler.HandleNewUser(req.Conn, req.ServiceList.Db)
 			case convert.LPGPLWPQUERYNICK:
-				handler.HandleQueryNick(buf, req.Conn, req.ServiceList.Rank, req.ServiceList.Db)
+				handler.HandleQueryNick(msgBuf, req.Conn, req.ServiceList.Rank, req.ServiceList.Db)
 			case convert.LPGPLWPPUSHTOKEN:
-				handler.HandlePushToken(buf, req.Conn, req.ServiceList)
+				handler.HandlePushToken(msgBuf, req.Conn, req.ServiceList)
 			case convert.LPGPLWPGETLEADERBOARD:
-				handler.HandleGetLeaderboard(buf, req.Conn, req.ServiceList)
+				handler.HandleGetLeaderboard(msgBuf, req.Conn, req.ServiceList)
 			case convert.LPGPLWPGETLEADERBOARDREVEALPLAYER:
-				handler.HandleGetLeaderboardRevealPlayer(buf, req.Conn, req.ServiceList)
+				handler.HandleGetLeaderboardRevealPlayer(msgBuf, req.Conn, req.ServiceList)
 			case convert.LPGPLWPSETNICKNAME:
-				handler.HandleSetNickname(buf, req.Conn, req.ServiceList.Db)
+				handler.HandleSetNickname(msgBuf, req.Conn, req.ServiceList.Db)
 			default:
 				// Unknown packet should be ignored
 				break
 			}
-			readLen = readLen - int(packetSize)
 			buf = buf[packetSize:]
 		}
-
+		previousBuf = buf
 	}
 	req.Conn.Close()
 	log.Printf("Conn closed %v", req.Conn.RemoteAddr())
