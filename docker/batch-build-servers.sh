@@ -20,7 +20,8 @@ GITHUB_PATH="$(git remote -v | grep "$(cat ../.author)" | head -n1 | cut -d"@" -
 TMP_PROJECT_PATH="${TMP_GOPATH}/src/${GITHUB_PATH}"
 TMP_USER_ROOT="$(dirname "${TMP_PROJECT_PATH}")"
 
-PROJECT_PATH="$(dirname $(pwd))"
+BUILD_PATH="$(pwd)"
+PROJECT_PATH="$(dirname "${BUILD_PATH}")"
 if [ ! -d "${TMP_PROJECT_PATH}" ]; then
   mkdir -p "${TMP_USER_ROOT}"
   ln -s "${PROJECT_PATH}" "${TMP_PROJECT_PATH}"
@@ -33,7 +34,7 @@ if [ "$?" -ne 0 ]; then
   exit 1
 fi
 
-GOPATH="${TMP_GOPATH}" CC="$(which musl-gcc)" go build --ldflags '-w -linkmode external -extldflags "-static"' -o ./bin/br-server ./br-server/br.go
+GOPATH="${TMP_GOPATH}" CC="$(which musl-gcc)" go build --ldflags '-w -linkmode external -extldflags "-static"' -o "${BUILD_PATH}/bin/br-server" ./br-server/br.go
 cd -
 
 cd services
