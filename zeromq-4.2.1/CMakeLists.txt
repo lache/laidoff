@@ -349,7 +349,7 @@ set (CMAKE_PYTHON_VERSION 2.7 2.6 2.5 2.4)
 find_package (PythonInterp)
 find_package (AsciiDoc)
 
-cmake_dependent_option (WITH_DOC "Build Reference Guide documentation (requires DocBook)" ON
+cmake_dependent_option (WITH_DOC "Build Reference Guide documentation (requires DocBook)" OFF
                        "PYTHONINTERP_FOUND;ASCIIDOC_FOUND" OFF)
 
 if (MSVC)
