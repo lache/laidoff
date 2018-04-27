@@ -568,44 +568,102 @@ static void render_sea_static_objects(const LWCONTEXT* pLwc,
                                                    proj);
     }
 
+    int chunk_index_array[4];
+    const int chunk_index_array_count = lwttl_query_static_object_chunk_range(pLwc->ttl,
+                                                                              lng_min,
+                                                                              lng_max,
+                                                                              lat_min,
+                                                                              lat_max,
+                                                                              view_scale,
+                                                                              chunk_index_array,
+                                                                              ARRAY_SIZE(chunk_index_array));
+    assert(chunk_index_array_count <= ARRAY_SIZE(chunk_index_array));
+    const int chunk_index_max = LWMIN(chunk_index_array_count, ARRAY_SIZE(chunk_index_array));
+    for (int ci = 0; ci < chunk_index_max; ci++) {
+        int obj_count = 0;
+        int xc0 = 0;
+        int yc0 = 0;
+        const LWPTTLSTATICOBJECT2* obj_begin = lwttl_query_static_object_chunk(pLwc->ttl,
+                                                                               chunk_index_array[ci],
+                                                                               &xc0,
+                                                                               &yc0,
+                                                                               &obj_count);
+        if (obj_begin && obj_count > 0) {
+            for (int i = 0; i < obj_count; i++) {
+                const float x0 = (float)(xc0 + view_scale * obj_begin[i].x_scaled_offset_0);
+                const float y0 = (float)(yc0 + view_scale * obj_begin[i].y_scaled_offset_0);
+                const float x1 = (float)(xc0 + view_scale * obj_begin[i].x_scaled_offset_1);
+                const float y1 = (float)(yc0 + view_scale * obj_begin[i].y_scaled_offset_1);
+
+                const float lng0_not_clamped = cell_fx_to_lng(x0);
+                const float lat0_not_clamped = cell_fy_to_lat(y0);
+                const float lng1_not_clamped = cell_fx_to_lng(x1);
+                const float lat1_not_clamped = cell_fy_to_lat(y1);
+
+                const float lng0 = LWCLAMP(lng0_not_clamped, lng_min, lng_max);
+                const float lat0 = LWCLAMP(lat0_not_clamped, lat_min, lat_max);
+                const float lng1 = LWCLAMP(lng1_not_clamped, lng_min, lng_max);
+                const float lat1 = LWCLAMP(lat1_not_clamped, lat_min, lat_max);
+
+                const float cell_x0 = lng_to_render_coords(lng0, center, view_scale);
+                const float cell_y0 = lat_to_render_coords(lat0, center, view_scale);
+                const float cell_x1 = lng_to_render_coords(lng1, center, view_scale);
+                const float cell_y1 = lat_to_render_coords(lat1, center, view_scale);
+                const float cell_w = cell_x1 - cell_x0;
+                const float cell_h = cell_y0 - cell_y1; // cell_y0 and cell_y1 are in OpenGL rendering coordinates (always cell_y0 > cell_y1)
+                                                        // skip degenerated cell
+                if (cell_w <= 0 || cell_h <= 0) {
+                    continue;
+                }
+                render_land_cell(pLwc,
+                                 view,
+                                 proj,
+                                 cell_x0,
+                                 cell_y0,
+                                 0,
+                                 cell_w,
+                                 cell_h);
+            }
+        }
+    }
     const LWPTTLSTATICSTATE2* s2 = lwttl_static_state2(pLwc->ttl);
     // land
     //lwttl_lock_rendering_mutex(pLwc->ttl);
-    for (int i = 0; i < s2->count; i++) {
-        const float x0 = (float)(s2->xc0 + s2->view_scale * s2->obj[i].x_scaled_offset_0);
-        const float y0 = (float)(s2->yc0 + s2->view_scale * s2->obj[i].y_scaled_offset_0);
-        const float x1 = (float)(s2->xc0 + s2->view_scale * s2->obj[i].x_scaled_offset_1);
-        const float y1 = (float)(s2->yc0 + s2->view_scale * s2->obj[i].y_scaled_offset_1);
+    //for (int i = 0; i < s2->count; i++) {
+    //    const float x0 = (float)(s2->xc0 + s2->view_scale * s2->obj[i].x_scaled_offset_0);
+    //    const float y0 = (float)(s2->yc0 + s2->view_scale * s2->obj[i].y_scaled_offset_0);
+    //    const float x1 = (float)(s2->xc0 + s2->view_scale * s2->obj[i].x_scaled_offset_1);
+    //    const float y1 = (float)(s2->yc0 + s2->view_scale * s2->obj[i].y_scaled_offset_1);
 
-        const float lng0_not_clamped = cell_fx_to_lng(x0);
-        const float lat0_not_clamped = cell_fy_to_lat(y0);
-        const float lng1_not_clamped = cell_fx_to_lng(x1);
-        const float lat1_not_clamped = cell_fy_to_lat(y1);
+    //    const float lng0_not_clamped = cell_fx_to_lng(x0);
+    //    const float lat0_not_clamped = cell_fy_to_lat(y0);
+    //    const float lng1_not_clamped = cell_fx_to_lng(x1);
+    //    const float lat1_not_clamped = cell_fy_to_lat(y1);
 
-        const float lng0 = LWCLAMP(lng0_not_clamped, lng_min, lng_max);
-        const float lat0 = LWCLAMP(lat0_not_clamped, lat_min, lat_max);
-        const float lng1 = LWCLAMP(lng1_not_clamped, lng_min, lng_max);
-        const float lat1 = LWCLAMP(lat1_not_clamped, lat_min, lat_max);
+    //    const float lng0 = LWCLAMP(lng0_not_clamped, lng_min, lng_max);
+    //    const float lat0 = LWCLAMP(lat0_not_clamped, lat_min, lat_max);
+    //    const float lng1 = LWCLAMP(lng1_not_clamped, lng_min, lng_max);
+    //    const float lat1 = LWCLAMP(lat1_not_clamped, lat_min, lat_max);
 
-        const float cell_x0 = lng_to_render_coords(lng0, center, view_scale);
-        const float cell_y0 = lat_to_render_coords(lat0, center, view_scale);
-        const float cell_x1 = lng_to_render_coords(lng1, center, view_scale);
-        const float cell_y1 = lat_to_render_coords(lat1, center, view_scale);
-        const float cell_w = cell_x1 - cell_x0;
-        const float cell_h = cell_y0 - cell_y1; // cell_y0 and cell_y1 are in OpenGL rendering coordinates (always cell_y0 > cell_y1)
-        // skip degenerated cell
-        if (cell_w <= 0 || cell_h <= 0) {
-            continue;
-        }
-        render_land_cell(pLwc,
-                         view,
-                         proj,
-                         cell_x0,
-                         cell_y0,
-                         0,
-                         cell_w,
-                         cell_h);
-    }
+    //    const float cell_x0 = lng_to_render_coords(lng0, center, view_scale);
+    //    const float cell_y0 = lat_to_render_coords(lat0, center, view_scale);
+    //    const float cell_x1 = lng_to_render_coords(lng1, center, view_scale);
+    //    const float cell_y1 = lat_to_render_coords(lat1, center, view_scale);
+    //    const float cell_w = cell_x1 - cell_x0;
+    //    const float cell_h = cell_y0 - cell_y1; // cell_y0 and cell_y1 are in OpenGL rendering coordinates (always cell_y0 > cell_y1)
+    //    // skip degenerated cell
+    //    if (cell_w <= 0 || cell_h <= 0) {
+    //        continue;
+    //    }
+    //    render_land_cell(pLwc,
+    //                     view,
+    //                     proj,
+    //                     cell_x0,
+    //                     cell_y0,
+    //                     0,
+    //                     cell_w,
+    //                     cell_h);
+    //}
     //lwttl_unlock_rendering_mutex(pLwc->ttl);
     // seaport
     const float cell_render_width = cell_x_to_render_coords(1, center, view_scale) - cell_x_to_render_coords(0, center, view_scale);

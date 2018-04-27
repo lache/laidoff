@@ -16,6 +16,22 @@
 #include "htmlui.h"
 #include "lwlnglat.h"
 
+#ifdef __GNUC__
+int __builtin_ctz(unsigned int x);
+int msb_index(unsigned int v) {
+    return __builtin_ctz(v);
+}
+#else
+// MSVC perhaps...
+#include <intrin.h> 
+#pragma intrinsic(_BitScanReverse)
+int msb_index(unsigned int v) {
+    unsigned long view_scale_msb_index = 0;
+    _BitScanReverse(&view_scale_msb_index, (unsigned long)v);
+    return (int)view_scale_msb_index;
+}
+#endif
+
 typedef struct _LWTTLDATA_SEAPORT {
     char locode[8];
     char name[64];
@@ -26,9 +42,9 @@ typedef struct _LWTTLDATA_SEAPORT {
 typedef union _LWTTLSTATICOBJECT2_CHUNK_KEY {
     int v;
     struct {
-        unsigned int xcc0 : 13; // 5-bit right shifted xc0
-        unsigned int ycc0 : 13; // 5-bit right shifted yc0
-        unsigned int view_scale : 6;
+        unsigned int xcc0 : 14; // right shifted xc0  200,000 pixels / chunk_size
+        unsigned int ycc0 : 14; // right shifted yc0
+        unsigned int view_scale_msb : 4; // 2^(view_scale_msb) == view_scale
     } bf;
 } LWTTLSTATICOBJECT2_CHUNK_KEY;
 
@@ -36,6 +52,20 @@ typedef struct _LWPTTLSTATICOBJECT2_CHUNK_VALUE {
     int start;
     int count;
 } LWPTTLSTATICOBJECT2_CHUNK_VALUE;
+
+typedef struct _LWTTLCELLBOUND {
+    int xc0;
+    int yc0;
+    int xc1;
+    int yc1;
+} LWTTLCELLBOUND;
+
+typedef struct _LWTTLCHUNKBOUND {
+    int xcc0;
+    int ycc0;
+    int xcc1;
+    int ycc1;
+} LWTTLCHUNKBOUND;
 
 #define TTL_STATIC_OBJECT_CHUNK_COUNT (1024)
 #define TTL_STATIC_OBJECT_COUNT (1024*1024)
@@ -304,9 +334,9 @@ static void add_to_static_object_cache(LWTTLSTATICOBJECTCACHE* c, const LWPTTLST
     }
     // check for existing chunk entry
     LWTTLSTATICOBJECT2_CHUNK_KEY chunk_key;
-    chunk_key.bf.xcc0 = s2->xc0 >> 5;
-    chunk_key.bf.ycc0 = s2->yc0 >> 5;
-    chunk_key.bf.view_scale = s2->view_scale;
+    chunk_key.bf.xcc0 = s2->xc0 >> msb_index(LNGLAT_SEA_PING_EXTENT_IN_CELL_PIXELS * s2->view_scale);
+    chunk_key.bf.ycc0 = s2->yc0 >> msb_index(LNGLAT_SEA_PING_EXTENT_IN_CELL_PIXELS * s2->view_scale);
+    chunk_key.bf.view_scale_msb = msb_index(s2->view_scale);
     int chunk_index = lower_bound_int(&c->static_object_chunk_key[0].v, c->static_object_chunk_count, chunk_key.v);
     if (chunk_index >= 0 && c->static_object_chunk_key[chunk_index].v == chunk_key.v) {
         // already exist. do nothing
@@ -339,28 +369,93 @@ static void add_to_static_object_cache(LWTTLSTATICOBJECTCACHE* c, const LWPTTLST
     }
 }
 
+
+static void cell_bound_to_chunk_bound(const LWTTLCELLBOUND* cell_bound, const int view_scale, LWTTLCHUNKBOUND* chunk_bound) {
+    const int half_cell_pixel_extent = LNGLAT_SEA_PING_EXTENT_IN_CELL_PIXELS / 2 * view_scale;
+    chunk_bound->xcc0 = ((cell_bound->xc0 + half_cell_pixel_extent) & ~(2 * half_cell_pixel_extent - 1) & ~(view_scale - 1)) >> msb_index(LNGLAT_SEA_PING_EXTENT_IN_CELL_PIXELS * view_scale);
+    chunk_bound->ycc0 = ((cell_bound->yc0 + half_cell_pixel_extent) & ~(2 * half_cell_pixel_extent - 1) & ~(view_scale - 1)) >> msb_index(LNGLAT_SEA_PING_EXTENT_IN_CELL_PIXELS * view_scale);
+    chunk_bound->xcc1 = ((cell_bound->xc1 + half_cell_pixel_extent) & ~(2 * half_cell_pixel_extent - 1) & ~(view_scale - 1)) >> msb_index(LNGLAT_SEA_PING_EXTENT_IN_CELL_PIXELS * view_scale);
+    chunk_bound->ycc1 = ((cell_bound->yc1 + half_cell_pixel_extent) & ~(2 * half_cell_pixel_extent - 1) & ~(view_scale - 1)) >> msb_index(LNGLAT_SEA_PING_EXTENT_IN_CELL_PIXELS * view_scale);
+}
+
+static void send_ttlping(const LWTTL* ttl,
+                         LWUDP* udp,
+                         const float lng,
+                         const float lat,
+                         const int ping_seq,
+                         const int view_scale,
+                         const int static_object) {
+    LWPTTLPING p;
+    memset(&p, 0, sizeof(LWPTTLPING));
+    p.type = LPGP_LWPTTLPING;
+    p.lng = lng;
+    p.lat = lat;
+    p.ex = LNGLAT_SEA_PING_EXTENT_IN_CELL_PIXELS;
+    p.ping_seq = ping_seq;
+    p.track_object_id = lwttl_track_object_id(ttl);
+    p.track_object_ship_id = lwttl_track_object_ship_id(ttl);
+    p.view_scale = view_scale;
+    p.static_object = static_object;
+    udp_send(udp, (const char*)&p, sizeof(LWPTTLPING));
+}
+
 void lwttl_udp_send_ttlping(const LWTTL* ttl, LWUDP* udp, int ping_seq) {
     const LWTTLLNGLAT* center = lwttl_center(ttl);
     const int view_scale = lwttl_view_scale(ttl);
-    const int xc0 = lwttl_lng_to_int(center->lng) & ~(32 - 1) & ~(view_scale - 1);
-    const int yc0 = lwttl_lat_to_int(center->lat) & ~(32 - 1) & ~(view_scale - 1);
-    LWTTLSTATICOBJECT2_CHUNK_KEY chunk_key;
-    chunk_key.bf.xcc0 = xc0 >> 5;
-    chunk_key.bf.ycc0 = yc0 >> 5;
-    chunk_key.bf.view_scale = view_scale;
-    /*if (find_static_object_chunk_index(&ttl->static_object_cache, chunk_key) == -1)*/ {
-        LWPTTLPING p;
-        memset(&p, 0, sizeof(LWPTTLPING));
-        p.type = LPGP_LWPTTLPING;
-        p.lng = center->lng;
-        p.lat = center->lat;
-        p.ex = LNGLAT_SEA_PING_EXTENT_IN_CELL_PIXELS;
-        p.ping_seq = ping_seq;
-        p.track_object_id = lwttl_track_object_id(ttl);
-        p.track_object_ship_id = lwttl_track_object_ship_id(ttl);
-        p.view_scale = view_scale;
-        udp_send(udp, (const char*)&p, sizeof(LWPTTLPING));
+
+    const float half_extent_in_deg = LNGLAT_SEA_PING_EXTENT_IN_DEGREES / 2 * view_scale;
+    const float lng_min = center->lng - half_extent_in_deg;
+    const float lng_max = center->lng + half_extent_in_deg;
+    const float lat_min = center->lat - half_extent_in_deg;
+    const float lat_max = center->lat + half_extent_in_deg;
+
+    LWTTLCELLBOUND cell_bound = {
+        lwttl_lng_to_int(lng_min),
+        lwttl_lat_to_int(lat_max),
+        lwttl_lng_to_int(lng_max),
+        lwttl_lat_to_int(lat_min),
+    };
+    LWTTLCHUNKBOUND chunk_bound;
+    cell_bound_to_chunk_bound(&cell_bound, view_scale, &chunk_bound);
+    chunk_bound.xcc0--;
+    chunk_bound.xcc1++;
+    chunk_bound.ycc0--;
+    chunk_bound.ycc1++;
+    const int xc_count = chunk_bound.xcc1 - chunk_bound.xcc0 + 1;
+    const int yc_count = chunk_bound.ycc1 - chunk_bound.ycc0 + 1;
+    int chunk_index_count = 0;
+    for (int i = 0; i < xc_count; i++) {
+        for (int j = 0; j < yc_count; j++) {
+            const int xcc0 = chunk_bound.xcc0 + i;
+            const int ycc0 = chunk_bound.ycc0 + j;
+            LWTTLSTATICOBJECT2_CHUNK_KEY chunk_key;
+            chunk_key.bf.xcc0 = xcc0;
+            chunk_key.bf.ycc0 = ycc0;
+            chunk_key.bf.view_scale_msb = msb_index(view_scale);
+            if (find_static_object_chunk_index(&ttl->static_object_cache, chunk_key) == -1) {
+                const int xc0 = xcc0 << msb_index(LNGLAT_SEA_PING_EXTENT_IN_CELL_PIXELS * view_scale);
+                const int yc0 = ycc0 << msb_index(LNGLAT_SEA_PING_EXTENT_IN_CELL_PIXELS * view_scale);
+                // ping for static object (land mass)
+                send_ttlping(ttl,
+                             udp,
+                             cell_x_to_lng(xc0),
+                             cell_y_to_lat(yc0),
+                             ping_seq,
+                             view_scale,
+                             1);
+            }
+        }
     }
+    // ping for dynamic object (ships, seaports)
+    const int xc0 = lwttl_lng_to_int(center->lng) & ~(view_scale - 1);
+    const int yc0 = lwttl_lat_to_int(center->lat) & ~(view_scale - 1);
+    send_ttlping(ttl,
+                 udp,
+                 cell_x_to_lng(xc0),
+                 cell_y_to_lat(yc0),
+                 ping_seq,
+                 view_scale,
+                 0);
 }
 
 void lwttl_udp_send_request_waypoints(const LWTTL* ttl, LWUDP* sea_udp, int ship_id) {
@@ -758,10 +853,58 @@ const LWPTTLSEAPORTSTATE* lwttl_seaport_state(const LWTTL* ttl) {
     return &ttl->ttl_seaport_state;
 }
 
-//int lwttl_query_static_state2(const LWTTL* ttl,
-//                              const float lng_min,
-//                              const float lng_max,
-//                              const float lat_min,
-//                              const float lat_max) {
-//    return &ttl->ttl_static_state2;
-//}
+int lwttl_query_static_object_chunk_range(const LWTTL* ttl,
+                                          const float lng_min,
+                                          const float lng_max,
+                                          const float lat_min,
+                                          const float lat_max,
+                                          const int view_scale,
+                                          int* chunk_index_array,
+                                          const int chunk_index_array_len) {
+    LWTTLCELLBOUND cell_bound = {
+        lwttl_lng_to_int(lng_min),
+        lwttl_lat_to_int(lat_max),
+        lwttl_lng_to_int(lng_max),
+        lwttl_lat_to_int(lat_min),
+    };
+    LWTTLCHUNKBOUND chunk_bound;
+    cell_bound_to_chunk_bound(&cell_bound, view_scale, &chunk_bound);
+    const int xc_count = chunk_bound.xcc1 - chunk_bound.xcc0 + 1;
+    const int yc_count = chunk_bound.ycc1 - chunk_bound.ycc0 + 1;
+    int chunk_index_count = 0;
+    for (int i = 0; i < xc_count; i++) {
+        for (int j = 0; j < yc_count; j++) {
+            const int xcc0 = chunk_bound.xcc0 + i;
+            const int ycc0 = chunk_bound.ycc0 + j;
+            LWTTLSTATICOBJECT2_CHUNK_KEY chunk_key;
+            chunk_key.bf.xcc0 = xcc0;
+            chunk_key.bf.ycc0 = ycc0;
+            chunk_key.bf.view_scale_msb = msb_index(view_scale);
+            const int chunk_index = find_static_object_chunk_index(&ttl->static_object_cache, chunk_key);
+            if (chunk_index >= 0) {
+                if (chunk_index_count < chunk_index_array_len) {
+                    chunk_index_array[chunk_index_count] = chunk_index;
+                }
+                chunk_index_count++;
+            }
+        }
+    }
+    return chunk_index_count;
+}
+
+const LWPTTLSTATICOBJECT2* lwttl_query_static_object_chunk(const LWTTL* ttl,
+                                                           const int chunk_index,
+                                                           int* xc0,
+                                                           int* yc0,
+                                                           int* count) {
+    if (chunk_index >= 0 && chunk_index < ttl->static_object_cache.static_object_chunk_count) {
+        const int start = ttl->static_object_cache.static_object_chunk_value[chunk_index].start;
+        const int view_scale = 1 << ttl->static_object_cache.static_object_chunk_key[chunk_index].bf.view_scale_msb;
+        *xc0 = ttl->static_object_cache.static_object_chunk_key[chunk_index].bf.xcc0 << msb_index(LNGLAT_SEA_PING_EXTENT_IN_CELL_PIXELS * view_scale);
+        *yc0 = ttl->static_object_cache.static_object_chunk_key[chunk_index].bf.ycc0 << msb_index(LNGLAT_SEA_PING_EXTENT_IN_CELL_PIXELS * view_scale);
+        *count = ttl->static_object_cache.static_object_chunk_value[chunk_index].count;
+        return &ttl->static_object_cache.static_object[start];
+    } else {
+        return 0;
+    }
+}

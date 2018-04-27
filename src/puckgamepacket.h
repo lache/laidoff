@@ -356,6 +356,7 @@ typedef struct _LWPTTLPING {
     int track_object_id;
     int track_object_ship_id;
     int view_scale;
+    int static_object;
 } LWPTTLPING;
 
 // UDP

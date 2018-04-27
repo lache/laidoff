@@ -10,6 +10,7 @@ typedef struct _LWPTTLWAYPOINTS LWPTTLWAYPOINTS;
 typedef struct _LWPTTLFULLSTATE LWPTTLFULLSTATE;
 typedef struct _LWPTTLSTATICSTATE2 LWPTTLSTATICSTATE2;
 typedef struct _LWPTTLSEAPORTSTATE LWPTTLSEAPORTSTATE;
+typedef struct _LWPTTLSTATICOBJECT2 LWPTTLSTATICOBJECT2;
 typedef struct _LWTTLLNGLAT {
     float lng;
     float lat;
@@ -59,6 +60,19 @@ void lwttl_read_last_state(LWTTL* ttl, const LWCONTEXT* pLwc);
 const LWPTTLFULLSTATE* lwttl_full_state(const LWTTL* ttl);
 const LWPTTLSTATICSTATE2* lwttl_static_state2(const LWTTL* ttl);
 const LWPTTLSEAPORTSTATE* lwttl_seaport_state(const LWTTL* ttl);
+int lwttl_query_static_object_chunk_range(const LWTTL* ttl,
+                                          const float lng_min,
+                                          const float lng_max,
+                                          const float lat_min,
+                                          const float lat_max,
+                                          const int view_scale,
+                                          int* chunk_index_array,
+                                          const int chunk_index_array_len);
+const LWPTTLSTATICOBJECT2* lwttl_query_static_object_chunk(const LWTTL* ttl,
+                                                           const int chunk_index,
+                                                           int* xc0,
+                                                           int* yc0,
+                                                           int* count);
 #ifdef __cplusplus
 }
 #endif
