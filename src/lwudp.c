@@ -115,7 +115,7 @@ void udp_send(LWUDP* udp, const char* data, int size) {
     //send the message
     if (sendto(udp->s, data, size, 0, (struct sockaddr *) &udp->si_other, udp->slen) == SOCKET_ERROR) {
 #if LW_PLATFORM_WIN32
-        //LOGE("sendto() failed with error code : %d", WSAGetLastError());
+        LOGE("sendto() failed with error code : %d", WSAGetLastError());
 #else
         //LOGE("sendto() failed with error...");
 #endif
