@@ -26,24 +26,23 @@ typedef struct _LWTTLDATA_SEAPORT {
 typedef union _LWTTLSTATICOBJECT2_CHUNK_KEY {
     int v;
     struct {
-        int xc0 : 13;
-        int yc0 : 13;
-        int log_view_scale : 6;
+        unsigned int xcc0 : 13; // 5-bit right shifted xc0
+        unsigned int ycc0 : 13; // 5-bit right shifted yc0
+        unsigned int view_scale : 6;
     } bf;
 } LWTTLSTATICOBJECT2_CHUNK_KEY;
 
-typedef struct _LWPTTLSTATICOBJECT2_CHUNK {
-    LWTTLSTATICOBJECT2_CHUNK_KEY key;
+typedef struct _LWPTTLSTATICOBJECT2_CHUNK_VALUE {
     int start;
     int count;
-} LWPTTLSTATICOBJECT2_CHUNK;
+} LWPTTLSTATICOBJECT2_CHUNK_VALUE;
 
 #define TTL_STATIC_OBJECT_CHUNK_COUNT (1024)
 #define TTL_STATIC_OBJECT_COUNT (1024*1024)
 
 typedef struct _LWTTLSTATICOBJECTCACHE {
     LWTTLSTATICOBJECT2_CHUNK_KEY static_object_chunk_key[TTL_STATIC_OBJECT_CHUNK_COUNT];
-    LWPTTLSTATICOBJECT2_CHUNK static_object_chunk_value[TTL_STATIC_OBJECT_CHUNK_COUNT];
+    LWPTTLSTATICOBJECT2_CHUNK_VALUE static_object_chunk_value[TTL_STATIC_OBJECT_CHUNK_COUNT];
     int static_object_chunk_count;
 
     LWPTTLSTATICOBJECT2 static_object[TTL_STATIC_OBJECT_COUNT];
@@ -200,11 +199,11 @@ void lwttl_update(LWTTL* ttl, LWCONTEXT* pLwc, float delta_time) {
 }
 
 int lwttl_lng_to_int(float lng) {
-    return (int)(LNGLAT_RES_WIDTH / 2 + (lng / 180.0f) * LNGLAT_RES_WIDTH / 2);
+    return (int)(roundf(LNGLAT_RES_WIDTH / 2 + (lng / 180.0f) * LNGLAT_RES_WIDTH / 2));
 }
 
 int lwttl_lat_to_int(float lat) {
-    return (int)(LNGLAT_RES_HEIGHT / 2 - (lat / 90.0f) * LNGLAT_RES_HEIGHT / 2);
+    return (int)(roundf(LNGLAT_RES_HEIGHT / 2 - (lat / 90.0f) * LNGLAT_RES_HEIGHT / 2));
 }
 
 const char* lwttl_http_header(const LWTTL* _ttl) {
@@ -250,19 +249,118 @@ int lwttl_view_scale(const LWTTL* _ttl) {
     return ttl->view_scale;
 }
 
+static int lower_bound_int(const int* a, int len, int v) {
+    if (len <= 0) {
+        return -1;
+    }
+    // Lower then the first element
+    int beg_value = a[0];
+    if (v < beg_value) {
+        return -1;
+    }
+    // only one element
+    if (len == 1) {
+        return 0;
+    }
+    // Higher than the last element
+    int end_value = a[len - 1];
+    if (v >= end_value) {
+        return len - 1;
+    }
+    int beg = 0;
+    int end = len - 1;
+    while (end - beg > 1) {
+        int mid = (beg + end) / 2;
+        int mid_value = a[mid];
+        if (mid_value < v) {
+            beg = mid;
+        } else if (v < mid_value) {
+            end = mid;
+        } else {
+            return mid;
+        }
+    }
+    return beg;
+}
+
+static int find_static_object_chunk_index(const LWTTLSTATICOBJECTCACHE* c, const LWTTLSTATICOBJECT2_CHUNK_KEY chunk_key) {
+    int chunk_index = lower_bound_int(&c->static_object_chunk_key[0].v, c->static_object_chunk_count, chunk_key.v);
+    if (chunk_index >= 0 && c->static_object_chunk_key[chunk_index].v == chunk_key.v) {
+        return chunk_index;
+    }
+    return -1;
+}
+
+static void add_to_static_object_cache(LWTTLSTATICOBJECTCACHE* c, const LWPTTLSTATICSTATE2* s2) {
+    if (c == 0) {
+        LOGEP("c == 0");
+        abort();
+        return;
+    }
+    if (s2 == 0) {
+        LOGEP("s2 == 0");
+        abort();
+        return;
+    }
+    // check for existing chunk entry
+    LWTTLSTATICOBJECT2_CHUNK_KEY chunk_key;
+    chunk_key.bf.xcc0 = s2->xc0 >> 5;
+    chunk_key.bf.ycc0 = s2->yc0 >> 5;
+    chunk_key.bf.view_scale = s2->view_scale;
+    int chunk_index = lower_bound_int(&c->static_object_chunk_key[0].v, c->static_object_chunk_count, chunk_key.v);
+    if (chunk_index >= 0 && c->static_object_chunk_key[chunk_index].v == chunk_key.v) {
+        // already exist. do nothing
+        // TODO update?
+    } else {
+        // new chunk entry received.
+        // check current capacity
+        if (c->static_object_chunk_count >= TTL_STATIC_OBJECT_CHUNK_COUNT) {
+            LOGEP("static_object_chunk_count exceeded.");
+            return;
+        }
+        if (c->static_object_count + s2->count > TTL_STATIC_OBJECT_COUNT) {
+            LOGEP("static_object_count exceeded.");
+            return;
+        }
+        // safe to add a new chunk at 'chunk_index'
+        // move chunk (move by 1-index by copying in backward direction)
+        for (int from = c->static_object_chunk_count - 1; from >= chunk_index + 1; from--) {
+            c->static_object_chunk_key[from + 1] = c->static_object_chunk_key[from];
+            c->static_object_chunk_value[from + 1] = c->static_object_chunk_value[from];
+        }
+        c->static_object_chunk_key[chunk_index + 1] = chunk_key;
+        c->static_object_chunk_value[chunk_index + 1].start = c->static_object_count;
+        c->static_object_chunk_value[chunk_index + 1].count = s2->count;
+        // copy static_object data
+        memcpy(&c->static_object[c->static_object_count], s2->obj, sizeof(LWPTTLSTATICOBJECT2) * s2->count);
+        // increase count indices
+        c->static_object_chunk_count++;
+        c->static_object_count += s2->count;
+    }
+}
+
 void lwttl_udp_send_ttlping(const LWTTL* ttl, LWUDP* udp, int ping_seq) {
-    LWPTTLPING p;
-    memset(&p, 0, sizeof(LWPTTLPING));
     const LWTTLLNGLAT* center = lwttl_center(ttl);
-    p.type = LPGP_LWPTTLPING;
-    p.lng = center->lng;
-    p.lat = center->lat;
-    p.ex = LNGLAT_SEA_PING_EXTENT_IN_CELL_PIXELS;
-    p.ping_seq = ping_seq;
-    p.track_object_id = lwttl_track_object_id(ttl);
-    p.track_object_ship_id = lwttl_track_object_ship_id(ttl);
-    p.view_scale = lwttl_view_scale(ttl);
-    udp_send(udp, (const char*)&p, sizeof(LWPTTLPING));
+    const int view_scale = lwttl_view_scale(ttl);
+    const int xc0 = lwttl_lng_to_int(center->lng) & ~(32 - 1) & ~(view_scale - 1);
+    const int yc0 = lwttl_lat_to_int(center->lat) & ~(32 - 1) & ~(view_scale - 1);
+    LWTTLSTATICOBJECT2_CHUNK_KEY chunk_key;
+    chunk_key.bf.xcc0 = xc0 >> 5;
+    chunk_key.bf.ycc0 = yc0 >> 5;
+    chunk_key.bf.view_scale = view_scale;
+    /*if (find_static_object_chunk_index(&ttl->static_object_cache, chunk_key) == -1)*/ {
+        LWPTTLPING p;
+        memset(&p, 0, sizeof(LWPTTLPING));
+        p.type = LPGP_LWPTTLPING;
+        p.lng = center->lng;
+        p.lat = center->lat;
+        p.ex = LNGLAT_SEA_PING_EXTENT_IN_CELL_PIXELS;
+        p.ping_seq = ping_seq;
+        p.track_object_id = lwttl_track_object_id(ttl);
+        p.track_object_ship_id = lwttl_track_object_ship_id(ttl);
+        p.view_scale = view_scale;
+        udp_send(udp, (const char*)&p, sizeof(LWPTTLPING));
+    }
 }
 
 void lwttl_udp_send_request_waypoints(const LWTTL* ttl, LWUDP* sea_udp, int ship_id) {
@@ -444,6 +542,8 @@ void lwttl_udp_update(LWTTL* ttl, LWUDP* udp, LWCONTEXT* pLwc) {
                 memcpy(&ttl->ttl_static_state2, p, sizeof(LWPTTLSTATICSTATE2));
                 //lwttl_unlock_rendering_mutex(pLwc->ttl);
                 lwttl_set_view_scale(pLwc->ttl, p->view_scale);
+
+                add_to_static_object_cache(&ttl->static_object_cache, p);
                 break;
             }
             case LPGP_LWPTTLSEAPORTSTATE:
@@ -657,3 +757,11 @@ const LWPTTLSTATICSTATE2* lwttl_static_state2(const LWTTL* ttl) {
 const LWPTTLSEAPORTSTATE* lwttl_seaport_state(const LWTTL* ttl) {
     return &ttl->ttl_seaport_state;
 }
+
+//int lwttl_query_static_state2(const LWTTL* ttl,
+//                              const float lng_min,
+//                              const float lng_max,
+//                              const float lat_min,
+//                              const float lat_max) {
+//    return &ttl->ttl_static_state2;
+//}
