@@ -40,7 +40,7 @@ typedef struct _LWTTL {
     LWPTTLWAYPOINTS waypoints;
     // packet cache
     LWPTTLFULLSTATE ttl_full_state;
-    LWPTTLSTATICSTATE ttl_static_state;
+    LWPTTLSTATICSTATE2 ttl_static_state2;
     LWPTTLSEAPORTSTATE ttl_seaport_state;
 } LWTTL;
 
@@ -267,18 +267,17 @@ void lwttl_set_sea_udp(LWTTL* ttl, LWUDP* sea_udp) {
     ttl->sea_udp = sea_udp;
 }
 
-
-static void convert_ttl_static_state2_to_1(const LWPTTLSTATICSTATE2* s2, LWPTTLSTATICSTATE* s) {
-    memset(s, 0, sizeof(LWPTTLSTATICSTATE));
-    s->count = s2->count;
-    s->type = LPGP_LWPTTLSTATICSTATE;
-    for (int i = 0; i < s2->count; i++) {
-        s->obj[i].x0 = s2->xc0 + s2->view_scale * s2->obj[i].x_scaled_offset_0;
-        s->obj[i].y0 = s2->yc0 + s2->view_scale * s2->obj[i].y_scaled_offset_0;
-        s->obj[i].x1 = s2->xc0 + s2->view_scale * s2->obj[i].x_scaled_offset_1;
-        s->obj[i].y1 = s2->yc0 + s2->view_scale * s2->obj[i].y_scaled_offset_1;
-    }
-}
+//static void convert_ttl_static_state2_to_1(const LWPTTLSTATICSTATE2* s2, LWPTTLSTATICSTATE* s) {
+//    memset(s, 0, sizeof(LWPTTLSTATICSTATE));
+//    s->count = s2->count;
+//    s->type = LPGP_LWPTTLSTATICSTATE;
+//    for (int i = 0; i < s2->count; i++) {
+//        s->obj[i].x0 = s2->xc0 + s2->view_scale * s2->obj[i].x_scaled_offset_0;
+//        s->obj[i].y0 = s2->yc0 + s2->view_scale * s2->obj[i].y_scaled_offset_0;
+//        s->obj[i].x1 = s2->xc0 + s2->view_scale * s2->obj[i].x_scaled_offset_1;
+//        s->obj[i].y1 = s2->yc0 + s2->view_scale * s2->obj[i].y_scaled_offset_1;
+//    }
+//}
 
 void lwttl_udp_update(LWTTL* ttl, LWUDP* udp, LWCONTEXT* pLwc) {
     if (pLwc->game_scene != LGS_TTL) {
@@ -380,19 +379,19 @@ void lwttl_udp_update(LWTTL* ttl, LWUDP* udp, LWCONTEXT* pLwc) {
                 memcpy(&ttl->ttl_full_state, p, sizeof(LWPTTLFULLSTATE));
                 break;
             }
-            case LPGP_LWPTTLSTATICSTATE:
-            {
-                if (decompressed_bytes != sizeof(LWPTTLSTATICSTATE)) {
-                    LOGE("LWPTTLSTATICSTATE: Size error %d (%zu expected)",
-                         decompressed_bytes,
-                         sizeof(LWPTTLSTATICSTATE));
-                }
+            //case LPGP_LWPTTLSTATICSTATE:
+            //{
+            //    if (decompressed_bytes != sizeof(LWPTTLSTATICSTATE)) {
+            //        LOGE("LWPTTLSTATICSTATE: Size error %d (%zu expected)",
+            //             decompressed_bytes,
+            //             sizeof(LWPTTLSTATICSTATE));
+            //    }
 
-                LWPTTLSTATICSTATE* p = (LWPTTLSTATICSTATE*)decompressed;
-                LOGIx("LWPTTLSTATICSTATE: %d objects.", p->count);
-                memcpy(&ttl->ttl_static_state, p, sizeof(LWPTTLSTATICSTATE));
-                break;
-            }
+            //    LWPTTLSTATICSTATE* p = (LWPTTLSTATICSTATE*)decompressed;
+            //    LOGIx("LWPTTLSTATICSTATE: %d objects.", p->count);
+            //    memcpy(&ttl->ttl_static_state, p, sizeof(LWPTTLSTATICSTATE));
+            //    break;
+            //}
             case LPGP_LWPTTLSTATICSTATE2:
             {
                 if (decompressed_bytes != sizeof(LWPTTLSTATICSTATE2)) {
@@ -403,12 +402,12 @@ void lwttl_udp_update(LWTTL* ttl, LWUDP* udp, LWCONTEXT* pLwc) {
 
                 LWPTTLSTATICSTATE2* p = (LWPTTLSTATICSTATE2*)decompressed;
                 LOGIx("LWPTTLSTATICSTATE2: %d objects.", p->count);
-                LWPTTLSTATICSTATE pp;
-                convert_ttl_static_state2_to_1(p, &pp);
+                //LWPTTLSTATICSTATE pp;
+                //convert_ttl_static_state2_to_1(p, &pp);
                 lwttl_set_xc0(pLwc->ttl, p->xc0);
                 lwttl_set_yc0(pLwc->ttl, p->yc0);
                 //lwttl_lock_rendering_mutex(pLwc->ttl);
-                memcpy(&ttl->ttl_static_state, &pp, sizeof(LWPTTLSTATICSTATE));
+                memcpy(&ttl->ttl_static_state2, p, sizeof(LWPTTLSTATICSTATE2));
                 //lwttl_unlock_rendering_mutex(pLwc->ttl);
                 lwttl_set_view_scale(pLwc->ttl, p->view_scale);
                 break;
@@ -603,8 +602,8 @@ const LWPTTLFULLSTATE* lwttl_full_state(const LWTTL* ttl) {
     return &ttl->ttl_full_state;
 }
 
-const LWPTTLSTATICSTATE* lwttl_static_state(const LWTTL* ttl) {
-    return &ttl->ttl_static_state;
+const LWPTTLSTATICSTATE2* lwttl_static_state2(const LWTTL* ttl) {
+    return &ttl->ttl_static_state2;
 }
 
 const LWPTTLSEAPORTSTATE* lwttl_seaport_state(const LWTTL* ttl) {

@@ -568,14 +568,14 @@ static void render_sea_static_objects(const LWCONTEXT* pLwc,
                                                    proj);
     }
 
-    const LWPTTLSTATICSTATE* ttl_static_state = lwttl_static_state(pLwc->ttl);
+    const LWPTTLSTATICSTATE2* s2 = lwttl_static_state2(pLwc->ttl);
     // land
     //lwttl_lock_rendering_mutex(pLwc->ttl);
-    for (int i = 0; i < ttl_static_state->count; i++) {
-        const float x0 = (float)ttl_static_state->obj[i].x0;
-        const float y0 = (float)ttl_static_state->obj[i].y0;
-        const float x1 = (float)ttl_static_state->obj[i].x1;
-        const float y1 = (float)ttl_static_state->obj[i].y1;
+    for (int i = 0; i < s2->count; i++) {
+        const float x0 = (float)(s2->xc0 + s2->view_scale * s2->obj[i].x_scaled_offset_0);
+        const float y0 = (float)(s2->yc0 + s2->view_scale * s2->obj[i].y_scaled_offset_0);
+        const float x1 = (float)(s2->xc0 + s2->view_scale * s2->obj[i].x_scaled_offset_1);
+        const float y1 = (float)(s2->yc0 + s2->view_scale * s2->obj[i].y_scaled_offset_1);
 
         const float lng0_not_clamped = cell_fx_to_lng(x0);
         const float lat0_not_clamped = cell_fy_to_lat(y0);

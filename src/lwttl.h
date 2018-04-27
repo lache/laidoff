@@ -8,7 +8,7 @@ typedef struct _LWUDP LWUDP;
 typedef struct _LWTTL LWTTL;
 typedef struct _LWPTTLWAYPOINTS LWPTTLWAYPOINTS;
 typedef struct _LWPTTLFULLSTATE LWPTTLFULLSTATE;
-typedef struct _LWPTTLSTATICSTATE LWPTTLSTATICSTATE;
+typedef struct _LWPTTLSTATICSTATE2 LWPTTLSTATICSTATE2;
 typedef struct _LWPTTLSEAPORTSTATE LWPTTLSEAPORTSTATE;
 typedef struct _LWTTLLNGLAT {
     float lng;
@@ -57,7 +57,7 @@ const LWPTTLWAYPOINTS* lwttl_get_waypoints(const LWTTL* ttl);
 void lwttl_write_last_state(const LWTTL* ttl, const LWCONTEXT* pLwc);
 void lwttl_read_last_state(LWTTL* ttl, const LWCONTEXT* pLwc);
 const LWPTTLFULLSTATE* lwttl_full_state(const LWTTL* ttl);
-const LWPTTLSTATICSTATE* lwttl_static_state(const LWTTL* ttl);
+const LWPTTLSTATICSTATE2* lwttl_static_state2(const LWTTL* ttl);
 const LWPTTLSEAPORTSTATE* lwttl_seaport_state(const LWTTL* ttl);
 #ifdef __cplusplus
 }

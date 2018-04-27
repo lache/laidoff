@@ -126,7 +126,6 @@ typedef enum _LW_MSG {
     LM_LWMSGINITSCENE,
     LM_LWMSGUIEVENT,
     LM_LWMSGEVALUATE,
-    LM_LWMSGREDRAWUIFBO,
 } LW_MSG;
 
 typedef struct _LWMSGINITFIELD {
@@ -370,8 +369,6 @@ void load_field_6_init_runtime_data(LWCONTEXT* pLwc) {
 }
 
 void load_scene_async(LWCONTEXT* pLwc, zactor_t* actor, void next_game_scene_changer(LWCONTEXT*)) {
-    next_game_scene_changer(pLwc);
-    // should load stage texture here
     zmsg_t* msg = zmsg_new();
     LWMSGINITSCENE m = {
             LM_LWMSGINITSCENE,
@@ -381,6 +378,7 @@ void load_scene_async(LWCONTEXT* pLwc, zactor_t* actor, void next_game_scene_cha
         zmsg_destroy(&msg);
         LOGE("Send message to logic worker failed!");
     }
+    next_game_scene_changer(pLwc);
 }
 
 void logic_emit_ui_event_async(LWCONTEXT* pLwc, const char* id, float w_ratio, float h_ratio) {
@@ -1069,9 +1067,13 @@ void logic_stop_logic_update_job(LWCONTEXT* pLwc) {
 void lwc_start_logic_thread(LWCONTEXT* pLwc) {
     // Start logic thread
     pLwc->logic_actor = zactor_new(s_logic_worker, pLwc);
-    // Load initial stage
-    //load_field_2_init_runtime_data_async(pLwc, pLwc->logic_actor);
-    load_scene_async(pLwc, pLwc->logic_actor, change_to_physics);
+    // Three entry points - Choose one
+    // [1] Field Scene
+    // [2] Physics (Ball Rumble) Scene
+    // [3] TTL Scene
+    /*[1]*///load_field_2_init_runtime_data_async(pLwc, pLwc->logic_actor);
+    /*[2]*///load_scene_async(pLwc, pLwc->logic_actor, change_to_physics);
+    /*[3]*/load_scene_async(pLwc, pLwc->logic_actor, change_to_ttl);
 }
 
 const char* logic_server_addr(int idx) {
