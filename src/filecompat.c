@@ -125,22 +125,22 @@ void write_file(const char* path_prefix, const char* filename, const char* dat, 
     LOGIP("File '%s' written.", path);
 }
 
-void read_file_string(const char* path_prefix, const char* filename, size_t str_out_len, char* str_out) {
-    read_file(path_prefix, filename, str_out_len, str_out, "r");
+int read_file_string(const char* path_prefix, const char* filename, size_t str_out_len, char* str_out) {
+    return read_file(path_prefix, filename, str_out_len, str_out, "r");
 }
 
-void read_file_binary(const char* path_prefix, const char* filename, size_t str_out_len, char* str_out) {
-    read_file(path_prefix, filename, str_out_len, str_out, "rb");
+int read_file_binary(const char* path_prefix, const char* filename, size_t str_out_len, char* str_out) {
+    return read_file(path_prefix, filename, str_out_len, str_out, "rb");
 }
 
-void read_file(const char* path_prefix, const char* filename, size_t dat_out_len, char* dat_out, const char* mode) {
+int read_file(const char* path_prefix, const char* filename, size_t dat_out_len, char* dat_out, const char* mode) {
     char path[1024] = { 0, };
     concat_path(path, path_prefix, filename);
     FILE* f = fopen(path, mode);
     if (f == 0) {
         // no cached user id exists
         LOGEP("CRITICAL ERROR: Cannot open file '%s' for reading...", path);
-        exit(-99);
+        return -1;
     }
     if (strcmp(mode, "r") == 0) {
         char format[16];
@@ -150,6 +150,7 @@ void read_file(const char* path_prefix, const char* filename, size_t dat_out_len
             LOGEP("Cannot read all string of '%s'. fscanf returned %d",
                   path,
                   fscanf_result);
+            return -2;
         }
     } else {
         fseek(f, 0, SEEK_END);
@@ -158,18 +159,20 @@ void read_file(const char* path_prefix, const char* filename, size_t dat_out_len
             LOGEP("Total size of '%s' is %d!",
                   path,
                   total_size);
-            abort();
+            return -3;
         }
         fseek(f, 0, SEEK_SET);
         size_t read_size = LWMIN((size_t)total_size, dat_out_len);
         fread(dat_out, 1, read_size, f);
         if (read_size != total_size) {
-            LOGEP("Cannot read all data of '%s'. Buffer size = %zud, Total size = %zu",
+            LOGEP("Cannot read all data of '%s'. Buffer size = %zu, Total size = %d",
                   path,
                   dat_out_len,
                   total_size);
+            return -4;
         }
     }
     fclose(f);
     LOGIP("File '%s' read.", path);
+    return 0;
 }

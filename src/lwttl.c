@@ -23,8 +23,42 @@ typedef struct _LWTTLDATA_SEAPORT {
     float lng;
 } LWTTLDATA_SEAPORT;
 
-typedef struct _LWTTL {
+typedef union _LWTTLSTATICOBJECT2_CHUNK_KEY {
+    int v;
+    struct {
+        int xc0 : 13;
+        int yc0 : 13;
+        int log_view_scale : 6;
+    } bf;
+} LWTTLSTATICOBJECT2_CHUNK_KEY;
+
+typedef struct _LWPTTLSTATICOBJECT2_CHUNK {
+    LWTTLSTATICOBJECT2_CHUNK_KEY key;
+    int start;
+    int count;
+} LWPTTLSTATICOBJECT2_CHUNK;
+
+#define TTL_STATIC_OBJECT_CHUNK_COUNT (1024)
+#define TTL_STATIC_OBJECT_COUNT (1024*1024)
+
+typedef struct _LWTTLSTATICOBJECTCACHE {
+    LWTTLSTATICOBJECT2_CHUNK_KEY static_object_chunk_key[TTL_STATIC_OBJECT_CHUNK_COUNT];
+    LWPTTLSTATICOBJECT2_CHUNK static_object_chunk_value[TTL_STATIC_OBJECT_CHUNK_COUNT];
+    int static_object_chunk_count;
+
+    LWPTTLSTATICOBJECT2 static_object[TTL_STATIC_OBJECT_COUNT];
+    int static_object_count;
+} LWTTLSTATICOBJECTCACHE;
+
+typedef struct _LWTTLSAVEDATA {
     int magic;
+    int version;
+    float lng;
+    float lat;
+    int view_scale;
+} LWTTLSAVEDATA;
+
+typedef struct _LWTTL {
     int version;
     LWTTLDATA_SEAPORT* seaport;
     size_t seaport_len;
@@ -42,11 +76,11 @@ typedef struct _LWTTL {
     LWPTTLFULLSTATE ttl_full_state;
     LWPTTLSTATICSTATE2 ttl_static_state2;
     LWPTTLSEAPORTSTATE ttl_seaport_state;
+    LWTTLSTATICOBJECTCACHE static_object_cache;
 } LWTTL;
 
 LWTTL* lwttl_new(float aspect_ratio) {
     LWTTL* ttl = (LWTTL*)calloc(1, sizeof(LWTTL));
-    ttl->magic = 0x19850506;
     ttl->version = 1;
     ttl->worldmap.render_org_x = 0;
     ttl->worldmap.render_org_y = -(2.0f - aspect_ratio) / 2;
@@ -582,18 +616,32 @@ const LWPTTLWAYPOINTS* lwttl_get_waypoints(const LWTTL* ttl) {
 }
 
 void lwttl_write_last_state(const LWTTL* ttl, const LWCONTEXT* pLwc) {
-    write_file_binary(pLwc->user_data_path, "lwttl.dat", (const char*)ttl, sizeof(LWTTL));
+    LWTTLSAVEDATA save;
+    save.magic = 0x19850506;
+    save.version = 1;
+    save.lng = ttl->worldmap.center.lng;
+    save.lat = ttl->worldmap.center.lat;
+    save.view_scale = ttl->view_scale;
+    write_file_binary(pLwc->user_data_path, "lwttl.dat", (const char*)&save, sizeof(LWTTLSAVEDATA));
 }
 
 void lwttl_read_last_state(LWTTL* ttl, const LWCONTEXT* pLwc) {
     if (is_file_exist(pLwc->user_data_path, "lwttl.dat")) {
-        LWTTL last_ttl;
-        read_file_binary(pLwc->user_data_path, "lwttl.dat", sizeof(LWTTL), (char*)&last_ttl);
-        if (last_ttl.magic != ttl->magic || last_ttl.version != ttl->version) {
-            LOGIP("Last state data outdated. Will be ignored and rewritten upon exit.");
+        LWTTLSAVEDATA save;
+        memset(&save, 0, sizeof(LWTTLSAVEDATA));
+        int ret = read_file_binary(pLwc->user_data_path, "lwttl.dat", sizeof(LWTTLSAVEDATA), (char*)&save);
+        if (ret == 0) {
+            if (save.magic != 0x19850506) {
+                LOGIP("TTL save data magic not match. Will be ignored and rewritten upon exit.");
+            } else if (save.version != 1) {
+                LOGIP("TTL save data version not match. Will be ignored and rewritten upon exit.");
+            } else {
+                ttl->worldmap.center.lng = LWCLAMP(save.lng, -180.0f, +180.0f);
+                ttl->worldmap.center.lat = LWCLAMP(save.lat, -90.0f, +90.0f);
+                ttl->view_scale = LWCLAMP(save.view_scale, 1, 64);
+            }
         } else {
-            ttl->worldmap.center = last_ttl.worldmap.center;
-            ttl->view_scale = last_ttl.view_scale;
+            LOGEP("TTL save data read failed! - return code: %d", ret);
         }
     }
 }

@@ -19,9 +19,9 @@ void touch_file(const char* path_prefix, const char* filename);
 void write_file_string(const char* path_prefix, const char* filename, const char* str);
 void write_file_binary(const char* path_prefix, const char* filename, const char* dat, size_t dat_len);
 void write_file(const char* path_prefix, const char* filename, const char* dat, size_t dat_len, const char* mode);
-void read_file_string(const char* path_prefix, const char* filename, size_t str_out_len, char* str_out);
-void read_file_binary(const char* path_prefix, const char* filename, size_t str_out_len, char* str_out);
-void read_file(const char* path_prefix, const char* filename, size_t dat_out_len, char* dat_out, const char* mode);
+int read_file_string(const char* path_prefix, const char* filename, size_t str_out_len, char* str_out);
+int read_file_binary(const char* path_prefix, const char* filename, size_t str_out_len, char* str_out);
+int read_file(const char* path_prefix, const char* filename, size_t dat_out_len, char* dat_out, const char* mode);
 #ifdef __cplusplus
 };
 #endif
