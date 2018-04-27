@@ -91,6 +91,13 @@ void change_to_skin(LWCONTEXT* pLwc) {
 }
 
 void change_to_physics(LWCONTEXT* pLwc) {
+    if (pLwc->tcp == 0) {
+        pLwc->tcp = new_tcp(pLwc,
+                            pLwc->user_data_path,
+                            &pLwc->tcp_host_addr,
+                            tcp_on_connect,
+                            parse_recv_packets);
+    }
     pLwc->next_game_scene = LGS_PHYSICS;
     // Initialize test font FBO
     init_shared_fbo(pLwc);
@@ -1028,11 +1035,12 @@ static void s_logic_worker(zsock_t *pipe, void *args) {
                          pLwc->sea_udp_host_addr.host,
                          pLwc->sea_udp_host_addr.port,
                          pLwc->sea_udp_host_addr.port_str);
-    pLwc->tcp = new_tcp(pLwc,
+    // Ball Rumble TCP connection: no connection made at this point. Lazy connect.
+    /*pLwc->tcp = new_tcp(pLwc,
                         pLwc->user_data_path,
                         &pLwc->tcp_host_addr,
                         tcp_on_connect,
-                        parse_recv_packets);
+                        parse_recv_packets);*/
     
     zloop_t* loop = zloop_new();
     pLwc->logic_loop = loop;
