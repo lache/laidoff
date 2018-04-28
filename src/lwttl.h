@@ -29,6 +29,7 @@ void lwttl_render_all_seaports(const LWCONTEXT* pLwc, const LWTTL* ttl, const LW
 float lnglat_to_xy(const LWCONTEXT* pLwc, float v);
 void lwttl_worldmap_scroll(LWTTL* ttl, float dlng, float dlat, float dzoom);
 void lwttl_worldmap_scroll_to(LWTTL* ttl, float lng, float lat, LWUDP* sea_udp);
+void lwttl_worldmap_scroll_to_int(LWTTL* ttl, int xc, int yc, LWUDP* sea_udp);
 const LWTTLWORLDMAP* lwttl_worldmap(LWTTL* ttl);
 void lwttl_update_aspect_ratio(LWTTL* ttl, float aspect_ratio);
 const LWTTLLNGLAT* lwttl_center(const LWTTL* ttl);
@@ -58,7 +59,6 @@ const LWPTTLWAYPOINTS* lwttl_get_waypoints(const LWTTL* ttl);
 void lwttl_write_last_state(const LWTTL* ttl, const LWCONTEXT* pLwc);
 void lwttl_read_last_state(LWTTL* ttl, const LWCONTEXT* pLwc);
 const LWPTTLFULLSTATE* lwttl_full_state(const LWTTL* ttl);
-const LWPTTLSTATICSTATE2* lwttl_static_state2(const LWTTL* ttl);
 const LWPTTLSEAPORTSTATE* lwttl_seaport_state(const LWTTL* ttl);
 int lwttl_query_static_object_chunk_range(const LWTTL* ttl,
                                           const float lng_min,
@@ -78,6 +78,7 @@ int lwttl_lng_to_floor_int(float lng);
 int lwttl_lat_to_floor_int(float lat);
 int lwttl_lng_to_ceil_int(float lng);
 int lwttl_lat_to_ceil_int(float lat);
+LWUDP* lwttl_sea_udp(LWTTL* ttl);
 #ifdef __cplusplus
 }
 #endif

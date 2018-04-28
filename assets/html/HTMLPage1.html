@@ -248,6 +248,9 @@
 		function worldmap_scroll(dlng, dlat, dscale)
 			lo.lwttl_worldmap_scroll(c.ttl, dlng/100, dlat/100, dscale)
 		end
+		function worldmap_scroll_to_int(xc, yc)
+			lo.lwttl_worldmap_scroll_to_int(c.ttl, xc, yc, lo.lwttl_sea_udp(c.ttl))
+		end
 		function go_online()
 			if c.tcp_ttl == nil then
 				lo.lw_new_tcp_ttl(c)
@@ -277,6 +280,13 @@
 		    if vs > 64 then vs = 64 end
 		    lo.lwttl_set_view_scale(c.ttl, vs)
 		    lo.lwttl_udp_send_ttlping(c.ttl, c.udp_sea, 0)
+		end
+		function select(type, id)
+		    print('[ui-select] type:'..type..',id:'..id)
+		end
+		function track(ship_id)
+		    set_track_object_ship_id(ship_id)
+		    request_waypoints(ship_id)
 		end
 		return 1234
 </script>

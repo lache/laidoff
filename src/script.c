@@ -792,9 +792,9 @@ void script_on_target_attack(void* _script) {
     }
 }
 
-void script_evaluate(void* L, const char* code, size_t code_len) {
+void script_evaluate_with_name(void* L, const char* code, size_t code_len, const char* name) {
     int top0 = lua_gettop(L);
-    int result = (luaL_loadbuffer(L, code, code_len, code) || lua_pcall(L, 0, LUA_MULTRET, 0));
+    int result = (luaL_loadbuffer(L, code, code_len, name) || lua_pcall(L, 0, LUA_MULTRET, 0));
     if (result) {
         LOGE("Failed to run lua: %s", lua_tostring(L, -1));
         lua_pop(L, 1);
@@ -807,6 +807,14 @@ void script_evaluate(void* L, const char* code, size_t code_len) {
         }
         lua_pop(L, nret);
     }
+}
+
+void script_evaluate_with_name_async(LWCONTEXT* pLwc, const char* code, size_t code_len, const char* name) {
+    logic_emit_evalute_with_name_async(pLwc, code, code_len, name);
+}
+
+void script_evaluate(void* L, const char* code, size_t code_len) {
+    script_evaluate_with_name(L, code, code_len, SCRIPT_UNNAMED_SCRIPT_NAME);
 }
 
 void script_evaluate_async(LWCONTEXT* pLwc, const char* code, size_t code_len) {

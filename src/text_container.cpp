@@ -435,7 +435,10 @@ void litehtml::text_container::link(const std::shared_ptr<litehtml::document>& d
 void litehtml::text_container::on_anchor_click(const litehtml::tchar_t * url, const litehtml::element::ptr & el) {
     LOGIx("on_anchor_click: %s", url);
     if (strncmp(url, "script:", strlen("script:")) == 0) {
-        script_evaluate_async(pLwc, url + strlen("script:"), strlen(url + strlen("script:")));
+        script_evaluate_with_name_async(pLwc,
+                                        url + strlen("script:"),
+                                        strlen(url + strlen("script:")),
+                                        "on_anchor_click");
     } else {
         const char* path_prefix = ASSETS_BASE_PATH "html" PATH_SEPARATOR;
         char path[1024] = { 0, };

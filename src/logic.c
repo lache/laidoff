@@ -419,7 +419,7 @@ void reset_runtime_context_async(LWCONTEXT* pLwc) {
     }
 }
 
-void logic_emit_evalute_async(LWCONTEXT* pLwc, const char* code, size_t code_len) {
+void logic_emit_evalute_with_name_async(LWCONTEXT* pLwc, const char* code, size_t code_len, const char* name) {
     if (code == 0 || code_len <= 0) {
         LOGE("Invalid script to evaluate");
         return;
@@ -429,11 +429,16 @@ void logic_emit_evalute_async(LWCONTEXT* pLwc, const char* code, size_t code_len
     m.type = LM_LWMSGEVALUATE;
     zmsg_addmem(msg, &m, sizeof(LWMSGEVALUATE));
     zmsg_addmem(msg, code, code_len);
+    zmsg_addmem(msg, name, strlen(name) + 1); // should include trailing NULL
     zactor_t* actor = pLwc->logic_actor;
     if (zactor_send(actor, &msg) < 0) {
         zmsg_destroy(&msg);
         LOGE("Send message to logic worker failed!");
     }
+}
+
+void logic_emit_evalute_async(LWCONTEXT* pLwc, const char* code, size_t code_len) {
+    logic_emit_evalute_with_name_async(pLwc, code, code_len, SCRIPT_UNNAMED_SCRIPT_NAME);
 }
 
 static void reinit_mq(LWCONTEXT* pLwc) {
@@ -1008,7 +1013,11 @@ static int loop_pipe_reader(zloop_t* loop, zsock_t* pipe, void* args) {
             // Lua script code in the next frame.
             f = zmsg_next(msg);
             byte* code = zframe_data(f);
-            script_evaluate(pLwc->L, code, zframe_size(f));
+            size_t code_len = zframe_size(f);
+            f = zmsg_next(msg);
+            byte* name = zframe_data(f);
+            //size_t code_len = zframe_size(f);
+            script_evaluate_with_name(pLwc->L, code, code_len, name);
         } else {
             abort();
         }

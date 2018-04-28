@@ -2,6 +2,7 @@
 #ifdef __cplusplus
 extern "C" {;
 #endif
+const static char* SCRIPT_UNNAMED_SCRIPT_NAME = "<Unnamed Script>";
 void init_lua(LWCONTEXT* pLwc);
 void spawn_all_field_object(LWCONTEXT* pLwc);
 int script_run_file_ex(LWCONTEXT* pLwc, const char* filename, int pop_result);
@@ -19,6 +20,8 @@ void script_get_string(void* L, const char* id, char* ret, int ret_max_len);
 void script_on_near_puck_player(void* _script, int dashing);
 void script_on_player_attack(void* _script);
 void script_on_target_attack(void* _script);
+void script_evaluate_with_name(void* L, const char* code, size_t code_len, const char* name);
+void script_evaluate_with_name_async(LWCONTEXT* pLwc, const char* code, size_t code_len, const char* name);
 void script_evaluate(void* L, const char* code, size_t code_len);
 void script_evaluate_async(LWCONTEXT* pLwc, const char* code, size_t code_len);
 const char* script_full_asset_path(const char* asset_type, const char* asset_name);

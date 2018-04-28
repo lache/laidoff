@@ -534,6 +534,34 @@ static void render_waypoints(const LWTTL* ttl,
     }
 }
 
+static void render_seaports(const LWCONTEXT* pLwc,
+                            const mat4x4 view,
+                            const mat4x4 proj,
+                            const LWTTLLNGLAT* center,
+                            const int view_scale) {
+    // seaport
+    const float cell_render_width = cell_x_to_render_coords(1, center, view_scale) - cell_x_to_render_coords(0, center, view_scale);
+    const float cell_render_height = cell_y_to_render_coords(0, center, view_scale) - cell_y_to_render_coords(1, center, view_scale);
+    int view_scale_msb = view_scale;
+    int view_scale_msb_index = 0;
+    while ((view_scale_msb & 1) == 0) {
+        view_scale_msb_index++;
+        view_scale_msb >>= 1;
+    }
+    const float size_ratio = 1.0f / sqrtf((float)(view_scale_msb_index + 1));
+    const LWPTTLSEAPORTSTATE* ttl_seaport_state = lwttl_seaport_state(pLwc->ttl);
+    for (int i = 0; i < ttl_seaport_state->count; i++) {
+        render_seaport_icon(pLwc,
+                            view,
+                            proj,
+                            cell_fx_to_render_coords(ttl_seaport_state->obj[i].x0 + 0.5f, center, view_scale),
+                            cell_fy_to_render_coords(ttl_seaport_state->obj[i].y0 + 0.5f, center, view_scale),
+                            0,
+                            cell_render_width * view_scale * size_ratio,
+                            cell_render_height * view_scale * size_ratio);
+    }
+}
+
 static void render_sea_static_objects(const LWCONTEXT* pLwc,
                                       const mat4x4 view,
                                       const mat4x4 proj,
@@ -572,7 +600,8 @@ static void render_sea_static_objects(const LWCONTEXT* pLwc,
                                                    view,
                                                    proj);
     }
-
+    // land
+    //lwttl_lock_rendering_mutex(pLwc->ttl);
     int chunk_index_array[(1 + LNGLAT_RENDER_EXTENT_MULTIPLIER + 1)*(1 + LNGLAT_RENDER_EXTENT_MULTIPLIER + 1)];
     const int chunk_index_array_count = lwttl_query_static_object_chunk_range(pLwc->ttl,
                                                                               lng_min,
@@ -634,66 +663,8 @@ static void render_sea_static_objects(const LWCONTEXT* pLwc,
             }
         }
     }
-    const LWPTTLSTATICSTATE2* s2 = lwttl_static_state2(pLwc->ttl);
-    // land
-    //lwttl_lock_rendering_mutex(pLwc->ttl);
-    //for (int i = 0; i < s2->count; i++) {
-    //    const float x0 = (float)(s2->xc0 + s2->view_scale * s2->obj[i].x_scaled_offset_0);
-    //    const float y0 = (float)(s2->yc0 + s2->view_scale * s2->obj[i].y_scaled_offset_0);
-    //    const float x1 = (float)(s2->xc0 + s2->view_scale * s2->obj[i].x_scaled_offset_1);
-    //    const float y1 = (float)(s2->yc0 + s2->view_scale * s2->obj[i].y_scaled_offset_1);
-
-    //    const float lng0_not_clamped = cell_fx_to_lng(x0);
-    //    const float lat0_not_clamped = cell_fy_to_lat(y0);
-    //    const float lng1_not_clamped = cell_fx_to_lng(x1);
-    //    const float lat1_not_clamped = cell_fy_to_lat(y1);
-
-    //    const float lng0 = LWCLAMP(lng0_not_clamped, lng_min, lng_max);
-    //    const float lat0 = LWCLAMP(lat0_not_clamped, lat_min, lat_max);
-    //    const float lng1 = LWCLAMP(lng1_not_clamped, lng_min, lng_max);
-    //    const float lat1 = LWCLAMP(lat1_not_clamped, lat_min, lat_max);
-
-    //    const float cell_x0 = lng_to_render_coords(lng0, center, view_scale);
-    //    const float cell_y0 = lat_to_render_coords(lat0, center, view_scale);
-    //    const float cell_x1 = lng_to_render_coords(lng1, center, view_scale);
-    //    const float cell_y1 = lat_to_render_coords(lat1, center, view_scale);
-    //    const float cell_w = cell_x1 - cell_x0;
-    //    const float cell_h = cell_y0 - cell_y1; // cell_y0 and cell_y1 are in OpenGL rendering coordinates (always cell_y0 > cell_y1)
-    //    // skip degenerated cell
-    //    if (cell_w <= 0 || cell_h <= 0) {
-    //        continue;
-    //    }
-    //    render_land_cell(pLwc,
-    //                     view,
-    //                     proj,
-    //                     cell_x0,
-    //                     cell_y0,
-    //                     0,
-    //                     cell_w,
-    //                     cell_h);
-    //}
     //lwttl_unlock_rendering_mutex(pLwc->ttl);
-    // seaport
-    const float cell_render_width = cell_x_to_render_coords(1, center, view_scale) - cell_x_to_render_coords(0, center, view_scale);
-    const float cell_render_height = cell_y_to_render_coords(0, center, view_scale) - cell_y_to_render_coords(1, center, view_scale);
-    int view_scale_msb = view_scale;
-    int view_scale_msb_index = 0;
-    while ((view_scale_msb & 1) == 0) {
-        view_scale_msb_index++;
-        view_scale_msb >>= 1;
-    }
-    const float size_ratio = 1.0f / sqrtf((float)(view_scale_msb_index + 1));
-    const LWPTTLSEAPORTSTATE* ttl_seaport_state = lwttl_seaport_state(pLwc->ttl);
-    for (int i = 0; i < ttl_seaport_state->count; i++) {
-        render_seaport_icon(pLwc,
-                            view,
-                            proj,
-                            cell_fx_to_render_coords(ttl_seaport_state->obj[i].x0 + 0.5f, center, view_scale),
-                            cell_fy_to_render_coords(ttl_seaport_state->obj[i].y0 + 0.5f, center, view_scale),
-                            0,
-                            cell_render_width * view_scale * size_ratio,
-                            cell_render_height * view_scale * size_ratio);
-    }
+
 
 
     //// water cells for debugging
@@ -987,14 +958,17 @@ void lwc_render_ttl(const LWCONTEXT* pLwc) {
     if (lwc_render_ttl_render("landcell")) {
         render_sea_static_objects(pLwc, view, proj, &lng_lat_center);
     }
+    glDisable(GL_DEPTH_TEST);
+    render_waypoints(pLwc->ttl, pLwc, view, proj, &lng_lat_center);
+    render_seaports(pLwc, view, proj, &lng_lat_center, view_scale);
+    glEnable(GL_DEPTH_TEST);
     // render sea objects(ships)
     if (lwc_render_ttl_render("world")) {
         render_world(pLwc, view, proj, ship_y, &lng_lat_center);
     }
-    // UI
     glDisable(GL_DEPTH_TEST);
-    render_waypoints(pLwc->ttl, pLwc, view, proj, &lng_lat_center);
     render_cell_pixel_selector_at_center(pLwc, view, proj, &lng_lat_center, view_scale);
+    // UI
     if (lwc_render_ttl_render("world")) {
         render_sea_objects_nameplate(pLwc, view, proj, &lng_lat_center);
     }
