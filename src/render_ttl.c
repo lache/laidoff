@@ -568,7 +568,7 @@ static void render_sea_static_objects(const LWCONTEXT* pLwc,
                                                    proj);
     }
 
-    int chunk_index_array[4];
+    int chunk_index_array[3*3];
     const int chunk_index_array_count = lwttl_query_static_object_chunk_range(pLwc->ttl,
                                                                               lng_min,
                                                                               lng_max,
@@ -577,7 +577,10 @@ static void render_sea_static_objects(const LWCONTEXT* pLwc,
                                                                               view_scale,
                                                                               chunk_index_array,
                                                                               ARRAY_SIZE(chunk_index_array));
-    assert(chunk_index_array_count <= ARRAY_SIZE(chunk_index_array));
+    if (chunk_index_array_count > ARRAY_SIZE(chunk_index_array)) {
+        LOGEP("incorrect query result");
+        assert(0);
+    }
     const int chunk_index_max = LWMIN(chunk_index_array_count, ARRAY_SIZE(chunk_index_array));
     for (int ci = 0; ci < chunk_index_max; ci++) {
         int obj_count = 0;

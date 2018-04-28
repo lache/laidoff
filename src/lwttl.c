@@ -228,12 +228,36 @@ void lwttl_update(LWTTL* ttl, LWCONTEXT* pLwc, float delta_time) {
     }
 }
 
-int lwttl_lng_to_int(float lng) {
-    return (int)(roundf(LNGLAT_RES_WIDTH / 2 + (lng / 180.0f) * LNGLAT_RES_WIDTH / 2));
+static float lwttl_lng_to_int_float(float lng) {
+    return LNGLAT_RES_WIDTH / 2 + (lng / 180.0f) * LNGLAT_RES_WIDTH / 2;
 }
 
-int lwttl_lat_to_int(float lat) {
-    return (int)(roundf(LNGLAT_RES_HEIGHT / 2 - (lat / 90.0f) * LNGLAT_RES_HEIGHT / 2));
+static int lwttl_lng_to_round_int(float lng) {
+    return (int)(roundf(lwttl_lng_to_int_float(lng)));
+}
+
+static int lwttl_lng_to_floor_int(float lng) {
+    return (int)(floorf(lwttl_lng_to_int_float(lng)));
+}
+
+static int lwttl_lng_to_ceil_int(float lng) {
+    return (int)(ceilf(lwttl_lng_to_int_float(lng)));
+}
+
+static float lwttl_lat_to_int_float(float lat) {
+    return LNGLAT_RES_HEIGHT / 2 - (lat / 90.0f) * LNGLAT_RES_HEIGHT / 2;
+}
+
+static int lwttl_lat_to_round_int(float lat) {
+    return (int)(roundf(lwttl_lat_to_int_float(lat)));
+}
+
+static int lwttl_lat_to_floor_int(float lat) {
+    return (int)(floorf(lwttl_lat_to_int_float(lat)));
+}
+
+static int lwttl_lat_to_ceil_int(float lat) {
+    return (int)(ceilf(lwttl_lat_to_int_float(lat)));
 }
 
 const char* lwttl_http_header(const LWTTL* _ttl) {
@@ -242,8 +266,8 @@ const char* lwttl_http_header(const LWTTL* _ttl) {
     const LWTTLLNGLAT* lnglat = lwttl_center(ttl);
 
     sprintf(http_header, "X-Lng: %d\r\nX-Lat: %d\r\n",
-            lwttl_lng_to_int(lnglat->lng),
-            lwttl_lat_to_int(lnglat->lat));
+            lwttl_lng_to_round_int(lnglat->lng),
+            lwttl_lat_to_round_int(lnglat->lat));
     return http_header;
 }
 
@@ -410,10 +434,10 @@ void lwttl_udp_send_ttlping(const LWTTL* ttl, LWUDP* udp, int ping_seq) {
     const float lat_max = center->lat + half_extent_in_deg;
 
     LWTTLCELLBOUND cell_bound = {
-        lwttl_lng_to_int(lng_min),
-        lwttl_lat_to_int(lat_max),
-        lwttl_lng_to_int(lng_max),
-        lwttl_lat_to_int(lat_min),
+        lwttl_lng_to_floor_int(lng_min),
+        lwttl_lat_to_floor_int(lat_max),
+        lwttl_lng_to_ceil_int(lng_max),
+        lwttl_lat_to_ceil_int(lat_min),
     };
     LWTTLCHUNKBOUND chunk_bound;
     cell_bound_to_chunk_bound(&cell_bound, view_scale, &chunk_bound);
@@ -447,8 +471,8 @@ void lwttl_udp_send_ttlping(const LWTTL* ttl, LWUDP* udp, int ping_seq) {
         }
     }
     // ping for dynamic object (ships, seaports)
-    const int xc0 = lwttl_lng_to_int(center->lng) & ~(view_scale - 1);
-    const int yc0 = lwttl_lat_to_int(center->lat) & ~(view_scale - 1);
+    const int xc0 = lwttl_lng_to_round_int(center->lng) & ~(view_scale - 1);
+    const int yc0 = lwttl_lat_to_round_int(center->lat) & ~(view_scale - 1);
     send_ttlping(ttl,
                  udp,
                  cell_x_to_lng(xc0),
@@ -862,10 +886,10 @@ int lwttl_query_static_object_chunk_range(const LWTTL* ttl,
                                           int* chunk_index_array,
                                           const int chunk_index_array_len) {
     LWTTLCELLBOUND cell_bound = {
-        lwttl_lng_to_int(lng_min),
-        lwttl_lat_to_int(lat_max),
-        lwttl_lng_to_int(lng_max),
-        lwttl_lat_to_int(lat_min),
+        lwttl_lng_to_floor_int(lng_min),
+        lwttl_lat_to_floor_int(lat_max),
+        lwttl_lng_to_ceil_int(lng_max),
+        lwttl_lat_to_ceil_int(lat_min),
     };
     LWTTLCHUNKBOUND chunk_bound;
     cell_bound_to_chunk_bound(&cell_bound, view_scale, &chunk_bound);
