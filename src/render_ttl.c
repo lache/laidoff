@@ -573,7 +573,7 @@ static void render_sea_static_objects(const LWCONTEXT* pLwc,
                                                    proj);
     }
 
-    int chunk_index_array[(1+LNGLAT_RENDER_EXTENT_MULTIPLIER+1)*(1 + LNGLAT_RENDER_EXTENT_MULTIPLIER + 1)];
+    int chunk_index_array[(1 + LNGLAT_RENDER_EXTENT_MULTIPLIER + 1)*(1 + LNGLAT_RENDER_EXTENT_MULTIPLIER + 1)];
     const int chunk_index_array_count = lwttl_query_static_object_chunk_range(pLwc->ttl,
                                                                               lng_min,
                                                                               lng_max,
@@ -720,8 +720,15 @@ static void render_sea_static_objects(const LWCONTEXT* pLwc,
     //    const float rh = ry0 - ry1; // cell_y0 and cell_y1 are in OpenGL rendering coordinates (always cell_y0 > cell_y1)
     //    render_sea_cell_debug(pLwc, view, proj, rx0, ry0, 0, rw, rh);
     //}
+}
 
-    // render cell pixel selector
+static void render_cell_pixel_selector_at_center(const LWCONTEXT* pLwc,
+                                                 const mat4x4 view,
+                                                 const mat4x4 proj,
+                                                 const LWTTLLNGLAT* center,
+                                                 const int view_scale) {
+    const float cell_render_width = cell_x_to_render_coords(1, center, view_scale) - cell_x_to_render_coords(0, center, view_scale);
+    const float cell_render_height = cell_y_to_render_coords(0, center, view_scale) - cell_y_to_render_coords(1, center, view_scale);
     const float selector_rx = cell_x_to_render_coords(lwttl_lng_to_floor_int(center->lng) & ~(view_scale - 1), center, view_scale);
     const float selector_ry = cell_y_to_render_coords(lwttl_lat_to_floor_int(center->lat) & ~(view_scale - 1), center, view_scale);
     render_cell_pixel_selector(pLwc,
@@ -984,9 +991,10 @@ void lwc_render_ttl(const LWCONTEXT* pLwc) {
     if (lwc_render_ttl_render("world")) {
         render_world(pLwc, view, proj, ship_y, &lng_lat_center);
     }
-    render_waypoints(pLwc->ttl, pLwc, view, proj, &lng_lat_center);
     // UI
     glDisable(GL_DEPTH_TEST);
+    render_waypoints(pLwc->ttl, pLwc, view, proj, &lng_lat_center);
+    render_cell_pixel_selector_at_center(pLwc, view, proj, &lng_lat_center, view_scale);
     if (lwc_render_ttl_render("world")) {
         render_sea_objects_nameplate(pLwc, view, proj, &lng_lat_center);
     }
