@@ -209,15 +209,16 @@ void lw_trigger_mouse_release(LWCONTEXT* pLwc, float x, float y, int pointer_id)
 	const float top_button_h = 0.75f;
 
 	// Touch right top corner of the screen
-	if (pLwc->game_scene != LGS_ADMIN
-		&& x > +pLwc->aspect_ratio - 0.25f
-		&& y > 1.0f - 0.25f) {
+    const float admin_button_size = 0.15f;
+    if (pLwc->game_scene != LGS_ADMIN
+        && x > +pLwc->aspect_ratio - admin_button_size
+		&& y > 1.0f - admin_button_size) {
 		if (is_file_exist(pLwc->user_data_path, "admin")) {
 			change_to_admin(pLwc);
 		} else {
 			static int admin_count = 0;
 			admin_count++;
-			if (admin_count > 20) {
+			if (admin_count > 10) {
 				touch_file(pLwc->user_data_path, "admin");
 			}
 		}
