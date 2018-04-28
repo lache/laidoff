@@ -360,7 +360,7 @@ static void render_earth(const LWCONTEXT* pLwc, const LWTTLLNGLAT* center, int v
     //                                  LVT_EARTH,
     //                                  0);
 
-    const float half_extent_in_deg = LNGLAT_SEA_PING_EXTENT_IN_DEGREES / 2 * view_scale;
+    const float half_extent_in_deg = lwttl_half_extent_in_degrees(view_scale);
     const float lng_min = center->lng - half_extent_in_deg;
     const float lng_max = center->lng + half_extent_in_deg;
     const float lat_min = center->lat - half_extent_in_deg;
@@ -534,7 +534,7 @@ static void render_sea_static_objects(const LWCONTEXT* pLwc,
                                       const mat4x4 proj,
                                       const LWTTLLNGLAT* center) {
     const int view_scale = lwttl_view_scale(pLwc->ttl);
-    const float half_extent_in_deg = LNGLAT_SEA_PING_EXTENT_IN_DEGREES / 2 * view_scale;
+    const float half_extent_in_deg = lwttl_half_extent_in_degrees(view_scale);
     const float lng_min = center->lng - half_extent_in_deg;
     const float lng_max = center->lng + half_extent_in_deg;
     const float lat_min = center->lat - half_extent_in_deg;
@@ -568,7 +568,7 @@ static void render_sea_static_objects(const LWCONTEXT* pLwc,
                                                    proj);
     }
 
-    int chunk_index_array[3*3];
+    int chunk_index_array[(1+LNGLAT_RENDER_EXTENT_MULTIPLIER+1)*(1 + LNGLAT_RENDER_EXTENT_MULTIPLIER + 1)];
     const int chunk_index_array_count = lwttl_query_static_object_chunk_range(pLwc->ttl,
                                                                               lng_min,
                                                                               lng_max,

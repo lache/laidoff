@@ -6,10 +6,11 @@ static char visibility[MAX_VISIBILITY_ENTRY_COUNT][MAX_VISIBILITY_ENTRY_NAME_LEN
 
 #define LNGLAT_RES_WIDTH (172824)
 #define LNGLAT_RES_HEIGHT (86412)
-const static float sea_render_scale = 256.0f;
+const static float sea_render_scale = 180.0f;
 // extant decribed in R-tree pixel(cell) unit
 #define LNGLAT_SEA_PING_EXTENT_IN_CELL_PIXELS (16)
 #define LNGLAT_SEA_PING_EXTENT_IN_DEGREES ((180.0f/LNGLAT_RES_HEIGHT)*LNGLAT_SEA_PING_EXTENT_IN_CELL_PIXELS)
+#define LNGLAT_RENDER_EXTENT_MULTIPLIER (3)
 
 static float cell_fx_to_lng(float fx) {
     return -180.0f + fx / LNGLAT_RES_WIDTH * 360.0f;

@@ -423,11 +423,15 @@ static void send_ttlping(const LWTTL* ttl,
     udp_send(udp, (const char*)&p, sizeof(LWPTTLPING));
 }
 
+float lwttl_half_extent_in_degrees(const int view_scale) {
+    return LNGLAT_SEA_PING_EXTENT_IN_DEGREES / 2 * view_scale * LNGLAT_RENDER_EXTENT_MULTIPLIER;
+}
+
 void lwttl_udp_send_ttlping(const LWTTL* ttl, LWUDP* udp, int ping_seq) {
     const LWTTLLNGLAT* center = lwttl_center(ttl);
     const int view_scale = lwttl_view_scale(ttl);
 
-    const float half_extent_in_deg = LNGLAT_SEA_PING_EXTENT_IN_DEGREES / 2 * view_scale;
+    const float half_extent_in_deg = lwttl_half_extent_in_degrees(view_scale);
     const float lng_min = center->lng - half_extent_in_deg;
     const float lng_max = center->lng + half_extent_in_deg;
     const float lat_min = center->lat - half_extent_in_deg;

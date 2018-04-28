@@ -73,6 +73,7 @@ const LWPTTLSTATICOBJECT2* lwttl_query_static_object_chunk(const LWTTL* ttl,
                                                            int* xc0,
                                                            int* yc0,
                                                            int* count);
+float lwttl_half_extent_in_degrees(const int view_scale);
 #ifdef __cplusplus
 }
 #endif
