@@ -74,6 +74,10 @@ const LWPTTLSTATICOBJECT2* lwttl_query_static_object_chunk(const LWTTL* ttl,
                                                            int* yc0,
                                                            int* count);
 float lwttl_half_extent_in_degrees(const int view_scale);
+int lwttl_lng_to_floor_int(float lng);
+int lwttl_lat_to_floor_int(float lat);
+int lwttl_lng_to_ceil_int(float lng);
+int lwttl_lat_to_ceil_int(float lat);
 #ifdef __cplusplus
 }
 #endif

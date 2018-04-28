@@ -236,11 +236,11 @@ static int lwttl_lng_to_round_int(float lng) {
     return (int)(roundf(lwttl_lng_to_int_float(lng)));
 }
 
-static int lwttl_lng_to_floor_int(float lng) {
+int lwttl_lng_to_floor_int(float lng) {
     return (int)(floorf(lwttl_lng_to_int_float(lng)));
 }
 
-static int lwttl_lng_to_ceil_int(float lng) {
+int lwttl_lng_to_ceil_int(float lng) {
     return (int)(ceilf(lwttl_lng_to_int_float(lng)));
 }
 
@@ -252,11 +252,11 @@ static int lwttl_lat_to_round_int(float lat) {
     return (int)(roundf(lwttl_lat_to_int_float(lat)));
 }
 
-static int lwttl_lat_to_floor_int(float lat) {
+int lwttl_lat_to_floor_int(float lat) {
     return (int)(floorf(lwttl_lat_to_int_float(lat)));
 }
 
-static int lwttl_lat_to_ceil_int(float lat) {
+int lwttl_lat_to_ceil_int(float lat) {
     return (int)(ceilf(lwttl_lat_to_int_float(lat)));
 }
 
@@ -266,8 +266,8 @@ const char* lwttl_http_header(const LWTTL* _ttl) {
     const LWTTLLNGLAT* lnglat = lwttl_center(ttl);
 
     sprintf(http_header, "X-Lng: %d\r\nX-Lat: %d\r\n",
-            lwttl_lng_to_round_int(lnglat->lng),
-            lwttl_lat_to_round_int(lnglat->lat));
+            lwttl_lng_to_floor_int(lnglat->lng),
+            lwttl_lat_to_floor_int(lnglat->lat));
     return http_header;
 }
 
@@ -393,13 +393,17 @@ static void add_to_static_object_cache(LWTTLSTATICOBJECTCACHE* c, const LWPTTLST
     }
 }
 
+static int aligned_chunk_index(const int cell_index, const int view_scale) {
+    const int half_cell_pixel_extent = LNGLAT_SEA_PING_EXTENT_IN_CELL_PIXELS / 2 * view_scale;
+    return (cell_index + half_cell_pixel_extent) & ~(2 * half_cell_pixel_extent - 1) & ~(view_scale - 1);
+}
 
 static void cell_bound_to_chunk_bound(const LWTTLCELLBOUND* cell_bound, const int view_scale, LWTTLCHUNKBOUND* chunk_bound) {
     const int half_cell_pixel_extent = LNGLAT_SEA_PING_EXTENT_IN_CELL_PIXELS / 2 * view_scale;
-    chunk_bound->xcc0 = ((cell_bound->xc0 + half_cell_pixel_extent) & ~(2 * half_cell_pixel_extent - 1) & ~(view_scale - 1)) >> msb_index(LNGLAT_SEA_PING_EXTENT_IN_CELL_PIXELS * view_scale);
-    chunk_bound->ycc0 = ((cell_bound->yc0 + half_cell_pixel_extent) & ~(2 * half_cell_pixel_extent - 1) & ~(view_scale - 1)) >> msb_index(LNGLAT_SEA_PING_EXTENT_IN_CELL_PIXELS * view_scale);
-    chunk_bound->xcc1 = ((cell_bound->xc1 + half_cell_pixel_extent) & ~(2 * half_cell_pixel_extent - 1) & ~(view_scale - 1)) >> msb_index(LNGLAT_SEA_PING_EXTENT_IN_CELL_PIXELS * view_scale);
-    chunk_bound->ycc1 = ((cell_bound->yc1 + half_cell_pixel_extent) & ~(2 * half_cell_pixel_extent - 1) & ~(view_scale - 1)) >> msb_index(LNGLAT_SEA_PING_EXTENT_IN_CELL_PIXELS * view_scale);
+    chunk_bound->xcc0 = aligned_chunk_index(cell_bound->xc0, view_scale) >> msb_index(LNGLAT_SEA_PING_EXTENT_IN_CELL_PIXELS * view_scale);
+    chunk_bound->ycc0 = aligned_chunk_index(cell_bound->yc0, view_scale) >> msb_index(LNGLAT_SEA_PING_EXTENT_IN_CELL_PIXELS * view_scale);
+    chunk_bound->xcc1 = aligned_chunk_index(cell_bound->xc1, view_scale) >> msb_index(LNGLAT_SEA_PING_EXTENT_IN_CELL_PIXELS * view_scale);
+    chunk_bound->ycc1 = aligned_chunk_index(cell_bound->yc1, view_scale) >> msb_index(LNGLAT_SEA_PING_EXTENT_IN_CELL_PIXELS * view_scale);
 }
 
 static void send_ttlping(const LWTTL* ttl,

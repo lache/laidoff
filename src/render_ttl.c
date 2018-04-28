@@ -254,6 +254,11 @@ static void render_sea_cell_debug(const LWCONTEXT* pLwc, const mat4x4 view, cons
     render_cell(pLwc, view, proj, x, y, z, w, h, lvt);
 }
 
+static void render_cell_pixel_selector(const LWCONTEXT* pLwc, const mat4x4 view, const mat4x4 proj, float x, float y, float z, float w, float h) {
+    const LW_VBO_TYPE lvt = LVT_CELL_PIXEL_SELECTOR;
+    render_cell(pLwc, view, proj, x, y, z, w, h, lvt);
+}
+
 static void render_waves(const LWCONTEXT* pLwc, const mat4x4 view, const mat4x4 proj, float ship_y) {
     if (last_wave_spawn + 1.1f < (float)pLwc->app_time) {
         for (int i = 0; i < ARRAY_SIZE(wave); i++) {
@@ -715,6 +720,18 @@ static void render_sea_static_objects(const LWCONTEXT* pLwc,
     //    const float rh = ry0 - ry1; // cell_y0 and cell_y1 are in OpenGL rendering coordinates (always cell_y0 > cell_y1)
     //    render_sea_cell_debug(pLwc, view, proj, rx0, ry0, 0, rw, rh);
     //}
+
+    // render cell pixel selector
+    const float selector_rx = cell_x_to_render_coords(lwttl_lng_to_floor_int(center->lng) & ~(view_scale - 1), center, view_scale);
+    const float selector_ry = cell_y_to_render_coords(lwttl_lat_to_floor_int(center->lat) & ~(view_scale - 1), center, view_scale);
+    render_cell_pixel_selector(pLwc,
+                               view,
+                               proj,
+                               selector_rx,
+                               selector_ry,
+                               0,
+                               cell_render_width * view_scale,
+                               cell_render_height * view_scale);
 }
 
 static void render_sea_static_objects_nameplate(const LWCONTEXT* pLwc, const mat4x4 view, const mat4x4 proj, const LWTTLLNGLAT* center) {
