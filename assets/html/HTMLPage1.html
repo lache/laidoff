@@ -281,8 +281,22 @@
 		    lo.lwttl_set_view_scale(c.ttl, vs)
 		    lo.lwttl_udp_send_ttlping(c.ttl, c.udp_sea, 0)
 		end
+		local select_context = {}
 		function select(type, id)
 		    print('[ui-select] type:'..type..',id:'..id)
+		    if select_context[type] == nil then
+		        select_context[type] = {}
+		    end
+		    table.insert(select_context[type], id)
+		    print('=== select_context ===')
+		    print(http_header())
+		end
+		function http_header()
+		    local r = ''
+		    for key, value in pairs(select_context) do
+                r = r .. 'X-Select-' .. key:sub(1,1):upper()..key:sub(2) .. ': ' .. table.concat(value, ',') .. '\r\n'
+            end
+            return r
 		end
 		function track(ship_id)
 		    set_track_object_ship_id(ship_id)

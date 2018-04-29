@@ -830,3 +830,26 @@ const char* script_full_asset_path(const char* asset_type, const char* asset_nam
     strcat(full_asset_path, asset_name);
     return full_asset_path;
 }
+
+int script_http_header(void* L, char* header, size_t header_max_len) {
+    if (L == 0) {
+        return 0;
+    }
+    int ret = 0;
+    // push functions and arguments
+    lua_getglobal(L, "http_header"); // function to be called
+    // do the call (0 arguments, 1 result)
+    if (lua_pcall(L, 0, 1, 0) != 0) {
+        LOGEP("error: %s", lua_tostring(L, -1));
+    }
+    // retrieve result
+    if (!lua_isstring(L, -1)) {
+        LOGEP("error: %s", lua_tostring(L, -1));
+        ret = -1;
+    } else {
+        strncpy(header, lua_tostring(L, -1), header_max_len - 1);
+        header[header_max_len - 1] = 0;
+    }
+    lua_pop(L, 1); // pop returned value
+    return ret;
+}

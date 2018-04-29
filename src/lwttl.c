@@ -15,6 +15,7 @@
 #include "lwttl.h"
 #include "htmlui.h"
 #include "lwlnglat.h"
+#include "script.h"
 
 #ifdef __GNUC__
 int __builtin_ctz(unsigned int x);
@@ -269,13 +270,17 @@ int lwttl_lat_to_ceil_int(float lat) {
 }
 
 const char* lwttl_http_header(const LWTTL* _ttl) {
-    static char http_header[1024];
+    static char http_header[2048];
     LWTTL* ttl = (LWTTL*)_ttl;
     const LWTTLLNGLAT* lnglat = lwttl_center(ttl);
-
-    sprintf(http_header, "X-Lng: %d\r\nX-Lat: %d\r\n",
-            lwttl_lng_to_floor_int(lnglat->lng),
-            lwttl_lat_to_floor_int(lnglat->lat));
+    snprintf(http_header,
+             ARRAY_SIZE(http_header),
+             "X-Lng: %d\r\nX-Lat: %d\r\n",
+             lwttl_lng_to_floor_int(lnglat->lng),
+             lwttl_lat_to_floor_int(lnglat->lat));
+    script_http_header(script_context()->L,
+                       http_header + strlen(http_header),
+                       ARRAY_SIZE(http_header) - strlen(http_header));
     return http_header;
 }
 
@@ -420,13 +425,14 @@ static void send_ttlping(const LWTTL* ttl,
                          const float lat,
                          const int ping_seq,
                          const int view_scale,
-                         const int static_object) {
+                         const int static_object,
+                         const float ex) {
     LWPTTLPING p;
     memset(&p, 0, sizeof(LWPTTLPING));
     p.type = LPGP_LWPTTLPING;
     p.lng = lng;
     p.lat = lat;
-    p.ex = LNGLAT_SEA_PING_EXTENT_IN_CELL_PIXELS;
+    p.ex = ex;
     p.ping_seq = ping_seq;
     p.track_object_id = lwttl_track_object_id(ttl);
     p.track_object_ship_id = lwttl_track_object_ship_id(ttl);
@@ -482,7 +488,8 @@ void lwttl_udp_send_ttlping(const LWTTL* ttl, LWUDP* udp, int ping_seq) {
                              cell_y_to_lat(yc0),
                              ping_seq,
                              view_scale,
-                             1);
+                             1,
+                             LNGLAT_SEA_PING_EXTENT_IN_CELL_PIXELS);
             }
         }
     }
@@ -495,7 +502,8 @@ void lwttl_udp_send_ttlping(const LWTTL* ttl, LWUDP* udp, int ping_seq) {
                  cell_y_to_lat(yc0),
                  ping_seq,
                  view_scale,
-                 0);
+                 0,
+                 LNGLAT_SEA_PING_EXTENT_IN_CELL_PIXELS * LNGLAT_RENDER_EXTENT_MULTIPLIER);
 }
 
 void lwttl_udp_send_request_waypoints(const LWTTL* ttl, LWUDP* sea_udp, int ship_id) {
@@ -581,7 +589,7 @@ void lwttl_udp_update(LWTTL* ttl, LWUDP* udp, LWCONTEXT* pLwc) {
             udp->reinit_next_update = 1;
             return;
 #endif
-        }
+            }
 
         char decompressed[1500 * 255]; // maximum lz4 compression ratio is 255...
         int decompressed_bytes = LZ4_decompress_safe(udp->buf, decompressed, udp->recv_len, ARRAY_SIZE(decompressed));
@@ -814,8 +822,8 @@ void lwttl_udp_update(LWTTL* ttl, LWUDP* udp, LWCONTEXT* pLwc) {
         } else {
             LOGEP("lz4 decompression failed!");
         }
+        }
     }
-}
 
 const LWPTTLWAYPOINTS* lwttl_get_waypoints(const LWTTL* ttl) {
     return &ttl->waypoints;

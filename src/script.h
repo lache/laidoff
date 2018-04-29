@@ -25,6 +25,7 @@ void script_evaluate_with_name_async(LWCONTEXT* pLwc, const char* code, size_t c
 void script_evaluate(void* L, const char* code, size_t code_len);
 void script_evaluate_async(LWCONTEXT* pLwc, const char* code, size_t code_len);
 const char* script_full_asset_path(const char* asset_type, const char* asset_name);
+int script_http_header(void* L, char* header, size_t header_max_len);
 #ifdef __cplusplus
 };
 #endif
