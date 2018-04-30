@@ -2,7 +2,7 @@
 #ifdef __cplusplus
 extern "C" {;
 #endif
-const static char* SCRIPT_UNNAMED_SCRIPT_NAME = "<Unnamed Script>";
+#define SCRIPT_UNNAMED_SCRIPT_NAME "<Unnamed Script>"
 void init_lua(LWCONTEXT* pLwc);
 void spawn_all_field_object(LWCONTEXT* pLwc);
 int script_run_file_ex(LWCONTEXT* pLwc, const char* filename, int pop_result);
