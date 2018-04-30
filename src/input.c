@@ -35,12 +35,14 @@ static struct {
     int count;
     LWPINCHPOINTER p[2];
 	float initial_dist;
+    int initial_view_scale;
 } pinch_zoom;
 
 float calculate_pinch_zoom_dist() {
 	const float dx = pinch_zoom.p[0].x0 - pinch_zoom.p[1].x0;
 	const float dy = pinch_zoom.p[0].y0 - pinch_zoom.p[1].y0;
-	return sqrtf(dx*dx + dy*dy);
+	const float d = sqrtf(dx*dx + dy*dy);
+    return LWCLAMP(d, 0.5f, 10.0f);
 }
 
 void lw_trigger_mouse_press(LWCONTEXT* pLwc, float x, float y, int pointer_id) {
@@ -63,6 +65,7 @@ void lw_trigger_mouse_press(LWCONTEXT* pLwc, float x, float y, int pointer_id) {
     if (pinch_zoom.count == 2 && prev_pinch_zoom_count != 2) {
         LOGI("Pinch zoom started.");
 		pinch_zoom.initial_dist = calculate_pinch_zoom_dist();
+        pinch_zoom.initial_view_scale = lwttl_view_scale(pLwc->ttl);
 	}
 
 	if (field_network(pLwc->field)) {
@@ -182,7 +185,17 @@ void lw_trigger_mouse_move(LWCONTEXT* pLwc, float x, float y, int pointer_id) {
 			p->x0 = x;
 			p->y0 = y;
 			const float dist = calculate_pinch_zoom_dist();
-			LOGI("Pinch zoom factor: %.2f", dist / pinch_zoom.initial_dist);
+            const float zoom_factor = (dist / pinch_zoom.initial_dist);
+            LOGI("Pinch zoom factor: %.2f", zoom_factor);
+            if (zoom_factor > 1.0f) {
+                // zoom in
+                const int zoom_factor_int = (int)(zoom_factor + 0.5f);
+                lwttl_set_view_scale(pLwc->ttl, LWCLAMP(pinch_zoom.initial_view_scale >> (zoom_factor_int - 1), 1, 2048));
+            } else if (0.0f < zoom_factor && zoom_factor < 1.0f) {
+                // zoom out
+                const int zoom_factor_int = (int)(1.0f / zoom_factor + 0.5f);
+                lwttl_set_view_scale(pLwc->ttl, LWCLAMP(pinch_zoom.initial_view_scale << (zoom_factor_int - 1), 1, 2048));
+            }
 		}
 	}
 
