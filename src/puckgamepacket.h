@@ -379,7 +379,7 @@ typedef struct _LWPTTLWAYPOINTS {
     struct {
         int x;
         int y;
-    } waypoints[300];
+    } waypoints[1000];
 } LWPTTLWAYPOINTS;
 /*
 * END: should sync with packet.h in sea-server

@@ -148,7 +148,7 @@ void udp_update(LWCONTEXT* pLwc, LWUDP* udp) {
                 //udp->master = 1;
                 return;
             } else {
-                LOGI("recvfrom() failed with error code : %d", wsa_error_code);
+                LOGEP("recvfrom() failed with error code : %d", wsa_error_code);
                 exit(EXIT_FAILURE);
             }
 #else

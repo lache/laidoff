@@ -16,7 +16,7 @@
 #include "lwringbuffer.h"
 #include "numcomp_puck_game.h"
 
-#define LW_UDP_BUFLEN (2048)
+#define LW_UDP_BUFLEN (1024*8)
 #define LW_STATE_RING_BUFFER_CAPACITY (16)
 
 typedef struct _LWUDP {
