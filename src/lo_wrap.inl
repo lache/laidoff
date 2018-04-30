@@ -9117,35 +9117,6 @@ fail:
 }
 
 
-static int _wrap_scroll_callback(lua_State* L) {
-  int SWIG_arg = 0;
-  GLFWwindow *arg1 = (GLFWwindow *) 0 ;
-  double arg2 ;
-  double arg3 ;
-  
-  SWIG_check_num_args("scroll_callback",3,3)
-  if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("scroll_callback",1,"GLFWwindow *");
-  if(!lua_isnumber(L,2)) SWIG_fail_arg("scroll_callback",2,"double");
-  if(!lua_isnumber(L,3)) SWIG_fail_arg("scroll_callback",3,"double");
-  
-  if (!SWIG_IsOK(SWIG_ConvertPtr(L,1,(void**)&arg1,SWIGTYPE_p_GLFWwindow,0))){
-    SWIG_fail_ptr("scroll_callback",1,SWIGTYPE_p_GLFWwindow);
-  }
-  
-  arg2 = (double)lua_tonumber(L, 2);
-  arg3 = (double)lua_tonumber(L, 3);
-  scroll_callback(arg1,arg2,arg3);
-  
-  return SWIG_arg;
-  
-  if(0) SWIG_fail;
-  
-fail:
-  lua_error(L);
-  return SWIG_arg;
-}
-
-
 static int _wrap_lw_trigger_reset(lua_State* L) {
   int SWIG_arg = 0;
   LWCONTEXT *arg1 = (LWCONTEXT *) 0 ;
@@ -96839,7 +96810,6 @@ static swig_lua_method swig_SwigModule_methods[]= {
     { "lw_trigger_mouse_press", _wrap_lw_trigger_mouse_press},
     { "lw_trigger_mouse_release", _wrap_lw_trigger_mouse_release},
     { "lw_trigger_mouse_move", _wrap_lw_trigger_mouse_move},
-    { "scroll_callback", _wrap_scroll_callback},
     { "lw_trigger_reset", _wrap_lw_trigger_reset},
     { "lw_trigger_play_sound", _wrap_lw_trigger_play_sound},
     { "lw_trigger_key_left", _wrap_lw_trigger_key_left},

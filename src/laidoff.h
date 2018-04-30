@@ -28,7 +28,6 @@ void lw_trigger_touch(LWCONTEXT* pLwc, float xpos, float ypos, int pointer_id);
 void lw_trigger_mouse_press(LWCONTEXT* pLwc, float xpos, float ypos, int pointer_id);
 void lw_trigger_mouse_release(LWCONTEXT* pLwc, float xpos, float ypos, int pointer_id);
 void lw_trigger_mouse_move(LWCONTEXT* pLwc, float x, float y, int pointer_id);
-void scroll_callback(GLFWwindow* window, double xoffset, double yoffset);
 void lw_trigger_reset(LWCONTEXT* pLwc);
 void lw_trigger_play_sound(LWCONTEXT* pLwc);
 void lw_trigger_key_left(LWCONTEXT* pLwc);
