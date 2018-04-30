@@ -351,7 +351,7 @@ typedef struct _LWPTTLPING {
     unsigned char padding0;
     unsigned char padding1;
     unsigned char padding2;
-    float lng, lat, ex; // x center, y center, extent
+    float lng, lat, ex_lng, ex_lat; // x center, y center, extent
     int ping_seq;
     int track_object_id;
     int track_object_ship_id;

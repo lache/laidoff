@@ -438,13 +438,15 @@ static void send_ttlping(const LWTTL* ttl,
                          const int ping_seq,
                          const int view_scale,
                          const int static_object,
-                         const float ex) {
+                         const float ex_lng,
+                         const float ex_lat) {
     LWPTTLPING p;
     memset(&p, 0, sizeof(LWPTTLPING));
     p.type = LPGP_LWPTTLPING;
     p.lng = lng;
     p.lat = lat;
-    p.ex = ex;
+    p.ex_lng = ex_lng;
+    p.ex_lat = ex_lat;
     p.ping_seq = ping_seq;
     p.track_object_id = lwttl_track_object_id(ttl);
     p.track_object_ship_id = lwttl_track_object_ship_id(ttl);
@@ -453,19 +455,24 @@ static void send_ttlping(const LWTTL* ttl,
     udp_send(udp, (const char*)&p, sizeof(LWPTTLPING));
 }
 
-float lwttl_half_extent_in_degrees(const int view_scale) {
-    return LNGLAT_SEA_PING_EXTENT_IN_DEGREES / 2 * view_scale * LNGLAT_RENDER_EXTENT_MULTIPLIER;
+float lwttl_half_lng_extent_in_degrees(const int view_scale) {
+    return LNGLAT_SEA_PING_EXTENT_IN_DEGREES / 2 * view_scale * LNGLAT_RENDER_EXTENT_MULTIPLIER_LNG;
+}
+
+float lwttl_half_lat_extent_in_degrees(const int view_scale) {
+    return LNGLAT_SEA_PING_EXTENT_IN_DEGREES / 2 * view_scale * LNGLAT_RENDER_EXTENT_MULTIPLIER_LAT;
 }
 
 void lwttl_udp_send_ttlping(const LWTTL* ttl, LWUDP* udp, int ping_seq) {
     const LWTTLLNGLAT* center = lwttl_center(ttl);
     const int clamped_view_scale = lwttl_clamped_view_scale(ttl);
 
-    const float half_extent_in_deg = lwttl_half_extent_in_degrees(clamped_view_scale);
-    const float lng_min = center->lng - half_extent_in_deg;
-    const float lng_max = center->lng + half_extent_in_deg;
-    const float lat_min = center->lat - half_extent_in_deg;
-    const float lat_max = center->lat + half_extent_in_deg;
+    const float half_lng_extent_in_deg = lwttl_half_lng_extent_in_degrees(clamped_view_scale);
+    const float half_lat_extent_in_deg = lwttl_half_lat_extent_in_degrees(clamped_view_scale);
+    const float lng_min = center->lng - half_lng_extent_in_deg;
+    const float lng_max = center->lng + half_lng_extent_in_deg;
+    const float lat_min = center->lat - half_lat_extent_in_deg;
+    const float lat_max = center->lat + half_lat_extent_in_deg;
 
     LWTTLCELLBOUND cell_bound = {
         lwttl_lng_to_floor_int(lng_min),
@@ -501,6 +508,7 @@ void lwttl_udp_send_ttlping(const LWTTL* ttl, LWUDP* udp, int ping_seq) {
                              ping_seq,
                              clamped_view_scale,
                              1,
+                             LNGLAT_SEA_PING_EXTENT_IN_CELL_PIXELS,
                              LNGLAT_SEA_PING_EXTENT_IN_CELL_PIXELS);
             }
         }
@@ -515,7 +523,8 @@ void lwttl_udp_send_ttlping(const LWTTL* ttl, LWUDP* udp, int ping_seq) {
                  ping_seq,
                  clamped_view_scale,
                  0,
-                 LNGLAT_SEA_PING_EXTENT_IN_CELL_PIXELS * LNGLAT_RENDER_EXTENT_MULTIPLIER);
+                 LNGLAT_SEA_PING_EXTENT_IN_CELL_PIXELS * LNGLAT_RENDER_EXTENT_MULTIPLIER_LNG,
+                 LNGLAT_SEA_PING_EXTENT_IN_CELL_PIXELS * LNGLAT_RENDER_EXTENT_MULTIPLIER_LAT);
 }
 
 void lwttl_udp_send_request_waypoints(const LWTTL* ttl, LWUDP* sea_udp, int ship_id) {

@@ -408,11 +408,12 @@ static void render_earth(const LWCONTEXT* pLwc, const LWTTLLNGLAT* center, int v
     //                                  LVT_EARTH,
     //                                  0);
 
-    const float half_extent_in_deg = lwttl_half_extent_in_degrees(view_scale);
-    const float lng_min = center->lng - half_extent_in_deg;
-    const float lng_max = center->lng + half_extent_in_deg;
-    const float lat_min = center->lat - half_extent_in_deg;
-    const float lat_max = center->lat + half_extent_in_deg;
+    const float half_lng_extent_in_deg = lwttl_half_lng_extent_in_degrees(view_scale);
+    const float half_lat_extent_in_deg = lwttl_half_lat_extent_in_degrees(view_scale);
+    const float lng_min = center->lng - half_lng_extent_in_deg;
+    const float lng_max = center->lng + half_lng_extent_in_deg;
+    const float lat_min = center->lat - half_lat_extent_in_deg;
+    const float lat_max = center->lat + half_lat_extent_in_deg;
     const float lng_extent = lng_max - lng_min;
     const float lat_extent = lat_max - lat_min;
     // current view window indicator
@@ -646,11 +647,12 @@ static void render_sea_static_objects(const LWCONTEXT* pLwc,
                                       const LWTTLLNGLAT* center) {
     const int clamped_view_scale = lwttl_clamped_view_scale(pLwc->ttl);
     const int clamped_to_original_view_scale_ratio = lwttl_view_scale(pLwc->ttl) / clamped_view_scale;
-    const float half_extent_in_deg = lwttl_half_extent_in_degrees(clamped_view_scale);
-    const float lng_min = center->lng - half_extent_in_deg;
-    const float lng_max = center->lng + half_extent_in_deg;
-    const float lat_min = center->lat - half_extent_in_deg;
-    const float lat_max = center->lat + half_extent_in_deg;
+    const float half_lng_extent_in_deg = lwttl_half_lng_extent_in_degrees(clamped_view_scale);
+    const float half_lat_extent_in_deg = lwttl_half_lat_extent_in_degrees(clamped_view_scale);
+    const float lng_min = center->lng - half_lng_extent_in_deg;
+    const float lng_max = center->lng + half_lng_extent_in_deg;
+    const float lat_min = center->lat - half_lat_extent_in_deg;
+    const float lat_max = center->lat + half_lat_extent_in_deg;
 
     /*render_background_sea_water(pLwc,
                                 view,
@@ -664,7 +666,7 @@ static void render_sea_static_objects(const LWCONTEXT* pLwc,
 
     // land
     //lwttl_lock_rendering_mutex(pLwc->ttl);
-    int chunk_index_array[(1 + LNGLAT_RENDER_EXTENT_MULTIPLIER + 1)*(1 + LNGLAT_RENDER_EXTENT_MULTIPLIER + 1)];
+    int chunk_index_array[(1 + LNGLAT_RENDER_EXTENT_MULTIPLIER_LNG + 1)*(1 + LNGLAT_RENDER_EXTENT_MULTIPLIER_LAT + 1)];
     const int chunk_index_array_count = lwttl_query_static_object_chunk_range(pLwc->ttl,
                                                                               lng_min,
                                                                               lng_max,

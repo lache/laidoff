@@ -10,7 +10,8 @@ const static float sea_render_scale = 50.0f * 4;
 // extant decribed in R-tree pixel(cell) unit
 #define LNGLAT_SEA_PING_EXTENT_IN_CELL_PIXELS (16)
 #define LNGLAT_SEA_PING_EXTENT_IN_DEGREES ((180.0f/LNGLAT_RES_HEIGHT)*LNGLAT_SEA_PING_EXTENT_IN_CELL_PIXELS)
-#define LNGLAT_RENDER_EXTENT_MULTIPLIER (3)
+#define LNGLAT_RENDER_EXTENT_MULTIPLIER_LNG (5)
+#define LNGLAT_RENDER_EXTENT_MULTIPLIER_LAT (3)
 
 static float cell_fx_to_lng(float fx) {
     return -180.0f + fx / LNGLAT_RES_WIDTH * 360.0f;
