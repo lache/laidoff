@@ -462,12 +462,14 @@
 		6CF70E3A20597A1D00F782C8 /* lz4frame.c in Sources */ = {isa = PBXBuildFile; fileRef = 6CF70E3620597A1D00F782C8 /* lz4frame.c */; };
 		6CF70E3B20597A1D00F782C8 /* xxhash.c in Sources */ = {isa = PBXBuildFile; fileRef = 6CF70E3720597A1D00F782C8 /* xxhash.c */; };
 		6CFC5019206012360077E1B7 /* lwttl.c in Sources */ = {isa = PBXBuildFile; fileRef = 6CFC5018206012360077E1B7 /* lwttl.c */; };
+		71E4555CFCE0FC140AB64668 /* render_morph.c in Sources */ = {isa = PBXBuildFile; fileRef = 3EF18865C9E87623A8107AC5 /* render_morph.c */; };
 		D8531FF879956455D7126889 /* render_ttl.c in Sources */ = {isa = PBXBuildFile; fileRef = 153809DC50A3E01320158089 /* render_ttl.c */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
 		153809DC50A3E01320158089 /* render_ttl.c */ = {isa = PBXFileReference; includeInIndex = 1; name = render_ttl.c; path = ../src/render_ttl.c; sourceTree = "<group>"; };
 		2601AFFC1EE1549700989AA6 /* platform.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = platform.h; path = ../build/include/platform.h; sourceTree = "<group>"; };
+		3EF18865C9E87623A8107AC5 /* render_morph.c */ = {isa = PBXFileReference; includeInIndex = 1; name = render_morph.c; path = ../src/render_morph.c; sourceTree = "<group>"; };
 		5633AC311EADDF98003F1549 /* net.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = net.c; sourceTree = "<group>"; };
 		566372651EBA52D3001DA3F4 /* collision.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = collision.h; sourceTree = "<group>"; };
 		566372661EBA52D3001DA3F4 /* collision_space.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = collision_space.h; sourceTree = "<group>"; };
@@ -2355,6 +2357,7 @@
 				6CA16CD51EA20B5600DB7AF0 /* laidoff */,
 				6CA16CD41EA20B5600DB7AF0 /* Products */,
 				153809DC50A3E01320158089 /* render_ttl.c */,
+				3EF18865C9E87623A8107AC5 /* render_morph.c */,
 			);
 			sourceTree = "<group>";
 		};
@@ -3254,6 +3257,7 @@
 				56F1899F1EC751950019312F /* zframe.c in Sources */,
 				56F188E81EC74DB60019312F /* select.cpp in Sources */,
 				D8531FF879956455D7126889 /* render_ttl.c in Sources */,
+				71E4555CFCE0FC140AB64668 /* render_morph.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
