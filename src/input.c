@@ -26,6 +26,23 @@ static void convert_touch_coord_to_ui_coord(LWCONTEXT* pLwc, float *x, float *y)
 	}
 }
 
+typedef struct _LWPINCHPOINTER {
+    int id;
+    float x0;
+    float y0;
+} LWPINCHPOINTER;
+static struct {
+    int count;
+    LWPINCHPOINTER p[2];
+	float initial_dist;
+} pinch_zoom;
+
+float calculate_pinch_zoom_dist() {
+	const float dx = pinch_zoom.p[0].x0 - pinch_zoom.p[1].x0;
+	const float dy = pinch_zoom.p[0].y0 - pinch_zoom.p[1].y0;
+	return sqrtf(dx*dx + dy*dy);
+}
+
 void lw_trigger_mouse_press(LWCONTEXT* pLwc, float x, float y, int pointer_id) {
 	if (!pLwc) {
 		return;
@@ -34,6 +51,19 @@ void lw_trigger_mouse_press(LWCONTEXT* pLwc, float x, float y, int pointer_id) {
 	convert_touch_coord_to_ui_coord(pLwc, &x, &y);
 
 	LOGIx("mouse press ui coord x=%f, y=%f", x, y);
+
+    int prev_pinch_zoom_count = pinch_zoom.count;
+    if (pinch_zoom.count == 0 || pinch_zoom.count == 1) {
+        pinch_zoom.p[pinch_zoom.count].id = pointer_id;
+        pinch_zoom.p[pinch_zoom.count].x0 = x;
+        pinch_zoom.p[pinch_zoom.count].y0 = y;
+        pinch_zoom.count++;
+    }
+
+    if (pinch_zoom.count == 2 && prev_pinch_zoom_count != 2) {
+        LOGI("Pinch zoom started.");
+		pinch_zoom.initial_dist = calculate_pinch_zoom_dist();
+	}
 
 	if (field_network(pLwc->field)) {
 		mq_publish_now(pLwc, pLwc->mq, 0);
@@ -146,6 +176,16 @@ void lw_trigger_mouse_move(LWCONTEXT* pLwc, float x, float y, int pointer_id) {
 
 	convert_touch_coord_to_ui_coord(pLwc, &x, &y);
 
+	if (pinch_zoom.count == 2) {
+		LWPINCHPOINTER* p = pinch_zoom.p[0].id == pointer_id ? &pinch_zoom.p[0] : pinch_zoom.p[1].id == pointer_id ? &pinch_zoom.p[1] : 0;
+		if (p) {
+			p->x0 = x;
+			p->y0 = y;
+			const float dist = calculate_pinch_zoom_dist();
+			LOGI("Pinch zoom factor: %.2f", dist / pinch_zoom.initial_dist);
+		}
+	}
+
     if (pLwc->game_scene == LGS_TTL) {
         // TOO SLOW ON MANY HTML TAGS
 
@@ -184,11 +224,25 @@ void lw_trigger_mouse_release(LWCONTEXT* pLwc, float x, float y, int pointer_id)
 
 	convert_touch_coord_to_ui_coord(pLwc, &x, &y);
 
-	LOGIx("mouse release ui coord x=%f, y=%f (last press ui coord x=%f, y=%f) (width %f) (height %f)\n",
+    LOGIx("mouse release ui coord x=%f, y=%f (last press ui coord x=%f, y=%f) (width %f) (height %f)\n",
 		  x, y,
 		  pLwc->last_mouse_press_x, pLwc->last_mouse_press_y,
 		  fabsf(x - pLwc->last_mouse_press_x),
 		  fabsf(y - pLwc->last_mouse_press_y));
+
+    int prev_pinch_zoom_count = pinch_zoom.count;
+    for (int i = pinch_zoom.count - 1; i >= 0; i--) {
+        if (pinch_zoom.p[i].id == pointer_id) {
+            for (int j = i; j < pinch_zoom.count - 1; j++) {
+                pinch_zoom.p[j] = pinch_zoom.p[j + 1];
+            }
+            pinch_zoom.count--;
+        }
+    }
+
+    if (prev_pinch_zoom_count == 2 && pinch_zoom.count != 2) {
+        LOGI("Pinch zoom aborted.");
+    }
 
     if (pLwc->game_scene == LGS_TTL
         || (pLwc->game_scene == LGS_PHYSICS && pLwc->puck_game->show_html_ui)) {
