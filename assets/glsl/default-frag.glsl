@@ -8,7 +8,7 @@
 #define TEX texture
 #endif
 
-precision mediump float;
+precision highp float;
 
 uniform sampler2D diffuse;
 uniform float alpha_multiplier;
