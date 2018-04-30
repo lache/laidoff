@@ -217,6 +217,22 @@ static void lwc_create_line_vbo(LWCONTEXT* pLwc) {
     lw_load_vbo_data(pLwc, (const char*)sea_route_data_2, sizeof(sea_route_data_2), &pLwc->sea_route_vbo, sizeof(float) * 2);
 }
 
+static void load_morph_vbo(LWCONTEXT* pLwc, const char *filename, LWVBO *pSvbo) {
+    GLuint vbo = 0;
+    glGenBuffers(1, &vbo);
+    glBindBuffer(GL_ARRAY_BUFFER, vbo);
+
+    size_t mesh_file_size = 0;
+    char *mesh_vbo_data = create_binary_from_file(filename, &mesh_file_size);
+    glBufferData(GL_ARRAY_BUFFER, mesh_file_size, mesh_vbo_data, GL_STATIC_DRAW);
+    release_binary(mesh_vbo_data);
+
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+    pSvbo->vertex_buffer = vbo;
+    pSvbo->vertex_count = (int)(mesh_file_size / lwmorphvertex_stride_in_bytes);
+}
+
 static void init_vbo(LWCONTEXT* pLwc) {
     
     // === STATIC MESHES ===
@@ -290,6 +306,11 @@ static void init_vbo(LWCONTEXT* pLwc) {
     lwc_create_ui_vbo(pLwc);
 
     lwc_create_line_vbo(pLwc);
+
+    // === MORPH VERTEX BUFFERS ===
+    // LMVT_EARTH
+    load_morph_vbo(pLwc, ASSETS_BASE_PATH "mvbo" PATH_SEPARATOR "earth.mvbo",
+                   &pLwc->morph_vertex_buffer[LMVT_EARTH]);
 }
 
 void set_vertex_attrib_pointer(const LWCONTEXT* pLwc, int shader_index) {
@@ -436,6 +457,28 @@ void set_line_vertex_attrib_pointer(const LWCONTEXT* pLwc, int shader_index) {
     }
 }
 
+void set_morph_vertex_attrib_pointer(const LWCONTEXT* pLwc, int shader_index) {
+    lw_create_lazy_shader_program(pLwc, (LW_SHADER_TYPE)shader_index);
+    // vertex coordinates 0
+    if (pLwc->shader[shader_index].vpos_location >= 0) {
+        glEnableVertexAttribArray((GLuint)pLwc->shader[shader_index].vpos_location);
+        glVertexAttribPointer((GLuint)pLwc->shader[shader_index].vpos_location, 3, GL_FLOAT, GL_FALSE,
+                              lwmorphvertex_stride_in_bytes, (void *)0);
+    }
+    // vertex coordinates 1
+    if (pLwc->shader[shader_index].vpos2_location >= 0) {
+        glEnableVertexAttribArray((GLuint)pLwc->shader[shader_index].vpos2_location);
+        glVertexAttribPointer((GLuint)pLwc->shader[shader_index].vpos2_location, 3, GL_FLOAT, GL_FALSE,
+                              lwmorphvertex_stride_in_bytes, (void *)(sizeof(float) * 3));
+    }
+    // uv coordinates
+    if (pLwc->shader[shader_index].vuv_location >= 0) {
+        glEnableVertexAttribArray((GLuint)pLwc->shader[shader_index].vuv_location);
+        glVertexAttribPointer((GLuint)pLwc->shader[shader_index].vuv_location, 2, GL_FLOAT, GL_FALSE,
+                              lwmorphvertex_stride_in_bytes, (void *)(sizeof(float) * (3 + 3)));
+    }
+}
+
 static void gen_all_vao(LWCONTEXT* pLwc) {
     // Vertex Array Objects
 #if LW_SUPPORT_VAO
@@ -536,6 +579,21 @@ static void init_line_vao(LWCONTEXT* pLwc, int shader_index) {
 #endif
 }
 
+static void init_morph_vao(LWCONTEXT* pLwc, int shader_index) {
+    // Skin Vertex Array Objects
+#if LW_SUPPORT_VAO
+    glGenVertexArrays(LMVT_COUNT, pLwc->morph_vao);
+    for (int i = 0; i < LMVT_COUNT; i++) {
+        glBindVertexArray(pLwc->morph_vao[i]);
+        glBindBuffer(GL_ARRAY_BUFFER, pLwc->morph_vertex_buffer[i].vertex_buffer);
+        set_morph_vertex_attrib_pointer(pLwc, shader_index);
+    }
+
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+    glBindVertexArray(0);
+#endif
+}
+
 void lw_clear_color() {
     // Alpha component should be 1 in RPI platform.
     glClearColor(0x44 / 255.f, 0x4c / 255.f, 0x50 / 255.f, 1);
@@ -561,6 +619,7 @@ static void init_gl_context(LWCONTEXT* pLwc) {
     init_ps_vao(pLwc, LWST_EMITTER2);
 	init_ps0_vao(pLwc, LWST_EMITTER);
     init_line_vao(pLwc, LWST_LINE);
+    init_morph_vao(pLwc, LWST_MORPH);
     // load all textures
     init_load_textures(pLwc);
     // load font metadata
@@ -1255,6 +1314,14 @@ static void bind_all_line_vertex_attrib_shader(const LWCONTEXT* pLwc, int shader
 #endif
 }
 
+static void bind_all_morph_vertex_attrib_shader(const LWCONTEXT* pLwc, int shader_index, int vbo_index) {
+#if LW_PLATFORM_WIN32 || LW_PLATFORM_OSX
+    glBindVertexArray(pLwc->morph_vao[vbo_index]);
+#else
+    set_morph_vertex_attrib_pointer(pLwc, shader_index);
+#endif
+}
+
 void bind_all_fvertex_attrib(const LWCONTEXT* pLwc, int fvbo_index) {
     bind_all_fvertex_attrib_shader(pLwc, LWST_DEFAULT_NORMAL, fvbo_index);
 }
@@ -1293,6 +1360,10 @@ void bind_all_ps0_vertex_attrib(const LWCONTEXT* pLwc, int vbo_index) {
 
 void bind_all_line_vertex_attrib(const LWCONTEXT* pLwc) {
     bind_all_line_vertex_attrib_shader(pLwc, LWST_LINE);
+}
+
+void bind_all_morph_vertex_attrib(const LWCONTEXT* pLwc, int vbo_index) {
+    bind_all_morph_vertex_attrib_shader(pLwc, LWST_MORPH, vbo_index);
 }
 
 void load_pkm_hw_decoding(const char *tex_atlas_filename) {
@@ -1908,6 +1979,10 @@ void lw_deinit(LWCONTEXT* pLwc) {
 
     if (pLwc->sea_route_vbo.vertex_buffer) {
         glDeleteBuffers(1, &pLwc->sea_route_vbo.vertex_buffer);
+    }
+
+    for (int i = 0; i < LMVT_COUNT; i++) {
+        glDeleteBuffers(1, &pLwc->morph_vertex_buffer[i].vertex_buffer);
     }
     
     glDeleteTextures(1, &pLwc->shared_fbo.color_tex);

@@ -4,6 +4,7 @@
 #if LW_PLATFORM_WIN32
 #include "lwimgui.h"
 #endif
+#include "input.h"
 
 void mouse_button_callback(GLFWwindow* window, int button, int action, int mods) {
 #if LW_PLATFORM_WIN32
@@ -55,10 +56,12 @@ void mouse_pos_callback(GLFWwindow* window, double xpos, double ypos) {
 }
 
 void scroll_callback(GLFWwindow* window, double xoffset, double yoffset) {
+    LWCONTEXT* pLwc = (LWCONTEXT*)glfwGetWindowUserPointer(window);
 #if LW_PLATFORM_WIN32
 	lwimgui_scroll_callback(window, xoffset, yoffset);
 	if (lwimgui_want_capture_mouse()) {
 		return;
 	}
 #endif
+    lw_trigger_scroll(pLwc, (float)xoffset, (float)yoffset);
 }

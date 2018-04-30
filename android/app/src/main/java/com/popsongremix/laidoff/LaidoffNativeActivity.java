@@ -102,6 +102,7 @@ public class LaidoffNativeActivity extends NativeActivity {
         assetsLoader.registerAllAssetsOfType("html");
         assetsLoader.registerAllAssetsOfType("cvbo");
         assetsLoader.registerAllAssetsOfType("ttldata");
+		assetsLoader.registerAllAssetsOfType("mvbo");
         sendApkPath(assetsLoader.GetAPKPath(), getApplicationContext().getFilesDir().getAbsolutePath(), getPackageVersion());
 
         //noinspection deprecation

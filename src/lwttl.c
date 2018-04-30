@@ -97,6 +97,7 @@ typedef struct _LWTTL {
     int track_object_ship_id;
     char seaarea[128]; // should match with LWPTTLSEAAREA.name size
     int view_scale;
+    int view_scale_render_max;
     int xc0;
     int yc0;
     LWMUTEX rendering_mutex;
@@ -106,6 +107,8 @@ typedef struct _LWTTL {
     LWPTTLFULLSTATE ttl_full_state;
     LWPTTLSEAPORTSTATE ttl_seaport_state;
     LWTTLSTATICOBJECTCACHE static_object_cache;
+    float earth_globe_scale;
+    float earth_globe_scale_0;
 } LWTTL;
 
 LWTTL* lwttl_new(float aspect_ratio) {
@@ -120,8 +123,11 @@ LWTTL* lwttl_new(float aspect_ratio) {
     size_t seaports_dat_size;
     ttl->seaport = (LWTTLDATA_SEAPORT*)create_binary_from_file(ASSETS_BASE_PATH "ttldata" PATH_SEPARATOR "seaports.dat", &seaports_dat_size);
     ttl->seaport_len = seaports_dat_size / sizeof(LWTTLDATA_SEAPORT);
-    ttl->view_scale = 64;
+    ttl->view_scale_render_max = 64;
+    ttl->view_scale = ttl->view_scale_render_max;
     LWMUTEX_INIT(ttl->rendering_mutex);
+    ttl->earth_globe_scale_0 = 45.0f * 4;
+    lwttl_set_earth_globe_scale(ttl, ttl->earth_globe_scale_0);
     return ttl;
 }
 
@@ -316,6 +322,12 @@ int lwttl_view_scale(const LWTTL* _ttl) {
     return ttl->view_scale;
 }
 
+int lwttl_clamped_view_scale(const LWTTL* _ttl) {
+    LWTTL* ttl = (LWTTL*)_ttl;
+    // max value of view_scale bounded by LWTTLSTATICOBJECT2_CHUNK_KEY
+    return LWCLAMP(ttl->view_scale, 1, ttl->view_scale_render_max);
+}
+
 static int lower_bound_int(const int* a, int len, int v) {
     if (len <= 0) {
         return -1;
@@ -447,9 +459,9 @@ float lwttl_half_extent_in_degrees(const int view_scale) {
 
 void lwttl_udp_send_ttlping(const LWTTL* ttl, LWUDP* udp, int ping_seq) {
     const LWTTLLNGLAT* center = lwttl_center(ttl);
-    const int view_scale = lwttl_view_scale(ttl);
+    const int clamped_view_scale = lwttl_clamped_view_scale(ttl);
 
-    const float half_extent_in_deg = lwttl_half_extent_in_degrees(view_scale);
+    const float half_extent_in_deg = lwttl_half_extent_in_degrees(clamped_view_scale);
     const float lng_min = center->lng - half_extent_in_deg;
     const float lng_max = center->lng + half_extent_in_deg;
     const float lat_min = center->lat - half_extent_in_deg;
@@ -462,7 +474,7 @@ void lwttl_udp_send_ttlping(const LWTTL* ttl, LWUDP* udp, int ping_seq) {
         lwttl_lat_to_ceil_int(lat_min),
     };
     LWTTLCHUNKBOUND chunk_bound;
-    cell_bound_to_chunk_bound(&cell_bound, view_scale, &chunk_bound);
+    cell_bound_to_chunk_bound(&cell_bound, clamped_view_scale, &chunk_bound);
     chunk_bound.xcc0--;
     chunk_bound.xcc1++;
     chunk_bound.ycc0--;
@@ -477,31 +489,31 @@ void lwttl_udp_send_ttlping(const LWTTL* ttl, LWUDP* udp, int ping_seq) {
             LWTTLSTATICOBJECT2_CHUNK_KEY chunk_key;
             chunk_key.bf.xcc0 = xcc0;
             chunk_key.bf.ycc0 = ycc0;
-            chunk_key.bf.view_scale_msb = msb_index(view_scale);
+            chunk_key.bf.view_scale_msb = msb_index(clamped_view_scale);
             if (find_static_object_chunk_index(&ttl->static_object_cache, chunk_key) == -1) {
-                const int xc0 = xcc0 << msb_index(LNGLAT_SEA_PING_EXTENT_IN_CELL_PIXELS * view_scale);
-                const int yc0 = ycc0 << msb_index(LNGLAT_SEA_PING_EXTENT_IN_CELL_PIXELS * view_scale);
+                const int xc0 = xcc0 << msb_index(LNGLAT_SEA_PING_EXTENT_IN_CELL_PIXELS * clamped_view_scale);
+                const int yc0 = ycc0 << msb_index(LNGLAT_SEA_PING_EXTENT_IN_CELL_PIXELS * clamped_view_scale);
                 // ping for static object (land mass)
                 send_ttlping(ttl,
                              udp,
                              cell_x_to_lng(xc0),
                              cell_y_to_lat(yc0),
                              ping_seq,
-                             view_scale,
+                             clamped_view_scale,
                              1,
                              LNGLAT_SEA_PING_EXTENT_IN_CELL_PIXELS);
             }
         }
     }
     // ping for dynamic object (ships, seaports)
-    const int xc0 = lwttl_lng_to_round_int(center->lng) & ~(view_scale - 1);
-    const int yc0 = lwttl_lat_to_round_int(center->lat) & ~(view_scale - 1);
+    const int xc0 = lwttl_lng_to_round_int(center->lng) & ~(clamped_view_scale - 1);
+    const int yc0 = lwttl_lat_to_round_int(center->lat) & ~(clamped_view_scale - 1);
     send_ttlping(ttl,
                  udp,
                  cell_x_to_lng(xc0),
                  cell_y_to_lat(yc0),
                  ping_seq,
-                 view_scale,
+                 clamped_view_scale,
                  0,
                  LNGLAT_SEA_PING_EXTENT_IN_CELL_PIXELS * LNGLAT_RENDER_EXTENT_MULTIPLIER);
 }
@@ -656,7 +668,7 @@ void lwttl_udp_update(LWTTL* ttl, LWUDP* udp, LWCONTEXT* pLwc) {
                 lwttl_set_yc0(pLwc->ttl, p->yc0);
                 //lwttl_lock_rendering_mutex(pLwc->ttl);
                 //lwttl_unlock_rendering_mutex(pLwc->ttl);
-                lwttl_set_view_scale(pLwc->ttl, p->view_scale);
+                //lwttl_set_view_scale(pLwc->ttl, p->view_scale);
                 add_to_static_object_cache(&ttl->static_object_cache, p);
                 break;
             }
@@ -926,4 +938,32 @@ const LWPTTLSTATICOBJECT2* lwttl_query_static_object_chunk(const LWTTL* ttl,
 
 LWUDP* lwttl_sea_udp(LWTTL* ttl) {
     return ttl->sea_udp;
+}
+
+void lwttl_set_earth_globe_scale(LWTTL* ttl, float earth_globe_scale) {
+    ttl->earth_globe_scale = LWCLAMP(earth_globe_scale, 0.1f, ttl->earth_globe_scale_0);
+    const float earth_globe_morph_weight = lwttl_earth_globe_morph_weight(ttl->earth_globe_scale);
+    LOGI("Globe scale: %.2f, Morph weight: %.2f", ttl->earth_globe_scale, earth_globe_morph_weight);
+}
+
+void lwttl_scroll_earth_globe_scale(LWTTL* ttl, float offset) {
+    if (offset > 0) {
+        lwttl_set_earth_globe_scale(ttl, ttl->earth_globe_scale * 1.2f);
+    } else {
+        lwttl_set_earth_globe_scale(ttl, ttl->earth_globe_scale / 1.2f);
+    }
+}
+
+float lwttl_earth_globe_scale(LWTTL* ttl) {
+    return ttl->earth_globe_scale;
+}
+
+float lwttl_earth_globe_morph_weight(float earth_globe_scale) {
+    return 1.0f / (1.0f + expf(0.5f * (earth_globe_scale - 35.0f))); // 0: plane, 1: globe
+}
+
+float lwttl_earth_globe_y(const LWTTLLNGLAT* center, float earth_globe_scale, float earth_globe_morph_weight) {
+    const float globe_y = -sinf((float)LWDEG2RAD(center->lat)) * earth_globe_scale;
+    const float plane_y = -(float)M_PI / 2 * center->lat / 90.0f * earth_globe_scale; // plane height is M_PI
+    return (1.0f - earth_globe_morph_weight) * plane_y + earth_globe_morph_weight * globe_y;
 }

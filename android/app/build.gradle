@@ -132,7 +132,8 @@ android {
                 'png',
                 'vbo',
                 'css',
-                'html'
+                'html',
+                'mvbo'
     }
 }
 

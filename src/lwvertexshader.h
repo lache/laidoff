@@ -15,6 +15,7 @@ typedef enum _LW_VERTEX_SHADER {
     LWVS_DEFAULT_NORMAL,
 	LWVS_DEFAULT_NORMAL_COLOR,
     LWVS_LINE,
+    LWVS_MORPH,
 
     LWVS_COUNT,
 } LW_VERTEX_SHADER;
@@ -28,6 +29,7 @@ static const char* vertex_shader_filename[] = {
     ASSETS_BASE_PATH GLSL_DIR_NAME PATH_SEPARATOR "default-normal-vert.glsl",
 	ASSETS_BASE_PATH GLSL_DIR_NAME PATH_SEPARATOR "default-normal-color-vert.glsl",
     ASSETS_BASE_PATH GLSL_DIR_NAME PATH_SEPARATOR "line-vert.glsl",
+    ASSETS_BASE_PATH GLSL_DIR_NAME PATH_SEPARATOR "morph-vert.glsl",
 };
 LwStaticAssert(ARRAY_SIZE(vertex_shader_filename) == LWVS_COUNT, "LWVS_COUNT error");
 

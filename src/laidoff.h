@@ -28,6 +28,7 @@ void lw_trigger_touch(LWCONTEXT* pLwc, float xpos, float ypos, int pointer_id);
 void lw_trigger_mouse_press(LWCONTEXT* pLwc, float xpos, float ypos, int pointer_id);
 void lw_trigger_mouse_release(LWCONTEXT* pLwc, float xpos, float ypos, int pointer_id);
 void lw_trigger_mouse_move(LWCONTEXT* pLwc, float x, float y, int pointer_id);
+void scroll_callback(GLFWwindow* window, double xoffset, double yoffset);
 void lw_trigger_reset(LWCONTEXT* pLwc);
 void lw_trigger_play_sound(LWCONTEXT* pLwc);
 void lw_trigger_key_left(LWCONTEXT* pLwc);
@@ -79,6 +80,7 @@ void bind_all_fan_vertex_attrib(const LWCONTEXT* pLwc, int vbo_index);
 void bind_all_ps_vertex_attrib(const LWCONTEXT* pLwc, int vbo_index);
 void bind_all_ps0_vertex_attrib(const LWCONTEXT* pLwc, int vbo_index);
 void bind_all_line_vertex_attrib(const LWCONTEXT* pLwc);
+void bind_all_morph_vertex_attrib(const LWCONTEXT* pLwc, int vbo_index);
 
 void set_texture_parameter_values(const LWCONTEXT* pLwc, float x, float y, float w, float h, float atlas_w, float atlas_h, int shader_index);
 int get_tex_index_by_hash_key(const LWCONTEXT* pLwc, const char* hash_key);

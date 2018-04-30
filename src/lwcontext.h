@@ -61,6 +61,11 @@ LwStaticAssert(sizeof(LWFANVERTEX) == (GLsizei)(sizeof(float) * 3), "LWFANVERTEX
 static const GLsizei line_stride_in_bytes = (GLsizei)(sizeof(float) * 2);
 LwStaticAssert(sizeof(LWLINEVERTEX) == (GLsizei)(sizeof(float) * 2), "LWLINEVERTEX size error");
 
+// Morph Vertex attributes: Coordinates_0 (3xf) + Coordinates_1 (3xf) + UV (2xf)
+// See Also: LWMORPHVERTEX
+static const GLsizei lwmorphvertex_stride_in_bytes = (GLsizei)(sizeof(float) * (3 + 3 + 2));
+LwStaticAssert(sizeof(LWMORPHVERTEX) == (GLsizei)(sizeof(float) * (3 + 3 + 2)), "LWMORPHVERTEX size error");
+
 #define MAX_ANIM_COUNT (10)
 #define ANIM_FPS (60)
 #define MAX_TOUCHPROC_COUNT (10)
@@ -136,6 +141,8 @@ typedef struct _LWCONTEXT {
     LWFVBO fvertex_buffer[LFT_COUNT];
     // Sea route VBO
     LWVBO sea_route_vbo;
+    // Sea route VBO
+    LWVBO morph_vertex_buffer[LMVT_COUNT];
     // FANIM (FVBO Anim)
     LWFANIM fanim[LFAT_COUNT];
 	// General mesh VAO
@@ -153,6 +160,8 @@ typedef struct _LWCONTEXT {
 	GLuint ps0_vao[PS0_VERTEX_BUFFER_COUNT];
     // Line VAO
     GLuint line_vao[1];
+    // Morph VAO
+    GLuint morph_vao[LMVT_COUNT];
 	// General texture atlas
 	GLuint tex_atlas[MAX_TEX_ATLAS];
     int tex_atlas_ready[MAX_TEX_ATLAS];

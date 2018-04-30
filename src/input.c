@@ -16,6 +16,7 @@
 #include "rmsg.h"
 #include "file.h"
 #include "htmlui.h"
+#include "lwttl.h"
 
 static void convert_touch_coord_to_ui_coord(LWCONTEXT* pLwc, float *x, float *y) {
 	if (pLwc->height < pLwc->width) {
@@ -514,4 +515,11 @@ void lw_go_back(LWCONTEXT* pLwc, void* native_context) {
 	} else {
 		rmsg_quitapp(pLwc, native_context);
 	}
+}
+
+void lw_trigger_scroll(LWCONTEXT* pLwc, float xoffset, float yoffset) {
+    if (!pLwc) {
+        return;
+    }
+    lwttl_scroll_earth_globe_scale(pLwc->ttl, yoffset);
 }

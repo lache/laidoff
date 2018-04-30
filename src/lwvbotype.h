@@ -163,3 +163,9 @@ typedef enum _LW_PS0_VBO_TYPE {
 
 	LP0VT_COUNT,
 } LW_PS0_VBO_TYPE;
+
+typedef enum _LW_MORPH_VBO_TYPE {
+    LMVT_EARTH,
+
+    LMVT_COUNT,
+} LW_MORPH_VBO_TYPE;

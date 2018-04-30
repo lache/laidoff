@@ -267,17 +267,19 @@
 		function request_waypoints(ship_id)
 			lo.lwttl_request_waypoints(c.ttl, ship_id)
 		end
+		local MIN_VIEW_SCALE = 1
+		local MAX_VIEW_SCALE = 2048
 		function map_zoom_in()
 		    local vs = lo.lwttl_view_scale(c.ttl)
 		    vs = vs / 2
-		    if vs < 1 then vs = 1 end
+		    if vs < MIN_VIEW_SCALE then vs = MIN_VIEW_SCALE end
 		    lo.lwttl_set_view_scale(c.ttl, vs)
 		    lo.lwttl_udp_send_ttlping(c.ttl, c.udp_sea, 0)
 		end
 		function map_zoom_out()
 		    local vs = lo.lwttl_view_scale(c.ttl)
 		    vs = vs * 2
-		    if vs > 64 then vs = 64 end
+		    if vs > MAX_VIEW_SCALE then vs = MAX_VIEW_SCALE end
 		    lo.lwttl_set_view_scale(c.ttl, vs)
 		    lo.lwttl_udp_send_ttlping(c.ttl, c.udp_sea, 0)
 		end

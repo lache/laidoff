@@ -83,6 +83,7 @@ int lw_create_shader_program(const char* shader_name, LWSHADER* pShader, GLuint 
     pShader->full_color = glGetUniformLocation(pShader->program, "full_color");
     pShader->empty_color = glGetUniformLocation(pShader->program, "empty_color");
     pShader->wrap_offset = glGetUniformLocation(pShader->program, "wrap_offset");
+    pShader->morph_weight = glGetUniformLocation(pShader->program, "morph_weight");
 
     // Set initial value...
     glUseProgram(pShader->program);
@@ -106,6 +107,7 @@ int lw_create_shader_program(const char* shader_name, LWSHADER* pShader, GLuint 
     pShader->a_pDecayOffset = glGetAttribLocation(pShader->program, "a_pDecayOffset");
     pShader->a_pSizeOffset = glGetAttribLocation(pShader->program, "a_pSizeOffset");
     pShader->a_pColorOffset = glGetAttribLocation(pShader->program, "a_pColorOffset");
+    pShader->vpos2_location = glGetAttribLocation(pShader->program, "vPos2");
 
     pShader->valid = 1;
     return 0;

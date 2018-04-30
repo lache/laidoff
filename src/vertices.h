@@ -45,3 +45,9 @@ typedef struct _LWCOLORVERTEX {
 typedef struct _LWLINEVERTEX {
     float x, y;
 } LWLINEVERTEX;
+
+typedef struct _LWMORPHVERTEX {
+    float x0, y0, z0;
+    float x1, y1, z1;
+    float u, v;
+} LWMORPHVERTEX;

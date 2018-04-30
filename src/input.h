@@ -24,6 +24,7 @@ void lw_release_key_z(LWCONTEXT* pLwc);
 void lw_release_key_x(LWCONTEXT* pLwc);
 void lw_release_key_q(LWCONTEXT* pLwc);
 void lw_go_back(LWCONTEXT* pLwc, void* native_context);
+void lw_trigger_scroll(LWCONTEXT* pLwc, float xoffset, float yoffset);
 #ifdef __cplusplus
 };
 #endif
