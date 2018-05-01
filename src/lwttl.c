@@ -117,8 +117,7 @@ LWTTL* lwttl_new(float aspect_ratio) {
     ttl->worldmap.render_org_x = 0;
     ttl->worldmap.render_org_y = -(2.0f - aspect_ratio) / 2;
     // Ulsan
-    ttl->worldmap.center.lng = 129.436f;
-    ttl->worldmap.center.lat = 35.494f;
+    lwttl_worldmap_scroll_to(ttl, 129.496f, 35.494f, 0);
     ttl->worldmap.zoom_scale = 5.0f;
     size_t seaports_dat_size;
     ttl->seaport = (LWTTLDATA_SEAPORT*)create_binary_from_file(ASSETS_BASE_PATH "ttldata" PATH_SEPARATOR "seaports.dat", &seaports_dat_size);
@@ -170,19 +169,21 @@ float lnglat_to_xy(const LWCONTEXT* pLwc, float v) {
 
 void lwttl_worldmap_scroll(LWTTL* ttl, float dlng, float dlat, float dzoom) {
     ttl->worldmap.zoom_scale = LWCLAMP(ttl->worldmap.zoom_scale + dzoom, 1.0f, 25.0f);
+    float lat, lng;
     if (ttl->worldmap.zoom_scale <= 1.0f) {
-        ttl->worldmap.center.lat = 0;
+        lat = 0;
     } else {
-        ttl->worldmap.center.lat = fmodf(ttl->worldmap.center.lat + dlat / ttl->worldmap.zoom_scale, 180.0f);
+        lat = ttl->worldmap.center.lat + dlat / ttl->worldmap.zoom_scale;
     }
-    ttl->worldmap.center.lng = fmodf(ttl->worldmap.center.lng + dlng / ttl->worldmap.zoom_scale, 360.0f);
+    lng = ttl->worldmap.center.lng + dlng / ttl->worldmap.zoom_scale;
+    lwttl_worldmap_scroll_to(ttl, lng, lat, 0);
 }
 
 void lwttl_worldmap_scroll_to(LWTTL* ttl, float lng, float lat, LWUDP* sea_udp) {
     // cancel tracking if user want to scroll around
     lwttl_set_track_object_ship_id(ttl, 0);
-    ttl->worldmap.center.lat = lat;
-    ttl->worldmap.center.lng = lng;
+    ttl->worldmap.center.lng = numcomp_wrap_min_max(lng, -180.0f, +180.0f);
+    ttl->worldmap.center.lat = numcomp_wrap_min_max(lat, -90.0f, +90.0f);
     if (sea_udp) {
         lwttl_udp_send_ttlping(ttl, sea_udp, 0);
     }
@@ -209,8 +210,7 @@ const LWTTLLNGLAT* lwttl_center(const LWTTL* ttl) {
 }
 
 void lwttl_set_center(LWTTL* ttl, float lng, float lat) {
-    ttl->worldmap.center.lng = lng;
-    ttl->worldmap.center.lat = lat;
+    lwttl_worldmap_scroll_to(ttl, lng, lat, 0);
 }
 
 void lwttl_set_seaarea(LWTTL* ttl, const char* name) {
@@ -238,8 +238,10 @@ void lwttl_update(LWTTL* ttl, LWCONTEXT* pLwc, float delta_time) {
     if (lw_get_normalized_dir_pad_input(pLwc, &pLwc->left_dir_pad, &dx, &dy, &dlen) && (dx || dy)) {
         // cancel tracking if user want to scroll around
         lwttl_set_track_object_ship_id(ttl, 0);
-        ttl->worldmap.center.lng += dx / 50.0f * delta_time * ttl->view_scale;
-        ttl->worldmap.center.lat += dy / 50.0f * delta_time * ttl->view_scale;
+        lwttl_worldmap_scroll_to(ttl,
+                                 ttl->worldmap.center.lng + dx / 50.0f * delta_time * ttl->view_scale,
+                                 ttl->worldmap.center.lat + dy / 50.0f * delta_time * ttl->view_scale,
+                                 0);
     }
 }
 
@@ -871,8 +873,7 @@ void lwttl_read_last_state(LWTTL* ttl, const LWCONTEXT* pLwc) {
             } else if (save.version != 1) {
                 LOGIP("TTL save data version not match. Will be ignored and rewritten upon exit.");
             } else {
-                ttl->worldmap.center.lng = LWCLAMP(save.lng, -180.0f, +180.0f);
-                ttl->worldmap.center.lat = LWCLAMP(save.lat, -90.0f, +90.0f);
+                lwttl_worldmap_scroll_to(ttl, save.lng, save.lat, 0);
                 ttl->view_scale = LWCLAMP(save.view_scale, 1, 64);
             }
         } else {
