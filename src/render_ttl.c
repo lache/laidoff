@@ -628,7 +628,7 @@ static void render_background_sea_water(const LWCONTEXT* pLwc,
                                                cell_h,
                                                0,
                                                LVT_CENTER_CENTER_ANCHORED_SQUARE,
-                                               1.0f,
+                                               0.75f,
                                                WATER_COLOR_R,
                                                WATER_COLOR_G,
                                                WATER_COLOR_B,
@@ -654,7 +654,7 @@ static void render_sea_static_objects(const LWCONTEXT* pLwc,
     const float lat_min = center->lat - half_lat_extent_in_deg;
     const float lat_max = center->lat + half_lat_extent_in_deg;
 
-    /*render_background_sea_water(pLwc,
+    render_background_sea_water(pLwc,
                                 view,
                                 proj,
                                 center,
@@ -662,7 +662,7 @@ static void render_sea_static_objects(const LWCONTEXT* pLwc,
                                 lng_max,
                                 lat_min,
                                 lat_max,
-                                clamped_view_scale);*/
+                                clamped_view_scale * clamped_to_original_view_scale_ratio);
 
     // land
     //lwttl_lock_rendering_mutex(pLwc->ttl);
@@ -1020,11 +1020,11 @@ void lwc_render_ttl(const LWCONTEXT* pLwc) {
     //render_earth(pLwc, &lng_lat_center, view_scale);
     // render morphed earth
     render_morphed_earth(pLwc, view, proj, &lng_lat_center, view_scale);
+    glDisable(GL_DEPTH_TEST);
     // render land
     if (lwc_render_ttl_render("landcell")) {
         render_sea_static_objects(pLwc, view, proj, &lng_lat_center);
     }
-    glDisable(GL_DEPTH_TEST);
     render_waypoints(pLwc->ttl, pLwc, view, proj, &lng_lat_center);
     render_seaports(pLwc, view, proj, &lng_lat_center, view_scale);
     glEnable(GL_DEPTH_TEST);

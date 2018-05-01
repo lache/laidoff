@@ -372,16 +372,16 @@ static int find_static_object_chunk_index(const LWTTLSTATICOBJECTCACHE* c, const
     return -1;
 }
 
-static void add_to_static_object_cache(LWTTLSTATICOBJECTCACHE* c, const LWPTTLSTATICSTATE2* s2) {
+static int add_to_static_object_cache(LWTTLSTATICOBJECTCACHE* c, const LWPTTLSTATICSTATE2* s2) {
     if (c == 0) {
         LOGEP("c == 0");
         abort();
-        return;
+        return -1;
     }
     if (s2 == 0) {
         LOGEP("s2 == 0");
         abort();
-        return;
+        return -2;
     }
     // check for existing chunk entry
     LWTTLSTATICOBJECT2_CHUNK_KEY chunk_key;
@@ -392,16 +392,17 @@ static void add_to_static_object_cache(LWTTLSTATICOBJECTCACHE* c, const LWPTTLST
     if (chunk_index >= 0 && c->static_object_chunk_key[chunk_index].v == chunk_key.v) {
         // already exist. do nothing
         // TODO update?
+        return 1;
     } else {
         // new chunk entry received.
         // check current capacity
         if (c->static_object_chunk_count >= TTL_STATIC_OBJECT_CHUNK_COUNT) {
             LOGEP("static_object_chunk_count exceeded.");
-            return;
+            return -3;
         }
         if (c->static_object_count + s2->count > TTL_STATIC_OBJECT_COUNT) {
             LOGEP("static_object_count exceeded.");
-            return;
+            return -4;
         }
         // safe to add a new chunk at 'chunk_index'
         // move chunk (move by 1-index by copying in backward direction)
@@ -417,6 +418,7 @@ static void add_to_static_object_cache(LWTTLSTATICOBJECTCACHE* c, const LWPTTLST
         // increase count indices
         c->static_object_chunk_count++;
         c->static_object_count += s2->count;
+        return 0;
     }
 }
 
@@ -455,6 +457,13 @@ static void send_ttlping(const LWTTL* ttl,
     p.view_scale = view_scale;
     p.static_object = static_object;
     udp_send(udp, (const char*)&p, sizeof(LWPTTLPING));
+}
+
+static void send_ttlpingflush(LWTTL* ttl) {
+    LWPTTLPINGFLUSH p;
+    memset(&p, 0, sizeof(LWPTTLPINGFLUSH));
+    p.type = LPGP_LWPTTLPINGFLUSH;
+    udp_send(ttl->sea_udp, (const char*)&p, sizeof(LWPTTLPINGFLUSH));
 }
 
 float lwttl_half_lng_extent_in_degrees(const int view_scale) {
@@ -582,7 +591,7 @@ void lwttl_udp_update(LWTTL* ttl, LWUDP* udp, LWCONTEXT* pLwc) {
         return;
     }
     float app_time = (float)pLwc->app_time;
-    float ping_send_interval = lwcontext_update_interval(pLwc) * 2;
+    float ping_send_interval = lwcontext_update_interval(pLwc) * 200;
     if (udp->last_updated == 0 || app_time > udp->last_updated + ping_send_interval) {
         lwttl_udp_send_ttlping(ttl, udp, udp->ping_seq);
         udp->ping_seq++;
@@ -612,7 +621,7 @@ void lwttl_udp_update(LWTTL* ttl, LWUDP* udp, LWCONTEXT* pLwc) {
             udp->reinit_next_update = 1;
             return;
 #endif
-            }
+        }
 
         char decompressed[1500 * 255]; // maximum lz4 compression ratio is 255...
         int decompressed_bytes = LZ4_decompress_safe(udp->buf, decompressed, udp->recv_len, ARRAY_SIZE(decompressed));
@@ -629,7 +638,7 @@ void lwttl_udp_update(LWTTL* ttl, LWUDP* udp, LWCONTEXT* pLwc) {
 
                 LWPTTLSEAAREA* p = (LWPTTLSEAAREA*)decompressed;
                 LOGIx("LWPTTLSEAAREA: name=%s", p->name);
-                lwttl_set_seaarea(pLwc->ttl, p->name);
+                lwttl_set_seaarea(ttl, p->name);
                 break;
             }
             case LPGP_LWPTTLTRACKCOORDS:
@@ -645,10 +654,10 @@ void lwttl_udp_update(LWTTL* ttl, LWUDP* udp, LWCONTEXT* pLwc) {
                     LOGIx("LWPTTLTRACKCOORDS: id=%d x=%f y=%f", p->id, p->x, p->y);
                     const float lng = cell_fx_to_lng(p->x);
                     const float lat = cell_fy_to_lat(p->y);
-                    lwttl_set_center(pLwc->ttl, lng, lat);
+                    lwttl_set_center(ttl, lng, lat);
                 } else {
-                    lwttl_set_track_object_id(pLwc->ttl, 0);
-                    lwttl_set_track_object_ship_id(pLwc->ttl, 0);
+                    lwttl_set_track_object_id(ttl, 0);
+                    lwttl_set_track_object_ship_id(ttl, 0);
                 }
                 break;
             }
@@ -675,12 +684,15 @@ void lwttl_udp_update(LWTTL* ttl, LWUDP* udp, LWCONTEXT* pLwc) {
 
                 LWPTTLSTATICSTATE2* p = (LWPTTLSTATICSTATE2*)decompressed;
                 LOGIx("LWPTTLSTATICSTATE2: %d objects.", p->count);
-                lwttl_set_xc0(pLwc->ttl, p->xc0);
-                lwttl_set_yc0(pLwc->ttl, p->yc0);
-                //lwttl_lock_rendering_mutex(pLwc->ttl);
-                //lwttl_unlock_rendering_mutex(pLwc->ttl);
-                //lwttl_set_view_scale(pLwc->ttl, p->view_scale);
-                add_to_static_object_cache(&ttl->static_object_cache, p);
+                lwttl_set_xc0(ttl, p->xc0);
+                lwttl_set_yc0(ttl, p->yc0);
+                //lwttl_lock_rendering_mutex(ttl);
+                //lwttl_unlock_rendering_mutex(ttl);
+                //lwttl_set_view_scale(ttl, p->view_scale);
+                const int add_ret = add_to_static_object_cache(&ttl->static_object_cache, p);
+                if (add_ret == 1) {
+                    //send_ttlpingflush(ttl);
+                }
                 break;
             }
             case LPGP_LWPTTLSEAPORTSTATE:
@@ -845,8 +857,8 @@ void lwttl_udp_update(LWTTL* ttl, LWUDP* udp, LWCONTEXT* pLwc) {
         } else {
             LOGEP("lz4 decompression failed!");
         }
-        }
     }
+}
 
 const LWPTTLWAYPOINTS* lwttl_get_waypoints(const LWTTL* ttl) {
     return &ttl->waypoints;
@@ -957,10 +969,15 @@ void lwttl_set_earth_globe_scale(LWTTL* ttl, float earth_globe_scale) {
 }
 
 void lwttl_scroll_earth_globe_scale(LWTTL* ttl, float offset) {
+    int view_scale = lwttl_view_scale(ttl);
     if (offset > 0) {
-        lwttl_set_earth_globe_scale(ttl, ttl->earth_globe_scale * 1.2f);
+        //lwttl_set_earth_globe_scale(ttl, ttl->earth_globe_scale * 1.2f);
+        lwttl_set_view_scale(ttl, LWCLAMP(view_scale >> 1, 1, 2048));
+        lwttl_udp_send_ttlping(ttl, ttl->sea_udp, 0);
     } else {
-        lwttl_set_earth_globe_scale(ttl, ttl->earth_globe_scale / 1.2f);
+        //lwttl_set_earth_globe_scale(ttl, ttl->earth_globe_scale / 1.2f);
+        lwttl_set_view_scale(ttl, LWCLAMP(view_scale << 1, 1, 2048));
+        lwttl_udp_send_ttlping(ttl, ttl->sea_udp, 0);
     }
 }
 
