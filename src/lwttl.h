@@ -11,6 +11,7 @@ typedef struct _LWPTTLFULLSTATE LWPTTLFULLSTATE;
 typedef struct _LWPTTLSTATICSTATE2 LWPTTLSTATICSTATE2;
 typedef struct _LWPTTLSEAPORTSTATE LWPTTLSEAPORTSTATE;
 typedef struct _LWPTTLSTATICOBJECT2 LWPTTLSTATICOBJECT2;
+typedef struct _LWPTTLSEAPORTOBJECT LWPTTLSEAPORTOBJECT;
 typedef struct _LWTTLLNGLAT {
     float lng;
     float lat;
@@ -50,17 +51,17 @@ void lwttl_set_sea_udp(LWTTL* ttl, LWUDP* sea_udp);
 void lwttl_udp_send_ttlping(const LWTTL* ttl, LWUDP* udp, int ping_seq);
 void lwttl_udp_send_request_waypoints(const LWTTL* ttl, LWUDP* sea_udp, int ship_id);
 void lwttl_udp_update(LWTTL* ttl, LWUDP* udp, LWCONTEXT* pLwc);
-void lwttl_set_xc0(LWTTL* ttl, int v);
-int lwttl_xc0(const LWTTL* ttl);
-void lwttl_set_yc0(LWTTL* ttl, int v);
-int lwttl_yc0(const LWTTL* ttl);
+//void lwttl_set_xc0(LWTTL* ttl, int v);
+//int lwttl_xc0(const LWTTL* ttl);
+//void lwttl_set_yc0(LWTTL* ttl, int v);
+//int lwttl_yc0(const LWTTL* ttl);
 void lwttl_lock_rendering_mutex(LWTTL* ttl);
 void lwttl_unlock_rendering_mutex(LWTTL* ttl);
 const LWPTTLWAYPOINTS* lwttl_get_waypoints(const LWTTL* ttl);
 void lwttl_write_last_state(const LWTTL* ttl, const LWCONTEXT* pLwc);
 void lwttl_read_last_state(LWTTL* ttl, const LWCONTEXT* pLwc);
 const LWPTTLFULLSTATE* lwttl_full_state(const LWTTL* ttl);
-const LWPTTLSEAPORTSTATE* lwttl_seaport_state(const LWTTL* ttl);
+//const LWPTTLSEAPORTSTATE* lwttl_seaport_state(const LWTTL* ttl);
 int lwttl_query_static_object_chunk_range(const LWTTL* ttl,
                                           const float lng_min,
                                           const float lng_max,
@@ -69,11 +70,16 @@ int lwttl_query_static_object_chunk_range(const LWTTL* ttl,
                                           const int view_scale,
                                           int* chunk_index_array,
                                           const int chunk_index_array_len);
-const LWPTTLSTATICOBJECT2* lwttl_query_static_object_chunk(const LWTTL* ttl,
-                                                           const int chunk_index,
-                                                           int* xc0,
-                                                           int* yc0,
-                                                           int* count);
+const LWPTTLSTATICOBJECT2* lwttl_query_chunk_land(const LWTTL* ttl,
+                                                  const int chunk_index,
+                                                  int* xc0,
+                                                  int* yc0,
+                                                  int* count);
+const LWPTTLSEAPORTOBJECT* lwttl_query_chunk_seaport(const LWTTL* ttl,
+                                                     const int chunk_index,
+                                                     int* xc0,
+                                                     int* yc0,
+                                                     int* count);
 float lwttl_half_lng_extent_in_degrees(const int view_scale);
 float lwttl_half_lat_extent_in_degrees(const int view_scale);
 int lwttl_lng_to_floor_int(float lng);

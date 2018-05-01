@@ -311,9 +311,10 @@ typedef struct _LWPTTLSTATICSTATE2 {
 
 // UDP
 typedef struct _LWPTTLSEAPORTOBJECT {
-    int x0;
-    int y0;
-    char name[64];
+    signed char x_scaled_offset_0;
+    signed char y_scaled_offset_0;
+    unsigned char padding0;
+    unsigned char padding1;
 } LWPTTLSEAPORTOBJECT;
 
 // UDP
@@ -322,6 +323,9 @@ typedef struct _LWPTTLSEAPORTSTATE {
     unsigned char padding0;
     unsigned char padding1;
     unsigned char padding2;
+    int xc0;
+    int yc0;
+    int view_scale;
     int count;
     LWPTTLSEAPORTOBJECT obj[128];
 } LWPTTLSEAPORTSTATE;
