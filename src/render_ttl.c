@@ -1002,7 +1002,9 @@ void lwc_render_ttl(const LWCONTEXT* pLwc) {
         render_world(pLwc, view, proj, ship_y, &lng_lat_center);
     }
     glDisable(GL_DEPTH_TEST);
-    render_cell_pixel_selector_at_center(pLwc, view, proj, &lng_lat_center, view_scale);
+    if (view_scale == 1) {
+        render_cell_pixel_selector_at_center(pLwc, view, proj, &lng_lat_center, view_scale);
+    }
     // UI
     if (lwc_render_ttl_render("world")) {
         render_sea_objects_nameplate(pLwc, view, proj, &lng_lat_center);

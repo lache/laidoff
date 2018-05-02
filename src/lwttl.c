@@ -112,7 +112,8 @@ typedef struct _LWTTL {
     int track_object_ship_id;
     char seaarea[128]; // should match with LWPTTLSEAAREA.name size
     int view_scale;
-    int view_scale_render_max;
+    int view_scale_max;
+    int view_scale_ping_max;
     //int xc0;
     //int yc0;
     LWMUTEX rendering_mutex;
@@ -136,8 +137,9 @@ LWTTL* lwttl_new(float aspect_ratio) {
     size_t seaports_dat_size;
     ttl->seaport = (LWTTLDATA_SEAPORT*)create_binary_from_file(ASSETS_BASE_PATH "ttldata" PATH_SEPARATOR "seaports.dat", &seaports_dat_size);
     ttl->seaport_len = seaports_dat_size / sizeof(LWTTLDATA_SEAPORT);
-    ttl->view_scale_render_max = 64;
-    ttl->view_scale = ttl->view_scale_render_max;
+    ttl->view_scale_max = 1 << 13; // should be no more than 2^15 (== 2 ^ MAX(LWTTLCHUNKKEY.view_scale_msb))
+    ttl->view_scale_ping_max = 64;
+    ttl->view_scale = ttl->view_scale_ping_max;
     LWMUTEX_INIT(ttl->rendering_mutex);
     ttl->earth_globe_scale_0 = earth_globe_render_scale;
     lwttl_set_earth_globe_scale(ttl, ttl->earth_globe_scale_0);
@@ -299,7 +301,7 @@ int lwttl_view_scale(const LWTTL* _ttl) {
 int lwttl_clamped_view_scale(const LWTTL* _ttl) {
     LWTTL* ttl = (LWTTL*)_ttl;
     // max value of view_scale bounded by LWTTLCHUNKKEY
-    return LWCLAMP(ttl->view_scale, 1, ttl->view_scale_render_max);
+    return LWCLAMP(ttl->view_scale, 1, ttl->view_scale_ping_max);
 }
 
 static int lower_bound_int(const int* a, int len, int v) {
@@ -1123,11 +1125,11 @@ void lwttl_scroll_earth_globe_scale(LWTTL* ttl, float offset) {
     int view_scale = lwttl_view_scale(ttl);
     if (offset > 0) {
         //lwttl_set_earth_globe_scale(ttl, ttl->earth_globe_scale * 1.2f);
-        lwttl_set_view_scale(ttl, LWCLAMP(view_scale >> 1, 1, 2048));
+        lwttl_set_view_scale(ttl, LWCLAMP(view_scale >> 1, 1, ttl->view_scale_max));
         lwttl_udp_send_ttlping(ttl, ttl->sea_udp, 0);
     } else {
         //lwttl_set_earth_globe_scale(ttl, ttl->earth_globe_scale / 1.2f);
-        lwttl_set_view_scale(ttl, LWCLAMP(view_scale << 1, 1, 2048));
+        lwttl_set_view_scale(ttl, LWCLAMP(view_scale << 1, 1, ttl->view_scale_max));
         lwttl_udp_send_ttlping(ttl, ttl->sea_udp, 0);
     }
 }
