@@ -97,6 +97,12 @@ typedef struct _LWTTLSAVEDATA {
     int view_scale;
 } LWTTLSAVEDATA;
 
+typedef struct _LWTTLWORLDMAP {
+    float render_org_x;
+    float render_org_y;
+    LWTTLLNGLAT center;
+} LWTTLWORLDMAP;
+
 typedef struct _LWTTL {
     int version;
     LWTTLDATA_SEAPORT* seaport;
@@ -127,14 +133,13 @@ LWTTL* lwttl_new(float aspect_ratio) {
     ttl->worldmap.render_org_y = -(2.0f - aspect_ratio) / 2;
     // Ulsan
     lwttl_worldmap_scroll_to(ttl, 129.496f, 35.494f, 0);
-    ttl->worldmap.zoom_scale = 5.0f;
     size_t seaports_dat_size;
     ttl->seaport = (LWTTLDATA_SEAPORT*)create_binary_from_file(ASSETS_BASE_PATH "ttldata" PATH_SEPARATOR "seaports.dat", &seaports_dat_size);
     ttl->seaport_len = seaports_dat_size / sizeof(LWTTLDATA_SEAPORT);
     ttl->view_scale_render_max = 64;
     ttl->view_scale = ttl->view_scale_render_max;
     LWMUTEX_INIT(ttl->rendering_mutex);
-    ttl->earth_globe_scale_0 = 45.0f * 4;
+    ttl->earth_globe_scale_0 = earth_globe_render_scale;
     lwttl_set_earth_globe_scale(ttl, ttl->earth_globe_scale_0);
     return ttl;
 }
@@ -146,53 +151,15 @@ void lwttl_destroy(LWTTL** __ttl) {
     *__ttl = 0;
 }
 
-void lwttl_render_all_seaports(const LWCONTEXT* pLwc, const LWTTL* _ttl, const LWTTLWORLDMAP* worldmap) {
-    const LWTTL* ttl = (const LWTTL*)_ttl;
-    for (size_t i = 0; i < ttl->seaport_len; i++) {
-        const LWTTLDATA_SEAPORT* sp = ttl->seaport + i;
-        float x = lnglat_to_xy(pLwc, sp->lng - worldmap->center.lng) * worldmap->zoom_scale;
-        float y = lnglat_to_xy(pLwc, sp->lat - worldmap->center.lat) * worldmap->zoom_scale;
-        lazy_tex_atlas_glBindTexture(pLwc, LAE_STOP_MARK);
-        render_solid_vb_ui_uv_shader_rot(pLwc,
-                                         worldmap->render_org_x + x,
-                                         worldmap->render_org_y + y,
-                                         0.01f,
-                                         0.01f,
-                                         pLwc->tex_atlas[LAE_STOP_MARK],
-                                         LVT_CENTER_CENTER_ANCHORED_SQUARE,
-                                         1.0f,
-                                         1.0f,
-                                         0.0f,
-                                         0.0f,
-                                         1.0f,
-                                         default_uv_offset,
-                                         default_uv_scale,
-                                         LWST_DEFAULT,
-                                         0);
-    }
-}
-
 float lnglat_to_xy(const LWCONTEXT* pLwc, float v) {
     return v * 1.0f / 180.0f * pLwc->aspect_ratio;
-}
-
-void lwttl_worldmap_scroll(LWTTL* ttl, float dlng, float dlat, float dzoom) {
-    ttl->worldmap.zoom_scale = LWCLAMP(ttl->worldmap.zoom_scale + dzoom, 1.0f, 25.0f);
-    float lat, lng;
-    if (ttl->worldmap.zoom_scale <= 1.0f) {
-        lat = 0;
-    } else {
-        lat = ttl->worldmap.center.lat + dlat / ttl->worldmap.zoom_scale;
-    }
-    lng = ttl->worldmap.center.lng + dlng / ttl->worldmap.zoom_scale;
-    lwttl_worldmap_scroll_to(ttl, lng, lat, 0);
 }
 
 void lwttl_worldmap_scroll_to(LWTTL* ttl, float lng, float lat, LWUDP* sea_udp) {
     // cancel tracking if user want to scroll around
     lwttl_set_track_object_ship_id(ttl, 0);
     ttl->worldmap.center.lng = numcomp_wrap_min_max(lng, -180.0f, +180.0f);
-    ttl->worldmap.center.lat = numcomp_wrap_min_max(lat, -90.0f, +90.0f);
+    ttl->worldmap.center.lat = LWCLAMP(lat, -90.0f, +90.0f);
     if (sea_udp) {
         lwttl_udp_send_ttlping(ttl, sea_udp, 0);
     }
@@ -203,10 +170,6 @@ void lwttl_worldmap_scroll_to_int(LWTTL* ttl, int xc, int yc, LWUDP* sea_udp) {
                              cell_x_to_lng(xc),
                              cell_y_to_lat(yc),
                              sea_udp);
-}
-
-const LWTTLWORLDMAP* lwttl_worldmap(LWTTL* ttl) {
-    return &ttl->worldmap;
 }
 
 void lwttl_update_aspect_ratio(LWTTL* ttl, float aspect_ratio) {

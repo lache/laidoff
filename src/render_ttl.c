@@ -516,12 +516,7 @@ static void render_waypoint_line_segment(const LWTTL* ttl,
                                          int x1,
                                          int y1) {
     const int view_scale = lwttl_view_scale(pLwc->ttl);
-    int view_scale_msb = view_scale;
-    int view_scale_msb_index = 0;
-    while ((view_scale_msb & 1) == 0) {
-        view_scale_msb_index++;
-        view_scale_msb >>= 1;
-    }
+    const int view_scale_msb = msb_index(view_scale);
     const float lng0_not_clamped = cell_fx_to_lng(x0 + 0.5f);
     const float lat0_not_clamped = cell_fy_to_lat(y0 + 0.5f);
     const float lng1_not_clamped = cell_fx_to_lng(x1 + 0.5f);
@@ -536,7 +531,7 @@ static void render_waypoint_line_segment(const LWTTL* ttl,
     const float dy = cell_y1 - cell_y0;
     const float dlen = sqrtf(dx * dx + dy * dy);
 
-    const float thickness = 0.2f / sqrtf((float)(view_scale_msb_index + 1));
+    const float thickness = 0.2f / sqrtf((float)(view_scale_msb + 1));
     const float rot_z = atan2f(dy, dx);
 
     render_solid_vb_ui_uv_shader_rot_view_proj(pLwc,
@@ -593,13 +588,8 @@ static void render_seaports(const LWCONTEXT* pLwc,
 
     const float cell_render_width = cell_x_to_render_coords(1, center, clamped_view_scale) - cell_x_to_render_coords(0, center, clamped_view_scale);
     const float cell_render_height = cell_y_to_render_coords(0, center, clamped_view_scale) - cell_y_to_render_coords(1, center, clamped_view_scale);
-    int view_scale_msb = clamped_view_scale;
-    int view_scale_msb_index = 0;
-    while ((view_scale_msb & 1) == 0) {
-        view_scale_msb_index++;
-        view_scale_msb >>= 1;
-    }
-    const float size_ratio = 1.0f / sqrtf((float)(view_scale_msb_index + 1));
+    const int view_scale_msb = msb_index(clamped_view_scale);
+    const float size_ratio = 1.0f / sqrtf((float)(view_scale_msb + 1));
 
     int chunk_index_array[(1 + LNGLAT_RENDER_EXTENT_MULTIPLIER_LNG + 1)*(1 + LNGLAT_RENDER_EXTENT_MULTIPLIER_LAT + 1)];
     const int chunk_index_array_count = lwttl_query_chunk_range_seaport(pLwc->ttl,
@@ -864,69 +854,6 @@ static void render_world(const LWCONTEXT* pLwc, const mat4x4 view, const mat4x4 
     //render_waves(pLwc, view, proj, ship_y);
 }
 
-static void render_route_line(const LWCONTEXT* pLwc, const LWTTLWORLDMAP* worldmap, float render_offset_x, float render_offset_y) {
-    int shader_index = LWST_LINE;
-    float rot = 0.0f;
-    lazy_glUseProgram(pLwc, shader_index);
-
-    float ui_scale_x = lnglat_to_xy(pLwc, 1.0f);
-    float ui_scale_y = lnglat_to_xy(pLwc, 1.0f);
-
-    mat4x4 model_translate;
-    mat4x4 model;
-    mat4x4 identity_view; mat4x4_identity(identity_view);
-    mat4x4 view_model;
-    mat4x4 proj_view_model;
-    mat4x4 model_scale;
-    mat4x4 model_scale_rotate;
-
-    mat4x4_identity(model_scale);
-    mat4x4_scale_aniso(model_scale, model_scale, ui_scale_x, ui_scale_y, 1.0f);
-    mat4x4_rotate_Z(model_scale_rotate, model_scale, rot);
-    mat4x4_translate(model_translate, worldmap->render_org_x, worldmap->render_org_y, 0);
-    mat4x4_identity(model);
-    mat4x4_mul(model, model_translate, model_scale_rotate);
-    mat4x4_mul(view_model, identity_view, model);
-    mat4x4_identity(proj_view_model);
-    mat4x4_mul(proj_view_model, pLwc->proj, view_model);
-
-    glBindBuffer(GL_ARRAY_BUFFER, pLwc->sea_route_vbo.vertex_buffer);
-    bind_all_line_vertex_attrib(pLwc);
-    glUniformMatrix4fv(pLwc->shader[shader_index].mvp_location, 1, GL_FALSE, (const GLfloat*)proj_view_model);
-    int vc = pLwc->sea_route_vbo.vertex_count;
-    glDrawArrays(GL_LINE_STRIP, 0, vc);
-}
-
-static void render_world_map(const LWCONTEXT* pLwc, const LWTTLWORLDMAP* worldmap) {
-    lazy_tex_atlas_glBindTexture(pLwc, LAE_WORLD_MAP);
-    //const float uv_offset[2] = { (float)fmod(pLwc->app_time/40.0f, 1.0f), 0 };
-    const float uv_scale[2] = {
-        1.0f,
-        1.0f,
-    };
-    const float uv_offset[2] = {
-        (+worldmap->center.lng / 360.0f),
-        (-worldmap->center.lat / 180.0f),
-    };
-
-    render_solid_vb_ui_uv_shader_rot(pLwc,
-                                     worldmap->render_org_x,
-                                     worldmap->render_org_y,
-                                     pLwc->aspect_ratio * 2 * worldmap->zoom_scale,
-                                     pLwc->aspect_ratio * worldmap->zoom_scale,
-                                     pLwc->tex_atlas[LAE_WORLD_MAP],
-                                     LVT_CENTER_CENTER_ANCHORED_SQUARE,
-                                     1.0f,
-                                     0.0f,
-                                     0.0f,
-                                     0.0f,
-                                     0.0f,
-                                     uv_offset,
-                                     uv_scale,
-                                     LWST_DEFAULT,
-                                     0);
-}
-
 static void degrees_to_dms(int* d, int* m, float* s, const float degrees) {
     *d = (int)degrees;
     const float minutes = (degrees - *d) * 60;
@@ -1082,24 +1009,6 @@ void lwc_render_ttl(const LWCONTEXT* pLwc) {
     }
     if (lwc_render_ttl_render("landcell_nameplate")) {
         render_sea_static_objects_nameplate(pLwc, view, proj, &lng_lat_center);
-    }
-    lwc_enable_additive_blending();
-    const LWTTLWORLDMAP* worldmap = lwttl_worldmap(pLwc->ttl);
-    if (lwc_render_ttl_render("worldmap")) {
-        render_world_map(pLwc, worldmap);
-    }
-    lwc_disable_additive_blending();
-    if (lwc_render_ttl_render("routeline")) {
-        float one_pixel = 2.0f / pLwc->height;
-        int thickness = 1;
-        for (int i = -thickness; i <= thickness; i++) {
-            for (int j = -thickness; j <= thickness; j++) {
-                render_route_line(pLwc, worldmap, i * one_pixel, j * one_pixel);
-            }
-        }
-    }
-    if (lwc_render_ttl_render("seaport")) {
-        lwttl_render_all_seaports(pLwc, pLwc->ttl, worldmap);
     }
     render_coords(pLwc, &lng_lat_center);
     render_region_name(pLwc);

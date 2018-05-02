@@ -6,12 +6,13 @@ static char visibility[MAX_VISIBILITY_ENTRY_COUNT][MAX_VISIBILITY_ENTRY_NAME_LEN
 
 #define LNGLAT_RES_WIDTH (172824)
 #define LNGLAT_RES_HEIGHT (86412)
-const static float sea_render_scale = 50.0f * 4;
+const static float sea_render_scale = 50.0f * 12;
+const static float earth_globe_render_scale = 45.0f * 12;
 // extant decribed in R-tree pixel(cell) unit
 #define LNGLAT_SEA_PING_EXTENT_IN_CELL_PIXELS (16)
 #define LNGLAT_SEA_PING_EXTENT_IN_DEGREES ((180.0f/LNGLAT_RES_HEIGHT)*LNGLAT_SEA_PING_EXTENT_IN_CELL_PIXELS)
-#define LNGLAT_RENDER_EXTENT_MULTIPLIER_LNG (5)
-#define LNGLAT_RENDER_EXTENT_MULTIPLIER_LAT (3)
+#define LNGLAT_RENDER_EXTENT_MULTIPLIER_LNG (3)
+#define LNGLAT_RENDER_EXTENT_MULTIPLIER_LAT (1)
 
 static float cell_fx_to_lng(float fx) {
     return -180.0f + fx / LNGLAT_RES_WIDTH * 360.0f;
