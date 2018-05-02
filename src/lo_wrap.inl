@@ -94348,6 +94348,27 @@ static swig_lua_class *swig_LWTTLLNGLAT_bases[] = {0};
 static const char *swig_LWTTLLNGLAT_base_names[] = {0};
 static swig_lua_class _wrap_class_LWTTLLNGLAT = { "LWTTLLNGLAT", "LWTTLLNGLAT", &SWIGTYPE_p__LWTTLLNGLAT,_proxy__wrap_new_LWTTLLNGLAT, swig_delete_LWTTLLNGLAT, swig_LWTTLLNGLAT_methods, swig_LWTTLLNGLAT_attributes, &swig_LWTTLLNGLAT_Sf_SwigStatic, swig_LWTTLLNGLAT_meta, swig_LWTTLLNGLAT_bases, swig_LWTTLLNGLAT_base_names };
 
+static int _wrap_msb_index(lua_State* L) {
+  int SWIG_arg = 0;
+  unsigned int arg1 ;
+  int result;
+  
+  SWIG_check_num_args("msb_index",1,1)
+  if(!lua_isnumber(L,1)) SWIG_fail_arg("msb_index",1,"unsigned int");
+  SWIG_contract_assert((lua_tonumber(L,1)>=0),"number must not be negative")
+  arg1 = (unsigned int)lua_tonumber(L, 1);
+  result = (int)msb_index(arg1);
+  lua_pushnumber(L, (lua_Number) result); SWIG_arg++;
+  return SWIG_arg;
+  
+  if(0) SWIG_fail;
+  
+fail:
+  lua_error(L);
+  return SWIG_arg;
+}
+
+
 static int _wrap_lwttl_new(lua_State* L) {
   int SWIG_arg = 0;
   float arg1 ;
@@ -95527,21 +95548,21 @@ fail:
 }
 
 
-static int _wrap_lwttl_scroll_earth_globe_scale(lua_State* L) {
+static int _wrap_lwttl_scroll_view_scale(lua_State* L) {
   int SWIG_arg = 0;
   LWTTL *arg1 = (LWTTL *) 0 ;
   float arg2 ;
   
-  SWIG_check_num_args("lwttl_scroll_earth_globe_scale",2,2)
-  if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("lwttl_scroll_earth_globe_scale",1,"LWTTL *");
-  if(!lua_isnumber(L,2)) SWIG_fail_arg("lwttl_scroll_earth_globe_scale",2,"float");
+  SWIG_check_num_args("lwttl_scroll_view_scale",2,2)
+  if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("lwttl_scroll_view_scale",1,"LWTTL *");
+  if(!lua_isnumber(L,2)) SWIG_fail_arg("lwttl_scroll_view_scale",2,"float");
   
   if (!SWIG_IsOK(SWIG_ConvertPtr(L,1,(void**)&arg1,SWIGTYPE_p__LWTTL,0))){
-    SWIG_fail_ptr("lwttl_scroll_earth_globe_scale",1,SWIGTYPE_p__LWTTL);
+    SWIG_fail_ptr("lwttl_scroll_view_scale",1,SWIGTYPE_p__LWTTL);
   }
   
   arg2 = (float)lua_tonumber(L, 2);
-  lwttl_scroll_earth_globe_scale(arg1,arg2);
+  lwttl_scroll_view_scale(arg1,arg2);
   
   return SWIG_arg;
   
@@ -97347,6 +97368,7 @@ static swig_lua_method swig_SwigModule_methods[]= {
     { "htmlui_load_redraw_fbo", _wrap_htmlui_load_redraw_fbo},
     { "htmlui_on_remtex_gpu_loaded", _wrap_htmlui_on_remtex_gpu_loaded},
     { "htmlui_set_client_size", _wrap_htmlui_set_client_size},
+    { "msb_index", _wrap_msb_index},
     { "lwttl_new", _wrap_lwttl_new},
     { "lwttl_destroy", _wrap_lwttl_destroy},
     { "lnglat_to_xy", _wrap_lnglat_to_xy},
@@ -97389,7 +97411,7 @@ static swig_lua_method swig_SwigModule_methods[]= {
     { "lwttl_lat_to_ceil_int", _wrap_lwttl_lat_to_ceil_int},
     { "lwttl_sea_udp", _wrap_lwttl_sea_udp},
     { "lwttl_set_earth_globe_scale", _wrap_lwttl_set_earth_globe_scale},
-    { "lwttl_scroll_earth_globe_scale", _wrap_lwttl_scroll_earth_globe_scale},
+    { "lwttl_scroll_view_scale", _wrap_lwttl_scroll_view_scale},
     { "lwttl_earth_globe_scale", _wrap_lwttl_earth_globe_scale},
     { "lwttl_earth_globe_morph_weight", _wrap_lwttl_earth_globe_morph_weight},
     { "lwttl_earth_globe_y", _wrap_lwttl_earth_globe_y},

@@ -63,9 +63,11 @@ void lw_trigger_mouse_press(LWCONTEXT* pLwc, float x, float y, int pointer_id) {
     }
 
     if (pinch_zoom.count == 2 && prev_pinch_zoom_count != 2) {
-        LOGI("Pinch zoom started.");
 		pinch_zoom.initial_dist = calculate_pinch_zoom_dist();
         pinch_zoom.initial_view_scale = lwttl_view_scale(pLwc->ttl);
+        LOGI("Pinch zoom started. initial dist = %.2f, initial view scale = %d",
+             pinch_zoom.initial_dist,
+             pinch_zoom.initial_view_scale);
 	}
 
 	if (field_network(pLwc->field)) {
@@ -91,7 +93,7 @@ void lw_trigger_mouse_press(LWCONTEXT* pLwc, float x, float y, int pointer_id) {
 		return;
 	}
 
-	if (pLwc->game_scene == LGS_FIELD || pLwc->game_scene == LGS_PHYSICS || pLwc->game_scene == LGS_TTL) {
+	if (pLwc->game_scene == LGS_FIELD || pLwc->game_scene == LGS_PHYSICS) {
 		const float sr = get_dir_pad_size_radius();
 
 		float left_dir_pad_center_x = 0;
@@ -105,7 +107,13 @@ void lw_trigger_mouse_press(LWCONTEXT* pLwc, float x, float y, int pointer_id) {
 			get_right_dir_pad_original_center(pLwc->aspect_ratio, &right_dir_pad_center_x, &right_dir_pad_center_y);
 			dir_pad_press(&pLwc->right_dir_pad, x, y, pointer_id, right_dir_pad_center_x, right_dir_pad_center_y, sr);
 		}
-	}
+    } else if (pLwc->game_scene == LGS_TTL) {
+        const float sr = 2.0f;
+
+        float left_dir_pad_center_x = 0;
+        float left_dir_pad_center_y = 0;
+        dir_pad_press(&pLwc->left_dir_pad, x, y, pointer_id, left_dir_pad_center_x, left_dir_pad_center_y, sr);
+    }
 
 	const float fist_button_w = 0.75f;
 	const float fist_button_h = 0.75f;
@@ -185,18 +193,19 @@ void lw_trigger_mouse_move(LWCONTEXT* pLwc, float x, float y, int pointer_id) {
 			p->x0 = x;
 			p->y0 = y;
 			const float dist = calculate_pinch_zoom_dist();
-            const float zoom_factor = (dist / pinch_zoom.initial_dist);
+            const float zoom_factor = dist / pinch_zoom.initial_dist;
             LOGIx("Pinch zoom factor: %.2f", zoom_factor);
+            const int view_scale_max = lwttl_view_scale_max(pLwc->ttl);
             if (zoom_factor > 1.0f) {
                 // zoom in
-                //const int zoom_factor_int = (int)(zoom_factor + 0.5f);
-                //lwttl_set_view_scale(pLwc->ttl, LWCLAMP(pinch_zoom.initial_view_scale >> (zoom_factor_int - 1), 1, 2048));
-                lwttl_scroll_earth_globe_scale(pLwc->ttl, +1);
+                const int zoom_factor_int = (int)(1.5f * zoom_factor + 0.5f);
+                lwttl_set_view_scale(pLwc->ttl, LWCLAMP(pinch_zoom.initial_view_scale >> (zoom_factor_int - 1), 1, view_scale_max));
+                lwttl_udp_send_ttlping(pLwc->ttl, lwttl_sea_udp(pLwc->ttl), 0);
             } else if (0.0f < zoom_factor && zoom_factor < 1.0f) {
                 // zoom out
-                //const int zoom_factor_int = (int)(1.0f / zoom_factor + 0.5f);
-                //lwttl_set_view_scale(pLwc->ttl, LWCLAMP(pinch_zoom.initial_view_scale << (zoom_factor_int - 1), 1, 2048));
-                lwttl_scroll_earth_globe_scale(pLwc->ttl, -1);
+                const int zoom_factor_int = (int)(1.5f * 1.0f / zoom_factor + 0.5f);
+                lwttl_set_view_scale(pLwc->ttl, LWCLAMP(pinch_zoom.initial_view_scale << (zoom_factor_int - 1), 1, view_scale_max));
+                lwttl_udp_send_ttlping(pLwc->ttl, lwttl_sea_udp(pLwc->ttl), 0);
             }
 		}
 	}
@@ -215,7 +224,7 @@ void lw_trigger_mouse_move(LWCONTEXT* pLwc, float x, float y, int pointer_id) {
 	pLwc->last_mouse_move_x = x;
 	pLwc->last_mouse_move_y = y;
 
-	if (pLwc->game_scene == LGS_FIELD || pLwc->game_scene == LGS_PHYSICS || pLwc->game_scene == LGS_TTL) {
+	if (pLwc->game_scene == LGS_FIELD || pLwc->game_scene == LGS_PHYSICS) {
 		const float sr = get_dir_pad_size_radius();
 
 		float left_dir_pad_center_x = 0;
@@ -229,7 +238,13 @@ void lw_trigger_mouse_move(LWCONTEXT* pLwc, float x, float y, int pointer_id) {
 			get_right_dir_pad_original_center(pLwc->aspect_ratio, &right_dir_pad_center_x, &right_dir_pad_center_y);
 			dir_pad_move(&pLwc->right_dir_pad, x, y, pointer_id, right_dir_pad_center_x, right_dir_pad_center_y, sr);
 		}
-	}
+	} else if (pLwc->game_scene == LGS_TTL) {
+        const float sr = 2.0f;
+
+        float left_dir_pad_center_x = 0;
+        float left_dir_pad_center_y = 0;
+        dir_pad_move(&pLwc->left_dir_pad, x, y, pointer_id, left_dir_pad_center_x, left_dir_pad_center_y, sr);
+    }
 }
 
 void lw_trigger_mouse_release(LWCONTEXT* pLwc, float x, float y, int pointer_id) {
@@ -590,5 +605,9 @@ void lw_trigger_scroll(LWCONTEXT* pLwc, float xoffset, float yoffset) {
     if (!pLwc) {
         return;
     }
-    lwttl_scroll_earth_globe_scale(pLwc->ttl, yoffset);
+    lwttl_scroll_view_scale(pLwc->ttl, yoffset);
+}
+
+int lw_pinch() {
+    return pinch_zoom.count == 2;
 }

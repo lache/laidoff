@@ -16,6 +16,7 @@
 #include "htmlui.h"
 #include "lwlnglat.h"
 #include "script.h"
+#include "input.h"
 
 #ifdef __GNUC__
 int __builtin_ctz(unsigned int x);
@@ -209,13 +210,16 @@ void lwttl_update(LWTTL* ttl, LWCONTEXT* pLwc, float delta_time) {
     }
 
     float dx = 0, dy = 0, dlen = 0;
-    if (lw_get_normalized_dir_pad_input(pLwc, &pLwc->left_dir_pad, &dx, &dy, &dlen) && (dx || dy)) {
-        // cancel tracking if user want to scroll around
-        lwttl_set_track_object_ship_id(ttl, 0);
-        lwttl_worldmap_scroll_to(ttl,
-                                 ttl->worldmap.center.lng + dx / 50.0f * delta_time * ttl->view_scale,
-                                 ttl->worldmap.center.lat + dy / 50.0f * delta_time * ttl->view_scale,
-                                 0);
+    if (lw_pinch() == 0) {
+        if (lw_get_normalized_dir_pad_input(pLwc, &pLwc->left_dir_pad, &dx, &dy, &dlen) && (dx || dy)) {
+            // cancel tracking if user want to scroll around
+            lwttl_set_track_object_ship_id(ttl, 0);
+            // direction inverted
+            lwttl_worldmap_scroll_to(ttl,
+                                     ttl->worldmap.center.lng + (-dx) / 50.0f * delta_time * ttl->view_scale,
+                                     ttl->worldmap.center.lat + (-dy) / 50.0f * delta_time * ttl->view_scale,
+                                     0);
+        }
     }
 }
 
@@ -293,13 +297,15 @@ void lwttl_set_view_scale(LWTTL* ttl, int v) {
     }
 }
 
-int lwttl_view_scale(const LWTTL* _ttl) {
-    LWTTL* ttl = (LWTTL*)_ttl;
+int lwttl_view_scale(const LWTTL* ttl) {
     return ttl->view_scale;
 }
 
-int lwttl_clamped_view_scale(const LWTTL* _ttl) {
-    LWTTL* ttl = (LWTTL*)_ttl;
+int lwttl_view_scale_max(const LWTTL* ttl) {
+    return ttl->view_scale_max;
+}
+
+int lwttl_clamped_view_scale(const LWTTL* ttl) {
     // max value of view_scale bounded by LWTTLCHUNKKEY
     return LWCLAMP(ttl->view_scale, 1, ttl->view_scale_ping_max);
 }
@@ -1121,14 +1127,12 @@ void lwttl_set_earth_globe_scale(LWTTL* ttl, float earth_globe_scale) {
     LOGI("Globe scale: %.2f, Morph weight: %.2f", ttl->earth_globe_scale, earth_globe_morph_weight);
 }
 
-void lwttl_scroll_earth_globe_scale(LWTTL* ttl, float offset) {
+void lwttl_scroll_view_scale(LWTTL* ttl, float offset) {
     int view_scale = lwttl_view_scale(ttl);
     if (offset > 0) {
-        //lwttl_set_earth_globe_scale(ttl, ttl->earth_globe_scale * 1.2f);
         lwttl_set_view_scale(ttl, LWCLAMP(view_scale >> 1, 1, ttl->view_scale_max));
         lwttl_udp_send_ttlping(ttl, ttl->sea_udp, 0);
     } else {
-        //lwttl_set_earth_globe_scale(ttl, ttl->earth_globe_scale / 1.2f);
         lwttl_set_view_scale(ttl, LWCLAMP(view_scale << 1, 1, ttl->view_scale_max));
         lwttl_udp_send_ttlping(ttl, ttl->sea_udp, 0);
     }
