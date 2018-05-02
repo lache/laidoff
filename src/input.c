@@ -186,15 +186,17 @@ void lw_trigger_mouse_move(LWCONTEXT* pLwc, float x, float y, int pointer_id) {
 			p->y0 = y;
 			const float dist = calculate_pinch_zoom_dist();
             const float zoom_factor = (dist / pinch_zoom.initial_dist);
-            LOGI("Pinch zoom factor: %.2f", zoom_factor);
+            LOGIx("Pinch zoom factor: %.2f", zoom_factor);
             if (zoom_factor > 1.0f) {
                 // zoom in
-                const int zoom_factor_int = (int)(zoom_factor + 0.5f);
-                lwttl_set_view_scale(pLwc->ttl, LWCLAMP(pinch_zoom.initial_view_scale >> (zoom_factor_int - 1), 1, 2048));
+                //const int zoom_factor_int = (int)(zoom_factor + 0.5f);
+                //lwttl_set_view_scale(pLwc->ttl, LWCLAMP(pinch_zoom.initial_view_scale >> (zoom_factor_int - 1), 1, 2048));
+                lwttl_scroll_earth_globe_scale(pLwc->ttl, +1);
             } else if (0.0f < zoom_factor && zoom_factor < 1.0f) {
                 // zoom out
-                const int zoom_factor_int = (int)(1.0f / zoom_factor + 0.5f);
-                lwttl_set_view_scale(pLwc->ttl, LWCLAMP(pinch_zoom.initial_view_scale << (zoom_factor_int - 1), 1, 2048));
+                //const int zoom_factor_int = (int)(1.0f / zoom_factor + 0.5f);
+                //lwttl_set_view_scale(pLwc->ttl, LWCLAMP(pinch_zoom.initial_view_scale << (zoom_factor_int - 1), 1, 2048));
+                lwttl_scroll_earth_globe_scale(pLwc->ttl, -1);
             }
 		}
 	}
