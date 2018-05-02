@@ -15,6 +15,10 @@ def versionProperties = new Properties()
 versionProperties['versionCode'] = "1134"
 versionProperties['versionName'] = "0.1.0"
 
+if (keystoreProperties.containsKey('versionCode')) {
+    versionProperties['versionCode'] = keystoreProperties['versionCode']
+}
+
 if (project.hasProperty('versionName')) {
     versionProperties['versionName'] = project.versionName
 }
