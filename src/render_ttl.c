@@ -602,14 +602,14 @@ static void render_seaports(const LWCONTEXT* pLwc,
     const float size_ratio = 1.0f / sqrtf((float)(view_scale_msb_index + 1));
 
     int chunk_index_array[(1 + LNGLAT_RENDER_EXTENT_MULTIPLIER_LNG + 1)*(1 + LNGLAT_RENDER_EXTENT_MULTIPLIER_LAT + 1)];
-    const int chunk_index_array_count = lwttl_query_static_object_chunk_range(pLwc->ttl,
-                                                                              lng_min,
-                                                                              lng_max,
-                                                                              lat_min,
-                                                                              lat_max,
-                                                                              clamped_view_scale,
-                                                                              chunk_index_array,
-                                                                              ARRAY_SIZE(chunk_index_array));
+    const int chunk_index_array_count = lwttl_query_chunk_range_seaport(pLwc->ttl,
+                                                                        lng_min,
+                                                                        lng_max,
+                                                                        lat_min,
+                                                                        lat_max,
+                                                                        clamped_view_scale,
+                                                                        chunk_index_array,
+                                                                        ARRAY_SIZE(chunk_index_array));
     if (chunk_index_array_count > ARRAY_SIZE(chunk_index_array)) {
         LOGEP("incorrect query result");
         assert(0);
@@ -629,12 +629,12 @@ static void render_seaports(const LWCONTEXT* pLwc,
                 const float x0 = (float)(xc0 + clamped_view_scale * obj_begin[i].x_scaled_offset_0);
                 const float y0 = (float)(yc0 + clamped_view_scale * obj_begin[i].y_scaled_offset_0);
 
-                const float lng0_not_clamped = cell_fx_to_lng(x0);
-                const float lat0_not_clamped = cell_fy_to_lat(y0);
+                const float lng0_not_clamped = cell_fx_to_lng(x0 + 0.5f);
+                const float lat0_not_clamped = cell_fy_to_lat(y0 + 0.5f);
 
                 const float cell_x0 = lng_to_render_coords(lng0_not_clamped, center, clamped_view_scale * clamped_to_original_view_scale_ratio);
                 const float cell_y0 = lat_to_render_coords(lat0_not_clamped, center, clamped_view_scale * clamped_to_original_view_scale_ratio);
-                
+
                 render_seaport_icon(pLwc,
                                     view,
                                     proj,
@@ -709,14 +709,14 @@ static void render_sea_static_objects(const LWCONTEXT* pLwc,
     // land
     //lwttl_lock_rendering_mutex(pLwc->ttl);
     int chunk_index_array[(1 + LNGLAT_RENDER_EXTENT_MULTIPLIER_LNG + 1)*(1 + LNGLAT_RENDER_EXTENT_MULTIPLIER_LAT + 1)];
-    const int chunk_index_array_count = lwttl_query_static_object_chunk_range(pLwc->ttl,
-                                                                              lng_min,
-                                                                              lng_max,
-                                                                              lat_min,
-                                                                              lat_max,
-                                                                              clamped_view_scale,
-                                                                              chunk_index_array,
-                                                                              ARRAY_SIZE(chunk_index_array));
+    const int chunk_index_array_count = lwttl_query_chunk_range_land(pLwc->ttl,
+                                                                     lng_min,
+                                                                     lng_max,
+                                                                     lat_min,
+                                                                     lat_max,
+                                                                     clamped_view_scale,
+                                                                     chunk_index_array,
+                                                                     ARRAY_SIZE(chunk_index_array));
     if (chunk_index_array_count > ARRAY_SIZE(chunk_index_array)) {
         LOGEP("incorrect query result");
         assert(0);

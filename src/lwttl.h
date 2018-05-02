@@ -62,14 +62,22 @@ void lwttl_write_last_state(const LWTTL* ttl, const LWCONTEXT* pLwc);
 void lwttl_read_last_state(LWTTL* ttl, const LWCONTEXT* pLwc);
 const LWPTTLFULLSTATE* lwttl_full_state(const LWTTL* ttl);
 //const LWPTTLSEAPORTSTATE* lwttl_seaport_state(const LWTTL* ttl);
-int lwttl_query_static_object_chunk_range(const LWTTL* ttl,
-                                          const float lng_min,
-                                          const float lng_max,
-                                          const float lat_min,
-                                          const float lat_max,
-                                          const int view_scale,
-                                          int* chunk_index_array,
-                                          const int chunk_index_array_len);
+int lwttl_query_chunk_range_land(const LWTTL* ttl,
+                                 const float lng_min,
+                                 const float lng_max,
+                                 const float lat_min,
+                                 const float lat_max,
+                                 const int view_scale,
+                                 int* chunk_index_array,
+                                 const int chunk_index_array_len);
+int lwttl_query_chunk_range_seaport(const LWTTL* ttl,
+                                    const float lng_min,
+                                    const float lng_max,
+                                    const float lat_min,
+                                    const float lat_max,
+                                    const int view_scale,
+                                    int* chunk_index_array,
+                                    const int chunk_index_array_len);
 const LWPTTLSTATICOBJECT2* lwttl_query_chunk_land(const LWTTL* ttl,
                                                   const int chunk_index,
                                                   int* xc0,
