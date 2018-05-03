@@ -41,15 +41,6 @@ typedef struct _LWTTLDATA_SEAPORT {
     float lng;
 } LWTTLDATA_SEAPORT;
 
-typedef union _LWTTLCHUNKKEY {
-    int v;
-    struct {
-        unsigned int xcc0 : 14; // right shifted xc0  200,000 pixels / chunk_size
-        unsigned int ycc0 : 14; // right shifted yc0
-        unsigned int view_scale_msb : 4; // 2^(view_scale_msb) == view_scale; view scale [1(2^0), 2048(2^11)]
-    } bf;
-} LWTTLCHUNKKEY;
-
 typedef struct _LWTTLCHUNKVALUE {
     LWTTLCHUNKKEY key;
     int start;
@@ -496,9 +487,7 @@ static void send_ttlping(const LWTTL* ttl,
                          LWUDP* udp,
                          const float lng,
                          const float lat,
-                         const int ping_seq,
                          const int view_scale,
-                         const int static_object,
                          const float ex_lng,
                          const float ex_lat) {
     LWPTTLPING p;
@@ -508,12 +497,22 @@ static void send_ttlping(const LWTTL* ttl,
     p.lat = lat;
     p.ex_lng = ex_lng;
     p.ex_lat = ex_lat;
-    p.ping_seq = ping_seq;
     p.track_object_id = lwttl_track_object_id(ttl);
     p.track_object_ship_id = lwttl_track_object_ship_id(ttl);
     p.view_scale = view_scale;
-    p.static_object = static_object;
     udp_send(udp, (const char*)&p, sizeof(LWPTTLPING));
+}
+
+static void send_ttlpingchunk(const LWTTL* ttl,
+                              LWUDP* udp,
+                              const LWTTLCHUNKKEY chunk_key,
+                              const unsigned char static_object) {
+    LWPTTLPINGCHUNK p;
+    memset(&p, 0, sizeof(LWPTTLPINGCHUNK));
+    p.type = LPGP_LWPTTLPINGCHUNK;
+    p.static_object = static_object;
+    p.chunk_key = chunk_key;
+    udp_send(udp, (const char*)&p, sizeof(LWPTTLPINGCHUNK));
 }
 
 static void send_ttlpingflush(LWTTL* ttl) {
@@ -535,21 +534,12 @@ static void send_ttlping_if_chunk_not_found(const LWTTL* ttl,
                                             LWUDP* udp,
                                             const LWTTLOBJECTCACHE* c,
                                             LWTTLCHUNKKEY chunk_key,
-                                            const float lng,
-                                            const float lat,
-                                            const int ping_seq,
-                                            const int clamped_view_scale,
-                                            const int static_object) {
+                                            const unsigned char static_object) {
     if (find_chunk_index(c, chunk_key) == -1) {
-        send_ttlping(ttl,
-                     udp,
-                     lng,
-                     lat,
-                     ping_seq,
-                     clamped_view_scale,
-                     static_object,
-                     LNGLAT_SEA_PING_EXTENT_IN_CELL_PIXELS,
-                     LNGLAT_SEA_PING_EXTENT_IN_CELL_PIXELS);
+        send_ttlpingchunk(ttl,
+                          udp,
+                          chunk_key,
+                          static_object);
     }
 }
 
@@ -593,7 +583,7 @@ void lwttl_udp_send_ttlping(const LWTTL* ttl, LWUDP* udp, int ping_seq) {
             const float lat = cell_y_to_lat(yc0);
             const struct {
                 const LWTTLOBJECTCACHE* c;
-                int static_object;
+                const unsigned char static_object;
             } cache_list[] = {
                 { &ttl->object_cache.land_cache, 1 },
                 { &ttl->object_cache.seaport_cache, 2 },
@@ -603,24 +593,18 @@ void lwttl_udp_send_ttlping(const LWTTL* ttl, LWUDP* udp, int ping_seq) {
                                                 udp,
                                                 cache_list[k].c,
                                                 chunk_key,
-                                                lng,
-                                                lat,
-                                                ping_seq,
-                                                clamped_view_scale,
                                                 cache_list[k].static_object);
             }
         }
     }
-    // ping for dynamic object (ships, seaports)
+    // ping for dynamic object (ships)
     const int xc0 = lwttl_lng_to_round_int(center->lng) & ~(clamped_view_scale - 1);
     const int yc0 = lwttl_lat_to_round_int(center->lat) & ~(clamped_view_scale - 1);
     send_ttlping(ttl,
                  udp,
                  cell_x_to_lng(xc0),
                  cell_y_to_lat(yc0),
-                 ping_seq,
                  clamped_view_scale,
-                 0, // ships
                  LNGLAT_SEA_PING_EXTENT_IN_CELL_PIXELS * LNGLAT_RENDER_EXTENT_MULTIPLIER_LNG,
                  LNGLAT_SEA_PING_EXTENT_IN_CELL_PIXELS * LNGLAT_RENDER_EXTENT_MULTIPLIER_LAT);
 }

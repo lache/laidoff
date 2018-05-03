@@ -27,6 +27,7 @@ typedef enum _LW_PUCK_GAME_PACKET {
     LPGP_LWPTTLREQUESTWAYPOINTS = 116, // client -> server
     LPGP_LWPTTLWAYPOINTS = 117, // server -> client
     LPGP_LWPTTLPINGFLUSH = 118, // client -> server
+    LPGP_LWPTTLPINGCHUNK = 119, // client -> server
 	// tcp
 	LPGP_LWPQUEUE2 = 200,
 	LPGP_LWPMAYBEMATCHED = 201,
@@ -357,11 +358,9 @@ typedef struct _LWPTTLPING {
     unsigned char padding1;
     unsigned char padding2;
     float lng, lat, ex_lng, ex_lat; // x center, y center, extent
-    int ping_seq;
     int track_object_id;
     int track_object_ship_id;
     int view_scale;
-    int static_object;
 } LWPTTLPING;
 
 // UDP
@@ -394,6 +393,24 @@ typedef struct _LWPTTLPINGFLUSH {
     unsigned char padding1;
     unsigned char padding2;
 } LWPTTLPINGFLUSH;
+
+typedef union _LWTTLCHUNKKEY {
+    int v;
+    struct {
+        unsigned int xcc0 : 14; // right shifted xc0  200,000 pixels / chunk_size
+        unsigned int ycc0 : 14; // right shifted yc0
+        unsigned int view_scale_msb : 4; // 2^(view_scale_msb) == view_scale; view scale [1(2^0), 2048(2^11)]
+    } bf;
+} LWTTLCHUNKKEY;
+
+// UDP
+typedef struct _LWPTTLPINGCHUNK {
+    unsigned char type;
+    unsigned char static_object;
+    unsigned char padding1;
+    unsigned char padding2;
+    LWTTLCHUNKKEY chunk_key;
+} LWPTTLPINGCHUNK;
 /*
 * END: should sync with packet.h in sea-server
 */
