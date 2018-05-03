@@ -43,6 +43,7 @@ typedef struct _LWTTLDATA_SEAPORT {
 
 typedef struct _LWTTLCHUNKVALUE {
     LWTTLCHUNKKEY key;
+    unsigned int ts;
     int start;
     int count;
 } LWTTLCHUNKVALUE;
@@ -343,12 +344,21 @@ static int find_chunk_index(const LWTTLOBJECTCACHE* c, const LWTTLCHUNKKEY chunk
     return -1;
 }
 
+static unsigned int find_chunk_ts(const LWTTLOBJECTCACHE* c, const LWTTLCHUNKKEY chunk_key) {
+    const int chunk_index = find_chunk_index(c, chunk_key);
+    if (chunk_index >= 0 && chunk_index < c->count) {
+        return c->value_array[chunk_index].ts;
+    }
+    return 0;
+}
+
 static int add_to_object_cache(LWTTLOBJECTCACHE* c,
                                LWTTLCHUNKVALUE* chunk_value_array,
                                int* cache_count,
                                void* cache_array,
                                const size_t entry_size,
                                const int entry_max_count,
+                               const unsigned int ts,
                                const int xc0,
                                const int yc0,
                                const int view_scale,
@@ -423,6 +433,7 @@ static int add_to_object_cache(LWTTLOBJECTCACHE* c,
     }
     c->key_array[chunk_index] = chunk_key;
     chunk_value_array[chunk_index].key = chunk_key;
+    chunk_value_array[chunk_index].ts = ts;
     chunk_value_array[chunk_index].start = *cache_count;
     chunk_value_array[chunk_index].count = count;
     // copy data
@@ -445,6 +456,7 @@ static int add_to_object_cache_land(LWTTLOBJECTCACHE* c,
                                land_array,
                                sizeof(LWPTTLSTATICOBJECT2),
                                land_array_size,
+                               s2->ts,
                                s2->xc0,
                                s2->yc0,
                                s2->view_scale,
@@ -463,6 +475,7 @@ static int add_to_object_cache_seaport(LWTTLOBJECTCACHE* c,
                                seaport_array,
                                sizeof(LWPTTLSEAPORTOBJECT),
                                seaport_array_size,
+                               s2->ts,
                                s2->xc0,
                                s2->yc0,
                                s2->view_scale,
@@ -506,12 +519,14 @@ static void send_ttlping(const LWTTL* ttl,
 static void send_ttlpingchunk(const LWTTL* ttl,
                               LWUDP* udp,
                               const LWTTLCHUNKKEY chunk_key,
-                              const unsigned char static_object) {
+                              const unsigned char static_object,
+                              const unsigned int ts) {
     LWPTTLPINGCHUNK p;
     memset(&p, 0, sizeof(LWPTTLPINGCHUNK));
     p.type = LPGP_LWPTTLPINGCHUNK;
     p.static_object = static_object;
     p.chunk_key = chunk_key;
+    p.ts = ts;
     udp_send(udp, (const char*)&p, sizeof(LWPTTLPINGCHUNK));
 }
 
@@ -533,14 +548,14 @@ float lwttl_half_lat_extent_in_degrees(const int view_scale) {
 static void send_ttlping_if_chunk_not_found(const LWTTL* ttl,
                                             LWUDP* udp,
                                             const LWTTLOBJECTCACHE* c,
-                                            LWTTLCHUNKKEY chunk_key,
+                                            const LWTTLCHUNKKEY chunk_key,
                                             const unsigned char static_object) {
-    if (find_chunk_index(c, chunk_key) == -1) {
-        send_ttlpingchunk(ttl,
-                          udp,
-                          chunk_key,
-                          static_object);
-    }
+    const unsigned int ts = find_chunk_ts(c, chunk_key);
+    send_ttlpingchunk(ttl,
+                      udp,
+                      chunk_key,
+                      static_object,
+                      ts);
 }
 
 void lwttl_udp_send_ttlping(const LWTTL* ttl, LWUDP* udp, int ping_seq) {
@@ -577,10 +592,6 @@ void lwttl_udp_send_ttlping(const LWTTL* ttl, LWUDP* udp, int ping_seq) {
             chunk_key.bf.xcc0 = xcc0;
             chunk_key.bf.ycc0 = ycc0;
             chunk_key.bf.view_scale_msb = msb_index(clamped_view_scale);
-            const int xc0 = xcc0 << msb_index(LNGLAT_SEA_PING_EXTENT_IN_CELL_PIXELS * clamped_view_scale);
-            const int yc0 = ycc0 << msb_index(LNGLAT_SEA_PING_EXTENT_IN_CELL_PIXELS * clamped_view_scale);
-            const float lng = cell_x_to_lng(xc0);
-            const float lat = cell_y_to_lat(yc0);
             const struct {
                 const LWTTLOBJECTCACHE* c;
                 const unsigned char static_object;
