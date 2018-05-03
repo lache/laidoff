@@ -337,7 +337,6 @@ static unsigned int find_chunk_ts(const LWTTLOBJECTCACHE* c, const LWTTLCHUNKKEY
 }
 
 static int add_to_object_cache(LWTTLOBJECTCACHE* c,
-                               LWTTLCHUNKVALUE* chunk_value_array,
                                int* cache_count,
                                void* cache_array,
                                const size_t entry_size,
@@ -384,39 +383,118 @@ static int add_to_object_cache(LWTTLOBJECTCACHE* c,
     if (chunk_index >= 0 && c->key_array[chunk_index].v == chunk_key.v) {
         // chunk key found.
         // check for cache entry in chunk value array
-        if (chunk_value_array[chunk_index].key.v == chunk_key.v) {
-            // already exist. do nothing
-            // TODO update?
-            return 1;
+        if (c->value_array[chunk_index].key.v == chunk_key.v) {
+            if (c->value_array[chunk_index].ts < ts) {
+                // Latest chunk arrived, so we should update our data.
+                // UPDATE PROCEDURE
+                // [0] Compare existing data count and updated data count
+                if (c->value_array[chunk_index].count < count) {
+                    // [1] Data count increased. Check capacity.
+                    const int count_delta = count - c->value_array[chunk_index].count;
+                    if (*cache_count + count_delta > entry_max_count) {
+                        LOGEP("entry_max_count exceeded.");
+                        return -7;
+                    }
+                    const int start0 = c->value_array[chunk_index].start;
+                    const int count0 = c->value_array[chunk_index].count;
+                    // [2] Make room in cache_array by shifting
+                    //     cache_array[start0 + count0] to cache_array[start0 + count0 + count_delta]
+                    //     in reverse order
+                    for (int from = *cache_count - 1; from >= start0 + count0; from--) {
+                        char* to_data = (char*)cache_array + entry_size * (from + count_delta);
+                        const char* from_data = (char*)cache_array + entry_size * (from);
+                        memcpy(to_data,
+                               from_data,
+                               entry_size);
+                    }
+                    // [3] For chunks in range of [chunk_index + 1, count), offset start value by count_delta
+                    for (int i = chunk_index + 1; i < c->count; i++) {
+                        c->value_array[i].start += count_delta;
+                    }
+                    // [4] Update chunk count and timestamp
+                    c->value_array[chunk_index].count = count;
+                    c->value_array[chunk_index].ts = ts;
+                    *cache_count += count_delta;
+                    // [5] Copy data
+                    memcpy((char*)cache_array + entry_size * c->value_array[chunk_index].start,
+                           obj,
+                           entry_size * count);
+                    return 1;
+                } else if (c->value_array[chunk_index].count > count) {
+                    // [1] Data count decreased.
+                    const int count_delta = c->value_array[chunk_index].count - count;
+                    const int start0 = c->value_array[chunk_index].start;
+                    const int count0 = c->value_array[chunk_index].count;
+                    // [2] Reduce space in cache_array by shifting
+                    //     cache_array[start0 + count0] to cache_array[start0 + count0 - count_delta]
+                    //     in forward order
+                    for (int from = start0 + count0; from < *cache_count; from++) {
+                        char* to_data = (char*)cache_array + entry_size * (from - count_delta);
+                        const char* from_data = (char*)cache_array + entry_size * (from);
+                        memcpy(to_data,
+                               from_data,
+                               entry_size);
+                    }
+                    // [3] For chunks in range of [chunk_index + 1, count), offset start value by count_delta
+                    for (int i = chunk_index + 1; i < c->count; i++) {
+                        c->value_array[i].start -= count_delta;
+                    }
+                    // [4] Update chunk count and timestamp
+                    c->value_array[chunk_index].count = count;
+                    c->value_array[chunk_index].ts = ts;
+                    *cache_count -= count_delta;
+                    // [5] Copy data
+                    memcpy((char*)cache_array + entry_size * c->value_array[chunk_index].start,
+                           obj,
+                           entry_size * count);
+                    return 2;
+                } else {
+                    // [1] Lucky! The same count!
+                    // [2] Update timestamp
+                    c->value_array[chunk_index].ts = ts;
+                    // [3] Copy data
+                    memcpy((char*)cache_array + entry_size * c->value_array[chunk_index].start,
+                           obj,
+                           entry_size * count);
+                    return 3;
+                }
+            } else {
+                // chunk with older timestamp compared to our's arrived.
+                // just ignore this chunk data.
+                return 4;
+            }
+            // should not reach here!
+            abort();
         } else {
-            // cache entry not exists.
-            int a = 10;
+            // cache key exists but cache entry not exists.
+            // what's going on here?
+            LOGE("Cache key found, but cache entry not found! Cache entry will be added at this time but it is strange...");
         }
     } else {
         // new chunk entry received.
         // check current capacity
         if (c->count >= TTL_OBJECT_CACHE_CHUNK_COUNT) {
             LOGEP("TTL_OBJECT_CACHE_CHUNK_COUNT exceeded.");
-            return -7;
+            return -8;
         }
         if (*cache_count + count > entry_max_count) {
             LOGEP("entry_max_count exceeded.");
-            return -8;
+            return -9;
         }
         // safe to add a new chunk at 'chunk_index'
         // move chunk (move by 1-index by copying in backward direction)
         for (int from = c->count - 1; from >= chunk_index + 1; from--) {
             c->key_array[from + 1] = c->key_array[from];
-            chunk_value_array[from + 1] = chunk_value_array[from];
+            c->value_array[from + 1] = c->value_array[from];
         }
         c->count++;
         chunk_index++;
     }
     c->key_array[chunk_index] = chunk_key;
-    chunk_value_array[chunk_index].key = chunk_key;
-    chunk_value_array[chunk_index].ts = ts;
-    chunk_value_array[chunk_index].start = *cache_count;
-    chunk_value_array[chunk_index].count = count;
+    c->value_array[chunk_index].key = chunk_key;
+    c->value_array[chunk_index].ts = ts;
+    c->value_array[chunk_index].start = *cache_count;
+    c->value_array[chunk_index].count = count;
     // copy data
     memcpy((char*)cache_array + entry_size * (*cache_count),
            obj,
@@ -432,7 +510,6 @@ static int add_to_object_cache_land(LWTTLOBJECTCACHE* c,
                                     int* land_count,
                                     const LWPTTLSTATICSTATE2* s2) {
     return add_to_object_cache(c,
-                               c->value_array,
                                land_count,
                                land_array,
                                sizeof(LWPTTLSTATICOBJECT2),
@@ -451,7 +528,6 @@ static int add_to_object_cache_seaport(LWTTLOBJECTCACHE* c,
                                        int* seaport_count,
                                        const LWPTTLSEAPORTSTATE* s2) {
     return add_to_object_cache(c,
-                               c->value_array,
                                seaport_count,
                                seaport_array,
                                sizeof(LWPTTLSEAPORTOBJECT),
@@ -671,7 +747,7 @@ void lwttl_udp_update(LWTTL* ttl, LWUDP* udp, LWCONTEXT* pLwc) {
             udp->reinit_next_update = 1;
             return;
 #endif
-        }
+}
 
         char decompressed[1500 * 255]; // maximum lz4 compression ratio is 255...
         int decompressed_bytes = LZ4_decompress_safe(udp->buf, decompressed, udp->recv_len, ARRAY_SIZE(decompressed));
