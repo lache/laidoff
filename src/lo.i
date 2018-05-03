@@ -100,6 +100,7 @@
 #include "puckgamepacket.h"
 #include "htmlui.h"
 #include "lwttl.h"
+#include "lwlnglat.h"
 #ifdef WIN32
 #pragma warning(pop)
 #endif
@@ -219,6 +220,7 @@
 %include "puckgamepacket.h"
 %include "htmlui.h"
 %include "lwttl.h"
+%include "lwlnglat.h"
 
 // using the C-array
 %include <carrays.i>

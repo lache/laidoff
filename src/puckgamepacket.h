@@ -396,22 +396,13 @@ typedef struct _LWPTTLPINGFLUSH {
     unsigned char padding2;
 } LWPTTLPINGFLUSH;
 
-typedef union _LWTTLCHUNKKEY {
-    int v;
-    struct {
-        unsigned int xcc0 : 14; // right shifted xc0  200,000 pixels / chunk_size
-        unsigned int ycc0 : 14; // right shifted yc0
-        unsigned int view_scale_msb : 4; // 2^(view_scale_msb) == view_scale; view scale [1(2^0), 2048(2^11)]
-    } bf;
-} LWTTLCHUNKKEY;
-
 // UDP
 typedef struct _LWPTTLPINGCHUNK {
     unsigned char type;
     unsigned char static_object;
     unsigned char padding1;
     unsigned char padding2;
-    LWTTLCHUNKKEY chunk_key;
+    int chunk_key;
     unsigned int ts;
 } LWPTTLPINGCHUNK;
 /*

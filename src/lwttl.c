@@ -18,22 +18,6 @@
 #include "script.h"
 #include "input.h"
 
-#ifdef __GNUC__
-int __builtin_ctz(unsigned int x);
-int msb_index(unsigned int v) {
-    return __builtin_ctz(v);
-}
-#else
-// MSVC perhaps...
-#include <intrin.h> 
-#pragma intrinsic(_BitScanReverse)
-int msb_index(unsigned int v) {
-    unsigned long view_scale_msb_index = 0;
-    _BitScanReverse(&view_scale_msb_index, (unsigned long)v);
-    return (int)view_scale_msb_index;
-}
-#endif
-
 typedef struct _LWTTLDATA_SEAPORT {
     char locode[8];
     char name[64];
@@ -131,7 +115,7 @@ LWTTL* lwttl_new(float aspect_ratio) {
     ttl->seaport = (LWTTLDATA_SEAPORT*)create_binary_from_file(ASSETS_BASE_PATH "ttldata" PATH_SEPARATOR "seaports.dat", &seaports_dat_size);
     ttl->seaport_len = seaports_dat_size / sizeof(LWTTLDATA_SEAPORT);
     ttl->view_scale_max = 1 << 13; // should be no more than 2^15 (== 2 ^ MAX(LWTTLCHUNKKEY.view_scale_msb))
-    ttl->view_scale_ping_max = 64;
+    ttl->view_scale_ping_max = LNGLAT_VIEW_SCALE_PING_MAX;
     ttl->view_scale = ttl->view_scale_ping_max;
     LWMUTEX_INIT(ttl->rendering_mutex);
     ttl->earth_globe_scale_0 = earth_globe_render_scale;
@@ -395,10 +379,7 @@ static int add_to_object_cache(LWTTLOBJECTCACHE* c,
         return -6;
     }
     // check for existing chunk entry
-    LWTTLCHUNKKEY chunk_key;
-    chunk_key.bf.xcc0 = xc0 >> msb_index(LNGLAT_SEA_PING_EXTENT_IN_CELL_PIXELS * view_scale);
-    chunk_key.bf.ycc0 = yc0 >> msb_index(LNGLAT_SEA_PING_EXTENT_IN_CELL_PIXELS * view_scale);
-    chunk_key.bf.view_scale_msb = msb_index(view_scale);
+    LWTTLCHUNKKEY chunk_key = make_chunk_key(xc0, yc0, view_scale);
     int chunk_index = lower_bound_int(&c->key_array[0].v, c->count, chunk_key.v);
     if (chunk_index >= 0 && c->key_array[chunk_index].v == chunk_key.v) {
         // chunk key found.
@@ -525,7 +506,7 @@ static void send_ttlpingchunk(const LWTTL* ttl,
     memset(&p, 0, sizeof(LWPTTLPINGCHUNK));
     p.type = LPGP_LWPTTLPINGCHUNK;
     p.static_object = static_object;
-    p.chunk_key = chunk_key;
+    p.chunk_key = chunk_key.v;
     p.ts = ts;
     udp_send(udp, (const char*)&p, sizeof(LWPTTLPINGCHUNK));
 }
@@ -556,6 +537,14 @@ static void send_ttlping_if_chunk_not_found(const LWTTL* ttl,
                       chunk_key,
                       static_object,
                       ts);
+
+    /*if (find_chunk_index(c, chunk_key) == -1) {
+        send_ttlpingchunk(ttl,
+                          udp,
+                          chunk_key,
+                          static_object,
+                          0);
+    }*/
 }
 
 void lwttl_udp_send_ttlping(const LWTTL* ttl, LWUDP* udp, int ping_seq) {
@@ -577,12 +566,12 @@ void lwttl_udp_send_ttlping(const LWTTL* ttl, LWUDP* udp, int ping_seq) {
     };
     LWTTLCHUNKBOUND chunk_bound;
     cell_bound_to_chunk_bound(&cell_bound, clamped_view_scale, &chunk_bound);
-    chunk_bound.xcc0--;
+    /*chunk_bound.xcc0--;
     chunk_bound.xcc1++;
     chunk_bound.ycc0--;
-    chunk_bound.ycc1++;
-    const int xc_count = chunk_bound.xcc1 - chunk_bound.xcc0 + 1;
-    const int yc_count = chunk_bound.ycc1 - chunk_bound.ycc0 + 1;
+    chunk_bound.ycc1++;*/
+    const int xc_count = chunk_bound.xcc1 - chunk_bound.xcc0;// + 1;
+    const int yc_count = chunk_bound.ycc1 - chunk_bound.ycc0;// + 1;
     int chunk_index_count = 0;
     for (int i = 0; i < xc_count; i++) {
         for (int j = 0; j < yc_count; j++) {

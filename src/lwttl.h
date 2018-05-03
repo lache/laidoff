@@ -12,12 +12,8 @@ typedef struct _LWPTTLSTATICSTATE2 LWPTTLSTATICSTATE2;
 typedef struct _LWPTTLSEAPORTSTATE LWPTTLSEAPORTSTATE;
 typedef struct _LWPTTLSTATICOBJECT2 LWPTTLSTATICOBJECT2;
 typedef struct _LWPTTLSEAPORTOBJECT LWPTTLSEAPORTOBJECT;
-typedef struct _LWTTLLNGLAT {
-    float lng;
-    float lat;
-} LWTTLLNGLAT;
+typedef struct _LWTTLLNGLAT LWTTLLNGLAT;
 
-int msb_index(unsigned int v);
 LWTTL* lwttl_new(float aspect_ratio);
 void lwttl_destroy(LWTTL** _ttl);
 float lnglat_to_xy(const LWCONTEXT* pLwc, float v);
