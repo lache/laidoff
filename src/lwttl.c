@@ -617,22 +617,6 @@ void lwttl_udp_send_request_waypoints(const LWTTL* ttl, LWUDP* sea_udp, int ship
     udp_send(sea_udp, (const char*)&p, sizeof(LWPTTLREQUESTWAYPOINTS));
 }
 
-//void lwttl_set_xc0(LWTTL* ttl, int v) {
-//    ttl->xc0 = v;
-//}
-//
-//int lwttl_xc0(const LWTTL* ttl) {
-//    return ttl->xc0;
-//}
-//
-//void lwttl_set_yc0(LWTTL* ttl, int v) {
-//    ttl->yc0 = v;
-//}
-//
-//int lwttl_yc0(const LWTTL* ttl) {
-//    return ttl->yc0;
-//}
-
 void lwttl_lock_rendering_mutex(LWTTL* ttl) {
     LWMUTEX_LOCK(ttl->rendering_mutex);
 }
@@ -755,11 +739,7 @@ void lwttl_udp_update(LWTTL* ttl, LWUDP* udp, LWCONTEXT* pLwc) {
 
                 LWPTTLSTATICSTATE2* p = (LWPTTLSTATICSTATE2*)decompressed;
                 LOGIx("LWPTTLSTATICSTATE2: %d objects.", p->count);
-                //lwttl_set_xc0(ttl, p->xc0);
-                //lwttl_set_yc0(ttl, p->yc0);
-                //lwttl_lock_rendering_mutex(ttl);
-                //lwttl_unlock_rendering_mutex(ttl);
-                //lwttl_set_view_scale(ttl, p->view_scale);
+
                 const int add_ret = add_to_object_cache_land(&ttl->object_cache.land_cache,
                                                              ttl->object_cache.land_array,
                                                              ARRAY_SIZE(ttl->object_cache.land_array),
@@ -984,10 +964,6 @@ void lwttl_read_last_state(LWTTL* ttl, const LWCONTEXT* pLwc) {
 const LWPTTLFULLSTATE* lwttl_full_state(const LWTTL* ttl) {
     return &ttl->ttl_full_state;
 }
-
-//const LWPTTLSEAPORTSTATE* lwttl_seaport_state(const LWTTL* ttl) {
-//    return &ttl->ttl_seaport_state;
-//}
 
 static int lwttl_query_chunk_range(const LWTTL* ttl,
                                    const float lng_min,
