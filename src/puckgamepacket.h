@@ -303,7 +303,7 @@ typedef struct _LWPTTLSTATICSTATE2 {
     unsigned char padding0;
     unsigned char padding1;
     unsigned char padding2;
-    unsigned int ts;
+    long long ts;
     int xc0;
     int yc0;
     int view_scale;
@@ -325,7 +325,7 @@ typedef struct _LWPTTLSEAPORTSTATE {
     unsigned char padding0;
     unsigned char padding1;
     unsigned char padding2;
-    unsigned int ts;
+    long long ts;
     int xc0;
     int yc0;
     int view_scale;
@@ -403,7 +403,7 @@ typedef struct _LWPTTLPINGCHUNK {
     unsigned char padding1;
     unsigned char padding2;
     int chunk_key;
-    unsigned int ts;
+    long long ts;
 } LWPTTLPINGCHUNK;
 /*
 * END: should sync with packet.h in sea-server

@@ -27,7 +27,7 @@ typedef struct _LWTTLDATA_SEAPORT {
 
 typedef struct _LWTTLCHUNKVALUE {
     LWTTLCHUNKKEY key;
-    unsigned int ts;
+    long long ts;
     int start;
     int count;
 } LWTTLCHUNKVALUE;
@@ -328,7 +328,7 @@ static int find_chunk_index(const LWTTLOBJECTCACHE* c, const LWTTLCHUNKKEY chunk
     return -1;
 }
 
-static unsigned int find_chunk_ts(const LWTTLOBJECTCACHE* c, const LWTTLCHUNKKEY chunk_key) {
+static long long find_chunk_ts(const LWTTLOBJECTCACHE* c, const LWTTLCHUNKKEY chunk_key) {
     const int chunk_index = find_chunk_index(c, chunk_key);
     if (chunk_index >= 0 && chunk_index < c->count) {
         return c->value_array[chunk_index].ts;
@@ -341,7 +341,7 @@ static int add_to_object_cache(LWTTLOBJECTCACHE* c,
                                void* cache_array,
                                const size_t entry_size,
                                const int entry_max_count,
-                               const unsigned int ts,
+                               const long long ts,
                                const int xc0,
                                const int yc0,
                                const int view_scale,
@@ -572,7 +572,7 @@ static void send_ttlpingchunk(const LWTTL* ttl,
                               LWUDP* udp,
                               const LWTTLCHUNKKEY chunk_key,
                               const unsigned char static_object,
-                              const unsigned int ts) {
+                              const long long ts) {
     LWPTTLPINGCHUNK p;
     memset(&p, 0, sizeof(LWPTTLPINGCHUNK));
     p.type = LPGP_LWPTTLPINGCHUNK;
@@ -602,7 +602,7 @@ static void send_ttlping_with_timestamp(const LWTTL* ttl,
                                         const LWTTLOBJECTCACHE* c,
                                         const LWTTLCHUNKKEY chunk_key,
                                         const unsigned char static_object) {
-    const unsigned int ts = find_chunk_ts(c, chunk_key);
+    const long long ts = find_chunk_ts(c, chunk_key);
     send_ttlpingchunk(ttl,
                       udp,
                       chunk_key,
