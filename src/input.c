@@ -307,7 +307,6 @@ void lw_trigger_mouse_release(LWCONTEXT* pLwc, float x, float y, int pointer_id)
 				touch_file(pLwc->user_data_path, "admin");
 			}
 		}
-		return;
 	}
 
 	// Touch right top corner of the screen
