@@ -1851,6 +1851,7 @@ LWCONTEXT* lw_init_initial_size(int width, int height) {
 
     pLwc->ttl = lwttl_new(pLwc->aspect_ratio);
     lwttl_read_last_state(pLwc->ttl, pLwc);
+    lwttl_fill_world_seaports_bookmarks(pLwc->htmlui);
 
     pLwc->remtex = remtex_new(pLwc->tcp_host_addr.host);
 

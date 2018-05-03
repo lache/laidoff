@@ -8,7 +8,7 @@
 // extant decribed in R-tree pixel(cell) unit
 #define LNGLAT_SEA_PING_EXTENT_IN_CELL_PIXELS (16)
 #define LNGLAT_SEA_PING_EXTENT_IN_DEGREES ((180.0f/LNGLAT_RES_HEIGHT)*LNGLAT_SEA_PING_EXTENT_IN_CELL_PIXELS)
-#define LNGLAT_RENDER_EXTENT_MULTIPLIER_LNG (1)
+#define LNGLAT_RENDER_EXTENT_MULTIPLIER_LNG (3)
 #define LNGLAT_RENDER_EXTENT_MULTIPLIER_LAT (1)
 
 #define LNGLAT_VIEW_SCALE_PING_MAX (1 << 6) // 64
@@ -83,10 +83,15 @@ static float cell_fy_to_render_coords(float fy, const LWTTLLNGLAT* center, int v
     return (cell_fy_to_lat(fy) - center->lat) * sea_render_scale / view_scale;
 }
 
-static LWTTLCHUNKKEY make_chunk_key(const int xc0, const int yc0, const int view_scale) {
+static LWTTLCHUNKKEY make_chunk_key(const int xc0_aligned, const int yc0_aligned, const int view_scale) {
     LWTTLCHUNKKEY chunk_key;
-    chunk_key.bf.xcc0 = xc0 >> msb_index(LNGLAT_SEA_PING_EXTENT_IN_CELL_PIXELS * view_scale);
-    chunk_key.bf.ycc0 = yc0 >> msb_index(LNGLAT_SEA_PING_EXTENT_IN_CELL_PIXELS * view_scale);
+    chunk_key.bf.xcc0 = xc0_aligned >> msb_index(LNGLAT_SEA_PING_EXTENT_IN_CELL_PIXELS * view_scale);
+    chunk_key.bf.ycc0 = yc0_aligned >> msb_index(LNGLAT_SEA_PING_EXTENT_IN_CELL_PIXELS * view_scale);
     chunk_key.bf.view_scale_msb = msb_index(view_scale);
     return chunk_key;
+}
+
+static int aligned_chunk_index(const int cell_index, const int view_scale, const int ex) {
+    const auto half_cell_pixel_extent = (ex >> 1) * view_scale;
+    return (cell_index + half_cell_pixel_extent) & ~(2 * half_cell_pixel_extent - 1) & ~(view_scale - 1);
 }

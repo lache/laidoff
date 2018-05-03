@@ -464,17 +464,12 @@ static int add_to_object_cache_seaport(LWTTLOBJECTCACHE* c,
                                s2->obj);
 }
 
-static int aligned_chunk_index(const int cell_index, const int view_scale) {
-    const int half_cell_pixel_extent = LNGLAT_SEA_PING_EXTENT_IN_CELL_PIXELS / 2 * view_scale;
-    return (cell_index + half_cell_pixel_extent) & ~(2 * half_cell_pixel_extent - 1) & ~(view_scale - 1);
-}
-
 static void cell_bound_to_chunk_bound(const LWTTLCELLBOUND* cell_bound, const int view_scale, LWTTLCHUNKBOUND* chunk_bound) {
     const int half_cell_pixel_extent = LNGLAT_SEA_PING_EXTENT_IN_CELL_PIXELS / 2 * view_scale;
-    chunk_bound->xcc0 = aligned_chunk_index(cell_bound->xc0, view_scale) >> msb_index(LNGLAT_SEA_PING_EXTENT_IN_CELL_PIXELS * view_scale);
-    chunk_bound->ycc0 = aligned_chunk_index(cell_bound->yc0, view_scale) >> msb_index(LNGLAT_SEA_PING_EXTENT_IN_CELL_PIXELS * view_scale);
-    chunk_bound->xcc1 = aligned_chunk_index(cell_bound->xc1, view_scale) >> msb_index(LNGLAT_SEA_PING_EXTENT_IN_CELL_PIXELS * view_scale);
-    chunk_bound->ycc1 = aligned_chunk_index(cell_bound->yc1, view_scale) >> msb_index(LNGLAT_SEA_PING_EXTENT_IN_CELL_PIXELS * view_scale);
+    chunk_bound->xcc0 = aligned_chunk_index(cell_bound->xc0, view_scale, LNGLAT_SEA_PING_EXTENT_IN_CELL_PIXELS) >> msb_index(LNGLAT_SEA_PING_EXTENT_IN_CELL_PIXELS * view_scale);
+    chunk_bound->ycc0 = aligned_chunk_index(cell_bound->yc0, view_scale, LNGLAT_SEA_PING_EXTENT_IN_CELL_PIXELS) >> msb_index(LNGLAT_SEA_PING_EXTENT_IN_CELL_PIXELS * view_scale);
+    chunk_bound->xcc1 = aligned_chunk_index(cell_bound->xc1, view_scale, LNGLAT_SEA_PING_EXTENT_IN_CELL_PIXELS) >> msb_index(LNGLAT_SEA_PING_EXTENT_IN_CELL_PIXELS * view_scale);
+    chunk_bound->ycc1 = aligned_chunk_index(cell_bound->yc1, view_scale, LNGLAT_SEA_PING_EXTENT_IN_CELL_PIXELS) >> msb_index(LNGLAT_SEA_PING_EXTENT_IN_CELL_PIXELS * view_scale);
 }
 
 static void send_ttlping(const LWTTL* ttl,
@@ -526,11 +521,11 @@ float lwttl_half_lat_extent_in_degrees(const int view_scale) {
     return LNGLAT_SEA_PING_EXTENT_IN_DEGREES / 2 * view_scale * LNGLAT_RENDER_EXTENT_MULTIPLIER_LAT;
 }
 
-static void send_ttlping_if_chunk_not_found(const LWTTL* ttl,
-                                            LWUDP* udp,
-                                            const LWTTLOBJECTCACHE* c,
-                                            const LWTTLCHUNKKEY chunk_key,
-                                            const unsigned char static_object) {
+static void send_ttlping_with_timestamp(const LWTTL* ttl,
+                                        LWUDP* udp,
+                                        const LWTTLOBJECTCACHE* c,
+                                        const LWTTLCHUNKKEY chunk_key,
+                                        const unsigned char static_object) {
     const unsigned int ts = find_chunk_ts(c, chunk_key);
     send_ttlpingchunk(ttl,
                       udp,
@@ -566,12 +561,12 @@ void lwttl_udp_send_ttlping(const LWTTL* ttl, LWUDP* udp, int ping_seq) {
     };
     LWTTLCHUNKBOUND chunk_bound;
     cell_bound_to_chunk_bound(&cell_bound, clamped_view_scale, &chunk_bound);
-    /*chunk_bound.xcc0--;
+    chunk_bound.xcc0--;
     chunk_bound.xcc1++;
     chunk_bound.ycc0--;
-    chunk_bound.ycc1++;*/
-    const int xc_count = chunk_bound.xcc1 - chunk_bound.xcc0;// + 1;
-    const int yc_count = chunk_bound.ycc1 - chunk_bound.ycc0;// + 1;
+    chunk_bound.ycc1++;
+    const int xc_count = chunk_bound.xcc1 - chunk_bound.xcc0 + 1;
+    const int yc_count = chunk_bound.ycc1 - chunk_bound.ycc0 + 1;
     int chunk_index_count = 0;
     for (int i = 0; i < xc_count; i++) {
         for (int j = 0; j < yc_count; j++) {
@@ -589,11 +584,11 @@ void lwttl_udp_send_ttlping(const LWTTL* ttl, LWUDP* udp, int ping_seq) {
                 { &ttl->object_cache.seaport_cache, 2 },
             };
             for (int k = 0; k < ARRAY_SIZE(cache_list); k++) {
-                send_ttlping_if_chunk_not_found(ttl,
-                                                udp,
-                                                cache_list[k].c,
-                                                chunk_key,
-                                                cache_list[k].static_object);
+                send_ttlping_with_timestamp(ttl,
+                                            udp,
+                                            cache_list[k].c,
+                                            chunk_key,
+                                            cache_list[k].static_object);
             }
         }
     }
@@ -771,135 +766,6 @@ void lwttl_udp_update(LWTTL* ttl, LWUDP* udp, LWCONTEXT* pLwc) {
                 if (add_ret == 1) {
                     //send_ttlpingflush(ttl);
                 }
-
-
-                // fill nearest seaports
-                /*htmlui_clear_loop(pLwc->htmlui, "seaport");
-                for (int i = 0; i < p->count; i++) {
-                htmlui_set_loop_key_value(pLwc->htmlui, "seaport", "name", ttl->ttl_seaport_state.obj[i].name);
-                char script[128];
-                sprintf(script, "script:local c = lo.script_context();lo.lwttl_worldmap_scroll_to(c.ttl, %f, %f, c.sea_udp)",
-                cell_x_to_lng(ttl->ttl_seaport_state.obj[i].x0),
-                cell_y_to_lat(ttl->ttl_seaport_state.obj[i].y0));
-                htmlui_set_loop_key_value(pLwc->htmlui, "seaport", "script", script);
-                }*/
-                // fill world seaports
-                char script[128];
-                htmlui_clear_loop(pLwc->htmlui, "world-seaport");
-
-                htmlui_set_loop_key_value(pLwc->htmlui, "world-seaport", "name", "Yokohama");
-                sprintf(script, "script:local c = lo.script_context();lo.lwttl_worldmap_scroll_to(c.ttl, %f, %f, c.sea_udp)",
-                        139.0f + 39.0f / 60.0f,
-                        35.0f + 27.0f / 60.0f);
-                htmlui_set_loop_key_value(pLwc->htmlui, "world-seaport", "script", script);
-
-                htmlui_set_loop_key_value(pLwc->htmlui, "world-seaport", "name", "Shanghai");
-                sprintf(script, "script:local c = lo.script_context();lo.lwttl_worldmap_scroll_to(c.ttl, %f, %f, c.sea_udp)",
-                        121.0f + 29.0f / 60.0f,
-                        31.0f + 14.0f / 60.0f);
-                htmlui_set_loop_key_value(pLwc->htmlui, "world-seaport", "script", script);
-
-                htmlui_set_loop_key_value(pLwc->htmlui, "world-seaport", "name", "Tianjin");
-                sprintf(script, "script:local c = lo.script_context();lo.lwttl_worldmap_scroll_to(c.ttl, %f, %f, c.sea_udp)",
-                        117.0f + 12.0f / 60.0f,
-                        39.0f + 2.0f / 60.0f);
-                htmlui_set_loop_key_value(pLwc->htmlui, "world-seaport", "script", script);
-
-                htmlui_set_loop_key_value(pLwc->htmlui, "world-seaport", "name", "Busan");
-                sprintf(script, "script:local c = lo.script_context();lo.lwttl_worldmap_scroll_to(c.ttl, %f, %f, c.sea_udp)",
-                        129.0f + 3.0f / 60.0f,
-                        35.0f + 8.0f / 60.0f);
-                htmlui_set_loop_key_value(pLwc->htmlui, "world-seaport", "script", script);
-
-                htmlui_set_loop_key_value(pLwc->htmlui, "world-seaport", "name", "Panama Canal");
-                sprintf(script, "script:local c = lo.script_context();lo.lwttl_worldmap_scroll_to(c.ttl, %f, %f, c.sea_udp)",
-                        -(79.0f + 40.0f / 60.0f),
-                        9.0f + 4.0f / 60.0f);
-                htmlui_set_loop_key_value(pLwc->htmlui, "world-seaport", "script", script);
-
-                htmlui_set_loop_key_value(pLwc->htmlui, "world-seaport", "name", "As Suways(Suez)");
-                sprintf(script, "script:local c = lo.script_context();lo.lwttl_worldmap_scroll_to(c.ttl, %f, %f, c.sea_udp)",
-                        32.0f + 31.0f / 60.0f,
-                        29.0f + 58.0f / 60.0f);
-                htmlui_set_loop_key_value(pLwc->htmlui, "world-seaport", "script", script);
-
-                htmlui_set_loop_key_value(pLwc->htmlui, "world-seaport", "name", "Hong Kong Central");
-                sprintf(script, "script:local c = lo.script_context();lo.lwttl_worldmap_scroll_to(c.ttl, %f, %f, c.sea_udp)",
-                        114.0f + 9.0f / 60.0f,
-                        22.0f + 16.0f / 60.0f);
-                htmlui_set_loop_key_value(pLwc->htmlui, "world-seaport", "script", script);
-
-                htmlui_set_loop_key_value(pLwc->htmlui, "world-seaport", "name", "Jurong/Singapore");
-                sprintf(script, "script:local c = lo.script_context();lo.lwttl_worldmap_scroll_to(c.ttl, %f, %f, c.sea_udp)",
-                        103.0f + 42.0f / 60.0f,
-                        1.0f + 20.0f / 60.0f);
-                htmlui_set_loop_key_value(pLwc->htmlui, "world-seaport", "script", script);
-
-                htmlui_set_loop_key_value(pLwc->htmlui, "world-seaport", "name", "Port Of South Louisiana");
-                sprintf(script, "script:local c = lo.script_context();lo.lwttl_worldmap_scroll_to(c.ttl, %f, %f, c.sea_udp)",
-                        -(90 + 30 / 60.0f),
-                        30 + 3 / 60.0f);
-                htmlui_set_loop_key_value(pLwc->htmlui, "world-seaport", "script", script);
-
-                htmlui_set_loop_key_value(pLwc->htmlui, "world-seaport", "name", "Pilottown");
-                sprintf(script, "script:local c = lo.script_context();lo.lwttl_worldmap_scroll_to(c.ttl, %f, %f, c.sea_udp)",
-                        -(89 + 15 / 60.0f),
-                        29 + 11 / 60.0f);
-                htmlui_set_loop_key_value(pLwc->htmlui, "world-seaport", "script", script);
-
-                htmlui_set_loop_key_value(pLwc->htmlui, "world-seaport", "name", "Sydney");
-                sprintf(script, "script:local c = lo.script_context();lo.lwttl_worldmap_scroll_to(c.ttl, %f, %f, c.sea_udp)",
-                        151 + 12 / 60.0f,
-                        -(33 + 51 / 60.0f));
-                htmlui_set_loop_key_value(pLwc->htmlui, "world-seaport", "script", script);
-
-                htmlui_set_loop_key_value(pLwc->htmlui, "world-seaport", "name", "Honolulu");
-                sprintf(script, "script:local c = lo.script_context();lo.lwttl_worldmap_scroll_to(c.ttl, %f, %f, c.sea_udp)",
-                        -(157 + 51 / 60.0f),
-                        21 + 18 / 60.0f);
-                htmlui_set_loop_key_value(pLwc->htmlui, "world-seaport", "script", script);
-
-                htmlui_set_loop_key_value(pLwc->htmlui, "world-seaport", "name", "Seoul");
-                sprintf(script, "script:local c = lo.script_context();lo.lwttl_worldmap_scroll_to(c.ttl, %f, %f, c.sea_udp)",
-                        126 + 56 / 60.0f,
-                        37 + 31 / 60.0f);
-                htmlui_set_loop_key_value(pLwc->htmlui, "world-seaport", "script", script);
-
-                htmlui_set_loop_key_value(pLwc->htmlui, "world-seaport", "name", "Civitavecchia");
-                sprintf(script, "script:local c = lo.script_context();lo.lwttl_worldmap_scroll_to(c.ttl, %f, %f, c.sea_udp)",
-                        11 + 48 / 60.0f,
-                        42 + 6 / 60.0f);
-                htmlui_set_loop_key_value(pLwc->htmlui, "world-seaport", "script", script);
-
-                htmlui_set_loop_key_value(pLwc->htmlui, "world-seaport", "name", "Rome (Roma)");
-                sprintf(script, "script:local c = lo.script_context();lo.lwttl_worldmap_scroll_to(c.ttl, %f, %f, c.sea_udp)",
-                        12 + 29 / 60.0f,
-                        41 + 54 / 60.0f);
-                htmlui_set_loop_key_value(pLwc->htmlui, "world-seaport", "script", script);
-
-                htmlui_set_loop_key_value(pLwc->htmlui, "world-seaport", "name", "Sunderland");
-                sprintf(script, "script:local c = lo.script_context();lo.lwttl_worldmap_scroll_to(c.ttl, %f, %f, c.sea_udp)",
-                        -(1 + 23 / 60.0f),
-                        54 + 54 / 60.0f);
-                htmlui_set_loop_key_value(pLwc->htmlui, "world-seaport", "script", script);
-
-                htmlui_set_loop_key_value(pLwc->htmlui, "world-seaport", "name", "Dokdo");
-                sprintf(script, "script:local c = lo.script_context();lo.lwttl_worldmap_scroll_to(c.ttl, %f, %f, c.sea_udp)",
-                        131 + 51 / 60.0f,
-                        37 + 14 / 60.0f);
-                htmlui_set_loop_key_value(pLwc->htmlui, "world-seaport", "script", script);
-
-                htmlui_set_loop_key_value(pLwc->htmlui, "world-seaport", "name", "Dokdo Precise");
-                sprintf(script, "script:local c = lo.script_context();lo.lwttl_worldmap_scroll_to(c.ttl, %f, %f, c.sea_udp)",
-                        131 + 52 / 60.0f + 8.045f / 3600.0f,
-                        37 + 14 / 60.0f + 21.786f / 3600.0f);
-                htmlui_set_loop_key_value(pLwc->htmlui, "world-seaport", "script", script);
-
-                htmlui_set_loop_key_value(pLwc->htmlui, "world-seaport", "name", "[0,0] (LNG -180 LAT 90)");
-                sprintf(script, "script:local c = lo.script_context();lo.lwttl_worldmap_scroll_to(c.ttl, %f, %f, c.sea_udp)",
-                        -180 + 0 / 60.0f,
-                        90 + 0 / 60.0f);
-                htmlui_set_loop_key_value(pLwc->htmlui, "world-seaport", "script", script);
 
                 break;
             }
@@ -1126,4 +992,134 @@ float lwttl_earth_globe_y(const LWTTLLNGLAT* center, float earth_globe_scale, fl
     const float globe_y = -sinf((float)LWDEG2RAD(center->lat)) * earth_globe_scale;
     const float plane_y = -(float)M_PI / 2 * center->lat / 90.0f * earth_globe_scale; // plane height is M_PI
     return (1.0f - earth_globe_morph_weight) * plane_y + earth_globe_morph_weight * globe_y;
+}
+
+void lwttl_fill_world_seaports_bookmarks(LWHTMLUI* htmlui) {
+    // fill nearest seaports
+    /*htmlui_clear_loop(htmlui, "seaport");
+    for (int i = 0; i < p->count; i++) {
+    htmlui_set_loop_key_value(htmlui, "seaport", "name", ttl->ttl_seaport_state.obj[i].name);
+    char script[128];
+    sprintf(script, "script:local c = lo.script_context();lo.lwttl_worldmap_scroll_to(c.ttl, %f, %f, c.sea_udp)",
+    cell_x_to_lng(ttl->ttl_seaport_state.obj[i].x0),
+    cell_y_to_lat(ttl->ttl_seaport_state.obj[i].y0));
+    htmlui_set_loop_key_value(htmlui, "seaport", "script", script);
+    }*/
+    // fill world seaports
+    char script[128];
+    htmlui_clear_loop(htmlui, "world-seaport");
+
+    htmlui_set_loop_key_value(htmlui, "world-seaport", "name", "Yokohama");
+    sprintf(script, "script:local c = lo.script_context();lo.lwttl_worldmap_scroll_to(c.ttl, %f, %f, c.sea_udp)",
+            139.0f + 39.0f / 60.0f,
+            35.0f + 27.0f / 60.0f);
+    htmlui_set_loop_key_value(htmlui, "world-seaport", "script", script);
+
+    htmlui_set_loop_key_value(htmlui, "world-seaport", "name", "Shanghai");
+    sprintf(script, "script:local c = lo.script_context();lo.lwttl_worldmap_scroll_to(c.ttl, %f, %f, c.sea_udp)",
+            121.0f + 29.0f / 60.0f,
+            31.0f + 14.0f / 60.0f);
+    htmlui_set_loop_key_value(htmlui, "world-seaport", "script", script);
+
+    htmlui_set_loop_key_value(htmlui, "world-seaport", "name", "Tianjin");
+    sprintf(script, "script:local c = lo.script_context();lo.lwttl_worldmap_scroll_to(c.ttl, %f, %f, c.sea_udp)",
+            117.0f + 12.0f / 60.0f,
+            39.0f + 2.0f / 60.0f);
+    htmlui_set_loop_key_value(htmlui, "world-seaport", "script", script);
+
+    htmlui_set_loop_key_value(htmlui, "world-seaport", "name", "Busan");
+    sprintf(script, "script:local c = lo.script_context();lo.lwttl_worldmap_scroll_to(c.ttl, %f, %f, c.sea_udp)",
+            129.0f + 3.0f / 60.0f,
+            35.0f + 8.0f / 60.0f);
+    htmlui_set_loop_key_value(htmlui, "world-seaport", "script", script);
+
+    htmlui_set_loop_key_value(htmlui, "world-seaport", "name", "Panama Canal");
+    sprintf(script, "script:local c = lo.script_context();lo.lwttl_worldmap_scroll_to(c.ttl, %f, %f, c.sea_udp)",
+            -(79.0f + 40.0f / 60.0f),
+            9.0f + 4.0f / 60.0f);
+    htmlui_set_loop_key_value(htmlui, "world-seaport", "script", script);
+
+    htmlui_set_loop_key_value(htmlui, "world-seaport", "name", "As Suways(Suez)");
+    sprintf(script, "script:local c = lo.script_context();lo.lwttl_worldmap_scroll_to(c.ttl, %f, %f, c.sea_udp)",
+            32.0f + 31.0f / 60.0f,
+            29.0f + 58.0f / 60.0f);
+    htmlui_set_loop_key_value(htmlui, "world-seaport", "script", script);
+
+    htmlui_set_loop_key_value(htmlui, "world-seaport", "name", "Hong Kong Central");
+    sprintf(script, "script:local c = lo.script_context();lo.lwttl_worldmap_scroll_to(c.ttl, %f, %f, c.sea_udp)",
+            114.0f + 9.0f / 60.0f,
+            22.0f + 16.0f / 60.0f);
+    htmlui_set_loop_key_value(htmlui, "world-seaport", "script", script);
+
+    htmlui_set_loop_key_value(htmlui, "world-seaport", "name", "Jurong/Singapore");
+    sprintf(script, "script:local c = lo.script_context();lo.lwttl_worldmap_scroll_to(c.ttl, %f, %f, c.sea_udp)",
+            103.0f + 42.0f / 60.0f,
+            1.0f + 20.0f / 60.0f);
+    htmlui_set_loop_key_value(htmlui, "world-seaport", "script", script);
+
+    htmlui_set_loop_key_value(htmlui, "world-seaport", "name", "Port Of South Louisiana");
+    sprintf(script, "script:local c = lo.script_context();lo.lwttl_worldmap_scroll_to(c.ttl, %f, %f, c.sea_udp)",
+            -(90 + 30 / 60.0f),
+            30 + 3 / 60.0f);
+    htmlui_set_loop_key_value(htmlui, "world-seaport", "script", script);
+
+    htmlui_set_loop_key_value(htmlui, "world-seaport", "name", "Pilottown");
+    sprintf(script, "script:local c = lo.script_context();lo.lwttl_worldmap_scroll_to(c.ttl, %f, %f, c.sea_udp)",
+            -(89 + 15 / 60.0f),
+            29 + 11 / 60.0f);
+    htmlui_set_loop_key_value(htmlui, "world-seaport", "script", script);
+
+    htmlui_set_loop_key_value(htmlui, "world-seaport", "name", "Sydney");
+    sprintf(script, "script:local c = lo.script_context();lo.lwttl_worldmap_scroll_to(c.ttl, %f, %f, c.sea_udp)",
+            151 + 12 / 60.0f,
+            -(33 + 51 / 60.0f));
+    htmlui_set_loop_key_value(htmlui, "world-seaport", "script", script);
+
+    htmlui_set_loop_key_value(htmlui, "world-seaport", "name", "Honolulu");
+    sprintf(script, "script:local c = lo.script_context();lo.lwttl_worldmap_scroll_to(c.ttl, %f, %f, c.sea_udp)",
+            -(157 + 51 / 60.0f),
+            21 + 18 / 60.0f);
+    htmlui_set_loop_key_value(htmlui, "world-seaport", "script", script);
+
+    htmlui_set_loop_key_value(htmlui, "world-seaport", "name", "Seoul");
+    sprintf(script, "script:local c = lo.script_context();lo.lwttl_worldmap_scroll_to(c.ttl, %f, %f, c.sea_udp)",
+            126 + 56 / 60.0f,
+            37 + 31 / 60.0f);
+    htmlui_set_loop_key_value(htmlui, "world-seaport", "script", script);
+
+    htmlui_set_loop_key_value(htmlui, "world-seaport", "name", "Civitavecchia");
+    sprintf(script, "script:local c = lo.script_context();lo.lwttl_worldmap_scroll_to(c.ttl, %f, %f, c.sea_udp)",
+            11 + 48 / 60.0f,
+            42 + 6 / 60.0f);
+    htmlui_set_loop_key_value(htmlui, "world-seaport", "script", script);
+
+    htmlui_set_loop_key_value(htmlui, "world-seaport", "name", "Rome (Roma)");
+    sprintf(script, "script:local c = lo.script_context();lo.lwttl_worldmap_scroll_to(c.ttl, %f, %f, c.sea_udp)",
+            12 + 29 / 60.0f,
+            41 + 54 / 60.0f);
+    htmlui_set_loop_key_value(htmlui, "world-seaport", "script", script);
+
+    htmlui_set_loop_key_value(htmlui, "world-seaport", "name", "Sunderland");
+    sprintf(script, "script:local c = lo.script_context();lo.lwttl_worldmap_scroll_to(c.ttl, %f, %f, c.sea_udp)",
+            -(1 + 23 / 60.0f),
+            54 + 54 / 60.0f);
+    htmlui_set_loop_key_value(htmlui, "world-seaport", "script", script);
+
+    htmlui_set_loop_key_value(htmlui, "world-seaport", "name", "Dokdo");
+    sprintf(script, "script:local c = lo.script_context();lo.lwttl_worldmap_scroll_to(c.ttl, %f, %f, c.sea_udp)",
+            131 + 51 / 60.0f,
+            37 + 14 / 60.0f);
+    htmlui_set_loop_key_value(htmlui, "world-seaport", "script", script);
+
+    htmlui_set_loop_key_value(htmlui, "world-seaport", "name", "Dokdo Precise");
+    sprintf(script, "script:local c = lo.script_context();lo.lwttl_worldmap_scroll_to(c.ttl, %f, %f, c.sea_udp)",
+            131 + 52 / 60.0f + 8.045f / 3600.0f,
+            37 + 14 / 60.0f + 21.786f / 3600.0f);
+    htmlui_set_loop_key_value(htmlui, "world-seaport", "script", script);
+
+    htmlui_set_loop_key_value(htmlui, "world-seaport", "name", "[0,0] (LNG -180 LAT 90)");
+    sprintf(script, "script:local c = lo.script_context();lo.lwttl_worldmap_scroll_to(c.ttl, %f, %f, c.sea_udp)",
+            -180 + 0 / 60.0f,
+            90 + 0 / 60.0f);
+    htmlui_set_loop_key_value(htmlui, "world-seaport", "script", script);
 }

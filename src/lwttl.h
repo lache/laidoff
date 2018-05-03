@@ -13,6 +13,7 @@ typedef struct _LWPTTLSEAPORTSTATE LWPTTLSEAPORTSTATE;
 typedef struct _LWPTTLSTATICOBJECT2 LWPTTLSTATICOBJECT2;
 typedef struct _LWPTTLSEAPORTOBJECT LWPTTLSEAPORTOBJECT;
 typedef struct _LWTTLLNGLAT LWTTLLNGLAT;
+typedef struct _LWHTMLUI LWHTMLUI;
 
 LWTTL* lwttl_new(float aspect_ratio);
 void lwttl_destroy(LWTTL** _ttl);
@@ -83,6 +84,7 @@ void lwttl_scroll_view_scale(LWTTL* ttl, float offset);
 float lwttl_earth_globe_scale(LWTTL* ttl);
 float lwttl_earth_globe_morph_weight(float earth_globe_scale);
 float lwttl_earth_globe_y(const LWTTLLNGLAT* center, float earth_globe_scale, float earth_globe_morph_weight);
+void lwttl_fill_world_seaports_bookmarks(LWHTMLUI* htmlui);
 #ifdef __cplusplus
 }
 #endif
