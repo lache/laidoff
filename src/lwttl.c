@@ -407,9 +407,16 @@ static int add_to_object_cache(LWTTLOBJECTCACHE* c,
                                from_data,
                                entry_size);
                     }
-                    // [3] For chunks in range of [chunk_index + 1, count), offset start value by count_delta
-                    for (int i = chunk_index + 1; i < c->count; i++) {
-                        c->value_array[i].start += count_delta;
+                    // [3] For all chunks except at index chunk_index,
+                    //     increment start by count_delta where
+                    //     start is equal or greater to 'start0 + count0'
+                    for (int i = 0; i < c->count; i++) {
+                        if (i == chunk_index) {
+                            continue;
+                        }
+                        if (c->value_array[i].start >= start0 + count0) {
+                            c->value_array[i].start += count_delta;
+                        }
                     }
                     // [4] Update chunk count and timestamp
                     c->value_array[chunk_index].count = count;
@@ -435,9 +442,16 @@ static int add_to_object_cache(LWTTLOBJECTCACHE* c,
                                from_data,
                                entry_size);
                     }
-                    // [3] For chunks in range of [chunk_index + 1, count), offset start value by count_delta
-                    for (int i = chunk_index + 1; i < c->count; i++) {
-                        c->value_array[i].start -= count_delta;
+                    // [3] For all chunks except at index chunk_index,
+                    //     decrement start by count_delta where
+                    //     start is equal or greater to 'start0 + count0'
+                    for (int i = 0; i < c->count; i++) {
+                        if (i == chunk_index) {
+                            continue;
+                        }
+                        if (c->value_array[i].start >= start0 + count0) {
+                            c->value_array[i].start -= count_delta;
+                        }
                     }
                     // [4] Update chunk count and timestamp
                     c->value_array[chunk_index].count = count;
@@ -481,8 +495,8 @@ static int add_to_object_cache(LWTTLOBJECTCACHE* c,
             LOGEP("entry_max_count exceeded.");
             return -9;
         }
-        // safe to add a new chunk at 'chunk_index'
-        // move chunk (move by 1-index by copying in backward direction)
+        // safe to insert a new chunk at 'chunk_index'
+        // move chunk key and value (move by 1-index by copying in backward direction)
         for (int from = c->count - 1; from >= chunk_index + 1; from--) {
             c->key_array[from + 1] = c->key_array[from];
             c->value_array[from + 1] = c->value_array[from];
@@ -601,21 +615,24 @@ static void send_ttlping_with_timestamp(const LWTTL* ttl,
                                         LWUDP* udp,
                                         const LWTTLOBJECTCACHE* c,
                                         const LWTTLCHUNKKEY chunk_key,
-                                        const unsigned char static_object) {
-    const long long ts = find_chunk_ts(c, chunk_key);
-    send_ttlpingchunk(ttl,
-                      udp,
-                      chunk_key,
-                      static_object,
-                      ts);
-
-    /*if (find_chunk_index(c, chunk_key) == -1) {
+                                        const unsigned char static_object,
+                                        const int compare_ts) {
+    if (compare_ts) {
+        const long long ts = find_chunk_ts(c, chunk_key);
         send_ttlpingchunk(ttl,
                           udp,
                           chunk_key,
                           static_object,
-                          0);
-    }*/
+                          ts);
+    } else {
+        if (find_chunk_index(c, chunk_key) == -1) {
+            send_ttlpingchunk(ttl,
+                              udp,
+                              chunk_key,
+                              static_object,
+                              0);
+        }
+    }
 }
 
 void lwttl_udp_send_ttlping(const LWTTL* ttl, LWUDP* udp, int ping_seq) {
@@ -655,16 +672,18 @@ void lwttl_udp_send_ttlping(const LWTTL* ttl, LWUDP* udp, int ping_seq) {
             const struct {
                 const LWTTLOBJECTCACHE* c;
                 const unsigned char static_object;
+                const int compare_ts;
             } cache_list[] = {
-                { &ttl->object_cache.land_cache, 1 },
-                { &ttl->object_cache.seaport_cache, 2 },
+                { &ttl->object_cache.land_cache, 1, 0 },
+                { &ttl->object_cache.seaport_cache, 2, 1 },
             };
             for (int k = 0; k < ARRAY_SIZE(cache_list); k++) {
                 send_ttlping_with_timestamp(ttl,
                                             udp,
                                             cache_list[k].c,
                                             chunk_key,
-                                            cache_list[k].static_object);
+                                            cache_list[k].static_object,
+                                            cache_list[k].compare_ts);
             }
         }
     }
