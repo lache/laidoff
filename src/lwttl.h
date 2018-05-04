@@ -19,7 +19,6 @@ typedef struct _LWHTMLUI LWHTMLUI;
 
 LWTTL* lwttl_new(float aspect_ratio);
 void lwttl_destroy(LWTTL** _ttl);
-float lnglat_to_xy(const LWCONTEXT* pLwc, float v);
 void lwttl_worldmap_scroll_to(LWTTL* ttl, float lng, float lat, LWUDP* sea_udp);
 void lwttl_worldmap_scroll_to_cell_center(LWTTL* ttl, int xc, int yc, LWUDP* sea_udp);
 void lwttl_update_aspect_ratio(LWTTL* ttl, float aspect_ratio);
@@ -91,15 +90,17 @@ void lwttl_send_ping_now(LWTTL* ttl);
 void lwttl_prerender_mutable_context(LWTTL* ttl, LWCONTEXT* pLwc, LWHTMLUI* htmlui);
 int lwttl_selected(const LWTTL* ttl, LWTTLLNGLAT* pos);
 void lwttl_on_press(LWTTL* ttl, const LWCONTEXT* pLwc, float nx, float ny);
+void lwttl_on_release(LWTTL* ttl, const LWCONTEXT* pLwc, float nx, float ny);
 void lwttl_view_proj(LWTTL* ttl, mat4x4 view, mat4x4 proj);
 void lwttl_calc_view_proj(LWTTL* ttl, float aspect_ratio);
-void GetWorldCoords(const float touchX,
-                    const float touchY,
-                    const float screenW,
-                    const float screenH,
-                    const mat4x4 proj,
-                    const mat4x4 view_model,
-                    vec2 worldPos);
+void lwttl_screen_to_world_pos(const float touchx,
+                               const float touchy,
+                               const float screenw,
+                               const float screenh,
+                               const mat4x4 proj,
+                               const mat4x4 view_model,
+                               vec2 world_pos);
+void lwttl_clear_selected_pressed_pos(LWTTL* ttl);
 #ifdef __cplusplus
 }
 #endif

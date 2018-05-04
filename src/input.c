@@ -295,6 +295,10 @@ void lw_trigger_mouse_release(LWCONTEXT* pLwc, float nx, float ny, int pointer_i
         LOGI("Pinch zoom aborted.");
     }
 
+    if (lw_pinch() == 0) {
+        lwttl_on_release(pLwc->ttl, pLwc, nx, ny);
+    }
+
     if (field_network(pLwc->field)) {
 		mq_publish_now(pLwc, pLwc->mq, 1);
 	}

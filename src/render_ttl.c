@@ -763,24 +763,6 @@ static void render_sea_static_objects(const LWCONTEXT* pLwc,
             }
         }
     }
-
-    // test
-    {
-        vec2 worldPos;
-        GetWorldCoords(-1.0f, +1.0f, (float)pLwc->width, (float)pLwc->height, proj, view, worldPos);
-        const int view_scale = 1;
-        const float cell_render_width = cell_x_to_render_coords(1, center, view_scale) - cell_x_to_render_coords(0, center, view_scale);
-        const float cell_render_height = cell_y_to_render_coords(0, center, view_scale) - cell_y_to_render_coords(1, center, view_scale);
-        render_land_cell(pLwc,
-                         view,
-                         proj,
-                         worldPos[0],
-                         worldPos[1],
-                         0,
-                         cell_render_width,
-                         cell_render_height);
-    }
-
     //lwttl_unlock_rendering_mutex(pLwc->ttl);
 
 
@@ -827,8 +809,8 @@ static void render_cell_pixel_selector_lng_lat(const LWCONTEXT* pLwc,
                                selector_rx,
                                selector_ry,
                                0,
-                               cell_render_width * view_scale,
-                               cell_render_height * view_scale);
+                               cell_render_width,
+                               cell_render_height);
 }
 
 static void render_sea_static_objects_nameplate(const LWCONTEXT* pLwc, const mat4x4 view, const mat4x4 proj, const LWTTLLNGLAT* center) {
@@ -996,16 +978,14 @@ void lwc_render_ttl(const LWCONTEXT* pLwc) {
         render_world(pLwc, view, proj, 0, &view_center);
     }
     glDisable(GL_DEPTH_TEST);
-    if (view_scale == 1) {
-        LWTTLLNGLAT selected_pos;
-        if (lwttl_selected(pLwc->ttl, &selected_pos)) {
-            render_cell_pixel_selector_lng_lat(pLwc,
-                                               view,
-                                               proj,
-                                               &selected_pos,
-                                               &view_center,
-                                               view_scale);
-        }
+    LWTTLLNGLAT selected_pos;
+    if (lwttl_selected(pLwc->ttl, &selected_pos)) {
+        render_cell_pixel_selector_lng_lat(pLwc,
+                                            view,
+                                            proj,
+                                            &selected_pos,
+                                            &view_center,
+                                            view_scale);
     }
     // UI
     if (lwc_render_ttl_render("world")) {

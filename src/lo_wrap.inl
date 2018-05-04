@@ -94673,33 +94673,6 @@ fail:
 }
 
 
-static int _wrap_lnglat_to_xy(lua_State* L) {
-  int SWIG_arg = 0;
-  LWCONTEXT *arg1 = (LWCONTEXT *) 0 ;
-  float arg2 ;
-  float result;
-  
-  SWIG_check_num_args("lnglat_to_xy",2,2)
-  if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("lnglat_to_xy",1,"LWCONTEXT const *");
-  if(!lua_isnumber(L,2)) SWIG_fail_arg("lnglat_to_xy",2,"float");
-  
-  if (!SWIG_IsOK(SWIG_ConvertPtr(L,1,(void**)&arg1,SWIGTYPE_p__LWCONTEXT,0))){
-    SWIG_fail_ptr("lnglat_to_xy",1,SWIGTYPE_p__LWCONTEXT);
-  }
-  
-  arg2 = (float)lua_tonumber(L, 2);
-  result = (float)lnglat_to_xy((struct _LWCONTEXT const *)arg1,arg2);
-  lua_pushnumber(L, (lua_Number) result); SWIG_arg++;
-  return SWIG_arg;
-  
-  if(0) SWIG_fail;
-  
-fail:
-  lua_error(L);
-  return SWIG_arg;
-}
-
-
 static int _wrap_lwttl_worldmap_scroll_to(lua_State* L) {
   int SWIG_arg = 0;
   LWTTL *arg1 = (LWTTL *) 0 ;
@@ -96146,7 +96119,7 @@ fail:
 }
 
 
-static int _wrap_GetWorldCoords(lua_State* L) {
+static int _wrap_lwttl_screen_to_world_pos(lua_State* L) {
   int SWIG_arg = 0;
   float arg1 ;
   float arg2 ;
@@ -96156,34 +96129,34 @@ static int _wrap_GetWorldCoords(lua_State* L) {
   vec4 *arg6 ;
   float *arg7 ;
   
-  SWIG_check_num_args("GetWorldCoords",7,7)
-  if(!lua_isnumber(L,1)) SWIG_fail_arg("GetWorldCoords",1,"float const");
-  if(!lua_isnumber(L,2)) SWIG_fail_arg("GetWorldCoords",2,"float const");
-  if(!lua_isnumber(L,3)) SWIG_fail_arg("GetWorldCoords",3,"float const");
-  if(!lua_isnumber(L,4)) SWIG_fail_arg("GetWorldCoords",4,"float const");
-  if(!SWIG_isptrtype(L,5)) SWIG_fail_arg("GetWorldCoords",5,"mat4x4 const");
-  if(!SWIG_isptrtype(L,6)) SWIG_fail_arg("GetWorldCoords",6,"mat4x4 const");
-  if(!SWIG_isptrtype(L,7)) SWIG_fail_arg("GetWorldCoords",7,"vec2");
+  SWIG_check_num_args("lwttl_screen_to_world_pos",7,7)
+  if(!lua_isnumber(L,1)) SWIG_fail_arg("lwttl_screen_to_world_pos",1,"float const");
+  if(!lua_isnumber(L,2)) SWIG_fail_arg("lwttl_screen_to_world_pos",2,"float const");
+  if(!lua_isnumber(L,3)) SWIG_fail_arg("lwttl_screen_to_world_pos",3,"float const");
+  if(!lua_isnumber(L,4)) SWIG_fail_arg("lwttl_screen_to_world_pos",4,"float const");
+  if(!SWIG_isptrtype(L,5)) SWIG_fail_arg("lwttl_screen_to_world_pos",5,"mat4x4 const");
+  if(!SWIG_isptrtype(L,6)) SWIG_fail_arg("lwttl_screen_to_world_pos",6,"mat4x4 const");
+  if(!SWIG_isptrtype(L,7)) SWIG_fail_arg("lwttl_screen_to_world_pos",7,"vec2");
   arg1 = (float const)lua_tonumber(L, 1);
   arg2 = (float const)lua_tonumber(L, 2);
   arg3 = (float const)lua_tonumber(L, 3);
   arg4 = (float const)lua_tonumber(L, 4);
   
   if (!SWIG_IsOK(SWIG_ConvertPtr(L,5,(void**)&arg5,SWIGTYPE_p_a_4__float,0))){
-    SWIG_fail_ptr("GetWorldCoords",5,SWIGTYPE_p_a_4__float);
+    SWIG_fail_ptr("lwttl_screen_to_world_pos",5,SWIGTYPE_p_a_4__float);
   }
   
   
   if (!SWIG_IsOK(SWIG_ConvertPtr(L,6,(void**)&arg6,SWIGTYPE_p_a_4__float,0))){
-    SWIG_fail_ptr("GetWorldCoords",6,SWIGTYPE_p_a_4__float);
+    SWIG_fail_ptr("lwttl_screen_to_world_pos",6,SWIGTYPE_p_a_4__float);
   }
   
   
   if (!SWIG_IsOK(SWIG_ConvertPtr(L,7,(void**)&arg7,SWIGTYPE_p_float,0))){
-    SWIG_fail_ptr("GetWorldCoords",7,SWIGTYPE_p_float);
+    SWIG_fail_ptr("lwttl_screen_to_world_pos",7,SWIGTYPE_p_float);
   }
   
-  GetWorldCoords(arg1,arg2,arg3,arg4,(float const (*)[4])arg5,(float const (*)[4])arg6,arg7);
+  lwttl_screen_to_world_pos(arg1,arg2,arg3,arg4,(float const (*)[4])arg5,(float const (*)[4])arg6,arg7);
   
   return SWIG_arg;
   
@@ -98854,7 +98827,6 @@ static swig_lua_method swig_SwigModule_methods[]= {
     { "htmlui_get_refresh_html_body", _wrap_htmlui_get_refresh_html_body},
     { "lwttl_new", _wrap_lwttl_new},
     { "lwttl_destroy", _wrap_lwttl_destroy},
-    { "lnglat_to_xy", _wrap_lnglat_to_xy},
     { "lwttl_worldmap_scroll_to", _wrap_lwttl_worldmap_scroll_to},
     { "lwttl_worldmap_scroll_to_cell_center", _wrap_lwttl_worldmap_scroll_to_cell_center},
     { "lwttl_update_aspect_ratio", _wrap_lwttl_update_aspect_ratio},
@@ -98906,7 +98878,7 @@ static swig_lua_method swig_SwigModule_methods[]= {
     { "lwttl_on_press", _wrap_lwttl_on_press},
     { "lwttl_view_proj", _wrap_lwttl_view_proj},
     { "lwttl_calc_view_proj", _wrap_lwttl_calc_view_proj},
-    { "GetWorldCoords", _wrap_GetWorldCoords},
+    { "lwttl_screen_to_world_pos", _wrap_lwttl_screen_to_world_pos},
     { "msb_index", _wrap_msb_index},
     { "cell_fx_to_lng", _wrap_cell_fx_to_lng},
     { "cell_fy_to_lat", _wrap_cell_fy_to_lat},

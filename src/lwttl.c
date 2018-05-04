@@ -84,7 +84,8 @@ typedef struct _LWTTLWORLDMAP {
 typedef struct _LWTTLSELECTED {
     int selected;
     LWTTLLNGLAT pos;
-    LWTTLLNGLAT press_pos;
+    int press_pos_xc;
+    int press_pos_yc;
 } LWTTLSELECTED;
 
 typedef struct _LWTTL {
@@ -131,6 +132,7 @@ LWTTL* lwttl_new(float aspect_ratio) {
     ttl->earth_globe_scale_0 = earth_globe_render_scale;
     lwttl_set_earth_globe_scale(ttl, ttl->earth_globe_scale_0);
     lwttl_calc_view_proj(ttl, aspect_ratio);
+    lwttl_clear_selected_pressed_pos(ttl);
     return ttl;
 }
 
@@ -139,10 +141,6 @@ void lwttl_destroy(LWTTL** __ttl) {
     LWMUTEX_DESTROY(ttl->rendering_mutex);
     free(*__ttl);
     *__ttl = 0;
-}
-
-float lnglat_to_xy(const LWCONTEXT* pLwc, float v) {
-    return v * 1.0f / 180.0f * pLwc->aspect_ratio;
 }
 
 void lwttl_worldmap_scroll_to(LWTTL* ttl, float lng, float lat, LWUDP* sea_udp) {
@@ -208,6 +206,9 @@ void lwttl_update(LWTTL* ttl, LWCONTEXT* pLwc, float delta_time) {
                                          ttl->worldmap.center.lng + (-dx) / 50.0f * delta_time * ttl->view_scale,
                                          ttl->worldmap.center.lat + (-dy) / 50.0f * delta_time * ttl->view_scale,
                                          0);
+                // prevent unintentional change of cell selection
+                // while spanning the map
+                lwttl_clear_selected_pressed_pos(ttl);
             }
         }
     }
@@ -780,7 +781,7 @@ void lwttl_udp_update(LWTTL* ttl, LWUDP* udp, LWCONTEXT* pLwc) {
             udp->reinit_next_update = 1;
             return;
 #endif
-        }
+            }
 
         char decompressed[1500 * 255]; // maximum lz4 compression ratio is 255...
         int decompressed_bytes = LZ4_decompress_safe(udp->buf, decompressed, udp->recv_len, ARRAY_SIZE(decompressed));
@@ -899,8 +900,8 @@ void lwttl_udp_update(LWTTL* ttl, LWUDP* udp, LWCONTEXT* pLwc) {
         } else {
             LOGEP("lz4 decompression failed!");
         }
+        }
     }
-}
 
 const LWPTTLWAYPOINTS* lwttl_get_waypoints(const LWTTL* ttl) {
     return &ttl->waypoints;
@@ -1250,82 +1251,89 @@ int lwttl_selected(const LWTTL* ttl, LWTTLLNGLAT* pos) {
     return ttl->selected.selected;
 }
 
-void GetWorldCoords(const float touchX,
-                    const float touchY,
-                    const float screenW,
-                    const float screenH,
-                    const mat4x4 proj,
-                    const mat4x4 view_model,
-                    vec2 worldPos) {
+void lwttl_screen_to_world_pos(const float touchx,
+                               const float touchy,
+                               const float screenw,
+                               const float screenh,
+                               const mat4x4 proj,
+                               const mat4x4 view_model,
+                               vec2 world_pos) {
     // Auxiliary matrix and vectors
     // to deal with ogl.
-    mat4x4 invertedMatrix;
-    mat4x4 transformMatrix;
-    vec4 normalizedInPoint;
-    vec4 outPoint;
+    mat4x4 inverted_matrix;
+    mat4x4 transform_matrix;
+    vec4 normalized_in_point;
+    vec4 out_point;
 
     // Invert y coordinate, as android uses
     // top-left, and ogl bottom-left.
-    int oglTouchY = (int)(screenH - touchY);
+    int oglTouchY = (int)(screenh - touchy);
 
     /* Transform the screen point to clip
     space in ogl (-1,1) */
-    /*normalizedInPoint[0] = (float)((touchX) * 2.0f / screenW - 1.0);
-    normalizedInPoint[1] = (float)((oglTouchY) * 2.0f / screenH - 1.0);
-    normalizedInPoint[2] = -1.0f;
-    normalizedInPoint[3] = 1.0f;*/
-    normalizedInPoint[0] = touchX;
-    normalizedInPoint[1] = touchY;
-    normalizedInPoint[2] = -1.0f;
-    normalizedInPoint[3] = 1.0f;
-
+    normalized_in_point[0] = touchx;
+    normalized_in_point[1] = touchy;
+    normalized_in_point[2] = -1.0f;
+    normalized_in_point[3] = 1.0f;
 
     /* Obtain the transform matrix and
     then the inverse. */
-    mat4x4_mul(transformMatrix, proj, view_model);
-    mat4x4_invert(invertedMatrix, transformMatrix);
+    mat4x4_mul(transform_matrix, proj, view_model);
+    mat4x4_invert(inverted_matrix, transform_matrix);
     /* Apply the inverse to the point
     in clip space */
-    mat4x4_mul_vec4(outPoint, invertedMatrix, normalizedInPoint);
+    mat4x4_mul_vec4(out_point, inverted_matrix, normalized_in_point);
 
-    if (outPoint[3] == 0.0) {
+    if (out_point[3] == 0.0) {
         // Avoid /0 error.
         LOGE("World coords ERROR!");
-        worldPos[0] = 0;
-        worldPos[1] = 0;
+        world_pos[0] = 0;
+        world_pos[1] = 0;
     } else {
         // Divide by the 3rd component to find
         // out the real position.
-        worldPos[0] = outPoint[0] / outPoint[3];
-        worldPos[1] = outPoint[1] / outPoint[3];
+        world_pos[0] = out_point[0] / out_point[3];
+        world_pos[1] = out_point[1] / out_point[3];
     }
 }
 
-void lwttl_on_press(LWTTL* ttl, const LWCONTEXT* pLwc, float nx, float ny) {
-    vec2 worldPos;
-    GetWorldCoords(nx,
-                   ny,
-                   (float)pLwc->width,
-                   (float)pLwc->height,
-                   ttl->proj,
-                   ttl->view,
-                   worldPos);
+static void nx_ny_to_lng_lat(const LWTTL* ttl, float nx, float ny, int width, int height, int* xc, int *yc, float* lng, float* lat) {
+    vec2 world_pos;
+    lwttl_screen_to_world_pos(nx,
+                              ny,
+                              (float)width,
+                              (float)height,
+                              ttl->proj,
+                              ttl->view,
+                              world_pos);
     const LWTTLLNGLAT* center = &ttl->worldmap.center;
-    const int view_scale = 1;
+    const int view_scale = lwttl_view_scale(ttl);
     const float cell_render_width = cell_x_to_render_coords(1, center, view_scale) - cell_x_to_render_coords(0, center, view_scale);
     const float cell_render_height = cell_y_to_render_coords(0, center, view_scale) - cell_y_to_render_coords(1, center, view_scale);
-    const float lng = render_coords_to_lng(worldPos[0], center, view_scale);
-    const float lat = render_coords_to_lat(worldPos[1], center, view_scale);
-    ttl->selected.selected = 1;
-    ttl->selected.pos.lng = lng;
-    ttl->selected.pos.lat = lat;
-    LOGI("World Pos: %.3f, %.3f (Cell render wh: %.3f, %.3f), LNG=%.3f, LAT=%.3f",
-         worldPos[0],
-         worldPos[1],
-         cell_render_width,
-         cell_render_height,
-         lng,
-         lat);
+    *lng = render_coords_to_lng(world_pos[0], center, view_scale);
+    *lat = render_coords_to_lat(world_pos[1], center, view_scale);
+    *xc = lwttl_lng_to_floor_int(*lng);
+    *yc = lwttl_lat_to_floor_int(*lat);
+}
+
+void lwttl_on_press(LWTTL* ttl, const LWCONTEXT* pLwc, float nx, float ny) {
+    int xc, yc;
+    float lng, lat;
+    nx_ny_to_lng_lat(ttl, nx, ny, pLwc->width, pLwc->height, &xc, &yc, &lng, &lat);
+    ttl->selected.press_pos_xc = xc;
+    ttl->selected.press_pos_yc = yc;
+}
+
+void lwttl_on_release(LWTTL* ttl, const LWCONTEXT* pLwc, float nx, float ny) {
+    int xc, yc;
+    float lng, lat;
+    nx_ny_to_lng_lat(ttl, nx, ny, pLwc->width, pLwc->height, &xc, &yc, &lng, &lat);
+    if (ttl->selected.press_pos_xc == xc
+        && ttl->selected.press_pos_yc == yc) {
+        ttl->selected.selected = 1;
+        ttl->selected.pos.lng = lng;
+        ttl->selected.pos.lat = lat;
+    }
 }
 
 void lwttl_view_proj(LWTTL* ttl, mat4x4 view, mat4x4 proj) {
@@ -1365,4 +1373,9 @@ void lwttl_calc_view_proj(LWTTL* ttl, float aspect_ratio) {
                  near_z,
                  far_z);
     mat4x4_look_at(ttl->view, eye, center, up);
+}
+
+void lwttl_clear_selected_pressed_pos(LWTTL* ttl) {
+    ttl->selected.press_pos_xc = -1;
+    ttl->selected.press_pos_yc = -1;
 }
