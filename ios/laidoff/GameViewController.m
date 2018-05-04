@@ -9,6 +9,7 @@
 #import "GameViewController.h"
 #import "lwgl.h"
 #import "laidoff.h"
+#import "input.h"
 #import "AppDelegate.h"
 #import "UIDeviceHardware.h"
 
