@@ -1301,10 +1301,10 @@ void GetWorldCoords(const float touchX,
     }
 }
 
-void lwttl_on_press(LWTTL* ttl, const LWCONTEXT* pLwc, float x, float y) {
+void lwttl_on_press(LWTTL* ttl, const LWCONTEXT* pLwc, float nx, float ny) {
     vec2 worldPos;
-    GetWorldCoords(x,
-                   y,
+    GetWorldCoords(nx,
+                   ny,
                    (float)pLwc->width,
                    (float)pLwc->height,
                    ttl->proj,
@@ -1314,16 +1314,18 @@ void lwttl_on_press(LWTTL* ttl, const LWCONTEXT* pLwc, float x, float y) {
     const int view_scale = 1;
     const float cell_render_width = cell_x_to_render_coords(1, center, view_scale) - cell_x_to_render_coords(0, center, view_scale);
     const float cell_render_height = cell_y_to_render_coords(0, center, view_scale) - cell_y_to_render_coords(1, center, view_scale);
-    LOGI("World Pos: %.3f, %.3f (Cell render wh: %.3f, %.3f)",
-         worldPos[0],
-         worldPos[1],
-         cell_render_width,
-         cell_render_height);
     const float lng = render_coords_to_lng(worldPos[0], center, view_scale);
     const float lat = render_coords_to_lat(worldPos[1], center, view_scale);
     ttl->selected.selected = 1;
     ttl->selected.pos.lng = lng;
     ttl->selected.pos.lat = lat;
+    LOGI("World Pos: %.3f, %.3f (Cell render wh: %.3f, %.3f), LNG=%.3f, LAT=%.3f",
+         worldPos[0],
+         worldPos[1],
+         cell_render_width,
+         cell_render_height,
+         lng,
+         lat);
 }
 
 void lwttl_view_proj(LWTTL* ttl, mat4x4 view, mat4x4 proj) {

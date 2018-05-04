@@ -46,11 +46,13 @@ float calculate_pinch_zoom_dist() {
     return LWCLAMP(d, 0.5f, 10.0f);
 }
 
-void lw_trigger_mouse_press(LWCONTEXT* pLwc, float x, float y, int pointer_id) {
+void lw_trigger_mouse_press(LWCONTEXT* pLwc, float nx, float ny, int pointer_id) {
 	if (!pLwc) {
 		return;
 	}
 
+    float x = nx;
+    float y = ny;
 	convert_touch_coord_to_ui_coord(pLwc, &x, &y);
 
 	LOGIx("mouse press ui coord x=%f, y=%f", x, y);
@@ -82,7 +84,7 @@ void lw_trigger_mouse_press(LWCONTEXT* pLwc, float x, float y, int pointer_id) {
 	}
 
     if (lw_pinch() == 0) {
-        lwttl_on_press(pLwc->ttl, pLwc, x, y);
+        lwttl_on_press(pLwc->ttl, pLwc, nx, ny);
     }
 
 	if (field_network(pLwc->field)) {
@@ -188,11 +190,13 @@ void lw_trigger_mouse_press(LWCONTEXT* pLwc, float x, float y, int pointer_id) {
 	}
 }
 
-void lw_trigger_mouse_move(LWCONTEXT* pLwc, float x, float y, int pointer_id) {
+void lw_trigger_mouse_move(LWCONTEXT* pLwc, float nx, float ny, int pointer_id) {
 	if (!pLwc) {
 		return;
 	}
 
+    float x = nx;
+    float y = ny;
 	convert_touch_coord_to_ui_coord(pLwc, &x, &y);
 
 	if (pinch_zoom.count == 2) {
@@ -255,11 +259,13 @@ void lw_trigger_mouse_move(LWCONTEXT* pLwc, float x, float y, int pointer_id) {
     }
 }
 
-void lw_trigger_mouse_release(LWCONTEXT* pLwc, float x, float y, int pointer_id) {
+void lw_trigger_mouse_release(LWCONTEXT* pLwc, float nx, float ny, int pointer_id) {
 	if (!pLwc) {
 		return;
 	}
 
+    float x = nx;
+    float y = ny;
 	convert_touch_coord_to_ui_coord(pLwc, &x, &y);
 
     LOGIx("mouse release ui coord x=%f, y=%f (last press ui coord x=%f, y=%f) (width %f) (height %f)\n",
@@ -349,11 +355,13 @@ void lw_trigger_mouse_release(LWCONTEXT* pLwc, float x, float y, int pointer_id)
 	}
 }
 
-void lw_trigger_touch(LWCONTEXT* pLwc, float x, float y, int pointer_id) {
+void lw_trigger_touch(LWCONTEXT* pLwc, float nx, float ny, int pointer_id) {
 	if (!pLwc) {
 		return;
 	}
 
+    float x = nx;
+    float y = ny;
 	convert_touch_coord_to_ui_coord(pLwc, &x, &y);
 
 	pLwc->dialog_move_next = 1;

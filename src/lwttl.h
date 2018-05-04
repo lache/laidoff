@@ -90,7 +90,7 @@ void lwttl_fill_world_seaports_bookmarks(LWHTMLUI* htmlui);
 void lwttl_send_ping_now(LWTTL* ttl);
 void lwttl_prerender_mutable_context(LWTTL* ttl, LWCONTEXT* pLwc, LWHTMLUI* htmlui);
 int lwttl_selected(const LWTTL* ttl, LWTTLLNGLAT* pos);
-void lwttl_on_press(LWTTL* ttl, const LWCONTEXT* pLwc, float x, float y);
+void lwttl_on_press(LWTTL* ttl, const LWCONTEXT* pLwc, float nx, float ny);
 void lwttl_view_proj(LWTTL* ttl, mat4x4 view, mat4x4 proj);
 void lwttl_calc_view_proj(LWTTL* ttl, float aspect_ratio);
 void GetWorldCoords(const float touchX,

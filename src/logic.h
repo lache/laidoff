@@ -13,6 +13,9 @@ typedef struct _LWFIELDMESH {
 #ifdef __cplusplus
 extern "C" {;
 #endif
+void lwc_update(LWCONTEXT* pLwc, double delta_time);
+void reset_runtime_context(LWCONTEXT* pLwc);
+void reset_time(LWCONTEXT* pLwc);
 const char* logic_server_addr(int idx);
 void logic_update_default_projection(LWCONTEXT* pLwc);
 void reset_runtime_context(LWCONTEXT* pLwc);
@@ -30,6 +33,18 @@ void load_field_3_init_runtime_data(LWCONTEXT* pLwc);
 void load_field_4_init_runtime_data(LWCONTEXT* pLwc);
 void load_field_5_init_runtime_data(LWCONTEXT* pLwc);
 void show_leaderboard(LWCONTEXT* pLwc);
+void change_to_field(LWCONTEXT* pLwc);
+void change_to_dialog(LWCONTEXT* pLwc);
+void change_to_battle(LWCONTEXT* pLwc);
+void change_to_font_test(LWCONTEXT* pLwc);
+void change_to_ttl(LWCONTEXT* pLwc);
+void change_to_admin(LWCONTEXT* pLwc);
+void change_to_battle_result(LWCONTEXT* pLwc);
+void change_to_skin(LWCONTEXT* pLwc);
+void change_to_physics(LWCONTEXT* pLwc);
+void change_to_particle_system(LWCONTEXT* pLwc);
+void connect_to_server_0(LWCONTEXT* pLwc);
+void connect_to_server_1(LWCONTEXT* pLwc);
 void change_to_leaderboard(LWCONTEXT* pLwc);
 void change_to_physics(LWCONTEXT* pLwc);
 void request_player_reveal_leaderboard(LWTCP* tcp);

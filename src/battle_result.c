@@ -5,6 +5,7 @@
 #include "render_battle_result.h"
 #include "lwuidim.h"
 #include "laidoff.h"
+#include "logic.h"
 
 float clamped_interp(float a, float b, float r) {
 	if (r < 0) {

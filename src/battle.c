@@ -1,6 +1,5 @@
 #include <string.h>
 #include <stdio.h>
-
 #include "lwcontext.h"
 #include "lwmacro.h"
 #include "lwbattlecommand.h"
@@ -10,6 +9,7 @@
 #include "render_battle.h"
 #include "laidoff.h"
 #include "sound.h"
+#include "logic.h"
 
 int calculate_and_apply_attack_1_on_1(LWCONTEXT* pLwc, LWBATTLECREATURE* ca, const LWSKILL* s, LWBATTLECREATURE* cb,
 	LWBATTLECOMMANDRESULT* cmd_result_a, LWBATTLECOMMANDRESULT* cmd_result_b);
