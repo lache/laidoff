@@ -189,13 +189,15 @@ void lwttl_update(LWTTL* ttl, LWCONTEXT* pLwc, float delta_time) {
     float dx = 0, dy = 0, dlen = 0;
     if (lw_pinch() == 0) {
         if (lw_get_normalized_dir_pad_input(pLwc, &pLwc->left_dir_pad, &dx, &dy, &dlen) && (dx || dy)) {
-            // cancel tracking if user want to scroll around
-            lwttl_set_track_object_ship_id(ttl, 0);
-            // direction inverted
-            lwttl_worldmap_scroll_to(ttl,
-                                     ttl->worldmap.center.lng + (-dx) / 50.0f * delta_time * ttl->view_scale,
-                                     ttl->worldmap.center.lat + (-dy) / 50.0f * delta_time * ttl->view_scale,
-                                     0);
+            if (dlen > 0.05f) {
+                // cancel tracking if user want to scroll around
+                lwttl_set_track_object_ship_id(ttl, 0);
+                // direction inverted
+                lwttl_worldmap_scroll_to(ttl,
+                                         ttl->worldmap.center.lng + (-dx) / 50.0f * delta_time * ttl->view_scale,
+                                         ttl->worldmap.center.lat + (-dy) / 50.0f * delta_time * ttl->view_scale,
+                                         0);
+            }
         }
     }
 }
