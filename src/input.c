@@ -54,6 +54,16 @@ void lw_trigger_mouse_press(LWCONTEXT* pLwc, float x, float y, int pointer_id) {
 
 	LOGIx("mouse press ui coord x=%f, y=%f", x, y);
 
+    if (pLwc->game_scene == LGS_TTL
+        || (pLwc->game_scene == LGS_PHYSICS && pLwc->puck_game->show_html_ui)) {
+        const float nx = (x + pLwc->aspect_ratio) / (2.0f * pLwc->aspect_ratio);
+        const float ny = (1.0f - y) / 2.0f;
+        htmlui_on_lbutton_down(pLwc->htmlui, nx, ny);
+        if (htmlui_over_element(pLwc->htmlui, nx, ny)) {
+            return;
+        }
+    }
+
     int prev_pinch_zoom_count = pinch_zoom.count;
     if (pinch_zoom.count == 0 || pinch_zoom.count == 1) {
         pinch_zoom.p[pinch_zoom.count].id = pointer_id;
@@ -73,13 +83,6 @@ void lw_trigger_mouse_press(LWCONTEXT* pLwc, float x, float y, int pointer_id) {
 	if (field_network(pLwc->field)) {
 		mq_publish_now(pLwc, pLwc->mq, 0);
 	}
-
-    if (pLwc->game_scene == LGS_TTL
-        || (pLwc->game_scene == LGS_PHYSICS && pLwc->puck_game->show_html_ui)) {
-        htmlui_on_lbutton_down(pLwc->htmlui,
-                               (x + pLwc->aspect_ratio) / (2.0f * pLwc->aspect_ratio),
-                               (1.0f - y) / 2.0f);
-    }
 
 	pLwc->last_mouse_press_x = x;
 	pLwc->last_mouse_press_y = y;
@@ -260,6 +263,13 @@ void lw_trigger_mouse_release(LWCONTEXT* pLwc, float x, float y, int pointer_id)
 		  fabsf(x - pLwc->last_mouse_press_x),
 		  fabsf(y - pLwc->last_mouse_press_y));
 
+    if (pLwc->game_scene == LGS_TTL
+        || (pLwc->game_scene == LGS_PHYSICS && pLwc->puck_game->show_html_ui)) {
+        const float nx = (x + pLwc->aspect_ratio) / (2.0f * pLwc->aspect_ratio);
+        const float ny = (1.0f - y) / 2.0f;
+        htmlui_on_lbutton_up(pLwc->htmlui, nx, ny);
+    }
+
     int prev_pinch_zoom_count = pinch_zoom.count;
     for (int i = pinch_zoom.count - 1; i >= 0; i--) {
         if (pinch_zoom.p[i].id == pointer_id) {
@@ -274,14 +284,7 @@ void lw_trigger_mouse_release(LWCONTEXT* pLwc, float x, float y, int pointer_id)
         LOGI("Pinch zoom aborted.");
     }
 
-    if (pLwc->game_scene == LGS_TTL
-        || (pLwc->game_scene == LGS_PHYSICS && pLwc->puck_game->show_html_ui)) {
-        htmlui_on_lbutton_up(pLwc->htmlui,
-                             (x + pLwc->aspect_ratio) / (2.0f * pLwc->aspect_ratio),
-                             (1.0f - y) / 2.0f);
-    }
-
-	if (field_network(pLwc->field)) {
+    if (field_network(pLwc->field)) {
 		mq_publish_now(pLwc, pLwc->mq, 1);
 	}
 

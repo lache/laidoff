@@ -23,6 +23,7 @@ extern "C" {
     void htmlui_load_redraw_fbo(void* c);
     void htmlui_on_remtex_gpu_loaded(void* c, unsigned int name_hash);
     void htmlui_set_client_size(void* c, int client_width, int client_height);
+    int htmlui_over_element(void* c, float nx, float ny);
 #ifdef __cplusplus
 }
 #endif

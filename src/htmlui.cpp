@@ -153,6 +153,15 @@ public:
         this->client_height = client_height;
         container.set_client_size(client_width, client_height);
     }
+    bool over_element(float nx, float ny) {
+        if (doc) {
+            int x = static_cast<int>(roundf(nx * client_width));
+            int y = static_cast<int>(roundf(ny * client_height));
+            const auto over_el = doc->root()->get_element_by_point(x, y, x, y);
+            return over_el ? (strcmp(over_el->get_tagName(), "body") != 0) : false;
+        }
+        return false;
+    }
 private:
     LWHTMLUI();
     LWHTMLUI(const LWHTMLUI&);
@@ -308,4 +317,9 @@ void htmlui_on_remtex_gpu_loaded(void* c, unsigned int name_hash) {
 void htmlui_set_client_size(void* c, int client_width, int client_height) {
     LWHTMLUI* htmlui = (LWHTMLUI*)c;
     htmlui->set_client_size(client_width, client_height);
+}
+
+int htmlui_over_element(void* c, float nx, float ny) {
+    LWHTMLUI* htmlui = (LWHTMLUI*)c;
+    return htmlui->over_element(nx, ny) ? 1 : 0;
 }
