@@ -67,6 +67,14 @@ static float lat_to_render_coords(float lat, const LWTTLLNGLAT* center, int view
     return (lat - center->lat) * sea_render_scale / view_scale;
 }
 
+static float render_coords_to_lng(float rc, const LWTTLLNGLAT* center, int view_scale) {
+    return rc * view_scale / sea_render_scale + center->lng;
+}
+
+static float render_coords_to_lat(float rc, const LWTTLLNGLAT* center, int view_scale) {
+    return rc * view_scale / sea_render_scale + center->lat;
+}
+
 static float cell_x_to_render_coords(int x, const LWTTLLNGLAT* center, int view_scale) {
     return lng_to_render_coords(cell_x_to_lng(x), center, view_scale);
 }

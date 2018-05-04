@@ -81,6 +81,12 @@ typedef struct _LWTTLWORLDMAP {
     LWTTLLNGLAT center;
 } LWTTLWORLDMAP;
 
+typedef struct _LWTTLSELECTED {
+    int selected;
+    LWTTLLNGLAT pos;
+    LWTTLLNGLAT press_pos;
+} LWTTLSELECTED;
+
 typedef struct _LWTTL {
     int version;
     LWTTLDATA_SEAPORT* seaport;
@@ -103,6 +109,9 @@ typedef struct _LWTTL {
     LWTTLOBJECTCACHEGROUP object_cache;
     float earth_globe_scale;
     float earth_globe_scale_0;
+    LWTTLSELECTED selected;
+    mat4x4 view;
+    mat4x4 proj;
 } LWTTL;
 
 LWTTL* lwttl_new(float aspect_ratio) {
@@ -121,6 +130,7 @@ LWTTL* lwttl_new(float aspect_ratio) {
     LWMUTEX_INIT(ttl->rendering_mutex);
     ttl->earth_globe_scale_0 = earth_globe_render_scale;
     lwttl_set_earth_globe_scale(ttl, ttl->earth_globe_scale_0);
+    lwttl_calc_view_proj(ttl, aspect_ratio);
     return ttl;
 }
 
@@ -155,6 +165,7 @@ void lwttl_worldmap_scroll_to_cell_center(LWTTL* ttl, int xc, int yc, LWUDP* sea
 void lwttl_update_aspect_ratio(LWTTL* ttl, float aspect_ratio) {
     ttl->worldmap.render_org_x = 0;
     ttl->worldmap.render_org_y = -(2.0f - aspect_ratio) / 2;
+    lwttl_calc_view_proj(ttl, aspect_ratio);
 }
 
 const LWTTLLNGLAT* lwttl_center(const LWTTL* ttl) {
@@ -769,7 +780,7 @@ void lwttl_udp_update(LWTTL* ttl, LWUDP* udp, LWCONTEXT* pLwc) {
             udp->reinit_next_update = 1;
             return;
 #endif
-}
+        }
 
         char decompressed[1500 * 255]; // maximum lz4 compression ratio is 255...
         int decompressed_bytes = LZ4_decompress_safe(udp->buf, decompressed, udp->recv_len, ARRAY_SIZE(decompressed));
@@ -1232,4 +1243,124 @@ void lwttl_prerender_mutable_context(LWTTL* ttl, LWCONTEXT* pLwc, LWHTMLUI* html
                                            strlen(send_ping_now),
                                            "send_ping_now");
     }
+}
+
+int lwttl_selected(const LWTTL* ttl, LWTTLLNGLAT* pos) {
+    memcpy(pos, &ttl->selected.pos, sizeof(LWTTLLNGLAT));
+    return ttl->selected.selected;
+}
+
+void GetWorldCoords(const float touchX,
+                    const float touchY,
+                    const float screenW,
+                    const float screenH,
+                    const mat4x4 proj,
+                    const mat4x4 view_model,
+                    vec2 worldPos) {
+    // Auxiliary matrix and vectors
+    // to deal with ogl.
+    mat4x4 invertedMatrix;
+    mat4x4 transformMatrix;
+    vec4 normalizedInPoint;
+    vec4 outPoint;
+
+    // Invert y coordinate, as android uses
+    // top-left, and ogl bottom-left.
+    int oglTouchY = (int)(screenH - touchY);
+
+    /* Transform the screen point to clip
+    space in ogl (-1,1) */
+    /*normalizedInPoint[0] = (float)((touchX) * 2.0f / screenW - 1.0);
+    normalizedInPoint[1] = (float)((oglTouchY) * 2.0f / screenH - 1.0);
+    normalizedInPoint[2] = -1.0f;
+    normalizedInPoint[3] = 1.0f;*/
+    normalizedInPoint[0] = touchX;
+    normalizedInPoint[1] = touchY;
+    normalizedInPoint[2] = -1.0f;
+    normalizedInPoint[3] = 1.0f;
+
+
+    /* Obtain the transform matrix and
+    then the inverse. */
+    mat4x4_mul(transformMatrix, proj, view_model);
+    mat4x4_invert(invertedMatrix, transformMatrix);
+    /* Apply the inverse to the point
+    in clip space */
+    mat4x4_mul_vec4(outPoint, invertedMatrix, normalizedInPoint);
+
+    if (outPoint[3] == 0.0) {
+        // Avoid /0 error.
+        LOGE("World coords ERROR!");
+        worldPos[0] = 0;
+        worldPos[1] = 0;
+    } else {
+        // Divide by the 3rd component to find
+        // out the real position.
+        worldPos[0] = outPoint[0] / outPoint[3];
+        worldPos[1] = outPoint[1] / outPoint[3];
+    }
+}
+
+void lwttl_on_press(LWTTL* ttl, const LWCONTEXT* pLwc, float x, float y) {
+    vec2 worldPos;
+    GetWorldCoords(x,
+                   y,
+                   (float)pLwc->width,
+                   (float)pLwc->height,
+                   ttl->proj,
+                   ttl->view,
+                   worldPos);
+    const LWTTLLNGLAT* center = &ttl->worldmap.center;
+    const int view_scale = 1;
+    const float cell_render_width = cell_x_to_render_coords(1, center, view_scale) - cell_x_to_render_coords(0, center, view_scale);
+    const float cell_render_height = cell_y_to_render_coords(0, center, view_scale) - cell_y_to_render_coords(1, center, view_scale);
+    LOGI("World Pos: %.3f, %.3f (Cell render wh: %.3f, %.3f)",
+         worldPos[0],
+         worldPos[1],
+         cell_render_width,
+         cell_render_height);
+    const float lng = render_coords_to_lng(worldPos[0], center, view_scale);
+    const float lat = render_coords_to_lat(worldPos[1], center, view_scale);
+    ttl->selected.selected = 1;
+    ttl->selected.pos.lng = lng;
+    ttl->selected.pos.lat = lat;
+}
+
+void lwttl_view_proj(LWTTL* ttl, mat4x4 view, mat4x4 proj) {
+    memcpy(view, ttl->view, sizeof(mat4x4));
+    memcpy(proj, ttl->proj, sizeof(mat4x4));
+}
+
+void lwttl_calc_view_proj(LWTTL* ttl, float aspect_ratio) {
+    float ship_y = 0.0f;//+(float)pLwc->app_time;
+
+    float half_height = 10.0f;
+    float near_z = 0.1f;
+    float far_z = 1000.0f;
+    float cam_r = 0;// sinf((float)pLwc->app_time / 4) / 4.0f;
+    float c_r = cosf(cam_r);
+    float s_r = sinf(cam_r);
+    float eye_x = 0;//5.0f;
+    float eye_y = 0;//-25.0f;
+    float eye_z = 15.0f;
+    vec3 eye = { c_r * eye_x - s_r * eye_y, s_r * eye_x + c_r * eye_y, eye_z }; // eye position
+    eye[1] += ship_y;
+    vec3 center = { 0, ship_y, 0 }; // look position
+    vec3 center_to_eye;
+    vec3_sub(center_to_eye, eye, center);
+    float cam_a = atan2f(center_to_eye[1], center_to_eye[0]);
+    //vec3 right = { -sinf(cam_a),cosf(cam_a),0 };
+    vec3 right = { cosf(cam_a), -sinf(cam_a), 0 };
+    vec3 eye_right;
+    vec3_mul_cross(eye_right, center_to_eye, right);
+    vec3 up;
+    vec3_norm(up, eye_right);
+    mat4x4_ortho(ttl->proj,
+                 -half_height * aspect_ratio,
+                 +half_height * aspect_ratio,
+                 -half_height,
+                 +half_height,
+                 near_z,
+                 far_z);
+    mat4x4_look_at(ttl->view, eye, center, up);
 }

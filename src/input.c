@@ -17,6 +17,7 @@
 #include "file.h"
 #include "htmlui.h"
 #include "lwttl.h"
+#include "input.h"
 
 static void convert_touch_coord_to_ui_coord(LWCONTEXT* pLwc, float *x, float *y) {
 	if (pLwc->height < pLwc->width) {
@@ -79,6 +80,10 @@ void lw_trigger_mouse_press(LWCONTEXT* pLwc, float x, float y, int pointer_id) {
              pinch_zoom.initial_dist,
              pinch_zoom.initial_view_scale);
 	}
+
+    if (lw_pinch() == 0) {
+        lwttl_on_press(pLwc->ttl, pLwc, x, y);
+    }
 
 	if (field_network(pLwc->field)) {
 		mq_publish_now(pLwc, pLwc->mq, 0);

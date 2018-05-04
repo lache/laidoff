@@ -763,6 +763,24 @@ static void render_sea_static_objects(const LWCONTEXT* pLwc,
             }
         }
     }
+
+    // test
+    {
+        vec2 worldPos;
+        GetWorldCoords(-1.0f, +1.0f, (float)pLwc->width, (float)pLwc->height, proj, view, worldPos);
+        const int view_scale = 1;
+        const float cell_render_width = cell_x_to_render_coords(1, center, view_scale) - cell_x_to_render_coords(0, center, view_scale);
+        const float cell_render_height = cell_y_to_render_coords(0, center, view_scale) - cell_y_to_render_coords(1, center, view_scale);
+        render_land_cell(pLwc,
+                         view,
+                         proj,
+                         worldPos[0],
+                         worldPos[1],
+                         0,
+                         cell_render_width,
+                         cell_render_height);
+    }
+
     //lwttl_unlock_rendering_mutex(pLwc->ttl);
 
 
@@ -954,40 +972,11 @@ void lwc_render_ttl(const LWCONTEXT* pLwc) {
     lw_clear_color();
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-    float ship_y = 0.0f;//+(float)pLwc->app_time;
+    
+    mat4x4 view, proj;
+    lwttl_view_proj(pLwc->ttl, view, proj);
 
-    float half_height = 10.0f;
-    float near_z = 0.1f;
-    float far_z = 1000.0f;
-    float cam_r = 0;// sinf((float)pLwc->app_time / 4) / 4.0f;
-    float c_r = cosf(cam_r);
-    float s_r = sinf(cam_r);
-    float eye_x = 0;//5.0f;
-    float eye_y = 0;//-25.0f;
-    float eye_z = 15.0f;
-    vec3 eye = { c_r * eye_x - s_r * eye_y, s_r * eye_x + c_r * eye_y, eye_z }; // eye position
-    eye[1] += ship_y;
-    vec3 center = { 0, ship_y, 0 }; // look position
-    vec3 center_to_eye;
-    vec3_sub(center_to_eye, eye, center);
-    float cam_a = atan2f(center_to_eye[1], center_to_eye[0]);
-    //vec3 right = { -sinf(cam_a),cosf(cam_a),0 };
-    vec3 right = { cosf(cam_a), -sinf(cam_a), 0 };
-    vec3 eye_right;
-    vec3_mul_cross(eye_right, center_to_eye, right);
-    vec3 up;
-    vec3_norm(up, eye_right);
-    mat4x4 proj, view;
     const int view_scale = lwttl_view_scale(pLwc->ttl);
-    mat4x4_ortho(proj,
-                 -half_height * pLwc->aspect_ratio,
-                 +half_height * pLwc->aspect_ratio,
-                 -half_height,
-                 +half_height,
-                 near_z,
-                 far_z);
-    mat4x4_look_at(view, eye, center, up);
-
     const LWTTLLNGLAT lng_lat_center = *lwttl_center(pLwc->ttl);
     // render earth minimap
     //render_earth(pLwc, &lng_lat_center, view_scale);
@@ -1003,11 +992,14 @@ void lwc_render_ttl(const LWCONTEXT* pLwc) {
     glEnable(GL_DEPTH_TEST);
     // render sea objects(ships)
     if (lwc_render_ttl_render("world")) {
-        render_world(pLwc, view, proj, ship_y, &lng_lat_center);
+        render_world(pLwc, view, proj, 0, &lng_lat_center);
     }
     glDisable(GL_DEPTH_TEST);
     if (view_scale == 1) {
-        render_cell_pixel_selector_at_center(pLwc, view, proj, &lng_lat_center, view_scale);
+        LWTTLLNGLAT selected_pos;
+        if (lwttl_selected(pLwc->ttl, &selected_pos)) {
+            render_cell_pixel_selector_at_center(pLwc, view, proj, &selected_pos, view_scale);
+        }
     }
     // UI
     if (lwc_render_ttl_render("world")) {
