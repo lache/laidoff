@@ -195,7 +195,7 @@ void tcp_update(LWTCP* tcp) {
             }
         }
     } else if (n == 0) {
-        LOGE("TCP receive returns 0 (disconnected by remote host?) ... trying to reconnect...");
+        LOGIx("TCP receive returns 0 (disconnected by remote host?) ... trying to reconnect...");
         tcp->send_fail = 1;
         tcp->send_fail_time = 0; // try immediately
     }
@@ -203,9 +203,9 @@ void tcp_update(LWTCP* tcp) {
     double now = lwtimepoint_now_seconds();
     const double retry_interval = 0.1;
     if (tcp->send_fail && now - tcp->send_fail_time > retry_interval) {
-        LOGI("send_fail flag detected. Trying to reconnect to %s", tcp->host_addr.host);
+        LOGIx("send_fail flag detected. Trying to reconnect to %s", tcp->host_addr.host);
         if (tcp_connect(tcp) == 0) {
-            LOGI("reconnected to %s", tcp->host_addr.host);
+            LOGIx("reconnected to %s", tcp->host_addr.host);
             if (tcp->send_buf_len > 0) {
                 LOGI("retry to send buffer %d bytes...", tcp->send_buf_len);
                 tcp_send_sendbuf(tcp, tcp->send_buf_len);
