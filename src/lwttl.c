@@ -1297,7 +1297,7 @@ void lwttl_screen_to_world_pos(const float touchx,
     }
 }
 
-static void nx_ny_to_lng_lat(const LWTTL* ttl, float nx, float ny, int width, int height, int* xc, int *yc, float* lng, float* lat) {
+static void nx_ny_to_lng_lat(const LWTTL* ttl, float nx, float ny, int width, int height, int* xc, int* yc, LWTTLLNGLAT* lnglat) {
     vec2 world_pos;
     lwttl_screen_to_world_pos(nx,
                               ny,
@@ -1308,31 +1308,28 @@ static void nx_ny_to_lng_lat(const LWTTL* ttl, float nx, float ny, int width, in
                               world_pos);
     const LWTTLLNGLAT* center = &ttl->worldmap.center;
     const int view_scale = lwttl_view_scale(ttl);
-    const float cell_render_width = cell_x_to_render_coords(1, center, view_scale) - cell_x_to_render_coords(0, center, view_scale);
-    const float cell_render_height = cell_y_to_render_coords(0, center, view_scale) - cell_y_to_render_coords(1, center, view_scale);
-    *lng = render_coords_to_lng(world_pos[0], center, view_scale);
-    *lat = render_coords_to_lat(world_pos[1], center, view_scale);
-    *xc = lwttl_lng_to_floor_int(*lng);
-    *yc = lwttl_lat_to_floor_int(*lat);
+    lnglat->lng = render_coords_to_lng(world_pos[0], center, view_scale);
+    lnglat->lat = render_coords_to_lat(world_pos[1], center, view_scale);
+    *xc = lwttl_lng_to_floor_int(lnglat->lng);
+    *yc = lwttl_lat_to_floor_int(lnglat->lat);
 }
 
 void lwttl_on_press(LWTTL* ttl, const LWCONTEXT* pLwc, float nx, float ny) {
     int xc, yc;
-    float lng, lat;
-    nx_ny_to_lng_lat(ttl, nx, ny, pLwc->width, pLwc->height, &xc, &yc, &lng, &lat);
+    LWTTLLNGLAT lnglat;
+    nx_ny_to_lng_lat(ttl, nx, ny, pLwc->width, pLwc->height, &xc, &yc, &lnglat);
     ttl->selected.press_pos_xc = xc;
     ttl->selected.press_pos_yc = yc;
 }
 
 void lwttl_on_release(LWTTL* ttl, const LWCONTEXT* pLwc, float nx, float ny) {
     int xc, yc;
-    float lng, lat;
-    nx_ny_to_lng_lat(ttl, nx, ny, pLwc->width, pLwc->height, &xc, &yc, &lng, &lat);
+    LWTTLLNGLAT lnglat;
+    nx_ny_to_lng_lat(ttl, nx, ny, pLwc->width, pLwc->height, &xc, &yc, &lnglat);
     if (ttl->selected.press_pos_xc == xc
         && ttl->selected.press_pos_yc == yc) {
         ttl->selected.selected = 1;
-        ttl->selected.pos.lng = lng;
-        ttl->selected.pos.lat = lat;
+        ttl->selected.pos = lnglat;
     }
 }
 
