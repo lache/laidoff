@@ -248,8 +248,8 @@
 		function worldmap_scroll(dlng, dlat, dscale)
 			lo.lwttl_worldmap_scroll(c.ttl, dlng/100, dlat/100, dscale)
 		end
-		function worldmap_scroll_to_int(xc, yc)
-			lo.lwttl_worldmap_scroll_to_int(c.ttl, xc, yc, lo.lwttl_sea_udp(c.ttl))
+		function worldmap_scroll_to_cell_center(xc, yc)
+			lo.lwttl_worldmap_scroll_to_cell_center(c.ttl, xc, yc, lo.lwttl_sea_udp(c.ttl))
 		end
 		function go_online()
 			if c.tcp_ttl == nil then

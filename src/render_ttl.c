@@ -886,9 +886,9 @@ static void render_coords(const LWCONTEXT* pLwc, const LWTTLLNGLAT* lng_lat_cent
     test_text_block.begin_index = 0;
     test_text_block.end_index = test_text_block.text_bytelen;
     test_text_block.multiline = 1;
-    test_text_block.text_block_x = 0.0f;
+    test_text_block.text_block_x = -pLwc->aspect_ratio;
     test_text_block.text_block_y = 1.0f;
-    test_text_block.align = LTBA_CENTER_TOP;
+    test_text_block.align = LTBA_LEFT_TOP;
     render_text_block(pLwc, &test_text_block);
 }
 
@@ -943,9 +943,9 @@ static void render_region_name(const LWCONTEXT* pLwc) {
     test_text_block.begin_index = 0;
     test_text_block.end_index = test_text_block.text_bytelen;
     test_text_block.multiline = 1;
-    test_text_block.text_block_x = 0.0f;
-    test_text_block.text_block_y = 0.9f;
-    test_text_block.align = LTBA_CENTER_TOP;
+    test_text_block.text_block_x = -pLwc->aspect_ratio;
+    test_text_block.text_block_y = -1.0f;
+    test_text_block.align = LTBA_LEFT_BOTTOM;
     render_text_block(pLwc, &test_text_block);
 }
 
@@ -1016,9 +1016,9 @@ void lwc_render_ttl(const LWCONTEXT* pLwc) {
     if (lwc_render_ttl_render("landcell_nameplate")) {
         render_sea_static_objects_nameplate(pLwc, view, proj, &lng_lat_center);
     }
-    render_coords(pLwc, &lng_lat_center);
+    //render_coords(pLwc, &lng_lat_center);
     render_region_name(pLwc);
-    render_coords_dms(pLwc, &lng_lat_center);
+    //render_coords_dms(pLwc, &lng_lat_center);
     glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
     // render FBO (HTML UI)
     render_solid_box_ui_lvt_flip_y_uv(pLwc, 0, 0, 2 * pLwc->aspect_ratio, 2, pLwc->shared_fbo.color_tex, LVT_CENTER_CENTER_ANCHORED_SQUARE, 1);

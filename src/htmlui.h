@@ -24,6 +24,7 @@ extern "C" {
     void htmlui_on_remtex_gpu_loaded(void* c, unsigned int name_hash);
     void htmlui_set_client_size(void* c, int client_width, int client_height);
     int htmlui_over_element(void* c, float nx, float ny);
+    int htmlui_get_refresh_html_body(void* c);
 #ifdef __cplusplus
 }
 #endif

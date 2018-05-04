@@ -19,7 +19,7 @@ LWTTL* lwttl_new(float aspect_ratio);
 void lwttl_destroy(LWTTL** _ttl);
 float lnglat_to_xy(const LWCONTEXT* pLwc, float v);
 void lwttl_worldmap_scroll_to(LWTTL* ttl, float lng, float lat, LWUDP* sea_udp);
-void lwttl_worldmap_scroll_to_int(LWTTL* ttl, int xc, int yc, LWUDP* sea_udp);
+void lwttl_worldmap_scroll_to_cell_center(LWTTL* ttl, int xc, int yc, LWUDP* sea_udp);
 void lwttl_update_aspect_ratio(LWTTL* ttl, float aspect_ratio);
 const LWTTLLNGLAT* lwttl_center(const LWTTL* ttl);
 void lwttl_update(LWTTL* ttl, LWCONTEXT* pLwc, float delta_time);
@@ -85,6 +85,8 @@ float lwttl_earth_globe_scale(LWTTL* ttl);
 float lwttl_earth_globe_morph_weight(float earth_globe_scale);
 float lwttl_earth_globe_y(const LWTTLLNGLAT* center, float earth_globe_scale, float earth_globe_morph_weight);
 void lwttl_fill_world_seaports_bookmarks(LWHTMLUI* htmlui);
+void lwttl_send_ping_now(LWTTL* ttl);
+void lwttl_prerender_mutable_context(LWTTL* ttl, LWCONTEXT* pLwc, LWHTMLUI* htmlui);
 #ifdef __cplusplus
 }
 #endif

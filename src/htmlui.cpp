@@ -11,6 +11,7 @@
 #include "render_ttl.h"
 #include "lwtcp.h"
 #include "lwmutex.h"
+#include "logic.h"
 
 class LWHTMLUI {
 public:
@@ -127,6 +128,9 @@ public:
     }
     void set_refresh_html_body(int v) {
         refresh_html_body = v;
+    }
+    int get_refresh_html_body() const {
+        return refresh_html_body;
     }
     void load_next_html_path() {
         if (next_html_path.empty() == false) {
@@ -322,4 +326,9 @@ void htmlui_set_client_size(void* c, int client_width, int client_height) {
 int htmlui_over_element(void* c, float nx, float ny) {
     LWHTMLUI* htmlui = (LWHTMLUI*)c;
     return htmlui->over_element(nx, ny) ? 1 : 0;
+}
+
+int htmlui_get_refresh_html_body(void* c) {
+    LWHTMLUI* htmlui = (LWHTMLUI*)c;
+    return htmlui->get_refresh_html_body();
 }

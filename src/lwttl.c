@@ -17,6 +17,7 @@
 #include "lwlnglat.h"
 #include "script.h"
 #include "input.h"
+#include "logic.h"
 
 typedef struct _LWTTLDATA_SEAPORT {
     char locode[8];
@@ -144,10 +145,10 @@ void lwttl_worldmap_scroll_to(LWTTL* ttl, float lng, float lat, LWUDP* sea_udp) 
     }
 }
 
-void lwttl_worldmap_scroll_to_int(LWTTL* ttl, int xc, int yc, LWUDP* sea_udp) {
+void lwttl_worldmap_scroll_to_cell_center(LWTTL* ttl, int xc, int yc, LWUDP* sea_udp) {
     lwttl_worldmap_scroll_to(ttl,
-                             cell_x_to_lng(xc),
-                             cell_y_to_lat(yc),
+                             cell_fx_to_lng(xc + 0.5f),
+                             cell_fy_to_lat(yc + 0.5f),
                              sea_udp);
 }
 
@@ -268,7 +269,7 @@ void lwttl_request_waypoints(const LWTTL* ttl, int v) {
 
 void lwttl_set_view_scale(LWTTL* ttl, int v) {
     if (ttl->view_scale != v) {
-        LOGI("ttl->view_scale %d -> %d", ttl->view_scale, v);
+        LOGIx("ttl->view_scale %d -> %d", ttl->view_scale, v);
         ttl->view_scale = v;
     }
 }
@@ -1066,13 +1067,11 @@ void lwttl_set_earth_globe_scale(LWTTL* ttl, float earth_globe_scale) {
 
 void lwttl_scroll_view_scale(LWTTL* ttl, float offset) {
     int view_scale = lwttl_view_scale(ttl);
-    if (offset > 0) {
-        lwttl_set_view_scale(ttl, LWCLAMP(view_scale >> 1, 1, ttl->view_scale_max));
-        lwttl_udp_send_ttlping(ttl, ttl->sea_udp, 0);
-    } else {
-        lwttl_set_view_scale(ttl, LWCLAMP(view_scale << 1, 1, ttl->view_scale_max));
-        lwttl_udp_send_ttlping(ttl, ttl->sea_udp, 0);
-    }
+    lwttl_set_view_scale(ttl,
+                         LWCLAMP(offset > 0 ? (view_scale >> 1) : (view_scale << 1),
+                                 1,
+                                 ttl->view_scale_max));
+    lwttl_send_ping_now(ttl);
 }
 
 float lwttl_earth_globe_scale(LWTTL* ttl) {
@@ -1217,4 +1216,18 @@ void lwttl_fill_world_seaports_bookmarks(LWHTMLUI* htmlui) {
             -180 + 0 / 60.0f,
             90 + 0 / 60.0f);
     htmlui_set_loop_key_value(htmlui, "world-seaport", "script", script);
+}
+
+void lwttl_send_ping_now(LWTTL* ttl) {
+    lwttl_udp_send_ttlping(ttl, ttl->sea_udp, 0);
+}
+
+void lwttl_prerender_mutable_context(LWTTL* ttl, LWCONTEXT* pLwc, LWHTMLUI* htmlui) {
+    if (htmlui && htmlui_get_refresh_html_body(htmlui)) {
+        const char* send_ping_now = "local c = lo.script_context();lo.lwttl_send_ping_now(c.ttl)";
+        logic_emit_evalute_with_name_async(pLwc,
+                                           send_ping_now,
+                                           strlen(send_ping_now),
+                                           "send_ping_now");
+    }
 }
