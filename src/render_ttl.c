@@ -811,15 +811,16 @@ static void render_sea_static_objects(const LWCONTEXT* pLwc,
     //}
 }
 
-static void render_cell_pixel_selector_at_center(const LWCONTEXT* pLwc,
-                                                 const mat4x4 view,
-                                                 const mat4x4 proj,
-                                                 const LWTTLLNGLAT* center,
-                                                 const int view_scale) {
+static void render_cell_pixel_selector_lng_lat(const LWCONTEXT* pLwc,
+                                               const mat4x4 view,
+                                               const mat4x4 proj,
+                                               const LWTTLLNGLAT* selector_pos,
+                                               const LWTTLLNGLAT* center,
+                                               const int view_scale) {
     const float cell_render_width = cell_x_to_render_coords(1, center, view_scale) - cell_x_to_render_coords(0, center, view_scale);
     const float cell_render_height = cell_y_to_render_coords(0, center, view_scale) - cell_y_to_render_coords(1, center, view_scale);
-    const float selector_rx = cell_x_to_render_coords(lwttl_lng_to_floor_int(center->lng) & ~(view_scale - 1), center, view_scale);
-    const float selector_ry = cell_y_to_render_coords(lwttl_lat_to_floor_int(center->lat) & ~(view_scale - 1), center, view_scale);
+    const float selector_rx = cell_x_to_render_coords(lwttl_lng_to_floor_int(selector_pos->lng)/* & ~(view_scale - 1)*/, center, view_scale);
+    const float selector_ry = cell_y_to_render_coords(lwttl_lat_to_floor_int(selector_pos->lat)/* & ~(view_scale - 1)*/, center, view_scale);
     render_cell_pixel_selector(pLwc,
                                view,
                                proj,
@@ -972,45 +973,50 @@ void lwc_render_ttl(const LWCONTEXT* pLwc) {
     lw_clear_color();
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-    
+
     mat4x4 view, proj;
     lwttl_view_proj(pLwc->ttl, view, proj);
 
     const int view_scale = lwttl_view_scale(pLwc->ttl);
-    const LWTTLLNGLAT lng_lat_center = *lwttl_center(pLwc->ttl);
+    const LWTTLLNGLAT view_center = *lwttl_center(pLwc->ttl);
     // render earth minimap
-    //render_earth(pLwc, &lng_lat_center, view_scale);
+    //render_earth(pLwc, &view_center, view_scale);
     // render morphed earth
-    render_morphed_earth(pLwc, view, proj, &lng_lat_center, view_scale);
+    render_morphed_earth(pLwc, view, proj, &view_center, view_scale);
     glDisable(GL_DEPTH_TEST);
     // render land
     if (lwc_render_ttl_render("landcell")) {
-        render_sea_static_objects(pLwc, view, proj, &lng_lat_center);
+        render_sea_static_objects(pLwc, view, proj, &view_center);
     }
-    render_waypoints(pLwc->ttl, pLwc, view, proj, &lng_lat_center);
-    render_seaports(pLwc, view, proj, &lng_lat_center);
+    render_waypoints(pLwc->ttl, pLwc, view, proj, &view_center);
+    render_seaports(pLwc, view, proj, &view_center);
     glEnable(GL_DEPTH_TEST);
     // render sea objects(ships)
     if (lwc_render_ttl_render("world")) {
-        render_world(pLwc, view, proj, 0, &lng_lat_center);
+        render_world(pLwc, view, proj, 0, &view_center);
     }
     glDisable(GL_DEPTH_TEST);
     if (view_scale == 1) {
         LWTTLLNGLAT selected_pos;
         if (lwttl_selected(pLwc->ttl, &selected_pos)) {
-            render_cell_pixel_selector_at_center(pLwc, view, proj, &selected_pos, view_scale);
+            render_cell_pixel_selector_lng_lat(pLwc,
+                                               view,
+                                               proj,
+                                               &selected_pos,
+                                               &view_center,
+                                               view_scale);
         }
     }
     // UI
     if (lwc_render_ttl_render("world")) {
-        render_sea_objects_nameplate(pLwc, view, proj, &lng_lat_center);
+        render_sea_objects_nameplate(pLwc, view, proj, &view_center);
     }
     if (lwc_render_ttl_render("landcell_nameplate")) {
-        render_sea_static_objects_nameplate(pLwc, view, proj, &lng_lat_center);
+        render_sea_static_objects_nameplate(pLwc, view, proj, &view_center);
     }
-    //render_coords(pLwc, &lng_lat_center);
+    //render_coords(pLwc, &view_center);
     render_region_name(pLwc);
-    //render_coords_dms(pLwc, &lng_lat_center);
+    //render_coords_dms(pLwc, &view_center);
     glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
     // render FBO (HTML UI)
     render_solid_box_ui_lvt_flip_y_uv(pLwc, 0, 0, 2 * pLwc->aspect_ratio, 2, pLwc->shared_fbo.color_tex, LVT_CENTER_CENTER_ANCHORED_SQUARE, 1);
