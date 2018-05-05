@@ -91,8 +91,8 @@ void lwttl_prerender_mutable_context(LWTTL* ttl, LWCONTEXT* pLwc, LWHTMLUI* html
 int lwttl_selected(const LWTTL* ttl, LWTTLLNGLAT* pos);
 void lwttl_on_press(LWTTL* ttl, const LWCONTEXT* pLwc, float nx, float ny);
 void lwttl_on_release(LWTTL* ttl, const LWCONTEXT* pLwc, float nx, float ny);
-void lwttl_view_proj(LWTTL* ttl, mat4x4 view, mat4x4 proj);
-void lwttl_calc_view_proj(LWTTL* ttl, float aspect_ratio);
+void lwttl_view_proj(const LWTTL* ttl, mat4x4 view, mat4x4 proj);
+void lwttl_update_view_proj(LWTTL* ttl, float aspect_ratio);
 void lwttl_screen_to_world_pos(const float touchx,
                                const float touchy,
                                const float screenw,

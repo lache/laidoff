@@ -96056,6 +96056,42 @@ fail:
 }
 
 
+static int _wrap_lwttl_on_release(lua_State* L) {
+  int SWIG_arg = 0;
+  LWTTL *arg1 = (LWTTL *) 0 ;
+  LWCONTEXT *arg2 = (LWCONTEXT *) 0 ;
+  float arg3 ;
+  float arg4 ;
+  
+  SWIG_check_num_args("lwttl_on_release",4,4)
+  if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("lwttl_on_release",1,"LWTTL *");
+  if(!SWIG_isptrtype(L,2)) SWIG_fail_arg("lwttl_on_release",2,"LWCONTEXT const *");
+  if(!lua_isnumber(L,3)) SWIG_fail_arg("lwttl_on_release",3,"float");
+  if(!lua_isnumber(L,4)) SWIG_fail_arg("lwttl_on_release",4,"float");
+  
+  if (!SWIG_IsOK(SWIG_ConvertPtr(L,1,(void**)&arg1,SWIGTYPE_p__LWTTL,0))){
+    SWIG_fail_ptr("lwttl_on_release",1,SWIGTYPE_p__LWTTL);
+  }
+  
+  
+  if (!SWIG_IsOK(SWIG_ConvertPtr(L,2,(void**)&arg2,SWIGTYPE_p__LWCONTEXT,0))){
+    SWIG_fail_ptr("lwttl_on_release",2,SWIGTYPE_p__LWCONTEXT);
+  }
+  
+  arg3 = (float)lua_tonumber(L, 3);
+  arg4 = (float)lua_tonumber(L, 4);
+  lwttl_on_release(arg1,(struct _LWCONTEXT const *)arg2,arg3,arg4);
+  
+  return SWIG_arg;
+  
+  if(0) SWIG_fail;
+  
+fail:
+  lua_error(L);
+  return SWIG_arg;
+}
+
+
 static int _wrap_lwttl_view_proj(lua_State* L) {
   int SWIG_arg = 0;
   LWTTL *arg1 = (LWTTL *) 0 ;
@@ -96063,7 +96099,7 @@ static int _wrap_lwttl_view_proj(lua_State* L) {
   vec4 *arg3 ;
   
   SWIG_check_num_args("lwttl_view_proj",3,3)
-  if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("lwttl_view_proj",1,"LWTTL *");
+  if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("lwttl_view_proj",1,"LWTTL const *");
   if(!SWIG_isptrtype(L,2)) SWIG_fail_arg("lwttl_view_proj",2,"mat4x4");
   if(!SWIG_isptrtype(L,3)) SWIG_fail_arg("lwttl_view_proj",3,"mat4x4");
   
@@ -96081,7 +96117,7 @@ static int _wrap_lwttl_view_proj(lua_State* L) {
     SWIG_fail_ptr("lwttl_view_proj",3,SWIGTYPE_p_a_4__float);
   }
   
-  lwttl_view_proj(arg1,(float (*)[4])arg2,(float (*)[4])arg3);
+  lwttl_view_proj((struct _LWTTL const *)arg1,(float (*)[4])arg2,(float (*)[4])arg3);
   
   return SWIG_arg;
   
@@ -96093,21 +96129,21 @@ fail:
 }
 
 
-static int _wrap_lwttl_calc_view_proj(lua_State* L) {
+static int _wrap_lwttl_update_view_proj(lua_State* L) {
   int SWIG_arg = 0;
   LWTTL *arg1 = (LWTTL *) 0 ;
   float arg2 ;
   
-  SWIG_check_num_args("lwttl_calc_view_proj",2,2)
-  if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("lwttl_calc_view_proj",1,"LWTTL *");
-  if(!lua_isnumber(L,2)) SWIG_fail_arg("lwttl_calc_view_proj",2,"float");
+  SWIG_check_num_args("lwttl_update_view_proj",2,2)
+  if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("lwttl_update_view_proj",1,"LWTTL *");
+  if(!lua_isnumber(L,2)) SWIG_fail_arg("lwttl_update_view_proj",2,"float");
   
   if (!SWIG_IsOK(SWIG_ConvertPtr(L,1,(void**)&arg1,SWIGTYPE_p__LWTTL,0))){
-    SWIG_fail_ptr("lwttl_calc_view_proj",1,SWIGTYPE_p__LWTTL);
+    SWIG_fail_ptr("lwttl_update_view_proj",1,SWIGTYPE_p__LWTTL);
   }
   
   arg2 = (float)lua_tonumber(L, 2);
-  lwttl_calc_view_proj(arg1,arg2);
+  lwttl_update_view_proj(arg1,arg2);
   
   return SWIG_arg;
   
@@ -96157,6 +96193,29 @@ static int _wrap_lwttl_screen_to_world_pos(lua_State* L) {
   }
   
   lwttl_screen_to_world_pos(arg1,arg2,arg3,arg4,(float const (*)[4])arg5,(float const (*)[4])arg6,arg7);
+  
+  return SWIG_arg;
+  
+  if(0) SWIG_fail;
+  
+fail:
+  lua_error(L);
+  return SWIG_arg;
+}
+
+
+static int _wrap_lwttl_clear_selected_pressed_pos(lua_State* L) {
+  int SWIG_arg = 0;
+  LWTTL *arg1 = (LWTTL *) 0 ;
+  
+  SWIG_check_num_args("lwttl_clear_selected_pressed_pos",1,1)
+  if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("lwttl_clear_selected_pressed_pos",1,"LWTTL *");
+  
+  if (!SWIG_IsOK(SWIG_ConvertPtr(L,1,(void**)&arg1,SWIGTYPE_p__LWTTL,0))){
+    SWIG_fail_ptr("lwttl_clear_selected_pressed_pos",1,SWIGTYPE_p__LWTTL);
+  }
+  
+  lwttl_clear_selected_pressed_pos(arg1);
   
   return SWIG_arg;
   
@@ -98876,9 +98935,11 @@ static swig_lua_method swig_SwigModule_methods[]= {
     { "lwttl_prerender_mutable_context", _wrap_lwttl_prerender_mutable_context},
     { "lwttl_selected", _wrap_lwttl_selected},
     { "lwttl_on_press", _wrap_lwttl_on_press},
+    { "lwttl_on_release", _wrap_lwttl_on_release},
     { "lwttl_view_proj", _wrap_lwttl_view_proj},
-    { "lwttl_calc_view_proj", _wrap_lwttl_calc_view_proj},
+    { "lwttl_update_view_proj", _wrap_lwttl_update_view_proj},
     { "lwttl_screen_to_world_pos", _wrap_lwttl_screen_to_world_pos},
+    { "lwttl_clear_selected_pressed_pos", _wrap_lwttl_clear_selected_pressed_pos},
     { "msb_index", _wrap_msb_index},
     { "cell_fx_to_lng", _wrap_cell_fx_to_lng},
     { "cell_fy_to_lat", _wrap_cell_fy_to_lat},

@@ -84,6 +84,8 @@ typedef struct _LWTTLWORLDMAP {
 typedef struct _LWTTLSELECTED {
     int selected;
     LWTTLLNGLAT pos;
+    int pos_xc;
+    int pos_yc;
     int press_pos_xc;
     int press_pos_yc;
 } LWTTLSELECTED;
@@ -131,7 +133,7 @@ LWTTL* lwttl_new(float aspect_ratio) {
     LWMUTEX_INIT(ttl->rendering_mutex);
     ttl->earth_globe_scale_0 = earth_globe_render_scale;
     lwttl_set_earth_globe_scale(ttl, ttl->earth_globe_scale_0);
-    lwttl_calc_view_proj(ttl, aspect_ratio);
+    lwttl_update_view_proj(ttl, aspect_ratio);
     lwttl_clear_selected_pressed_pos(ttl);
     return ttl;
 }
@@ -163,7 +165,7 @@ void lwttl_worldmap_scroll_to_cell_center(LWTTL* ttl, int xc, int yc, LWUDP* sea
 void lwttl_update_aspect_ratio(LWTTL* ttl, float aspect_ratio) {
     ttl->worldmap.render_org_x = 0;
     ttl->worldmap.render_org_y = -(2.0f - aspect_ratio) / 2;
-    lwttl_calc_view_proj(ttl, aspect_ratio);
+    lwttl_update_view_proj(ttl, aspect_ratio);
 }
 
 const LWTTLLNGLAT* lwttl_center(const LWTTL* ttl) {
@@ -246,15 +248,21 @@ int lwttl_lat_to_ceil_int(float lat) {
     return (int)(ceilf(lwttl_lat_to_int_float(lat)));
 }
 
-const char* lwttl_http_header(const LWTTL* _ttl) {
+const char* lwttl_http_header(const LWTTL* ttl) {
     static char http_header[2048];
-    LWTTL* ttl = (LWTTL*)_ttl;
     const LWTTLLNGLAT* lnglat = lwttl_center(ttl);
+    LWTTLLNGLAT selected_pos;
+    const int selected = lwttl_selected(ttl, &selected_pos);
     snprintf(http_header,
              ARRAY_SIZE(http_header),
-             "X-Lng: %d\r\nX-Lat: %d\r\n",
+             "X-Lng: %d\r\n"            // view center longitude cell index
+             "X-Lat: %d\r\n"            // view center latitude cell index
+             "X-S-Lng: %d\r\n"          // selected longitude cell index (-1 if no selection)
+             "X-S-Lat: %d\r\n",         // selected latitude cell index (-1 if no selection)
              lwttl_lng_to_floor_int(lnglat->lng),
-             lwttl_lat_to_floor_int(lnglat->lat));
+             lwttl_lat_to_floor_int(lnglat->lat),
+             selected ? lwttl_lng_to_floor_int(selected_pos.lng) : -1,
+             selected ? lwttl_lat_to_floor_int(selected_pos.lat) : -1);
     script_http_header(script_context()->L,
                        http_header + strlen(http_header),
                        ARRAY_SIZE(http_header) - strlen(http_header));
@@ -1326,19 +1334,31 @@ void lwttl_on_release(LWTTL* ttl, const LWCONTEXT* pLwc, float nx, float ny) {
     int xc, yc;
     LWTTLLNGLAT lnglat;
     nx_ny_to_lng_lat(ttl, nx, ny, pLwc->width, pLwc->height, &xc, &yc, &lnglat);
+    // check touch press cell and touch release cell are the same cell
     if (ttl->selected.press_pos_xc == xc
         && ttl->selected.press_pos_yc == yc) {
-        ttl->selected.selected = 1;
-        ttl->selected.pos = lnglat;
+        // check the same cell selected twice
+        if (ttl->selected.selected == 1
+            && ttl->selected.pos_xc == xc
+            && ttl->selected.pos_yc == yc) {
+            // deselect
+            ttl->selected.selected = 0;
+        } else {
+            // select a new cell
+            ttl->selected.selected = 1;
+            ttl->selected.pos = lnglat;
+            ttl->selected.pos_xc = xc;
+            ttl->selected.pos_yc = yc;
+        }
     }
 }
 
-void lwttl_view_proj(LWTTL* ttl, mat4x4 view, mat4x4 proj) {
+void lwttl_view_proj(const LWTTL* ttl, mat4x4 view, mat4x4 proj) {
     memcpy(view, ttl->view, sizeof(mat4x4));
     memcpy(proj, ttl->proj, sizeof(mat4x4));
 }
 
-void lwttl_calc_view_proj(LWTTL* ttl, float aspect_ratio) {
+void lwttl_update_view_proj(LWTTL* ttl, float aspect_ratio) {
     float ship_y = 0.0f;//+(float)pLwc->app_time;
 
     float half_height = 10.0f;
