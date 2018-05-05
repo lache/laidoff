@@ -16,6 +16,7 @@ typedef struct _LWPTTLSTATICOBJECT2 LWPTTLSTATICOBJECT2;
 typedef struct _LWPTTLSEAPORTOBJECT LWPTTLSEAPORTOBJECT;
 typedef struct _LWTTLLNGLAT LWTTLLNGLAT;
 typedef struct _LWHTMLUI LWHTMLUI;
+typedef struct _LWPTTLSINGLECELL LWPTTLSINGLECELL;
 
 LWTTL* lwttl_new(float aspect_ratio);
 void lwttl_destroy(LWTTL** _ttl);
@@ -101,6 +102,7 @@ void lwttl_screen_to_world_pos(const float touchx,
                                const mat4x4 view_model,
                                vec2 world_pos);
 void lwttl_clear_selected_pressed_pos(LWTTL* ttl);
+const LWPTTLSINGLECELL* lwttl_single_cell(const LWTTL* ttl);
 #ifdef __cplusplus
 }
 #endif

@@ -793,6 +793,67 @@ static void render_sea_static_objects(const LWCONTEXT* pLwc,
     //}
 }
 
+static void render_single_cell_info(const LWCONTEXT* pLwc,
+                                    const float x,
+                                    const float y,
+                                    const mat4x4 view,
+                                    const mat4x4 proj,
+                                    const int view_scale) {
+    if (lwttl_selected(pLwc->ttl, 0) == 0) {
+        return;
+    }
+    mat4x4 proj_view;
+    mat4x4_identity(proj_view);
+    mat4x4_mul(proj_view, proj, view);
+    vec4 obj_pos_vec4 = {
+        x,
+        y,
+        0,
+        1,
+    };
+    vec2 ui_point;
+    calculate_ui_point_from_world_point(pLwc->aspect_ratio, proj_view, obj_pos_vec4, ui_point);
+
+    LWTEXTBLOCK tb;
+    tb.text_block_width = 999.0f;// 2.00f * aspect_ratio;
+    tb.text_block_line_height = DEFAULT_TEXT_BLOCK_LINE_HEIGHT_F;
+    tb.size = DEFAULT_TEXT_BLOCK_SIZE_E;
+    SET_COLOR_RGBA_FLOAT(tb.color_normal_glyph, 1, 1, 1, 1);
+    SET_COLOR_RGBA_FLOAT(tb.color_normal_outline, 0, 0, 0, 1);
+    SET_COLOR_RGBA_FLOAT(tb.color_emp_glyph, 1, 1, 0, 1);
+    SET_COLOR_RGBA_FLOAT(tb.color_emp_outline, 0, 0, 0, 1);
+    char info[512];
+    const LWPTTLSINGLECELL* p = lwttl_single_cell(pLwc->ttl);
+    const char* cell_type = 0;
+    if ((p->attr >> 0) & 1) {
+        cell_type = "Land";
+    } else if ((p->attr >> 2) & 1) {
+        cell_type = "Seawater";
+    } else {
+        cell_type = "Water";
+    }
+    if (p->port_id >= 0 && p->port_name) {
+        sprintf(info,
+                "%s[%d] %s",
+                p->port_name,
+                p->port_id,
+                cell_type);
+    } else {
+        sprintf(info,
+                "%s",
+                cell_type);
+    }
+    tb.text = info;
+    tb.text_bytelen = (int)strlen(tb.text);
+    tb.begin_index = 0;
+    tb.end_index = tb.text_bytelen;
+    tb.multiline = 1;
+    tb.text_block_x = ui_point[0];
+    tb.text_block_y = ui_point[1] + 0.05f / view_scale;
+    tb.align = LTBA_LEFT_BOTTOM;
+    render_text_block(pLwc, &tb);
+}
+
 static void render_cell_pixel_selector_lng_lat(const LWCONTEXT* pLwc,
                                                const mat4x4 view,
                                                const mat4x4 proj,
@@ -811,6 +872,12 @@ static void render_cell_pixel_selector_lng_lat(const LWCONTEXT* pLwc,
                                0,
                                cell_render_width,
                                cell_render_height);
+    render_single_cell_info(pLwc,
+                            selector_rx,
+                            selector_ry,
+                            view,
+                            proj,
+                            view_scale);
 }
 
 static void render_sea_static_objects_nameplate(const LWCONTEXT* pLwc, const mat4x4 view, const mat4x4 proj, const LWTTLLNGLAT* center) {
@@ -981,11 +1048,11 @@ void lwc_render_ttl(const LWCONTEXT* pLwc) {
     LWTTLLNGLAT selected_pos;
     if (lwttl_selected(pLwc->ttl, &selected_pos)) {
         render_cell_pixel_selector_lng_lat(pLwc,
-                                            view,
-                                            proj,
-                                            &selected_pos,
-                                            &view_center,
-                                            view_scale);
+                                           view,
+                                           proj,
+                                           &selected_pos,
+                                           &view_center,
+                                           view_scale);
     }
     // UI
     if (lwc_render_ttl_render("world")) {

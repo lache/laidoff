@@ -108,7 +108,7 @@ typedef struct _LWTTL {
     LWPTTLWAYPOINTS waypoints;
     // packet cache
     LWPTTLFULLSTATE ttl_full_state;
-    //LWPTTLSEAPORTSTATE ttl_seaport_state;
+    LWPTTLSINGLECELL ttl_single_cell;
     LWTTLOBJECTCACHEGROUP object_cache;
     float earth_globe_scale;
     float earth_globe_scale_0;
@@ -619,6 +619,18 @@ static void send_ttlpingchunk(const LWTTL* ttl,
     udp_send(udp, (const char*)&p, sizeof(LWPTTLPINGCHUNK));
 }
 
+static void send_ttlpingsinglecell(const LWTTL* ttl,
+                                   LWUDP* udp,
+                                   const int xc0,
+                                   const int yc0) {
+    LWPTTLPINGSINGLECELL p;
+    memset(&p, 0, sizeof(LWPTTLPINGSINGLECELL));
+    p.type = LPGP_LWPTTLPINGSINGLECELL;
+    p.xc0 = xc0;
+    p.yc0 = yc0;
+    udp_send(udp, (const char*)&p, sizeof(LWPTTLPINGSINGLECELL));
+}
+
 static void send_ttlpingflush(LWTTL* ttl) {
     LWPTTLPINGFLUSH p;
     memset(&p, 0, sizeof(LWPTTLPINGFLUSH));
@@ -789,7 +801,7 @@ void lwttl_udp_update(LWTTL* ttl, LWUDP* udp, LWCONTEXT* pLwc) {
             udp->reinit_next_update = 1;
             return;
 #endif
-            }
+        }
 
         char decompressed[1500 * 255]; // maximum lz4 compression ratio is 255...
         int decompressed_bytes = LZ4_decompress_safe(udp->buf, decompressed, udp->recv_len, ARRAY_SIZE(decompressed));
@@ -895,8 +907,27 @@ void lwttl_udp_update(LWTTL* ttl, LWUDP* udp, LWCONTEXT* pLwc) {
                          sizeof(LWPTTLWAYPOINTS));
                 }
                 LWPTTLWAYPOINTS* p = (LWPTTLWAYPOINTS*)decompressed;
-                LOGI("LWPTTLWAYPOINTS: %d objects.", p->count);
+                LOGIx("LWPTTLWAYPOINTS: %d objects.", p->count);
                 memcpy(&ttl->waypoints, p, sizeof(LWPTTLWAYPOINTS));
+                break;
+            }
+            case LPGP_LWPTTLSINGLECELL:
+            {
+                if (decompressed_bytes != sizeof(LWPTTLSINGLECELL)) {
+                    LOGE("LWPTTLSINGLECELL: Size error %d (%zu expected)",
+                         decompressed_bytes,
+                         sizeof(LWPTTLWAYPOINTS));
+                }
+                LWPTTLSINGLECELL* p = (LWPTTLSINGLECELL*)decompressed;
+                LOGIx("LWPTTLSINGLECELL: %d,%d L[%d], W[%d], SW[%d], PID[%d], PNAME[%s]",
+                      p->xc0,
+                      p->yc0,
+                      (p->attr >> 0) & 1,
+                      (p->attr >> 1) & 1,
+                      (p->attr >> 2) & 1,
+                      p->port_id,
+                      p->port_name);
+                memcpy(&ttl->ttl_single_cell, p, sizeof(LWPTTLSINGLECELL));
                 break;
             }
             default:
@@ -908,8 +939,8 @@ void lwttl_udp_update(LWTTL* ttl, LWUDP* udp, LWCONTEXT* pLwc) {
         } else {
             LOGEP("lz4 decompression failed!");
         }
-        }
     }
+}
 
 const LWPTTLWAYPOINTS* lwttl_get_waypoints(const LWTTL* ttl) {
     return &ttl->waypoints;
@@ -1255,7 +1286,9 @@ void lwttl_prerender_mutable_context(LWTTL* ttl, LWCONTEXT* pLwc, LWHTMLUI* html
 }
 
 int lwttl_selected(const LWTTL* ttl, LWTTLLNGLAT* pos) {
-    memcpy(pos, &ttl->selected.pos, sizeof(LWTTLLNGLAT));
+    if (pos) {
+        memcpy(pos, &ttl->selected.pos, sizeof(LWTTLLNGLAT));
+    }
     return ttl->selected.selected;
 }
 
@@ -1345,10 +1378,12 @@ void lwttl_on_release(LWTTL* ttl, const LWCONTEXT* pLwc, float nx, float ny) {
             ttl->selected.selected = 0;
         } else {
             // select a new cell
+            memset(&ttl->ttl_single_cell, 0, sizeof(LWPTTLSINGLECELL));
             ttl->selected.selected = 1;
             ttl->selected.pos = lnglat;
             ttl->selected.pos_xc = xc;
             ttl->selected.pos_yc = yc;
+            send_ttlpingsinglecell(ttl, ttl->sea_udp, xc, yc);
         }
     }
 }
@@ -1395,4 +1430,8 @@ void lwttl_update_view_proj(LWTTL* ttl, float aspect_ratio) {
 void lwttl_clear_selected_pressed_pos(LWTTL* ttl) {
     ttl->selected.press_pos_xc = -1;
     ttl->selected.press_pos_yc = -1;
+}
+
+const LWPTTLSINGLECELL* lwttl_single_cell(const LWTTL* ttl) {
+    return &ttl->ttl_single_cell;
 }
