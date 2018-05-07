@@ -24,7 +24,7 @@ int parse_recv_packets(LWTCP* tcp);
 const char* lw_tcp_addr(const LWCONTEXT* pLwc);
 const char* lw_tcp_port_str(const LWCONTEXT* pLwc);
 int lw_tcp_port(const LWCONTEXT* pLwc);
-void tcp_request_landing_page(LWTCP* tcp, const char* path_prefix, const LWTTL* ttl);
+void tcp_request_landing_page(LWTCP* tcp, const char* path_prefix, LWTTL* ttl);
 #ifdef __cplusplus
 }
 #endif

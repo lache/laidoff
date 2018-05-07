@@ -18,6 +18,7 @@
 #include "script.h"
 #include "input.h"
 #include "logic.h"
+#include "pcg_basic.h"
 
 typedef struct _LWTTLDATA_SEAPORT {
     char locode[8];
@@ -122,6 +123,7 @@ typedef struct _LWTTL {
     LWTTLSELECTED selected;
     mat4x4 view;
     mat4x4 proj;
+    char user_id_str[512];
 } LWTTL;
 
 LWTTL* lwttl_new(float aspect_ratio) {
@@ -142,6 +144,8 @@ LWTTL* lwttl_new(float aspect_ratio) {
     lwttl_set_earth_globe_scale(ttl, ttl->earth_globe_scale_0);
     lwttl_update_view_proj(ttl, aspect_ratio);
     lwttl_clear_selected_pressed_pos(ttl);
+    ttl->selected.press_menu_gauge_total = 0.45f;
+    ttl->selected.press_menu_gauge_appear_delay = 0.2f;
     return ttl;
 }
 
@@ -237,7 +241,7 @@ void lwttl_update(LWTTL* ttl, LWCONTEXT* pLwc, float delta_time) {
                                               ttl->selected.press_pos_yc,
                                               &lnglat);
             } else if (ttl->selected.dragging == 0
-                       && app_time > ttl->selected.press_at + ttl->selected.press_menu_gauge_appear_delay + ttl->selected.press_menu_gauge_total) {
+                       && app_time > ttl->selected.press_at + ttl->selected.press_menu_gauge_total) {
                 // change to selection-dragging mode
                 ttl->selected.dragging = 1;
                 ttl->selected.dragging_pos_xc = ttl->selected.pos_xc;
@@ -284,16 +288,29 @@ const char* lwttl_http_header(const LWTTL* ttl) {
     const LWTTLLNGLAT* lnglat = lwttl_center(ttl);
     LWTTLLNGLAT selected_pos;
     const int selected = lwttl_selected(ttl, &selected_pos);
+    if (ttl->user_id_str[0] == 0) {
+        LOGEP("ttl->user_id_str length is 0");
+    }
     snprintf(http_header,
              ARRAY_SIZE(http_header),
-             "X-Lng: %d\r\n"            // view center longitude cell index
-             "X-Lat: %d\r\n"            // view center latitude cell index
-             "X-S-Lng: %d\r\n"          // selected longitude cell index (-1 if no selection)
-             "X-S-Lat: %d\r\n",         // selected latitude cell index (-1 if no selection)
+             "X-U: %s\r\n"        // ttl-user-id.dat
+             "X-Lng: %d\r\n"      // view center longitude cell index
+             "X-Lat: %d\r\n"      // view center latitude cell index
+             "X-S-Lng: %d\r\n"    // selected longitude cell index (-1 if no selection)
+             "X-S-Lat: %d\r\n"    // selected latitude cell index (-1 if no selection)
+             "X-D-XC0: %d\r\n"    // drag begin x
+             "X-D-YC0: %d\r\n"    // drag begin y
+             "X-D-XC1: %d\r\n"    // drag end x
+             "X-D-YC1: %d\r\n",   // drag end y
+             ttl->user_id_str,
              lwttl_lng_to_floor_int(lnglat->lng),
              lwttl_lat_to_floor_int(lnglat->lat),
              selected ? lwttl_lng_to_floor_int(selected_pos.lng) : -1,
-             selected ? lwttl_lat_to_floor_int(selected_pos.lat) : -1);
+             selected ? lwttl_lat_to_floor_int(selected_pos.lat) : -1,
+             ttl->selected.pos_xc,
+             ttl->selected.pos_yc,
+             ttl->selected.dragging_pos_xc,
+             ttl->selected.dragging_pos_yc);
     script_http_header(script_context()->L,
                        http_header + strlen(http_header),
                        ARRAY_SIZE(http_header) - strlen(http_header));
@@ -832,7 +849,7 @@ void lwttl_udp_update(LWTTL* ttl, LWUDP* udp, LWCONTEXT* pLwc) {
             udp->reinit_next_update = 1;
             return;
 #endif
-        }
+            }
 
         char decompressed[1500 * 255]; // maximum lz4 compression ratio is 255...
         int decompressed_bytes = LZ4_decompress_safe(udp->buf, decompressed, udp->recv_len, ARRAY_SIZE(decompressed));
@@ -970,8 +987,8 @@ void lwttl_udp_update(LWTTL* ttl, LWUDP* udp, LWCONTEXT* pLwc) {
         } else {
             LOGEP("lz4 decompression failed!");
         }
+        }
     }
-}
 
 const LWPTTLWAYPOINTS* lwttl_get_waypoints(const LWTTL* ttl) {
     return &ttl->waypoints;
@@ -1447,6 +1464,11 @@ void lwttl_on_release(LWTTL* ttl, const LWCONTEXT* pLwc, float nx, float ny) {
                                       yc,
                                       &lnglat);
         ttl->selected.pressing = 0;
+    }
+    if (ttl->selected.dragging) {
+        if (ttl->selected.pos_xc != ttl->selected.dragging_pos_xc || ttl->selected.pos_yc != ttl->selected.dragging_pos_yc) {
+            htmlui_execute_anchor_click(pLwc->htmlui, "/link");
+        }
         ttl->selected.dragging = 0;
     }
 }
@@ -1493,8 +1515,6 @@ void lwttl_update_view_proj(LWTTL* ttl, float aspect_ratio) {
 void lwttl_clear_selected_pressed_pos(LWTTL* ttl) {
     ttl->selected.press_pos_xc = -1;
     ttl->selected.press_pos_yc = -1;
-    ttl->selected.press_menu_gauge_total = 0.55f;
-    ttl->selected.press_menu_gauge_appear_delay = 0.2f;
 }
 
 const LWPTTLSINGLECELL* lwttl_single_cell(const LWTTL* ttl) {
@@ -1541,4 +1561,19 @@ int lwttl_dragging_info(const LWTTL* ttl,
     *xc1 = ttl->selected.dragging_pos_xc;
     *yc1 = ttl->selected.dragging_pos_yc;
     return ttl->selected.dragging;
+}
+
+const char* lwttl_get_or_create_user_id(LWTTL* ttl,
+                                        LWCONTEXT* pLwc) {
+    if (is_file_exist(pLwc->user_data_path, "ttl-user-id.dat") == 0) {
+        sprintf(ttl->user_id_str, "%08X%08X%08X%08X",
+                pcg32_random(),
+                pcg32_random(),
+                pcg32_random(),
+                pcg32_random());
+        write_file_string(pLwc->user_data_path, "ttl-user-id.dat", ttl->user_id_str);
+    } else {
+        read_file_string(pLwc->user_data_path, "ttl-user-id.dat", sizeof(ttl->user_id_str), ttl->user_id_str);
+    }
+    return ttl->user_id_str;
 }

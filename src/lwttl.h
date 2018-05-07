@@ -122,6 +122,8 @@ int lwttl_dragging_info(const LWTTL* ttl,
                         int* yc0,
                         int* xc1,
                         int* yc1);
+const char* lwttl_get_or_create_user_id(LWTTL* ttl,
+                                        LWCONTEXT* pLwc);
 #ifdef __cplusplus
 }
 #endif

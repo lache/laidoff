@@ -166,6 +166,9 @@ public:
         }
         return false;
     }
+    void execute_anchor_click(const char* url) {
+        container.on_anchor_click(url, doc->root());
+    }
 private:
     LWHTMLUI();
     LWHTMLUI(const LWHTMLUI&);
@@ -331,4 +334,9 @@ int htmlui_over_element(void* c, float nx, float ny) {
 int htmlui_get_refresh_html_body(void* c) {
     LWHTMLUI* htmlui = (LWHTMLUI*)c;
     return htmlui->get_refresh_html_body();
+}
+
+void htmlui_execute_anchor_click(void* c, const char* url) {
+    LWHTMLUI* htmlui = (LWHTMLUI*)c;
+    htmlui->execute_anchor_click(url);
 }

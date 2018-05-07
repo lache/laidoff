@@ -26,26 +26,16 @@ void tcp_on_connect(LWTCP* tcp, const char* path_prefix) {
     request_player_reveal_leaderboard(tcp);
 }
 
-void tcp_request_landing_page(LWTCP* tcp, const char* path_prefix, const LWTTL* ttl) {
+void tcp_request_landing_page(LWTCP* tcp, const char* path_prefix, LWTTL* ttl) {
     if (!tcp) {
         LOGEP("tcp null");
         return;
     }
     // Transport Tycoon Lee
     char landing_page_url[512] = { 0, };
-    char user_id_str[512] = { 0, };
+    // XXX setting random seed here?
     pcg32_srandom(time(0), time(0));
-
-    if (is_file_exist(tcp->pLwc->user_data_path, "ttl-user-id.dat") == 0) {
-        sprintf(user_id_str, "%08X%08X%08X%08X",
-                pcg32_random(),
-                pcg32_random(),
-                pcg32_random(),
-                pcg32_random());
-        write_file_string(tcp->pLwc->user_data_path, "ttl-user-id.dat", user_id_str);
-    } else {
-        read_file_string(tcp->pLwc->user_data_path, "ttl-user-id.dat", sizeof(user_id_str), user_id_str);
-    }
+    const char* user_id_str = lwttl_get_or_create_user_id(ttl, tcp->pLwc);
     sprintf(landing_page_url, "/idle?u=%s", user_id_str);
     tcp_send_httpget(tcp, landing_page_url, lwttl_http_header(ttl));
 }

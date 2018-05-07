@@ -702,9 +702,9 @@ static void render_waypoints(const LWTTL* ttl,
                                      waypoints->waypoints[i + 0].y,
                                      waypoints->waypoints[i + 1].x,
                                      waypoints->waypoints[i + 1].y,
-                                     WATER_COLOR_R,
-                                     WATER_COLOR_G,
-                                     WATER_COLOR_B);
+                                     WAYPOINT_COLOR_R,
+                                     WAYPOINT_COLOR_G,
+                                     WAYPOINT_COLOR_B);
     }
 }
 
