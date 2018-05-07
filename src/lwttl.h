@@ -92,6 +92,7 @@ void lwttl_prerender_mutable_context(LWTTL* ttl, LWCONTEXT* pLwc, LWHTMLUI* html
 int lwttl_selected(const LWTTL* ttl, LWTTLLNGLAT* pos);
 int lwttl_selected_int(const LWTTL* ttl, int* xc0, int* yc0);
 void lwttl_on_press(LWTTL* ttl, const LWCONTEXT* pLwc, float nx, float ny);
+void lwttl_on_move(LWTTL* ttl, const LWCONTEXT* pLwc, float nx, float ny);
 void lwttl_on_release(LWTTL* ttl, const LWCONTEXT* pLwc, float nx, float ny);
 void lwttl_view_proj(const LWTTL* ttl, mat4x4 view, mat4x4 proj);
 void lwttl_update_view_proj(LWTTL* ttl, float aspect_ratio);
@@ -112,6 +113,15 @@ void lwttl_change_selected_cell_to(LWTTL* ttl,
                                    int xc,
                                    int yc,
                                    const LWTTLLNGLAT* lnglat);
+int lwttl_press_ring_info(const LWTTL* ttl,
+                          const float app_time,
+                          float* press_menu_gauge_current,
+                          float* press_menu_gauge_total);
+int lwttl_dragging_info(const LWTTL* ttl,
+                        int* xc0,
+                        int* yc0,
+                        int* xc1,
+                        int* yc1);
 #ifdef __cplusplus
 }
 #endif

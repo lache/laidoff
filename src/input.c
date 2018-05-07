@@ -229,6 +229,10 @@ void lw_trigger_mouse_move(LWCONTEXT* pLwc, float nx, float ny, int pointer_id) 
 		(x + pLwc->aspect_ratio) / (2.0f * pLwc->aspect_ratio),
 						 (1.0f - y) / 2.0f);*/
     }
+
+    if (lw_pinch() == 0) {
+        lwttl_on_move(pLwc->ttl, pLwc, nx, ny);
+    }
     
 	pLwc->last_mouse_move_delta_x = x - pLwc->last_mouse_move_x;
 	pLwc->last_mouse_move_delta_y = y - pLwc->last_mouse_move_y;

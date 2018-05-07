@@ -88,10 +88,13 @@ typedef struct _LWTTLSELECTED {
     int pos_yc;
     int press_pos_xc;
     int press_pos_yc;
+    int dragging_pos_xc;
+    int dragging_pos_yc;
     float press_at;
     int pressing;
     float press_menu_gauge_appear_delay;
     float press_menu_gauge_total;
+    int dragging;
 } LWTTLSELECTED;
 
 typedef struct _LWTTL {
@@ -203,7 +206,7 @@ void lwttl_update(LWTTL* ttl, LWCONTEXT* pLwc, float delta_time) {
     }
 
     float dx = 0, dy = 0, dlen = 0;
-    if (lw_pinch() == 0) {
+    if (lw_pinch() == 0 && ttl->selected.dragging == 0) {
         if (lw_get_normalized_dir_pad_input(pLwc, &pLwc->left_dir_pad, &dx, &dy, &dlen) && (dx || dy)) {
             if (dlen > 0.05f) {
                 // cancel tracking if user want to scroll around
@@ -220,21 +223,28 @@ void lwttl_update(LWTTL* ttl, LWCONTEXT* pLwc, float delta_time) {
         }
     }
 
-    if (ttl->selected.press_pos_xc >= 0
-        && ttl->selected.press_pos_yc >= 0
-        && (ttl->selected.press_pos_xc != ttl->selected.pos_xc || ttl->selected.press_pos_yc != ttl->selected.pos_yc)) {
-        if (ttl->selected.pressing
-            && app_time > ttl->selected.press_at + ttl->selected.press_menu_gauge_appear_delay) {
-            LWTTLLNGLAT lnglat;
-            lnglat.lng = cell_x_to_lng(ttl->selected.press_pos_xc);
-            lnglat.lat = cell_y_to_lat(ttl->selected.press_pos_yc);
-            lwttl_change_selected_cell_to(ttl,
-                                          ttl->selected.press_pos_xc,
-                                          ttl->selected.press_pos_yc,
-                                          &lnglat);
+    if (ttl->selected.press_pos_xc >= 0 && ttl->selected.press_pos_yc >= 0) {
+        if (ttl->selected.pressing) {
+            if (app_time > ttl->selected.press_at + ttl->selected.press_menu_gauge_appear_delay
+                && (ttl->selected.press_pos_xc != ttl->selected.pos_xc || ttl->selected.press_pos_yc != ttl->selected.pos_yc)) {
+                // change selection after 'press_menu_gauge_appear_delay'
+                // even if touch is not released
+                LWTTLLNGLAT lnglat;
+                lnglat.lng = cell_x_to_lng(ttl->selected.press_pos_xc);
+                lnglat.lat = cell_y_to_lat(ttl->selected.press_pos_yc);
+                lwttl_change_selected_cell_to(ttl,
+                                              ttl->selected.press_pos_xc,
+                                              ttl->selected.press_pos_yc,
+                                              &lnglat);
+            } else if (ttl->selected.dragging == 0
+                       && app_time > ttl->selected.press_at + ttl->selected.press_menu_gauge_appear_delay + ttl->selected.press_menu_gauge_total) {
+                // change to selection-dragging mode
+                ttl->selected.dragging = 1;
+                ttl->selected.dragging_pos_xc = ttl->selected.pos_xc;
+                ttl->selected.dragging_pos_yc = ttl->selected.pos_yc;
+            }
         }
     }
-    
 }
 
 static float lwttl_lng_to_int_float(float lng) {
@@ -1382,16 +1392,6 @@ static void nx_ny_to_lng_lat(const LWTTL* ttl, float nx, float ny, int width, in
     *yc = lwttl_lat_to_floor_int(lnglat->lat);
 }
 
-void lwttl_on_press(LWTTL* ttl, const LWCONTEXT* pLwc, float nx, float ny) {
-    int xc, yc;
-    LWTTLLNGLAT lnglat;
-    nx_ny_to_lng_lat(ttl, nx, ny, pLwc->width, pLwc->height, &xc, &yc, &lnglat);
-    ttl->selected.press_pos_xc = xc;
-    ttl->selected.press_pos_yc = yc;
-    ttl->selected.pressing = 1;
-    ttl->selected.press_at = (float)pLwc->app_time;
-}
-
 void lwttl_change_selected_cell_to(LWTTL* ttl,
                                    int xc,
                                    int yc,
@@ -1417,6 +1417,26 @@ void lwttl_change_selected_cell_to(LWTTL* ttl,
     }
 }
 
+void lwttl_on_press(LWTTL* ttl, const LWCONTEXT* pLwc, float nx, float ny) {
+    int xc, yc;
+    LWTTLLNGLAT lnglat;
+    nx_ny_to_lng_lat(ttl, nx, ny, pLwc->width, pLwc->height, &xc, &yc, &lnglat);
+    ttl->selected.press_pos_xc = xc;
+    ttl->selected.press_pos_yc = yc;
+    ttl->selected.pressing = 1;
+    ttl->selected.press_at = (float)pLwc->app_time;
+}
+
+void lwttl_on_move(LWTTL* ttl, const LWCONTEXT* pLwc, float nx, float ny) {
+    if (ttl->selected.dragging) {
+        int xc, yc;
+        LWTTLLNGLAT lnglat;
+        nx_ny_to_lng_lat(ttl, nx, ny, pLwc->width, pLwc->height, &xc, &yc, &lnglat);
+        ttl->selected.dragging_pos_xc = xc;
+        ttl->selected.dragging_pos_yc = yc;
+    }
+}
+
 void lwttl_on_release(LWTTL* ttl, const LWCONTEXT* pLwc, float nx, float ny) {
     if (ttl->selected.pressing) {
         int xc, yc;
@@ -1427,6 +1447,7 @@ void lwttl_on_release(LWTTL* ttl, const LWCONTEXT* pLwc, float nx, float ny) {
                                       yc,
                                       &lnglat);
         ttl->selected.pressing = 0;
+        ttl->selected.dragging = 0;
     }
 }
 
@@ -1490,4 +1511,34 @@ int lwttl_press_menu_info(const LWTTL* ttl,
     return ttl->selected.press_pos_xc >= 0
         && ttl->selected.press_pos_yc >= 0
         && ttl->selected.pressing;
+}
+
+int lwttl_press_ring_info(const LWTTL* ttl,
+                          const float app_time,
+                          float* press_menu_gauge_current,
+                          float* press_menu_gauge_total) {
+    float press_menu_gauge_appear_delay;
+    float press_at;
+    if (lwttl_press_menu_info(ttl,
+                              press_menu_gauge_total,
+                              &press_menu_gauge_appear_delay,
+                              &press_at)
+        && app_time > press_at + press_menu_gauge_appear_delay
+        && app_time - press_at < *press_menu_gauge_total) {
+        *press_menu_gauge_current = app_time - press_at;
+        return 1;
+    }
+    return 0;
+}
+
+int lwttl_dragging_info(const LWTTL* ttl,
+                        int* xc0,
+                        int* yc0,
+                        int* xc1,
+                        int* yc1) {
+    *xc0 = ttl->selected.pos_xc;
+    *yc0 = ttl->selected.pos_yc;
+    *xc1 = ttl->selected.dragging_pos_xc;
+    *yc1 = ttl->selected.dragging_pos_yc;
+    return ttl->selected.dragging;
 }

@@ -22,6 +22,14 @@ static char visibility[MAX_VISIBILITY_ENTRY_COUNT][MAX_VISIBILITY_ENTRY_NAME_LEN
 #define WATER_COLOR_G (94 / 255.f)
 #define WATER_COLOR_B (190 / 255.f)
 
+#define WAYPOINT_COLOR_R (0.2f)
+#define WAYPOINT_COLOR_G (0.7f)
+#define WAYPOINT_COLOR_B (0.2f)
+
+#define CELL_DRAGGING_LINE_COLOR_R (0.7f)
+#define CELL_DRAGGING_LINE_COLOR_G (0.9f)
+#define CELL_DRAGGING_LINE_COLOR_B (0.7f)
+
 void lwc_render_ttl_fbo_body(const LWCONTEXT* pLwc, const char* html_body) {
     glBindFramebuffer(GL_FRAMEBUFFER, pLwc->shared_fbo.fbo);
     glDisable(GL_DEPTH_TEST);
@@ -358,31 +366,23 @@ static void render_cell_pixel_selector(const LWTTL* ttl,
                                        const float h) {
     const LW_VBO_TYPE lvt = LVT_CELL_PIXEL_SELECTOR;
     render_cell_color(pLwc, view, proj, x, y, z, w, h, lvt, 0.0f, 0.0f, 0.0f, 0.0f);
+    float press_menu_gauge_current;
     float press_menu_gauge_total;
-    float press_menu_gauge_appear_delay;
-    float press_at;
     float app_time = (float)pLwc->app_time;
-    if (lwttl_press_menu_info(ttl,
-                              &press_menu_gauge_total,
-                              &press_menu_gauge_appear_delay,
-                              &press_at)) {
-        if (app_time > press_at + press_menu_gauge_appear_delay) {
-            const float filled = app_time - (press_at + press_menu_gauge_appear_delay);
-            if (filled + LWEPSILON > press_menu_gauge_total) {
-
-            } else {
-                render_timer(pLwc,
-                             view,
-                             proj,
-                             x,
-                             y + 2.5f,
-                             w / 4,
-                             h / 4,
-                             filled,
-                             press_menu_gauge_total,
-                             1.0f);
-            }
-        }
+    if (lwttl_press_ring_info(ttl,
+                              app_time,
+                              &press_menu_gauge_current,
+                              &press_menu_gauge_total)) {
+        render_timer(pLwc,
+                     view,
+                     proj,
+                     x,
+                     y + 2.5f,
+                     w / 4,
+                     h / 4,
+                     press_menu_gauge_current,
+                     press_menu_gauge_total,
+                     1.0f);
     }
 }
 
@@ -637,10 +637,16 @@ static void render_waypoint_line_segment(const LWTTL* ttl,
                                          const mat4x4 view,
                                          const mat4x4 proj,
                                          const LWTTLLNGLAT* center,
-                                         int x0,
-                                         int y0,
-                                         int x1,
-                                         int y1) {
+                                         const int x0,
+                                         const int y0,
+                                         const int x1,
+                                         const int y1,
+                                         const float over_r,
+                                         const float over_g,
+                                         const float over_b) {
+    if (x0 == x1 && y0 == y1) {
+        return;
+    }
     const int view_scale = lwttl_view_scale(pLwc->ttl);
     const int view_scale_msb = msb_index(view_scale);
     const float lng0_not_clamped = cell_fx_to_lng(x0 + 0.5f);
@@ -668,9 +674,9 @@ static void render_waypoint_line_segment(const LWTTL* ttl,
                                                pLwc->tex_atlas[LAE_ZERO_FOR_BLACK],
                                                LVT_LEFT_CENTER_ANCHORED_SQUARE,
                                                1.0f,
-                                               0.2f,
-                                               0.7f,
-                                               0.2f,
+                                               over_r,
+                                               over_g,
+                                               over_b,
                                                1.0f,
                                                default_uv_offset,
                                                default_uv_scale,
@@ -695,7 +701,10 @@ static void render_waypoints(const LWTTL* ttl,
                                      waypoints->waypoints[i + 0].x,
                                      waypoints->waypoints[i + 0].y,
                                      waypoints->waypoints[i + 1].x,
-                                     waypoints->waypoints[i + 1].y);
+                                     waypoints->waypoints[i + 1].y,
+                                     WATER_COLOR_R,
+                                     WATER_COLOR_G,
+                                     WATER_COLOR_B);
     }
 }
 
@@ -1181,6 +1190,28 @@ void lwc_render_ttl(const LWCONTEXT* pLwc) {
                                            selected_yc0,
                                            &view_center,
                                            view_scale);
+    }
+    int dragging_xc0;
+    int dragging_yc0;
+    int dragging_xc1;
+    int dragging_yc1;
+    if (lwttl_dragging_info(pLwc->ttl,
+                            &dragging_xc0,
+                            &dragging_yc0,
+                            &dragging_xc1,
+                            &dragging_yc1)) {
+        render_waypoint_line_segment(pLwc->ttl,
+                                     pLwc,
+                                     view,
+                                     proj,
+                                     &view_center,
+                                     dragging_xc0,
+                                     dragging_yc0,
+                                     dragging_xc1,
+                                     dragging_yc1,
+                                     CELL_DRAGGING_LINE_COLOR_R,
+                                     CELL_DRAGGING_LINE_COLOR_G,
+                                     CELL_DRAGGING_LINE_COLOR_B);
     }
     // UI
     if (lwc_render_ttl_render("world")) {
