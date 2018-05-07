@@ -134,6 +134,8 @@ typedef struct _LWSHADER {
 	GLint empty_color;
 	GLint wrap_offset;
     GLint morph_weight;
+    GLint vertex_color;
+    GLint vertex_color_ratio;
 } LWSHADER;
 
 int lw_create_shader_program(const char *shader_name, LWSHADER *pShader, GLuint vs, GLuint fs);

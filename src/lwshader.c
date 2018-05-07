@@ -84,6 +84,8 @@ int lw_create_shader_program(const char* shader_name, LWSHADER* pShader, GLuint 
     pShader->empty_color = glGetUniformLocation(pShader->program, "empty_color");
     pShader->wrap_offset = glGetUniformLocation(pShader->program, "wrap_offset");
     pShader->morph_weight = glGetUniformLocation(pShader->program, "morph_weight");
+    pShader->vertex_color = glGetUniformLocation(pShader->program, "vertex_color");
+    pShader->vertex_color_ratio = glGetUniformLocation(pShader->program, "vertex_color_ratio");
 
     // Set initial value...
     glUseProgram(pShader->program);
