@@ -306,9 +306,84 @@ static void render_sea_cell_debug(const LWCONTEXT* pLwc, const mat4x4 view, cons
     render_cell(pLwc, view, proj, x, y, z, w, h, lvt);
 }
 
-static void render_cell_pixel_selector(const LWCONTEXT* pLwc, const mat4x4 view, const mat4x4 proj, float x, float y, float z, float w, float h) {
+
+static void render_timer(const LWCONTEXT* pLwc,
+                         const mat4x4 view,
+                         const mat4x4 proj,
+                         const float x,
+                         const float y,
+                         const float w,
+                         const float h,
+                         const float remain_sec,
+                         const float total_sec,
+                         const float ui_alpha) {
+    float remain_ratio = 1.0f;
+    if (total_sec != 0) {
+        remain_ratio = remain_sec / total_sec;
+    }
+    const LWSHADER* shader = &pLwc->shader[LWST_RINGGAUGE];
+    lazy_glUseProgram(pLwc, LWST_RINGGAUGE);
+    glUniform3f(shader->full_color, 0, 1, 0);
+    glUniform3f(shader->empty_color, 1, 0, 0);
+    glUniform1f(shader->gauge_ratio, remain_ratio);
+    // text origin point debug indicator
+    render_solid_vb_ui_uv_shader_rot_view_proj(pLwc,
+                                               x,
+                                               y,
+                                               w,
+                                               h,
+                                               0,//pLwc->tex_atlas[LVT_RINGGAUGE],
+                                               LVT_RINGGAUGETHICK,
+                                               ui_alpha,
+                                               0,
+                                               1,
+                                               0,
+                                               1,
+                                               default_uv_offset,
+                                               default_uv_scale,
+                                               LWST_RINGGAUGE,
+                                               (float)M_PI,
+                                               view,
+                                               proj);
+}
+
+static void render_cell_pixel_selector(const LWTTL* ttl,
+                                       const LWCONTEXT* pLwc,
+                                       const mat4x4 view,
+                                       const mat4x4 proj,
+                                       const float x,
+                                       const float y,
+                                       const float z,
+                                       const float w,
+                                       const float h) {
     const LW_VBO_TYPE lvt = LVT_CELL_PIXEL_SELECTOR;
     render_cell_color(pLwc, view, proj, x, y, z, w, h, lvt, 0.0f, 0.0f, 0.0f, 0.0f);
+    float press_menu_gauge_total;
+    float press_menu_gauge_appear_delay;
+    float press_at;
+    float app_time = (float)pLwc->app_time;
+    if (lwttl_press_menu_info(ttl,
+                              &press_menu_gauge_total,
+                              &press_menu_gauge_appear_delay,
+                              &press_at)) {
+        if (app_time > press_at + press_menu_gauge_appear_delay) {
+            const float filled = app_time - (press_at + press_menu_gauge_appear_delay);
+            if (filled + LWEPSILON > press_menu_gauge_total) {
+
+            } else {
+                render_timer(pLwc,
+                             view,
+                             proj,
+                             x,
+                             y + 2.5f,
+                             w / 4,
+                             h / 4,
+                             filled,
+                             press_menu_gauge_total,
+                             1.0f);
+            }
+        }
+    }
 }
 
 static void render_waves(const LWCONTEXT* pLwc, const mat4x4 view, const mat4x4 proj, float ship_y) {
@@ -901,17 +976,20 @@ static void render_single_cell_info(const LWCONTEXT* pLwc,
     render_text_block(pLwc, &tb);
 }
 
-static void render_cell_pixel_selector_lng_lat(const LWCONTEXT* pLwc,
+static void render_cell_pixel_selector_lng_lat(const LWTTL* ttl,
+                                               const LWCONTEXT* pLwc,
                                                const mat4x4 view,
                                                const mat4x4 proj,
-                                               const LWTTLLNGLAT* selector_pos,
+                                               const int xc0,
+                                               const int yc0,
                                                const LWTTLLNGLAT* center,
                                                const int view_scale) {
     const float cell_render_width = cell_x_to_render_coords(1, center, view_scale) - cell_x_to_render_coords(0, center, view_scale);
     const float cell_render_height = cell_y_to_render_coords(0, center, view_scale) - cell_y_to_render_coords(1, center, view_scale);
-    const float selector_rx = cell_x_to_render_coords(lwttl_lng_to_floor_int(selector_pos->lng)/* & ~(view_scale - 1)*/, center, view_scale);
-    const float selector_ry = cell_y_to_render_coords(lwttl_lat_to_floor_int(selector_pos->lat)/* & ~(view_scale - 1)*/, center, view_scale);
-    render_cell_pixel_selector(pLwc,
+    const float selector_rx = cell_x_to_render_coords(xc0, center, view_scale);
+    const float selector_ry = cell_y_to_render_coords(yc0, center, view_scale);
+    render_cell_pixel_selector(ttl,
+                               pLwc,
                                view,
                                proj,
                                selector_rx,
@@ -1092,12 +1170,15 @@ void lwc_render_ttl(const LWCONTEXT* pLwc) {
         render_world(pLwc, view, proj, 0, &view_center);
     }
     glDisable(GL_DEPTH_TEST);
-    LWTTLLNGLAT selected_pos;
-    if (lwttl_selected(pLwc->ttl, &selected_pos)) {
-        render_cell_pixel_selector_lng_lat(pLwc,
+    int selected_xc0;
+    int selected_yc0;
+    if (lwttl_selected_int(pLwc->ttl, &selected_xc0, &selected_yc0)) {
+        render_cell_pixel_selector_lng_lat(pLwc->ttl,
+                                           pLwc,
                                            view,
                                            proj,
-                                           &selected_pos,
+                                           selected_xc0,
+                                           selected_yc0,
                                            &view_center,
                                            view_scale);
     }

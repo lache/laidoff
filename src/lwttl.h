@@ -90,6 +90,7 @@ void lwttl_fill_world_seaports_bookmarks(LWHTMLUI* htmlui);
 void lwttl_send_ping_now(LWTTL* ttl);
 void lwttl_prerender_mutable_context(LWTTL* ttl, LWCONTEXT* pLwc, LWHTMLUI* htmlui);
 int lwttl_selected(const LWTTL* ttl, LWTTLLNGLAT* pos);
+int lwttl_selected_int(const LWTTL* ttl, int* xc0, int* yc0);
 void lwttl_on_press(LWTTL* ttl, const LWCONTEXT* pLwc, float nx, float ny);
 void lwttl_on_release(LWTTL* ttl, const LWCONTEXT* pLwc, float nx, float ny);
 void lwttl_view_proj(const LWTTL* ttl, mat4x4 view, mat4x4 proj);
@@ -103,6 +104,14 @@ void lwttl_screen_to_world_pos(const float touchx,
                                vec2 world_pos);
 void lwttl_clear_selected_pressed_pos(LWTTL* ttl);
 const LWPTTLSINGLECELL* lwttl_single_cell(const LWTTL* ttl);
+int lwttl_press_menu_info(const LWTTL* ttl,
+                          float* press_menu_gauge_total,
+                          float* press_menu_gauge_appear_delay,
+                          float* press_at);
+void lwttl_change_selected_cell_to(LWTTL* ttl,
+                                   int xc,
+                                   int yc,
+                                   const LWTTLLNGLAT* lnglat);
 #ifdef __cplusplus
 }
 #endif

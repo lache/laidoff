@@ -88,6 +88,10 @@ typedef struct _LWTTLSELECTED {
     int pos_yc;
     int press_pos_xc;
     int press_pos_yc;
+    float press_at;
+    int pressing;
+    float press_menu_gauge_appear_delay;
+    float press_menu_gauge_total;
 } LWTTLSELECTED;
 
 typedef struct _LWTTL {
@@ -186,6 +190,7 @@ const char* lwttl_seaarea(LWTTL* ttl) {
 }
 
 void lwttl_update(LWTTL* ttl, LWCONTEXT* pLwc, float delta_time) {
+    const float app_time = (float)pLwc->app_time;
     for (int i = 0; i < ttl->ttl_full_state.count; i++) {
         ttl->ttl_full_state.obj[i].fx0 += (float)delta_time * ttl->ttl_full_state.obj[i].fvx;
         ttl->ttl_full_state.obj[i].fy0 += (float)delta_time * ttl->ttl_full_state.obj[i].fvy;
@@ -214,6 +219,22 @@ void lwttl_update(LWTTL* ttl, LWCONTEXT* pLwc, float delta_time) {
             }
         }
     }
+
+    if (ttl->selected.press_pos_xc >= 0
+        && ttl->selected.press_pos_yc >= 0
+        && (ttl->selected.press_pos_xc != ttl->selected.pos_xc || ttl->selected.press_pos_yc != ttl->selected.pos_yc)) {
+        if (ttl->selected.pressing
+            && app_time > ttl->selected.press_at + ttl->selected.press_menu_gauge_appear_delay) {
+            LWTTLLNGLAT lnglat;
+            lnglat.lng = cell_x_to_lng(ttl->selected.press_pos_xc);
+            lnglat.lat = cell_y_to_lat(ttl->selected.press_pos_yc);
+            lwttl_change_selected_cell_to(ttl,
+                                          ttl->selected.press_pos_xc,
+                                          ttl->selected.press_pos_yc,
+                                          &lnglat);
+        }
+    }
+    
 }
 
 static float lwttl_lng_to_int_float(float lng) {
@@ -1292,6 +1313,12 @@ int lwttl_selected(const LWTTL* ttl, LWTTLLNGLAT* pos) {
     return ttl->selected.selected;
 }
 
+int lwttl_selected_int(const LWTTL* ttl, int* xc0, int* yc0) {
+    *xc0 = ttl->selected.pos_xc;
+    *yc0 = ttl->selected.pos_yc;
+    return ttl->selected.selected;
+}
+
 void lwttl_screen_to_world_pos(const float touchx,
                                const float touchy,
                                const float screenw,
@@ -1361,12 +1388,14 @@ void lwttl_on_press(LWTTL* ttl, const LWCONTEXT* pLwc, float nx, float ny) {
     nx_ny_to_lng_lat(ttl, nx, ny, pLwc->width, pLwc->height, &xc, &yc, &lnglat);
     ttl->selected.press_pos_xc = xc;
     ttl->selected.press_pos_yc = yc;
+    ttl->selected.pressing = 1;
+    ttl->selected.press_at = (float)pLwc->app_time;
 }
 
-void lwttl_on_release(LWTTL* ttl, const LWCONTEXT* pLwc, float nx, float ny) {
-    int xc, yc;
-    LWTTLLNGLAT lnglat;
-    nx_ny_to_lng_lat(ttl, nx, ny, pLwc->width, pLwc->height, &xc, &yc, &lnglat);
+void lwttl_change_selected_cell_to(LWTTL* ttl,
+                                   int xc,
+                                   int yc,
+                                   const LWTTLLNGLAT* lnglat) {
     // check touch press cell and touch release cell are the same cell
     if (ttl->selected.press_pos_xc == xc
         && ttl->selected.press_pos_yc == yc) {
@@ -1375,16 +1404,29 @@ void lwttl_on_release(LWTTL* ttl, const LWCONTEXT* pLwc, float nx, float ny) {
             && ttl->selected.pos_xc == xc
             && ttl->selected.pos_yc == yc) {
             // deselect
-            ttl->selected.selected = 0;
+            //ttl->selected.selected = 0;
         } else {
             // select a new cell
             memset(&ttl->ttl_single_cell, 0, sizeof(LWPTTLSINGLECELL));
             ttl->selected.selected = 1;
-            ttl->selected.pos = lnglat;
+            ttl->selected.pos = *lnglat;
             ttl->selected.pos_xc = xc;
             ttl->selected.pos_yc = yc;
             send_ttlpingsinglecell(ttl, ttl->sea_udp, xc, yc);
         }
+    }
+}
+
+void lwttl_on_release(LWTTL* ttl, const LWCONTEXT* pLwc, float nx, float ny) {
+    if (ttl->selected.pressing) {
+        int xc, yc;
+        LWTTLLNGLAT lnglat;
+        nx_ny_to_lng_lat(ttl, nx, ny, pLwc->width, pLwc->height, &xc, &yc, &lnglat);
+        lwttl_change_selected_cell_to(ttl,
+                                      xc,
+                                      yc,
+                                      &lnglat);
+        ttl->selected.pressing = 0;
     }
 }
 
@@ -1430,8 +1472,22 @@ void lwttl_update_view_proj(LWTTL* ttl, float aspect_ratio) {
 void lwttl_clear_selected_pressed_pos(LWTTL* ttl) {
     ttl->selected.press_pos_xc = -1;
     ttl->selected.press_pos_yc = -1;
+    ttl->selected.press_menu_gauge_total = 0.55f;
+    ttl->selected.press_menu_gauge_appear_delay = 0.2f;
 }
 
 const LWPTTLSINGLECELL* lwttl_single_cell(const LWTTL* ttl) {
     return &ttl->ttl_single_cell;
+}
+
+int lwttl_press_menu_info(const LWTTL* ttl,
+                          float* press_menu_gauge_total,
+                          float* press_menu_gauge_appear_delay,
+                          float* press_at) {
+    *press_menu_gauge_total = ttl->selected.press_menu_gauge_total;
+    *press_menu_gauge_appear_delay = ttl->selected.press_menu_gauge_appear_delay;
+    *press_at = ttl->selected.press_at;
+    return ttl->selected.press_pos_xc >= 0
+        && ttl->selected.press_pos_yc >= 0
+        && ttl->selected.pressing;
 }
