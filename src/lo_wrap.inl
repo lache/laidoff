@@ -97052,9 +97052,13 @@ static int _wrap_lwttl_query_chunk_range_land(lua_State* L) {
   int arg6 ;
   int *arg7 = (int *) 0 ;
   int arg8 ;
+  int *arg9 = (int *) 0 ;
+  int *arg10 = (int *) 0 ;
+  int *arg11 = (int *) 0 ;
+  int *arg12 = (int *) 0 ;
   int result;
   
-  SWIG_check_num_args("lwttl_query_chunk_range_land",8,8)
+  SWIG_check_num_args("lwttl_query_chunk_range_land",12,12)
   if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("lwttl_query_chunk_range_land",1,"LWTTL const *");
   if(!lua_isnumber(L,2)) SWIG_fail_arg("lwttl_query_chunk_range_land",2,"float const");
   if(!lua_isnumber(L,3)) SWIG_fail_arg("lwttl_query_chunk_range_land",3,"float const");
@@ -97063,6 +97067,10 @@ static int _wrap_lwttl_query_chunk_range_land(lua_State* L) {
   if(!lua_isnumber(L,6)) SWIG_fail_arg("lwttl_query_chunk_range_land",6,"int const");
   if(!SWIG_isptrtype(L,7)) SWIG_fail_arg("lwttl_query_chunk_range_land",7,"int *");
   if(!lua_isnumber(L,8)) SWIG_fail_arg("lwttl_query_chunk_range_land",8,"int const");
+  if(!SWIG_isptrtype(L,9)) SWIG_fail_arg("lwttl_query_chunk_range_land",9,"int *");
+  if(!SWIG_isptrtype(L,10)) SWIG_fail_arg("lwttl_query_chunk_range_land",10,"int *");
+  if(!SWIG_isptrtype(L,11)) SWIG_fail_arg("lwttl_query_chunk_range_land",11,"int *");
+  if(!SWIG_isptrtype(L,12)) SWIG_fail_arg("lwttl_query_chunk_range_land",12,"int *");
   
   if (!SWIG_IsOK(SWIG_ConvertPtr(L,1,(void**)&arg1,SWIGTYPE_p__LWTTL,0))){
     SWIG_fail_ptr("lwttl_query_chunk_range_land",1,SWIGTYPE_p__LWTTL);
@@ -97079,7 +97087,27 @@ static int _wrap_lwttl_query_chunk_range_land(lua_State* L) {
   }
   
   arg8 = (int const)lua_tonumber(L, 8);
-  result = (int)lwttl_query_chunk_range_land((struct _LWTTL const *)arg1,arg2,arg3,arg4,arg5,arg6,arg7,arg8);
+  
+  if (!SWIG_IsOK(SWIG_ConvertPtr(L,9,(void**)&arg9,SWIGTYPE_p_int,0))){
+    SWIG_fail_ptr("lwttl_query_chunk_range_land",9,SWIGTYPE_p_int);
+  }
+  
+  
+  if (!SWIG_IsOK(SWIG_ConvertPtr(L,10,(void**)&arg10,SWIGTYPE_p_int,0))){
+    SWIG_fail_ptr("lwttl_query_chunk_range_land",10,SWIGTYPE_p_int);
+  }
+  
+  
+  if (!SWIG_IsOK(SWIG_ConvertPtr(L,11,(void**)&arg11,SWIGTYPE_p_int,0))){
+    SWIG_fail_ptr("lwttl_query_chunk_range_land",11,SWIGTYPE_p_int);
+  }
+  
+  
+  if (!SWIG_IsOK(SWIG_ConvertPtr(L,12,(void**)&arg12,SWIGTYPE_p_int,0))){
+    SWIG_fail_ptr("lwttl_query_chunk_range_land",12,SWIGTYPE_p_int);
+  }
+  
+  result = (int)lwttl_query_chunk_range_land((struct _LWTTL const *)arg1,arg2,arg3,arg4,arg5,arg6,arg7,arg8,arg9,arg10,arg11,arg12);
   lua_pushnumber(L, (lua_Number) result); SWIG_arg++;
   return SWIG_arg;
   
@@ -97101,9 +97129,13 @@ static int _wrap_lwttl_query_chunk_range_seaport(lua_State* L) {
   int arg6 ;
   int *arg7 = (int *) 0 ;
   int arg8 ;
+  int *arg9 = (int *) 0 ;
+  int *arg10 = (int *) 0 ;
+  int *arg11 = (int *) 0 ;
+  int *arg12 = (int *) 0 ;
   int result;
   
-  SWIG_check_num_args("lwttl_query_chunk_range_seaport",8,8)
+  SWIG_check_num_args("lwttl_query_chunk_range_seaport",12,12)
   if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("lwttl_query_chunk_range_seaport",1,"LWTTL const *");
   if(!lua_isnumber(L,2)) SWIG_fail_arg("lwttl_query_chunk_range_seaport",2,"float const");
   if(!lua_isnumber(L,3)) SWIG_fail_arg("lwttl_query_chunk_range_seaport",3,"float const");
@@ -97112,6 +97144,10 @@ static int _wrap_lwttl_query_chunk_range_seaport(lua_State* L) {
   if(!lua_isnumber(L,6)) SWIG_fail_arg("lwttl_query_chunk_range_seaport",6,"int const");
   if(!SWIG_isptrtype(L,7)) SWIG_fail_arg("lwttl_query_chunk_range_seaport",7,"int *");
   if(!lua_isnumber(L,8)) SWIG_fail_arg("lwttl_query_chunk_range_seaport",8,"int const");
+  if(!SWIG_isptrtype(L,9)) SWIG_fail_arg("lwttl_query_chunk_range_seaport",9,"int *");
+  if(!SWIG_isptrtype(L,10)) SWIG_fail_arg("lwttl_query_chunk_range_seaport",10,"int *");
+  if(!SWIG_isptrtype(L,11)) SWIG_fail_arg("lwttl_query_chunk_range_seaport",11,"int *");
+  if(!SWIG_isptrtype(L,12)) SWIG_fail_arg("lwttl_query_chunk_range_seaport",12,"int *");
   
   if (!SWIG_IsOK(SWIG_ConvertPtr(L,1,(void**)&arg1,SWIGTYPE_p__LWTTL,0))){
     SWIG_fail_ptr("lwttl_query_chunk_range_seaport",1,SWIGTYPE_p__LWTTL);
@@ -97128,7 +97164,27 @@ static int _wrap_lwttl_query_chunk_range_seaport(lua_State* L) {
   }
   
   arg8 = (int const)lua_tonumber(L, 8);
-  result = (int)lwttl_query_chunk_range_seaport((struct _LWTTL const *)arg1,arg2,arg3,arg4,arg5,arg6,arg7,arg8);
+  
+  if (!SWIG_IsOK(SWIG_ConvertPtr(L,9,(void**)&arg9,SWIGTYPE_p_int,0))){
+    SWIG_fail_ptr("lwttl_query_chunk_range_seaport",9,SWIGTYPE_p_int);
+  }
+  
+  
+  if (!SWIG_IsOK(SWIG_ConvertPtr(L,10,(void**)&arg10,SWIGTYPE_p_int,0))){
+    SWIG_fail_ptr("lwttl_query_chunk_range_seaport",10,SWIGTYPE_p_int);
+  }
+  
+  
+  if (!SWIG_IsOK(SWIG_ConvertPtr(L,11,(void**)&arg11,SWIGTYPE_p_int,0))){
+    SWIG_fail_ptr("lwttl_query_chunk_range_seaport",11,SWIGTYPE_p_int);
+  }
+  
+  
+  if (!SWIG_IsOK(SWIG_ConvertPtr(L,12,(void**)&arg12,SWIGTYPE_p_int,0))){
+    SWIG_fail_ptr("lwttl_query_chunk_range_seaport",12,SWIGTYPE_p_int);
+  }
+  
+  result = (int)lwttl_query_chunk_range_seaport((struct _LWTTL const *)arg1,arg2,arg3,arg4,arg5,arg6,arg7,arg8,arg9,arg10,arg11,arg12);
   lua_pushnumber(L, (lua_Number) result); SWIG_arg++;
   return SWIG_arg;
   

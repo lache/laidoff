@@ -1056,7 +1056,11 @@ static int lwttl_query_chunk_range(const LWTTL* ttl,
                                    const int view_scale,
                                    const LWTTLOBJECTCACHE* c,
                                    int* chunk_index_array,
-                                   const int chunk_index_array_len) {
+                                   const int chunk_index_array_len,
+                                   int* xcc0,
+                                   int* ycc0, 
+                                   int* xcc1, 
+                                   int* ycc1) {
     LWTTLCELLBOUND cell_bound = {
         lwttl_lng_to_floor_int(lng_min),
         lwttl_lat_to_floor_int(lat_max),
@@ -1065,6 +1069,10 @@ static int lwttl_query_chunk_range(const LWTTL* ttl,
     };
     LWTTLCHUNKBOUND chunk_bound;
     cell_bound_to_chunk_bound(&cell_bound, view_scale, &chunk_bound);
+    *xcc0 = chunk_bound.xcc0;
+    *ycc0 = chunk_bound.ycc0;
+    *xcc1 = chunk_bound.xcc1;
+    *ycc1 = chunk_bound.ycc1;
     const int xc_count = chunk_bound.xcc1 - chunk_bound.xcc0 + 1;
     const int yc_count = chunk_bound.ycc1 - chunk_bound.ycc0 + 1;
     int chunk_index_count = 0;
@@ -1095,7 +1103,11 @@ int lwttl_query_chunk_range_land(const LWTTL* ttl,
                                  const float lat_max,
                                  const int view_scale,
                                  int* chunk_index_array,
-                                 const int chunk_index_array_len) {
+                                 const int chunk_index_array_len,
+                                 int* xcc0,
+                                 int* ycc0, 
+                                 int* xcc1, 
+                                 int* ycc1) {
     return lwttl_query_chunk_range(ttl,
                                    lng_min,
                                    lng_max,
@@ -1104,7 +1116,11 @@ int lwttl_query_chunk_range_land(const LWTTL* ttl,
                                    view_scale,
                                    &ttl->object_cache.land_cache,
                                    chunk_index_array,
-                                   chunk_index_array_len);
+                                   chunk_index_array_len,
+                                   xcc0,
+                                   ycc0,
+                                   xcc1,
+                                   ycc1);
 }
 
 int lwttl_query_chunk_range_seaport(const LWTTL* ttl,
@@ -1114,7 +1130,11 @@ int lwttl_query_chunk_range_seaport(const LWTTL* ttl,
                                     const float lat_max,
                                     const int view_scale,
                                     int* chunk_index_array,
-                                    const int chunk_index_array_len) {
+                                    const int chunk_index_array_len,
+                                    int* xcc0,
+                                    int* ycc0,
+                                    int* xcc1,
+                                    int* ycc1) {
     return lwttl_query_chunk_range(ttl,
                                    lng_min,
                                    lng_max,
@@ -1123,7 +1143,11 @@ int lwttl_query_chunk_range_seaport(const LWTTL* ttl,
                                    view_scale,
                                    &ttl->object_cache.seaport_cache,
                                    chunk_index_array,
-                                   chunk_index_array_len);
+                                   chunk_index_array_len,
+                                   xcc0,
+                                   ycc0,
+                                   xcc1,
+                                   ycc1);
 }
 
 static const void* lwttl_query_chunk(const LWTTL* ttl,
