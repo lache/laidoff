@@ -17,6 +17,7 @@ typedef struct _LWPTTLSEAPORTOBJECT LWPTTLSEAPORTOBJECT;
 typedef struct _LWTTLLNGLAT LWTTLLNGLAT;
 typedef struct _LWHTMLUI LWHTMLUI;
 typedef struct _LWPTTLSINGLECELL LWPTTLSINGLECELL;
+typedef struct _LWPTTLSTATICSTATE3 LWPTTLSTATICSTATE3;
 
 LWTTL* lwttl_new(float aspect_ratio);
 void lwttl_destroy(LWTTL** _ttl);

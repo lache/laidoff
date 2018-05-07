@@ -309,6 +309,101 @@ static void render_land_cell(const LWCONTEXT* pLwc, const mat4x4 view, const mat
     render_cell(pLwc, view, proj, x, y, z, w, h, lvt);
 }
 
+static int bitmap_land(const unsigned char bitmap[LNGLAT_SEA_PING_EXTENT_IN_CELL_PIXELS][LNGLAT_SEA_PING_EXTENT_IN_CELL_PIXELS],
+                        size_t bx,
+                        size_t by) {
+    if (bx < 0 || bx >= LNGLAT_SEA_PING_EXTENT_IN_CELL_PIXELS) {
+        return 0;
+    }
+    if (by < 0 || by >= LNGLAT_SEA_PING_EXTENT_IN_CELL_PIXELS) {
+        return 0;
+    }
+    return bitmap[by][bx];
+}
+
+static void render_land_cell_bitmap(const LWCONTEXT* pLwc,
+                                    const mat4x4 view,
+                                    const mat4x4 proj,
+                                    const int xc0,
+                                    const int yc0,
+                                    const int clamped_view_scale,
+                                    const int clamped_to_original_view_scale_ratio,
+                                    const LWTTLLNGLAT* center,
+                                    const float lng_min,
+                                    const float lng_max,
+                                    const float lat_min,
+                                    const float lat_max,
+                                    const unsigned char bitmap[LNGLAT_SEA_PING_EXTENT_IN_CELL_PIXELS][LNGLAT_SEA_PING_EXTENT_IN_CELL_PIXELS],
+                                    const int rows,
+                                    const int cols) {
+    const float tw = 1.0f / 2;
+    const float th = 1.0f / 2;
+    lazy_tex_atlas_glBindTexture(pLwc, LAE_WATER_SAND_TILE);
+    // need to see neighbor tiles by 1 tile for each direction
+    for (int by = -1; by <= rows; by++) {
+        for (int bx = -1; bx <= cols; bx++) {
+            int tx = 0;
+            int ty = 0;
+            if (bitmap_land(bitmap, bx, by)) {
+                tx = 1;
+                ty = 1;
+            } else {
+                tx = 2;
+                ty = 3;
+            }
+            const float uv_offset[] = { 1.0f / 4 * tx, 1.0f / 4 * ty };
+            const float uv_scale[] = { 1.0f / 4, 1.0f / 4 };
+
+            const signed char x_scaled_offset_0 = (signed char)(bx - LNGLAT_SEA_PING_EXTENT_IN_CELL_PIXELS / 2);
+            const signed char y_scaled_offset_0 = (signed char)(by - LNGLAT_SEA_PING_EXTENT_IN_CELL_PIXELS / 2);
+            const signed char x_scaled_offset_1 = (signed char)(x_scaled_offset_0 + 1);
+            const signed char y_scaled_offset_1 = (signed char)(y_scaled_offset_0 + 1);
+
+            const float x0 = (float)(xc0 + clamped_view_scale * x_scaled_offset_0);
+            const float y0 = (float)(yc0 + clamped_view_scale * y_scaled_offset_0);
+            const float x1 = (float)(xc0 + clamped_view_scale * x_scaled_offset_1);
+            const float y1 = (float)(yc0 + clamped_view_scale * y_scaled_offset_1);
+
+            const float lng0_not_clamped = cell_fx_to_lng(x0);
+            const float lat0_not_clamped = cell_fy_to_lat(y0);
+            const float lng1_not_clamped = cell_fx_to_lng(x1);
+            const float lat1_not_clamped = cell_fy_to_lat(y1);
+
+            const float lng0 = LWCLAMP(lng0_not_clamped, lng_min, lng_max);
+            const float lat0 = LWCLAMP(lat0_not_clamped, lat_min, lat_max);
+            const float lng1 = LWCLAMP(lng1_not_clamped, lng_min, lng_max);
+            const float lat1 = LWCLAMP(lat1_not_clamped, lat_min, lat_max);
+
+            const float cell_x0 = lng_to_render_coords(lng0, center, clamped_view_scale * clamped_to_original_view_scale_ratio);
+            const float cell_y0 = lat_to_render_coords(lat0, center, clamped_view_scale * clamped_to_original_view_scale_ratio);
+            const float cell_x1 = lng_to_render_coords(lng1, center, clamped_view_scale * clamped_to_original_view_scale_ratio);
+            const float cell_y1 = lat_to_render_coords(lat1, center, clamped_view_scale * clamped_to_original_view_scale_ratio);
+            const float cell_w = cell_x1 - cell_x0;
+            // cell_y0 and cell_y1 are in OpenGL rendering coordinates (always cell_y0 > cell_y1)
+            const float cell_h = cell_y0 - cell_y1;
+            
+            render_solid_vb_ui_uv_shader_rot_view_proj(pLwc,
+                                                       cell_x0,
+                                                       cell_y0,
+                                                       cell_w,
+                                                       cell_h,
+                                                       pLwc->tex_atlas[LAE_WATER_SAND_TILE],
+                                                       LVT_LEFT_TOP_ANCHORED_SQUARE,
+                                                       1,
+                                                       0,
+                                                       0,
+                                                       0,
+                                                       0,
+                                                       uv_offset,
+                                                       uv_scale,
+                                                       LWST_DEFAULT,
+                                                       0,
+                                                       view,
+                                                       proj);
+        }
+    }
+}
+
 static void render_sea_cell_debug(const LWCONTEXT* pLwc, const mat4x4 view, const mat4x4 proj, float x, float y, float z, float w, float h) {
     const LW_VBO_TYPE lvt = LVT_SEA_CELL_DEBUG;
     render_cell(pLwc, view, proj, x, y, z, w, h, lvt);
@@ -821,6 +916,11 @@ static void render_sea_static_objects(const LWCONTEXT* pLwc,
     const float lat_min = center->lat - half_lat_extent_in_deg;
     const float lat_max = center->lat + half_lat_extent_in_deg;
 
+    const int xc_min = lwttl_lng_to_floor_int(lng_min);
+    //const int xc_max = lwttl_lng_to_floor_int(lng_max);
+    //const int yc_max = lwttl_lat_to_floor_int(lat_min);
+    const int yc_min = lwttl_lat_to_floor_int(lat_max);
+
     render_background_sea_water(pLwc,
                                 view,
                                 proj,
@@ -857,7 +957,19 @@ static void render_sea_static_objects(const LWCONTEXT* pLwc,
                                                                       &yc0,
                                                                       &obj_count);
         if (obj_begin && obj_count > 0) {
+            unsigned char bitmap[LNGLAT_SEA_PING_EXTENT_IN_CELL_PIXELS][LNGLAT_SEA_PING_EXTENT_IN_CELL_PIXELS];
+            memset(bitmap, 0, sizeof(bitmap));
             for (int i = 0; i < obj_count; i++) {
+                const int bitmap_x0 = LNGLAT_SEA_PING_EXTENT_IN_CELL_PIXELS / 2 + obj_begin[i].x_scaled_offset_0;
+                const int bitmap_y0 = LNGLAT_SEA_PING_EXTENT_IN_CELL_PIXELS / 2 + obj_begin[i].y_scaled_offset_0;
+                const int bitmap_x1 = LNGLAT_SEA_PING_EXTENT_IN_CELL_PIXELS / 2 + obj_begin[i].x_scaled_offset_1;
+                const int bitmap_y1 = LNGLAT_SEA_PING_EXTENT_IN_CELL_PIXELS / 2 + obj_begin[i].y_scaled_offset_1;
+                for (int by = bitmap_y0; by < bitmap_y1; by++) {
+                    for (int bx = bitmap_x0; bx < bitmap_x1; bx++) {
+                        bitmap[by][bx] = 1;
+                    }
+                }
+
                 const float x0 = (float)(xc0 + clamped_view_scale * obj_begin[i].x_scaled_offset_0);
                 const float y0 = (float)(yc0 + clamped_view_scale * obj_begin[i].y_scaled_offset_0);
                 const float x1 = (float)(xc0 + clamped_view_scale * obj_begin[i].x_scaled_offset_1);
@@ -878,20 +990,38 @@ static void render_sea_static_objects(const LWCONTEXT* pLwc,
                 const float cell_x1 = lng_to_render_coords(lng1, center, clamped_view_scale * clamped_to_original_view_scale_ratio);
                 const float cell_y1 = lat_to_render_coords(lat1, center, clamped_view_scale * clamped_to_original_view_scale_ratio);
                 const float cell_w = cell_x1 - cell_x0;
-                const float cell_h = cell_y0 - cell_y1; // cell_y0 and cell_y1 are in OpenGL rendering coordinates (always cell_y0 > cell_y1)
-                                                        // skip degenerated cell
+                // cell_y0 and cell_y1 are in OpenGL rendering coordinates (always cell_y0 > cell_y1)
+                const float cell_h = cell_y0 - cell_y1;
+                // skip degenerated cell
                 if (cell_w <= 0 || cell_h <= 0) {
                     continue;
                 }
-                render_land_cell(pLwc,
+
+                /*render_land_cell(pLwc,
                                  view,
                                  proj,
                                  cell_x0,
                                  cell_y0,
                                  0,
                                  cell_w,
-                                 cell_h);
+                                 cell_h);*/
             }
+            // render water-land tilemap
+            render_land_cell_bitmap(pLwc,
+                                    view,
+                                    proj,
+                                    xc0,
+                                    yc0,
+                                    clamped_view_scale,
+                                    clamped_to_original_view_scale_ratio,
+                                    center,
+                                    lng_min,
+                                    lng_max,
+                                    lat_min,
+                                    lat_max,
+                                    bitmap,
+                                    LNGLAT_SEA_PING_EXTENT_IN_CELL_PIXELS,
+                                    LNGLAT_SEA_PING_EXTENT_IN_CELL_PIXELS);
         }
     }
     //lwttl_unlock_rendering_mutex(pLwc->ttl);

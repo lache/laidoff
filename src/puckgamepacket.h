@@ -1,19 +1,19 @@
 #pragma once
 
 typedef enum _LW_PUCK_GAME_PACKET {
-	LPGP_LWPGETTOKEN = 0,
-	LPGP_LWPTOKEN,
-	LPGP_LWPQUEUE,
-	LPGP_LWPMATCHED,
-	LPGP_LWPPLAYERDAMAGED,
-	LPGP_LWPTARGETDAMAGED,
-	// udp
-	LPGP_LWPMOVE = 100,
-	LPGP_LWPSTOP = 101,
-	LPGP_LWPDASH = 102,
-	LPGP_LWPPULLSTART = 103,
-	LPGP_LWPPULLSTOP = 104,
-	LPGP_LWPSTATE = 105,
+    LPGP_LWPGETTOKEN = 0,
+    LPGP_LWPTOKEN,
+    LPGP_LWPQUEUE,
+    LPGP_LWPMATCHED,
+    LPGP_LWPPLAYERDAMAGED,
+    LPGP_LWPTARGETDAMAGED,
+    // udp
+    LPGP_LWPMOVE = 100,
+    LPGP_LWPSTOP = 101,
+    LPGP_LWPDASH = 102,
+    LPGP_LWPPULLSTART = 103,
+    LPGP_LWPPULLSTOP = 104,
+    LPGP_LWPSTATE = 105,
     LPGP_LWPJUMP = 106,
     LPGP_LWPFIRE = 107,
     LPGP_LWPSTATE2 = 108,
@@ -30,17 +30,18 @@ typedef enum _LW_PUCK_GAME_PACKET {
     LPGP_LWPTTLPINGCHUNK = 119, // client -> server
     LPGP_LWPTTLPINGSINGLECELL = 120, // client -> server
     LPGP_LWPTTLSINGLECELL = 121, // server -> client
-	// tcp
-	LPGP_LWPQUEUE2 = 200,
-	LPGP_LWPMAYBEMATCHED = 201,
-	LPGP_LWPMATCHED2 = 202,
-	LPGP_LWPQUEUEOK = 203,
-	LPGP_LWPRETRYQUEUE = 204,
-	LPGP_LWPSUDDENDEATH = 205,
-	LPGP_LWPNEWUSER = 206,
-	LPGP_LWPNEWUSERDATA = 207,
-	LPGP_LWPQUERYNICK = 208,
-	LPGP_LWPNICK = 209,
+    LPGP_LWPTTLSTATICSTATE3 = 122, // server -> client
+    // tcp
+    LPGP_LWPQUEUE2 = 200,
+    LPGP_LWPMAYBEMATCHED = 201,
+    LPGP_LWPMATCHED2 = 202,
+    LPGP_LWPQUEUEOK = 203,
+    LPGP_LWPRETRYQUEUE = 204,
+    LPGP_LWPSUDDENDEATH = 205,
+    LPGP_LWPNEWUSER = 206,
+    LPGP_LWPNEWUSERDATA = 207,
+    LPGP_LWPQUERYNICK = 208,
+    LPGP_LWPNICK = 209,
     LPGP_LWPPUSHTOKEN = 210,
     LPGP_LWPSYSMSG = 211,
     LPGP_LWPGETLEADERBOARD = 212,
@@ -57,9 +58,9 @@ typedef enum _LW_PUCK_GAME_PACKET {
     LPGP_LWPGETLEADERBOARDREVEALPLAYER = 223,
     // should be less than 256 (packet type field: unsigned char type)
     LPGP_SENTIAL_UNSIGNED_CHAR = 255,
-	// internal admin tcp
-	LPGP_LWPCREATEBATTLE = 1000,
-	LPGP_LWPCREATEBATTLEOK = 1001,
+    // internal admin tcp
+    LPGP_LWPCREATEBATTLE = 1000,
+    LPGP_LWPCREATEBATTLEOK = 1001,
     LPGP_LWPCHECKBATTLEVALID = 1002,
     LPGP_LWPBATTLEVALID = 1003,
 } LW_PUCK_GAME_PACKET;
@@ -106,63 +107,63 @@ enum {
 
 // Client -> Server
 typedef struct _LWPGETTOKEN {
-	int type;
+    int type;
 } LWPGETTOKEN;
 
 // Server --> Client
 typedef struct _LWPTOKEN {
-	int type;
-	int token;
+    int type;
+    int token;
 } LWPTOKEN;
 
 // Client --> Server
 typedef struct _LWPQUEUE {
-	int type;
-	int token;
+    int type;
+    int token;
 } LWPQUEUE;
 
 // Server --> Client
 typedef struct _LWPMATCHED {
-	int type;
-	int master;
+    int type;
+    int master;
 } LWPMATCHED;
 
 typedef struct _LWPPLAYERDAMAGED {
-	int type;
+    int type;
 } LWPPLAYERDAMAGED;
 
 typedef struct _LWPTARGETDAMAGED {
-	int type;
+    int type;
 } LWPTARGETDAMAGED;
 
 typedef struct _LWPUDPHEADER {
-	int type;
-	int battle_id;
-	int token;
+    int type;
+    int battle_id;
+    int token;
 } LWPUDPHEADER;
 
 // UDP
 typedef struct _LWPMOVE {
-	int type;
-	int battle_id;
-	int token;
-	float dx;
-	float dy;
+    int type;
+    int battle_id;
+    int token;
+    float dx;
+    float dy;
     float dlen;
 } LWPMOVE;
 
 // UDP
 typedef struct _LWPSTOP {
-	int type;
-	int battle_id;
-	int token;
+    int type;
+    int battle_id;
+    int token;
 } LWPSTOP;
 
 // UDP
 typedef struct _LWPDASH {
-	int type;
-	int battle_id;
-	int token;
+    int type;
+    int battle_id;
+    int token;
 } LWPDASH;
 
 // UDP
@@ -184,16 +185,16 @@ typedef struct _LWPJUMP {
 
 // UDP
 typedef struct _LWPPULLSTART {
-	int type;
-	int battle_id;
-	int token;
+    int type;
+    int battle_id;
+    int token;
 } LWPPULLSTART;
 
 // UDP
 typedef struct _LWPPULLSTOP {
-	int type;
-	int battle_id;
-	int token;
+    int type;
+    int battle_id;
+    int token;
 } LWPPULLSTOP;
 
 typedef struct _LWPSTATEBITFIELD {
@@ -210,23 +211,23 @@ typedef struct _LWPSTATEBITFIELD {
 
 // UDP
 typedef struct _LWPSTATE {
-	int type;
-	int update_tick;
-	// player
-	float player[3];
-	float player_rot[4][4];
-	float player_speed;
-	float player_move_rad;
-	// puck
-	float puck[3];
-	float puck_rot[4][4];
-	float puck_speed;
-	float puck_move_rad;
-	// target
-	float target[3];
-	float target_rot[4][4];
-	float target_speed;
-	float target_move_rad;
+    int type;
+    int update_tick;
+    // player
+    float player[3];
+    float player_rot[4][4];
+    float player_speed;
+    float player_move_rad;
+    // puck
+    float puck[3];
+    float puck_rot[4][4];
+    float puck_speed;
+    float puck_move_rad;
+    // target
+    float target[3];
+    float target_rot[4][4];
+    float target_speed;
+    float target_move_rad;
     // reflect size
     float puck_reflect_size;
     // bitfield
@@ -252,7 +253,7 @@ typedef struct _LWPSTATE2 {
 /*
  * BEGIN: should sync with packet.h in sea-server
  */
-// UDP
+ // UDP
 typedef struct _LWPTTLFULLSTATEOBJECT {
     float fx0, fy0;
     float fx1, fy1;
@@ -288,15 +289,15 @@ typedef struct _LWPTTLSTATICSTATE {
     unsigned char padding1;
     unsigned char padding2;
     int count;
-    LWPTTLSTATICOBJECT obj[256+128];
+    LWPTTLSTATICOBJECT obj[256 + 128];
 } LWPTTLSTATICSTATE;
 
 // UDP
 typedef struct _LWPTTLSTATICOBJECT2 {
     signed char x_scaled_offset_0;
-	signed char y_scaled_offset_0;
-	signed char x_scaled_offset_1;
-	signed char y_scaled_offset_1;
+    signed char y_scaled_offset_0;
+    signed char x_scaled_offset_1;
+    signed char y_scaled_offset_1;
 } LWPTTLSTATICOBJECT2;
 
 // UDP
@@ -310,8 +311,21 @@ typedef struct _LWPTTLSTATICSTATE2 {
     int yc0;
     int view_scale;
     int count;
-    LWPTTLSTATICOBJECT2 obj[256+128];
+    LWPTTLSTATICOBJECT2 obj[256 + 128];
 } LWPTTLSTATICSTATE2;
+
+// UDP
+typedef struct _LWPTTLSTATICSTATE3 {
+    unsigned char type;
+    unsigned char padding0;
+    unsigned char padding1;
+    unsigned char padding2;
+    long long ts;
+    int xc0;
+    int yc0;
+    int view_scale;
+    unsigned int bitmap[128][128 / 8];
+} LWPTTLSTATICSTATE3;
 
 // UDP
 typedef struct _LWPTTLSEAPORTOBJECT {
@@ -438,37 +452,37 @@ typedef struct _LWPTTLSINGLECELL {
 // (Cgo compatibility issue)
 //#pragma pack(push, 1)
 typedef struct _LWPNEWUSER {
-	unsigned short size;
-	unsigned short type;
+    unsigned short size;
+    unsigned short type;
 } LWPNEWUSER;
 
 typedef struct _LWPQUERYNICK {
-	unsigned short Size;
-	unsigned short Type;
-	unsigned int Id[4];
+    unsigned short Size;
+    unsigned short Type;
+    unsigned int Id[4];
 } LWPQUERYNICK;
 
 typedef struct _LWPNICK {
-	unsigned short size;
-	unsigned short type;
-	char nickname[LW_NICKNAME_MAX_LEN];
+    unsigned short size;
+    unsigned short type;
+    char nickname[LW_NICKNAME_MAX_LEN];
     int score;
     int rank;
 } LWPNICK;
 
 typedef struct _LWPNEWUSERDATA {
-	unsigned short size;
-	unsigned short type;
-	unsigned int id[4];
-	char nickname[LW_NICKNAME_MAX_LEN];
+    unsigned short size;
+    unsigned short type;
+    unsigned int id[4];
+    char nickname[LW_NICKNAME_MAX_LEN];
     int score;
     int rank;
 } LWPNEWUSERDATA;
 
 typedef struct _LWPQUEUE2 {
-	unsigned short Size;
-	unsigned short Type;
-	unsigned int Id[4];
+    unsigned short Size;
+    unsigned short Type;
+    unsigned int Id[4];
 } LWPQUEUE2;
 
 typedef struct _LWPQUEUE3 {
@@ -490,13 +504,13 @@ typedef struct _LWPCANCELQUEUEOK {
 } LWPCANCELQUEUEOK;
 
 typedef struct _LWPQUEUEOK {
-	unsigned short size;
-	unsigned short type;
+    unsigned short size;
+    unsigned short type;
 } LWPQUEUEOK;
 
 typedef struct _LWPRETRYQUEUE {
-	unsigned short size;
-	unsigned short type;
+    unsigned short size;
+    unsigned short type;
 } LWPRETRYQUEUE;
 
 typedef struct _LWPRETRYQUEUE2 {
@@ -511,50 +525,50 @@ typedef struct _LWPRETRYQUEUELATER {
 } LWPRETRYQUEUELATER;
 
 typedef struct _LWPMAYBEMATCHED {
-	unsigned short size;
-	unsigned short type;
+    unsigned short size;
+    unsigned short type;
 } LWPMAYBEMATCHED;
 
 typedef struct _LWPMATCHED2 {
-	unsigned short size;
-	unsigned short type;
-	unsigned short port;
-	unsigned short padding_unused;
-	unsigned char ipaddr[4];
-	int battle_id;
-	unsigned int token;
-	int player_no;
+    unsigned short size;
+    unsigned short type;
+    unsigned short port;
+    unsigned short padding_unused;
+    unsigned char ipaddr[4];
+    int battle_id;
+    unsigned int token;
+    int player_no;
     int target_score;
-	char target_nickname[LW_NICKNAME_MAX_LEN];
+    char target_nickname[LW_NICKNAME_MAX_LEN];
     int victory_score;
     int defeat_score;
     int draw_score;
 } LWPMATCHED2;
 
 typedef struct _LWPBASE {
-	unsigned short size;
-	unsigned short type;
+    unsigned short size;
+    unsigned short type;
 } LWPBASE;
 
 typedef struct _LWPCREATEBATTLE {
-	unsigned short Size;
-	unsigned short Type;
+    unsigned short Size;
+    unsigned short Type;
     int BotBattle;
-	unsigned int Id1[4];
-	unsigned int Id2[4];
+    unsigned int Id1[4];
+    unsigned int Id2[4];
     char Nickname1[LW_NICKNAME_MAX_LEN];
     char Nickname2[LW_NICKNAME_MAX_LEN];
 } LWPCREATEBATTLE;
 
 typedef struct _LWPCREATEBATTLEOK {
-	unsigned short Size;
-	unsigned short Type;
-	int Battle_id;
-	unsigned int C1_token;
-	unsigned int C2_token;
-	unsigned char IpAddr[4];
-	unsigned short Port;
-	unsigned short Padding_unused;
+    unsigned short Size;
+    unsigned short Type;
+    int Battle_id;
+    unsigned int C1_token;
+    unsigned int C2_token;
+    unsigned char IpAddr[4];
+    unsigned short Port;
+    unsigned short Padding_unused;
 } LWPCREATEBATTLEOK;
 
 typedef struct _LWPCHECKBATTLEVALID {
@@ -570,10 +584,10 @@ typedef struct _LWPBATTLEVALID {
 } LWPBATTLEVALID;
 
 typedef struct _LWPSUDDENDEATH {
-	unsigned short Size;
-	unsigned short Type;
-	int Battle_id;
-	unsigned int Token;
+    unsigned short Size;
+    unsigned short Type;
+    int Battle_id;
+    unsigned int Token;
 } LWPSUDDENDEATH;
 
 typedef struct _LWPGETLEADERBOARD {

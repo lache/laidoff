@@ -63,6 +63,10 @@ typedef struct _LWTTLOBJECTCACHEGROUP {
     LWPTTLSTATICOBJECT2 land_array[TTL_OBJECT_CACHE_LAND_COUNT];
     int land_count;
 
+    //LWTTLOBJECTCACHE land_bitmap_cache;
+    //LWPTTLSTATICSTATE3 land_bitmap_array[TTL_OBJECT_CACHE_LAND_BITMAP_COUNT];
+    //int land_count;
+
     LWTTLOBJECTCACHE seaport_cache;
     LWPTTLSEAPORTOBJECT seaport_array[TTL_OBJECT_CACHE_SEAPORT_COUNT];
     int seaport_count;
@@ -849,7 +853,7 @@ void lwttl_udp_update(LWTTL* ttl, LWUDP* udp, LWCONTEXT* pLwc) {
             udp->reinit_next_update = 1;
             return;
 #endif
-            }
+        }
 
         char decompressed[1500 * 255]; // maximum lz4 compression ratio is 255...
         int decompressed_bytes = LZ4_decompress_safe(udp->buf, decompressed, udp->recv_len, ARRAY_SIZE(decompressed));
@@ -923,6 +927,22 @@ void lwttl_udp_update(LWTTL* ttl, LWUDP* udp, LWCONTEXT* pLwc) {
                 }
                 break;
             }
+            case LPGP_LWPTTLSTATICSTATE3:
+            {
+                if (decompressed_bytes != sizeof(LWPTTLSTATICSTATE3)) {
+                    LOGE("LWPTTLSTATICSTATE3: Size error %d (%zu expected)",
+                         decompressed_bytes,
+                         sizeof(LWPTTLSTATICSTATE3));
+                }
+
+                LWPTTLSTATICSTATE3* p = (LWPTTLSTATICSTATE3*)decompressed;
+                //add_to_object_cache_land(&ttl->object_cache.land_cache,
+                //                         ttl->object_cache.land_array,
+                //                         ARRAY_SIZE(ttl->object_cache.land_array),
+                //                         &ttl->object_cache.land_count,
+                //                         p);
+                break;
+            }
             case LPGP_LWPTTLSEAPORTSTATE:
             {
                 if (decompressed_bytes != sizeof(LWPTTLSEAPORTSTATE)) {
@@ -987,8 +1007,8 @@ void lwttl_udp_update(LWTTL* ttl, LWUDP* udp, LWCONTEXT* pLwc) {
         } else {
             LOGEP("lz4 decompression failed!");
         }
-        }
     }
+}
 
 const LWPTTLWAYPOINTS* lwttl_get_waypoints(const LWTTL* ttl) {
     return &ttl->waypoints;
@@ -1106,14 +1126,14 @@ int lwttl_query_chunk_range_seaport(const LWTTL* ttl,
                                    chunk_index_array_len);
 }
 
-const void* lwttl_query_chunk(const LWTTL* ttl,
-                              const LWTTLOBJECTCACHE* c,
-                              const int chunk_index,
-                              const void* cache_array,
-                              const size_t entry_size,
-                              int* xc0,
-                              int* yc0,
-                              int* count) {
+static const void* lwttl_query_chunk(const LWTTL* ttl,
+                                     const LWTTLOBJECTCACHE* c,
+                                     const int chunk_index,
+                                     const void* cache_array,
+                                     const size_t entry_size,
+                                     int* xc0,
+                                     int* yc0,
+                                     int* count) {
     if (chunk_index >= 0 && chunk_index < c->count) {
         const int start = c->value_array[chunk_index].start;
         const int view_scale = 1 << c->key_array[chunk_index].bf.view_scale_msb;
