@@ -2996,7 +2996,7 @@ static swig_module_info swig_module = {swig_types, 261, 0, 0, 0, 0};
 #include "render_field.h"
 #include "render_font_test.h"
 #include "render_ttl.h"
-#include "render_physics.h"
+#include "render_puckgame.h"
 #include "render_ps.h"
 #include "render_skin.h"
 #include "render_solid.h"
@@ -11015,18 +11015,18 @@ fail:
 }
 
 
-static int _wrap_change_to_physics(lua_State* L) {
+static int _wrap_change_to_puck_game(lua_State* L) {
   int SWIG_arg = 0;
   LWCONTEXT *arg1 = (LWCONTEXT *) 0 ;
   
-  SWIG_check_num_args("change_to_physics",1,1)
-  if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("change_to_physics",1,"LWCONTEXT *");
+  SWIG_check_num_args("change_to_puck_game",1,1)
+  if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("change_to_puck_game",1,"LWCONTEXT *");
   
   if (!SWIG_IsOK(SWIG_ConvertPtr(L,1,(void**)&arg1,SWIGTYPE_p__LWCONTEXT,0))){
-    SWIG_fail_ptr("change_to_physics",1,SWIGTYPE_p__LWCONTEXT);
+    SWIG_fail_ptr("change_to_puck_game",1,SWIGTYPE_p__LWCONTEXT);
   }
   
-  change_to_physics(arg1);
+  change_to_puck_game(arg1);
   
   return SWIG_arg;
   
@@ -48039,32 +48039,32 @@ fail:
 }
 
 
-static int _wrap_lwc_render_physics(lua_State* L) {
+static int _wrap_lwc_render_puck_game(lua_State* L) {
   int SWIG_arg = 0;
   LWCONTEXT *arg1 = (LWCONTEXT *) 0 ;
   vec4 *arg2 ;
   vec4 *arg3 ;
   
-  SWIG_check_num_args("lwc_render_physics",3,3)
-  if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("lwc_render_physics",1,"LWCONTEXT const *");
-  if(!SWIG_isptrtype(L,2)) SWIG_fail_arg("lwc_render_physics",2,"mat4x4 const");
-  if(!SWIG_isptrtype(L,3)) SWIG_fail_arg("lwc_render_physics",3,"mat4x4 const");
+  SWIG_check_num_args("lwc_render_puck_game",3,3)
+  if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("lwc_render_puck_game",1,"LWCONTEXT const *");
+  if(!SWIG_isptrtype(L,2)) SWIG_fail_arg("lwc_render_puck_game",2,"mat4x4 const");
+  if(!SWIG_isptrtype(L,3)) SWIG_fail_arg("lwc_render_puck_game",3,"mat4x4 const");
   
   if (!SWIG_IsOK(SWIG_ConvertPtr(L,1,(void**)&arg1,SWIGTYPE_p__LWCONTEXT,0))){
-    SWIG_fail_ptr("lwc_render_physics",1,SWIGTYPE_p__LWCONTEXT);
+    SWIG_fail_ptr("lwc_render_puck_game",1,SWIGTYPE_p__LWCONTEXT);
   }
   
   
   if (!SWIG_IsOK(SWIG_ConvertPtr(L,2,(void**)&arg2,SWIGTYPE_p_a_4__float,0))){
-    SWIG_fail_ptr("lwc_render_physics",2,SWIGTYPE_p_a_4__float);
+    SWIG_fail_ptr("lwc_render_puck_game",2,SWIGTYPE_p_a_4__float);
   }
   
   
   if (!SWIG_IsOK(SWIG_ConvertPtr(L,3,(void**)&arg3,SWIGTYPE_p_a_4__float,0))){
-    SWIG_fail_ptr("lwc_render_physics",3,SWIGTYPE_p_a_4__float);
+    SWIG_fail_ptr("lwc_render_puck_game",3,SWIGTYPE_p_a_4__float);
   }
   
-  lwc_render_physics((struct _LWCONTEXT const *)arg1,(float const (*)[4])arg2,(float const (*)[4])arg3);
+  lwc_render_puck_game((struct _LWCONTEXT const *)arg1,(float const (*)[4])arg2,(float const (*)[4])arg3);
   
   return SWIG_arg;
   
@@ -99918,7 +99918,7 @@ static swig_lua_const_info swig_SwigModule_constants[]= {
     {SWIG_LUA_CONSTTAB_INT("LGS_ADMIN", LGS_ADMIN)},
     {SWIG_LUA_CONSTTAB_INT("LGS_BATTLE_RESULT", LGS_BATTLE_RESULT)},
     {SWIG_LUA_CONSTTAB_INT("LGS_SKIN", LGS_SKIN)},
-    {SWIG_LUA_CONSTTAB_INT("LGS_PHYSICS", LGS_PHYSICS)},
+    {SWIG_LUA_CONSTTAB_INT("LGS_PUCK_GAME", LGS_PUCK_GAME)},
     {SWIG_LUA_CONSTTAB_INT("LGS_PARTICLE_SYSTEM", LGS_PARTICLE_SYSTEM)},
     {SWIG_LUA_CONSTTAB_INT("LGS_UI", LGS_UI)},
     {SWIG_LUA_CONSTTAB_INT("LGS_SPLASH", LGS_SPLASH)},
@@ -100249,15 +100249,15 @@ static swig_lua_const_info swig_SwigModule_constants[]= {
     {SWIG_LUA_CONSTTAB_INT("LSWHB_NORTH", LSWHB_NORTH)},
     {SWIG_LUA_CONSTTAB_INT("LW_PUSH_TOKEN_LENGTH", LW_PUSH_TOKEN_LENGTH)},
     {SWIG_LUA_CONSTTAB_INT("LW_SYS_MSG_LENGTH", LW_SYS_MSG_LENGTH)},
-    {SWIG_LUA_CONSTTAB_FLOAT("sea_render_scale", (50.0*12))},
-    {SWIG_LUA_CONSTTAB_FLOAT("earth_globe_render_scale", (45.0*12))},
+    {SWIG_LUA_CONSTTAB_FLOAT("sea_render_scale", (50.0*14))},
+    {SWIG_LUA_CONSTTAB_FLOAT("earth_globe_render_scale", (45.0*14))},
     {SWIG_LUA_CONSTTAB_INT("LNGLAT_RES_WIDTH", (172824))},
     {SWIG_LUA_CONSTTAB_INT("LNGLAT_RES_HEIGHT", (86412))},
     {SWIG_LUA_CONSTTAB_INT("LNGLAT_SEA_PING_EXTENT_IN_CELL_PIXELS", (16))},
     {SWIG_LUA_CONSTTAB_INT("LNGLAT_SEA_PING_EXTENT_IN_DEGREES", ((180.0/(86412))*(16)))},
-    {SWIG_LUA_CONSTTAB_INT("LNGLAT_RENDER_EXTENT_MULTIPLIER_LNG", (1))},
+    {SWIG_LUA_CONSTTAB_INT("LNGLAT_RENDER_EXTENT_MULTIPLIER_LNG", (2))},
     {SWIG_LUA_CONSTTAB_INT("LNGLAT_RENDER_EXTENT_MULTIPLIER_LAT", (1))},
-    {SWIG_LUA_CONSTTAB_INT("LNGLAT_RENDER_EXTENT_MULTIPLIER_LNG_WITH_MARGIN", ((1) +1))},
+    {SWIG_LUA_CONSTTAB_INT("LNGLAT_RENDER_EXTENT_MULTIPLIER_LNG_WITH_MARGIN", ((2) +1))},
     {SWIG_LUA_CONSTTAB_INT("LNGLAT_RENDER_EXTENT_MULTIPLIER_LAT_WITH_MARGIN", ((1) +1))},
     {SWIG_LUA_CONSTTAB_INT("LNGLAT_VIEW_SCALE_PING_MAX", (1 << 6))},
     {0,0,0,0,0,0}
@@ -100535,7 +100535,7 @@ static swig_lua_method swig_SwigModule_methods[]= {
     { "change_to_admin", _wrap_change_to_admin},
     { "change_to_battle_result", _wrap_change_to_battle_result},
     { "change_to_skin", _wrap_change_to_skin},
-    { "change_to_physics", _wrap_change_to_physics},
+    { "change_to_puck_game", _wrap_change_to_puck_game},
     { "change_to_particle_system", _wrap_change_to_particle_system},
     { "connect_to_server_0", _wrap_connect_to_server_0},
     { "connect_to_server_1", _wrap_connect_to_server_1},
@@ -100705,7 +100705,7 @@ static swig_lua_method swig_SwigModule_methods[]= {
     { "lwc_render_ttl_enable_render", _wrap_lwc_render_ttl_enable_render},
     { "lwc_prerender_ttl_fbo", _wrap_lwc_prerender_ttl_fbo},
     { "lwc_postrender_ttl_fbo", _wrap_lwc_postrender_ttl_fbo},
-    { "lwc_render_physics", _wrap_lwc_render_physics},
+    { "lwc_render_puck_game", _wrap_lwc_render_puck_game},
     { "mult_world_roll", _wrap_mult_world_roll},
     { "calculate_world_right_top_end_ui_point", _wrap_calculate_world_right_top_end_ui_point},
     { "lwc_render_ps", _wrap_lwc_render_ps},

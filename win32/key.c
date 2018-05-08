@@ -220,7 +220,7 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
 	}
 
 	if (key == GLFW_KEY_F7 && action == GLFW_PRESS) {
-		change_to_physics(pLwc);
+		change_to_puck_game(pLwc);
 	}
 
 	if (key == GLFW_KEY_F8 && action == GLFW_PRESS) {

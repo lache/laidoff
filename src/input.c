@@ -58,7 +58,7 @@ void lw_trigger_mouse_press(LWCONTEXT* pLwc, float nx, float ny, int pointer_id)
 	LOGIx("mouse press ui coord x=%f, y=%f", x, y);
 
     if (pLwc->game_scene == LGS_TTL
-        || (pLwc->game_scene == LGS_PHYSICS && pLwc->puck_game->show_html_ui)) {
+        || (pLwc->game_scene == LGS_PUCK_GAME && pLwc->puck_game->show_html_ui)) {
         const float nx = (x + pLwc->aspect_ratio) / (2.0f * pLwc->aspect_ratio);
         const float ny = (1.0f - y) / 2.0f;
         htmlui_on_lbutton_down(pLwc->htmlui, nx, ny);
@@ -103,7 +103,7 @@ void lw_trigger_mouse_press(LWCONTEXT* pLwc, float nx, float ny, int pointer_id)
 		return;
 	}
 
-	if (pLwc->game_scene == LGS_FIELD || pLwc->game_scene == LGS_PHYSICS) {
+	if (pLwc->game_scene == LGS_FIELD || pLwc->game_scene == LGS_PUCK_GAME) {
 		const float sr = get_dir_pad_size_radius();
 
 		float left_dir_pad_center_x = 0;
@@ -136,7 +136,7 @@ void lw_trigger_mouse_press(LWCONTEXT* pLwc, float nx, float ny, int pointer_id)
 	const float top_button_y_center = -fist_button_y_center;
 
 
-	if (pLwc->game_scene == LGS_PHYSICS
+	if (pLwc->game_scene == LGS_PUCK_GAME
 		&& fabs(fist_button_x_center - x) < fist_button_w
 		&& fabs(fist_button_y_center - y) < fist_button_h
 		&& (!pLwc->left_dir_pad.dragging || (pLwc->left_dir_pad.pointer_id != pointer_id))) {
@@ -163,7 +163,7 @@ void lw_trigger_mouse_press(LWCONTEXT* pLwc, float nx, float ny, int pointer_id)
 		//pLwc->fps_mode = !pLwc->fps_mode;
 	}
 
-	if (pLwc->game_scene == LGS_PHYSICS
+	if (pLwc->game_scene == LGS_PUCK_GAME
 		&& fabs(top_button_x_center - x) < top_button_w
 		&& fabs(top_button_y_center - y) < top_button_h) {
 		// controlled by LWBUTTONLIST and lua script
@@ -240,7 +240,7 @@ void lw_trigger_mouse_move(LWCONTEXT* pLwc, float nx, float ny, int pointer_id) 
 	pLwc->last_mouse_move_x = x;
 	pLwc->last_mouse_move_y = y;
 
-	if (pLwc->game_scene == LGS_FIELD || pLwc->game_scene == LGS_PHYSICS) {
+	if (pLwc->game_scene == LGS_FIELD || pLwc->game_scene == LGS_PUCK_GAME) {
 		const float sr = get_dir_pad_size_radius();
 
 		float left_dir_pad_center_x = 0;
@@ -279,7 +279,7 @@ void lw_trigger_mouse_release(LWCONTEXT* pLwc, float nx, float ny, int pointer_i
 		  fabsf(y - pLwc->last_mouse_press_y));
 
     if (pLwc->game_scene == LGS_TTL
-        || (pLwc->game_scene == LGS_PHYSICS && pLwc->puck_game->show_html_ui)) {
+        || (pLwc->game_scene == LGS_PUCK_GAME && pLwc->puck_game->show_html_ui)) {
         const float nx = (x + pLwc->aspect_ratio) / (2.0f * pLwc->aspect_ratio);
         const float ny = (1.0f - y) / 2.0f;
         htmlui_on_lbutton_up(pLwc->htmlui, nx, ny);
@@ -340,7 +340,7 @@ void lw_trigger_mouse_release(LWCONTEXT* pLwc, float nx, float ny, int pointer_i
 		return;
 	}
 
-	if (pLwc->game_scene == LGS_PHYSICS
+	if (pLwc->game_scene == LGS_PUCK_GAME
 		&& fabs(top_button_x_center - x) < top_button_w
 		&& fabs(top_button_y_center - y) < top_button_h) {
 		// controlled by LWBUTTONLIST and lua script

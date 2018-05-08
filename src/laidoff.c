@@ -29,7 +29,7 @@
 #include "armature.h"
 #include "lwanim.h"
 #include "lwskinmesh.h"
-#include "render_physics.h"
+#include "render_puckgame.h"
 #include "mq.h"
 #include "sysmsg.h"
 #include "render_text_block.h"
@@ -1232,8 +1232,8 @@ void lwc_render(const LWCONTEXT* pLwc) {
         lwc_render_battle_result(pLwc);
     } else if (pLwc->game_scene == LGS_SKIN) {
         lwc_render_skin(pLwc);
-    } else if (pLwc->game_scene == LGS_PHYSICS) {
-        lwc_render_physics(pLwc, pLwc->puck_game_view, pLwc->puck_game_proj);
+    } else if (pLwc->game_scene == LGS_PUCK_GAME) {
+        lwc_render_puck_game(pLwc, pLwc->puck_game_view, pLwc->puck_game_proj);
     } else if (pLwc->game_scene == LGS_PARTICLE_SYSTEM) {
         lwc_render_ps(pLwc, pLwc->ps_context);
     } else if (pLwc->game_scene == LGS_UI) {
@@ -1903,11 +1903,11 @@ void lw_set_size(LWCONTEXT* pLwc, int w, int h) {
 
         lwttl_update_aspect_ratio(pLwc->ttl, pLwc->aspect_ratio);
 
-        if (pLwc->game_scene == LGS_PHYSICS || pLwc->game_scene == LGS_FONT_TEST || pLwc->game_scene == LGS_TTL) {
+        if (pLwc->game_scene == LGS_PUCK_GAME || pLwc->game_scene == LGS_FONT_TEST || pLwc->game_scene == LGS_TTL) {
             // Resize FBO
             init_shared_fbo(pLwc);
 
-            if (pLwc->game_scene == LGS_PHYSICS || pLwc->game_scene == LGS_TTL) {
+            if (pLwc->game_scene == LGS_PUCK_GAME || pLwc->game_scene == LGS_TTL) {
                 // Rerender HTML UI
                 htmlui_set_client_size(pLwc->htmlui, pLwc->width, pLwc->height);
                 htmlui_load_redraw_fbo(pLwc->htmlui);

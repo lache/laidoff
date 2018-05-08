@@ -18,7 +18,6 @@
 #include "nav.h"
 #include "laidoff.h"
 #include "lwbutton.h"
-#include "physics.h"
 #include "puckgameupdate.h"
 #include "lwudp.h"
 #include "lwtcp.h"
@@ -90,7 +89,7 @@ void change_to_skin(LWCONTEXT* pLwc) {
     pLwc->next_game_scene = LGS_SKIN;
 }
 
-void change_to_physics(LWCONTEXT* pLwc) {
+void change_to_puck_game(LWCONTEXT* pLwc) {
     if (pLwc->tcp == 0) {
         pLwc->tcp = new_tcp(pLwc,
                             pLwc->user_data_path,
@@ -98,7 +97,7 @@ void change_to_physics(LWCONTEXT* pLwc) {
                             tcp_on_connect,
                             parse_recv_packets);
     }
-    pLwc->next_game_scene = LGS_PHYSICS;
+    pLwc->next_game_scene = LGS_PUCK_GAME;
     // Initialize test font FBO
     init_shared_fbo(pLwc);
 }
@@ -710,7 +709,7 @@ void reset_runtime_context(LWCONTEXT* pLwc) {
         { LWU("Font Debug"), toggle_font_texture_test_mode },
         { LWU("UDP"), net_rtt_test },
         { LWU("Skin"), change_to_skin },
-        { LWU("Physics"), change_to_physics },
+        { LWU("Puck Game"), change_to_puck_game },
         { LWU("Particles"), change_to_particle_system },
         { LWU("Field 1"), load_field_1_init_runtime_data },
         { LWU("Field 2"), load_field_2_init_runtime_data },
@@ -833,7 +832,7 @@ void lwc_update(LWCONTEXT* pLwc, double delta_time) {
         update_dialog(pLwc);
     }
 
-    if (pLwc->game_scene == LGS_PHYSICS) {
+    if (pLwc->game_scene == LGS_PUCK_GAME) {
         update_puck_game(pLwc, pLwc->puck_game, delta_time);
         update_damage_text(pLwc);
     }
@@ -888,12 +887,8 @@ void lwc_update(LWCONTEXT* pLwc, double delta_time) {
         ps_test_update(pLwc, pLwc->ps_context);
     }
 
-    if (pLwc->game_scene == LGS_FIELD || pLwc->game_scene == LGS_PHYSICS) {
+    if (pLwc->game_scene == LGS_FIELD || pLwc->game_scene == LGS_PUCK_GAME) {
         script_update(pLwc);
-    }
-
-    if (pLwc->game_scene == LGS_PHYSICS) {
-        update_physics(pLwc);
     }
 
     if (pLwc->game_scene == LGS_TTL) {
@@ -1086,11 +1081,11 @@ void lwc_start_logic_thread(LWCONTEXT* pLwc) {
     pLwc->logic_actor = zactor_new(s_logic_worker, pLwc);
     // Three entry points - Choose one
     // [1] Field Scene
-    // [2] Physics (Ball Rumble) Scene
+    // [2] Ball Rumble Scene
     // [3] TTL Scene
     /*[1]*///load_field_2_init_runtime_data_async(pLwc, pLwc->logic_actor);
-    /*[2]*///load_scene_async(pLwc, pLwc->logic_actor, change_to_physics);
-    /*[3]*/load_scene_async(pLwc, pLwc->logic_actor, change_to_ttl);
+    /*[2]*/load_scene_async(pLwc, pLwc->logic_actor, change_to_puck_game);
+    /*[3]*///load_scene_async(pLwc, pLwc->logic_actor, change_to_ttl);
 }
 
 const char* logic_server_addr(int idx) {

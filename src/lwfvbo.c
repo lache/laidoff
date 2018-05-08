@@ -5,7 +5,7 @@
 #include <assert.h>
 #include "laidoff.h"
 #include "puckgame.h"
-#include "render_physics.h"
+#include "render_puckgame.h"
 
 void load_fvbo(LWCONTEXT* pLwc, const char* filename, LWFVBO* fvbo) {
     size_t file_size = 0;

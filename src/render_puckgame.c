@@ -1,5 +1,5 @@
 #include "lwcontext.h"
-#include "render_physics.h"
+#include "render_puckgame.h"
 #include "render_solid.h"
 #include "laidoff.h"
 #include "lwlog.h"
@@ -1664,7 +1664,7 @@ static void render_battle_ui_layer(const LWCONTEXT* pLwc,
     }
 }
 
-void lwc_render_physics(const LWCONTEXT* pLwc, const mat4x4 view, const mat4x4 proj) {
+void lwc_render_puck_game(const LWCONTEXT* pLwc, const mat4x4 view, const mat4x4 proj) {
     const LWPUCKGAME* puck_game = pLwc->puck_game;
     const LWPSTATE* state = &pLwc->puck_game_state;
     LW_GL_VIEWPORT();
