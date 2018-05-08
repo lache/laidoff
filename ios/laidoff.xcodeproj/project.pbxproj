@@ -393,7 +393,6 @@
 		6CC8334C205D50DA0031523A /* lwtimepoint.c in Sources */ = {isa = PBXBuildFile; fileRef = 6CC832A0205D50DA0031523A /* lwtimepoint.c */; };
 		6CC8334D205D50DA0031523A /* kvmsg.c in Sources */ = {isa = PBXBuildFile; fileRef = 6CC832A7205D50DA0031523A /* kvmsg.c */; };
 		6CC8334E205D50DA0031523A /* lwskill.c in Sources */ = {isa = PBXBuildFile; fileRef = 6CC832A9205D50DA0031523A /* lwskill.c */; };
-		6CC8334F205D50DA0031523A /* render_physics.c in Sources */ = {isa = PBXBuildFile; fileRef = 6CC832AA205D50DA0031523A /* render_physics.c */; };
 		6CC83350205D50DA0031523A /* text_container.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6CC832AF205D50DA0031523A /* text_container.cpp */; };
 		6CC83351205D50DA0031523A /* font.c in Sources */ = {isa = PBXBuildFile; fileRef = 6CC832B2205D50DA0031523A /* font.c */; };
 		6CC83352205D50DA0031523A /* render_battle_result.c in Sources */ = {isa = PBXBuildFile; fileRef = 6CC832B3205D50DA0031523A /* render_battle_result.c */; };
@@ -405,7 +404,6 @@
 		6CC83358205D50DA0031523A /* lwdirpad.c in Sources */ = {isa = PBXBuildFile; fileRef = 6CC832C5205D50DA0031523A /* lwdirpad.c */; };
 		6CC83359205D50DA0031523A /* lwgl.c in Sources */ = {isa = PBXBuildFile; fileRef = 6CC832C6205D50DA0031523A /* lwgl.c */; };
 		6CC8335A205D50DA0031523A /* render_skin.c in Sources */ = {isa = PBXBuildFile; fileRef = 6CC832C7205D50DA0031523A /* render_skin.c */; };
-		6CC8335B205D50DA0031523A /* physics.c in Sources */ = {isa = PBXBuildFile; fileRef = 6CC832C8205D50DA0031523A /* physics.c */; };
 		6CC8335C205D50DA0031523A /* stb_vorbis.c in Sources */ = {isa = PBXBuildFile; fileRef = 6CC832C9205D50DA0031523A /* stb_vorbis.c */; };
 		6CC8335D205D50DA0031523A /* lwbutton.c in Sources */ = {isa = PBXBuildFile; fileRef = 6CC832CA205D50DA0031523A /* lwbutton.c */; };
 		6CC8335E205D50DA0031523A /* render_field.c in Sources */ = {isa = PBXBuildFile; fileRef = 6CC832CC205D50DA0031523A /* render_field.c */; };
@@ -463,6 +461,7 @@
 		6CF70E3B20597A1D00F782C8 /* xxhash.c in Sources */ = {isa = PBXBuildFile; fileRef = 6CF70E3720597A1D00F782C8 /* xxhash.c */; };
 		6CFC5019206012360077E1B7 /* lwttl.c in Sources */ = {isa = PBXBuildFile; fileRef = 6CFC5018206012360077E1B7 /* lwttl.c */; };
 		71E4555CFCE0FC140AB64668 /* render_morph.c in Sources */ = {isa = PBXBuildFile; fileRef = 3EF18865C9E87623A8107AC5 /* render_morph.c */; };
+		78C0045A2ED2FB61C2B8D165 /* render_puckgame.c in Sources */ = {isa = PBXBuildFile; fileRef = FE6E8484ADBCBB3A0251BB37 /* render_puckgame.c */; };
 		D8531FF879956455D7126889 /* render_ttl.c in Sources */ = {isa = PBXBuildFile; fileRef = 153809DC50A3E01320158089 /* render_ttl.c */; };
 /* End PBXBuildFile section */
 
@@ -1431,6 +1430,7 @@
 		6CF70E4020597A2B00F782C8 /* xxhash.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = xxhash.h; path = ../../../../lz4/lib/xxhash.h; sourceTree = "<group>"; };
 		6CFC5017206012360077E1B7 /* lwttl.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = lwttl.h; sourceTree = "<group>"; };
 		6CFC5018206012360077E1B7 /* lwttl.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = lwttl.c; sourceTree = "<group>"; };
+		FE6E8484ADBCBB3A0251BB37 /* render_puckgame.c */ = {isa = PBXFileReference; includeInIndex = 1; name = render_puckgame.c; path = ../src/render_puckgame.c; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -2358,6 +2358,7 @@
 				6CA16CD41EA20B5600DB7AF0 /* Products */,
 				153809DC50A3E01320158089 /* render_ttl.c */,
 				3EF18865C9E87623A8107AC5 /* render_morph.c */,
+				FE6E8484ADBCBB3A0251BB37 /* render_puckgame.c */,
 			);
 			sourceTree = "<group>";
 		};
@@ -2918,7 +2919,6 @@
 				566373761EBA52D4001DA3F4 /* threading_base.cpp in Sources */,
 				6CA16D881EA210BB00DB7AF0 /* ldebug.c in Sources */,
 				56F189941EC751950019312F /* zauth.c in Sources */,
-				6CC8334F205D50DA0031523A /* render_physics.c in Sources */,
 				6CC83352205D50DA0031523A /* render_battle_result.c in Sources */,
 				56F188F61EC74DB60019312F /* tcp_listener.cpp in Sources */,
 				6CC83388205D50DA0031523A /* render_ps.c in Sources */,
@@ -3232,7 +3232,6 @@
 				6C295EDB204310700052999C /* el_break.cpp in Sources */,
 				56ED77BC1EBB9C1C00FABA64 /* DetourNode.cpp in Sources */,
 				56F188CC1EC74DB60019312F /* object.cpp in Sources */,
-				6CC8335B205D50DA0031523A /* physics.c in Sources */,
 				566373521EBA52D4001DA3F4 /* dball.cpp in Sources */,
 				566373511EBA52D4001DA3F4 /* contact.cpp in Sources */,
 				56F188DD1EC74DB60019312F /* pull.cpp in Sources */,
@@ -3258,6 +3257,7 @@
 				56F188E81EC74DB60019312F /* select.cpp in Sources */,
 				D8531FF879956455D7126889 /* render_ttl.c in Sources */,
 				71E4555CFCE0FC140AB64668 /* render_morph.c in Sources */,
+				78C0045A2ED2FB61C2B8D165 /* render_puckgame.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
