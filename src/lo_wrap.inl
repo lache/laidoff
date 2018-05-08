@@ -98210,6 +98210,62 @@ fail:
 }
 
 
+static int _wrap_lwttl_get_cell_bound(lua_State* L) {
+  int SWIG_arg = 0;
+  float arg1 ;
+  float arg2 ;
+  float arg3 ;
+  float arg4 ;
+  int *arg5 = (int *) 0 ;
+  int *arg6 = (int *) 0 ;
+  int *arg7 = (int *) 0 ;
+  int *arg8 = (int *) 0 ;
+  
+  SWIG_check_num_args("lwttl_get_cell_bound",8,8)
+  if(!lua_isnumber(L,1)) SWIG_fail_arg("lwttl_get_cell_bound",1,"float const");
+  if(!lua_isnumber(L,2)) SWIG_fail_arg("lwttl_get_cell_bound",2,"float const");
+  if(!lua_isnumber(L,3)) SWIG_fail_arg("lwttl_get_cell_bound",3,"float const");
+  if(!lua_isnumber(L,4)) SWIG_fail_arg("lwttl_get_cell_bound",4,"float const");
+  if(!SWIG_isptrtype(L,5)) SWIG_fail_arg("lwttl_get_cell_bound",5,"int *");
+  if(!SWIG_isptrtype(L,6)) SWIG_fail_arg("lwttl_get_cell_bound",6,"int *");
+  if(!SWIG_isptrtype(L,7)) SWIG_fail_arg("lwttl_get_cell_bound",7,"int *");
+  if(!SWIG_isptrtype(L,8)) SWIG_fail_arg("lwttl_get_cell_bound",8,"int *");
+  arg1 = (float const)lua_tonumber(L, 1);
+  arg2 = (float const)lua_tonumber(L, 2);
+  arg3 = (float const)lua_tonumber(L, 3);
+  arg4 = (float const)lua_tonumber(L, 4);
+  
+  if (!SWIG_IsOK(SWIG_ConvertPtr(L,5,(void**)&arg5,SWIGTYPE_p_int,0))){
+    SWIG_fail_ptr("lwttl_get_cell_bound",5,SWIGTYPE_p_int);
+  }
+  
+  
+  if (!SWIG_IsOK(SWIG_ConvertPtr(L,6,(void**)&arg6,SWIGTYPE_p_int,0))){
+    SWIG_fail_ptr("lwttl_get_cell_bound",6,SWIGTYPE_p_int);
+  }
+  
+  
+  if (!SWIG_IsOK(SWIG_ConvertPtr(L,7,(void**)&arg7,SWIGTYPE_p_int,0))){
+    SWIG_fail_ptr("lwttl_get_cell_bound",7,SWIGTYPE_p_int);
+  }
+  
+  
+  if (!SWIG_IsOK(SWIG_ConvertPtr(L,8,(void**)&arg8,SWIGTYPE_p_int,0))){
+    SWIG_fail_ptr("lwttl_get_cell_bound",8,SWIGTYPE_p_int);
+  }
+  
+  lwttl_get_cell_bound(arg1,arg2,arg3,arg4,arg5,arg6,arg7,arg8);
+  
+  return SWIG_arg;
+  
+  if(0) SWIG_fail;
+  
+fail:
+  lua_error(L);
+  return SWIG_arg;
+}
+
+
 static int _wrap_LWTTLLNGLAT_lng_set(lua_State* L) {
   int SWIG_arg = 0;
   struct _LWTTLLNGLAT *arg1 = (struct _LWTTLLNGLAT *) 0 ;
@@ -100939,6 +100995,7 @@ static swig_lua_method swig_SwigModule_methods[]= {
     { "lwttl_dragging_info", _wrap_lwttl_dragging_info},
     { "lwttl_get_or_create_user_id", _wrap_lwttl_get_or_create_user_id},
     { "lwttl_ping_send_interval_multiplier", _wrap_lwttl_ping_send_interval_multiplier},
+    { "lwttl_get_cell_bound", _wrap_lwttl_get_cell_bound},
     { "msb_index", _wrap_msb_index},
     { "cell_fx_to_lng", _wrap_cell_fx_to_lng},
     { "cell_fy_to_lat", _wrap_cell_fy_to_lat},

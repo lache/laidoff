@@ -134,6 +134,14 @@ int lwttl_dragging_info(const LWTTL* ttl,
 const char* lwttl_get_or_create_user_id(LWTTL* ttl,
                                         LWCONTEXT* pLwc);
 int lwttl_ping_send_interval_multiplier(const LWTTL* ttl);
+void lwttl_get_cell_bound(const float lng_min,
+                          const float lat_min,
+                          const float lng_max,
+                          const float lat_max,
+                          int* xc0,
+                          int* yc0,
+                          int* xc1,
+                          int* yc1);
 #ifdef __cplusplus
 }
 #endif

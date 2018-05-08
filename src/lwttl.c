@@ -732,15 +732,18 @@ static void send_ttlping_with_timestamp(const LWTTL* ttl,
     }
 }
 
-static void get_cell_bound(const float lng_min,
-                           const float lat_min,
-                           const float lng_max,
-                           const float lat_max,
-                           LWTTLCELLBOUND* cell_bound) {
-    cell_bound->xc0 = lwttl_lng_to_round_int(lng_min);
-    cell_bound->yc0 = lwttl_lat_to_round_int(lat_max);
-    cell_bound->xc1 = lwttl_lng_to_round_int(lng_max);
-    cell_bound->yc1 = lwttl_lat_to_round_int(lat_min);
+void lwttl_get_cell_bound(const float lng_min,
+                          const float lat_min,
+                          const float lng_max,
+                          const float lat_max,
+                          int* xc0,
+                          int* yc0,
+                          int* xc1,
+                          int* yc1) {
+    *xc0 = lwttl_lng_to_round_int(lng_min);
+    *yc0 = lwttl_lat_to_round_int(lat_max);
+    *xc1 = lwttl_lng_to_round_int(lng_max);
+    *yc1 = lwttl_lat_to_round_int(lat_min);
 }
 
 void lwttl_udp_send_ttlping(const LWTTL* ttl, LWUDP* udp, int ping_seq) {
@@ -755,11 +758,14 @@ void lwttl_udp_send_ttlping(const LWTTL* ttl, LWUDP* udp, int ping_seq) {
     const float lat_max = center->lat + half_lat_extent_in_deg;
 
     LWTTLCELLBOUND cell_bound;
-    get_cell_bound(lng_min,
-                   lat_min,
-                   lng_max,
-                   lat_max,
-                   &cell_bound);
+    lwttl_get_cell_bound(lng_min,
+                         lat_min,
+                         lng_max,
+                         lat_max,
+                         &cell_bound.xc0,
+                         &cell_bound.yc0,
+                         &cell_bound.xc1,
+                         &cell_bound.yc1);
     LWTTLCHUNKBOUND chunk_bound;
     cell_bound_to_chunk_bound(&cell_bound, clamped_view_scale, &chunk_bound);
     //chunk_bound.xcc0--;
@@ -1083,11 +1089,14 @@ static int lwttl_query_chunk_range(const LWTTL* ttl,
                                    int* xcc1,
                                    int* ycc1) {
     LWTTLCELLBOUND cell_bound;
-    get_cell_bound(lng_min,
-                   lat_min,
-                   lng_max,
-                   lat_max,
-                   &cell_bound);
+    lwttl_get_cell_bound(lng_min,
+                         lat_min,
+                         lng_max,
+                         lat_max,
+                         &cell_bound.xc0,
+                         &cell_bound.yc0,
+                         &cell_bound.xc1,
+                         &cell_bound.yc1);
     LWTTLCHUNKBOUND chunk_bound;
     cell_bound_to_chunk_bound(&cell_bound, view_scale, &chunk_bound);
     *xcc0 = chunk_bound.xcc0;
@@ -1546,7 +1555,7 @@ void lwttl_view_proj(const LWTTL* ttl, mat4x4 view, mat4x4 proj) {
 void lwttl_update_view_proj(LWTTL* ttl, float aspect_ratio) {
     float ship_y = 0.0f;//+(float)pLwc->app_time;
 
-    float half_height = 5.0f;
+    float half_height = 10.0f;
     float near_z = 0.1f;
     float far_z = 1000.0f;
     float cam_r = 0;// sinf((float)pLwc->app_time / 4) / 4.0f;
