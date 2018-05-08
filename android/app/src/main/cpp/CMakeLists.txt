@@ -118,7 +118,7 @@ target_include_directories(native-activity PRIVATE
                            ../../../../../ode/ode/src
                            ../../../../../recastnavigation/Detour/Include
 						   ../../../../../litehtml/include
-				../../../../../lz4/lib	)
+                           ../../../../../lz4/lib)
 
 # add lib dependencies
 target_link_libraries(native-activity
