@@ -98186,6 +98186,30 @@ fail:
 }
 
 
+static int _wrap_lwttl_ping_send_interval_multiplier(lua_State* L) {
+  int SWIG_arg = 0;
+  LWTTL *arg1 = (LWTTL *) 0 ;
+  int result;
+  
+  SWIG_check_num_args("lwttl_ping_send_interval_multiplier",1,1)
+  if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("lwttl_ping_send_interval_multiplier",1,"LWTTL const *");
+  
+  if (!SWIG_IsOK(SWIG_ConvertPtr(L,1,(void**)&arg1,SWIGTYPE_p__LWTTL,0))){
+    SWIG_fail_ptr("lwttl_ping_send_interval_multiplier",1,SWIGTYPE_p__LWTTL);
+  }
+  
+  result = (int)lwttl_ping_send_interval_multiplier((struct _LWTTL const *)arg1);
+  lua_pushnumber(L, (lua_Number) result); SWIG_arg++;
+  return SWIG_arg;
+  
+  if(0) SWIG_fail;
+  
+fail:
+  lua_error(L);
+  return SWIG_arg;
+}
+
+
 static int _wrap_LWTTLLNGLAT_lng_set(lua_State* L) {
   int SWIG_arg = 0;
   struct _LWTTLLNGLAT *arg1 = (struct _LWTTLLNGLAT *) 0 ;
@@ -100177,6 +100201,8 @@ static swig_lua_const_info swig_SwigModule_constants[]= {
     {SWIG_LUA_CONSTTAB_INT("LNGLAT_SEA_PING_EXTENT_IN_DEGREES", ((180.0/(86412))*(16)))},
     {SWIG_LUA_CONSTTAB_INT("LNGLAT_RENDER_EXTENT_MULTIPLIER_LNG", (1))},
     {SWIG_LUA_CONSTTAB_INT("LNGLAT_RENDER_EXTENT_MULTIPLIER_LAT", (1))},
+    {SWIG_LUA_CONSTTAB_INT("LNGLAT_RENDER_EXTENT_MULTIPLIER_LNG_WITH_MARGIN", ((1) +1))},
+    {SWIG_LUA_CONSTTAB_INT("LNGLAT_RENDER_EXTENT_MULTIPLIER_LAT_WITH_MARGIN", ((1) +1))},
     {SWIG_LUA_CONSTTAB_INT("LNGLAT_VIEW_SCALE_PING_MAX", (1 << 6))},
     {0,0,0,0,0,0}
 };
@@ -100912,6 +100938,7 @@ static swig_lua_method swig_SwigModule_methods[]= {
     { "lwttl_press_ring_info", _wrap_lwttl_press_ring_info},
     { "lwttl_dragging_info", _wrap_lwttl_dragging_info},
     { "lwttl_get_or_create_user_id", _wrap_lwttl_get_or_create_user_id},
+    { "lwttl_ping_send_interval_multiplier", _wrap_lwttl_ping_send_interval_multiplier},
     { "msb_index", _wrap_msb_index},
     { "cell_fx_to_lng", _wrap_cell_fx_to_lng},
     { "cell_fy_to_lat", _wrap_cell_fy_to_lat},

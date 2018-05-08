@@ -51,8 +51,8 @@ void lwttl_read_last_state(LWTTL* ttl, const LWCONTEXT* pLwc);
 const LWPTTLFULLSTATE* lwttl_full_state(const LWTTL* ttl);
 int lwttl_query_chunk_range_land(const LWTTL* ttl,
                                  const float lng_min,
-                                 const float lng_max,
                                  const float lat_min,
+                                 const float lng_max,
                                  const float lat_max,
                                  const int view_scale,
                                  int* chunk_index_array,
@@ -63,8 +63,8 @@ int lwttl_query_chunk_range_land(const LWTTL* ttl,
                                  int* ycc1);
 int lwttl_query_chunk_range_seaport(const LWTTL* ttl,
                                     const float lng_min,
-                                    const float lng_max,
                                     const float lat_min,
+                                    const float lng_max,
                                     const float lat_max,
                                     const int view_scale,
                                     int* chunk_index_array,
@@ -133,6 +133,7 @@ int lwttl_dragging_info(const LWTTL* ttl,
                         int* yc1);
 const char* lwttl_get_or_create_user_id(LWTTL* ttl,
                                         LWCONTEXT* pLwc);
+int lwttl_ping_send_interval_multiplier(const LWTTL* ttl);
 #ifdef __cplusplus
 }
 #endif

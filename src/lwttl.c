@@ -128,6 +128,7 @@ typedef struct _LWTTL {
     mat4x4 view;
     mat4x4 proj;
     char user_id_str[512];
+    int panning;
 } LWTTL;
 
 LWTTL* lwttl_new(float aspect_ratio) {
@@ -227,8 +228,12 @@ void lwttl_update(LWTTL* ttl, LWCONTEXT* pLwc, float delta_time) {
                 // prevent unintentional change of cell selection
                 // while spanning the map
                 lwttl_clear_selected_pressed_pos(ttl);
+                // send ping persistently while map panning
+                ttl->panning = 1;
             }
         }
+    } else {
+        ttl->panning = 0;
     }
 
     if (ttl->selected.press_pos_xc >= 0 && ttl->selected.press_pos_yc >= 0) {
@@ -635,6 +640,11 @@ static void cell_bound_to_chunk_bound(const LWTTLCELLBOUND* cell_bound, const in
     chunk_bound->ycc0 = aligned_chunk_index(cell_bound->yc0, view_scale, LNGLAT_SEA_PING_EXTENT_IN_CELL_PIXELS) >> msb_index(LNGLAT_SEA_PING_EXTENT_IN_CELL_PIXELS * view_scale);
     chunk_bound->xcc1 = aligned_chunk_index(cell_bound->xc1, view_scale, LNGLAT_SEA_PING_EXTENT_IN_CELL_PIXELS) >> msb_index(LNGLAT_SEA_PING_EXTENT_IN_CELL_PIXELS * view_scale);
     chunk_bound->ycc1 = aligned_chunk_index(cell_bound->yc1, view_scale, LNGLAT_SEA_PING_EXTENT_IN_CELL_PIXELS) >> msb_index(LNGLAT_SEA_PING_EXTENT_IN_CELL_PIXELS * view_scale);
+    //chunk_bound->xcc0--;
+    //chunk_bound->ycc0--;
+    // make 0-1 (min-max) range inclusive,exclusive style
+    chunk_bound->xcc1++;
+    chunk_bound->ycc1++;
 }
 
 static void send_ttlping(const LWTTL* ttl,
@@ -722,6 +732,17 @@ static void send_ttlping_with_timestamp(const LWTTL* ttl,
     }
 }
 
+static void get_cell_bound(const float lng_min,
+                           const float lat_min,
+                           const float lng_max,
+                           const float lat_max,
+                           LWTTLCELLBOUND* cell_bound) {
+    cell_bound->xc0 = lwttl_lng_to_round_int(lng_min);
+    cell_bound->yc0 = lwttl_lat_to_round_int(lat_max);
+    cell_bound->xc1 = lwttl_lng_to_round_int(lng_max);
+    cell_bound->yc1 = lwttl_lat_to_round_int(lat_min);
+}
+
 void lwttl_udp_send_ttlping(const LWTTL* ttl, LWUDP* udp, int ping_seq) {
     const LWTTLLNGLAT* center = lwttl_center(ttl);
     const int clamped_view_scale = lwttl_clamped_view_scale(ttl);
@@ -733,20 +754,20 @@ void lwttl_udp_send_ttlping(const LWTTL* ttl, LWUDP* udp, int ping_seq) {
     const float lat_min = center->lat - half_lat_extent_in_deg;
     const float lat_max = center->lat + half_lat_extent_in_deg;
 
-    LWTTLCELLBOUND cell_bound = {
-        lwttl_lng_to_floor_int(lng_min),
-        lwttl_lat_to_floor_int(lat_max),
-        lwttl_lng_to_ceil_int(lng_max),
-        lwttl_lat_to_ceil_int(lat_min),
-    };
+    LWTTLCELLBOUND cell_bound;
+    get_cell_bound(lng_min,
+                   lat_min,
+                   lng_max,
+                   lat_max,
+                   &cell_bound);
     LWTTLCHUNKBOUND chunk_bound;
     cell_bound_to_chunk_bound(&cell_bound, clamped_view_scale, &chunk_bound);
-    chunk_bound.xcc0--;
-    chunk_bound.xcc1++;
-    chunk_bound.ycc0--;
-    chunk_bound.ycc1++;
-    const int xc_count = chunk_bound.xcc1 - chunk_bound.xcc0 + 1;
-    const int yc_count = chunk_bound.ycc1 - chunk_bound.ycc0 + 1;
+    //chunk_bound.xcc0--;
+    //chunk_bound.xcc1++;
+    //chunk_bound.ycc0--;
+    //chunk_bound.ycc1++;
+    const int xc_count = chunk_bound.xcc1 - chunk_bound.xcc0;// +1;
+    const int yc_count = chunk_bound.ycc1 - chunk_bound.ycc0;// +1;
     int chunk_index_count = 0;
     for (int i = 0; i < xc_count; i++) {
         for (int j = 0; j < yc_count; j++) {
@@ -822,8 +843,8 @@ void lwttl_udp_update(LWTTL* ttl, LWUDP* udp, LWCONTEXT* pLwc) {
     if (udp->ready == 0) {
         return;
     }
-    float app_time = (float)pLwc->app_time;
-    float ping_send_interval = lwcontext_update_interval(pLwc) * 200;
+    const float app_time = (float)pLwc->app_time;
+    const float ping_send_interval = lwcontext_update_interval(pLwc) * lwttl_ping_send_interval_multiplier(ttl);
     if (udp->last_updated == 0 || app_time > udp->last_updated + ping_send_interval) {
         lwttl_udp_send_ttlping(ttl, udp, udp->ping_seq);
         udp->ping_seq++;
@@ -1036,7 +1057,7 @@ void lwttl_read_last_state(LWTTL* ttl, const LWCONTEXT* pLwc) {
                 LOGIP("TTL save data version not match. Will be ignored and rewritten upon exit.");
             } else {
                 lwttl_worldmap_scroll_to(ttl, save.lng, save.lat, 0);
-                ttl->view_scale = LWCLAMP(save.view_scale, 1, 64);
+                ttl->view_scale = LWCLAMP(save.view_scale, 1, ttl->view_scale_max);
             }
         } else {
             LOGEP("TTL save data read failed! - return code: %d", ret);
@@ -1050,31 +1071,31 @@ const LWPTTLFULLSTATE* lwttl_full_state(const LWTTL* ttl) {
 
 static int lwttl_query_chunk_range(const LWTTL* ttl,
                                    const float lng_min,
-                                   const float lng_max,
                                    const float lat_min,
+                                   const float lng_max,
                                    const float lat_max,
                                    const int view_scale,
                                    const LWTTLOBJECTCACHE* c,
                                    int* chunk_index_array,
                                    const int chunk_index_array_len,
                                    int* xcc0,
-                                   int* ycc0, 
-                                   int* xcc1, 
+                                   int* ycc0,
+                                   int* xcc1,
                                    int* ycc1) {
-    LWTTLCELLBOUND cell_bound = {
-        lwttl_lng_to_floor_int(lng_min),
-        lwttl_lat_to_floor_int(lat_max),
-        lwttl_lng_to_ceil_int(lng_max),
-        lwttl_lat_to_ceil_int(lat_min),
-    };
+    LWTTLCELLBOUND cell_bound;
+    get_cell_bound(lng_min,
+                   lat_min,
+                   lng_max,
+                   lat_max,
+                   &cell_bound);
     LWTTLCHUNKBOUND chunk_bound;
     cell_bound_to_chunk_bound(&cell_bound, view_scale, &chunk_bound);
     *xcc0 = chunk_bound.xcc0;
     *ycc0 = chunk_bound.ycc0;
     *xcc1 = chunk_bound.xcc1;
     *ycc1 = chunk_bound.ycc1;
-    const int xc_count = chunk_bound.xcc1 - chunk_bound.xcc0 + 1;
-    const int yc_count = chunk_bound.ycc1 - chunk_bound.ycc0 + 1;
+    const int xc_count = chunk_bound.xcc1 - chunk_bound.xcc0;
+    const int yc_count = chunk_bound.ycc1 - chunk_bound.ycc0;
     int chunk_index_count = 0;
     for (int i = 0; i < xc_count; i++) {
         for (int j = 0; j < yc_count; j++) {
@@ -1098,20 +1119,20 @@ static int lwttl_query_chunk_range(const LWTTL* ttl,
 
 int lwttl_query_chunk_range_land(const LWTTL* ttl,
                                  const float lng_min,
-                                 const float lng_max,
                                  const float lat_min,
+                                 const float lng_max,
                                  const float lat_max,
                                  const int view_scale,
                                  int* chunk_index_array,
                                  const int chunk_index_array_len,
                                  int* xcc0,
-                                 int* ycc0, 
-                                 int* xcc1, 
+                                 int* ycc0,
+                                 int* xcc1,
                                  int* ycc1) {
     return lwttl_query_chunk_range(ttl,
                                    lng_min,
-                                   lng_max,
                                    lat_min,
+                                   lng_max,
                                    lat_max,
                                    view_scale,
                                    &ttl->object_cache.land_cache,
@@ -1125,8 +1146,8 @@ int lwttl_query_chunk_range_land(const LWTTL* ttl,
 
 int lwttl_query_chunk_range_seaport(const LWTTL* ttl,
                                     const float lng_min,
-                                    const float lng_max,
                                     const float lat_min,
+                                    const float lng_max,
                                     const float lat_max,
                                     const int view_scale,
                                     int* chunk_index_array,
@@ -1137,8 +1158,8 @@ int lwttl_query_chunk_range_seaport(const LWTTL* ttl,
                                     int* ycc1) {
     return lwttl_query_chunk_range(ttl,
                                    lng_min,
-                                   lng_max,
                                    lat_min,
+                                   lng_max,
                                    lat_max,
                                    view_scale,
                                    &ttl->object_cache.seaport_cache,
@@ -1525,7 +1546,7 @@ void lwttl_view_proj(const LWTTL* ttl, mat4x4 view, mat4x4 proj) {
 void lwttl_update_view_proj(LWTTL* ttl, float aspect_ratio) {
     float ship_y = 0.0f;//+(float)pLwc->app_time;
 
-    float half_height = 10.0f;
+    float half_height = 5.0f;
     float near_z = 0.1f;
     float far_z = 1000.0f;
     float cam_r = 0;// sinf((float)pLwc->app_time / 4) / 4.0f;
@@ -1620,4 +1641,12 @@ const char* lwttl_get_or_create_user_id(LWTTL* ttl,
         read_file_string(pLwc->user_data_path, "ttl-user-id.dat", sizeof(ttl->user_id_str), ttl->user_id_str);
     }
     return ttl->user_id_str;
+}
+
+int lwttl_ping_send_interval_multiplier(const LWTTL* ttl) {
+    if (ttl->panning) {
+        return 10;
+    } else {
+        return 200;
+    }
 }
