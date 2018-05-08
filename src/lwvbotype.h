@@ -59,6 +59,7 @@ typedef enum _LW_VBO_TYPE
     LVT_EARTH,
     LVT_SEA_CELL_DEBUG,
     LVT_CELL_PIXEL_SELECTOR,
+    LVT_OCTAGON_PLANE, // programmed
 
 	LVT_COUNT,
     LVT_DONTCARE,
@@ -129,6 +130,7 @@ static const LWVBOFILENAME vbo_filename[] = {
     { LVT_EARTH, ASSETS_BASE_PATH "vbo" PATH_SEPARATOR "earth.vbo", LWST_DEFAULT, },
     { LVT_SEA_CELL_DEBUG, ASSETS_BASE_PATH "cvbo" PATH_SEPARATOR "sea-cell-debug.cvbo", LWST_DEFAULT_NORMAL_COLOR, },
     { LVT_CELL_PIXEL_SELECTOR, ASSETS_BASE_PATH "cvbo" PATH_SEPARATOR "cell-pixel-selector.cvbo", LWST_DEFAULT_NORMAL_COLOR, },
+    { LVT_OCTAGON_PLANE, "", LWST_DEFAULT, },
 };
 LwStaticAssert(ARRAY_SIZE(vbo_filename) == LVT_COUNT, "LVT_COUNT error");
 

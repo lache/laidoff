@@ -657,7 +657,7 @@ static void render_wall(const LWCONTEXT* pLwc, const mat4x4 proj, const LWPUCKGA
     glDrawArrays(GL_TRIANGLES, 0, pLwc->vertex_buffer[lvt].vertex_count);
 }
 
-static void render_physics_menu(const LWCONTEXT *pLwc, const mat4x4 proj, const mat4x4 view, const LWPUCKGAME *puck_game) {
+static void render_puck_game_menu(const LWCONTEXT *pLwc, const mat4x4 proj, const mat4x4 view, const LWPUCKGAME *puck_game) {
     int shader_index = LWST_DEFAULT;
     const LWSHADER* shader = &pLwc->shader[shader_index];
     lazy_glUseProgram(pLwc, shader_index);
@@ -831,7 +831,10 @@ static void render_floor(const LWCONTEXT *pLwc,
 
     //glUniformMatrix4fv(shader->mvp_location, 1, GL_FALSE, (const GLfloat*)proj_view_model);
 
-    const LW_VBO_TYPE lvt = LVT_CENTER_CENTER_ANCHORED_SQUARE;
+    //const LW_VBO_TYPE lvt = LVT_CENTER_CENTER_ANCHORED_SQUARE;
+    //const GLenum mode = GL_TRIANGLES;
+    const LW_VBO_TYPE lvt = LVT_OCTAGON_PLANE;
+    const GLenum mode = GL_TRIANGLE_FAN;
 
     lazy_glBindBuffer(pLwc, lvt);
     bind_all_vertex_attrib(pLwc, lvt);
@@ -853,7 +856,7 @@ static void render_floor(const LWCONTEXT *pLwc,
     //set_tex_filter(GL_NEAREST, GL_NEAREST);
     glUniformMatrix4fv(shader->mvp_location, 1, GL_FALSE, (const GLfloat*)proj_view_model);
     glUniformMatrix4fv(shader->m_location, 1, GL_FALSE, (const GLfloat*)model);
-    glDrawArrays(GL_TRIANGLES, 0, pLwc->vertex_buffer[lvt].vertex_count);
+    glDrawArrays(mode, 0, pLwc->vertex_buffer[lvt].vertex_count);
 }
 
 static void render_default_stage(const LWCONTEXT *pLwc,
@@ -1788,7 +1791,7 @@ void lwc_render_puck_game(const LWCONTEXT* pLwc, const mat4x4 view, const mat4x4
         sphere_render_uniform.sphere_col[1][2] = 0.8f;
     }
 
-    render_physics_menu(pLwc, proj, view, puck_game);
+    render_puck_game_menu(pLwc, proj, view, puck_game);
 
     if (pLwc->puck_game_stage_lvt != LVT_DONTCARE
         && pLwc->puck_game_stage_lae != LAE_DONTCARE) {

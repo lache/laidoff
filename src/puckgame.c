@@ -164,6 +164,44 @@ void puck_game_create_control_joint(LWPUCKGAME* puck_game, int lpgo) {
     }
 }
 
+// planes always perpendicular to xy=0 plane have c = 0
+static void octagonal_plane_param(float h, float theta, float* a, float* b, float* d) {
+    float ct = cosf(theta);
+    float st = sinf(theta);
+    *a = -ct;
+    *b = -st;
+    *d = -h * ct;
+}
+
+static dGeomID create_octagonal_plane(dSpaceID space, float h, float theta) {
+    float a, b, d;
+    octagonal_plane_param(h, theta, &a, &b, &d);
+    return dCreatePlane(space, a, b, 0, d);
+}
+
+static void calculate_x1_y1_for_octagonal_plane(float h, float* x1, float* y1) {
+    float ct = cosf((float)(M_PI / 8));
+    float st = sinf((float)(M_PI / 8));
+    *x1 = h * ct * ct;
+    *y1 = h * ct * st;
+}
+
+static float calculate_d_for_octagonal_plane(float a, float b, float x1, float y1, float theta) {
+    float rct = cosf(theta);
+    float rst = sinf(theta);
+    // calculate rotated (x1,y1)
+    float x2 = rct * x1 - rst * y1;
+    float y2 = rst * x1 + rct * y1;
+    return a * x2 + b * y2;
+}
+
+static void calculate_a_b_for_octagonal_plane(float theta, float* a, float* b) {
+    float ct = cosf(theta);
+    float st = sinf(theta);
+    *a = -ct;
+    *b = -st;
+}
+
 void puck_game_create_walls(LWPUCKGAME* puck_game) {
     // dCreatePlane(..., a, b, c, d); ==> plane equation: a*x + b*y + c*z = d
     if (puck_game->boundary[LPGB_GROUND] == 0) {
@@ -186,6 +224,18 @@ void puck_game_create_walls(LWPUCKGAME* puck_game) {
     }
     if (puck_game->boundary[LPGB_DIAGONAL_2] == 0) {
         //puck_game->boundary[LPGB_DIAGONAL_2] = dCreatePlane(puck_game->space, +1, +1, 0, 0);
+    }
+    // octagonal boundary
+    assert(puck_game->world_width_half == puck_game->world_height_half);
+    float oct_x1, oct_y1;
+    calculate_x1_y1_for_octagonal_plane(puck_game->world_width_half, &oct_x1, &oct_y1);
+    for (int i = 0; i < 8; i++) {
+        if (puck_game->boundary[LPGB_EN + i] == 0) {
+            float oct_a, oct_b;
+            calculate_a_b_for_octagonal_plane((float)(M_PI / 8 + M_PI / 4 * i), &oct_a, &oct_b);
+            float oct_d = calculate_d_for_octagonal_plane(oct_a, oct_b, oct_x1, oct_y1, (float)(M_PI / 4 * i));
+            puck_game->boundary[LPGB_EN + i] = dCreatePlane(puck_game->space, oct_a, oct_b, 0, oct_d);
+        }
     }
     for (int i = 0; i < LPGB_COUNT; i++) {
         if (puck_game->boundary[i]) {
