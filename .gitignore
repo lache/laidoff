@@ -54,3 +54,4 @@ ios/build-appstore
 /br-server/*.exe
 /br-server/*.exe~
 /*.dat
+IDEWorkspaceChecks.plist
