@@ -28,6 +28,11 @@ typedef enum _LW_PUCK_GAME_BOUNDARY {
     LPGB_COUNT
 } LW_PUCK_GAME_BOUNDARY;
 
+typedef enum _LW_PUCK_GAME_MAP {
+    LPGM_SQUARE,
+    LPGM_OCTAGON,
+} LW_PUCK_GAME_MAP;
+
 typedef enum _LW_PUCK_GAME_OBJECT {
 	LPGO_PUCK,
 	LPGO_PLAYER,
@@ -268,6 +273,7 @@ typedef struct _LWPUCKGAME {
     float last_udp_frame_sync_sent;
     int show_top_level_main_menu;
     int show_html_ui;
+    LW_PUCK_GAME_MAP map;
 } LWPUCKGAME;
 
 LWPUCKGAME* new_puck_game(int update_frequency);

@@ -140,12 +140,16 @@ static void render_tower_normal_2(const LWCONTEXT* pLwc, const mat4x4 view, cons
 static void render_tower_collapsing(const LWCONTEXT* pLwc, const mat4x4 view, const mat4x4 proj, const LWPUCKGAME* puck_game, const float* pos, const LWPUCKGAMETOWER* tower, int remote, float tower_collapsing_z_rot_angle) {
     // collapsing tower model scale matches current world
     const float tower_scale = 1.0f; // puck_game->tower_radius / puck_game->tower_mesh_radius;
+    LW_F_ANIM_TYPE anim_type = LFAT_TOWER_COLLAPSE;
+    if (puck_game->map == LPGM_OCTAGON) {
+        anim_type = LFAT_TOWER_COLLAPSE_OCTAGON;
+    }
     render_fvbo(pLwc,
                 puck_game,
                 view,
                 proj,
                 LFT_TOWER,
-                LFAT_TOWER_COLLAPSE_OCTAGON, //LFAT_TOWER_COLLAPSE,
+                anim_type,
                 fabsf(pos[0]),
                 fabsf(pos[1]),
                 pos[2],
@@ -536,6 +540,7 @@ static void render_searching_state(const LWCONTEXT* pLwc, const LWPUCKGAME* puck
     text_block.text_block_y = 0;
     render_text_block(pLwc, &text_block);
 }
+
 static void render_nickname_score(const LWCONTEXT* pLwc,
                                   int left,
                                   float ui_alpha,
@@ -783,8 +788,11 @@ static void render_floor_cover(const LWCONTEXT* pLwc,
                                const mat4x4 proj,
                                const mat4x4 view,
                                const LWPUCKGAME* puck_game) {
-    //render_custom_stage(pLwc, proj, view, puck_game, LVT_PUCK_FLOOR_COVER, LAE_PUCK_FLOOR_COVER);
-    render_custom_stage(pLwc, proj, view, puck_game, LVT_PUCK_FLOOR_COVER_OCTAGON, LAE_PUCK_FLOOR_COVER_OCTAGON);
+    if (puck_game->map == LPGM_SQUARE) {
+        render_custom_stage(pLwc, proj, view, puck_game, LVT_PUCK_FLOOR_COVER, LAE_PUCK_FLOOR_COVER);
+    } else {
+        render_custom_stage(pLwc, proj, view, puck_game, LVT_PUCK_FLOOR_COVER_OCTAGON, LAE_PUCK_FLOOR_COVER_OCTAGON);
+    }
 }
 
 static void render_floor(const LWCONTEXT *pLwc,
@@ -849,11 +857,12 @@ static void render_floor(const LWCONTEXT *pLwc,
 
     //glUniformMatrix4fv(shader->mvp_location, 1, GL_FALSE, (const GLfloat*)proj_view_model);
 
-    //const LW_VBO_TYPE lvt = LVT_CENTER_CENTER_ANCHORED_SQUARE;
-    //const GLenum mode = GL_TRIANGLES;
-    const LW_VBO_TYPE lvt = LVT_OCTAGON_PLANE;
-    const GLenum mode = GL_TRIANGLE_FAN;
-
+    LW_VBO_TYPE lvt = LVT_CENTER_CENTER_ANCHORED_SQUARE;
+    GLenum mode = GL_TRIANGLES;
+    if (puck_game->map == LPGM_OCTAGON) {
+        lvt = LVT_OCTAGON_PLANE;
+        mode = GL_TRIANGLE_FAN;
+    }
     lazy_glBindBuffer(pLwc, lvt);
     bind_all_vertex_attrib(pLwc, lvt);
 
@@ -1130,20 +1139,22 @@ static void render_default_stage(const LWCONTEXT *pLwc,
     render_floor_cover(pLwc, proj, view, puck_game);
     // Floor
     render_floor(pLwc, proj, puck_game, floor_shader_index, view, sphere_render_uniform);
-    // Walls (Square)
-    //render_wall_square(pLwc,
-    //                   proj,
-    //                   puck_game,
-    //                   wall_shader_index,
-    //                   view,
-    //                   sphere_render_uniform);
-    // Walls (Octagon)
-    render_wall_octagon(pLwc,
-                        proj,
-                        puck_game,
-                        wall_shader_index,
-                        view,
-                        sphere_render_uniform);
+    // Walls
+    if (puck_game->map == LPGM_SQUARE) {
+        render_wall_square(pLwc,
+                           proj,
+                           puck_game,
+                           wall_shader_index,
+                           view,
+                           sphere_render_uniform);
+    } else {
+        render_wall_octagon(pLwc,
+                            proj,
+                            puck_game,
+                            wall_shader_index,
+                            view,
+                            sphere_render_uniform);
+    }
 }
 
 static void render_battle_result_popup(const LWCONTEXT* pLwc,
