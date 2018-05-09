@@ -7,8 +7,25 @@
 typedef struct _LWPUCKGAME LWPUCKGAME;
 
 typedef enum _LW_PUCK_GAME_BOUNDARY {
-	LPGB_GROUND, LPGB_E, LPGB_W, LPGB_S, LPGB_N, LPGB_DIAGONAL_1, LPGB_DIAGONAL_2,
-	LPGB_COUNT
+	LPGB_GROUND,
+    // Square stage walls
+    LPGB_E,
+    LPGB_W,
+    LPGB_S, 
+    LPGB_N,
+    // Octagon stage walls
+    LPGB_EE,
+    LPGB_EN,
+    LPGB_NN,
+    LPGB_NW,
+    LPGB_WW,
+    LPGB_WS,
+    LPGB_SS,
+    LPGB_SE,
+    // Diagonal walls
+    LPGB_DIAGONAL_1,
+    LPGB_DIAGONAL_2,
+    LPGB_COUNT
 } LW_PUCK_GAME_BOUNDARY;
 
 typedef enum _LW_PUCK_GAME_OBJECT {

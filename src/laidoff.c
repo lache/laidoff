@@ -208,6 +208,8 @@ static void init_fvbo(LWCONTEXT* pLwc) {
 static void init_fanim(LWCONTEXT* pLwc) {
     load_fanim(pLwc, ASSETS_BASE_PATH "fanim" PATH_SEPARATOR "whole-tower_cell.fanim",
                &pLwc->fanim[LFAT_TOWER_COLLAPSE]);
+    load_fanim(pLwc, ASSETS_BASE_PATH "fanim" PATH_SEPARATOR "whole-tower_cell_octagon.fanim",
+               &pLwc->fanim[LFAT_TOWER_COLLAPSE_OCTAGON]);
 }
 
 static void lwc_create_line_vbo(LWCONTEXT* pLwc) {
@@ -238,7 +240,9 @@ static void init_vbo(LWCONTEXT* pLwc) {
     // === STATIC MESHES ===
     //lw_load_all_vbo(pLwc);
     
-    // LVT_LEFT_TOP_ANCHORED_SQUARE ~ LVT_RIGHT_BOTTOM_ANCHORED_SQUARE
+    // LVT_LEFT_TOP_ANCHORED_SQUARE,	LVT_CENTER_TOP_ANCHORED_SQUARE,		LVT_RIGHT_TOP_ANCHORED_SQUARE,
+	// LVT_LEFT_CENTER_ANCHORED_SQUARE,	LVT_CENTER_CENTER_ANCHORED_SQUARE,	LVT_RIGHT_CENTER_ANCHORED_SQUARE,
+	// LVT_LEFT_BOTTOM_ANCHORED_SQUARE,	LVT_CENTER_BOTTOM_ANCHORED_SQUARE,	LVT_RIGHT_BOTTOM_ANCHORED_SQUARE,
     // 9 anchored squares...
     const float anchored_square_offset[][2] = {
         { +1, -1 },{ +0, -1 },{ -1, -1 },
@@ -260,6 +264,28 @@ static void init_vbo(LWCONTEXT* pLwc) {
         glBufferData(GL_ARRAY_BUFFER, sizeof(LWVERTEX) * VERTEX_COUNT_PER_ARRAY,
                      square_vertices, GL_STATIC_DRAW);
         pLwc->vertex_buffer[lvt].vertex_count = VERTEX_COUNT_PER_ARRAY;
+    }
+
+    // LVT_OCTAGON_PLANE
+    {
+        LWVERTEX vertices[1 + 8 + 1]; // center plus eight vertices plus first vertex repeated
+        memset(vertices, 0, sizeof(vertices));
+        vertices[0].u = 0.5f;
+        vertices[0].v = 0.5f;
+        float h = 1.0f / cosf((float)(M_PI / 8));
+        for (int r = 0; r < 9; r++) {
+            float ct = cosf((float)(M_PI / 4 * r - M_PI / 8));
+            float st = sinf((float)(M_PI / 4 * r - M_PI / 8));
+            vertices[r + 1].x = h * ct;
+            vertices[r + 1].y = h * st;
+            vertices[r + 1].u = 0.5f + vertices[r + 1].x / 2;
+            vertices[r + 1].v = 0.5f + vertices[r + 1].y / 2;
+        }
+        const LW_VBO_TYPE lvt = LVT_OCTAGON_PLANE;
+        glGenBuffers(1, &pLwc->vertex_buffer[lvt].vertex_buffer);
+        glBindBuffer(GL_ARRAY_BUFFER, pLwc->vertex_buffer[lvt].vertex_buffer);
+        glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+        pLwc->vertex_buffer[lvt].vertex_count = ARRAY_SIZE(vertices);
     }
     
     // === SKIN VERTEX BUFFERS ===

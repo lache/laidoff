@@ -240,7 +240,7 @@ void update_puck_game(LWCONTEXT* pLwc, LWPUCKGAME* puck_game, double delta_time)
         puck_game->time = puck_game_elapsed_time(puck_game->update_tick, pLwc->update_frequency);
     }
     // set boundary impact according to wall hit bits
-    for (int i = 0; i < 4; i++) {
+    for (int i = 0; i <= LPGB_SE - LPGB_E; i++) {
         if ((puck_game->wall_hit_bit >> i) & 1) {
             int boundary = LPGB_E + i;
             puck_game->boundary_impact[boundary] = puck_game->boundary_impact_start;
