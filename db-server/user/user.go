@@ -57,9 +57,10 @@ type LeaseDb struct {
 }
 
 type Agent struct {
-	Conn        net.Conn
-	Db          Db
-	CancelQueue bool
+	Conn             net.Conn
+	Db               Db
+	CancelQueue      bool
+	SupportedGameMap int
 }
 
 var persistentDbPath string

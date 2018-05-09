@@ -9,6 +9,7 @@ import (
 	"github.com/gasbank/laidoff/shared-server"
 	"log"
 	"github.com/gasbank/laidoff/reward-server/rating"
+	"math/rand"
 )
 // #include "../../src/puckgamepacket.h"
 import "C"
@@ -32,12 +33,17 @@ const (
 
 	LWPUCKGAMEQUEUETYPEFIFO          = C.LW_PUCK_GAME_QUEUE_TYPE_FIFO
 	LWPUCKGAMEQUEUETYPENEARESTSCORE  = C.LW_PUCK_GAME_QUEUE_TYPE_NEAREST_SCORE
+	LWPUCKGAMEQUEUETYPENEARESTSCOREWITHOCTAGONSUPPORT  = C.LW_PUCK_GAME_QUEUE_TYPE_NEAREST_SCORE_WITH_OCTAGON_SUPPORT
 	LWNICKNAMEMAXLEN                 = C.LW_NICKNAME_MAX_LEN
 	LWSETNICKNAMERESULTOK            = C.LW_SET_NICKNAME_RESULT_OK
 	LWSETNICKNAMERESULTTOOSHORT      = C.LW_SET_NICKNAME_RESULT_TOO_SHORT
 	LWSETNICKNAMERESULTTOOLONG       = C.LW_SET_NICKNAME_RESULT_TOO_LONG
 	LWSETNICKNAMERESULTTOONOTALLOWED = C.LW_SET_NICKNAME_RESULT_TOO_NOT_ALLOWED
 	LWSETNICKNAMERESULTINTERNALERROR = C.LW_SET_NICKNAME_RESULT_INTERNAL_ERROR
+
+	LPGMSQUARE = C.LPGM_SQUARE
+	LPGMOCTAGON = C.LPGM_OCTAGON
+	LPGMCOUNT = C.LPGM_COUNT
 )
 
 /////////////////////////////////////////////////////////////////////////////////////
@@ -135,7 +141,7 @@ func NewLwpSetNicknameResult(request *C.LWPSETNICKNAME, result int) *C.LWPSETNIC
 	}
 }
 
-func NewLwpMatched2(port int, ipv4 net.IP, battleId int, token uint, playerNo, playerScore, targetScore int, targetNickname string) *C.LWPMATCHED2 {
+func NewLwpMatched2(port int, ipv4 net.IP, battleId int, token uint, playerNo, playerScore, targetScore int, targetNickname string, gameMap int) *C.LWPMATCHED2 {
 	drawScore, _ := rating.CalculateNewRating(playerScore, targetScore, 0)
 	victoryScore, _ := rating.CalculateNewRating(playerScore, targetScore, 1)
 	defeatScore, _ := rating.CalculateNewRating(playerScore, targetScore, 2)
@@ -143,7 +149,7 @@ func NewLwpMatched2(port int, ipv4 net.IP, battleId int, token uint, playerNo, p
 		C.ushort(unsafe.Sizeof(C.LWPMATCHED2{})),
 		C.LPGP_LWPMATCHED2,
 		C.ushort(port), // createBattleOk.Port
-		C.ushort(0),    // padding
+		C.ushort(gameMap),
 		[4]C.uchar{C.uchar(ipv4[0]), C.uchar(ipv4[1]), C.uchar(ipv4[2]), C.uchar(ipv4[3]),},
 		C.int(battleId),
 		C.uint(token),
@@ -269,7 +275,7 @@ func NicknameToCArray(nickname string) [C.LW_NICKNAME_MAX_LEN]C.char {
 	return nicknameCchar
 }
 
-func NewCreateBattle(id1, id2 user.Id, nickname1, nickname2 string, bot bool) *C.LWPCREATEBATTLE {
+func NewCreateBattle(id1, id2 user.Id, nickname1, nickname2 string, bot bool, gameMap int) *C.LWPCREATEBATTLE {
 	var c1Nickname [C.LW_NICKNAME_MAX_LEN]C.char
 	var c2Nickname [C.LW_NICKNAME_MAX_LEN]C.char
 	GoStringToCCharArray(&nickname1, &c1Nickname)
@@ -288,6 +294,7 @@ func NewCreateBattle(id1, id2 user.Id, nickname1, nickname2 string, bot bool) *C
 		UserIdToCuint(id2),
 		c1Nickname,
 		c2Nickname,
+		C.int(gameMap),
 	}
 }
 
@@ -398,4 +405,19 @@ func ParseGetLeaderboardRevealPlayer(buf []byte) (*C.LWPGETLEADERBOARDREVEALPLAY
 		return nil, err
 	}
 	return recvPacket, nil
+}
+
+func min(a, b int) int {
+	if a < b {
+		return a
+	}
+	return b
+}
+
+func GetRandomGameMap(supportedGameMap1, rating1, supportedGameMap2, rating2 int) int {
+	gameMap := int(C.LPGM_SQUARE)
+	if rating1 > 1600 || rating2 > 1600 {
+		gameMap = rand.Intn(min(supportedGameMap1, supportedGameMap2) + 1)
+	}
+	return gameMap
 }

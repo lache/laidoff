@@ -108,7 +108,7 @@ function on_ui_event(id, w_ratio, h_ratio)
 	elseif id == 'tutorial_button' then
 		reload_require('tutorial_button')()
 	elseif id == 'online_button' then
-		reload_require('online_button')(lo.LW_PUCK_GAME_QUEUE_TYPE_NEAREST_SCORE)
+		reload_require('online_button')(lo.LW_PUCK_GAME_QUEUE_TYPE_NEAREST_SCORE_WITH_OCTAGON_SUPPORT)
 	elseif id == 'leaderboard_button' then
 		lo.show_leaderboard(c)
 	elseif id == 'leaderboard_page_button' then

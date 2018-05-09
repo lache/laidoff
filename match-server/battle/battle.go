@@ -21,6 +21,7 @@ type Ok struct {
 	c1             user.Agent
 	c2             user.Agent
 	RemoveUserId   user.Id
+	GameMap        int
 }
 
 type Service struct {
@@ -71,6 +72,8 @@ func createBattleInstance(battleService Service, c1 user.Agent, c2 user.Agent, b
 		SendRetryQueueLater(c1.Conn)
 		SendRetryQueueLater(c2.Conn)
 	} else {
+		// Select game map (square or octagon)
+		gameMap := convert.GetRandomGameMap(c1.SupportedGameMap, c1.Db.Rating, c2.SupportedGameMap, c2.Db.Rating)
 		// Send create battle request
 		createBattleBuf := convert.Packet2Buf(convert.NewCreateBattle(
 			c1.Db.Id,
@@ -78,6 +81,7 @@ func createBattleInstance(battleService Service, c1 user.Agent, c2 user.Agent, b
 			c1.Db.Nickname,
 			c2.Db.Nickname,
 			bot,
+			gameMap,
 		))
 		_, err = connToBattle.Write(createBattleBuf)
 		if err != nil {
@@ -98,13 +102,14 @@ func createBattleInstance(battleService Service, c1 user.Agent, c2 user.Agent, b
 				log.Printf("MATCH %v and *bot* matched successfully!", c1.Conn.RemoteAddr())
 			}
 			createBattleOkWrap := convert.CreateBattleOk{S: *createBattleOk}
-			battleOkQueue <- Ok {
+			battleOkQueue <- Ok{
 				false,
 				int(createBattleOk.Battle_id),
 				createBattleOkWrap,
 				c1,
 				c2,
 				user.Id{},
+				gameMap,
 			}
 		}
 	}
@@ -132,13 +137,13 @@ func WriteMatched2(conf config.ServerConfig, conn net.Conn, battleOk Ok, id user
 		return
 	}
 	if battleOk.c1.Db.Id == id {
-		conn.Write(createMatched2Buf(conf, battleOk.createBattleOk, uint(battleOk.createBattleOk.S.C1_token), 1, battleOk.c1.Db.Rating, battleOk.c2.Db.Rating, battleOk.c2.Db.Nickname))
+		conn.Write(createMatched2Buf(conf, battleOk.createBattleOk, uint(battleOk.createBattleOk.S.C1_token), 1, battleOk.c1.Db.Rating, battleOk.c2.Db.Rating, battleOk.c2.Db.Nickname, battleOk.GameMap))
 	} else if battleOk.c2.Db.Id == id {
-		conn.Write(createMatched2Buf(conf, battleOk.createBattleOk, uint(battleOk.createBattleOk.S.C2_token), 2, battleOk.c2.Db.Rating, battleOk.c1.Db.Rating, battleOk.c1.Db.Nickname))
+		conn.Write(createMatched2Buf(conf, battleOk.createBattleOk, uint(battleOk.createBattleOk.S.C2_token), 2, battleOk.c2.Db.Rating, battleOk.c1.Db.Rating, battleOk.c1.Db.Nickname, battleOk.GameMap))
 	}
 }
 
-func createMatched2Buf(conf config.ServerConfig, createBattleOk convert.CreateBattleOk, token uint, playerNo, playerScore, targetScore int, targetNickname string) []byte {
+func createMatched2Buf(conf config.ServerConfig, createBattleOk convert.CreateBattleOk, token uint, playerNo, playerScore, targetScore int, targetNickname string, gameMap int) []byte {
 	publicAddr, err := net.ResolveTCPAddr(conf.BattlePublicServiceConnType, conf.BattlePublicServiceHost+":"+conf.BattlePublicServicePort)
 	if err != nil {
 		log.Panicf("BattlePublicService conf parse error: %v", err.Error())
@@ -154,6 +159,7 @@ func createMatched2Buf(conf config.ServerConfig, createBattleOk convert.CreateBa
 		playerScore,
 		targetScore,
 		targetNickname,
+		gameMap,
 	))
 }
 
@@ -224,9 +230,10 @@ func CreateBotMatch(c1 user.Agent, battleService Service, battleOkQueue chan<- O
 		return
 	}
 	c2Bot := user.Agent{
-		Conn:        nil,
-		Db:          botUserDb,
-		CancelQueue: false,
+		Conn:             nil,
+		Db:               botUserDb,
+		CancelQueue:      false,
+		SupportedGameMap: convert.LPGMOCTAGON,
 	}
 	if n1 == 4 && err1 == nil {
 		go createBattleInstance(battleService, c1, c2Bot, battleOkQueue, true)

@@ -81,6 +81,7 @@ typedef enum _LW_PUCK_GAME_PACKET {
 
 #define LW_PUCK_GAME_QUEUE_TYPE_FIFO (0)
 #define LW_PUCK_GAME_QUEUE_TYPE_NEAREST_SCORE (1)
+#define LW_PUCK_GAME_QUEUE_TYPE_NEAREST_SCORE_WITH_OCTAGON_SUPPORT (2)
 
 typedef enum _LWP_STATE_PHASE {
     LSP_INIT = 0,
@@ -100,6 +101,12 @@ typedef enum _LWP_STATE_WALL_HIT_BIT {
     LSWHB_SOUTH = 1 << 2,
     LSWHB_NORTH = 1 << 3,
 } LWP_STATE_WALL_HIT_BIT;
+
+typedef enum _LW_PUCK_GAME_MAP {
+    LPGM_SQUARE,
+    LPGM_OCTAGON,
+    LPGM_COUNT,
+} LW_PUCK_GAME_MAP;
 
 enum {
     LW_PUSH_TOKEN_LENGTH = 256,
@@ -556,7 +563,7 @@ typedef struct _LWPMATCHED2 {
     unsigned short size;
     unsigned short type;
     unsigned short port;
-    unsigned short padding_unused;
+    unsigned short map;
     unsigned char ipaddr[4];
     int battle_id;
     unsigned int token;
@@ -581,6 +588,7 @@ typedef struct _LWPCREATEBATTLE {
     unsigned int Id2[4];
     char Nickname1[LW_NICKNAME_MAX_LEN];
     char Nickname2[LW_NICKNAME_MAX_LEN];
+    int GameMap;
 } LWPCREATEBATTLE;
 
 typedef struct _LWPCREATEBATTLEOK {
@@ -591,7 +599,6 @@ typedef struct _LWPCREATEBATTLEOK {
     unsigned int C2_token;
     unsigned char IpAddr[4];
     unsigned short Port;
-    unsigned short Padding_unused;
 } LWPCREATEBATTLEOK;
 
 typedef struct _LWPCHECKBATTLEVALID {

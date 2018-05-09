@@ -69487,12 +69487,15 @@ static swig_lua_class _wrap_class_LWPUCKGAME = { "LWPUCKGAME", "LWPUCKGAME", &SW
 static int _wrap_new_puck_game(lua_State* L) {
   int SWIG_arg = 0;
   int arg1 ;
+  LW_PUCK_GAME_MAP arg2 ;
   LWPUCKGAME *result = 0 ;
   
-  SWIG_check_num_args("new_puck_game",1,1)
+  SWIG_check_num_args("new_puck_game",2,2)
   if(!lua_isnumber(L,1)) SWIG_fail_arg("new_puck_game",1,"int");
+  if(!lua_isnumber(L,2)) SWIG_fail_arg("new_puck_game",2,"LW_PUCK_GAME_MAP");
   arg1 = (int)lua_tonumber(L, 1);
-  result = (LWPUCKGAME *)new_puck_game(arg1);
+  arg2 = (LW_PUCK_GAME_MAP)(int)lua_tonumber(L, 2);
+  result = (LWPUCKGAME *)new_puck_game(arg1,arg2);
   SWIG_NewPointerObj(L,result,SWIGTYPE_p__LWPUCKGAME,0); SWIG_arg++; 
   return SWIG_arg;
   
@@ -89459,22 +89462,22 @@ fail:
 }
 
 
-static int _wrap_LWPMATCHED2_padding_unused_set(lua_State* L) {
+static int _wrap_LWPMATCHED2_map_set(lua_State* L) {
   int SWIG_arg = 0;
   struct _LWPMATCHED2 *arg1 = (struct _LWPMATCHED2 *) 0 ;
   unsigned short arg2 ;
   
-  SWIG_check_num_args("_LWPMATCHED2::padding_unused",2,2)
-  if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("_LWPMATCHED2::padding_unused",1,"struct _LWPMATCHED2 *");
-  if(!lua_isnumber(L,2)) SWIG_fail_arg("_LWPMATCHED2::padding_unused",2,"unsigned short");
+  SWIG_check_num_args("_LWPMATCHED2::map",2,2)
+  if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("_LWPMATCHED2::map",1,"struct _LWPMATCHED2 *");
+  if(!lua_isnumber(L,2)) SWIG_fail_arg("_LWPMATCHED2::map",2,"unsigned short");
   
   if (!SWIG_IsOK(SWIG_ConvertPtr(L,1,(void**)&arg1,SWIGTYPE_p__LWPMATCHED2,0))){
-    SWIG_fail_ptr("LWPMATCHED2_padding_unused_set",1,SWIGTYPE_p__LWPMATCHED2);
+    SWIG_fail_ptr("LWPMATCHED2_map_set",1,SWIGTYPE_p__LWPMATCHED2);
   }
   
   SWIG_contract_assert((lua_tonumber(L,2)>=0),"number must not be negative")
   arg2 = (unsigned short)lua_tonumber(L, 2);
-  if (arg1) (arg1)->padding_unused = arg2;
+  if (arg1) (arg1)->map = arg2;
   
   return SWIG_arg;
   
@@ -89486,19 +89489,19 @@ fail:
 }
 
 
-static int _wrap_LWPMATCHED2_padding_unused_get(lua_State* L) {
+static int _wrap_LWPMATCHED2_map_get(lua_State* L) {
   int SWIG_arg = 0;
   struct _LWPMATCHED2 *arg1 = (struct _LWPMATCHED2 *) 0 ;
   unsigned short result;
   
-  SWIG_check_num_args("_LWPMATCHED2::padding_unused",1,1)
-  if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("_LWPMATCHED2::padding_unused",1,"struct _LWPMATCHED2 *");
+  SWIG_check_num_args("_LWPMATCHED2::map",1,1)
+  if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("_LWPMATCHED2::map",1,"struct _LWPMATCHED2 *");
   
   if (!SWIG_IsOK(SWIG_ConvertPtr(L,1,(void**)&arg1,SWIGTYPE_p__LWPMATCHED2,0))){
-    SWIG_fail_ptr("LWPMATCHED2_padding_unused_get",1,SWIGTYPE_p__LWPMATCHED2);
+    SWIG_fail_ptr("LWPMATCHED2_map_get",1,SWIGTYPE_p__LWPMATCHED2);
   }
   
-  result = (unsigned short) ((arg1)->padding_unused);
+  result = (unsigned short) ((arg1)->map);
   lua_pushnumber(L, (lua_Number) result); SWIG_arg++;
   return SWIG_arg;
   
@@ -90009,7 +90012,7 @@ static swig_lua_attribute swig_LWPMATCHED2_attributes[] = {
     { "size", _wrap_LWPMATCHED2_size_get, _wrap_LWPMATCHED2_size_set },
     { "type", _wrap_LWPMATCHED2_type_get, _wrap_LWPMATCHED2_type_set },
     { "port", _wrap_LWPMATCHED2_port_get, _wrap_LWPMATCHED2_port_set },
-    { "padding_unused", _wrap_LWPMATCHED2_padding_unused_get, _wrap_LWPMATCHED2_padding_unused_set },
+    { "map", _wrap_LWPMATCHED2_map_get, _wrap_LWPMATCHED2_map_set },
     { "ipaddr", _wrap_LWPMATCHED2_ipaddr_get, _wrap_LWPMATCHED2_ipaddr_set },
     { "battle_id", _wrap_LWPMATCHED2_battle_id_get, _wrap_LWPMATCHED2_battle_id_set },
     { "token", _wrap_LWPMATCHED2_token_get, _wrap_LWPMATCHED2_token_set },
@@ -90603,6 +90606,56 @@ fail:
 }
 
 
+static int _wrap_LWPCREATEBATTLE_GameMap_set(lua_State* L) {
+  int SWIG_arg = 0;
+  struct _LWPCREATEBATTLE *arg1 = (struct _LWPCREATEBATTLE *) 0 ;
+  int arg2 ;
+  
+  SWIG_check_num_args("_LWPCREATEBATTLE::GameMap",2,2)
+  if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("_LWPCREATEBATTLE::GameMap",1,"struct _LWPCREATEBATTLE *");
+  if(!lua_isnumber(L,2)) SWIG_fail_arg("_LWPCREATEBATTLE::GameMap",2,"int");
+  
+  if (!SWIG_IsOK(SWIG_ConvertPtr(L,1,(void**)&arg1,SWIGTYPE_p__LWPCREATEBATTLE,0))){
+    SWIG_fail_ptr("LWPCREATEBATTLE_GameMap_set",1,SWIGTYPE_p__LWPCREATEBATTLE);
+  }
+  
+  arg2 = (int)lua_tonumber(L, 2);
+  if (arg1) (arg1)->GameMap = arg2;
+  
+  return SWIG_arg;
+  
+  if(0) SWIG_fail;
+  
+fail:
+  lua_error(L);
+  return SWIG_arg;
+}
+
+
+static int _wrap_LWPCREATEBATTLE_GameMap_get(lua_State* L) {
+  int SWIG_arg = 0;
+  struct _LWPCREATEBATTLE *arg1 = (struct _LWPCREATEBATTLE *) 0 ;
+  int result;
+  
+  SWIG_check_num_args("_LWPCREATEBATTLE::GameMap",1,1)
+  if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("_LWPCREATEBATTLE::GameMap",1,"struct _LWPCREATEBATTLE *");
+  
+  if (!SWIG_IsOK(SWIG_ConvertPtr(L,1,(void**)&arg1,SWIGTYPE_p__LWPCREATEBATTLE,0))){
+    SWIG_fail_ptr("LWPCREATEBATTLE_GameMap_get",1,SWIGTYPE_p__LWPCREATEBATTLE);
+  }
+  
+  result = (int) ((arg1)->GameMap);
+  lua_pushnumber(L, (lua_Number) result); SWIG_arg++;
+  return SWIG_arg;
+  
+  if(0) SWIG_fail;
+  
+fail:
+  lua_error(L);
+  return SWIG_arg;
+}
+
+
 static int _wrap_new_LWPCREATEBATTLE(lua_State* L) {
   int SWIG_arg = 0;
   struct _LWPCREATEBATTLE *result = 0 ;
@@ -90640,6 +90693,7 @@ static swig_lua_attribute swig_LWPCREATEBATTLE_attributes[] = {
     { "Id2", _wrap_LWPCREATEBATTLE_Id2_get, _wrap_LWPCREATEBATTLE_Id2_set },
     { "Nickname1", _wrap_LWPCREATEBATTLE_Nickname1_get, _wrap_LWPCREATEBATTLE_Nickname1_set },
     { "Nickname2", _wrap_LWPCREATEBATTLE_Nickname2_get, _wrap_LWPCREATEBATTLE_Nickname2_set },
+    { "GameMap", _wrap_LWPCREATEBATTLE_GameMap_get, _wrap_LWPCREATEBATTLE_GameMap_set },
     {0,0,0}
 };
 static swig_lua_method swig_LWPCREATEBATTLE_methods[]= {
@@ -91037,57 +91091,6 @@ fail:
 }
 
 
-static int _wrap_LWPCREATEBATTLEOK_Padding_unused_set(lua_State* L) {
-  int SWIG_arg = 0;
-  struct _LWPCREATEBATTLEOK *arg1 = (struct _LWPCREATEBATTLEOK *) 0 ;
-  unsigned short arg2 ;
-  
-  SWIG_check_num_args("_LWPCREATEBATTLEOK::Padding_unused",2,2)
-  if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("_LWPCREATEBATTLEOK::Padding_unused",1,"struct _LWPCREATEBATTLEOK *");
-  if(!lua_isnumber(L,2)) SWIG_fail_arg("_LWPCREATEBATTLEOK::Padding_unused",2,"unsigned short");
-  
-  if (!SWIG_IsOK(SWIG_ConvertPtr(L,1,(void**)&arg1,SWIGTYPE_p__LWPCREATEBATTLEOK,0))){
-    SWIG_fail_ptr("LWPCREATEBATTLEOK_Padding_unused_set",1,SWIGTYPE_p__LWPCREATEBATTLEOK);
-  }
-  
-  SWIG_contract_assert((lua_tonumber(L,2)>=0),"number must not be negative")
-  arg2 = (unsigned short)lua_tonumber(L, 2);
-  if (arg1) (arg1)->Padding_unused = arg2;
-  
-  return SWIG_arg;
-  
-  if(0) SWIG_fail;
-  
-fail:
-  lua_error(L);
-  return SWIG_arg;
-}
-
-
-static int _wrap_LWPCREATEBATTLEOK_Padding_unused_get(lua_State* L) {
-  int SWIG_arg = 0;
-  struct _LWPCREATEBATTLEOK *arg1 = (struct _LWPCREATEBATTLEOK *) 0 ;
-  unsigned short result;
-  
-  SWIG_check_num_args("_LWPCREATEBATTLEOK::Padding_unused",1,1)
-  if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("_LWPCREATEBATTLEOK::Padding_unused",1,"struct _LWPCREATEBATTLEOK *");
-  
-  if (!SWIG_IsOK(SWIG_ConvertPtr(L,1,(void**)&arg1,SWIGTYPE_p__LWPCREATEBATTLEOK,0))){
-    SWIG_fail_ptr("LWPCREATEBATTLEOK_Padding_unused_get",1,SWIGTYPE_p__LWPCREATEBATTLEOK);
-  }
-  
-  result = (unsigned short) ((arg1)->Padding_unused);
-  lua_pushnumber(L, (lua_Number) result); SWIG_arg++;
-  return SWIG_arg;
-  
-  if(0) SWIG_fail;
-  
-fail:
-  lua_error(L);
-  return SWIG_arg;
-}
-
-
 static int _wrap_new_LWPCREATEBATTLEOK(lua_State* L) {
   int SWIG_arg = 0;
   struct _LWPCREATEBATTLEOK *result = 0 ;
@@ -91125,7 +91128,6 @@ static swig_lua_attribute swig_LWPCREATEBATTLEOK_attributes[] = {
     { "C2_token", _wrap_LWPCREATEBATTLEOK_C2_token_get, _wrap_LWPCREATEBATTLEOK_C2_token_set },
     { "IpAddr", _wrap_LWPCREATEBATTLEOK_IpAddr_get, _wrap_LWPCREATEBATTLEOK_IpAddr_set },
     { "Port", _wrap_LWPCREATEBATTLEOK_Port_get, _wrap_LWPCREATEBATTLEOK_Port_set },
-    { "Padding_unused", _wrap_LWPCREATEBATTLEOK_Padding_unused_get, _wrap_LWPCREATEBATTLEOK_Padding_unused_set },
     {0,0,0}
 };
 static swig_lua_method swig_LWPCREATEBATTLEOK_methods[]= {
@@ -101206,8 +101208,6 @@ static swig_lua_const_info swig_SwigModule_constants[]= {
     {SWIG_LUA_CONSTTAB_INT("LPGB_DIAGONAL_1", LPGB_DIAGONAL_1)},
     {SWIG_LUA_CONSTTAB_INT("LPGB_DIAGONAL_2", LPGB_DIAGONAL_2)},
     {SWIG_LUA_CONSTTAB_INT("LPGB_COUNT", LPGB_COUNT)},
-    {SWIG_LUA_CONSTTAB_INT("LPGM_SQUARE", LPGM_SQUARE)},
-    {SWIG_LUA_CONSTTAB_INT("LPGM_OCTAGON", LPGM_OCTAGON)},
     {SWIG_LUA_CONSTTAB_INT("LPGO_PUCK", LPGO_PUCK)},
     {SWIG_LUA_CONSTTAB_INT("LPGO_PLAYER", LPGO_PLAYER)},
     {SWIG_LUA_CONSTTAB_INT("LPGO_TARGET", LPGO_TARGET)},
@@ -101299,6 +101299,7 @@ static swig_lua_const_info swig_SwigModule_constants[]= {
     {SWIG_LUA_CONSTTAB_INT("LW_LEADERBOARD_ITEMS_IN_PAGE", (15))},
     {SWIG_LUA_CONSTTAB_INT("LW_PUCK_GAME_QUEUE_TYPE_FIFO", (0))},
     {SWIG_LUA_CONSTTAB_INT("LW_PUCK_GAME_QUEUE_TYPE_NEAREST_SCORE", (1))},
+    {SWIG_LUA_CONSTTAB_INT("LW_PUCK_GAME_QUEUE_TYPE_NEAREST_SCORE_WITH_OCTAGON_SUPPORT", (2))},
     {SWIG_LUA_CONSTTAB_INT("LSP_INIT", LSP_INIT)},
     {SWIG_LUA_CONSTTAB_INT("LSP_READY", LSP_READY)},
     {SWIG_LUA_CONSTTAB_INT("LSP_STEADY", LSP_STEADY)},
@@ -101312,6 +101313,9 @@ static swig_lua_const_info swig_SwigModule_constants[]= {
     {SWIG_LUA_CONSTTAB_INT("LSWHB_WEST", LSWHB_WEST)},
     {SWIG_LUA_CONSTTAB_INT("LSWHB_SOUTH", LSWHB_SOUTH)},
     {SWIG_LUA_CONSTTAB_INT("LSWHB_NORTH", LSWHB_NORTH)},
+    {SWIG_LUA_CONSTTAB_INT("LPGM_SQUARE", LPGM_SQUARE)},
+    {SWIG_LUA_CONSTTAB_INT("LPGM_OCTAGON", LPGM_OCTAGON)},
+    {SWIG_LUA_CONSTTAB_INT("LPGM_COUNT", LPGM_COUNT)},
     {SWIG_LUA_CONSTTAB_INT("LW_PUSH_TOKEN_LENGTH", LW_PUSH_TOKEN_LENGTH)},
     {SWIG_LUA_CONSTTAB_INT("LW_SYS_MSG_LENGTH", LW_SYS_MSG_LENGTH)},
     {SWIG_LUA_CONSTTAB_FLOAT("sea_render_scale", (50.0*14))},

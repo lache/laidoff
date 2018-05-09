@@ -330,13 +330,13 @@ void puck_game_destroy_all_battle_objects(LWPUCKGAME* puck_game) {
     }
 }
 
-LWPUCKGAME* new_puck_game(int update_frequency) {
+LWPUCKGAME* new_puck_game(int update_frequency, LW_PUCK_GAME_MAP gameMap) {
     // Static game data
     LWPUCKGAME* puck_game = malloc(sizeof(LWPUCKGAME));
     memset(puck_game, 0, sizeof(LWPUCKGAME));
     puck_game_set_static_default_values(puck_game);
     puck_game->prepare_step_wait_tick = 2 * update_frequency;
-    
+    puck_game->map = gameMap;
     // ------
 
     // Initialize OpenDE

@@ -512,7 +512,7 @@ int tcp_admin_server_entry(void* context) {
             LOGI("LWPCREATEBATTLE received");
             LWPCREATEBATTLEOK reply_p;
             LWPCREATEBATTLE* p = (LWPCREATEBATTLE*)base;
-            LWPUCKGAME* puck_game = new_puck_game(server->update_frequency);
+            LWPUCKGAME* puck_game = new_puck_game(server->update_frequency, (LW_PUCK_GAME_MAP)p->GameMap);
             memcpy(puck_game->id1, p->Id1, sizeof(puck_game->id1));
             memcpy(puck_game->id2, p->Id2, sizeof(puck_game->id2));
             memcpy(puck_game->nickname[0], p->Nickname1, sizeof(puck_game->nickname));

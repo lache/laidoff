@@ -38,7 +38,10 @@ func HandleQueue3(req *HandleQueue3Request) {
 	switch recvPacket.QueueType {
 	case convert.LWPUCKGAMEQUEUETYPENEARESTSCORE:
 		userId := convert.IdCuintToByteArray(recvPacket.Id)
-		handleNearestScoreQueue3(userId, req)
+		handleNearestScoreQueue3(userId, convert.LPGMSQUARE, req)
+	case convert.LWPUCKGAMEQUEUETYPENEARESTSCOREWITHOCTAGONSUPPORT:
+		userId := convert.IdCuintToByteArray(recvPacket.Id)
+		handleNearestScoreQueue3(userId, convert.LPGMOCTAGON, req)
 	case convert.LWPUCKGAMEQUEUETYPEFIFO:
 		fallthrough
 	default:
@@ -46,7 +49,7 @@ func HandleQueue3(req *HandleQueue3Request) {
 	}
 }
 
-func handleNearestScoreQueue3(userId user.Id, req *HandleQueue3Request) {
+func handleNearestScoreQueue3(userId user.Id, supportedGameMap int, req *HandleQueue3Request) {
 	userDb, resumed, err := CheckOngoingBattle(userId, req.Db, req.OngoingBattleMap, req.BattleService, req.BattleOkQueue, req.Conn, req.Conf)
 	if err != nil {
 		log.Printf("CheckOngoingBattle error: %v", err.Error())
@@ -62,18 +65,18 @@ func handleNearestScoreQueue3(userId user.Id, req *HandleQueue3Request) {
 			// match with bot if user defeated at previous battle
 			if userDb.BattleStat.ConsecutiveDefeat > 0 {
 				log.Printf("Here comes a defeat type bot...!")
-				agent1 := user.Agent{Conn: req.Conn, Db: userDb}
+				agent1 := user.Agent{Conn: req.Conn, Db: userDb, SupportedGameMap: supportedGameMap}
 				battle.CreateBotMatch(agent1, req.BattleService, req.BattleOkQueue, convert.LWPUCKGAMEQUEUETYPENEARESTSCORE, req.Db)
 			} else {
 				// normal pvp
 				// queue user-requested score match entry
-				go queueToScoreMatch(userDb, req)
+				go queueToScoreMatch(userDb, supportedGameMap, req)
 			}
 		}
 	}
 }
 
-func queueToScoreMatch(userDb user.Db, req *HandleQueue3Request) {
+func queueToScoreMatch(userDb user.Db, supportedGameMap int, req *HandleQueue3Request) {
 	timeDilationFactor := 0.5 + 0.5*rand.Float64()
 	distanceByElapsed := rankservice.DistanceByElapsed{
 		Elapsed: []time.Duration{
@@ -116,7 +119,7 @@ func queueToScoreMatch(userDb user.Db, req *HandleQueue3Request) {
 			if req.Conn != nil && queueScoreMatchReq.Update == false {
 				// Cache this match request at first time
 				req.NearestMatchMapLock.Lock()
-				req.NearestMatchMap[userDb.Id] = user.Agent{Conn: req.Conn, Db: userDb}
+				req.NearestMatchMap[userDb.Id] = user.Agent{Conn: req.Conn, Db: userDb, SupportedGameMap: supportedGameMap}
 				req.NearestMatchMapLock.Unlock()
 				// Send reply to client at first time
 				queueOkBuf := convert.Packet2Buf(convert.NewLwpQueueOk())
@@ -165,7 +168,7 @@ func queueToScoreMatch(userDb user.Db, req *HandleQueue3Request) {
 	req.NearestMatchMapLock.Unlock()
 
 	log.Printf("Here comes a long-wait type bot...!")
-	agent1 := user.Agent{Conn: req.Conn, Db: userDb}
+	agent1 := user.Agent{Conn: req.Conn, Db: userDb, SupportedGameMap: supportedGameMap}
 	battle.CreateBotMatch(agent1, req.BattleService, req.BattleOkQueue, convert.LWPUCKGAMEQUEUETYPENEARESTSCORE, req.Db)
 	// or wait again
 	//battle.SendRetryQueue2(req.Conn, convert.LWPUCKGAMEQUEUETYPENEARESTSCORE)

@@ -53,7 +53,7 @@ func HandleCancelQueue(req *HandleCancelQueueRequest) {
 			DeleteFromQueue(deleteFromQueueReq)
 		} else {
 			// Queue 'cancel queue' request
-			req.MatchQueue <- user.Agent{req.Conn, userDb, true}
+			req.MatchQueue <- user.Agent{req.Conn, userDb, true, 0}
 		}
 	}
 }

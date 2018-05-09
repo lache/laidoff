@@ -24,7 +24,7 @@ func HandleQueue2(conf config.ServerConfig, matchQueue chan<- user.Agent, buf []
 		log.Printf("CheckOngoingBattle error: %v", err.Error())
 	} else if resumed == false {
 		// Queue connection
-		matchQueue <- user.Agent{conn, userDb, false}
+		matchQueue <- user.Agent{conn, userDb, false, convert.LPGMSQUARE}
 		// Send reply
 		queueOkBuf := convert.Packet2Buf(convert.NewLwpQueueOk())
 		conn.Write(queueOkBuf)

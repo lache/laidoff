@@ -1858,7 +1858,7 @@ LWCONTEXT* lw_init_initial_size(int width, int height) {
     
     lwcontext_set_update_frequency(pLwc, 125);
     
-    pLwc->puck_game = new_puck_game(lwcontext_update_frequency(pLwc));
+    pLwc->puck_game = new_puck_game(lwcontext_update_frequency(pLwc), LPGM_SQUARE);
     puck_game_set_static_default_values_client(pLwc->puck_game);
     pLwc->puck_game->pLwc = pLwc;
     
