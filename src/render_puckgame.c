@@ -145,7 +145,7 @@ static void render_tower_collapsing(const LWCONTEXT* pLwc, const mat4x4 view, co
                 view,
                 proj,
                 LFT_TOWER,
-                LFAT_TOWER_COLLAPSE,
+                LFAT_TOWER_COLLAPSE_OCTAGON, //LFAT_TOWER_COLLAPSE,
                 fabsf(pos[0]),
                 fabsf(pos[1]),
                 pos[2],

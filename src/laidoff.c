@@ -208,6 +208,8 @@ static void init_fvbo(LWCONTEXT* pLwc) {
 static void init_fanim(LWCONTEXT* pLwc) {
     load_fanim(pLwc, ASSETS_BASE_PATH "fanim" PATH_SEPARATOR "whole-tower_cell.fanim",
                &pLwc->fanim[LFAT_TOWER_COLLAPSE]);
+    load_fanim(pLwc, ASSETS_BASE_PATH "fanim" PATH_SEPARATOR "whole-tower_cell_octagon.fanim",
+               &pLwc->fanim[LFAT_TOWER_COLLAPSE_OCTAGON]);
 }
 
 static void lwc_create_line_vbo(LWCONTEXT* pLwc) {
