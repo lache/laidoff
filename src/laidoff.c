@@ -1884,8 +1884,6 @@ LWCONTEXT* lw_init_initial_size(int width, int height) {
 
     pLwc->remtex = remtex_new(pLwc->tcp_host_addr.host);
 
-    remtex_preload(pLwc->remtex, "circle-shadow");
-
     return pLwc;
 }
 

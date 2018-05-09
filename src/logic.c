@@ -841,7 +841,9 @@ void lwc_update(LWCONTEXT* pLwc, double delta_time) {
         udp_update(pLwc, pLwc->udp);
     }
 
-    remtex_update(pLwc->remtex, delta_time);
+    if (pLwc->game_scene != LGS_PUCK_GAME) {
+        remtex_update(pLwc->remtex, delta_time);
+    }
     
     if (pLwc->tcp) {
         tcp_update(pLwc->tcp);
