@@ -270,13 +270,14 @@ static void init_vbo(LWCONTEXT* pLwc) {
         memset(vertices, 0, sizeof(vertices));
         vertices[0].u = 0.5f;
         vertices[0].v = 0.5f;
+        float h = 1.0f / cosf((float)(M_PI / 8));
         for (int r = 0; r < 9; r++) {
-            float ct = cosf((float)(M_PI / 4 * r));
-            float st = sinf((float)(M_PI / 4 * r));
-            vertices[r + 1].x = ct;
-            vertices[r + 1].y = st;
-            vertices[r + 1].u = 0.5f + ct / 2;
-            vertices[r + 1].v = 0.5f + st / 2;
+            float ct = cosf((float)(M_PI / 4 * r - M_PI / 8));
+            float st = sinf((float)(M_PI / 4 * r - M_PI / 8));
+            vertices[r + 1].x = h * ct;
+            vertices[r + 1].y = h * st;
+            vertices[r + 1].u = 0.5f + vertices[r + 1].x / 2;
+            vertices[r + 1].v = 0.5f + vertices[r + 1].y / 2;
         }
         const LW_VBO_TYPE lvt = LVT_OCTAGON_PLANE;
         glGenBuffers(1, &pLwc->vertex_buffer[lvt].vertex_buffer);

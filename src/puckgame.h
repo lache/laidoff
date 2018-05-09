@@ -14,14 +14,14 @@ typedef enum _LW_PUCK_GAME_BOUNDARY {
     LPGB_N,
     LPGB_DIAGONAL_1,
     LPGB_DIAGONAL_2,
+    LPGB_EE,
     LPGB_EN,
-    LPGB_NE,
+    LPGB_NN,
     LPGB_NW,
-    LPGB_WN,
+    LPGB_WW,
     LPGB_WS,
-    LPGB_SW,
+    LPGB_SS,
     LPGB_SE,
-    LPGB_ES,
 	LPGB_COUNT
 } LW_PUCK_GAME_BOUNDARY;
 
