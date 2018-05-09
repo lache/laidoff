@@ -1,12 +1,10 @@
 local c = lo.script_context()
 return function ()
 	print('[script]practice_button')
-	lo.puck_game_set_static_default_values(c.puck_game)
-	lo.puck_game_set_static_default_values_client(c.puck_game)
-	lo.puck_game_reset_tutorial_state(c.puck_game)
-	lo.puck_game_reset_battle_state(c.puck_game)
-	lo.puck_game_clear_match_data(c, c.puck_game)
-	lo.puck_game_reset_view_proj(c, c.puck_game)
-	lo.puck_game_roll_to_practice(c.puck_game)
-	lo.lwcontext_set_custom_puck_game_stage(c, lo.LVT_DONTCARE, lo.LAE_DONTCARE)
+
+	lo.puck_game_set_show_top_level_main_menu(c.puck_game, 0)
+	local html_path = lo.script_full_asset_path('html', 'practice-menu.html')
+	print('[script]loading HTML ' .. html_path)
+	lo.htmlui_set_next_html_path(c.htmlui, html_path)
+	lo.puck_game_set_show_htmlui(c.puck_game, 1)
 end

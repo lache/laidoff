@@ -209,40 +209,45 @@ void puck_game_create_walls(LWPUCKGAME* puck_game) {
     if (puck_game->boundary[LPGB_GROUND] == 0) {
         puck_game->boundary[LPGB_GROUND] = dCreatePlane(puck_game->space, 0, 0, 1, 0);
     }
-    if (puck_game->boundary[LPGB_E] == 0) {
-        puck_game->boundary[LPGB_E] = dCreatePlane(puck_game->space, -1, 0, 0, -puck_game->world_width_half);
+    if (puck_game->map == LPGM_SQUARE) {
+        // square map (4 planes)
+        if (puck_game->boundary[LPGB_E] == 0) {
+            puck_game->boundary[LPGB_E] = dCreatePlane(puck_game->space, -1, 0, 0, -puck_game->world_width_half);
+        }
+        if (puck_game->boundary[LPGB_W] == 0) {
+            puck_game->boundary[LPGB_W] = dCreatePlane(puck_game->space, 1, 0, 0, -puck_game->world_width_half);
+        }
+        if (puck_game->boundary[LPGB_S] == 0) {
+            puck_game->boundary[LPGB_S] = dCreatePlane(puck_game->space, 0, 1, 0, -puck_game->world_height_half);
+        }
+        if (puck_game->boundary[LPGB_N] == 0) {
+            puck_game->boundary[LPGB_N] = dCreatePlane(puck_game->space, 0, -1, 0, -puck_game->world_height_half);
+        }
+    } else {
+        // octagon map (8 planes)
+        assert(puck_game->world_width_half == puck_game->world_height_half);
+        float oct_x1, oct_y1;
+        calculate_x1_y1_for_octagonal_plane(puck_game->world_width_half, &oct_x1, &oct_y1);
+        for (int i = 0; i < 8; i++) {
+            if (puck_game->boundary[LPGB_EE + i] == 0) {
+                float oct_a, oct_b;
+                calculate_a_b_for_octagonal_plane((float)(M_PI / 4 * i), &oct_a, &oct_b);
+                float oct_d = calculate_d_for_octagonal_plane(oct_a, oct_b, oct_x1, oct_y1, (float)(M_PI / 4 * i));
+                puck_game->boundary[LPGB_EE + i] = dCreatePlane(puck_game->space, oct_a, oct_b, 0, oct_d);
+            }
+        }
     }
-    if (puck_game->boundary[LPGB_W] == 0) {
-        puck_game->boundary[LPGB_W] = dCreatePlane(puck_game->space, 1, 0, 0, -puck_game->world_width_half);
-    }
-    if (puck_game->boundary[LPGB_S] == 0) {
-        puck_game->boundary[LPGB_S] = dCreatePlane(puck_game->space, 0, 1, 0, -puck_game->world_height_half);
-    }
-    if (puck_game->boundary[LPGB_N] == 0) {
-        puck_game->boundary[LPGB_N] = dCreatePlane(puck_game->space, 0, -1, 0, -puck_game->world_height_half);
+    // Set Geom data to LPGB_* values
+    for (int i = 0; i < LPGB_COUNT; i++) {
+        if (puck_game->boundary[i]) {
+            dGeomSetData(puck_game->boundary[i], (void*)(uintptr_t)i);
+        }
     }
     if (puck_game->boundary[LPGB_DIAGONAL_1] == 0) {
         //puck_game->boundary[LPGB_DIAGONAL_1] = dCreatePlane(puck_game->space, -1, -1, 0, 0);
     }
     if (puck_game->boundary[LPGB_DIAGONAL_2] == 0) {
         //puck_game->boundary[LPGB_DIAGONAL_2] = dCreatePlane(puck_game->space, +1, +1, 0, 0);
-    }
-    // octagonal boundary
-    assert(puck_game->world_width_half == puck_game->world_height_half);
-    float oct_x1, oct_y1;
-    calculate_x1_y1_for_octagonal_plane(puck_game->world_width_half, &oct_x1, &oct_y1);
-    for (int i = 0; i < 8; i++) {
-        if (puck_game->boundary[LPGB_EE + i] == 0) {
-            float oct_a, oct_b;
-            calculate_a_b_for_octagonal_plane((float)(M_PI / 4 * i), &oct_a, &oct_b);
-            float oct_d = calculate_d_for_octagonal_plane(oct_a, oct_b, oct_x1, oct_y1, (float)(M_PI / 4 * i));
-            puck_game->boundary[LPGB_EE + i] = dCreatePlane(puck_game->space, oct_a, oct_b, 0, oct_d);
-        }
-    }
-    for (int i = 0; i < LPGB_COUNT; i++) {
-        if (puck_game->boundary[i]) {
-            dGeomSetData(puck_game->boundary[i], (void*)(uintptr_t)i);
-        }
     }
 }
 
@@ -471,18 +476,21 @@ static void near_puck_target(LWPUCKGAME* puck_game, dContact* contact) {
 }
 
 int is_wall_geom(LWPUCKGAME* puck_game, dGeomID maybe_wall_geom) {
-    return puck_game->boundary[LPGB_E] == maybe_wall_geom
-        || puck_game->boundary[LPGB_W] == maybe_wall_geom
-        || puck_game->boundary[LPGB_S] == maybe_wall_geom
-        || puck_game->boundary[LPGB_N] == maybe_wall_geom
-        || puck_game->boundary[LPGB_EE] == maybe_wall_geom
-        || puck_game->boundary[LPGB_EN] == maybe_wall_geom
-        || puck_game->boundary[LPGB_NN] == maybe_wall_geom
-        || puck_game->boundary[LPGB_NW] == maybe_wall_geom
-        || puck_game->boundary[LPGB_WW] == maybe_wall_geom
-        || puck_game->boundary[LPGB_WS] == maybe_wall_geom
-        || puck_game->boundary[LPGB_SS] == maybe_wall_geom
-        || puck_game->boundary[LPGB_SE] == maybe_wall_geom;
+    if (puck_game->map == LPGM_SQUARE) {
+        return puck_game->boundary[LPGB_E] == maybe_wall_geom
+            || puck_game->boundary[LPGB_W] == maybe_wall_geom
+            || puck_game->boundary[LPGB_S] == maybe_wall_geom
+            || puck_game->boundary[LPGB_N] == maybe_wall_geom;
+    } else {
+        return puck_game->boundary[LPGB_EE] == maybe_wall_geom
+            || puck_game->boundary[LPGB_EN] == maybe_wall_geom
+            || puck_game->boundary[LPGB_NN] == maybe_wall_geom
+            || puck_game->boundary[LPGB_NW] == maybe_wall_geom
+            || puck_game->boundary[LPGB_WW] == maybe_wall_geom
+            || puck_game->boundary[LPGB_WS] == maybe_wall_geom
+            || puck_game->boundary[LPGB_SS] == maybe_wall_geom
+            || puck_game->boundary[LPGB_SE] == maybe_wall_geom;
+    }
 }
 
 LWPUCKGAMETOWER* get_tower_from_geom(LWPUCKGAME* puck_game, dGeomID maybe_tower_geom) {
@@ -494,7 +502,7 @@ LWPUCKGAMETOWER* get_tower_from_geom(LWPUCKGAME* puck_game, dGeomID maybe_tower_
     return 0;
 }
 
-void near_puck_wall(LWPUCKGAME* puck_game, dGeomID puck_geom, dGeomID wall_geom, const dContact* contact) {
+static void near_puck_wall(LWPUCKGAME* puck_game, dGeomID puck_geom, dGeomID wall_geom, const dContact* contact) {
     LW_PUCK_GAME_BOUNDARY boundary = (LW_PUCK_GAME_BOUNDARY)dGeomGetData(wall_geom);
     if (boundary < LPGB_E || boundary > LPGB_SE) {
         LOGE("boundary geom data corrupted");
@@ -507,7 +515,7 @@ void near_puck_wall(LWPUCKGAME* puck_game, dGeomID puck_geom, dGeomID wall_geom,
     call_collision_callback(puck_game, contact, puck_game->on_puck_wall_collision);
 }
 
-void near_puck_tower(LWPUCKGAME* puck_game, dGeomID puck_geom, LWPUCKGAMETOWER* tower, dContact* contact, double now) {
+static void near_puck_tower(LWPUCKGAME* puck_game, dGeomID puck_geom, LWPUCKGAMETOWER* tower, dContact* contact, double now) {
     // Puck - tower contacts
     // Set basic contact parameters first
     contact->surface.mode = dContactSoftCFM | dContactBounce;
