@@ -474,7 +474,15 @@ int is_wall_geom(LWPUCKGAME* puck_game, dGeomID maybe_wall_geom) {
     return puck_game->boundary[LPGB_E] == maybe_wall_geom
         || puck_game->boundary[LPGB_W] == maybe_wall_geom
         || puck_game->boundary[LPGB_S] == maybe_wall_geom
-        || puck_game->boundary[LPGB_N] == maybe_wall_geom;
+        || puck_game->boundary[LPGB_N] == maybe_wall_geom
+        || puck_game->boundary[LPGB_EE] == maybe_wall_geom
+        || puck_game->boundary[LPGB_EN] == maybe_wall_geom
+        || puck_game->boundary[LPGB_NN] == maybe_wall_geom
+        || puck_game->boundary[LPGB_NW] == maybe_wall_geom
+        || puck_game->boundary[LPGB_WW] == maybe_wall_geom
+        || puck_game->boundary[LPGB_WS] == maybe_wall_geom
+        || puck_game->boundary[LPGB_SS] == maybe_wall_geom
+        || puck_game->boundary[LPGB_SE] == maybe_wall_geom;
 }
 
 LWPUCKGAMETOWER* get_tower_from_geom(LWPUCKGAME* puck_game, dGeomID maybe_tower_geom) {
@@ -488,7 +496,7 @@ LWPUCKGAMETOWER* get_tower_from_geom(LWPUCKGAME* puck_game, dGeomID maybe_tower_
 
 void near_puck_wall(LWPUCKGAME* puck_game, dGeomID puck_geom, dGeomID wall_geom, const dContact* contact) {
     LW_PUCK_GAME_BOUNDARY boundary = (LW_PUCK_GAME_BOUNDARY)dGeomGetData(wall_geom);
-    if (boundary < LPGB_E || boundary > LPGB_N) {
+    if (boundary < LPGB_E || boundary > LPGB_SE) {
         LOGE("boundary geom data corrupted");
         return;
     }
