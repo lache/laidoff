@@ -154,6 +154,24 @@ typedef enum _LW_ATLAS_ENUM {
     LAE_FLAGS_MINI2_ALPHA,
     LAE_WATER_2048_1024_AA,
     LAE_WATER_SAND_TILE,
+    
+    LAE_TTL_CITY_ALPHA,
+    LAE_TTL_CITY,
+    LAE_TTL_CONTAINER_BLUE_ALPHA,
+    LAE_TTL_CONTAINER_BLUE,
+    LAE_TTL_CONTAINER_GREEN_ALPHA,
+    LAE_TTL_CONTAINER_GREEN,
+    LAE_TTL_CONTAINER_ORANGE_ALPHA,
+    LAE_TTL_CONTAINER_ORANGE,
+    LAE_TTL_CONTAINER_WHITE_ALPHA,
+    LAE_TTL_CONTAINER_WHITE,
+    LAE_TTL_DOTS_ALPHA,
+    LAE_TTL_DOTS,
+    LAE_TTL_MARK_ALPHA,
+    LAE_TTL_MARK,
+    LAE_TTL_PORT_ALPHA,
+    LAE_TTL_PORT,
+    
     LAE_COUNT,
 
     LAE_DONTCARE,
@@ -315,6 +333,23 @@ static const char *tex_atlas_filename[] = {
     ASSETS_BASE_PATH "ktx" PATH_SEPARATOR "flags-mini2-a_alpha.ktx",
     ASSETS_BASE_PATH "ktx" PATH_SEPARATOR "water_2048x1024_aa.ktx",
     ASSETS_BASE_PATH "ktx" PATH_SEPARATOR "water-sand-tile.ktx",
+    
+    ASSETS_BASE_PATH "ktx" PATH_SEPARATOR "ttl-city-a_alpha.ktx",
+    ASSETS_BASE_PATH "ktx" PATH_SEPARATOR "ttl-city-a.ktx",
+    ASSETS_BASE_PATH "ktx" PATH_SEPARATOR "ttl-container-blue-a_alpha.ktx",
+    ASSETS_BASE_PATH "ktx" PATH_SEPARATOR "ttl-container-blue-a.ktx",
+    ASSETS_BASE_PATH "ktx" PATH_SEPARATOR "ttl-container-green-a_alpha.ktx",
+    ASSETS_BASE_PATH "ktx" PATH_SEPARATOR "ttl-container-green-a.ktx",
+    ASSETS_BASE_PATH "ktx" PATH_SEPARATOR "ttl-container-orange-a_alpha.ktx",
+    ASSETS_BASE_PATH "ktx" PATH_SEPARATOR "ttl-container-orange-a.ktx",
+    ASSETS_BASE_PATH "ktx" PATH_SEPARATOR "ttl-container-white-a_alpha.ktx",
+    ASSETS_BASE_PATH "ktx" PATH_SEPARATOR "ttl-container-white-a.ktx",
+    ASSETS_BASE_PATH "ktx" PATH_SEPARATOR "ttl-dots-a_alpha.ktx",
+    ASSETS_BASE_PATH "ktx" PATH_SEPARATOR "ttl-dots-a.ktx",
+    ASSETS_BASE_PATH "ktx" PATH_SEPARATOR "ttl-mark-a_alpha.ktx",
+    ASSETS_BASE_PATH "ktx" PATH_SEPARATOR "ttl-mark-a.ktx",
+    ASSETS_BASE_PATH "ktx" PATH_SEPARATOR "ttl-port-a_alpha.ktx",
+    ASSETS_BASE_PATH "ktx" PATH_SEPARATOR "ttl-port-a.ktx",
 };
 
 #define MAX_TEX_ATLAS LAE_COUNT
