@@ -90,15 +90,15 @@ function on_ui_event(id, w_ratio, h_ratio)
 	elseif id == 'seltower2' then gtid = 'guntower'
 	elseif id == 'seltower3' then gtid = 'pyro'
 	elseif id == 'pull_button' then
-		print('[script]button_pull')
+		--print('[script]button_pull')
 		lo.puck_game_pull_puck_toggle(c, c.puck_game)
 		return 0
 	elseif id == 'dash_button' then
-		print('[script]button_dash')
+		--print('[script]button_dash')
 		lo.puck_game_dash_and_send(c, c.puck_game)
 		return 0
 	elseif id == 'jump_button' then
-		print('[script]button_jump')
+		--print('[script]button_jump')
 		lo.puck_game_jump(c, c.puck_game)
 		return 0
 	elseif id == 'practice_button' then

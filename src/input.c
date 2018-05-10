@@ -78,7 +78,7 @@ void lw_trigger_mouse_press(LWCONTEXT* pLwc, float nx, float ny, int pointer_id)
     if (pinch_zoom.count == 2 && prev_pinch_zoom_count != 2) {
 		pinch_zoom.initial_dist = calculate_pinch_zoom_dist();
         pinch_zoom.initial_view_scale = lwttl_view_scale(pLwc->ttl);
-        LOGI("Pinch zoom started. initial dist = %.2f, initial view scale = %d",
+        LOGIx("Pinch zoom started. initial dist = %.2f, initial view scale = %d",
              pinch_zoom.initial_dist,
              pinch_zoom.initial_view_scale);
 	}
@@ -296,7 +296,7 @@ void lw_trigger_mouse_release(LWCONTEXT* pLwc, float nx, float ny, int pointer_i
     }
 
     if (prev_pinch_zoom_count == 2 && pinch_zoom.count != 2) {
-        LOGI("Pinch zoom aborted.");
+        LOGIx("Pinch zoom aborted.");
     }
 
     if (lw_pinch() == 0) {
