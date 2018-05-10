@@ -71,7 +71,7 @@ typedef struct _LWTTLOBJECTCACHEGROUP {
     LWTTLOBJECTCACHE seaport_cache;
     LWPTTLSEAPORTOBJECT seaport_array[TTL_OBJECT_CACHE_SEAPORT_COUNT];
     int seaport_count;
-    
+
     LWTTLOBJECTCACHE city_cache;
     LWPTTLCITYOBJECT city_array[TTL_OBJECT_CACHE_CITY_COUNT];
     int city_count;
@@ -640,10 +640,10 @@ static int add_to_object_cache_seaport(LWTTLOBJECTCACHE* c,
 }
 
 static int add_to_object_cache_city(LWTTLOBJECTCACHE* c,
-                                       LWPTTLCITYOBJECT* city_array,
-                                       const size_t city_array_size,
-                                       int* city_count,
-                                       const LWPTTLCITYSTATE* s2) {
+                                    LWPTTLCITYOBJECT* city_array,
+                                    const size_t city_array_size,
+                                    int* city_count,
+                                    const LWPTTLCITYSTATE* s2) {
     return add_to_object_cache(c,
                                city_count,
                                city_array,
@@ -1025,21 +1025,21 @@ void lwttl_udp_update(LWTTL* ttl, LWUDP* udp, LWCONTEXT* pLwc) {
                          decompressed_bytes,
                          sizeof(LWPTTLCITYSTATE));
                 }
-                
+
                 LWPTTLCITYSTATE* p = (LWPTTLCITYSTATE*)decompressed;
                 LOGIx("LWPTTLCITYSTATE: %d objects.", p->count);
-                
+
                 //memcpy(&ttl->ttl_seaport_state, p, sizeof(LWPTTLSEAPORTSTATE));
-                
+
                 const int add_ret = add_to_object_cache_city(&ttl->object_cache.city_cache,
-                                                                ttl->object_cache.city_array,
-                                                                ARRAY_SIZE(ttl->object_cache.city_array),
-                                                                &ttl->object_cache.city_count,
-                                                                p);
+                                                             ttl->object_cache.city_array,
+                                                             ARRAY_SIZE(ttl->object_cache.city_array),
+                                                             &ttl->object_cache.city_count,
+                                                             p);
                 if (add_ret == 1) {
                     //send_ttlpingflush(ttl);
                 }
-                
+
                 break;
             }
             case LPGP_LWPTTLWAYPOINTS:
@@ -1229,17 +1229,17 @@ int lwttl_query_chunk_range_seaport(const LWTTL* ttl,
 }
 
 int lwttl_query_chunk_range_city(const LWTTL* ttl,
-                                    const float lng_min,
-                                    const float lat_min,
-                                    const float lng_max,
-                                    const float lat_max,
-                                    const int view_scale,
-                                    int* chunk_index_array,
-                                    const int chunk_index_array_len,
-                                    int* xcc0,
-                                    int* ycc0,
-                                    int* xcc1,
-                                    int* ycc1) {
+                                 const float lng_min,
+                                 const float lat_min,
+                                 const float lng_max,
+                                 const float lat_max,
+                                 const int view_scale,
+                                 int* chunk_index_array,
+                                 const int chunk_index_array_len,
+                                 int* xcc0,
+                                 int* ycc0,
+                                 int* xcc1,
+                                 int* ycc1) {
     return lwttl_query_chunk_range(ttl,
                                    lng_min,
                                    lat_min,
@@ -1305,11 +1305,11 @@ const LWPTTLSEAPORTOBJECT* lwttl_query_chunk_seaport(const LWTTL* ttl,
                              count);
 }
 
-const LWPTTLSEAPORTOBJECT* lwttl_query_chunk_city(const LWTTL* ttl,
-                                                     const int chunk_index,
-                                                     int* xc0,
-                                                     int* yc0,
-                                                     int* count) {
+const LWPTTLCITYOBJECT* lwttl_query_chunk_city(const LWTTL* ttl,
+                                               const int chunk_index,
+                                               int* xc0,
+                                               int* yc0,
+                                               int* count) {
     return lwttl_query_chunk(ttl,
                              &ttl->object_cache.city_cache,
                              chunk_index,
