@@ -112,7 +112,7 @@ android {
     }
 
     sourceSets {
-        debug.assets.srcDirs += '../../selected-assets/assets'
+        debug.assets.srcDirs += '../../assets'
         releaseSingapore.assets.srcDirs += '../../selected-assets/assets'
         releaseBallRumbleGooglePlay.assets.srcDirs += '../../selected-assets-br/assets'
     }
