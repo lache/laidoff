@@ -14,6 +14,7 @@
 #include <puckgame.h>
 #include <lwtcp.h>
 #include <lwime.h>
+#include <string>
 #include "laidoff.h"
 #include "lwlog.h"
 #include "czmq.h"

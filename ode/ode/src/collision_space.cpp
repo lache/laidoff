@@ -420,7 +420,7 @@ void dxHashSpace::cleanGeoms()
 
 void dxHashSpace::collide (void *data, dNearCallback *callback)
 {
-    dAASSERT(this && callback);
+    dAASSERT(callback);
     dxGeom *geom;
     int i,maxlevel;
 

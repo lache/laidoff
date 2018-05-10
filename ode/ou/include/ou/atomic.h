@@ -1248,7 +1248,7 @@ struct _ou_atomic_CLargeStruct
 static _OU_ALWAYSINLINE atomicord32 _OU_CONVENTION_API 
 /*atomicord32 */AtomicIncrement(volatile atomicord32 *paoDestination)
 {
-	register atomicord32 aoResult = 1;
+	atomicord32 aoResult = 1;
 
 	asm volatile (
 		"lock; xaddl %2, %0;"
@@ -1262,7 +1262,7 @@ static _OU_ALWAYSINLINE atomicord32 _OU_CONVENTION_API
 static _OU_ALWAYSINLINE atomicord32 _OU_CONVENTION_API 
 /*atomicord32 */AtomicDecrement(volatile atomicord32 *paoDestination)
 {
-	register atomicord32 aoResult = (atomicord32)(-1);
+	atomicord32 aoResult = (atomicord32)(-1);
 
 	asm volatile (
 		"lock; xaddl %2, %0;"
@@ -1277,7 +1277,7 @@ static _OU_ALWAYSINLINE atomicord32 _OU_CONVENTION_API
 static _OU_ALWAYSINLINE atomicord32 _OU_CONVENTION_API 
 /*atomicord32 */AtomicExchange(volatile atomicord32 *paoDestination, atomicord32 aoExchange)
 {
-	register atomicord32 aoResult;
+	atomicord32 aoResult;
 
 	asm volatile (
 		"xchgl %2, %0;"
@@ -1291,7 +1291,7 @@ static _OU_ALWAYSINLINE atomicord32 _OU_CONVENTION_API
 static _OU_ALWAYSINLINE atomicord32 _OU_CONVENTION_API 
 /*atomicord32 */AtomicExchangeAdd(volatile atomicord32 *paoDestination, atomicord32 aoAddend)
 {
-	register atomicord32 aoResult;
+	atomicord32 aoResult;
 
 	asm volatile (
 		"lock; xaddl %2, %0;"
@@ -1305,7 +1305,7 @@ static _OU_ALWAYSINLINE atomicord32 _OU_CONVENTION_API
 static _OU_ALWAYSINLINE bool _OU_CONVENTION_API 
 /*bool */AtomicCompareExchange(volatile atomicord32 *paoDestination, atomicord32 aoComparand, atomicord32 aoExchange)
 {
-	register bool bResult;
+	bool bResult;
 
 	asm volatile (
         "lock; cmpxchgl %3, %0;"
@@ -1323,8 +1323,8 @@ static _OU_ALWAYSINLINE bool _OU_CONVENTION_API
 static _OU_ALWAYSINLINE atomicord32 _OU_CONVENTION_API 
 /*atomicord32 */AtomicAnd(volatile atomicord32 *paoDestination, atomicord32 aoBitMask)
 {
-	register atomicord32 aoResult;
-	register atomicord32 aoExchange;
+	atomicord32 aoResult;
+	atomicord32 aoExchange;
 
 	asm volatile (
 	"0:;"
@@ -1342,8 +1342,8 @@ static _OU_ALWAYSINLINE atomicord32 _OU_CONVENTION_API
 static _OU_ALWAYSINLINE atomicord32 _OU_CONVENTION_API 
 /*atomicord32 */AtomicOr(volatile atomicord32 *paoDestination, atomicord32 aoBitMask)
 {
-	register atomicord32 aoResult;
-	register atomicord32 aoExchange;
+	atomicord32 aoResult;
+	atomicord32 aoExchange;
 
 	asm volatile (
 	"0:;"
@@ -1361,8 +1361,8 @@ static _OU_ALWAYSINLINE atomicord32 _OU_CONVENTION_API
 static _OU_ALWAYSINLINE atomicord32 _OU_CONVENTION_API 
 /*atomicord32 */AtomicXor(volatile atomicord32 *paoDestination, atomicord32 aoBitMask)
 {
-	register atomicord32 aoResult;
-	register atomicord32 aoExchange;
+	atomicord32 aoResult;
+	atomicord32 aoExchange;
 
 	asm volatile (
 	"0:;"
@@ -1434,7 +1434,7 @@ static _OU_ALWAYSINLINE void _OU_CONVENTION_API
 static _OU_ALWAYSINLINE atomicptr _OU_CONVENTION_API 
 /*atomicptr */AtomicExchangePointer(volatile atomicptr *papDestination, atomicptr apExchange)
 {
-    register atomicptr apResult;
+    atomicptr apResult;
 
     asm volatile (
         "xchg %2, %0;"
@@ -1448,7 +1448,7 @@ static _OU_ALWAYSINLINE atomicptr _OU_CONVENTION_API
 static _OU_ALWAYSINLINE bool _OU_CONVENTION_API 
 /*bool */AtomicCompareExchangePointer(volatile atomicptr *papDestination, atomicptr apComparand, atomicptr apExchange)
 {
-    register bool bResult;
+    bool bResult;
 
     asm volatile (
         "lock; cmpxchg %3, %0;"

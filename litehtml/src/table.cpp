@@ -1,6 +1,7 @@
 #include "html.h"
 #include "table.h"
 #include "html_tag.h"
+#include <cmath>
 
 void litehtml::table_grid::add_cell(element::ptr& el)
 {
@@ -260,7 +261,7 @@ void litehtml::table_grid::distribute_width( int width, int start, int end )
 						added_width		+= add;
 					} else
 					{
-						added_width	+= ((*col)->width - (*col)->min_width) * (add / abs(add));
+						added_width	+= ((*col)->width - (*col)->min_width) * (add / (add>0?add:-add));
 						(*col)->width = (*col)->min_width;
 					}
 				}
