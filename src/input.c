@@ -56,9 +56,9 @@ void lw_trigger_mouse_press(LWCONTEXT* pLwc, float nx, float ny, int pointer_id)
 	convert_touch_coord_to_ui_coord(pLwc, &x, &y);
 
 	LOGIx("mouse press ui coord x=%f, y=%f", x, y);
-
+    
     if (pLwc->game_scene == LGS_TTL
-        || (pLwc->game_scene == LGS_PUCK_GAME && pLwc->puck_game->show_html_ui)) {
+        || (pLwc->game_scene == LGS_PUCK_GAME && pLwc->puck_game->game_state == LPGS_MAIN_MENU && pLwc->puck_game->show_html_ui && pLwc->puck_game->world_roll_dirty == 0)) {
         const float nx = (x + pLwc->aspect_ratio) / (2.0f * pLwc->aspect_ratio);
         const float ny = (1.0f - y) / 2.0f;
         htmlui_on_lbutton_down(pLwc->htmlui, nx, ny);
