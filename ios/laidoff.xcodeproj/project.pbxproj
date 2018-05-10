@@ -93,7 +93,6 @@
 		5663737E1EBA52D4001DA3F4 /* customization.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 566373291EBA52D3001DA3F4 /* customization.cpp */; };
 		5663737F1EBA52D4001DA3F4 /* malloc.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 5663732A1EBA52D3001DA3F4 /* malloc.cpp */; };
 		566373801EBA52D4001DA3F4 /* threadlocalstorage.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 5663732B1EBA52D3001DA3F4 /* threadlocalstorage.cpp */; };
-		567F39BE1EA29BC90081EB67 /* assets in Resources */ = {isa = PBXBuildFile; fileRef = 567F39BD1EA29BC90081EB67 /* assets */; };
 		567F39C01EA2A2F70081EB67 /* image.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 567F39BF1EA2A2F70081EB67 /* image.cpp */; };
 		567F39C21EA2A4600081EB67 /* etc1.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 567F39C11EA2A4600081EB67 /* etc1.cpp */; };
 		567F39C51EA2A7500081EB67 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 567F39C41EA2A7500081EB67 /* UIKit.framework */; };
@@ -267,6 +266,7 @@
 		56F189BA1EC751950019312F /* ztimerset.c in Sources */ = {isa = PBXBuildFile; fileRef = 56F1897D1EC751950019312F /* ztimerset.c */; };
 		56F189BB1EC751950019312F /* ztrie.c in Sources */ = {isa = PBXBuildFile; fileRef = 56F1897E1EC751950019312F /* ztrie.c */; };
 		56F189BC1EC751950019312F /* zuuid.c in Sources */ = {isa = PBXBuildFile; fileRef = 56F1897F1EC751950019312F /* zuuid.c */; };
+		6C0D218B20A47BAF001BD0E5 /* assets in Resources */ = {isa = PBXBuildFile; fileRef = 6C0D218A20A47BAF001BD0E5 /* assets */; };
 		6C20CE8E1FE6C2E500A85583 /* UIDeviceHardware.m in Sources */ = {isa = PBXBuildFile; fileRef = 6C20CE8C1FE6C2E500A85583 /* UIDeviceHardware.m */; };
 		6C295E9F204310700052999C /* CMakeLists.txt in Resources */ = {isa = PBXBuildFile; fileRef = 6C295E18204310700052999C /* CMakeLists.txt */; };
 		6C295EA0204310700052999C /* LICENSE in Resources */ = {isa = PBXBuildFile; fileRef = 6C295E19204310700052999C /* LICENSE */; };
@@ -466,9 +466,9 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		153809DC50A3E01320158089 /* render_ttl.c */ = {isa = PBXFileReference; includeInIndex = 1; name = render_ttl.c; path = ../src/render_ttl.c; sourceTree = "<group>"; };
+		153809DC50A3E01320158089 /* render_ttl.c */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.c; name = render_ttl.c; path = ../src/render_ttl.c; sourceTree = "<group>"; };
 		2601AFFC1EE1549700989AA6 /* platform.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = platform.h; path = ../build/include/platform.h; sourceTree = "<group>"; };
-		3EF18865C9E87623A8107AC5 /* render_morph.c */ = {isa = PBXFileReference; includeInIndex = 1; name = render_morph.c; path = ../src/render_morph.c; sourceTree = "<group>"; };
+		3EF18865C9E87623A8107AC5 /* render_morph.c */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.c; name = render_morph.c; path = ../src/render_morph.c; sourceTree = "<group>"; };
 		5633AC311EADDF98003F1549 /* net.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = net.c; sourceTree = "<group>"; };
 		566372651EBA52D3001DA3F4 /* collision.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = collision.h; sourceTree = "<group>"; };
 		566372661EBA52D3001DA3F4 /* collision_space.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = collision_space.h; sourceTree = "<group>"; };
@@ -661,7 +661,6 @@
 		566373291EBA52D3001DA3F4 /* customization.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = customization.cpp; sourceTree = "<group>"; };
 		5663732A1EBA52D3001DA3F4 /* malloc.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = malloc.cpp; sourceTree = "<group>"; };
 		5663732B1EBA52D3001DA3F4 /* threadlocalstorage.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = threadlocalstorage.cpp; sourceTree = "<group>"; };
-		567F39BD1EA29BC90081EB67 /* assets */ = {isa = PBXFileReference; lastKnownFileType = folder; name = assets; path = ../assets; sourceTree = "<group>"; };
 		567F39BF1EA2A2F70081EB67 /* image.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = image.cpp; path = ../../win32/image.cpp; sourceTree = "<group>"; };
 		567F39C11EA2A4600081EB67 /* etc1.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = etc1.cpp; path = ../../win32/etc1.cpp; sourceTree = "<group>"; };
 		567F39C41EA2A7500081EB67 /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
@@ -1013,6 +1012,7 @@
 		56F1897D1EC751950019312F /* ztimerset.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = ztimerset.c; sourceTree = "<group>"; };
 		56F1897E1EC751950019312F /* ztrie.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = ztrie.c; sourceTree = "<group>"; };
 		56F1897F1EC751950019312F /* zuuid.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = zuuid.c; sourceTree = "<group>"; };
+		6C0D218A20A47BAF001BD0E5 /* assets */ = {isa = PBXFileReference; lastKnownFileType = folder; name = assets; path = "../selected-assets-br/assets"; sourceTree = "<group>"; };
 		6C20CE8C1FE6C2E500A85583 /* UIDeviceHardware.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = UIDeviceHardware.m; sourceTree = "<group>"; };
 		6C20CE8D1FE6C2E500A85583 /* UIDeviceHardware.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = UIDeviceHardware.h; sourceTree = "<group>"; };
 		6C295E18204310700052999C /* CMakeLists.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = CMakeLists.txt; sourceTree = "<group>"; };
@@ -1430,7 +1430,7 @@
 		6CF70E4020597A2B00F782C8 /* xxhash.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = xxhash.h; path = ../../../../lz4/lib/xxhash.h; sourceTree = "<group>"; };
 		6CFC5017206012360077E1B7 /* lwttl.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = lwttl.h; sourceTree = "<group>"; };
 		6CFC5018206012360077E1B7 /* lwttl.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = lwttl.c; sourceTree = "<group>"; };
-		FE6E8484ADBCBB3A0251BB37 /* render_puckgame.c */ = {isa = PBXFileReference; includeInIndex = 1; name = render_puckgame.c; path = ../src/render_puckgame.c; sourceTree = "<group>"; };
+		FE6E8484ADBCBB3A0251BB37 /* render_puckgame.c */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.c; name = render_puckgame.c; path = ../src/render_puckgame.c; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -2352,7 +2352,7 @@
 		6CA16CCA1EA20B5600DB7AF0 = {
 			isa = PBXGroup;
 			children = (
-				567F39BD1EA29BC90081EB67 /* assets */,
+				6C0D218A20A47BAF001BD0E5 /* assets */,
 				567F39C31EA2A7500081EB67 /* Frameworks */,
 				6CA16CD51EA20B5600DB7AF0 /* laidoff */,
 				6CA16CD41EA20B5600DB7AF0 /* Products */,
@@ -2795,7 +2795,6 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				567F39BE1EA29BC90081EB67 /* assets in Resources */,
 				56F1898A1EC751950019312F /* Makemodule.am in Resources */,
 				56F1898F1EC751950019312F /* sockopts.xml in Resources */,
 				56F1898D1EC751950019312F /* selftest.cfg in Resources */,
@@ -2817,6 +2816,7 @@
 				6C295EA1204310700052999C /* master.css in Resources */,
 				6C295EA3204310700052999C /* .gitignore in Resources */,
 				56F189821EC751950019312F /* CMakeLists-local.txt in Resources */,
+				6C0D218B20A47BAF001BD0E5 /* assets in Resources */,
 				56F189881EC751950019312F /* libczmq.pc.in in Resources */,
 				56F188C21EC74DB60019312F /* libzmq.pc.in in Resources */,
 				6C295ECE204310700052999C /* litehtml.vcproj in Resources */,
