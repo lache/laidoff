@@ -69234,21 +69234,21 @@ fail:
 }
 
 
-static int _wrap_LWPUCKGAME_map_set(lua_State* L) {
+static int _wrap_LWPUCKGAME_game_map_set(lua_State* L) {
   int SWIG_arg = 0;
   struct _LWPUCKGAME *arg1 = (struct _LWPUCKGAME *) 0 ;
   LW_PUCK_GAME_MAP arg2 ;
   
-  SWIG_check_num_args("_LWPUCKGAME::map",2,2)
-  if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("_LWPUCKGAME::map",1,"struct _LWPUCKGAME *");
-  if(!lua_isnumber(L,2)) SWIG_fail_arg("_LWPUCKGAME::map",2,"LW_PUCK_GAME_MAP");
+  SWIG_check_num_args("_LWPUCKGAME::game_map",2,2)
+  if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("_LWPUCKGAME::game_map",1,"struct _LWPUCKGAME *");
+  if(!lua_isnumber(L,2)) SWIG_fail_arg("_LWPUCKGAME::game_map",2,"LW_PUCK_GAME_MAP");
   
   if (!SWIG_IsOK(SWIG_ConvertPtr(L,1,(void**)&arg1,SWIGTYPE_p__LWPUCKGAME,0))){
-    SWIG_fail_ptr("LWPUCKGAME_map_set",1,SWIGTYPE_p__LWPUCKGAME);
+    SWIG_fail_ptr("LWPUCKGAME_game_map_set",1,SWIGTYPE_p__LWPUCKGAME);
   }
   
   arg2 = (LW_PUCK_GAME_MAP)(int)lua_tonumber(L, 2);
-  if (arg1) (arg1)->map = arg2;
+  if (arg1) (arg1)->game_map = arg2;
   
   return SWIG_arg;
   
@@ -69260,19 +69260,19 @@ fail:
 }
 
 
-static int _wrap_LWPUCKGAME_map_get(lua_State* L) {
+static int _wrap_LWPUCKGAME_game_map_get(lua_State* L) {
   int SWIG_arg = 0;
   struct _LWPUCKGAME *arg1 = (struct _LWPUCKGAME *) 0 ;
   LW_PUCK_GAME_MAP result;
   
-  SWIG_check_num_args("_LWPUCKGAME::map",1,1)
-  if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("_LWPUCKGAME::map",1,"struct _LWPUCKGAME *");
+  SWIG_check_num_args("_LWPUCKGAME::game_map",1,1)
+  if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("_LWPUCKGAME::game_map",1,"struct _LWPUCKGAME *");
   
   if (!SWIG_IsOK(SWIG_ConvertPtr(L,1,(void**)&arg1,SWIGTYPE_p__LWPUCKGAME,0))){
-    SWIG_fail_ptr("LWPUCKGAME_map_get",1,SWIGTYPE_p__LWPUCKGAME);
+    SWIG_fail_ptr("LWPUCKGAME_game_map_get",1,SWIGTYPE_p__LWPUCKGAME);
   }
   
-  result = (LW_PUCK_GAME_MAP) ((arg1)->map);
+  result = (LW_PUCK_GAME_MAP) ((arg1)->game_map);
   lua_pushnumber(L, (lua_Number)(int)(result)); SWIG_arg++;
   return SWIG_arg;
   
@@ -69449,7 +69449,7 @@ static swig_lua_attribute swig_LWPUCKGAME_attributes[] = {
     { "last_udp_frame_sync_sent", _wrap_LWPUCKGAME_last_udp_frame_sync_sent_get, _wrap_LWPUCKGAME_last_udp_frame_sync_sent_set },
     { "show_top_level_main_menu", _wrap_LWPUCKGAME_show_top_level_main_menu_get, _wrap_LWPUCKGAME_show_top_level_main_menu_set },
     { "show_html_ui", _wrap_LWPUCKGAME_show_html_ui_get, _wrap_LWPUCKGAME_show_html_ui_set },
-    { "map", _wrap_LWPUCKGAME_map_get, _wrap_LWPUCKGAME_map_set },
+    { "game_map", _wrap_LWPUCKGAME_game_map_get, _wrap_LWPUCKGAME_game_map_set },
     {0,0,0}
 };
 static swig_lua_method swig_LWPUCKGAME_methods[]= {
@@ -89462,22 +89462,22 @@ fail:
 }
 
 
-static int _wrap_LWPMATCHED2_map_set(lua_State* L) {
+static int _wrap_LWPMATCHED2_game_map_set(lua_State* L) {
   int SWIG_arg = 0;
   struct _LWPMATCHED2 *arg1 = (struct _LWPMATCHED2 *) 0 ;
   unsigned short arg2 ;
   
-  SWIG_check_num_args("_LWPMATCHED2::map",2,2)
-  if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("_LWPMATCHED2::map",1,"struct _LWPMATCHED2 *");
-  if(!lua_isnumber(L,2)) SWIG_fail_arg("_LWPMATCHED2::map",2,"unsigned short");
+  SWIG_check_num_args("_LWPMATCHED2::game_map",2,2)
+  if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("_LWPMATCHED2::game_map",1,"struct _LWPMATCHED2 *");
+  if(!lua_isnumber(L,2)) SWIG_fail_arg("_LWPMATCHED2::game_map",2,"unsigned short");
   
   if (!SWIG_IsOK(SWIG_ConvertPtr(L,1,(void**)&arg1,SWIGTYPE_p__LWPMATCHED2,0))){
-    SWIG_fail_ptr("LWPMATCHED2_map_set",1,SWIGTYPE_p__LWPMATCHED2);
+    SWIG_fail_ptr("LWPMATCHED2_game_map_set",1,SWIGTYPE_p__LWPMATCHED2);
   }
   
   SWIG_contract_assert((lua_tonumber(L,2)>=0),"number must not be negative")
   arg2 = (unsigned short)lua_tonumber(L, 2);
-  if (arg1) (arg1)->map = arg2;
+  if (arg1) (arg1)->game_map = arg2;
   
   return SWIG_arg;
   
@@ -89489,19 +89489,19 @@ fail:
 }
 
 
-static int _wrap_LWPMATCHED2_map_get(lua_State* L) {
+static int _wrap_LWPMATCHED2_game_map_get(lua_State* L) {
   int SWIG_arg = 0;
   struct _LWPMATCHED2 *arg1 = (struct _LWPMATCHED2 *) 0 ;
   unsigned short result;
   
-  SWIG_check_num_args("_LWPMATCHED2::map",1,1)
-  if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("_LWPMATCHED2::map",1,"struct _LWPMATCHED2 *");
+  SWIG_check_num_args("_LWPMATCHED2::game_map",1,1)
+  if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("_LWPMATCHED2::game_map",1,"struct _LWPMATCHED2 *");
   
   if (!SWIG_IsOK(SWIG_ConvertPtr(L,1,(void**)&arg1,SWIGTYPE_p__LWPMATCHED2,0))){
-    SWIG_fail_ptr("LWPMATCHED2_map_get",1,SWIGTYPE_p__LWPMATCHED2);
+    SWIG_fail_ptr("LWPMATCHED2_game_map_get",1,SWIGTYPE_p__LWPMATCHED2);
   }
   
-  result = (unsigned short) ((arg1)->map);
+  result = (unsigned short) ((arg1)->game_map);
   lua_pushnumber(L, (lua_Number) result); SWIG_arg++;
   return SWIG_arg;
   
@@ -90012,7 +90012,7 @@ static swig_lua_attribute swig_LWPMATCHED2_attributes[] = {
     { "size", _wrap_LWPMATCHED2_size_get, _wrap_LWPMATCHED2_size_set },
     { "type", _wrap_LWPMATCHED2_type_get, _wrap_LWPMATCHED2_type_set },
     { "port", _wrap_LWPMATCHED2_port_get, _wrap_LWPMATCHED2_port_set },
-    { "map", _wrap_LWPMATCHED2_map_get, _wrap_LWPMATCHED2_map_set },
+    { "game_map", _wrap_LWPMATCHED2_game_map_get, _wrap_LWPMATCHED2_game_map_set },
     { "ipaddr", _wrap_LWPMATCHED2_ipaddr_get, _wrap_LWPMATCHED2_ipaddr_set },
     { "battle_id", _wrap_LWPMATCHED2_battle_id_get, _wrap_LWPMATCHED2_battle_id_set },
     { "token", _wrap_LWPMATCHED2_token_get, _wrap_LWPMATCHED2_token_set },
@@ -98288,7 +98288,7 @@ static int _wrap_lwttl_query_chunk_city(lua_State* L) {
   int *arg3 = (int *) 0 ;
   int *arg4 = (int *) 0 ;
   int *arg5 = (int *) 0 ;
-  LWPTTLSEAPORTOBJECT *result = 0 ;
+  LWPTTLCITYOBJECT *result = 0 ;
   
   SWIG_check_num_args("lwttl_query_chunk_city",5,5)
   if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("lwttl_query_chunk_city",1,"LWTTL const *");
@@ -98317,8 +98317,8 @@ static int _wrap_lwttl_query_chunk_city(lua_State* L) {
     SWIG_fail_ptr("lwttl_query_chunk_city",5,SWIGTYPE_p_int);
   }
   
-  result = (LWPTTLSEAPORTOBJECT *)lwttl_query_chunk_city((struct _LWTTL const *)arg1,arg2,arg3,arg4,arg5);
-  SWIG_NewPointerObj(L,result,SWIGTYPE_p__LWPTTLSEAPORTOBJECT,0); SWIG_arg++; 
+  result = (LWPTTLCITYOBJECT *)lwttl_query_chunk_city((struct _LWTTL const *)arg1,arg2,arg3,arg4,arg5);
+  SWIG_NewPointerObj(L,result,SWIGTYPE_p__LWPTTLCITYOBJECT,0); SWIG_arg++; 
   return SWIG_arg;
   
   if(0) SWIG_fail;
@@ -100979,7 +100979,7 @@ static swig_lua_const_info swig_SwigModule_constants[]= {
     {SWIG_LUA_CONSTTAB_INT("LGS_LEADERBOARD", LGS_LEADERBOARD)},
     {SWIG_LUA_CONSTTAB_INT("LGS_REMTEX", LGS_REMTEX)},
     {SWIG_LUA_CONSTTAB_STRING("__LW_STRING_LINE__", "61")},
-    {SWIG_LUA_CONSTTAB_STRING("LWLOGPOS", "src/lwlog.h(62): ")},
+    {SWIG_LUA_CONSTTAB_STRING("LWLOGPOS", "src\\lwlog.h(62): ")},
     {SWIG_LUA_CONSTTAB_INT("LPT_GRID", LPT_GRID)},
     {SWIG_LUA_CONSTTAB_INT("LPT_SOLID_RED", LPT_SOLID_RED)},
     {SWIG_LUA_CONSTTAB_INT("LPT_SOLID_GREEN", LPT_SOLID_GREEN)},

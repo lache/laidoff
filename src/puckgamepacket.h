@@ -214,7 +214,7 @@ typedef struct _LWPSTATEBITFIELD {
     unsigned int phase : 3; // LWP_STATE_PHASE
     unsigned int player_pull : 1;
     unsigned int target_pull : 1;
-    unsigned int wall_hit_bit : 4; // LWP_STATE_WALL_HIT_BIT (ORing)
+    unsigned int wall_hit_bit : 8; // LWP_STATE_WALL_HIT_BIT (ORing)
 } LWPSTATEBITFIELD;
 
 // UDP
@@ -563,7 +563,7 @@ typedef struct _LWPMATCHED2 {
     unsigned short size;
     unsigned short type;
     unsigned short port;
-    unsigned short map;
+    unsigned short game_map;
     unsigned char ipaddr[4];
     int battle_id;
     unsigned int token;

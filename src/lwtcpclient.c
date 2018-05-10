@@ -342,8 +342,9 @@ int parse_recv_packets(LWTCP* tcp) {
         unsigned short packet_type = *(unsigned short*)(cursor + 2);
         if (CHECK_PACKET(packet_type, packet_size, LWPMATCHED2)) {
             LWPMATCHED2* p = (LWPMATCHED2*)cursor;
-            LOGI("LWPMATCHED2 - bid:%d,map:%d", p->battle_id, p->map);
-            pLwc->puck_game->map = p->map;
+            LOGI("LWPMATCHED2 - bid:%d,map:%d", p->battle_id, p->game_map);
+            pLwc->puck_game->game_map = p->game_map;
+            puck_game_set_static_default_values(pLwc->puck_game);
             pLwc->puck_game->world_roll_dir *= -1;
             puck_game_roll_to_battle(pLwc->puck_game);
             pLwc->puck_game->battle_id = p->battle_id;

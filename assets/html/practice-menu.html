@@ -38,8 +38,8 @@ function back_to_main_menu()
     lo.puck_game_set_show_top_level_main_menu(c.puck_game, 1)
     lo.puck_game_set_show_htmlui(c.puck_game, 0)
 end
-function start_practice(map)
-    c.puck_game.map = map
+function start_practice(game_map)
+    c.puck_game.game_map = game_map
     lo.puck_game_set_static_default_values(c.puck_game)
     lo.puck_game_set_static_default_values_client(c.puck_game)
     lo.puck_game_reset_tutorial_state(c.puck_game)

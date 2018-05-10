@@ -141,7 +141,7 @@ static void render_tower_collapsing(const LWCONTEXT* pLwc, const mat4x4 view, co
     // collapsing tower model scale matches current world
     const float tower_scale = 1.0f; // puck_game->tower_radius / puck_game->tower_mesh_radius;
     LW_F_ANIM_TYPE anim_type = LFAT_TOWER_COLLAPSE;
-    if (puck_game->map == LPGM_OCTAGON) {
+    if (puck_game->game_map == LPGM_OCTAGON) {
         anim_type = LFAT_TOWER_COLLAPSE_OCTAGON;
     }
     render_fvbo(pLwc,
@@ -788,7 +788,7 @@ static void render_floor_cover(const LWCONTEXT* pLwc,
                                const mat4x4 proj,
                                const mat4x4 view,
                                const LWPUCKGAME* puck_game) {
-    if (puck_game->map == LPGM_SQUARE) {
+    if (puck_game->game_map == LPGM_SQUARE) {
         render_custom_stage(pLwc, proj, view, puck_game, LVT_PUCK_FLOOR_COVER, LAE_PUCK_FLOOR_COVER);
     } else {
         render_custom_stage(pLwc, proj, view, puck_game, LVT_PUCK_FLOOR_COVER_OCTAGON, LAE_PUCK_FLOOR_COVER_OCTAGON);
@@ -859,7 +859,7 @@ static void render_floor(const LWCONTEXT *pLwc,
 
     LW_VBO_TYPE lvt = LVT_CENTER_CENTER_ANCHORED_SQUARE;
     GLenum mode = GL_TRIANGLES;
-    if (puck_game->map == LPGM_OCTAGON) {
+    if (puck_game->game_map == LPGM_OCTAGON) {
         lvt = LVT_OCTAGON_PLANE;
         mode = GL_TRIANGLE_FAN;
     }
@@ -1140,7 +1140,7 @@ static void render_default_stage(const LWCONTEXT *pLwc,
     // Floor
     render_floor(pLwc, proj, puck_game, floor_shader_index, view, sphere_render_uniform);
     // Walls
-    if (puck_game->map == LPGM_SQUARE) {
+    if (puck_game->game_map == LPGM_SQUARE) {
         render_wall_square(pLwc,
                            proj,
                            puck_game,

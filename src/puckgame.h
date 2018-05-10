@@ -268,7 +268,7 @@ typedef struct _LWPUCKGAME {
     float last_udp_frame_sync_sent;
     int show_top_level_main_menu;
     int show_html_ui;
-    LW_PUCK_GAME_MAP map;
+    LW_PUCK_GAME_MAP game_map;
 } LWPUCKGAME;
 
 LWPUCKGAME* new_puck_game(int update_frequency, LW_PUCK_GAME_MAP gameMap);

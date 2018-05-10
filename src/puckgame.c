@@ -209,7 +209,7 @@ void puck_game_create_walls(LWPUCKGAME* puck_game) {
     if (puck_game->boundary[LPGB_GROUND] == 0) {
         puck_game->boundary[LPGB_GROUND] = dCreatePlane(puck_game->space, 0, 0, 1, 0);
     }
-    if (puck_game->map == LPGM_SQUARE) {
+    if (puck_game->game_map == LPGM_SQUARE) {
         // square map (4 planes)
         if (puck_game->boundary[LPGB_E] == 0) {
             puck_game->boundary[LPGB_E] = dCreatePlane(puck_game->space, -1, 0, 0, -puck_game->world_width_half);
@@ -334,9 +334,10 @@ LWPUCKGAME* new_puck_game(int update_frequency, LW_PUCK_GAME_MAP gameMap) {
     // Static game data
     LWPUCKGAME* puck_game = malloc(sizeof(LWPUCKGAME));
     memset(puck_game, 0, sizeof(LWPUCKGAME));
+    puck_game->game_map = gameMap;
     puck_game_set_static_default_values(puck_game);
     puck_game->prepare_step_wait_tick = 2 * update_frequency;
-    puck_game->map = gameMap;
+    
     // ------
 
     // Initialize OpenDE
@@ -381,7 +382,7 @@ void puck_game_set_static_default_values(LWPUCKGAME* puck_game) {
     puck_game->fire_interval = 1.5f;
     puck_game->fire_duration = 0.2f;
     puck_game->fire_shake_time = 0.5f;
-    if (puck_game->map == LPGM_SQUARE) {
+    if (puck_game->game_map == LPGM_SQUARE) {
         puck_game->tower_pos = 1.1f;
     } else {
         puck_game->tower_pos = 0.9f;
@@ -480,7 +481,7 @@ static void near_puck_target(LWPUCKGAME* puck_game, dContact* contact) {
 }
 
 int is_wall_geom(LWPUCKGAME* puck_game, dGeomID maybe_wall_geom) {
-    if (puck_game->map == LPGM_SQUARE) {
+    if (puck_game->game_map == LPGM_SQUARE) {
         return puck_game->boundary[LPGB_E] == maybe_wall_geom
             || puck_game->boundary[LPGB_W] == maybe_wall_geom
             || puck_game->boundary[LPGB_S] == maybe_wall_geom
@@ -512,7 +513,11 @@ static void near_puck_wall(LWPUCKGAME* puck_game, dGeomID puck_geom, dGeomID wal
         LOGE("boundary geom data corrupted");
         return;
     }
-    puck_game->wall_hit_bit |= 1 << (boundary - LPGB_E);
+    if (puck_game->game_map == LPGM_SQUARE) {
+        puck_game->wall_hit_bit |= 1 << (boundary - LPGB_E);
+    } else {
+        puck_game->wall_hit_bit |= 1 << (boundary - LPGB_EE);
+    }
     puck_game->wall_hit_bit_send_buf_1 |= puck_game->wall_hit_bit;
     puck_game->wall_hit_bit_send_buf_2 |= puck_game->wall_hit_bit;
     // custom collision callback

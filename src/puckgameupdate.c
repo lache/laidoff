@@ -241,16 +241,30 @@ void update_puck_game(LWCONTEXT* pLwc, LWPUCKGAME* puck_game, double delta_time)
     }
     // set boundary impact according to wall hit bits
     // (no branches by map)
-    for (int i = 0; i <= LPGB_SE - LPGB_E; i++) {
-        if ((puck_game->wall_hit_bit >> i) & 1) {
-            int boundary = LPGB_E + i;
-            puck_game->boundary_impact[boundary] = puck_game->boundary_impact_start;
-            puck_game->boundary_impact_player_no[boundary] = puck_game->puck_owner_player_no;
-            if (remote) {
-                play_sound(LWS_COLLISION);
+    if (puck_game->game_map == LPGM_SQUARE) {
+        for (int i = 0; i <= LPGB_N - LPGB_E; i++) {
+            if ((puck_game->wall_hit_bit >> i) & 1) {
+                int boundary = LPGB_E + i;
+                puck_game->boundary_impact[boundary] = puck_game->boundary_impact_start;
+                puck_game->boundary_impact_player_no[boundary] = puck_game->puck_owner_player_no;
+                if (remote) {
+                    play_sound(LWS_COLLISION);
+                }
+            }
+        }
+    } else {
+        for (int i = 0; i <= LPGB_SE - LPGB_EE; i++) {
+            if ((puck_game->wall_hit_bit >> i) & 1) {
+                int boundary = LPGB_EE + i;
+                puck_game->boundary_impact[boundary] = puck_game->boundary_impact_start;
+                puck_game->boundary_impact_player_no[boundary] = puck_game->puck_owner_player_no;
+                if (remote) {
+                    play_sound(LWS_COLLISION);
+                }
             }
         }
     }
+    
     // clear wall hit bit here only on online mode
     if (puck_game->game_state == LPGS_BATTLE) {
         puck_game->wall_hit_bit = 0;
