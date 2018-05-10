@@ -416,6 +416,8 @@ static void engine_draw_frame(struct engine* engine) {
 
         if (swap_error == EGL_BAD_SURFACE) {
             // EGL 서피스 문제면 서피스만 새로 만들어보자...
+            engine->pLwc->width = 1;
+            engine->pLwc->height = 1;
             recreate_surface(engine);
         } else if (swap_error == EGL_BAD_NATIVE_WINDOW) {
             // 재초기화 위해서 `inited` 플래그 내림
@@ -425,30 +427,49 @@ static void engine_draw_frame(struct engine* engine) {
 }
 
 static void recreate_surface(engine* engine) {
-    engine->surface_ready = 0;
+    // 'RE'-create surface request called before 'initial' surface is ever created.
+    if (engine->surface_ready == 0) {
+        return;
+    }
+    EGLint w, h;
+    eglQuerySurface(engine->display, engine->surface, EGL_WIDTH, &w);
+    eglQuerySurface(engine->display, engine->surface, EGL_HEIGHT, &h);
+    if (w == engine->pLwc->width && h == engine->pLwc->height) {
+        LOGI("recreate_surface: skipped since there is no size change...");
+        return;
+    }
 
+    engine->surface_ready = 0;
     if (engine->display && engine->config && engine->app && engine->app->window) {
         if (engine->surface != EGL_NO_SURFACE) {
-            // TODO: eglDestroySurface() call below makes infinite 'Emulator: Draw context is NULL' errors on emulators... comment it for now
-            //eglDestroySurface(engine->display, engine->surface);
+            // eglDestroySurface() call below makes
+            // infinite 'Emulator: Draw context is NULL' errors
+            // on emulators... comment it for now
+            eglDestroySurface(engine->display, engine->surface);
         }
 
-        engine->surface = eglCreateWindowSurface(engine->display, engine->config,
-                                                 engine->app->window, NULL);
+        engine->surface = eglCreateWindowSurface(engine->display,
+                                                 engine->config,
+                                                 engine->app->window,
+                                                 NULL);
 
-        if (eglMakeCurrent(engine->display, engine->surface, engine->surface, engine->context) ==
-            EGL_FALSE) {
+        if (eglMakeCurrent(engine->display,
+                           engine->surface,
+                           engine->surface,
+                           engine->context) == EGL_FALSE) {
             LOGW("Unable to eglMakeCurrent!!");
         } else {
             EGLint w, h;
             eglQuerySurface(engine->display, engine->surface, EGL_WIDTH, &w);
             eglQuerySurface(engine->display, engine->surface, EGL_HEIGHT, &h);
-            engine->width = w;
-            engine->height = h;
-            lw_set_size(engine->pLwc, w, h);
-
-            LOGI("Change surface (width x height) to (%d x %d)", w, h);
-
+            if (w > 0 && w < 5000 && h > 0 && h < 5000) {
+                engine->width = w;
+                engine->height = h;
+                lw_set_size(engine->pLwc, w, h);
+                LOGI("Change surface (width x height) to (%d x %d)", w, h);
+            } else {
+                LOGE("Surface recreated but size query result is not valid: w=%d, h=%d", w, h);
+            }
             engine->surface_ready = 1;
         }
     } else {
@@ -1009,6 +1030,14 @@ extern "C" JNIEXPORT void JNICALL
 Java_com_popsongremix_laidoff_LaidoffNativeActivity_setWindowSize(JNIEnv* env, jclass cls, jint w,
                                                                   jint h, jlong pLwcLong) {
     if (shared_engine) {
+        // no size change - do nothing
+        if (shared_engine->width == w && shared_engine->height == h) {
+            return;
+        }
+        // width-height switched (might in sleep mode) - do nothing
+        if (shared_engine->width == h && shared_engine->height == w) {
+            return;
+        }
         shared_engine->width = w;
         shared_engine->height = h;
         LWCONTEXT* pLwc = pLwcLong ? (LWCONTEXT*) pLwcLong : shared_engine->pLwc;

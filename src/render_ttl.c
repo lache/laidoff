@@ -44,16 +44,21 @@ void lwc_render_ttl_fbo_body(const LWCONTEXT* pLwc, const char* html_body) {
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
-void lwc_prerender_ttl_fbo(const LWCONTEXT* pLwc) {
-    assert(pLwc->shared_fbo.fbo);
-    glBindFramebuffer(GL_FRAMEBUFFER, pLwc->shared_fbo.fbo);
-    glDisable(GL_DEPTH_TEST);
+int lwc_prerender_ttl_fbo(const LWCONTEXT* pLwc) {
+    if (pLwc->shared_fbo.fbo) {
+        glBindFramebuffer(GL_FRAMEBUFFER, pLwc->shared_fbo.fbo);
+        glDisable(GL_DEPTH_TEST);
 
-    glViewport(0, 0, pLwc->shared_fbo.width, pLwc->shared_fbo.height);
-    glClearColor(0, 0, 0, 0); // alpha should be cleared to zero
-    //lw_clear_color();
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    glBlendFuncSeparate(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA, GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
+        glViewport(0, 0, pLwc->shared_fbo.width, pLwc->shared_fbo.height);
+        glClearColor(0, 0, 0, 0); // alpha should be cleared to zero
+        //lw_clear_color();
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        glBlendFuncSeparate(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA, GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
+        return 0;
+    } else {
+        // might awoke from sleep mode?
+        return -1;
+    }
 }
 
 void lwc_postrender_ttl_fbo(const LWCONTEXT* pLwc) {
@@ -62,9 +67,10 @@ void lwc_postrender_ttl_fbo(const LWCONTEXT* pLwc) {
 }
 
 void lwc_render_ttl_fbo(const LWCONTEXT* pLwc, const char* html_path) {
-    lwc_prerender_ttl_fbo(pLwc);
-    htmlui_load_render_draw(pLwc->htmlui, html_path);
-    lwc_postrender_ttl_fbo(pLwc);
+    if (lwc_prerender_ttl_fbo(pLwc) == 0) {
+        htmlui_load_render_draw(pLwc->htmlui, html_path);
+        lwc_postrender_ttl_fbo(pLwc);
+    }
 }
 
 typedef struct _LWWAVE {
