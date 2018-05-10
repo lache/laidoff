@@ -33,13 +33,13 @@ static char visibility[MAX_VISIBILITY_ENTRY_COUNT][MAX_VISIBILITY_ENTRY_NAME_LEN
 void lwc_render_ttl_fbo_body(const LWCONTEXT* pLwc, const char* html_body) {
     glBindFramebuffer(GL_FRAMEBUFFER, pLwc->shared_fbo.fbo);
     glDisable(GL_DEPTH_TEST);
-    
+
     glViewport(0, 0, pLwc->shared_fbo.width, pLwc->shared_fbo.height);
     glClearColor(0, 0, 0, 0);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glBlendFuncSeparate(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA, GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
     htmlui_load_render_draw_body(pLwc->htmlui, html_body);
-    
+
     glEnable(GL_DEPTH_TEST);
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
@@ -48,7 +48,7 @@ void lwc_prerender_ttl_fbo(const LWCONTEXT* pLwc) {
     assert(pLwc->shared_fbo.fbo);
     glBindFramebuffer(GL_FRAMEBUFFER, pLwc->shared_fbo.fbo);
     glDisable(GL_DEPTH_TEST);
-    
+
     glViewport(0, 0, pLwc->shared_fbo.width, pLwc->shared_fbo.height);
     glClearColor(0, 0, 0, 0); // alpha should be cleared to zero
     //lw_clear_color();
@@ -81,26 +81,26 @@ static void render_port(const LWCONTEXT* pLwc, const mat4x4 view, const mat4x4 p
     lazy_glUseProgram(pLwc, shader_index);
     mat4x4 rot;
     mat4x4_identity(rot);
-    
+
     float sx = 1, sy = 1, sz = 1;
     float x = 0, y = port_y, z = 0;
     mat4x4 model;
     mat4x4_identity(model);
     mat4x4_mul(model, model, rot);
     mat4x4_scale_aniso(model, model, sx, sy, sz);
-    
+
     mat4x4 model_translate;
     mat4x4_translate(model_translate, x, y, z);
-    
+
     mat4x4_mul(model, model_translate, model);
-    
+
     mat4x4 view_model;
     mat4x4_mul(view_model, view, model);
-    
+
     mat4x4 proj_view_model;
     mat4x4_identity(proj_view_model);
     mat4x4_mul(proj_view_model, proj, view_model);
-    
+
     const LW_VBO_TYPE lvt = LVT_PORT;
     lazy_glBindBuffer(pLwc, lvt);
     bind_all_color_vertex_attrib(pLwc, lvt);
@@ -118,26 +118,26 @@ static void render_sea_city(const LWCONTEXT* pLwc, const mat4x4 view, const mat4
     lazy_glUseProgram(pLwc, shader_index);
     mat4x4 rot;
     mat4x4_identity(rot);
-    
+
     float sx = 1, sy = 1, sz = 1;
     float x = 0, y = 25, z = 0;
     mat4x4 model;
     mat4x4_identity(model);
     mat4x4_mul(model, model, rot);
     mat4x4_scale_aniso(model, model, sx, sy, sz);
-    
+
     mat4x4 model_translate;
     mat4x4_translate(model_translate, x, y, z);
-    
+
     mat4x4_mul(model, model_translate, model);
-    
+
     mat4x4 view_model;
     mat4x4_mul(view_model, view, model);
-    
+
     mat4x4 proj_view_model;
     mat4x4_identity(proj_view_model);
     mat4x4_mul(proj_view_model, proj, view_model);
-    
+
     const LW_VBO_TYPE lvt = LVT_SEA_CITY;
     lazy_glBindBuffer(pLwc, lvt);
     bind_all_color_vertex_attrib(pLwc, lvt);
@@ -163,22 +163,22 @@ static void render_ship(const LWCONTEXT* pLwc, const mat4x4 view, const mat4x4 p
     mat4x4_identity(model);
     mat4x4_mul(model, model, rot);
     mat4x4_scale_aniso(model, model, sx, sy, sz);
-    
+
     mat4x4 model_translate;
     mat4x4_translate(model_translate, x, y, z);
-    
+
     mat4x4_mul(model, model_translate, model);
-    
+
     mat4x4 view_model;
     mat4x4_mul(view_model, view, model);
-    
+
     mat4x4 proj_view_model;
     mat4x4_identity(proj_view_model);
     mat4x4_mul(proj_view_model, proj, view_model);
-    
+
     mat4x4 model_normal_transform;
     mat4x4_identity(model_normal_transform);
-    
+
     const LW_VBO_TYPE lvt = LVT_SHIP;
     lazy_glBindBuffer(pLwc, lvt);
     bind_all_color_vertex_attrib(pLwc, lvt);
@@ -242,28 +242,28 @@ static void render_seaport_icon_xxx(const LWCONTEXT* pLwc, const mat4x4 view, co
     lazy_glUseProgram(pLwc, shader_index);
     mat4x4 rot;
     mat4x4_identity(rot);
-    
+
     mat4x4 model_normal_transform;
     mat4x4_identity(model_normal_transform);
-    
+
     float sx = w, sy = h, sz = 1;
     mat4x4 model;
     mat4x4_identity(model);
     mat4x4_mul(model, model, rot);
     mat4x4_scale_aniso(model, model, sx, sy, sz);
-    
+
     mat4x4 model_translate;
     mat4x4_translate(model_translate, x, y, z);
-    
+
     mat4x4_mul(model, model_translate, model);
-    
+
     mat4x4 view_model;
     mat4x4_mul(view_model, view, model);
-    
+
     mat4x4 proj_view_model;
     mat4x4_identity(proj_view_model);
     mat4x4_mul(proj_view_model, proj, view_model);
-    
+
     const LW_VBO_TYPE lvt = LVT_SEAPORT_ICON;
     lazy_glBindBuffer(pLwc, lvt);
     bind_all_color_vertex_attrib(pLwc, lvt);
@@ -293,28 +293,28 @@ static void render_cell_color(const LWCONTEXT* pLwc,
     lazy_glUseProgram(pLwc, shader_index);
     mat4x4 rot;
     mat4x4_identity(rot);
-    
+
     mat4x4 model_normal_transform;
     mat4x4_identity(model_normal_transform);
-    
+
     float sx = w, sy = h, sz = 1;
     mat4x4 model;
     mat4x4_identity(model);
     mat4x4_mul(model, model, rot);
     mat4x4_scale_aniso(model, model, sx, sy, sz);
-    
+
     mat4x4 model_translate;
     mat4x4_translate(model_translate, x, y, z);
-    
+
     mat4x4_mul(model, model_translate, model);
-    
+
     mat4x4 view_model;
     mat4x4_mul(view_model, view, model);
-    
+
     mat4x4 proj_view_model;
     mat4x4_identity(proj_view_model);
     mat4x4_mul(proj_view_model, proj, view_model);
-    
+
     lazy_glBindBuffer(pLwc, lvt);
     bind_all_color_vertex_attrib(pLwc, lvt);
     glUniformMatrix4fv(shader->mvp_location, 1, GL_FALSE, (const GLfloat*)proj_view_model);
@@ -358,10 +358,10 @@ static void render_land_cell(const LWCONTEXT* pLwc, const mat4x4 view, const mat
 static int bitmap_land(const unsigned char bitmap[LNGLAT_RENDER_EXTENT_MULTIPLIER_LAT_WITH_MARGIN*LNGLAT_SEA_PING_EXTENT_IN_CELL_PIXELS][LNGLAT_RENDER_EXTENT_MULTIPLIER_LNG_WITH_MARGIN*LNGLAT_SEA_PING_EXTENT_IN_CELL_PIXELS],
                        size_t bx,
                        size_t by) {
-    if (by < 0 || by >= LNGLAT_RENDER_EXTENT_MULTIPLIER_LAT_WITH_MARGIN*LNGLAT_SEA_PING_EXTENT_IN_CELL_PIXELS) {
+    if (by < 0 || by >= LNGLAT_RENDER_EXTENT_MULTIPLIER_LAT_WITH_MARGIN * LNGLAT_SEA_PING_EXTENT_IN_CELL_PIXELS) {
         return 0;
     }
-    if (bx < 0 || bx >= LNGLAT_RENDER_EXTENT_MULTIPLIER_LNG_WITH_MARGIN*LNGLAT_SEA_PING_EXTENT_IN_CELL_PIXELS) {
+    if (bx < 0 || bx >= LNGLAT_RENDER_EXTENT_MULTIPLIER_LNG_WITH_MARGIN * LNGLAT_SEA_PING_EXTENT_IN_CELL_PIXELS) {
         return 0;
     }
     return bitmap[by][bx];
@@ -418,7 +418,7 @@ static void render_land_cell_bitmap(const LWCONTEXT* pLwc,
                          &cell_bound_yc1);
     const float tw = 1.0f / 2;
     const float th = 1.0f / 2;
-    
+
     lazy_tex_atlas_glBindTexture(pLwc, LAE_WATER_SAND_TILE);
     for (int by = 0; by < LNGLAT_RENDER_EXTENT_MULTIPLIER_LAT_WITH_MARGIN*LNGLAT_SEA_PING_EXTENT_IN_CELL_PIXELS; by++) {
         for (int bx = 0; bx < LNGLAT_RENDER_EXTENT_MULTIPLIER_LNG_WITH_MARGIN*LNGLAT_SEA_PING_EXTENT_IN_CELL_PIXELS; bx++) {
@@ -436,17 +436,17 @@ static void render_land_cell_bitmap(const LWCONTEXT* pLwc,
             }
             const float x1 = (float)(bound_xc0 + clamped_view_scale * x_scaled_offset_1);
             const float y1 = (float)(bound_yc0 + clamped_view_scale * y_scaled_offset_1);
-            
+
             const float lng0_not_clamped = cell_fx_to_lng(x0 - 0.5f * clamped_view_scale);
             const float lat0_not_clamped = cell_fy_to_lat(y0 - 0.5f * clamped_view_scale);
             const float lng1_not_clamped = cell_fx_to_lng(x1 - 0.5f * clamped_view_scale);
             const float lat1_not_clamped = cell_fy_to_lat(y1 - 0.5f * clamped_view_scale);
-            
+
             /*const float lng0 = LWCLAMP(lng0_not_clamped, lng_min, lng_max);
              const float lat0 = LWCLAMP(lat0_not_clamped, lat_min, lat_max);
              const float lng1 = LWCLAMP(lng1_not_clamped, lng_min, lng_max);
              const float lat1 = LWCLAMP(lat1_not_clamped, lat_min, lat_max);*/
-            
+
             const float cell_x0 = lng_to_render_coords(lng0_not_clamped, center, clamped_view_scale * clamped_to_original_view_scale_ratio);
             const float cell_y0 = lat_to_render_coords(lat0_not_clamped, center, clamped_view_scale * clamped_to_original_view_scale_ratio);
             const float cell_x1 = lng_to_render_coords(lng1_not_clamped, center, clamped_view_scale * clamped_to_original_view_scale_ratio);
@@ -454,12 +454,12 @@ static void render_land_cell_bitmap(const LWCONTEXT* pLwc,
             const float cell_w = cell_x1 - cell_x0;
             // cell_y0 and cell_y1 are in OpenGL rendering coordinates (always cell_y0 > cell_y1)
             const float cell_h = cell_y0 - cell_y1;
-            
+
             const int uv_offset_index =
-            bitmap_land(bitmap, bx - 1, by - 1) << 3
-            | bitmap_land(bitmap, bx - 0, by - 1) << 2
-            | bitmap_land(bitmap, bx - 1, by - 0) << 1
-            | bitmap_land(bitmap, bx - 0, by - 0) << 0;
+                bitmap_land(bitmap, bx - 1, by - 1) << 3
+                | bitmap_land(bitmap, bx - 0, by - 1) << 2
+                | bitmap_land(bitmap, bx - 1, by - 0) << 1
+                | bitmap_land(bitmap, bx - 0, by - 0) << 0;
             render_solid_vb_ui_uv_shader_rot_view_proj(pLwc,
                                                        cell_x0,
                                                        cell_y0,
@@ -655,7 +655,7 @@ static void render_earth(const LWCONTEXT* pLwc, const LWTTLLNGLAT* center, int v
     const float alpha_multiplier = 0.5f;
     lazy_glBindBuffer(pLwc, lvt);
     lazy_tex_atlas_glBindTexture(pLwc, lae);
-    
+
     const int shader_index = LWST_DEFAULT;
     lazy_glUseProgram(pLwc, shader_index);
     glUniform2fv(pLwc->shader[shader_index].vuvoffset_location, 1, default_uv_offset);
@@ -666,7 +666,7 @@ static void render_earth(const LWCONTEXT* pLwc, const LWTTLLNGLAT* center, int v
     glUniform3f(pLwc->shader[shader_index].overlay_color_location, 0, 0, 0);
     glUniform1f(pLwc->shader[shader_index].overlay_color_ratio_location, 0);
     glUniformMatrix4fv(pLwc->shader[shader_index].mvp_location, 1, GL_FALSE, (const GLfloat*)pLwc->proj);
-    
+
     const int tex_index = pLwc->tex_atlas[lae];
     mat4x4 model_translate;
     mat4x4 model;
@@ -687,7 +687,7 @@ static void render_earth(const LWCONTEXT* pLwc, const LWTTLLNGLAT* center, int v
     mat4x4_mul(view_model, view_identity, model);
     mat4x4_identity(proj_view_model);
     mat4x4_mul(proj_view_model, pLwc->proj, view_model);
-    
+
     lazy_glBindBuffer(pLwc, lvt);
     bind_all_vertex_attrib(pLwc, lvt);
     glActiveTexture(GL_TEXTURE0);
@@ -697,7 +697,7 @@ static void render_earth(const LWCONTEXT* pLwc, const LWTTLLNGLAT* center, int v
     //set_tex_filter(GL_NEAREST, GL_NEAREST);
     glUniformMatrix4fv(pLwc->shader[shader_index].mvp_location, 1, GL_FALSE, (const GLfloat*)proj_view_model);
     glDrawArrays(GL_TRIANGLES, 0, pLwc->vertex_buffer[lvt].vertex_count);
-    
+
     //render_solid_box_ui_lvt_flip_y_uv(pLwc,
     //                                  pLwc->aspect_ratio - 0.5f,
     //                                  0.5f,
@@ -706,7 +706,7 @@ static void render_earth(const LWCONTEXT* pLwc, const LWTTLLNGLAT* center, int v
     //                                  pLwc->tex_atlas[LAE_WATER_2048_1024_AA],
     //                                  LVT_EARTH,
     //                                  0);
-    
+
     const float half_lng_extent_in_deg = lwttl_half_lng_extent_in_degrees(view_scale);
     const float half_lat_extent_in_deg = lwttl_half_lat_extent_in_degrees(view_scale);
     const float lng_min = center->lng - half_lng_extent_in_deg;
@@ -737,7 +737,7 @@ static void render_sea_objects_nameplate(const LWCONTEXT* pLwc, const mat4x4 vie
     mat4x4_mul(proj_view, proj, view);
     const int view_scale = lwttl_view_scale(pLwc->ttl);
     const LWPTTLFULLSTATE* ttl_full_state = lwttl_full_state(pLwc->ttl);
-    
+
     for (int i = 0; i < ttl_full_state->count; i++) {
         const float x = (ttl_full_state->obj[i].fx1 + ttl_full_state->obj[i].fx0) / 2;
         const float y = (ttl_full_state->obj[i].fy1 + ttl_full_state->obj[i].fy0) / 2;
@@ -793,7 +793,7 @@ static void render_sea_objects(const LWCONTEXT* pLwc, const mat4x4 view, const m
                     ry,
                     0);
     }
-    
+
     // test ship
     float x = cell_fx_to_render_coords(0, center, view_scale);
     float y = cell_fy_to_render_coords(0, center, view_scale);
@@ -826,19 +826,19 @@ static void render_waypoint_line_segment(const LWTTL* ttl,
     const float lat0_not_clamped = cell_fy_to_lat(y0 + 0.5f);
     const float lng1_not_clamped = cell_fx_to_lng(x1 + 0.5f);
     const float lat1_not_clamped = cell_fy_to_lat(y1 + 0.5f);
-    
+
     const float cell_x0 = lng_to_render_coords(lng0_not_clamped, center, view_scale);
     const float cell_y0 = lat_to_render_coords(lat0_not_clamped, center, view_scale);
     const float cell_x1 = lng_to_render_coords(lng1_not_clamped, center, view_scale);
     const float cell_y1 = lat_to_render_coords(lat1_not_clamped, center, view_scale);
-    
+
     const float dx = cell_x1 - cell_x0;
     const float dy = cell_y1 - cell_y0;
     const float dlen = sqrtf(dx * dx + dy * dy);
-    
+
     const float thickness = 0.2f / sqrtf((float)(view_scale_msb + 1));
     const float rot_z = atan2f(dy, dx);
-    
+
     render_solid_vb_ui_uv_shader_rot_view_proj(pLwc,
                                                cell_x0,
                                                cell_y0,
@@ -902,12 +902,12 @@ static void render_seaports(const LWCONTEXT* pLwc,
                          &cell_bound_yc0,
                          &cell_bound_xc1,
                          &cell_bound_yc1);
-    
+
     const float cell_render_width = cell_x_to_render_coords(1, center, clamped_view_scale) - cell_x_to_render_coords(0, center, clamped_view_scale);
     const float cell_render_height = cell_y_to_render_coords(0, center, clamped_view_scale) - cell_y_to_render_coords(1, center, clamped_view_scale);
     const int view_scale_msb = msb_index(clamped_view_scale);
     const float size_ratio = 1.0f / sqrtf((float)(view_scale_msb + 1));
-    
+
     int chunk_index_array[LNGLAT_RENDER_EXTENT_MULTIPLIER_LNG_WITH_MARGIN*LNGLAT_RENDER_EXTENT_MULTIPLIER_LAT_WITH_MARGIN];
     int bound_xcc0, bound_ycc0, bound_xcc1, bound_ycc1;
     const int chunk_index_array_count = lwttl_query_chunk_range_seaport(pLwc->ttl,
@@ -958,7 +958,7 @@ static void render_seaports(const LWCONTEXT* pLwc,
                 const float lat0_not_clamped = cell_fy_to_lat(y0 + 0.5f);
                 const float cell_x0 = lng_to_render_coords(lng0_not_clamped, center, clamped_view_scale * clamped_to_original_view_scale_ratio);
                 const float cell_y0 = lat_to_render_coords(lat0_not_clamped, center, clamped_view_scale * clamped_to_original_view_scale_ratio);
-                
+
                 /*render_seaport_icon_xxx(pLwc,
                  view,
                  proj,
@@ -981,9 +981,9 @@ static void render_seaports(const LWCONTEXT* pLwc,
 }
 
 static void render_cities(const LWCONTEXT* pLwc,
-                            const mat4x4 view,
-                            const mat4x4 proj,
-                            const LWTTLLNGLAT* center) {
+                          const mat4x4 view,
+                          const mat4x4 proj,
+                          const LWTTLLNGLAT* center) {
     const int clamped_view_scale = lwttl_clamped_view_scale(pLwc->ttl);
     const int clamped_to_original_view_scale_ratio = lwttl_view_scale(pLwc->ttl) / clamped_view_scale;
     const float half_lng_extent_in_deg = lwttl_half_lng_extent_in_degrees(clamped_view_scale);
@@ -1001,26 +1001,26 @@ static void render_cities(const LWCONTEXT* pLwc,
                          &cell_bound_yc0,
                          &cell_bound_xc1,
                          &cell_bound_yc1);
-    
+
     const float cell_render_width = cell_x_to_render_coords(1, center, clamped_view_scale) - cell_x_to_render_coords(0, center, clamped_view_scale);
     const float cell_render_height = cell_y_to_render_coords(0, center, clamped_view_scale) - cell_y_to_render_coords(1, center, clamped_view_scale);
     const int view_scale_msb = msb_index(clamped_view_scale);
     const float size_ratio = 1.0f / sqrtf((float)(view_scale_msb + 1));
-    
+
     int chunk_index_array[LNGLAT_RENDER_EXTENT_MULTIPLIER_LNG_WITH_MARGIN*LNGLAT_RENDER_EXTENT_MULTIPLIER_LAT_WITH_MARGIN];
     int bound_xcc0, bound_ycc0, bound_xcc1, bound_ycc1;
     const int chunk_index_array_count = lwttl_query_chunk_range_city(pLwc->ttl,
-                                                                        lng_min,
-                                                                        lat_min,
-                                                                        lng_max,
-                                                                        lat_max,
-                                                                        clamped_view_scale,
-                                                                        chunk_index_array,
-                                                                        ARRAY_SIZE(chunk_index_array),
-                                                                        &bound_xcc0,
-                                                                        &bound_ycc0,
-                                                                        &bound_xcc1,
-                                                                        &bound_ycc1);
+                                                                     lng_min,
+                                                                     lat_min,
+                                                                     lng_max,
+                                                                     lat_max,
+                                                                     clamped_view_scale,
+                                                                     chunk_index_array,
+                                                                     ARRAY_SIZE(chunk_index_array),
+                                                                     &bound_xcc0,
+                                                                     &bound_ycc0,
+                                                                     &bound_xcc1,
+                                                                     &bound_ycc1);
     if (chunk_index_array_count > ARRAY_SIZE(chunk_index_array)) {
         LOGEP("incorrect query result");
         assert(0);
@@ -1039,10 +1039,10 @@ static void render_cities(const LWCONTEXT* pLwc,
         int xc0 = 0;
         int yc0 = 0;
         const LWPTTLCITYOBJECT* obj_begin = lwttl_query_chunk_city(pLwc->ttl,
-                                                                         chunk_index_array[ci],
-                                                                         &xc0,
-                                                                         &yc0,
-                                                                         &obj_count);
+                                                                   chunk_index_array[ci],
+                                                                   &xc0,
+                                                                   &yc0,
+                                                                   &obj_count);
         if (obj_begin && obj_count > 0) {
             for (int i = 0; i < obj_count; i++) {
                 const float x0 = (float)(xc0 + clamped_view_scale * obj_begin[i].x_scaled_offset_0);
@@ -1057,7 +1057,7 @@ static void render_cities(const LWCONTEXT* pLwc,
                 const float lat0_not_clamped = cell_fy_to_lat(y0 + 0.5f);
                 const float cell_x0 = lng_to_render_coords(lng0_not_clamped, center, clamped_view_scale * clamped_to_original_view_scale_ratio);
                 const float cell_y0 = lat_to_render_coords(lat0_not_clamped, center, clamped_view_scale * clamped_to_original_view_scale_ratio);
-                
+
                 /*render_seaport_icon_xxx(pLwc,
                  view,
                  proj,
@@ -1067,13 +1067,13 @@ static void render_cities(const LWCONTEXT* pLwc,
                  cell_render_width * clamped_view_scale * size_ratio,
                  cell_render_height * clamped_view_scale * size_ratio);*/
                 render_city_icon(pLwc,
-                                    view,
-                                    proj,
-                                    cell_x0,
-                                    cell_y0,
-                                    0,
-                                    cell_render_width * clamped_view_scale * size_ratio,
-                                    cell_render_height * clamped_view_scale * size_ratio,
+                                 view,
+                                 proj,
+                                 cell_x0,
+                                 cell_y0,
+                                 0,
+                                 cell_render_width * clamped_view_scale * size_ratio,
+                                 cell_render_height * clamped_view_scale * size_ratio,
                                  obj_begin[i].population_level);
             }
         }
@@ -1127,7 +1127,7 @@ static void render_sea_static_objects(const LWCONTEXT* pLwc,
     const float lng_max = center->lng + half_lng_extent_in_deg;
     const float lat_min = center->lat - half_lat_extent_in_deg;
     const float lat_max = center->lat + half_lat_extent_in_deg;
-    
+
     render_background_sea_water(pLwc,
                                 view,
                                 proj,
@@ -1137,7 +1137,7 @@ static void render_sea_static_objects(const LWCONTEXT* pLwc,
                                 lat_min,
                                 lat_max,
                                 clamped_view_scale * clamped_to_original_view_scale_ratio);
-    
+
     // land
     //lwttl_lock_rendering_mutex(pLwc->ttl);
     int chunk_index_array[LNGLAT_RENDER_EXTENT_MULTIPLIER_LNG_WITH_MARGIN*LNGLAT_RENDER_EXTENT_MULTIPLIER_LAT_WITH_MARGIN];
@@ -1195,22 +1195,22 @@ static void render_sea_static_objects(const LWCONTEXT* pLwc,
                         bitmap[(ycc0 - bound_ycc0)*LNGLAT_SEA_PING_EXTENT_IN_CELL_PIXELS + by][(xcc0 - bound_xcc0)*LNGLAT_SEA_PING_EXTENT_IN_CELL_PIXELS + bx] = 1;
                     }
                 }
-                
+
                 const float x0 = (float)(xc0 + clamped_view_scale * obj_begin[i].x_scaled_offset_0);
                 const float y0 = (float)(yc0 + clamped_view_scale * obj_begin[i].y_scaled_offset_0);
                 const float x1 = (float)(xc0 + clamped_view_scale * obj_begin[i].x_scaled_offset_1);
                 const float y1 = (float)(yc0 + clamped_view_scale * obj_begin[i].y_scaled_offset_1);
-                
+
                 const float lng0_not_clamped = cell_fx_to_lng(x0);
                 const float lat0_not_clamped = cell_fy_to_lat(y0);
                 const float lng1_not_clamped = cell_fx_to_lng(x1);
                 const float lat1_not_clamped = cell_fy_to_lat(y1);
-                
+
                 /*const float lng0 = LWCLAMP(lng0_not_clamped, lng_min, lng_max);
                  const float lat0 = LWCLAMP(lat0_not_clamped, lat_min, lat_max);
                  const float lng1 = LWCLAMP(lng1_not_clamped, lng_min, lng_max);
                  const float lat1 = LWCLAMP(lat1_not_clamped, lat_min, lat_max);*/
-                
+
                 const float cell_x0 = lng_to_render_coords(lng0_not_clamped, center, clamped_view_scale * clamped_to_original_view_scale_ratio);
                 const float cell_y0 = lat_to_render_coords(lat0_not_clamped, center, clamped_view_scale * clamped_to_original_view_scale_ratio);
                 const float cell_x1 = lng_to_render_coords(lng1_not_clamped, center, clamped_view_scale * clamped_to_original_view_scale_ratio);
@@ -1222,7 +1222,7 @@ static void render_sea_static_objects(const LWCONTEXT* pLwc,
                 if (cell_w <= 0 || cell_h <= 0) {
                     continue;
                 }
-                
+
                 /*render_land_cell(pLwc,
                  view,
                  proj,
@@ -1251,9 +1251,9 @@ static void render_sea_static_objects(const LWCONTEXT* pLwc,
                             lat_max,
                             bitmap);
     //lwttl_unlock_rendering_mutex(pLwc->ttl);
-    
-    
-    
+
+
+
     //// water cells for debugging
     //struct {
     //    int x0, y0;
@@ -1300,7 +1300,7 @@ static void render_single_cell_info(const LWCONTEXT* pLwc,
     };
     vec2 ui_point;
     calculate_ui_point_from_world_point(pLwc->aspect_ratio, proj_view, obj_pos_vec4, ui_point);
-    
+
     LWTEXTBLOCK tb;
     tb.text_block_width = 999.0f;// 2.00f * aspect_ratio;
     tb.text_block_line_height = DEFAULT_TEXT_BLOCK_LINE_HEIGHT_F;
@@ -1512,10 +1512,10 @@ void lwc_render_ttl(const LWCONTEXT* pLwc) {
     lw_clear_color();
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-    
+
     mat4x4 view, proj;
     lwttl_view_proj(pLwc->ttl, view, proj);
-    
+
     const int view_scale = lwttl_view_scale(pLwc->ttl);
     const LWTTLLNGLAT view_center = *lwttl_center(pLwc->ttl);
     // render earth minimap

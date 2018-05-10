@@ -108,9 +108,9 @@ void puck_game_create_tower_geom(LWPUCKGAME* puck_game, int i) {
     assert(tower->geom == 0);
     tower->geom = dCreateCapsule(puck_game->space, puck_game->tower_radius, 10.0f);
     dGeomSetPosition(tower->geom,
-                        puck_game->tower_pos * puck_game->tower_pos_multiplier[i][0],
-                        puck_game->tower_pos * puck_game->tower_pos_multiplier[i][1],
-                        0.0f);
+                     puck_game->tower_pos * puck_game->tower_pos_multiplier[i][0],
+                     puck_game->tower_pos * puck_game->tower_pos_multiplier[i][1],
+                     0.0f);
     dGeomSetData(tower->geom, tower);
     // Tower #0(NW), #1(NE) --> player 1
     // Tower #2(SW), #3(SE) --> player 2
@@ -381,7 +381,11 @@ void puck_game_set_static_default_values(LWPUCKGAME* puck_game) {
     puck_game->fire_interval = 1.5f;
     puck_game->fire_duration = 0.2f;
     puck_game->fire_shake_time = 0.5f;
-    puck_game->tower_pos = 1.1f;
+    if (puck_game->map == LPGM_SQUARE) {
+        puck_game->tower_pos = 1.1f;
+    } else {
+        puck_game->tower_pos = 0.9f;
+    }
     puck_game->tower_radius = 0.3f; //0.825f / 2;
     puck_game->tower_mesh_radius = 0.825f / 2; // Check tower.blend file
     puck_game->tower_total_hp = 5;
@@ -610,7 +614,7 @@ void puck_game_near_callback(void* data, dGeomID geom1, dGeomID geom2) {
             dSpaceCollide((dSpaceID)geom2, data, &puck_game_near_callback);
 
     } else {
-        
+
         //if (geom1 == puck_game->boundary[LPGB_DIAGONAL_2] || geom2 == puck_game->boundary[LPGB_DIAGONAL_2]) {
         //    if (geom1 == puck_game->go[LPGO_TARGET].geom || puck_game->go[LPGO_TARGET].geom) {
 
@@ -843,7 +847,7 @@ void puck_game_control_bogus(LWPUCKGAME* puck_game, const LWPUCKGAMEBOGUSPARAM* 
     float target_dlen = sqrtf(puck_game->target_dx[0] * puck_game->target_dx[0] + puck_game->target_dy[0] * puck_game->target_dy[0]);
     puck_game->target_dx[0] /= target_dlen;
     puck_game->target_dy[0] /= target_dlen;
-    
+
     float ideal_target_dx2 = ideal_target_dx * ideal_target_dx;
     float ideal_target_dy2 = ideal_target_dy * ideal_target_dy;
     float ideal_target_dlen = sqrtf(ideal_target_dx2 + ideal_target_dy2);
@@ -859,11 +863,11 @@ void puck_game_control_bogus(LWPUCKGAME* puck_game, const LWPUCKGAMEBOGUSPARAM* 
     puck_game->remote_control[LW_PUCK_GAME_TARGET_TEAM][0].dy = puck_game->target_dy[0];
     puck_game->remote_control[LW_PUCK_GAME_TARGET_TEAM][0].dlen = puck_game->target_dlen_ratio[0];
     puck_game->remote_control[LW_PUCK_GAME_TARGET_TEAM][0].pull_puck = 0;
-    
+
     LOGIx("[BOGUS] dx=%.2f, dy=%.2f, dlen=xxxx, dlen_max=xxxx, dlen_ratio=%.2f",
-         puck_game->target_dx[0],
-         puck_game->target_dy[0],
-         puck_game->target_dlen_ratio[0]);
+          puck_game->target_dx[0],
+          puck_game->target_dy[0],
+          puck_game->target_dlen_ratio[0]);
 
     // dash
     int bogus_player_no = puck_game->player_no == 2 ? 1 : 2;
@@ -887,7 +891,7 @@ void puck_game_update_remote_player(LWPUCKGAME* puck_game, float delta_time, int
         LPGO_PLAYER,
         LPGO_TARGET,
     };
-    
+
     if (pcj[i]) {
         if (puck_game->remote_control[i][0].dir_pad_dragging) {
             float dx, dy, dlen;
@@ -912,7 +916,7 @@ void puck_game_update_remote_player(LWPUCKGAME* puck_game, float delta_time, int
             dJointSetLMotorParam(pcj[i], dParamVel1, puck_game->player_dash_speed * dx);
             dJointSetLMotorParam(pcj[i], dParamVel2, puck_game->player_dash_speed * dy);
             puck_game->remote_dash[i][0].remain_time = LWMAX(0,
-                                                          puck_game->remote_dash[i][0].remain_time - delta_time);
+                                                             puck_game->remote_dash[i][0].remain_time - delta_time);
         }
     }
     // Jump
