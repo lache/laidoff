@@ -47999,6 +47999,7 @@ fail:
 static int _wrap_lwc_prerender_ttl_fbo(lua_State* L) {
   int SWIG_arg = 0;
   LWCONTEXT *arg1 = (LWCONTEXT *) 0 ;
+  int result;
   
   SWIG_check_num_args("lwc_prerender_ttl_fbo",1,1)
   if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("lwc_prerender_ttl_fbo",1,"LWCONTEXT const *");
@@ -48007,8 +48008,8 @@ static int _wrap_lwc_prerender_ttl_fbo(lua_State* L) {
     SWIG_fail_ptr("lwc_prerender_ttl_fbo",1,SWIGTYPE_p__LWCONTEXT);
   }
   
-  lwc_prerender_ttl_fbo((struct _LWCONTEXT const *)arg1);
-  
+  result = (int)lwc_prerender_ttl_fbo((struct _LWCONTEXT const *)arg1);
+  lua_pushnumber(L, (lua_Number) result); SWIG_arg++;
   return SWIG_arg;
   
   if(0) SWIG_fail;
@@ -100979,7 +100980,7 @@ static swig_lua_const_info swig_SwigModule_constants[]= {
     {SWIG_LUA_CONSTTAB_INT("LGS_LEADERBOARD", LGS_LEADERBOARD)},
     {SWIG_LUA_CONSTTAB_INT("LGS_REMTEX", LGS_REMTEX)},
     {SWIG_LUA_CONSTTAB_STRING("__LW_STRING_LINE__", "61")},
-    {SWIG_LUA_CONSTTAB_STRING("LWLOGPOS", "src\\lwlog.h(62): ")},
+    {SWIG_LUA_CONSTTAB_STRING("LWLOGPOS", "src/lwlog.h(62): ")},
     {SWIG_LUA_CONSTTAB_INT("LPT_GRID", LPT_GRID)},
     {SWIG_LUA_CONSTTAB_INT("LPT_SOLID_RED", LPT_SOLID_RED)},
     {SWIG_LUA_CONSTTAB_INT("LPT_SOLID_GREEN", LPT_SOLID_GREEN)},

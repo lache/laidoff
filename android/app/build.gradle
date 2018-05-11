@@ -103,12 +103,18 @@ android {
             }
             buildConfigField "boolean", "DOWNLOAD_ASSETS", "true"
         }
-        
+        releaseBallRumbleGooglePlay {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'),
+                    'proguard-rules.pro'
+            buildConfigField "boolean", "DOWNLOAD_ASSETS", "false"
+        }
     }
 
     sourceSets {
-        debug.assets.srcDirs += '../../selected-assets/assets'
+        debug.assets.srcDirs += '../../assets'
         releaseSingapore.assets.srcDirs += '../../selected-assets/assets'
+        releaseBallRumbleGooglePlay.assets.srcDirs += '../../selected-assets-br/assets'
     }
 
     externalNativeBuild {

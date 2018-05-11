@@ -56,9 +56,9 @@ void lw_trigger_mouse_press(LWCONTEXT* pLwc, float nx, float ny, int pointer_id)
 	convert_touch_coord_to_ui_coord(pLwc, &x, &y);
 
 	LOGIx("mouse press ui coord x=%f, y=%f", x, y);
-
+    
     if (pLwc->game_scene == LGS_TTL
-        || (pLwc->game_scene == LGS_PUCK_GAME && pLwc->puck_game->show_html_ui)) {
+        || (pLwc->game_scene == LGS_PUCK_GAME && pLwc->puck_game->game_state == LPGS_MAIN_MENU && pLwc->puck_game->show_html_ui && pLwc->puck_game->world_roll_dirty == 0)) {
         const float nx = (x + pLwc->aspect_ratio) / (2.0f * pLwc->aspect_ratio);
         const float ny = (1.0f - y) / 2.0f;
         htmlui_on_lbutton_down(pLwc->htmlui, nx, ny);
@@ -78,7 +78,7 @@ void lw_trigger_mouse_press(LWCONTEXT* pLwc, float nx, float ny, int pointer_id)
     if (pinch_zoom.count == 2 && prev_pinch_zoom_count != 2) {
 		pinch_zoom.initial_dist = calculate_pinch_zoom_dist();
         pinch_zoom.initial_view_scale = lwttl_view_scale(pLwc->ttl);
-        LOGI("Pinch zoom started. initial dist = %.2f, initial view scale = %d",
+        LOGIx("Pinch zoom started. initial dist = %.2f, initial view scale = %d",
              pinch_zoom.initial_dist,
              pinch_zoom.initial_view_scale);
 	}
@@ -296,7 +296,7 @@ void lw_trigger_mouse_release(LWCONTEXT* pLwc, float nx, float ny, int pointer_i
     }
 
     if (prev_pinch_zoom_count == 2 && pinch_zoom.count != 2) {
-        LOGI("Pinch zoom aborted.");
+        LOGIx("Pinch zoom aborted.");
     }
 
     if (lw_pinch() == 0) {

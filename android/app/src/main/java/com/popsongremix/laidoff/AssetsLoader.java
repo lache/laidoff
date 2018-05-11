@@ -57,10 +57,14 @@ public class AssetsLoader {
 
                 Log.i("And9", "Registering asset " + assetPath);
 
-                AssetFileDescriptor afd = activity.getAssets().openFd(assetPath);
+                try {
+                    AssetFileDescriptor afd = activity.getAssets().openFd(assetPath);
 
-                LaidoffNativeActivity.registerAsset(assetPath, (int)afd.getStartOffset(), (int)afd.getLength());
-
+                    LaidoffNativeActivity.registerAsset(assetPath, (int) afd.getStartOffset(), (int) afd.getLength());
+                } catch (IOException e) {
+                    // may 'assetPath' directs a directory(should directs a file)
+                    e.printStackTrace();
+                }
             }
         } catch (IOException e) {
             e.printStackTrace();

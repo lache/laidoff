@@ -88,9 +88,10 @@ public:
         container.clear_remtex_name_hash_set();
         doc = litehtml::document::createFromString(last_html_str.c_str(), &container, &browser_context);
         render_page();
-        lwc_prerender_ttl_fbo(pLwc);
-        draw();
-        lwc_postrender_ttl_fbo(pLwc);
+        if (lwc_prerender_ttl_fbo(pLwc) == 0) {
+            draw();
+            lwc_postrender_ttl_fbo(pLwc);
+        }
         unlock();
     }
     void on_lbutton_down(float nx, float ny) {
