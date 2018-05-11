@@ -143,7 +143,7 @@ LWTTL* lwttl_new(float aspect_ratio) {
     ttl->worldmap.render_org_y = -(2.0f - aspect_ratio) / 2;
     // Ulsan
     lwttl_worldmap_scroll_to(ttl, 129.496f, 35.494f, 0);
-    size_t seaports_dat_size;
+    //size_t seaports_dat_size;
     //ttl->seaport = (LWTTLDATA_SEAPORT*)create_binary_from_file(ASSETS_BASE_PATH "ttldata" PATH_SEPARATOR "seaports.dat", &seaports_dat_size);
     //ttl->seaport_len = seaports_dat_size / sizeof(LWTTLDATA_SEAPORT);
     ttl->view_scale_max = 1 << 13; // should be no more than 2^15 (== 2 ^ MAX(LWTTLCHUNKKEY.view_scale_msb))
