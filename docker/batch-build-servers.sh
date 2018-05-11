@@ -16,6 +16,7 @@ cd ..
 
 # br-server (all-in-one server binary)
 TMP_GOPATH="/tmp/gopath"
+rm -rf "$(TMP_GOPATH)"
 GITHUB_PATH="$(git remote -v | grep "$(cat ../.author)" | head -n1 | cut -d"@" -f2 | cut -d"." -f1-2 | tr ":" "/")"
 TMP_PROJECT_PATH="${TMP_GOPATH}/src/${GITHUB_PATH}"
 TMP_USER_ROOT="$(dirname "${TMP_PROJECT_PATH}")"
