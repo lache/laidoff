@@ -1327,9 +1327,20 @@ static void render_single_cell_info(const LWCONTEXT* pLwc,
     }
     if (p->port_id >= 0 && p->port_name) {
         sprintf(info,
-                "%s[%d] %s",
+                "SEAPORT %s[%d] %s",
                 p->port_name,
                 p->port_id,
+                cell_type);
+    } else {
+        sprintf(info,
+                "%s",
+                cell_type);
+    }
+    if (p->city_id >= 0 && p->city_name) {
+        sprintf(info,
+                "CITY %s[%d] %s",
+                p->city_name,
+                p->city_id,
                 cell_type);
     } else {
         sprintf(info,
