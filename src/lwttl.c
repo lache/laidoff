@@ -763,10 +763,10 @@ void lwttl_get_cell_bound(const float lng_min,
                           int* yc0,
                           int* xc1,
                           int* yc1) {
-    *xc0 = lwttl_lng_to_round_int(lng_min);
-    *yc0 = lwttl_lat_to_round_int(lat_max);
-    *xc1 = lwttl_lng_to_round_int(lng_max);
-    *yc1 = lwttl_lat_to_round_int(lat_min);
+    *xc0 = lwttl_lng_to_ceil_int(lng_min);
+    *yc0 = lwttl_lat_to_ceil_int(lat_max);
+    *xc1 = lwttl_lng_to_ceil_int(lng_max);
+    *yc1 = lwttl_lat_to_ceil_int(lat_min);
 }
 
 void lwttl_udp_send_ttlping(const LWTTL* ttl, LWUDP* udp, int ping_seq) {

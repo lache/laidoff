@@ -1318,6 +1318,7 @@ static void render_single_cell_info(const LWCONTEXT* pLwc,
     char info[512];
     const LWPTTLSINGLECELL* p = lwttl_single_cell(pLwc->ttl);
     const char* cell_type = 0;
+    // fill cell type
     if ((p->attr >> 0) & 1) {
         cell_type = "Land";
     } else if ((p->attr >> 2) & 1) {
@@ -1325,22 +1326,19 @@ static void render_single_cell_info(const LWCONTEXT* pLwc,
     } else {
         cell_type = "Water";
     }
-    if (p->port_id >= 0 && p->port_name) {
-        sprintf(info,
-                "SEAPORT %s[%d] %s",
-                p->port_name,
-                p->port_id,
-                cell_type);
-    } else {
-        sprintf(info,
-                "%s",
-                cell_type);
-    }
+    // short description
     if (p->city_id >= 0 && p->city_name) {
         sprintf(info,
                 "CITY %s[%d] %s",
                 p->city_name,
                 p->city_id,
+                cell_type);
+    } else if (p->port_id >= 0 && p->port_name) {
+        sprintf(info,
+                "SEAPORT %s[%d] CARGO %d %s",
+                p->port_name,
+                p->port_id,
+                p->cargo,
                 cell_type);
     } else {
         sprintf(info,
