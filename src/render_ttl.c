@@ -799,16 +799,6 @@ static void render_sea_objects(const LWCONTEXT* pLwc, const mat4x4 view, const m
                     ry,
                     0);
     }
-
-    // test ship
-    float x = cell_fx_to_render_coords(0, center, view_scale);
-    float y = cell_fy_to_render_coords(0, center, view_scale);
-    render_ship(pLwc,
-                view,
-                proj,
-                x,
-                y,
-                0);
 }
 
 static void render_waypoint_line_segment(const LWTTL* ttl,
