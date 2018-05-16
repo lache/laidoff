@@ -149,8 +149,16 @@ void release_binary(char* d) {
     free(d);
 }
 
-void register_asset(const char* asset_path, int start_offset, int length) {
+void init_register_asset() {
+    nativeAssetLength = 0;
+}
 
+void register_asset(const char* asset_path, int start_offset, int length) {
+    if (nativeAssetLength >= ARRAY_SIZE(nativeAssetArray)) {
+        LOGE("nativeAssetArray exceeded! asset %s cannot be registered.", asset_path);
+        // cannot proceed!
+        abort();
+    }
     nativeAssetArray[nativeAssetLength].asset_hash = hash((unsigned char*) asset_path);
     nativeAssetArray[nativeAssetLength].start_offset = start_offset;
     nativeAssetArray[nativeAssetLength].length = length;

@@ -10,7 +10,6 @@
 #include "laidoff.h"
 #include <assert.h>
 #include "zmq.h"
-#include "mq.h"
 #include "logic.h"
 
 #define LW_SCRIPT_PREFIX_PATH ASSETS_BASE_PATH "l" PATH_SEPARATOR

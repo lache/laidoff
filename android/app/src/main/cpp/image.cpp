@@ -15,6 +15,7 @@
 #endif
 #include "lwime.h"
 
+extern "C" void init_register_asset();
 extern "C" void register_asset(const char* asset_path, int start_offset, int length);
 extern "C" void set_apk_path(const char* apk_path);
 extern "C" void set_files_path(const char* files_path);
@@ -73,6 +74,10 @@ extern "C" JNIEXPORT int JNICALL Java_com_popsongremix_laidoff_LaidoffNativeActi
     LOGI("pushTextureData (tex_atlas_index index=%d): pushed %d bytes", tex_atlas_index, len);
 
     return len;
+}
+
+extern "C" JNIEXPORT void JNICALL Java_com_popsongremix_laidoff_LaidoffNativeActivity_initRegisterAsset(JNIEnv * env, jclass cls) {
+    init_register_asset();
 }
 
 extern "C" JNIEXPORT void JNICALL Java_com_popsongremix_laidoff_LaidoffNativeActivity_registerAsset(JNIEnv * env, jclass cls, jstring assetpath, int startoffset, int length) {

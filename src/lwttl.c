@@ -207,6 +207,9 @@ const char* lwttl_seaarea(LWTTL* ttl) {
 }
 
 void lwttl_update(LWTTL* ttl, LWCONTEXT* pLwc, float delta_time) {
+    if (ttl == 0) {
+        return;
+    }
     const float app_time = (float)pLwc->app_time;
     for (int i = 0; i < ttl->ttl_full_state.count; i++) {
         ttl->ttl_full_state.obj[i].fx0 += (float)delta_time * ttl->ttl_full_state.obj[i].fvx;

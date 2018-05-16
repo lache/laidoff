@@ -15,6 +15,7 @@
 #include <lwtcp.h>
 #include <lwime.h>
 #include <string>
+#include <lwttl.h>
 #include "laidoff.h"
 #include "lwlog.h"
 #include "czmq.h"
@@ -58,6 +59,7 @@ struct engine {
     int resumed;
     int focused;
     int surface_ready;
+    int window_ready;
 };
 
 static void recreate_surface(engine* pEngine);
@@ -370,9 +372,8 @@ static int engine_init_display(struct engine* engine) {
     engine->context = context;
     engine->surface = surface;
     engine->config = config;
-    // engine->width and engine->height may be already filled with correct size
-    engine->width = engine->width < w ? w : engine->width;
-    engine->height = engine->height < h ? h : engine->height;
+    engine->width = w;
+    engine->height = h;
     engine->state.angle = 0;
 
     LOGI("Surface width: %d", engine->width);
@@ -397,7 +398,7 @@ static void engine_draw_frame(struct engine* engine) {
         return;
     }
 
-    if (!engine->surface_ready || !engine->focused || !engine->resumed) {
+    if (!engine->surface_ready || !engine->focused || !engine->resumed || !engine->window_ready) {
         return;
     }
 
@@ -422,19 +423,22 @@ static void engine_draw_frame(struct engine* engine) {
         } else if (swap_error == EGL_BAD_NATIVE_WINDOW) {
             // 재초기화 위해서 `inited` 플래그 내림
             engine->inited = false;
+        } else {
+            LOGE("Unknown swap failure reason: %d", swap_error);
+            abort();
         }
     }
 }
 
 static void recreate_surface(engine* engine) {
     // 'RE'-create surface request called before 'initial' surface is ever created.
-    if (engine->surface_ready == 0) {
-        return;
-    }
+    //if (engine->surface_ready == 0) {
+    //    return;
+    //}
     EGLint w, h;
     eglQuerySurface(engine->display, engine->surface, EGL_WIDTH, &w);
     eglQuerySurface(engine->display, engine->surface, EGL_HEIGHT, &h);
-    if (w == engine->pLwc->width && h == engine->pLwc->height) {
+    if (engine->pLwc && w == engine->pLwc->width && h == engine->pLwc->height) {
         LOGI("recreate_surface: skipped since there is no size change...");
         return;
     }
@@ -459,7 +463,6 @@ static void recreate_surface(engine* engine) {
                            engine->context) == EGL_FALSE) {
             LOGW("Unable to eglMakeCurrent!!");
         } else {
-            EGLint w, h;
             eglQuerySurface(engine->display, engine->surface, EGL_WIDTH, &w);
             eglQuerySurface(engine->display, engine->surface, EGL_HEIGHT, &h);
             if (w > 0 && w < 5000 && h > 0 && h < 5000) {
@@ -648,6 +651,7 @@ static void engine_handle_cmd(struct android_app* app, int32_t cmd) {
             break;
         case APP_CMD_DESTROY:
             LOGI("APP_CMD_DESTROY");
+            app->destroyRequested = 1;
             break;
         case APP_CMD_SAVE_STATE:
             LOGI("APP_CMD_SAVE_STATE");
@@ -655,11 +659,15 @@ static void engine_handle_cmd(struct android_app* app, int32_t cmd) {
             engine->app->savedState = malloc(sizeof(struct saved_state));
             *((struct saved_state*) engine->app->savedState) = engine->state;
             engine->app->savedStateSize = sizeof(struct saved_state);
+            if (engine && engine->pLwc && engine->pLwc->ttl) {
+                lwttl_write_last_state(engine->pLwc->ttl, engine->pLwc);
+            }
             break;
         case APP_CMD_INIT_WINDOW:
             LOGI("APP_CMD_INIT_WINDOW");
             // The window is being shown, get it ready.
             engine->app_cmd_init_window_triggered = true;
+            engine->window_ready = 1;
             break;
         case APP_CMD_TERM_WINDOW:
             LOGI("APP_CMD_TERM_WINDOW");
@@ -667,11 +675,13 @@ static void engine_handle_cmd(struct android_app* app, int32_t cmd) {
             //eglMakeCurrent(engine->display, EGL_NO_SURFACE, EGL_NO_SURFACE, EGL_NO_CONTEXT);
             //glFlush();
             //engine_term_display(engine);
+            engine->window_ready = 0;
             break;
         case APP_CMD_GAINED_FOCUS:
             LOGI("APP_CMD_GAINED_FOCUS");
             engine->focused = 1;
             ALooper_wake(engine->app->looper);
+            recreate_surface(engine);
             /*
             // When our app gains focus, we start monitoring the accelerometer.
             if (engine->accelerometerSensor != NULL) {

@@ -41,6 +41,7 @@ public class LaidoffNativeActivity extends NativeActivity {
 
     public static native int pushTextureData(int width, int height, int[] data, int texAtlasIndex);
 
+    public static native void initRegisterAsset();
     public static native void registerAsset(String assetPath, int startOffset, int length);
 
     private static native void sendApkPath(String apkPath, String filesPath, String packageVersion);
@@ -80,6 +81,7 @@ public class LaidoffNativeActivity extends NativeActivity {
         Log.i(LOG_TAG, "Device Android Version: " + Build.VERSION.SDK_INT);
         AssetsLoader assetsLoader = new AssetsLoader(this);
         Log.i(LOG_TAG, "APK Path: " + assetsLoader.GetAPKPath());
+        initRegisterAsset();
         assetsLoader.registerAllAssetsOfType("action");
         assetsLoader.registerAllAssetsOfType("armature");
         assetsLoader.registerAllAssetsOfType("atlas");

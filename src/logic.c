@@ -1041,6 +1041,8 @@ static void s_logic_worker(zsock_t *pipe, void *args) {
                          pLwc->sea_udp_host_addr.host,
                          pLwc->sea_udp_host_addr.port,
                          pLwc->sea_udp_host_addr.port_str);
+    // load previous ttl data
+    lwttl_read_last_state(pLwc->ttl, pLwc);
     // Ball Rumble TCP connection: no connection made at this point. Lazy connect.
     /*pLwc->tcp = new_tcp(pLwc,
                         pLwc->user_data_path,
