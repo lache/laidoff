@@ -155,12 +155,13 @@ static void render_sea_city(const LWCONTEXT* pLwc, const mat4x4 view, const mat4
     glDrawArrays(GL_TRIANGLES, 0, pLwc->vertex_buffer[lvt].vertex_count);
 }
 
-static void render_ship(const LWCONTEXT* pLwc, const mat4x4 view, const mat4x4 proj, float x, float y, float z) {
+static void render_ship(const LWCONTEXT* pLwc, const mat4x4 view, const mat4x4 proj, float x, float y, float z, float rot_z) {
     int shader_index = LWST_DEFAULT_NORMAL_COLOR;
     const LWSHADER* shader = &pLwc->shader[shader_index];
     lazy_glUseProgram(pLwc, shader_index);
     mat4x4 rot;
     mat4x4_identity(rot);
+    mat4x4_rotate_Z(rot, rot, rot_z);
     const int view_scale = lwttl_view_scale(pLwc->ttl);
     const float sx = 0.075f / view_scale;
     const float sy = 0.075f / view_scale;
@@ -797,7 +798,8 @@ static void render_sea_objects(const LWCONTEXT* pLwc, const mat4x4 view, const m
                     proj,
                     rx,
                     ry,
-                    0);
+                    0,
+                    atan2f(-ttl_full_state->obj[i].fvy, ttl_full_state->obj[i].fvx) - (float)(M_PI / 2));
     }
 }
 
@@ -1325,10 +1327,12 @@ static void render_single_cell_info(const LWCONTEXT* pLwc,
                 cell_type);
     } else if (p->port_id >= 0 && p->port_name) {
         sprintf(info,
-                "SEAPORT %s[%d] CARGO %d %s",
+                "SEAPORT %s[%d] CARGO %d/%d/%d %s",
                 p->port_name,
                 p->port_id,
                 p->cargo,
+                p->cargo_loaded,
+                p->cargo_unloaded,
                 cell_type);
     } else {
         sprintf(info,

@@ -279,7 +279,7 @@ typedef struct _LWPTTLFULLSTATE {
     unsigned char padding1;
     unsigned char padding2;
     int count;
-    LWPTTLFULLSTATEOBJECT obj[32];
+    LWPTTLFULLSTATEOBJECT obj[64];
 } LWPTTLFULLSTATE;
 
 // UDP
@@ -454,6 +454,8 @@ typedef struct _LWPTTLSINGLECELL {
     char city_name[64];
     unsigned int attr;
     int cargo;
+    int cargo_loaded;
+    int cargo_unloaded;
 } LWPTTLSINGLECELL;
 
 // UDP
