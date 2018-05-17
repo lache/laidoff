@@ -102,6 +102,6 @@ static LWTTLCHUNKKEY make_chunk_key(const int xc0_aligned, const int yc0_aligned
 }
 
 static int aligned_chunk_index(const int cell_index, const int view_scale, const int ex) {
-    const auto half_cell_pixel_extent = (ex >> 1) * view_scale;
+    const int half_cell_pixel_extent = (ex >> 1) * view_scale;
     return (cell_index + half_cell_pixel_extent) & ~(2 * half_cell_pixel_extent - 1) & ~(view_scale - 1);
 }

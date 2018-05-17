@@ -134,6 +134,8 @@ typedef struct _LWTTL {
     mat4x4 proj;
     char user_id_str[512];
     int panning;
+    LWPTTLWAYPOINTS waypoints_cache[512];
+    int waypoints_cache_count;
 } LWTTL;
 
 LWTTL* lwttl_new(float aspect_ratio) {
@@ -214,8 +216,8 @@ void lwttl_update(LWTTL* ttl, LWCONTEXT* pLwc, float delta_time) {
     for (int i = 0; i < ttl->ttl_full_state.count; i++) {
         ttl->ttl_full_state.obj[i].fx0 += (float)delta_time * ttl->ttl_full_state.obj[i].fvx;
         ttl->ttl_full_state.obj[i].fy0 += (float)delta_time * ttl->ttl_full_state.obj[i].fvy;
-        ttl->ttl_full_state.obj[i].fx1 += (float)delta_time * ttl->ttl_full_state.obj[i].fvx;
-        ttl->ttl_full_state.obj[i].fy1 += (float)delta_time * ttl->ttl_full_state.obj[i].fvy;
+        //ttl->ttl_full_state.obj[i].fx1 += (float)delta_time * ttl->ttl_full_state.obj[i].fvx;
+        //ttl->ttl_full_state.obj[i].fy1 += (float)delta_time * ttl->ttl_full_state.obj[i].fvy;
     }
 
     if (ttl->sea_udp) {
@@ -860,6 +862,40 @@ void lwttl_set_sea_udp(LWTTL* ttl, LWUDP* sea_udp) {
     ttl->sea_udp = sea_udp;
 }
 
+static void set_ttl_full_state(LWTTL* ttl, const LWPTTLFULLSTATE* p) {
+    memcpy(&ttl->ttl_full_state, p, sizeof(LWPTTLFULLSTATE));
+    for (int i = 0; i < p->count; i++) {
+        const int ship_id = p->obj[i].type;
+        int cache_hit = 0;
+        for (int j = 0; j < ttl->waypoints_cache_count; j++) {
+            if (ttl->waypoints_cache[j].ship_id == ship_id) {
+                cache_hit = 1;
+            }
+        }
+        if (cache_hit == 0) {
+            lwttl_request_waypoints(ttl, ship_id);
+        }
+    }
+}
+
+static void set_ttl_waypoints(LWTTL* ttl, const LWPTTLWAYPOINTS* p) {
+    memcpy(&ttl->waypoints, p, sizeof(LWPTTLWAYPOINTS));
+    // overwrite if exist
+    for (int i = 0; i < ttl->waypoints_cache_count; i++) {
+        if (ttl->waypoints_cache[i].ship_id == p->ship_id) {
+            memcpy(&ttl->waypoints_cache[i], p, sizeof(LWPTTLWAYPOINTS));
+            return;
+        }
+    }
+    // new!
+    if (ttl->waypoints_cache_count < ARRAY_SIZE(ttl->waypoints_cache)) {
+        memcpy(&ttl->waypoints_cache[ttl->waypoints_cache_count], p, sizeof(LWPTTLWAYPOINTS));
+        ttl->waypoints_cache_count++;
+    } else {
+        LOGEP("maximum capacity exceeded");
+    }
+}
+
 void lwttl_udp_update(LWTTL* ttl, LWUDP* udp, LWCONTEXT* pLwc) {
     if (pLwc->game_scene != LGS_TTL) {
         return;
@@ -957,7 +993,7 @@ void lwttl_udp_update(LWTTL* ttl, LWUDP* udp, LWCONTEXT* pLwc) {
 
                 LWPTTLFULLSTATE* p = (LWPTTLFULLSTATE*)decompressed;
                 LOGIx("LWPTTLFULLSTATE: %d objects.", p->count);
-                memcpy(&ttl->ttl_full_state, p, sizeof(LWPTTLFULLSTATE));
+                set_ttl_full_state(ttl, p);
                 break;
             }
             case LPGP_LWPTTLSTATICSTATE2:
@@ -1054,7 +1090,7 @@ void lwttl_udp_update(LWTTL* ttl, LWUDP* udp, LWCONTEXT* pLwc) {
                 }
                 LWPTTLWAYPOINTS* p = (LWPTTLWAYPOINTS*)decompressed;
                 LOGIx("LWPTTLWAYPOINTS: %d objects.", p->count);
-                memcpy(&ttl->waypoints, p, sizeof(LWPTTLWAYPOINTS));
+                set_ttl_waypoints(ttl, p);
                 break;
             }
             case LPGP_LWPTTLSINGLECELL:
@@ -1090,6 +1126,15 @@ void lwttl_udp_update(LWTTL* ttl, LWUDP* udp, LWCONTEXT* pLwc) {
 
 const LWPTTLWAYPOINTS* lwttl_get_waypoints(const LWTTL* ttl) {
     return &ttl->waypoints;
+}
+
+const LWPTTLWAYPOINTS* lwttl_get_waypoints_by_ship_id(const LWTTL* ttl, int ship_id) {
+    for (int i = 0; i < ttl->waypoints_cache_count; i++) {
+        if (ttl->waypoints_cache[i].ship_id == ship_id) {
+            return &ttl->waypoints_cache[i];
+        }
+    }
+    return 0;
 }
 
 void lwttl_write_last_state(const LWTTL* ttl, const LWCONTEXT* pLwc) {

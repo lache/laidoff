@@ -2,7 +2,8 @@
 
 Private toy project
 
-![screenshot5](images/ss6.png)
+![screenshot7](images/ss7.png)
+![screenshot6](images/ss6.png)
 ![screenshot5](images/ss5.png)
 ![screenshot4](images/ss4.png)
 ![screenshot3](images/ss3.png)

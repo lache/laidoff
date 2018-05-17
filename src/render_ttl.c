@@ -26,6 +26,10 @@ static char visibility[MAX_VISIBILITY_ENTRY_COUNT][MAX_VISIBILITY_ENTRY_NAME_LEN
 #define WAYPOINT_COLOR_G (0.7f)
 #define WAYPOINT_COLOR_B (0.2f)
 
+#define WAYPOINT2_COLOR_R (0.15f)
+#define WAYPOINT2_COLOR_G (0.55f)
+#define WAYPOINT2_COLOR_B (0.15f)
+
 #define CELL_DRAGGING_LINE_COLOR_R (0.7f)
 #define CELL_DRAGGING_LINE_COLOR_G (0.9f)
 #define CELL_DRAGGING_LINE_COLOR_B (0.7f)
@@ -746,8 +750,10 @@ static void render_sea_objects_nameplate(const LWCONTEXT* pLwc, const mat4x4 vie
     const LWPTTLFULLSTATE* ttl_full_state = lwttl_full_state(pLwc->ttl);
 
     for (int i = 0; i < ttl_full_state->count; i++) {
-        const float x = (ttl_full_state->obj[i].fx1 + ttl_full_state->obj[i].fx0) / 2;
-        const float y = (ttl_full_state->obj[i].fy1 + ttl_full_state->obj[i].fy0) / 2;
+        //const float x = (ttl_full_state->obj[i].fx1 + ttl_full_state->obj[i].fx0) / 2;
+        //const float y = (ttl_full_state->obj[i].fy1 + ttl_full_state->obj[i].fy0) / 2;
+        const float x = ttl_full_state->obj[i].fx0 + 0.5f;
+        const float y = ttl_full_state->obj[i].fy0 + 0.5f;
         const float rx = cell_fx_to_render_coords(x, center, view_scale);
         const float ry = cell_fy_to_render_coords(y, center, view_scale);
         vec4 obj_pos_vec4 = {
@@ -789,8 +795,10 @@ static void render_sea_objects(const LWCONTEXT* pLwc, const mat4x4 view, const m
     const int view_scale = lwttl_view_scale(pLwc->ttl);
     const LWPTTLFULLSTATE* ttl_full_state = lwttl_full_state(pLwc->ttl);
     for (int i = 0; i < ttl_full_state->count; i++) {
-        const float x = (ttl_full_state->obj[i].fx1 + ttl_full_state->obj[i].fx0) / 2;
-        const float y = (ttl_full_state->obj[i].fy1 + ttl_full_state->obj[i].fy0) / 2;
+        //const float x = (ttl_full_state->obj[i].fx1 + ttl_full_state->obj[i].fx0) / 2;
+        //const float y = (ttl_full_state->obj[i].fy1 + ttl_full_state->obj[i].fy0) / 2;
+        const float x = ttl_full_state->obj[i].fx0 + 0.5f;
+        const float y = ttl_full_state->obj[i].fy0 + 0.5f;
         const float rx = cell_fx_to_render_coords(x, center, view_scale);
         const float ry = cell_fy_to_render_coords(y, center, view_scale);
         render_ship(pLwc,
@@ -876,6 +884,48 @@ static void render_waypoints(const LWTTL* ttl,
                                      WAYPOINT_COLOR_R,
                                      WAYPOINT_COLOR_G,
                                      WAYPOINT_COLOR_B);
+    }
+}
+
+static void render_waypoints_by_ship_id(const LWTTL* ttl,
+                                        const LWCONTEXT* pLwc,
+                                        const mat4x4 view,
+                                        const mat4x4 proj,
+                                        const LWTTLLNGLAT* center,
+                                        int ship_id) {
+    const LWPTTLWAYPOINTS* waypoints = lwttl_get_waypoints_by_ship_id(ttl, ship_id);
+    if (waypoints) {
+        for (int i = 0; i < waypoints->count - 1; i++) {
+            render_waypoint_line_segment(ttl,
+                                         pLwc,
+                                         view,
+                                         proj,
+                                         center,
+                                         waypoints->waypoints[i + 0].x,
+                                         waypoints->waypoints[i + 0].y,
+                                         waypoints->waypoints[i + 1].x,
+                                         waypoints->waypoints[i + 1].y,
+                                         WAYPOINT2_COLOR_R,
+                                         WAYPOINT2_COLOR_G,
+                                         WAYPOINT2_COLOR_B);
+        }
+    }
+}
+
+static void render_waypoints_cache(const LWTTL* ttl,
+                                   const LWCONTEXT* pLwc,
+                                   const mat4x4 view,
+                                   const mat4x4 proj,
+                                   const LWTTLLNGLAT* center) {
+    const LWPTTLFULLSTATE* ttl_full_state = lwttl_full_state(pLwc->ttl);
+    for (int i = 0; i < ttl_full_state->count; i++) {
+        const int ship_id = ttl_full_state->obj[i].type;
+        render_waypoints_by_ship_id(pLwc->ttl,
+                                    pLwc,
+                                    view,
+                                    proj,
+                                    center,
+                                    ship_id);
     }
 }
 
@@ -1537,6 +1587,7 @@ void lwc_render_ttl(const LWCONTEXT* pLwc) {
         render_sea_static_objects(pLwc, view, proj, &view_center);
     }
     render_waypoints(pLwc->ttl, pLwc, view, proj, &view_center);
+    render_waypoints_cache(pLwc->ttl, pLwc, view, proj, &view_center);
     render_seaports(pLwc, view, proj, &view_center);
     render_cities(pLwc, view, proj, &view_center);
     glEnable(GL_DEPTH_TEST);
