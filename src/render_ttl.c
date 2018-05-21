@@ -1466,6 +1466,51 @@ static void render_sea_static_objects_nameplate(const LWCONTEXT* pLwc, const mat
     //}
 }
 
+static void render_world_text(const LWCONTEXT* pLwc, const mat4x4 view, const mat4x4 proj, const LWTTLLNGLAT* center) {
+    mat4x4 proj_view;
+    mat4x4_identity(proj_view);
+    mat4x4_mul(proj_view, proj, view);
+    const int view_scale = lwttl_view_scale(pLwc->ttl);
+    const void* wt_it = lwttl_world_text_begin(pLwc->ttl);
+    while (wt_it) {
+        int xc0, yc0;
+        float age, lifetime;
+        const char* text = lwttl_world_text(pLwc->ttl, wt_it, &xc0, &yc0, &age, &lifetime);
+        if (lifetime <= 0) {
+            lifetime = 1;
+        }
+        const float ratio = age / lifetime;
+        const float x = cell_fx_to_render_coords((float)xc0, center, view_scale);
+        const float y = cell_fy_to_render_coords((float)yc0 - ratio, center, view_scale);
+        vec4 obj_pos_vec4 = {
+            x,
+            y,
+            0,
+            1,
+        };
+        vec2 ui_point;
+        calculate_ui_point_from_world_point(pLwc->aspect_ratio, proj_view, obj_pos_vec4, ui_point);
+        LWTEXTBLOCK test_text_block;
+        test_text_block.text_block_width = 999.0f;// 2.00f * aspect_ratio;
+        test_text_block.text_block_line_height = DEFAULT_TEXT_BLOCK_LINE_HEIGHT_F;
+        test_text_block.size = DEFAULT_TEXT_BLOCK_SIZE_F;
+        SET_COLOR_RGBA_FLOAT(test_text_block.color_normal_glyph, 1, 1, 1, 1);
+        SET_COLOR_RGBA_FLOAT(test_text_block.color_normal_outline, 0, 0, 0, 1);
+        SET_COLOR_RGBA_FLOAT(test_text_block.color_emp_glyph, 1, 1, 0, 1);
+        SET_COLOR_RGBA_FLOAT(test_text_block.color_emp_outline, 0, 0, 0, 1);
+        test_text_block.text = text;
+        test_text_block.text_bytelen = (int)strlen(test_text_block.text);
+        test_text_block.begin_index = 0;
+        test_text_block.end_index = test_text_block.text_bytelen;
+        test_text_block.multiline = 1;
+        test_text_block.text_block_x = ui_point[0];
+        test_text_block.text_block_y = ui_point[1];
+        test_text_block.align = LTBA_LEFT_CENTER;
+        render_text_block(pLwc, &test_text_block);
+        wt_it = lwttl_world_text_next(pLwc->ttl, wt_it);
+    }
+}
+
 static void render_world(const LWCONTEXT* pLwc, const mat4x4 view, const mat4x4 proj, float ship_y, const LWTTLLNGLAT* center) {
     //render_ship(pLwc, view, proj, 0, ship_y, 0);
     render_sea_objects(pLwc, view, proj, center);
@@ -1637,6 +1682,7 @@ void lwc_render_ttl(const LWCONTEXT* pLwc) {
     if (lwc_render_ttl_render("landcell_nameplate")) {
         render_sea_static_objects_nameplate(pLwc, view, proj, &view_center);
     }
+    render_world_text(pLwc, view, proj, &view_center);
     //render_coords(pLwc, &view_center);
     render_region_name(pLwc);
     //render_coords_dms(pLwc, &view_center);

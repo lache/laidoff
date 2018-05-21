@@ -107,6 +107,16 @@ typedef struct _LWTTLSELECTED {
     int dragging;
 } LWTTLSELECTED;
 
+typedef struct _LWTTLWORLDTEXT {
+    int valid;
+    int xc;
+    int yc;
+    float age;
+    float lifetime;
+    float move_dist;
+    char text[128];
+} LWTTLWORLDTEXT;
+
 typedef struct _LWTTL {
     int version;
     LWTTLDATA_SEAPORT* seaport;
@@ -136,6 +146,7 @@ typedef struct _LWTTL {
     int panning;
     LWPTTLWAYPOINTS waypoints_cache[512];
     int waypoints_cache_count;
+    LWTTLWORLDTEXT world_text[64];
 } LWTTL;
 
 LWTTL* lwttl_new(float aspect_ratio) {
@@ -206,68 +217,6 @@ void lwttl_set_seaarea(LWTTL* ttl, const char* name) {
 
 const char* lwttl_seaarea(LWTTL* ttl) {
     return ttl->seaarea;
-}
-
-void lwttl_update(LWTTL* ttl, LWCONTEXT* pLwc, float delta_time) {
-    if (ttl == 0) {
-        return;
-    }
-    const float app_time = (float)pLwc->app_time;
-    for (int i = 0; i < ttl->ttl_full_state.count; i++) {
-        ttl->ttl_full_state.obj[i].fx0 += (float)delta_time * ttl->ttl_full_state.obj[i].fvx;
-        ttl->ttl_full_state.obj[i].fy0 += (float)delta_time * ttl->ttl_full_state.obj[i].fvy;
-        //ttl->ttl_full_state.obj[i].fx1 += (float)delta_time * ttl->ttl_full_state.obj[i].fvx;
-        //ttl->ttl_full_state.obj[i].fy1 += (float)delta_time * ttl->ttl_full_state.obj[i].fvy;
-    }
-
-    if (ttl->sea_udp) {
-        lwttl_udp_update(ttl, ttl->sea_udp, pLwc);
-    }
-
-    float dx = 0, dy = 0, dlen = 0;
-    if ((lw_pinch() == 0)
-        && (ttl->selected.dragging == 0)
-        && lw_get_normalized_dir_pad_input(pLwc, &pLwc->left_dir_pad, &dx, &dy, &dlen)
-        && (dx || dy)
-        && (dlen > 0.05f)) {
-        // cancel tracking if user want to scroll around
-        lwttl_set_track_object_ship_id(ttl, 0);
-        // direction inverted
-        lwttl_worldmap_scroll_to(ttl,
-                                 ttl->worldmap.center.lng + (-dx) / 50.0f * delta_time * ttl->view_scale,
-                                 ttl->worldmap.center.lat + (-dy) / 50.0f * delta_time * ttl->view_scale,
-                                 0);
-        // prevent unintentional change of cell selection
-        // while spanning the map
-        lwttl_clear_selected_pressed_pos(ttl);
-        // send ping persistently while map panning
-        ttl->panning = 1;
-    } else {
-        ttl->panning = 0;
-    }
-
-    if (ttl->selected.press_pos_xc >= 0 && ttl->selected.press_pos_yc >= 0) {
-        if (ttl->selected.pressing) {
-            if (app_time > ttl->selected.press_at + ttl->selected.press_menu_gauge_appear_delay
-                && (ttl->selected.press_pos_xc != ttl->selected.pos_xc || ttl->selected.press_pos_yc != ttl->selected.pos_yc)) {
-                // change selection after 'press_menu_gauge_appear_delay'
-                // even if touch is not released
-                LWTTLLNGLAT lnglat;
-                lnglat.lng = cell_x_to_lng(ttl->selected.press_pos_xc);
-                lnglat.lat = cell_y_to_lat(ttl->selected.press_pos_yc);
-                lwttl_change_selected_cell_to(ttl,
-                                              ttl->selected.press_pos_xc,
-                                              ttl->selected.press_pos_yc,
-                                              &lnglat);
-            } else if (ttl->selected.dragging == 0
-                       && app_time > ttl->selected.press_at + ttl->selected.press_menu_gauge_total) {
-                // change to selection-dragging mode
-                ttl->selected.dragging = 1;
-                ttl->selected.dragging_pos_xc = ttl->selected.pos_xc;
-                ttl->selected.dragging_pos_yc = ttl->selected.pos_yc;
-            }
-        }
-    }
 }
 
 static float lwttl_lng_to_int_float(float lng) {
@@ -896,244 +845,53 @@ static void set_ttl_waypoints(LWTTL* ttl, const LWPTTLWAYPOINTS* p) {
     }
 }
 
-void lwttl_udp_update(LWTTL* ttl, LWUDP* udp, LWCONTEXT* pLwc) {
-    if (pLwc->game_scene != LGS_TTL) {
-        return;
-    }
-    if (udp->reinit_next_update) {
-        destroy_udp(&ttl->sea_udp);
-        ttl->sea_udp = new_udp();
-        udp_update_addr_host(ttl->sea_udp,
-                             pLwc->sea_udp_host_addr.host,
-                             pLwc->sea_udp_host_addr.port,
-                             pLwc->sea_udp_host_addr.port_str);
-        udp->reinit_next_update = 0;
-    }
-    if (udp->ready == 0) {
-        return;
-    }
-    const float app_time = (float)pLwc->app_time;
-    const float ping_send_interval = lwcontext_update_interval(pLwc) * lwttl_ping_send_interval_multiplier(ttl);
-    if (udp->last_updated == 0 || app_time > udp->last_updated + ping_send_interval) {
-        lwttl_udp_send_ttlping(ttl, udp, udp->ping_seq);
-        udp->ping_seq++;
-        udp->last_updated = app_time;
-    }
-
-    FD_ZERO(&udp->readfds);
-    FD_SET(udp->s, &udp->readfds);
-    int rv = 0;
-    while ((rv = select(udp->s + 1, &udp->readfds, NULL, NULL, &udp->tv)) == 1) {
-        if ((udp->recv_len = recvfrom(udp->s, udp->buf, LW_UDP_BUFLEN, 0, (struct sockaddr*)&udp->si_other, (socklen_t*)&udp->slen)) == SOCKET_ERROR) {
-#if LW_PLATFORM_WIN32
-            int wsa_error_code = WSAGetLastError();
-            if (wsa_error_code == WSAECONNRESET) {
-                // UDP server not ready?
-                // Go back to single play mode
-                //udp->master = 1;
-                return;
-            } else {
-                LOGEP("recvfrom() failed with error code : %d", wsa_error_code);
-                exit(EXIT_FAILURE);
+static void update_world_text(LWTTL* ttl, float delta_time) {
+    for (int i = 0; i < ARRAY_SIZE(ttl->world_text); i++) {
+        if (ttl->world_text[i].valid) {
+            ttl->world_text[i].age += delta_time;
+            if (ttl->world_text[i].age > ttl->world_text[i].lifetime) {
+                ttl->world_text[i].valid = 0;
             }
-#else
-            // Socket recovery needed
-            LOGEP("UDP socket error! Socket recovery needed...");
-            udp->ready = 0;
-            udp->reinit_next_update = 1;
-            return;
-#endif
         }
+    }
+}
 
-        char decompressed[1500 * 255]; // maximum lz4 compression ratio is 255...
-        int decompressed_bytes = LZ4_decompress_safe(udp->buf, decompressed, udp->recv_len, ARRAY_SIZE(decompressed));
-        if (decompressed_bytes > 0) {
-            const int packet_type = *(int*)decompressed;
-            switch (packet_type) {
-            case LPGP_LWPTTLSEAAREA:
-            {
-                if (decompressed_bytes != sizeof(LWPTTLSEAAREA)) {
-                    LOGE("LWPTTLSEAAREA: Size error %d (%zu expected)",
-                         decompressed_bytes,
-                         sizeof(LWPTTLSEAAREA));
-                }
-
-                LWPTTLSEAAREA* p = (LWPTTLSEAAREA*)decompressed;
-                LOGIx("LWPTTLSEAAREA: name=%s", p->name);
-                lwttl_set_seaarea(ttl, p->name);
-                break;
-            }
-            case LPGP_LWPTTLTRACKCOORDS:
-            {
-                if (decompressed_bytes != sizeof(LWPTTLTRACKCOORDS)) {
-                    LOGE("LPGP_LWPTTLTRACKCOORDS: Size error %d (%zu expected)",
-                         decompressed_bytes,
-                         sizeof(LWPTTLTRACKCOORDS));
-                }
-
-                LWPTTLTRACKCOORDS* p = (LWPTTLTRACKCOORDS*)decompressed;
-                if (p->id) {
-                    LOGIx("LWPTTLTRACKCOORDS: id=%d x=%f y=%f", p->id, p->x, p->y);
-                    const float lng = cell_fx_to_lng(p->x);
-                    const float lat = cell_fy_to_lat(p->y);
-                    lwttl_set_center(ttl, lng, lat);
-                } else {
-                    lwttl_set_track_object_id(ttl, 0);
-                    lwttl_set_track_object_ship_id(ttl, 0);
-                }
-                break;
-            }
-            case LPGP_LWPTTLFULLSTATE:
-            {
-                if (decompressed_bytes != sizeof(LWPTTLFULLSTATE)) {
-                    LOGE("LWPTTLFULLSTATE: Size error %d (%zu expected)",
-                         decompressed_bytes,
-                         sizeof(LWPTTLFULLSTATE));
-                }
-
-                LWPTTLFULLSTATE* p = (LWPTTLFULLSTATE*)decompressed;
-                LOGIx("LWPTTLFULLSTATE: %d objects.", p->count);
-                set_ttl_full_state(ttl, p);
-                break;
-            }
-            case LPGP_LWPTTLSTATICSTATE2:
-            {
-                if (decompressed_bytes != sizeof(LWPTTLSTATICSTATE2)) {
-                    LOGE("LWPTTLSTATICSTATE2: Size error %d (%zu expected)",
-                         decompressed_bytes,
-                         sizeof(LWPTTLSTATICSTATE2));
-                }
-
-                LWPTTLSTATICSTATE2* p = (LWPTTLSTATICSTATE2*)decompressed;
-                LOGIx("LWPTTLSTATICSTATE2: %d objects.", p->count);
-
-                const int add_ret = add_to_object_cache_land(&ttl->object_cache.land_cache,
-                                                             ttl->object_cache.land_array,
-                                                             ARRAY_SIZE(ttl->object_cache.land_array),
-                                                             &ttl->object_cache.land_count,
-                                                             p);
-                if (add_ret == 1) {
-                    //send_ttlpingflush(ttl);
-                }
-                break;
-            }
-            case LPGP_LWPTTLSTATICSTATE3:
-            {
-                if (decompressed_bytes != sizeof(LWPTTLSTATICSTATE3)) {
-                    LOGE("LWPTTLSTATICSTATE3: Size error %d (%zu expected)",
-                         decompressed_bytes,
-                         sizeof(LWPTTLSTATICSTATE3));
-                }
-
-                LWPTTLSTATICSTATE3* p = (LWPTTLSTATICSTATE3*)decompressed;
-                //add_to_object_cache_land(&ttl->object_cache.land_cache,
-                //                         ttl->object_cache.land_array,
-                //                         ARRAY_SIZE(ttl->object_cache.land_array),
-                //                         &ttl->object_cache.land_count,
-                //                         p);
-                break;
-            }
-            case LPGP_LWPTTLSEAPORTSTATE:
-            {
-                if (decompressed_bytes != sizeof(LWPTTLSEAPORTSTATE)) {
-                    LOGE("LWPTTLSEAPORTSTATE: Size error %d (%zu expected)",
-                         decompressed_bytes,
-                         sizeof(LWPTTLSEAPORTSTATE));
-                }
-
-                LWPTTLSEAPORTSTATE* p = (LWPTTLSEAPORTSTATE*)decompressed;
-                LOGIx("LWPTTLSEAPORTSTATE: %d objects.", p->count);
-
-                //memcpy(&ttl->ttl_seaport_state, p, sizeof(LWPTTLSEAPORTSTATE));
-
-                const int add_ret = add_to_object_cache_seaport(&ttl->object_cache.seaport_cache,
-                                                                ttl->object_cache.seaport_array,
-                                                                ARRAY_SIZE(ttl->object_cache.seaport_array),
-                                                                &ttl->object_cache.seaport_count,
-                                                                p);
-                if (add_ret == 1) {
-                    //send_ttlpingflush(ttl);
-                }
-
-                break;
-            }
-            case LPGP_LWPTTLCITYSTATE:
-            {
-                if (decompressed_bytes != sizeof(LWPTTLCITYSTATE)) {
-                    LOGE("LWPTTLCITYSTATE: Size error %d (%zu expected)",
-                         decompressed_bytes,
-                         sizeof(LWPTTLCITYSTATE));
-                }
-
-                LWPTTLCITYSTATE* p = (LWPTTLCITYSTATE*)decompressed;
-                LOGIx("LWPTTLCITYSTATE: %d objects.", p->count);
-
-                //memcpy(&ttl->ttl_seaport_state, p, sizeof(LWPTTLSEAPORTSTATE));
-
-                const int add_ret = add_to_object_cache_city(&ttl->object_cache.city_cache,
-                                                             ttl->object_cache.city_array,
-                                                             ARRAY_SIZE(ttl->object_cache.city_array),
-                                                             &ttl->object_cache.city_count,
-                                                             p);
-                if (add_ret == 1) {
-                    //send_ttlpingflush(ttl);
-                }
-
-                break;
-            }
-            case LPGP_LWPTTLWAYPOINTS:
-            {
-                if (decompressed_bytes != sizeof(LWPTTLWAYPOINTS)) {
-                    LOGE("LWPTTLWAYPOINTS: Size error %d (%zu expected)",
-                         decompressed_bytes,
-                         sizeof(LWPTTLWAYPOINTS));
-                }
-                LWPTTLWAYPOINTS* p = (LWPTTLWAYPOINTS*)decompressed;
-                LOGIx("LWPTTLWAYPOINTS: %d objects.", p->count);
-                set_ttl_waypoints(ttl, p);
-                break;
-            }
-            case LPGP_LWPTTLSINGLECELL:
-            {
-                if (decompressed_bytes != sizeof(LWPTTLSINGLECELL)) {
-                    LOGE("LWPTTLSINGLECELL: Size error %d (%zu expected)",
-                         decompressed_bytes,
-                         sizeof(LWPTTLWAYPOINTS));
-                }
-                LWPTTLSINGLECELL* p = (LWPTTLSINGLECELL*)decompressed;
-                LOGIx("LWPTTLSINGLECELL: %d,%d L[%d], W[%d], SW[%d], PID[%d], PNAME[%s]",
-                      p->xc0,
-                      p->yc0,
-                      (p->attr >> 0) & 1,
-                      (p->attr >> 1) & 1,
-                      (p->attr >> 2) & 1,
-                      p->port_id,
-                      p->port_name);
-                memcpy(&ttl->ttl_single_cell, p, sizeof(LWPTTLSINGLECELL));
-                break;
-            }
-            case LPGP_LWPTTLGOLDEARNED:
-            {
-                if (decompressed_bytes != sizeof(LWPTTLGOLDEARNED)) {
-                    LOGE("LWPTTLGOLDEARNED: Size error %d (%zu expected)",
-                         decompressed_bytes,
-                         sizeof(LWPTTLGOLDEARNED));
-                }
-
-                LWPTTLGOLDEARNED* p = (LWPTTLGOLDEARNED*)decompressed;
-                LOGI("LWPTTLGOLDEARNED");
-
-                break;
-            }
-            default:
-            {
-                LOGEP("Unknown UDP packet");
-                break;
-            }
-            }
-        } else {
-            LOGEP("lz4 decompression failed!");
+static LWTTLWORLDTEXT* empty_world_text(LWTTL* ttl) {
+    for (int i = 0; i < ARRAY_SIZE(ttl->world_text); i++) {
+        if (ttl->world_text[i].valid == 0) {
+            return &ttl->world_text[i];
         }
+    }
+    return 0;
+}
+
+static const LWTTLWORLDTEXT* valid_world_text_start(const LWTTL* ttl, const LWTTLWORLDTEXT* start_it) {
+    const int i0 = ((const char*)start_it - (const char*)ttl->world_text) / sizeof(LWTTLWORLDTEXT);
+    for (int i = i0; i < ARRAY_SIZE(ttl->world_text); i++) {
+        if (ttl->world_text[i].valid) {
+            return &ttl->world_text[i];
+        }
+    }
+    return 0;
+}
+
+static const LWTTLWORLDTEXT* first_valid_world_text(const LWTTL* ttl) {
+    return valid_world_text_start(ttl, ttl->world_text);
+}
+
+static void spawn_world_text(LWTTL* ttl, const char* text, int xc, int yc) {
+    LWTTLWORLDTEXT* world_text = empty_world_text(ttl);
+    if (world_text) {
+        world_text->valid = 1;
+        world_text->age = 0;
+        world_text->lifetime = 1.0f;
+        world_text->move_dist = 5.0f;
+        strncpy(world_text->text, text, ARRAY_SIZE(world_text->text));
+        world_text->text[ARRAY_SIZE(world_text->text) - 1] = 0;
+        world_text->xc = xc;
+        world_text->yc = yc;
+    } else {
+        LOGEP("size exceeded");
     }
 }
 
@@ -1809,4 +1567,335 @@ int lwttl_ping_send_interval_multiplier(const LWTTL* ttl) {
     } else {
         return 200;
     }
+}
+
+const void* lwttl_world_text_begin(const LWTTL* ttl) {
+    return first_valid_world_text(ttl);
+}
+
+const char* lwttl_world_text(const LWTTL* ttl, const void* it, int* xc, int* yc, float* age, float* lifetime) {
+    const LWTTLWORLDTEXT* wt = (const LWTTLWORLDTEXT*)it;
+    if (wt < ttl->world_text || wt >= &ttl->world_text[ARRAY_SIZE(ttl->world_text)]) {
+        LOGEP("out of bound it");
+        return 0;
+    }
+    if (((const char*)wt - (const char*)ttl->world_text) % sizeof(LWTTLWORLDTEXT) != 0) {
+        LOGEP("misaligned it");
+        return 0;
+    }
+    *xc = wt->xc;
+    *yc = wt->yc;
+    *age = wt->age;
+    *lifetime = wt->lifetime;
+    return wt->text;
+}
+
+const void* lwttl_world_text_next(const LWTTL* ttl, const void* it) {
+    const LWTTLWORLDTEXT* wt = (const LWTTLWORLDTEXT*)it;
+    return valid_world_text_start(ttl, wt + 1);
+}
+
+void lwttl_udp_update(LWTTL* ttl, LWUDP* udp, LWCONTEXT* pLwc) {
+    if (pLwc->game_scene != LGS_TTL) {
+        return;
+    }
+    if (udp->reinit_next_update) {
+        destroy_udp(&ttl->sea_udp);
+        ttl->sea_udp = new_udp();
+        udp_update_addr_host(ttl->sea_udp,
+                             pLwc->sea_udp_host_addr.host,
+                             pLwc->sea_udp_host_addr.port,
+                             pLwc->sea_udp_host_addr.port_str);
+        udp->reinit_next_update = 0;
+    }
+    if (udp->ready == 0) {
+        return;
+    }
+    const float app_time = (float)pLwc->app_time;
+    const float ping_send_interval = lwcontext_update_interval(pLwc) * lwttl_ping_send_interval_multiplier(ttl);
+    if (udp->last_updated == 0 || app_time > udp->last_updated + ping_send_interval) {
+        lwttl_udp_send_ttlping(ttl, udp, udp->ping_seq);
+        udp->ping_seq++;
+        udp->last_updated = app_time;
+    }
+
+    FD_ZERO(&udp->readfds);
+    FD_SET(udp->s, &udp->readfds);
+    int rv = 0;
+    while ((rv = select(udp->s + 1, &udp->readfds, NULL, NULL, &udp->tv)) == 1) {
+        if ((udp->recv_len = recvfrom(udp->s, udp->buf, LW_UDP_BUFLEN, 0, (struct sockaddr*)&udp->si_other, (socklen_t*)&udp->slen)) == SOCKET_ERROR) {
+#if LW_PLATFORM_WIN32
+            int wsa_error_code = WSAGetLastError();
+            if (wsa_error_code == WSAECONNRESET) {
+                // UDP server not ready?
+                // Go back to single play mode
+                //udp->master = 1;
+                return;
+            } else {
+                LOGEP("recvfrom() failed with error code : %d", wsa_error_code);
+                exit(EXIT_FAILURE);
+            }
+#else
+            // Socket recovery needed
+            LOGEP("UDP socket error! Socket recovery needed...");
+            udp->ready = 0;
+            udp->reinit_next_update = 1;
+            return;
+#endif
+        }
+
+        char decompressed[1500 * 255]; // maximum lz4 compression ratio is 255...
+        int decompressed_bytes = LZ4_decompress_safe(udp->buf, decompressed, udp->recv_len, ARRAY_SIZE(decompressed));
+        if (decompressed_bytes > 0) {
+            const int packet_type = *(int*)decompressed;
+            switch (packet_type) {
+            case LPGP_LWPTTLSEAAREA:
+            {
+                if (decompressed_bytes != sizeof(LWPTTLSEAAREA)) {
+                    LOGE("LWPTTLSEAAREA: Size error %d (%zu expected)",
+                         decompressed_bytes,
+                         sizeof(LWPTTLSEAAREA));
+                }
+
+                LWPTTLSEAAREA* p = (LWPTTLSEAAREA*)decompressed;
+                LOGIx("LWPTTLSEAAREA: name=%s", p->name);
+                lwttl_set_seaarea(ttl, p->name);
+                break;
+            }
+            case LPGP_LWPTTLTRACKCOORDS:
+            {
+                if (decompressed_bytes != sizeof(LWPTTLTRACKCOORDS)) {
+                    LOGE("LPGP_LWPTTLTRACKCOORDS: Size error %d (%zu expected)",
+                         decompressed_bytes,
+                         sizeof(LWPTTLTRACKCOORDS));
+                }
+
+                LWPTTLTRACKCOORDS* p = (LWPTTLTRACKCOORDS*)decompressed;
+                if (p->id) {
+                    LOGIx("LWPTTLTRACKCOORDS: id=%d x=%f y=%f", p->id, p->x, p->y);
+                    const float lng = cell_fx_to_lng(p->x);
+                    const float lat = cell_fy_to_lat(p->y);
+                    lwttl_set_center(ttl, lng, lat);
+                } else {
+                    lwttl_set_track_object_id(ttl, 0);
+                    lwttl_set_track_object_ship_id(ttl, 0);
+                }
+                break;
+            }
+            case LPGP_LWPTTLFULLSTATE:
+            {
+                if (decompressed_bytes != sizeof(LWPTTLFULLSTATE)) {
+                    LOGE("LWPTTLFULLSTATE: Size error %d (%zu expected)",
+                         decompressed_bytes,
+                         sizeof(LWPTTLFULLSTATE));
+                }
+
+                LWPTTLFULLSTATE* p = (LWPTTLFULLSTATE*)decompressed;
+                LOGIx("LWPTTLFULLSTATE: %d objects.", p->count);
+                set_ttl_full_state(ttl, p);
+                break;
+            }
+            case LPGP_LWPTTLSTATICSTATE2:
+            {
+                if (decompressed_bytes != sizeof(LWPTTLSTATICSTATE2)) {
+                    LOGE("LWPTTLSTATICSTATE2: Size error %d (%zu expected)",
+                         decompressed_bytes,
+                         sizeof(LWPTTLSTATICSTATE2));
+                }
+
+                LWPTTLSTATICSTATE2* p = (LWPTTLSTATICSTATE2*)decompressed;
+                LOGIx("LWPTTLSTATICSTATE2: %d objects.", p->count);
+
+                const int add_ret = add_to_object_cache_land(&ttl->object_cache.land_cache,
+                                                             ttl->object_cache.land_array,
+                                                             ARRAY_SIZE(ttl->object_cache.land_array),
+                                                             &ttl->object_cache.land_count,
+                                                             p);
+                if (add_ret == 1) {
+                    //send_ttlpingflush(ttl);
+                }
+                break;
+            }
+            case LPGP_LWPTTLSTATICSTATE3:
+            {
+                if (decompressed_bytes != sizeof(LWPTTLSTATICSTATE3)) {
+                    LOGE("LWPTTLSTATICSTATE3: Size error %d (%zu expected)",
+                         decompressed_bytes,
+                         sizeof(LWPTTLSTATICSTATE3));
+                }
+
+                LWPTTLSTATICSTATE3* p = (LWPTTLSTATICSTATE3*)decompressed;
+                //add_to_object_cache_land(&ttl->object_cache.land_cache,
+                //                         ttl->object_cache.land_array,
+                //                         ARRAY_SIZE(ttl->object_cache.land_array),
+                //                         &ttl->object_cache.land_count,
+                //                         p);
+                break;
+            }
+            case LPGP_LWPTTLSEAPORTSTATE:
+            {
+                if (decompressed_bytes != sizeof(LWPTTLSEAPORTSTATE)) {
+                    LOGE("LWPTTLSEAPORTSTATE: Size error %d (%zu expected)",
+                         decompressed_bytes,
+                         sizeof(LWPTTLSEAPORTSTATE));
+                }
+
+                LWPTTLSEAPORTSTATE* p = (LWPTTLSEAPORTSTATE*)decompressed;
+                LOGIx("LWPTTLSEAPORTSTATE: %d objects.", p->count);
+
+                //memcpy(&ttl->ttl_seaport_state, p, sizeof(LWPTTLSEAPORTSTATE));
+
+                const int add_ret = add_to_object_cache_seaport(&ttl->object_cache.seaport_cache,
+                                                                ttl->object_cache.seaport_array,
+                                                                ARRAY_SIZE(ttl->object_cache.seaport_array),
+                                                                &ttl->object_cache.seaport_count,
+                                                                p);
+                if (add_ret == 1) {
+                    //send_ttlpingflush(ttl);
+                }
+
+                break;
+            }
+            case LPGP_LWPTTLCITYSTATE:
+            {
+                if (decompressed_bytes != sizeof(LWPTTLCITYSTATE)) {
+                    LOGE("LWPTTLCITYSTATE: Size error %d (%zu expected)",
+                         decompressed_bytes,
+                         sizeof(LWPTTLCITYSTATE));
+                }
+
+                LWPTTLCITYSTATE* p = (LWPTTLCITYSTATE*)decompressed;
+                LOGIx("LWPTTLCITYSTATE: %d objects.", p->count);
+
+                //memcpy(&ttl->ttl_seaport_state, p, sizeof(LWPTTLSEAPORTSTATE));
+
+                const int add_ret = add_to_object_cache_city(&ttl->object_cache.city_cache,
+                                                             ttl->object_cache.city_array,
+                                                             ARRAY_SIZE(ttl->object_cache.city_array),
+                                                             &ttl->object_cache.city_count,
+                                                             p);
+                if (add_ret == 1) {
+                    //send_ttlpingflush(ttl);
+                }
+
+                break;
+            }
+            case LPGP_LWPTTLWAYPOINTS:
+            {
+                if (decompressed_bytes != sizeof(LWPTTLWAYPOINTS)) {
+                    LOGE("LWPTTLWAYPOINTS: Size error %d (%zu expected)",
+                         decompressed_bytes,
+                         sizeof(LWPTTLWAYPOINTS));
+                }
+                LWPTTLWAYPOINTS* p = (LWPTTLWAYPOINTS*)decompressed;
+                LOGIx("LWPTTLWAYPOINTS: %d objects.", p->count);
+                set_ttl_waypoints(ttl, p);
+                break;
+            }
+            case LPGP_LWPTTLSINGLECELL:
+            {
+                if (decompressed_bytes != sizeof(LWPTTLSINGLECELL)) {
+                    LOGE("LWPTTLSINGLECELL: Size error %d (%zu expected)",
+                         decompressed_bytes,
+                         sizeof(LWPTTLWAYPOINTS));
+                }
+                LWPTTLSINGLECELL* p = (LWPTTLSINGLECELL*)decompressed;
+                LOGIx("LWPTTLSINGLECELL: %d,%d L[%d], W[%d], SW[%d], PID[%d], PNAME[%s]",
+                      p->xc0,
+                      p->yc0,
+                      (p->attr >> 0) & 1,
+                      (p->attr >> 1) & 1,
+                      (p->attr >> 2) & 1,
+                      p->port_id,
+                      p->port_name);
+                memcpy(&ttl->ttl_single_cell, p, sizeof(LWPTTLSINGLECELL));
+                break;
+            }
+            case LPGP_LWPTTLGOLDEARNED:
+            {
+                if (decompressed_bytes != sizeof(LWPTTLGOLDEARNED)) {
+                    LOGE("LWPTTLGOLDEARNED: Size error %d (%zu expected)",
+                         decompressed_bytes,
+                         sizeof(LWPTTLGOLDEARNED));
+                }
+                LWPTTLGOLDEARNED* p = (LWPTTLGOLDEARNED*)decompressed;
+                LOGIx("LWPTTLGOLDEARNED");
+                char text[64];
+                snprintf(text, ARRAY_SIZE(text), "GOLD %d", p->amount);
+                spawn_world_text(ttl, text, p->xc0, p->yc0);
+                break;
+            }
+            default:
+            {
+                LOGEP("Unknown UDP packet");
+                break;
+            }
+            }
+        } else {
+            LOGEP("lz4 decompression failed!");
+        }
+    }
+}
+
+void lwttl_update(LWTTL* ttl, LWCONTEXT* pLwc, float delta_time) {
+    if (ttl == 0) {
+        return;
+    }
+    const float app_time = (float)pLwc->app_time;
+    for (int i = 0; i < ttl->ttl_full_state.count; i++) {
+        ttl->ttl_full_state.obj[i].fx0 += (float)delta_time * ttl->ttl_full_state.obj[i].fvx;
+        ttl->ttl_full_state.obj[i].fy0 += (float)delta_time * ttl->ttl_full_state.obj[i].fvy;
+        //ttl->ttl_full_state.obj[i].fx1 += (float)delta_time * ttl->ttl_full_state.obj[i].fvx;
+        //ttl->ttl_full_state.obj[i].fy1 += (float)delta_time * ttl->ttl_full_state.obj[i].fvy;
+    }
+
+    if (ttl->sea_udp) {
+        lwttl_udp_update(ttl, ttl->sea_udp, pLwc);
+    }
+
+    float dx = 0, dy = 0, dlen = 0;
+    if ((lw_pinch() == 0)
+        && (ttl->selected.dragging == 0)
+        && lw_get_normalized_dir_pad_input(pLwc, &pLwc->left_dir_pad, &dx, &dy, &dlen)
+        && (dx || dy)
+        && (dlen > 0.05f)) {
+        // cancel tracking if user want to scroll around
+        lwttl_set_track_object_ship_id(ttl, 0);
+        // direction inverted
+        lwttl_worldmap_scroll_to(ttl,
+                                 ttl->worldmap.center.lng + (-dx) / 50.0f * delta_time * ttl->view_scale,
+                                 ttl->worldmap.center.lat + (-dy) / 50.0f * delta_time * ttl->view_scale,
+                                 0);
+        // prevent unintentional change of cell selection
+        // while spanning the map
+        lwttl_clear_selected_pressed_pos(ttl);
+        // send ping persistently while map panning
+        ttl->panning = 1;
+    } else {
+        ttl->panning = 0;
+    }
+
+    if (ttl->selected.press_pos_xc >= 0 && ttl->selected.press_pos_yc >= 0) {
+        if (ttl->selected.pressing) {
+            if (app_time > ttl->selected.press_at + ttl->selected.press_menu_gauge_appear_delay
+                && (ttl->selected.press_pos_xc != ttl->selected.pos_xc || ttl->selected.press_pos_yc != ttl->selected.pos_yc)) {
+                // change selection after 'press_menu_gauge_appear_delay'
+                // even if touch is not released
+                LWTTLLNGLAT lnglat;
+                lnglat.lng = cell_x_to_lng(ttl->selected.press_pos_xc);
+                lnglat.lat = cell_y_to_lat(ttl->selected.press_pos_yc);
+                lwttl_change_selected_cell_to(ttl,
+                                              ttl->selected.press_pos_xc,
+                                              ttl->selected.press_pos_yc,
+                                              &lnglat);
+            } else if (ttl->selected.dragging == 0
+                       && app_time > ttl->selected.press_at + ttl->selected.press_menu_gauge_total) {
+                // change to selection-dragging mode
+                ttl->selected.dragging = 1;
+                ttl->selected.dragging_pos_xc = ttl->selected.pos_xc;
+                ttl->selected.dragging_pos_yc = ttl->selected.pos_yc;
+            }
+        }
+    }
+    update_world_text(ttl, delta_time);
 }

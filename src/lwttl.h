@@ -161,6 +161,9 @@ void lwttl_get_cell_bound(const float lng_min,
                           int* yc0,
                           int* xc1,
                           int* yc1);
+const void* lwttl_world_text_begin(const LWTTL* ttl);
+const char* lwttl_world_text(const LWTTL* ttl, const void* it, int* xc, int* yc, float* age, float* lifetime);
+const void* lwttl_world_text_next(const LWTTL* ttl, const void* it);
 #ifdef __cplusplus
 }
 #endif

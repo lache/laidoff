@@ -487,6 +487,9 @@ typedef struct _LWPTTLGOLDEARNED {
     unsigned char padding0;
     unsigned char padding1;
     unsigned char padding2;
+    int xc0;
+    int yc0;
+    int amount;
 } LWPTTLGOLDEARNED;
 /*
 * END: should sync with packet.h in sea-server
