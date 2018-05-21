@@ -1112,6 +1112,19 @@ void lwttl_udp_update(LWTTL* ttl, LWUDP* udp, LWCONTEXT* pLwc) {
                 memcpy(&ttl->ttl_single_cell, p, sizeof(LWPTTLSINGLECELL));
                 break;
             }
+            case LPGP_LWPTTLGOLDEARNED:
+            {
+                if (decompressed_bytes != sizeof(LWPTTLGOLDEARNED)) {
+                    LOGE("LWPTTLGOLDEARNED: Size error %d (%zu expected)",
+                         decompressed_bytes,
+                         sizeof(LWPTTLGOLDEARNED));
+                }
+
+                LWPTTLGOLDEARNED* p = (LWPTTLGOLDEARNED*)decompressed;
+                LOGI("LWPTTLGOLDEARNED");
+
+                break;
+            }
             default:
             {
                 LOGEP("Unknown UDP packet");

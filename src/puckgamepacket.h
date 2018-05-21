@@ -32,6 +32,7 @@ typedef enum _LW_PUCK_GAME_PACKET {
     LPGP_LWPTTLSINGLECELL = 121, // server -> client
     LPGP_LWPTTLSTATICSTATE3 = 122, // server -> client
     LPGP_LWPTTLCITYSTATE = 123, // server -> client
+    LPGP_LWPTTLGOLDEARNED = 124, // server -> client (push)
     // tcp
     LPGP_LWPQUEUE2 = 200,
     LPGP_LWPMAYBEMATCHED = 201,
@@ -479,6 +480,14 @@ typedef struct _LWPTTLCITYSTATE {
     int count;
     LWPTTLCITYOBJECT obj[128];
 } LWPTTLCITYSTATE;
+
+// UDP
+typedef struct _LWPTTLGOLDEARNED {
+    unsigned char type;
+    unsigned char padding0;
+    unsigned char padding1;
+    unsigned char padding2;
+} LWPTTLGOLDEARNED;
 /*
 * END: should sync with packet.h in sea-server
 */
