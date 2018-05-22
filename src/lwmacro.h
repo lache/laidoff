@@ -2,6 +2,9 @@
 
 #include "platform_detection.h"
 
+#define LW_CONF_FILE_NAME "conf.json"
+#define LW_MAX_CONF_TOKEN (1024*512)
+
 #define LWMAX(a, b)					((a) > (b) ? (a) : (b))
 #define LWMIN(a, b)					((a) < (b) ? (a) : (b))
 #define LWCLAMP(v, a, b)			((v) < (a) ? (a) : (v) > (b) ? (b) : (v))

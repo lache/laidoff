@@ -771,11 +771,11 @@ int lw_write_tcp_addr(LWCONTEXT* pLwc, const char* tcp_addr) {
 #if LW_PLATFORM_ANDROID || LW_PLATFORM_IOS
     FILE* f;
     char path[1024] = { 0, };
-    concat_path(path, pLwc->internal_data_path, "conf.json");
+    concat_path(path, pLwc->internal_data_path, LW_CONF_FILE_NAME);
     f = fopen(path, "w");
     if (f == 0) {
         // no cached user id exists
-        LOGE("Cannot open user id file cache for writing...");
+        LOGEP("error for writing path %s...", path);
         return -1;
     }
     char conf[1024] = { 0, };
@@ -1024,8 +1024,283 @@ static int loop_pipe_reader(zloop_t* loop, zsock_t* pipe, void* args) {
     return 0;
 }
 
+static int jsoneq(const char *json, jsmntok_t *tok, const char *s) {
+    if (tok->type == JSMN_STRING && (int)strlen(s) == tok->end - tok->start &&
+        strncmp(json + tok->start, s, tok->end - tok->start) == 0) {
+        return 0;
+    }
+    return -1;
+}
+
+static int str2int(const char* str, int len) {
+    int i;
+    int ret = 0;
+    for (i = 0; i < len; ++i) {
+        ret = ret * 10 + (str[i] - '0');
+    }
+    return ret;
+}
+
+static void parse_countries(LWCONTEXT* pLwc, LWCOUNTRYARRAY* country_array, const char* conf_path) {
+    jsmn_parser conf_parser;
+    jsmn_init(&conf_parser);
+    jsmntok_t* conf_token = malloc(sizeof(jsmntok_t) * LW_MAX_CONF_TOKEN);
+    LOGI("sizeof(char) == %zu", sizeof(char));
+    char *conf_str = create_string_from_file(conf_path);
+    if (conf_str) {
+        int token_count = jsmn_parse(&conf_parser, conf_str, strlen(conf_str), conf_token, LW_MAX_CONF_TOKEN);
+        jsmntok_t* t = conf_token;
+        if (token_count < 1 || t[0].type != JSMN_ARRAY) {
+            LOGE("Conf file broken...");
+            fflush(stdout);
+            exit(-1);
+        }
+        LOGI("countries file: %s", conf_path);
+        
+        int entry_count = t[0].size;
+        LWCOUNTRY* country = (LWCOUNTRY*)calloc(entry_count, sizeof(LWCOUNTRY));
+        
+        int string_count = 0;
+        int entry_index = -1;
+        for (int i = 1; i < token_count; i++) {
+            if (t[i].type == JSMN_STRING) {
+                LOGIx("countries: %.*s", t[i].end - t[i].start, conf_str + t[i].start);
+                int string_mod = string_count % 3;
+                if (string_mod == 0) {
+                    entry_index++;
+                    strncpy(country[entry_index].code, conf_str + t[i].start, t[i].end - t[i].start);
+                    country[entry_index].code[t[i].end - t[i].start] = 0;
+                } else if (string_mod == 1) {
+                    // korean
+                    strncpy(country[entry_index].name, conf_str + t[i].start, t[i].end - t[i].start);
+                    country[entry_index].name[t[i].end - t[i].start] = 0;
+                } else if (string_mod == 2) {
+                    // english
+                }
+                string_count++;
+            }
+        }
+        country_array->count = entry_count;
+        country_array->first = country;
+        //free(atlas_sprite);
+        conf_str = 0;
+        release_string(conf_str);
+    } else {
+        LOGE("Atlas conf file %s not found!", conf_path);
+        fflush(stdout);
+        exit(-2);
+    }
+    free(conf_token);
+}
+
+static void parse_atlas_conf(LWCONTEXT* pLwc, LWATLASSPRITEARRAY* atlas_array, const char* conf_path, LW_ATLAS_ENUM first_lae, LW_ATLAS_ENUM first_alpha_lae) {
+    jsmn_parser conf_parser;
+    jsmn_init(&conf_parser);
+    jsmntok_t* conf_token = malloc(sizeof(jsmntok_t) * LW_MAX_CONF_TOKEN);
+    LOGI("sizeof(char) == %zu", sizeof(char));
+    char *conf_str = create_string_from_file(conf_path);
+    if (conf_str) {
+        int token_count = jsmn_parse(&conf_parser, conf_str, strlen(conf_str), conf_token, LW_MAX_CONF_TOKEN);
+        jsmntok_t* t = conf_token;
+        if (token_count < 1 || t[0].type != JSMN_OBJECT) {
+            LOGE("Conf file broken...");
+            fflush(stdout);
+            exit(-1);
+        }
+        LOGI("atlas file: %s", conf_path);
+        if (jsoneq(conf_str, &t[1], "textures") == 0) {
+            // 'crunch' generated output json
+            if (token_count < 2 || t[2].type != JSMN_ARRAY) {
+                LOGE("Conf file broken...");
+                fflush(stdout);
+                exit(-1);
+            }
+            int entry_count = 0;
+            for (int i = 1; i < token_count; i++) {
+                if (jsoneq(conf_str, &t[i], "images") == 0 && t[i + 1].type == JSMN_ARRAY) {
+                    entry_count += t[i + 1].size;
+                }
+            }
+            LWATLASSPRITE* atlas_sprite = (LWATLASSPRITE*)calloc(entry_count, sizeof(LWATLASSPRITE));
+            int entry_index = -1;
+            int atlas_index = -1;
+            for (int i = 1; i < token_count; i++) {
+                if (jsoneq(conf_str, &t[i], "name") == 0) {
+                    atlas_index++;
+                } else if (jsoneq(conf_str, &t[i], "n") == 0) {
+                    LOGIx("n: %.*s", t[i + 1].end - t[i + 1].start, conf_str + t[i + 1].start);
+                    entry_index++;
+                    strncpy(atlas_sprite[entry_index].name, conf_str + t[i + 1].start, t[i + 1].end - t[i + 1].start);
+                    atlas_sprite[entry_index].atlas_index = atlas_index;
+                } else if (jsoneq(conf_str, &t[i], "x") == 0) {
+                    LOGIx("x: %.*s", t[i + 1].end - t[i + 1].start, conf_str + t[i + 1].start);
+                    atlas_sprite[entry_index].x = str2int(conf_str + t[i + 1].start, t[i + 1].end - t[i + 1].start);
+                } else if (jsoneq(conf_str, &t[i], "y") == 0) {
+                    LOGIx("y: %.*s", t[i + 1].end - t[i + 1].start, conf_str + t[i + 1].start);
+                    atlas_sprite[entry_index].y = str2int(conf_str + t[i + 1].start, t[i + 1].end - t[i + 1].start);
+                } else if (jsoneq(conf_str, &t[i], "w") == 0) {
+                    LOGIx("w: %.*s", t[i + 1].end - t[i + 1].start, conf_str + t[i + 1].start);
+                    atlas_sprite[entry_index].width = str2int(conf_str + t[i + 1].start, t[i + 1].end - t[i + 1].start);
+                } else if (jsoneq(conf_str, &t[i], "h") == 0) {
+                    LOGIx("h: %.*s", t[i + 1].end - t[i + 1].start, conf_str + t[i + 1].start);
+                    atlas_sprite[entry_index].height = str2int(conf_str + t[i + 1].start, t[i + 1].end - t[i + 1].start);
+                }
+            }
+            char* period = strrchr(conf_path, '.');
+            char* separator = strrchr(conf_path, PATH_SEPARATOR[0]);
+            size_t atlas_name_len = period - (separator + 1);
+            strncpy(atlas_array->atlas_name, separator + 1, atlas_name_len);
+            atlas_array->atlas_name[atlas_name_len] = 0;
+            atlas_array->count = entry_count;
+            atlas_array->first = atlas_sprite;
+            atlas_array->first_lae = first_lae;
+            atlas_array->first_alpha_lae = first_alpha_lae;
+            //free(atlas_sprite);
+            conf_str = 0;
+        } else {
+            // 'simple (legacy)' output json
+            int entry_count = 0;
+            for (int i = 1; i < token_count; i++) {
+                if (jsoneq(conf_str, &t[i], "name") == 0) {
+                    entry_count++;
+                }
+            }
+            LWATLASSPRITE* atlas_sprite = (LWATLASSPRITE*)calloc(entry_count, sizeof(LWATLASSPRITE));
+            int entry_index = -1;
+            for (int i = 1; i < token_count; i++) {
+                if (jsoneq(conf_str, &t[i], "name") == 0) {
+                    LOGIx("name: %.*s", t[i + 1].end - t[i + 1].start, conf_str + t[i + 1].start);
+                    entry_index++;
+                    strncpy(atlas_sprite[entry_index].name, conf_str + t[i + 1].start, t[i + 1].end - t[i + 1].start);
+                } else if (jsoneq(conf_str, &t[i], "x") == 0) {
+                    LOGIx("x: %.*s", t[i + 1].end - t[i + 1].start, conf_str + t[i + 1].start);
+                    atlas_sprite[entry_index].x = str2int(conf_str + t[i + 1].start, t[i + 1].end - t[i + 1].start);
+                } else if (jsoneq(conf_str, &t[i], "y") == 0) {
+                    LOGIx("y: %.*s", t[i + 1].end - t[i + 1].start, conf_str + t[i + 1].start);
+                    atlas_sprite[entry_index].y = str2int(conf_str + t[i + 1].start, t[i + 1].end - t[i + 1].start);
+                } else if (jsoneq(conf_str, &t[i], "width") == 0) {
+                    LOGIx("width: %.*s", t[i + 1].end - t[i + 1].start, conf_str + t[i + 1].start);
+                    atlas_sprite[entry_index].width = str2int(conf_str + t[i + 1].start, t[i + 1].end - t[i + 1].start);
+                } else if (jsoneq(conf_str, &t[i], "height") == 0) {
+                    LOGIx("height: %.*s", t[i + 1].end - t[i + 1].start, conf_str + t[i + 1].start);
+                    atlas_sprite[entry_index].height = str2int(conf_str + t[i + 1].start, t[i + 1].end - t[i + 1].start);
+                }
+            }
+            char* period = strrchr(conf_path, '.');
+            char* separator = strrchr(conf_path, PATH_SEPARATOR[0]);
+            size_t atlas_name_len = period - (separator + 1);
+            strncpy(atlas_array->atlas_name, separator + 1, atlas_name_len);
+            atlas_array->atlas_name[atlas_name_len] = 0;
+            atlas_array->count = entry_count;
+            atlas_array->first = atlas_sprite;
+            atlas_array->first_lae = first_lae;
+            atlas_array->first_alpha_lae = first_alpha_lae;
+            //free(atlas_sprite);
+            conf_str = 0;
+        }
+        release_string(conf_str);
+    } else {
+        LOGE("Atlas conf file %s not found!", conf_path);
+        fflush(stdout);
+        atlas_array->count = 0;
+        atlas_array->first = 0;
+        exit(-2);
+    }
+    free(conf_token);
+}
+
+static void parse_atlas(LWCONTEXT* pLwc) {
+    for (int i = 0; i < LAC_COUNT; i++) {
+        parse_atlas_conf(pLwc,
+                         &pLwc->atlas_conf[i],
+                         atlas_conf_filename[i],
+                         atlas_first_lae[i],
+                         atlas_first_alpha_lae[i]);
+    }
+}
+
+static void parse_conf(LWCONTEXT* pLwc) {
+    const char *conf_path = ASSETS_BASE_PATH "conf" PATH_SEPARATOR LW_CONF_FILE_NAME;
+    jsmn_parser conf_parser;
+    jsmn_init(&conf_parser);
+    jsmntok_t* conf_token = malloc(sizeof(jsmntok_t) * LW_MAX_CONF_TOKEN);
+    LOGI("sizeof(char) == %zu", sizeof(char));
+    // check user saved (customized) conf.json first
+    FILE* f;
+    char path[1024] = { 0, };
+    concat_path(path, pLwc->internal_data_path, LW_CONF_FILE_NAME);
+    f = fopen(path, "r");
+    char *conf_str;
+    if (f) {
+        fseek(f, 0, SEEK_END);
+        const int f_size = (int)ftell(f);
+        fseek(f, 0, SEEK_SET);
+        char* d = (char*)malloc(f_size + 1);
+        const size_t last_byte = fread(d, 1, f_size, f);
+        d[last_byte] = '\0';
+        fclose(f);
+        LOGI("parse_conf (user saved): %s (%d bytes) loaded to memory.", path, (int)last_byte);
+        conf_str = d;
+    } else {
+        conf_str = create_string_from_file(conf_path);
+    }
+    if (conf_str) {
+        int token_count = jsmn_parse(&conf_parser, conf_str, strlen(conf_str), conf_token, LW_MAX_CONF_TOKEN);
+        jsmntok_t* t = conf_token;
+        if (token_count < 1 || t[0].type != JSMN_OBJECT) {
+            LOGE("Conf file broken...");
+            fflush(stdout);
+            exit(-1);
+        }
+        LOGI("Conf file: %s", conf_path);
+        for (int i = 1; i < token_count; i++) {
+            if (jsoneq(conf_str, &t[i], "ClientTcpHost") == 0) {
+                LOGI("ClientTcpHost: %.*s", t[i + 1].end - t[i + 1].start, conf_str + t[i + 1].start);
+                strncpy(pLwc->tcp_host_addr.host, conf_str + t[i + 1].start, t[i + 1].end - t[i + 1].start);
+            } else if (jsoneq(conf_str, &t[i], "ConnPort") == 0) {
+                LOGI("ConnPort: %.*s", t[i + 1].end - t[i + 1].start, conf_str + t[i + 1].start);
+                strncpy(pLwc->tcp_host_addr.port_str, conf_str + t[i + 1].start, t[i + 1].end - t[i + 1].start);
+                pLwc->tcp_host_addr.port = atoi(pLwc->tcp_host_addr.port_str);
+            } else if (jsoneq(conf_str, &t[i], "ClientTcpTtlHost") == 0) {
+                LOGI("ClientTcpTtlHost: %.*s", t[i + 1].end - t[i + 1].start, conf_str + t[i + 1].start);
+                strncpy(pLwc->tcp_ttl_host_addr.host, conf_str + t[i + 1].start, t[i + 1].end - t[i + 1].start);
+            } else if (jsoneq(conf_str, &t[i], "TtlConnPort") == 0) {
+                LOGI("TtlConnPort: %.*s", t[i + 1].end - t[i + 1].start, conf_str + t[i + 1].start);
+                strncpy(pLwc->tcp_ttl_host_addr.port_str, conf_str + t[i + 1].start, t[i + 1].end - t[i + 1].start);
+                pLwc->tcp_ttl_host_addr.port = atoi(pLwc->tcp_ttl_host_addr.port_str);
+            } else if (jsoneq(conf_str, &t[i], "SeaUdpHost") == 0) {
+                LOGI("SeaUdpHost: %.*s", t[i + 1].end - t[i + 1].start, conf_str + t[i + 1].start);
+                strncpy(pLwc->sea_udp_host_addr.host, conf_str + t[i + 1].start, t[i + 1].end - t[i + 1].start);
+            } else if (jsoneq(conf_str, &t[i], "SeaUdpPort") == 0) {
+                LOGI("SeaUdpPort: %.*s", t[i + 1].end - t[i + 1].start, conf_str + t[i + 1].start);
+                strncpy(pLwc->sea_udp_host_addr.port_str, conf_str + t[i + 1].start, t[i + 1].end - t[i + 1].start);
+                pLwc->sea_udp_host_addr.port = atoi(pLwc->sea_udp_host_addr.port_str);
+            } else if (jsoneq(conf_str, &t[i], "SeaTcpHost") == 0) {
+                LOGI("SeaTcpHost: %.*s", t[i + 1].end - t[i + 1].start, conf_str + t[i + 1].start);
+                strncpy(pLwc->sea_tcp_host_addr.host, conf_str + t[i + 1].start, t[i + 1].end - t[i + 1].start);
+            } else if (jsoneq(conf_str, &t[i], "SeaTcpPort") == 0) {
+                LOGI("SeaTcpPort: %.*s", t[i + 1].end - t[i + 1].start, conf_str + t[i + 1].start);
+                strncpy(pLwc->sea_tcp_host_addr.port_str, conf_str + t[i + 1].start, t[i + 1].end - t[i + 1].start);
+                pLwc->sea_tcp_host_addr.port = atoi(pLwc->sea_tcp_host_addr.port_str);
+            }
+        }
+        release_string(conf_str);
+        conf_str = 0;
+    } else {
+        LOGE("Conf file not found!");
+        fflush(stdout);
+        exit(-2);
+    }
+    free(conf_token);
+}
+
 static void s_logic_worker(zsock_t *pipe, void *args) {
     LWCONTEXT* pLwc = args;
+    
+    parse_conf(pLwc);
+    parse_atlas(pLwc);
+    parse_countries(pLwc, &pLwc->country_array, ASSETS_BASE_PATH "ttldata" PATH_SEPARATOR "countries.json");
+    
     // Send 'worker ready' signal to parent thread
     zsock_signal(pipe, 0);
     LWTIMEPOINT last_time;
