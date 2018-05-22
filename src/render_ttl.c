@@ -167,9 +167,9 @@ static void render_ship(const LWCONTEXT* pLwc, const mat4x4 view, const mat4x4 p
     mat4x4_identity(rot);
     mat4x4_rotate_Z(rot, rot, rot_z);
     const int view_scale = lwttl_view_scale(pLwc->ttl);
-    const float sx = 0.075f / view_scale;
-    const float sy = 0.075f / view_scale;
-    const float sz = 0.075f / view_scale;
+    const float sx = 0.175f / view_scale;
+    const float sy = 0.175f / view_scale;
+    const float sz = 0.175f / view_scale;
     mat4x4 model;
     mat4x4_identity(model);
     mat4x4_mul(model, model, rot);
@@ -742,20 +742,117 @@ static void render_earth(const LWCONTEXT* pLwc, const LWTTLLNGLAT* center, int v
                                  0);
 }
 
+static float distance_xy(const float ax,
+                         const float ay,
+                         const float bx,
+                         const float by) {
+    return sqrtf((float)((ax - bx) * (ax - bx) + (ay - by) * (ay - by)));
+}
+
+float float_value_with_stride(const float* a, size_t stride, int i);
+
+int std_lower_bound_float(const float* a,
+                          int first,
+                          const int last,
+                          const float value) {
+    int count = last - first;
+    int it;
+    int step;
+    while (count > 0) {
+        it = first;
+        step = count / 2;
+        it += step;
+        if (a[it] < value) {
+            first = ++it;
+            count -= step + 1;
+        } else {
+            count = step;
+        }
+    }
+    return first;
+}
+
+static void pos_from_waypoints(const LWPTTLWAYPOINTS* wp,
+                               float param,
+                               const int reversed,
+                               float* px,
+                               float* py,
+                               float* dx,
+                               float* dy) {
+    *px = 0;
+    *py = 0;
+    *dx = 0;
+    *dy = 0;
+    if (wp->count < 2) {
+        LOGEP("wp count less than 2");
+    } else {
+        float* accum_distance = alloca(sizeof(float) * wp->count);
+        size_t accum_distance_cursor = 0;
+        float dist = 0;
+        accum_distance[accum_distance_cursor++] = dist;
+        for (size_t i = 0; i < wp->count - 1; i++) {
+            dist += distance_xy(wp->waypoints[i + 0].x,
+                                wp->waypoints[i + 0].y,
+                                wp->waypoints[i + 1].x,
+                                wp->waypoints[i + 1].y);
+            accum_distance[accum_distance_cursor++] = dist;
+        }
+        if (accum_distance_cursor == 0) {
+            return;
+        }
+        if (reversed) {
+            param = accum_distance[accum_distance_cursor - 1] - param;
+        }
+        int it_idx = std_lower_bound_float(accum_distance, 0, accum_distance_cursor, param);
+        if (it_idx == 0) {
+            *px = (float)wp->waypoints[0].x;
+            *py = (float)wp->waypoints[0].y;
+            *dx = (float)wp->waypoints[1].x - *px;
+            *dy = (float)wp->waypoints[1].y - *py;
+        } else if (it_idx == accum_distance_cursor) {
+            *px = (float)wp->waypoints[wp->count - 1].x;
+            *py = (float)wp->waypoints[wp->count - 1].y;
+            *dx = 0;
+            *dy = 0;
+        } else {
+            const xy32* wp1 = &wp->waypoints[it_idx - 1];
+            const xy32* wp2 = &wp->waypoints[it_idx];
+            float d1 = accum_distance[it_idx - 1];
+            float d2 = accum_distance[it_idx];
+            float r = (param - d1) / (d2 - d1);
+            if (r < 0) r = 0;
+            if (r > 1) r = 1;
+            *dx = (float)(wp2->x - wp1->x);
+            *dy = (float)(wp2->y - wp1->y);
+            *px = wp1->x + *dx * r;
+            *py = wp1->y + *dy * r;
+        }
+    }
+}
+
 static void render_sea_objects_nameplate(const LWCONTEXT* pLwc, const mat4x4 view, const mat4x4 proj, const LWTTLLNGLAT* center) {
     mat4x4 proj_view;
     mat4x4_identity(proj_view);
     mat4x4_mul(proj_view, proj, view);
     const int view_scale = lwttl_view_scale(pLwc->ttl);
-    const LWPTTLFULLSTATE* ttl_full_state = lwttl_full_state(pLwc->ttl);
+    const LWPTTLDYNAMICSTATE* ttl_dynamic_state = lwttl_full_state(pLwc->ttl);
 
-    for (int i = 0; i < ttl_full_state->count; i++) {
-        //const float x = (ttl_full_state->obj[i].fx1 + ttl_full_state->obj[i].fx0) / 2;
-        //const float y = (ttl_full_state->obj[i].fy1 + ttl_full_state->obj[i].fy0) / 2;
-        const float x = ttl_full_state->obj[i].fx0 + 0.5f;
-        const float y = ttl_full_state->obj[i].fy0 + 0.5f;
-        const float rx = cell_fx_to_render_coords(x, center, view_scale);
-        const float ry = cell_fy_to_render_coords(y, center, view_scale);
+    for (int i = 0; i < ttl_dynamic_state->count; i++) {
+        const LWPTTLWAYPOINTS* wp = lwttl_get_waypoints_by_ship_id(pLwc->ttl,
+                                                                   ttl_dynamic_state->obj[i].obj_db_id);
+        if (wp == 0) {
+            continue;
+        }
+        float px, py, dx, dy;
+        pos_from_waypoints(wp,
+                           ttl_dynamic_state->obj[i].route_param,
+                           ttl_dynamic_state->obj[i].route_reversed,
+                           &px,
+                           &py,
+                           &dx,
+                           &dy);
+        const float rx = cell_fx_to_render_coords(px + 0.5f, center, view_scale);
+        const float ry = cell_fy_to_render_coords(py + 0.5f, center, view_scale);
         vec4 obj_pos_vec4 = {
             rx,
             ry,
@@ -775,10 +872,10 @@ static void render_sea_objects_nameplate(const LWCONTEXT* pLwc, const mat4x4 vie
         char obj_nameplate[256];
         sprintf(obj_nameplate,
                 "%d %s %.0f",
-                //ttl_full_state->obj[i].id, // sea-server instance id
-                ttl_full_state->obj[i].type, // laidoff-server db id
-                ttl_full_state->obj[i].guid,
-                ttl_full_state->obj[i].route_left);
+                //ttl_dynamic_state->obj[i].id, // sea-server instance id
+                ttl_dynamic_state->obj[i].obj_db_id, // laidoff-server db id
+                ttl_dynamic_state->obj[i].guid,
+                ttl_dynamic_state->obj[i].route_param);
         test_text_block.text = obj_nameplate;
         test_text_block.text_bytelen = (int)strlen(test_text_block.text);
         test_text_block.begin_index = 0;
@@ -793,21 +890,31 @@ static void render_sea_objects_nameplate(const LWCONTEXT* pLwc, const mat4x4 vie
 
 static void render_sea_objects(const LWCONTEXT* pLwc, const mat4x4 view, const mat4x4 proj, const LWTTLLNGLAT* center) {
     const int view_scale = lwttl_view_scale(pLwc->ttl);
-    const LWPTTLFULLSTATE* ttl_full_state = lwttl_full_state(pLwc->ttl);
-    for (int i = 0; i < ttl_full_state->count; i++) {
-        //const float x = (ttl_full_state->obj[i].fx1 + ttl_full_state->obj[i].fx0) / 2;
-        //const float y = (ttl_full_state->obj[i].fy1 + ttl_full_state->obj[i].fy0) / 2;
-        const float x = ttl_full_state->obj[i].fx0 + 0.5f;
-        const float y = ttl_full_state->obj[i].fy0 + 0.5f;
-        const float rx = cell_fx_to_render_coords(x, center, view_scale);
-        const float ry = cell_fy_to_render_coords(y, center, view_scale);
+    const LWPTTLDYNAMICSTATE* ttl_dynamic_state = lwttl_full_state(pLwc->ttl);
+    for (int i = 0; i < ttl_dynamic_state->count; i++) {
+        const LWPTTLWAYPOINTS* wp = lwttl_get_waypoints_by_ship_id(pLwc->ttl,
+                                                                   ttl_dynamic_state->obj[i].obj_db_id);
+        if (wp == 0) {
+            continue;
+        }
+        float px, py, dx, dy;
+        pos_from_waypoints(wp,
+                           ttl_dynamic_state->obj[i].route_param,
+                           ttl_dynamic_state->obj[i].route_reversed,
+                           &px,
+                           &py,
+                           &dx,
+                           &dy);
+        const float rx = cell_fx_to_render_coords(px + 0.5f, center, view_scale);
+        const float ry = cell_fy_to_render_coords(py + 0.5f, center, view_scale);
+        const float rot_z = atan2f(-dy, dx) + (ttl_dynamic_state->obj[i].route_reversed ? (-1) : (+1)) * (- (float)(M_PI / 2));
         render_ship(pLwc,
                     view,
                     proj,
                     rx,
                     ry,
                     0,
-                    atan2f(-ttl_full_state->obj[i].fvy, ttl_full_state->obj[i].fvx) - (float)(M_PI / 2));
+                    rot_z);
     }
 }
 
@@ -917,9 +1024,9 @@ static void render_waypoints_cache(const LWTTL* ttl,
                                    const mat4x4 view,
                                    const mat4x4 proj,
                                    const LWTTLLNGLAT* center) {
-    const LWPTTLFULLSTATE* ttl_full_state = lwttl_full_state(pLwc->ttl);
-    for (int i = 0; i < ttl_full_state->count; i++) {
-        const int ship_id = ttl_full_state->obj[i].type;
+    const LWPTTLDYNAMICSTATE* ttl_dynamic_state = lwttl_full_state(pLwc->ttl);
+    for (int i = 0; i < ttl_dynamic_state->count; i++) {
+        const int ship_id = ttl_dynamic_state->obj[i].obj_db_id;
         render_waypoints_by_ship_id(pLwc->ttl,
                                     pLwc,
                                     view,

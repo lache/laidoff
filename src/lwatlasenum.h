@@ -5,6 +5,9 @@
 typedef struct _LWCONTEXT LWCONTEXT;
 
 typedef enum _LW_ATLAS_ENUM {
+    LAE_DONTCARE,
+    LAE_ZERO_FOR_BLACK,
+    
     LAE_TWIRL_PNG,
     LAE_C2_PNG,
     LAE_TWIRL_XXX_PNG,
@@ -172,18 +175,17 @@ typedef enum _LW_ATLAS_ENUM {
     LAE_TTL_PORT_ALPHA,
     LAE_TTL_PORT,
     
-    LAE_COUNT,
-
-    LAE_DONTCARE,
-    LAE_ZERO_FOR_BLACK,
+    LAE_COUNT
 } LW_ATLAS_ENUM;
 
 static const char *tex_atlas_filename[] = {
+    "",
+    "",
+    
     ASSETS_BASE_PATH "tex" PATH_SEPARATOR "Twirl.png",
     ASSETS_BASE_PATH "tex" PATH_SEPARATOR "atlas01.png",
     ASSETS_BASE_PATH "tex" PATH_SEPARATOR "Twirl.png",
     ASSETS_BASE_PATH "tex" PATH_SEPARATOR "bg-road.png",
-
 
     ASSETS_BASE_PATH "pkm" PATH_SEPARATOR "bg-kitchen.pkm",
     ASSETS_BASE_PATH "pkm" PATH_SEPARATOR "bg-mart-in.pkm",

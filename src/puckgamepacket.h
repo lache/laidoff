@@ -17,7 +17,7 @@ typedef enum _LW_PUCK_GAME_PACKET {
     LPGP_LWPJUMP = 106,
     LPGP_LWPFIRE = 107,
     LPGP_LWPSTATE2 = 108,
-    LPGP_LWPTTLFULLSTATE = 109, // server -> client
+    LPGP_LWPTTLDYNAMICSTATE = 109, // server -> client
     LPGP_LWPTTLPING = 110, // client -> server
     LPGP_LWPTTLSTATICSTATE = 111, // server -> client
     LPGP_LWPTTLSEAPORTSTATE = 112, // server -> client
@@ -263,25 +263,24 @@ typedef struct _LWPSTATE2 {
  * BEGIN: should sync with packet.h in sea-server
  */
  // UDP
-typedef struct _LWPTTLFULLSTATEOBJECT {
-    float fx0, fy0;
-    //float fx1, fy1;
-    float fvx, fvy;
-    int id;
-    int type;
+typedef struct _LWPTTLDYNAMICSTATEOBJECT {
+    int obj_id;
+    int obj_db_id;
+    float route_param;
+    float route_speed;
+    int route_reversed;
     char guid[64];
-    float route_left;
-} LWPTTLFULLSTATEOBJECT;
+} LWPTTLDYNAMICSTATEOBJECT;
 
 // UDP
-typedef struct _LWPTTLFULLSTATE {
+typedef struct _LWPTTLDYNAMICSTATE {
     unsigned char type;
     unsigned char padding0;
     unsigned char padding1;
     unsigned char padding2;
     int count;
-    LWPTTLFULLSTATEOBJECT obj[64];
-} LWPTTLFULLSTATE;
+    LWPTTLDYNAMICSTATEOBJECT obj[64];
+} LWPTTLDYNAMICSTATE;
 
 // UDP
 typedef struct _LWPTTLSTATICOBJECT {
@@ -399,6 +398,11 @@ typedef struct _LWPTTLREQUESTWAYPOINTS {
     int ship_id;
 } LWPTTLREQUESTWAYPOINTS;
 
+typedef struct _xy32 {
+    int x;
+    int y;
+} xy32;
+
 // UDP
 typedef struct _LWPTTLWAYPOINTS {
     unsigned char type;
@@ -407,10 +411,7 @@ typedef struct _LWPTTLWAYPOINTS {
     unsigned char padding2;
     int ship_id;
     int count;
-    struct {
-        int x;
-        int y;
-    } waypoints[1000];
+    xy32 waypoints[1000];
 } LWPTTLWAYPOINTS;
 
 // UDP

@@ -134,7 +134,7 @@ typedef struct _LWTTL {
     LWUDP* sea_udp;
     LWPTTLWAYPOINTS waypoints;
     // packet cache
-    LWPTTLFULLSTATE ttl_full_state;
+    LWPTTLDYNAMICSTATE ttl_dynamic_state;
     LWPTTLSINGLECELL ttl_single_cell;
     LWTTLOBJECTCACHEGROUP object_cache;
     float earth_globe_scale;
@@ -811,10 +811,10 @@ void lwttl_set_sea_udp(LWTTL* ttl, LWUDP* sea_udp) {
     ttl->sea_udp = sea_udp;
 }
 
-static void set_ttl_full_state(LWTTL* ttl, const LWPTTLFULLSTATE* p) {
-    memcpy(&ttl->ttl_full_state, p, sizeof(LWPTTLFULLSTATE));
+static void set_ttl_full_state(LWTTL* ttl, const LWPTTLDYNAMICSTATE* p) {
+    memcpy(&ttl->ttl_dynamic_state, p, sizeof(LWPTTLDYNAMICSTATE));
     for (int i = 0; i < p->count; i++) {
-        const int ship_id = p->obj[i].type;
+        const int ship_id = p->obj[i].obj_db_id;
         int cache_hit = 0;
         for (int j = 0; j < ttl->waypoints_cache_count; j++) {
             if (ttl->waypoints_cache[j].ship_id == ship_id) {
@@ -938,8 +938,8 @@ void lwttl_read_last_state(LWTTL* ttl, const LWCONTEXT* pLwc) {
     }
 }
 
-const LWPTTLFULLSTATE* lwttl_full_state(const LWTTL* ttl) {
-    return &ttl->ttl_full_state;
+const LWPTTLDYNAMICSTATE* lwttl_full_state(const LWTTL* ttl) {
+    return &ttl->ttl_dynamic_state;
 }
 
 static int lwttl_query_chunk_range(const LWTTL* ttl,
@@ -1682,16 +1682,16 @@ void lwttl_udp_update(LWTTL* ttl, LWUDP* udp, LWCONTEXT* pLwc) {
                 }
                 break;
             }
-            case LPGP_LWPTTLFULLSTATE:
+            case LPGP_LWPTTLDYNAMICSTATE:
             {
-                if (decompressed_bytes != sizeof(LWPTTLFULLSTATE)) {
-                    LOGE("LWPTTLFULLSTATE: Size error %d (%zu expected)",
+                if (decompressed_bytes != sizeof(LWPTTLDYNAMICSTATE)) {
+                    LOGE("LWPTTLDYNAMICSTATE: Size error %d (%zu expected)",
                          decompressed_bytes,
-                         sizeof(LWPTTLFULLSTATE));
+                         sizeof(LWPTTLDYNAMICSTATE));
                 }
 
-                LWPTTLFULLSTATE* p = (LWPTTLFULLSTATE*)decompressed;
-                LOGIx("LWPTTLFULLSTATE: %d objects.", p->count);
+                LWPTTLDYNAMICSTATE* p = (LWPTTLDYNAMICSTATE*)decompressed;
+                LOGIx("LWPTTLDYNAMICSTATE: %d objects.", p->count);
                 set_ttl_full_state(ttl, p);
                 break;
             }
@@ -1842,11 +1842,12 @@ void lwttl_update(LWTTL* ttl, LWCONTEXT* pLwc, float delta_time) {
         return;
     }
     const float app_time = (float)pLwc->app_time;
-    for (int i = 0; i < ttl->ttl_full_state.count; i++) {
-        ttl->ttl_full_state.obj[i].fx0 += (float)delta_time * ttl->ttl_full_state.obj[i].fvx;
-        ttl->ttl_full_state.obj[i].fy0 += (float)delta_time * ttl->ttl_full_state.obj[i].fvy;
-        //ttl->ttl_full_state.obj[i].fx1 += (float)delta_time * ttl->ttl_full_state.obj[i].fvx;
-        //ttl->ttl_full_state.obj[i].fy1 += (float)delta_time * ttl->ttl_full_state.obj[i].fvy;
+    for (int i = 0; i < ttl->ttl_dynamic_state.count; i++) {
+        ttl->ttl_dynamic_state.obj[i].route_param += (float)delta_time * ttl->ttl_dynamic_state.obj[i].route_speed;
+        //ttl->ttl_dynamic_state.obj[i].fx0 += (float)delta_time * ttl->ttl_dynamic_state.obj[i].fvx;
+        //ttl->ttl_dynamic_state.obj[i].fy0 += (float)delta_time * ttl->ttl_dynamic_state.obj[i].fvy;
+        //ttl->ttl_dynamic_state.obj[i].fx1 += (float)delta_time * ttl->ttl_dynamic_state.obj[i].fvx;
+        //ttl->ttl_dynamic_state.obj[i].fy1 += (float)delta_time * ttl->ttl_dynamic_state.obj[i].fvy;
     }
 
     if (ttl->sea_udp) {
