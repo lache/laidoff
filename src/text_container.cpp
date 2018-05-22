@@ -436,7 +436,7 @@ void litehtml::text_container::on_anchor_click(const litehtml::tchar_t * url, co
     LOGIx("on_anchor_click: %s", url);
     if (strncmp(url, "script:", strlen("script:")) == 0) {
         script_evaluate_with_name_async(pLwc,
-                                        url + strlen("script:"),
+                                        url + strlen("script:"), // remove 'script:' prefix
                                         strlen(url + strlen("script:")),
                                         "on_anchor_click");
     } else {
@@ -446,7 +446,20 @@ void litehtml::text_container::on_anchor_click(const litehtml::tchar_t * url, co
         strcat(path, url);
         if (online) {
             if (pLwc->tcp_ttl) {
-                tcp_send_httpget(pLwc->tcp_ttl, url, lwttl_http_header(pLwc->ttl));
+                // make a script executing this asynchronously in logic thread;
+                // since lwttl_http_header() should be called in logic thread
+                //
+                // tcp_send_httpget(pLwc->tcp_ttl, url, lwttl_http_header(pLwc->ttl));
+                //
+                char scr[2048];
+                sprintf(scr,
+                        "local c = lo.script_context();"
+                        "lo.tcp_send_httpget(c.tcp_ttl, \"%s\", lo.lwttl_http_header(c.ttl))",
+                        url);
+                script_evaluate_with_name_async(pLwc,
+                                                scr,
+                                                strlen(scr),
+                                                "on_anchor_click 2");
             } else {
                 LOGE("tcp_ttl null");
             }
