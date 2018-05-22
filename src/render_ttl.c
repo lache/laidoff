@@ -13,7 +13,10 @@
 #include "lwlnglat.h"
 #include <assert.h>
 #include "render_morph.h"
-
+#include "platform_detection.h"
+#if LW_PLATFORM_IOS
+#include <alloca.h>
+#endif
 #define MAX_VISIBILITY_ENTRY_COUNT (32)
 #define MAX_VISIBILITY_ENTRY_NAME_LENGTH (32)
 static char visibility[MAX_VISIBILITY_ENTRY_COUNT][MAX_VISIBILITY_ENTRY_NAME_LENGTH];
