@@ -210,8 +210,8 @@ static void render_seaport_icon(const LWCONTEXT* pLwc, const mat4x4 view, const 
     render_solid_vb_ui_alpha_uv_shader_view_proj(pLwc,
                                                  x,
                                                  y - h / 2,
-                                                 w * 3,
-                                                 h * 3,
+                                                 w * 1,
+                                                 h * 1,
                                                  pLwc->tex_atlas[LAE_TTL_PORT],
                                                  pLwc->tex_atlas[LAE_TTL_PORT_ALPHA],
                                                  LVT_CENTER_BOTTOM_ANCHORED_SQUARE,
@@ -219,7 +219,7 @@ static void render_seaport_icon(const LWCONTEXT* pLwc, const mat4x4 view, const 
                                                  1.0f,
                                                  1.0f,
                                                  1.0f,
-                                                 0.0F,
+                                                 0.0f,
                                                  default_uv_offset,
                                                  default_uv_scale,
                                                  LWST_ETC1,
@@ -242,7 +242,7 @@ static void render_city_icon(const LWCONTEXT* pLwc, const mat4x4 view, const mat
                                                  1.0f,
                                                  1.0f,
                                                  1.0f,
-                                                 0.0F,
+                                                 0.0f,
                                                  default_uv_offset,
                                                  default_uv_scale,
                                                  LWST_ETC1,
@@ -776,7 +776,7 @@ int std_lower_bound_float(const float* a,
 }
 
 static void pos_from_waypoints(const LWPTTLWAYPOINTS* wp,
-                               float param,
+                               const float param,
                                const int reversed,
                                float* px,
                                float* py,
@@ -804,7 +804,7 @@ static void pos_from_waypoints(const LWPTTLWAYPOINTS* wp,
             return;
         }
         if (reversed) {
-            param = accum_distance[accum_distance_cursor - 1] - param;
+            //param = accum_distance[accum_distance_cursor - 1] - param;
         }
         int it_idx = std_lower_bound_float(accum_distance, 0, accum_distance_cursor, param);
         if (it_idx == 0) {
@@ -815,8 +815,8 @@ static void pos_from_waypoints(const LWPTTLWAYPOINTS* wp,
         } else if (it_idx == accum_distance_cursor) {
             *px = (float)wp->waypoints[wp->count - 1].x;
             *py = (float)wp->waypoints[wp->count - 1].y;
-            *dx = 0;
-            *dy = 0;
+            *dx = *px - (float)wp->waypoints[wp->count - 2].x;
+            *dy = *py - (float)wp->waypoints[wp->count - 2].y;
         } else {
             const xy32* wp1 = &wp->waypoints[it_idx - 1];
             const xy32* wp2 = &wp->waypoints[it_idx];
