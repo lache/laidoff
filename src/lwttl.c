@@ -1595,19 +1595,26 @@ const void* lwttl_world_text_next(const LWTTL* ttl, const void* it) {
     return valid_world_text_start(ttl, wt + 1);
 }
 
-void lwttl_udp_update(LWTTL* ttl, LWUDP* udp, LWCONTEXT* pLwc) {
-    if (pLwc->game_scene != LGS_TTL) {
+void lwttl_udp_update(LWTTL* ttl, LWCONTEXT* pLwc) {
+    if (ttl == 0 || ttl->sea_udp == 0) {
         return;
     }
-    if (udp->reinit_next_update) {
+    if (pLwc == 0 || pLwc->game_scene != LGS_TTL) {
+        return;
+    }
+    if (ttl->sea_udp->reinit_next_update) {
         destroy_udp(&ttl->sea_udp);
         ttl->sea_udp = new_udp();
         udp_update_addr_host(ttl->sea_udp,
                              pLwc->sea_udp_host_addr.host,
                              pLwc->sea_udp_host_addr.port,
                              pLwc->sea_udp_host_addr.port_str);
-        udp->reinit_next_update = 0;
+        ttl->sea_udp->reinit_next_update = 0;
     }
+    if (ttl->sea_udp == 0) {
+        LOGEP("ttl->sea_udp null");
+    }
+    LWUDP* udp = ttl->sea_udp;
     if (udp->ready == 0) {
         return;
     }
@@ -1851,7 +1858,7 @@ void lwttl_update(LWTTL* ttl, LWCONTEXT* pLwc, float delta_time) {
     }
 
     if (ttl->sea_udp) {
-        lwttl_udp_update(ttl, ttl->sea_udp, pLwc);
+        lwttl_udp_update(ttl, pLwc);
     }
 
     float dx = 0, dy = 0, dlen = 0;

@@ -43,7 +43,7 @@ int lwttl_clamped_view_scale(const LWTTL* ttl);
 void lwttl_set_sea_udp(LWTTL* ttl, LWUDP* sea_udp);
 void lwttl_udp_send_ttlping(const LWTTL* ttl, LWUDP* udp, int ping_seq);
 void lwttl_udp_send_request_waypoints(const LWTTL* ttl, LWUDP* sea_udp, int ship_id);
-void lwttl_udp_update(LWTTL* ttl, LWUDP* udp, LWCONTEXT* pLwc);
+void lwttl_udp_update(LWTTL* ttl, LWCONTEXT* pLwc);
 void lwttl_lock_rendering_mutex(LWTTL* ttl);
 void lwttl_unlock_rendering_mutex(LWTTL* ttl);
 const LWPTTLWAYPOINTS* lwttl_get_waypoints(const LWTTL* ttl);

@@ -98280,29 +98280,22 @@ fail:
 static int _wrap_lwttl_udp_update(lua_State* L) {
   int SWIG_arg = 0;
   LWTTL *arg1 = (LWTTL *) 0 ;
-  LWUDP *arg2 = (LWUDP *) 0 ;
-  LWCONTEXT *arg3 = (LWCONTEXT *) 0 ;
+  LWCONTEXT *arg2 = (LWCONTEXT *) 0 ;
   
-  SWIG_check_num_args("lwttl_udp_update",3,3)
+  SWIG_check_num_args("lwttl_udp_update",2,2)
   if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("lwttl_udp_update",1,"LWTTL *");
-  if(!SWIG_isptrtype(L,2)) SWIG_fail_arg("lwttl_udp_update",2,"LWUDP *");
-  if(!SWIG_isptrtype(L,3)) SWIG_fail_arg("lwttl_udp_update",3,"LWCONTEXT *");
+  if(!SWIG_isptrtype(L,2)) SWIG_fail_arg("lwttl_udp_update",2,"LWCONTEXT *");
   
   if (!SWIG_IsOK(SWIG_ConvertPtr(L,1,(void**)&arg1,SWIGTYPE_p__LWTTL,0))){
     SWIG_fail_ptr("lwttl_udp_update",1,SWIGTYPE_p__LWTTL);
   }
   
   
-  if (!SWIG_IsOK(SWIG_ConvertPtr(L,2,(void**)&arg2,SWIGTYPE_p__LWUDP,0))){
-    SWIG_fail_ptr("lwttl_udp_update",2,SWIGTYPE_p__LWUDP);
+  if (!SWIG_IsOK(SWIG_ConvertPtr(L,2,(void**)&arg2,SWIGTYPE_p__LWCONTEXT,0))){
+    SWIG_fail_ptr("lwttl_udp_update",2,SWIGTYPE_p__LWCONTEXT);
   }
   
-  
-  if (!SWIG_IsOK(SWIG_ConvertPtr(L,3,(void**)&arg3,SWIGTYPE_p__LWCONTEXT,0))){
-    SWIG_fail_ptr("lwttl_udp_update",3,SWIGTYPE_p__LWCONTEXT);
-  }
-  
-  lwttl_udp_update(arg1,arg2,arg3);
+  lwttl_udp_update(arg1,arg2);
   
   return SWIG_arg;
   
@@ -101966,8 +101959,8 @@ static swig_lua_const_info swig_SwigModule_constants[]= {
     {SWIG_LUA_CONSTTAB_INT("LPGM_COUNT", LPGM_COUNT)},
     {SWIG_LUA_CONSTTAB_INT("LW_PUSH_TOKEN_LENGTH", LW_PUSH_TOKEN_LENGTH)},
     {SWIG_LUA_CONSTTAB_INT("LW_SYS_MSG_LENGTH", LW_SYS_MSG_LENGTH)},
-    {SWIG_LUA_CONSTTAB_FLOAT("sea_render_scale", (50.0*14))},
-    {SWIG_LUA_CONSTTAB_FLOAT("earth_globe_render_scale", (45.0*14))},
+    {SWIG_LUA_CONSTTAB_FLOAT("sea_render_scale", (50.0*20))},
+    {SWIG_LUA_CONSTTAB_FLOAT("earth_globe_render_scale", (45.0*20))},
     {SWIG_LUA_CONSTTAB_INT("LNGLAT_RES_WIDTH", (172824))},
     {SWIG_LUA_CONSTTAB_INT("LNGLAT_RES_HEIGHT", (86412))},
     {SWIG_LUA_CONSTTAB_INT("LNGLAT_SEA_PING_EXTENT_IN_CELL_PIXELS", (16))},
