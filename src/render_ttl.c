@@ -745,10 +745,10 @@ static void render_earth(const LWCONTEXT* pLwc, const LWTTLLNGLAT* center, int v
                                  0);
 }
 
-static float distance_xy(const float ax,
-                         const float ay,
-                         const float bx,
-                         const float by) {
+static float distance_xy(const int ax,
+                         const int ay,
+                         const int bx,
+                         const int by) {
     return sqrtf((float)((ax - bx) * (ax - bx) + (ay - by) * (ay - by)));
 }
 
@@ -793,7 +793,7 @@ static void pos_from_waypoints(const LWPTTLWAYPOINTS* wp,
         size_t accum_distance_cursor = 0;
         float dist = 0;
         accum_distance[accum_distance_cursor++] = dist;
-        for (size_t i = 0; i < wp->count - 1; i++) {
+        for (size_t i = 0; i < (size_t)wp->count - 1; i++) {
             dist += distance_xy(wp->waypoints[i + 0].x,
                                 wp->waypoints[i + 0].y,
                                 wp->waypoints[i + 1].x,
@@ -1163,7 +1163,8 @@ static void render_cities(const LWCONTEXT* pLwc,
     const float cell_render_width = cell_x_to_render_coords(1, center, clamped_view_scale) - cell_x_to_render_coords(0, center, clamped_view_scale);
     const float cell_render_height = cell_y_to_render_coords(0, center, clamped_view_scale) - cell_y_to_render_coords(1, center, clamped_view_scale);
     const int view_scale_msb = msb_index(clamped_view_scale);
-    const float size_ratio = 1.0f / sqrtf((float)(view_scale_msb + 1));
+    //const float size_ratio = 1.0f / sqrtf((float)(view_scale_msb + 1));
+    const float size_ratio = 0.5f;
 
     int chunk_index_array[LNGLAT_RENDER_EXTENT_MULTIPLIER_LNG_WITH_MARGIN*LNGLAT_RENDER_EXTENT_MULTIPLIER_LAT_WITH_MARGIN];
     int bound_xcc0, bound_ycc0, bound_xcc1, bound_ycc1;
